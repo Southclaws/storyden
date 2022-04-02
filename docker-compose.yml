@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-default}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-default}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  rabbit:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - 5672:5672
+      - 8080:15672

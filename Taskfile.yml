@@ -1,0 +1,40 @@
+version: 3
+
+vars:
+  VERSION:
+    sh: git describe --always --dirty --tags
+
+tasks:
+  default:
+    deps: [api]
+    cmds:
+      - ./api.exe
+    sources:
+      - api/**/*.go
+
+  production:
+    cmds:
+      - ./api.exe
+
+  api:
+    cmds:
+      - go build -o api.exe -ldflags="-X 'github.com/Southclaws/storyden/api/src/config.Version={{.VERSION}}'" ./api/
+  api-image:
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE_TAG}} .
+
+  # -
+  # Code generation
+  # -
+
+  generate:
+    deps: [generate:db, generate:swagger]
+
+  generate:db:
+    cmds:
+      - go generate ./api/...
+
+  generate:swagger:
+    cmds:
+      - swag fmt --dir ./api
+      - swag init --dir ./api --output ./api/src/interfaces/swagger

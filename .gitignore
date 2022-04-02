@@ -1,0 +1,10 @@
+.env
+.task
+
+data/
+node_modules/
+
+*.exe
+*.db
+
+.DS_Store
