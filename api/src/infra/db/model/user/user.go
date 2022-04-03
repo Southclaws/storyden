@@ -95,6 +95,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 	// DefaultAdmin holds the default value on creation for the "admin" field.
 	DefaultAdmin bool
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.

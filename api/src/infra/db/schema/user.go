@@ -22,8 +22,8 @@ func (User) Fields() []ent.Field {
             Immutable().
             Default(uuid.New),
 
-        field.String("email"),
-        field.String("name"),
+        field.String("email").Unique(),
+        field.String("name").NotEmpty(),
         field.String("bio").Optional(),
         field.Bool("admin").Default(false),
 

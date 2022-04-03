@@ -265,6 +265,11 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "User.name"`)}
 	}
+	if v, ok := uc.mutation.Name(); ok {
+		if err := user.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`model: validator failed for field "User.name": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`model: missing required field "User.admin"`)}
 	}

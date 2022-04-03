@@ -42,6 +42,10 @@ func init() {
 	post.DefaultPinned = postDescPinned.Default.(bool)
 	userFields := schema.User{}.Fields()
 	_ = userFields
+	// userDescName is the schema descriptor for name field.
+	userDescName := userFields[2].Descriptor()
+	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	user.NameValidator = userDescName.Validators[0].(func(string) error)
 	// userDescAdmin is the schema descriptor for admin field.
 	userDescAdmin := userFields[4].Descriptor()
 	// user.DefaultAdmin holds the default value on creation for the admin field.

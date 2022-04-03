@@ -25,4 +25,9 @@ func TestCreate(t *testing.T) {
 
 	assert.Equal(t, SeedUser_01_Admin.Email, u1.Email)
 	assert.Equal(t, SeedUser_01_Admin.Name, u1.Name)
+
+	// Duplicate email address should fail.
+	u2, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+	require.Error(t, err)
+	assert.Nil(t, u2)
 }
