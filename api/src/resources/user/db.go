@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -35,7 +34,6 @@ func (d *DB) CreateUser(ctx context.Context, email string, username string) (*Us
 }
 
 func (d *DB) GetUser(ctx context.Context, userId UserID, public bool) (*User, error) {
-	fmt.Println(uuid.UUID(userId).String())
 	user, err := d.db.User.Get(ctx, uuid.UUID(userId))
 	if err != nil {
 		if model.IsNotFound(err) {

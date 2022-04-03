@@ -91,7 +91,7 @@ func (m *mockRepo) Ban(ctx context.Context, userId UserID) (*User, error) {
 	update.DeletedAt = optional.Of(time.Now())
 	m.m[userId] = update
 
-	return nil, nil
+	return &update, nil
 }
 
 func (m *mockRepo) Unban(ctx context.Context, userId UserID) (*User, error) {
@@ -99,5 +99,5 @@ func (m *mockRepo) Unban(ctx context.Context, userId UserID) (*User, error) {
 	update.DeletedAt = nil
 	m.m[userId] = update
 
-	return nil, nil
+	return &update, nil
 }

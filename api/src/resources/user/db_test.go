@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -12,8 +13,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func implementations(t *testing.T, seed bool) []utils.ImplConstructor[Repository] {
+	if seed {
+		return []utils.ImplConstructor[Repository]{
+			func() Repository { return NewWithSeed(db.TestDB(t)) },
+			func() Repository { return NewMockWithSeed() },
+		}
+	} else {
+		return []utils.ImplConstructor[Repository]{
+			func() Repository { return New(db.TestDB(t)) },
+			func() Repository { return NewMock() },
+		}
+	}
+}
+
 func TestCreateUser(t *testing.T) {
-	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+	utils.TestAll(t, implementations(t, false),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -39,7 +54,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetByID(t *testing.T) {
-	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+	utils.TestAll(t, implementations(t, false),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -57,7 +72,7 @@ func TestGetByID(t *testing.T) {
 }
 
 func TestGetByEmail(t *testing.T) {
-	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+	utils.TestAll(t, implementations(t, false),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -75,7 +90,7 @@ func TestGetByEmail(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+	utils.TestAll(t, implementations(t, true),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -91,14 +106,14 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	utils.TestAll(t, []Repository{
-		NewWithSeed(db.TestDB(t)),
-		NewMockWithSeed(),
-	},
+	utils.TestAll(t, implementations(t, true),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
+			fmt.Println("BEFORE GET", SeedUser_02_User.ID)
+
 			before, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
+			fmt.Println(before, err, SeedUser_02_User.ID)
 			require.NoError(t, err)
 			assert.NotNil(t, before)
 
@@ -111,7 +126,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestSetAdmin(t *testing.T) {
-	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+	utils.TestAll(t, implementations(t, true),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -126,7 +141,7 @@ func TestSetAdmin(t *testing.T) {
 }
 
 func TestBan(t *testing.T) {
-	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+	utils.TestAll(t, implementations(t, true),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
@@ -144,7 +159,7 @@ func TestBan(t *testing.T) {
 }
 
 func TestUnban(t *testing.T) {
-	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+	utils.TestAll(t, implementations(t, true),
 		func(t *testing.T, r Repository) {
 			ctx := context.Background()
 
