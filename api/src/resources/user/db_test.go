@@ -12,146 +12,157 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreate(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := New(db)
+func TestCreateUser(t *testing.T) {
+	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-	require.NoError(t, err)
-	require.NotNil(t, u)
+			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+			require.NoError(t, err)
+			require.NotNil(t, u)
 
-	assert.Equal(t, SeedUser_01_Admin.Email, u.Email)
-	assert.Equal(t, SeedUser_01_Admin.Name, u.Name)
+			assert.Equal(t, SeedUser_01_Admin.Email, u.Email)
+			assert.Equal(t, SeedUser_01_Admin.Name, u.Name)
 
-	u1, err := r.GetUser(ctx, u.ID, false)
-	require.NoError(t, err)
-	assert.NotNil(t, u1)
+			u1, err := r.GetUser(ctx, u.ID, false)
+			require.NoError(t, err)
+			assert.NotNil(t, u1)
 
-	assert.Equal(t, SeedUser_01_Admin.Email, u1.Email)
-	assert.Equal(t, SeedUser_01_Admin.Name, u1.Name)
+			assert.Equal(t, SeedUser_01_Admin.Email, u1.Email)
+			assert.Equal(t, SeedUser_01_Admin.Name, u1.Name)
 
-	// Duplicate email address should fail.
-	u2, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-	assert.Error(t, err)
-	assert.Nil(t, u2)
+			// Duplicate email address should fail.
+			u2, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+			require.Error(t, err)
+			assert.Nil(t, u2)
+		})
 }
 
 func TestGetByID(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := New(db)
+	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	none, err := r.GetUser(ctx, SeedUser_01_Admin.ID, false)
-	require.NoError(t, err)
-	assert.Nil(t, none)
+			none, err := r.GetUser(ctx, SeedUser_01_Admin.ID, false)
+			require.NoError(t, err)
+			assert.Nil(t, none)
 
-	u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-	require.NoError(t, err)
+			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+			require.NoError(t, err)
 
-	u, err = r.GetUser(ctx, u.ID, false)
-	require.NoError(t, err)
-	assert.NotNil(t, u)
+			u, err = r.GetUser(ctx, u.ID, false)
+			require.NoError(t, err)
+			assert.NotNil(t, u)
+		})
 }
 
 func TestGetByEmail(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := New(db)
+	utils.TestAll(t, []Repository{New(db.TestDB(t)), NewMock()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	none, err := r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
-	require.NoError(t, err)
-	assert.Nil(t, none)
+			none, err := r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
+			require.NoError(t, err)
+			assert.Nil(t, none)
 
-	u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-	require.NoError(t, err)
+			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+			require.NoError(t, err)
 
-	u, err = r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
-	require.NoError(t, err)
-	assert.NotNil(t, u)
+			u, err = r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
+			require.NoError(t, err)
+			assert.NotNil(t, u)
+		})
 }
 
 func TestGetAll(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := NewWithSeed(db)
+	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	u, err := r.GetUsers(ctx, "asc", 10, 0, false)
-	require.NoError(t, err)
-	assert.NotNil(t, u)
+			u, err := r.GetUsers(ctx, "asc", 10, 0, false)
+			require.NoError(t, err)
+			assert.NotNil(t, u)
 
-	emails := lo.Map(u, func(t User, i int) string { return t.Email })
+			emails := lo.Map(u, func(t User, i int) string { return t.Email })
 
-	assert.Contains(t, emails, SeedUser_01_Admin.Email)
-	assert.Contains(t, emails, SeedUser_02_User.Email)
+			assert.Contains(t, emails, SeedUser_01_Admin.Email)
+			assert.Contains(t, emails, SeedUser_02_User.Email)
+		})
 }
 
 func TestUpdateUser(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := NewWithSeed(db)
+	utils.TestAll(t, []Repository{
+		NewWithSeed(db.TestDB(t)),
+		NewMockWithSeed(),
+	},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	before, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-	require.NoError(t, err)
-	assert.NotNil(t, before)
+			before, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
+			require.NoError(t, err)
+			assert.NotNil(t, before)
 
-	after, err := r.UpdateUser(ctx, SeedUser_02_User.ID, utils.Ref("timmy@storyd.en"), nil, nil)
-	require.NoError(t, err)
-	require.NotNil(t, after)
+			after, err := r.UpdateUser(ctx, SeedUser_02_User.ID, utils.Ref("timmy@storyd.en"), nil, nil)
+			require.NoError(t, err)
+			require.NotNil(t, after)
 
-	assert.Equal(t, "timmy@storyd.en", after.Email)
+			assert.Equal(t, "timmy@storyd.en", after.Email)
+		})
 }
 
 func TestSetAdmin(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := NewWithSeed(db)
+	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	err := r.SetAdmin(ctx, SeedUser_02_User.ID, true)
-	require.NoError(t, err)
+			err := r.SetAdmin(ctx, SeedUser_02_User.ID, true)
+			require.NoError(t, err)
 
-	after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-	require.NoError(t, err)
-	require.NotNil(t, after)
-	assert.True(t, after.Admin)
+			after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
+			require.NoError(t, err)
+			require.NotNil(t, after)
+			assert.True(t, after.Admin)
+		})
 }
 
 func TestBan(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := NewWithSeed(db)
+	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	u, err := r.Ban(ctx, SeedUser_02_User.ID)
-	require.NoError(t, err)
-	require.NotNil(t, u)
+			u, err := r.Ban(ctx, SeedUser_02_User.ID)
+			require.NoError(t, err)
+			require.NotNil(t, u)
 
-	after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-	require.NoError(t, err)
-	require.NotNil(t, after)
+			after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
+			require.NoError(t, err)
+			require.NotNil(t, after)
 
-	assert.True(t, after.DeletedAt.IsPresent())
-	assert.WithinDuration(t, time.Now(), after.DeletedAt.ElseZero(), time.Second)
+			assert.True(t, after.DeletedAt.IsPresent())
+			assert.WithinDuration(t, time.Now(), after.DeletedAt.ElseZero(), time.Second)
+		})
 }
 
 func TestUnban(t *testing.T) {
-	ctx := context.Background()
-	db := db.TestDB(t)
-	r := NewWithSeed(db)
+	utils.TestAll(t, []Repository{NewWithSeed(db.TestDB(t)), NewMockWithSeed()},
+		func(t *testing.T, r Repository) {
+			ctx := context.Background()
 
-	u1, err := r.Ban(ctx, SeedUser_02_User.ID)
-	require.NoError(t, err)
-	require.NotNil(t, u1)
+			u1, err := r.Ban(ctx, SeedUser_02_User.ID)
+			require.NoError(t, err)
+			require.NotNil(t, u1)
 
-	u2, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-	require.NoError(t, err)
-	require.NotNil(t, u2)
+			u2, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
+			require.NoError(t, err)
+			require.NotNil(t, u2)
 
-	assert.True(t, u2.DeletedAt.IsPresent())
-	assert.WithinDuration(t, time.Now(), u2.DeletedAt.ElseZero(), time.Second)
+			assert.True(t, u2.DeletedAt.IsPresent())
+			assert.WithinDuration(t, time.Now(), u2.DeletedAt.ElseZero(), time.Second)
 
-	u3, err := r.Unban(ctx, SeedUser_02_User.ID)
-	require.NoError(t, err)
-	require.NotNil(t, u3)
+			u3, err := r.Unban(ctx, SeedUser_02_User.ID)
+			require.NoError(t, err)
+			require.NotNil(t, u3)
 
-	assert.False(t, u3.DeletedAt.IsPresent())
+			assert.False(t, u3.DeletedAt.IsPresent())
+		})
 }

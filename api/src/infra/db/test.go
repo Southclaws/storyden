@@ -3,19 +3,9 @@ package db
 import (
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/rule"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/server"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 )
 
 func TestDB(t *testing.T) *model.Client {
@@ -30,26 +20,26 @@ func TestDB(t *testing.T) *model.Client {
 	}
 
 	t.Cleanup(func() {
-		tables := []string{
-			notification.Table,
-			subscription.Table,
-			react.Table,
-			rule.Table,
-			server.Table,
-			user.Table,
-			category.Table,
-			tag.Table,
-			post.Table,
-		}
+		// tables := []string{
+		// 	notification.Table,
+		// 	subscription.Table,
+		// 	react.Table,
+		// 	rule.Table,
+		// 	server.Table,
+		// 	user.Table,
+		// 	category.Table,
+		// 	tag.Table,
+		// 	post.Table,
+		// }
 
-		q := fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))
+		// q := fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))
 
-		if _, err := d.Exec(q); err != nil {
-			t.Fatal(err)
-		}
+		// if _, err := d.Exec(q); err != nil {
+		// 	t.Fatal(err)
+		// }
 		c.Close()
 
-		fmt.Println("--- Cleaned database after test")
+		fmt.Println("--- Cleaned database after test", d)
 	})
 
 	return c

@@ -12,6 +12,8 @@ import (
 
 type UserID uuid.UUID
 
+func (u UserID) String() string { return uuid.UUID(u).String() }
+
 type User struct {
 	ID          UserID                    `json:"id"`
 	Email       string                    `json:"email"`

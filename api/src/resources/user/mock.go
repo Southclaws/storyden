@@ -22,9 +22,11 @@ func NewMock() Repository {
 }
 
 func (m *mockRepo) CreateUser(ctx context.Context, email string, username string) (*User, error) {
-	m.r.CreateUser(ctx, email, username)
-
 	id := uuid.New()
+
+	if _, ok := lo.Find(lo.Values(m.m), func(t User) bool { return email == t.Email }); ok {
+		return nil, errors.New("email already exists")
+	}
 
 	u := User{
 		ID:    UserID(id),
@@ -38,30 +40,27 @@ func (m *mockRepo) CreateUser(ctx context.Context, email string, username string
 }
 
 func (m *mockRepo) GetUser(ctx context.Context, userId UserID, public bool) (*User, error) {
-	m.r.GetUser(ctx, userId, public)
-
-	return utils.Ref(m.m[userId]), nil
+	u, ok := m.m[userId]
+	if !ok {
+		return nil, nil
+	}
+	return utils.Ref(u), nil
 }
 
 func (m *mockRepo) GetUserByEmail(ctx context.Context, email string, public bool) (*User, error) {
-	m.r.GetUserByEmail(ctx, email, public)
-
 	u, ok := lo.Find(lo.Values(m.m), func(t User) bool { return email == t.Email })
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, nil
 	}
 
 	return &u, nil
 }
 
 func (m *mockRepo) GetUsers(ctx context.Context, sort string, max, skip int, public bool) ([]User, error) {
-	m.r.GetUsers(ctx, sort, max, skip, public)
 	return lo.Values(m.m), nil
 }
 
 func (m *mockRepo) UpdateUser(ctx context.Context, userId UserID, email, name, bio *string) (*User, error) {
-	m.r.UpdateUser(ctx, userId, email, name, bio)
-
 	update := m.m[userId]
 
 	if email != nil {
@@ -80,8 +79,6 @@ func (m *mockRepo) UpdateUser(ctx context.Context, userId UserID, email, name, b
 }
 
 func (m *mockRepo) SetAdmin(ctx context.Context, userId UserID, status bool) error {
-	m.r.SetAdmin(ctx, userId, status)
-
 	update := m.m[userId]
 	update.Admin = status
 	m.m[userId] = update
@@ -90,8 +87,6 @@ func (m *mockRepo) SetAdmin(ctx context.Context, userId UserID, status bool) err
 }
 
 func (m *mockRepo) Ban(ctx context.Context, userId UserID) (*User, error) {
-	m.r.Ban(ctx, userId)
-
 	update := m.m[userId]
 	update.DeletedAt = optional.Of(time.Now())
 	m.m[userId] = update
@@ -100,8 +95,6 @@ func (m *mockRepo) Ban(ctx context.Context, userId UserID) (*User, error) {
 }
 
 func (m *mockRepo) Unban(ctx context.Context, userId UserID) (*User, error) {
-	m.r.Unban(ctx, userId)
-
 	update := m.m[userId]
 	update.DeletedAt = nil
 	m.m[userId] = update

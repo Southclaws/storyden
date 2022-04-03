@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"4d63.com/optional"
 	"github.com/google/uuid"
@@ -48,4 +49,6 @@ func Seed(r Repository) {
 
 	u, _ = r.CreateUser(ctx, SeedUser_02_User.Email, SeedUser_02_User.Name)
 	SeedUser_02_User.ID = u.ID
+
+	fmt.Println("created seed users", SeedUser_01_Admin.ID, SeedUser_02_User.ID)
 }
