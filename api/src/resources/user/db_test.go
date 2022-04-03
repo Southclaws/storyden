@@ -19,4 +19,10 @@ func TestCreate(t *testing.T) {
 
 	assert.Equal(t, SeedUser_01_Admin.Email, u.Email)
 	assert.Equal(t, SeedUser_01_Admin.Name, u.Name)
+
+	u1, err := r.GetUser(ctx, u.ID, false)
+	require.NoError(t, err)
+
+	assert.Equal(t, SeedUser_01_Admin.Email, u1.Email)
+	assert.Equal(t, SeedUser_01_Admin.Name, u1.Name)
 }

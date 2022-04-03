@@ -48,6 +48,8 @@ func TestDB(t *testing.T) *model.Client {
 			t.Fatal(err)
 		}
 		c.Close()
+
+		fmt.Println("--- Cleaned database after test")
 	})
 
 	return c
