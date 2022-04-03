@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
+	"github.com/Southclaws/storyden/api/src/utils"
 )
 
 type UserID uuid.UUID
@@ -34,7 +35,7 @@ func FromModel(u model.User) (o User) {
 		Admin:     u.Admin,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		DeletedAt: optional.Of(u.DeletedAt),
+		DeletedAt: utils.OptionalZero(u.DeletedAt),
 	}
 
 	return result

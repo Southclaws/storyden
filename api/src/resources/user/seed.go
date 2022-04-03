@@ -41,6 +41,11 @@ func NewWithSeed(db *model.Client) Repository {
 func Seed(r Repository) {
 	ctx := context.Background()
 
-	r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-	r.CreateUser(ctx, SeedUser_02_User.Email, SeedUser_02_User.Name)
+	var u *User
+
+	u, _ = r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
+	SeedUser_01_Admin.ID = u.ID
+
+	u, _ = r.CreateUser(ctx, SeedUser_02_User.Email, SeedUser_02_User.Name)
+	SeedUser_02_User.ID = u.ID
 }
