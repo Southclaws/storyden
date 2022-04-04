@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Southclaws/storyden/api/src/infra/db"
-	"github.com/Southclaws/storyden/ent"
+	"github.com/Southclaws/storyden/api/src/infra/db/model"
 )
 
 var (
@@ -16,10 +16,10 @@ var (
 )
 
 type DB struct {
-	db *ent.Client
+	db *model.Client
 }
 
-func New(db *ent.Client) Repository {
+func New(db *model.Client) Repository {
 	return &DB{db}
 }
 

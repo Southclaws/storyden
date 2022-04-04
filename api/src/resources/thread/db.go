@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/api/src/infra/db"
+	"github.com/Southclaws/storyden/api/src/infra/db/model"
 	"github.com/Southclaws/storyden/api/src/resources/post"
-	"github.com/Southclaws/storyden/ent"
 )
 
 var (
@@ -20,10 +20,10 @@ var (
 )
 
 type DB struct {
-	db *ent.Client
+	db *model.Client
 }
 
-func New(db *ent.Client) Repository {
+func New(db *model.Client) Repository {
 	return &DB{db}
 }
 

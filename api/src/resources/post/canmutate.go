@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/api/src/infra/db"
-	"github.com/Southclaws/storyden/ent"
+	"github.com/Southclaws/storyden/api/src/infra/db/model"
 )
 
-func CanUserMutatePost(ctx context.Context, d *ent.Client, authorID, id string) error {
+func CanUserMutatePost(ctx context.Context, d *model.Client, authorID, id string) error {
 	// First, check if this user is the author of the post.
 	post, err := d.Post.
 		FindUnique(db.Post.ID.Equals(id)).

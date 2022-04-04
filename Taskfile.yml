@@ -19,7 +19,11 @@ tasks:
   api:
     cmds:
       - go build -o api.exe -ldflags="-X 'github.com/Southclaws/storyden/api/src/config.Version={{.VERSION}}'" ./api/
-  api-image:
+  api:test:
+    cmds:
+      - go test -p 1 -race ./api/...
+
+  api:image:
     cmds:
       - docker build -t {{.DOCKER_IMAGE_TAG}} .
 
