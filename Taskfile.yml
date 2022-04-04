@@ -36,7 +36,7 @@ tasks:
 
   generate:db:
     cmds:
-      - go generate ./api/...
+      - go generate ./api/src/infra/db/...
 
   generate:swagger:
     cmds:

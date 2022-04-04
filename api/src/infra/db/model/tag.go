@@ -19,8 +19,7 @@ type Tag struct {
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TagQuery when eager-loading is set.
-	Edges     TagEdges `json:"edges"`
-	post_tags *string
+	Edges TagEdges `json:"edges"`
 }
 
 // TagEdges holds the relations/edges for other nodes in the graph.
@@ -48,8 +47,6 @@ func (*Tag) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case tag.FieldID, tag.FieldName:
 			values[i] = new(sql.NullString)
-		case tag.ForeignKeys[0]: // post_tags
-			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Tag", columns[i])
 		}
@@ -76,13 +73,6 @@ func (t *Tag) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				t.Name = value.String
-			}
-		case tag.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field post_tags", values[i])
-			} else if value.Valid {
-				t.post_tags = new(string)
-				*t.post_tags = value.String
 			}
 		}
 	}

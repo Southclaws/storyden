@@ -13,13 +13,11 @@ const (
 	EdgePosts = "posts"
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
-	// PostsTable is the table that holds the posts relation/edge.
-	PostsTable = "posts"
+	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
+	PostsTable = "tag_posts"
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
-	// PostsColumn is the table column denoting the posts relation/edge.
-	PostsColumn = "tag_posts"
 )
 
 // Columns holds all SQL columns for tag fields.
@@ -28,21 +26,16 @@ var Columns = []string{
 	FieldName,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "tags"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"post_tags",
-}
+var (
+	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
+	// primary key for the posts relation (M2M).
+	PostsPrimaryKey = []string{"tag_id", "post_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

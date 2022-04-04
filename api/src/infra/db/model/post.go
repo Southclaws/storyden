@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -45,30 +46,27 @@ type Post struct {
 	CategoryId string `json:"categoryId,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
-	Edges          PostEdges `json:"edges"`
-	category_posts *string
-	post_posts     *string
-	react_post     *string
-	tag_posts      *string
-	user_posts     *uuid.UUID
+	Edges      PostEdges `json:"edges"`
+	react_post *string
+	user_posts *uuid.UUID
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
 type PostEdges struct {
+	// Author holds the value of the author edge.
+	Author *User `json:"author,omitempty"`
 	// Category holds the value of the category edge.
 	Category []*Category `json:"category,omitempty"`
-	// Author holds the value of the author edge.
-	Author []*User `json:"author,omitempty"`
-	// Root holds the value of the root edge.
-	Root *Post `json:"root,omitempty"`
-	// Posts holds the value of the posts edge.
-	Posts []*Post `json:"posts,omitempty"`
-	// ReplyTo holds the value of the replyTo edge.
-	ReplyTo []*Post `json:"replyTo,omitempty"`
-	// Replies holds the value of the replies edge.
-	Replies []*Post `json:"replies,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Root holds the value of the root edge.
+	Root []*Post `json:"root,omitempty"`
+	// Posts holds the value of the posts edge.
+	Posts []*Post `json:"posts,omitempty"`
+	// Replies holds the value of the replies edge.
+	Replies []*Post `json:"replies,omitempty"`
+	// ReplyTo holds the value of the replyTo edge.
+	ReplyTo []*Post `json:"replyTo,omitempty"`
 	// Reacts holds the value of the reacts edge.
 	Reacts []*React `json:"reacts,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -76,33 +74,42 @@ type PostEdges struct {
 	loadedTypes [8]bool
 }
 
-// CategoryOrErr returns the Category value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) CategoryOrErr() ([]*Category, error) {
-	if e.loadedTypes[0] {
-		return e.Category, nil
-	}
-	return nil, &NotLoadedError{edge: "category"}
-}
-
 // AuthorOrErr returns the Author value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) AuthorOrErr() ([]*User, error) {
-	if e.loadedTypes[1] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) AuthorOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.Author == nil {
+			// The edge author was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
 		return e.Author, nil
 	}
 	return nil, &NotLoadedError{edge: "author"}
 }
 
-// RootOrErr returns the Root value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e PostEdges) RootOrErr() (*Post, error) {
+// CategoryOrErr returns the Category value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) CategoryOrErr() ([]*Category, error) {
+	if e.loadedTypes[1] {
+		return e.Category, nil
+	}
+	return nil, &NotLoadedError{edge: "category"}
+}
+
+// TagsOrErr returns the Tags value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) TagsOrErr() ([]*Tag, error) {
 	if e.loadedTypes[2] {
-		if e.Root == nil {
-			// The edge root was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: post.Label}
-		}
+		return e.Tags, nil
+	}
+	return nil, &NotLoadedError{edge: "tags"}
+}
+
+// RootOrErr returns the Root value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) RootOrErr() ([]*Post, error) {
+	if e.loadedTypes[3] {
 		return e.Root, nil
 	}
 	return nil, &NotLoadedError{edge: "root"}
@@ -111,19 +118,10 @@ func (e PostEdges) RootOrErr() (*Post, error) {
 // PostsOrErr returns the Posts value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) PostsOrErr() ([]*Post, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
-}
-
-// ReplyToOrErr returns the ReplyTo value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) ReplyToOrErr() ([]*Post, error) {
-	if e.loadedTypes[4] {
-		return e.ReplyTo, nil
-	}
-	return nil, &NotLoadedError{edge: "replyTo"}
 }
 
 // RepliesOrErr returns the Replies value or an error if the edge
@@ -135,13 +133,13 @@ func (e PostEdges) RepliesOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "replies"}
 }
 
-// TagsOrErr returns the Tags value or an error if the edge
+// ReplyToOrErr returns the ReplyTo value or an error if the edge
 // was not loaded in eager-loading.
-func (e PostEdges) TagsOrErr() ([]*Tag, error) {
+func (e PostEdges) ReplyToOrErr() ([]*Post, error) {
 	if e.loadedTypes[6] {
-		return e.Tags, nil
+		return e.ReplyTo, nil
 	}
-	return nil, &NotLoadedError{edge: "tags"}
+	return nil, &NotLoadedError{edge: "replyTo"}
 }
 
 // ReactsOrErr returns the Reacts value or an error if the edge
@@ -164,15 +162,9 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case post.ForeignKeys[0]: // category_posts
+		case post.ForeignKeys[0]: // react_post
 			values[i] = new(sql.NullString)
-		case post.ForeignKeys[1]: // post_posts
-			values[i] = new(sql.NullString)
-		case post.ForeignKeys[2]: // react_post
-			values[i] = new(sql.NullString)
-		case post.ForeignKeys[3]: // tag_posts
-			values[i] = new(sql.NullString)
-		case post.ForeignKeys[4]: // user_posts
+		case post.ForeignKeys[1]: // user_posts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
@@ -275,33 +267,12 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			}
 		case post.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field category_posts", values[i])
-			} else if value.Valid {
-				po.category_posts = new(string)
-				*po.category_posts = value.String
-			}
-		case post.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field post_posts", values[i])
-			} else if value.Valid {
-				po.post_posts = new(string)
-				*po.post_posts = value.String
-			}
-		case post.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field react_post", values[i])
 			} else if value.Valid {
 				po.react_post = new(string)
 				*po.react_post = value.String
 			}
-		case post.ForeignKeys[3]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tag_posts", values[i])
-			} else if value.Valid {
-				po.tag_posts = new(string)
-				*po.tag_posts = value.String
-			}
-		case post.ForeignKeys[4]:
+		case post.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_posts", values[i])
 			} else if value.Valid {
@@ -313,14 +284,19 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 	return nil
 }
 
+// QueryAuthor queries the "author" edge of the Post entity.
+func (po *Post) QueryAuthor() *UserQuery {
+	return (&PostClient{config: po.config}).QueryAuthor(po)
+}
+
 // QueryCategory queries the "category" edge of the Post entity.
 func (po *Post) QueryCategory() *CategoryQuery {
 	return (&PostClient{config: po.config}).QueryCategory(po)
 }
 
-// QueryAuthor queries the "author" edge of the Post entity.
-func (po *Post) QueryAuthor() *UserQuery {
-	return (&PostClient{config: po.config}).QueryAuthor(po)
+// QueryTags queries the "tags" edge of the Post entity.
+func (po *Post) QueryTags() *TagQuery {
+	return (&PostClient{config: po.config}).QueryTags(po)
 }
 
 // QueryRoot queries the "root" edge of the Post entity.
@@ -333,19 +309,14 @@ func (po *Post) QueryPosts() *PostQuery {
 	return (&PostClient{config: po.config}).QueryPosts(po)
 }
 
-// QueryReplyTo queries the "replyTo" edge of the Post entity.
-func (po *Post) QueryReplyTo() *PostQuery {
-	return (&PostClient{config: po.config}).QueryReplyTo(po)
-}
-
 // QueryReplies queries the "replies" edge of the Post entity.
 func (po *Post) QueryReplies() *PostQuery {
 	return (&PostClient{config: po.config}).QueryReplies(po)
 }
 
-// QueryTags queries the "tags" edge of the Post entity.
-func (po *Post) QueryTags() *TagQuery {
-	return (&PostClient{config: po.config}).QueryTags(po)
+// QueryReplyTo queries the "replyTo" edge of the Post entity.
+func (po *Post) QueryReplyTo() *PostQuery {
+	return (&PostClient{config: po.config}).QueryReplyTo(po)
 }
 
 // QueryReacts queries the "reacts" edge of the Post entity.

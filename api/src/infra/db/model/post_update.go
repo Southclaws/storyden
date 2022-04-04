@@ -203,6 +203,17 @@ func (pu *PostUpdate) ClearCategoryId() *PostUpdate {
 	return pu
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (pu *PostUpdate) SetAuthorID(id uuid.UUID) *PostUpdate {
+	pu.mutation.SetAuthorID(id)
+	return pu
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (pu *PostUpdate) SetAuthor(u *User) *PostUpdate {
+	return pu.SetAuthorID(u.ID)
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (pu *PostUpdate) AddCategoryIDs(ids ...string) *PostUpdate {
 	pu.mutation.AddCategoryIDs(ids...)
@@ -218,38 +229,34 @@ func (pu *PostUpdate) AddCategory(c ...*Category) *PostUpdate {
 	return pu.AddCategoryIDs(ids...)
 }
 
-// AddAuthorIDs adds the "author" edge to the User entity by IDs.
-func (pu *PostUpdate) AddAuthorIDs(ids ...uuid.UUID) *PostUpdate {
-	pu.mutation.AddAuthorIDs(ids...)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (pu *PostUpdate) AddTagIDs(ids ...string) *PostUpdate {
+	pu.mutation.AddTagIDs(ids...)
 	return pu
 }
 
-// AddAuthor adds the "author" edges to the User entity.
-func (pu *PostUpdate) AddAuthor(u ...*User) *PostUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddTags adds the "tags" edges to the Tag entity.
+func (pu *PostUpdate) AddTags(t ...*Tag) *PostUpdate {
+	ids := make([]string, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return pu.AddAuthorIDs(ids...)
+	return pu.AddTagIDs(ids...)
 }
 
-// SetRootID sets the "root" edge to the Post entity by ID.
-func (pu *PostUpdate) SetRootID(id string) *PostUpdate {
-	pu.mutation.SetRootID(id)
+// AddRootIDs adds the "root" edge to the Post entity by IDs.
+func (pu *PostUpdate) AddRootIDs(ids ...string) *PostUpdate {
+	pu.mutation.AddRootIDs(ids...)
 	return pu
 }
 
-// SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (pu *PostUpdate) SetNillableRootID(id *string) *PostUpdate {
-	if id != nil {
-		pu = pu.SetRootID(*id)
+// AddRoot adds the "root" edges to the Post entity.
+func (pu *PostUpdate) AddRoot(p ...*Post) *PostUpdate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pu
-}
-
-// SetRoot sets the "root" edge to the Post entity.
-func (pu *PostUpdate) SetRoot(p *Post) *PostUpdate {
-	return pu.SetRootID(p.ID)
+	return pu.AddRootIDs(ids...)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -267,21 +274,6 @@ func (pu *PostUpdate) AddPosts(p ...*Post) *PostUpdate {
 	return pu.AddPostIDs(ids...)
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
-func (pu *PostUpdate) AddReplyToIDs(ids ...string) *PostUpdate {
-	pu.mutation.AddReplyToIDs(ids...)
-	return pu
-}
-
-// AddReplyTo adds the "replyTo" edges to the Post entity.
-func (pu *PostUpdate) AddReplyTo(p ...*Post) *PostUpdate {
-	ids := make([]string, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return pu.AddReplyToIDs(ids...)
-}
-
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
 func (pu *PostUpdate) AddReplyIDs(ids ...string) *PostUpdate {
 	pu.mutation.AddReplyIDs(ids...)
@@ -297,19 +289,19 @@ func (pu *PostUpdate) AddReplies(p ...*Post) *PostUpdate {
 	return pu.AddReplyIDs(ids...)
 }
 
-// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pu *PostUpdate) AddTagIDs(ids ...string) *PostUpdate {
-	pu.mutation.AddTagIDs(ids...)
+// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
+func (pu *PostUpdate) AddReplyToIDs(ids ...string) *PostUpdate {
+	pu.mutation.AddReplyToIDs(ids...)
 	return pu
 }
 
-// AddTags adds the "tags" edges to the Tag entity.
-func (pu *PostUpdate) AddTags(t ...*Tag) *PostUpdate {
-	ids := make([]string, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddReplyTo adds the "replyTo" edges to the Post entity.
+func (pu *PostUpdate) AddReplyTo(p ...*Post) *PostUpdate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pu.AddTagIDs(ids...)
+	return pu.AddReplyToIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -330,6 +322,12 @@ func (pu *PostUpdate) AddReacts(r ...*React) *PostUpdate {
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (pu *PostUpdate) ClearAuthor() *PostUpdate {
+	pu.mutation.ClearAuthor()
+	return pu
 }
 
 // ClearCategory clears all "category" edges to the Category entity.
@@ -353,31 +351,46 @@ func (pu *PostUpdate) RemoveCategory(c ...*Category) *PostUpdate {
 	return pu.RemoveCategoryIDs(ids...)
 }
 
-// ClearAuthor clears all "author" edges to the User entity.
-func (pu *PostUpdate) ClearAuthor() *PostUpdate {
-	pu.mutation.ClearAuthor()
+// ClearTags clears all "tags" edges to the Tag entity.
+func (pu *PostUpdate) ClearTags() *PostUpdate {
+	pu.mutation.ClearTags()
 	return pu
 }
 
-// RemoveAuthorIDs removes the "author" edge to User entities by IDs.
-func (pu *PostUpdate) RemoveAuthorIDs(ids ...uuid.UUID) *PostUpdate {
-	pu.mutation.RemoveAuthorIDs(ids...)
+// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
+func (pu *PostUpdate) RemoveTagIDs(ids ...string) *PostUpdate {
+	pu.mutation.RemoveTagIDs(ids...)
 	return pu
 }
 
-// RemoveAuthor removes "author" edges to User entities.
-func (pu *PostUpdate) RemoveAuthor(u ...*User) *PostUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// RemoveTags removes "tags" edges to Tag entities.
+func (pu *PostUpdate) RemoveTags(t ...*Tag) *PostUpdate {
+	ids := make([]string, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return pu.RemoveAuthorIDs(ids...)
+	return pu.RemoveTagIDs(ids...)
 }
 
-// ClearRoot clears the "root" edge to the Post entity.
+// ClearRoot clears all "root" edges to the Post entity.
 func (pu *PostUpdate) ClearRoot() *PostUpdate {
 	pu.mutation.ClearRoot()
 	return pu
+}
+
+// RemoveRootIDs removes the "root" edge to Post entities by IDs.
+func (pu *PostUpdate) RemoveRootIDs(ids ...string) *PostUpdate {
+	pu.mutation.RemoveRootIDs(ids...)
+	return pu
+}
+
+// RemoveRoot removes "root" edges to Post entities.
+func (pu *PostUpdate) RemoveRoot(p ...*Post) *PostUpdate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pu.RemoveRootIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -401,27 +414,6 @@ func (pu *PostUpdate) RemovePosts(p ...*Post) *PostUpdate {
 	return pu.RemovePostIDs(ids...)
 }
 
-// ClearReplyTo clears all "replyTo" edges to the Post entity.
-func (pu *PostUpdate) ClearReplyTo() *PostUpdate {
-	pu.mutation.ClearReplyTo()
-	return pu
-}
-
-// RemoveReplyToIDs removes the "replyTo" edge to Post entities by IDs.
-func (pu *PostUpdate) RemoveReplyToIDs(ids ...string) *PostUpdate {
-	pu.mutation.RemoveReplyToIDs(ids...)
-	return pu
-}
-
-// RemoveReplyTo removes "replyTo" edges to Post entities.
-func (pu *PostUpdate) RemoveReplyTo(p ...*Post) *PostUpdate {
-	ids := make([]string, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return pu.RemoveReplyToIDs(ids...)
-}
-
 // ClearReplies clears all "replies" edges to the Post entity.
 func (pu *PostUpdate) ClearReplies() *PostUpdate {
 	pu.mutation.ClearReplies()
@@ -443,25 +435,25 @@ func (pu *PostUpdate) RemoveReplies(p ...*Post) *PostUpdate {
 	return pu.RemoveReplyIDs(ids...)
 }
 
-// ClearTags clears all "tags" edges to the Tag entity.
-func (pu *PostUpdate) ClearTags() *PostUpdate {
-	pu.mutation.ClearTags()
+// ClearReplyTo clears all "replyTo" edges to the Post entity.
+func (pu *PostUpdate) ClearReplyTo() *PostUpdate {
+	pu.mutation.ClearReplyTo()
 	return pu
 }
 
-// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (pu *PostUpdate) RemoveTagIDs(ids ...string) *PostUpdate {
-	pu.mutation.RemoveTagIDs(ids...)
+// RemoveReplyToIDs removes the "replyTo" edge to Post entities by IDs.
+func (pu *PostUpdate) RemoveReplyToIDs(ids ...string) *PostUpdate {
+	pu.mutation.RemoveReplyToIDs(ids...)
 	return pu
 }
 
-// RemoveTags removes "tags" edges to Tag entities.
-func (pu *PostUpdate) RemoveTags(t ...*Tag) *PostUpdate {
-	ids := make([]string, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// RemoveReplyTo removes "replyTo" edges to Post entities.
+func (pu *PostUpdate) RemoveReplyTo(p ...*Post) *PostUpdate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pu.RemoveTagIDs(ids...)
+	return pu.RemoveReplyToIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
@@ -492,12 +484,18 @@ func (pu *PostUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(pu.hooks) == 0 {
+		if err = pu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = pu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*PostMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = pu.check(); err != nil {
+				return 0, err
 			}
 			pu.mutation = mutation
 			affected, err = pu.sqlSave(ctx)
@@ -537,6 +535,14 @@ func (pu *PostUpdate) ExecX(ctx context.Context) {
 	if err := pu.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (pu *PostUpdate) check() error {
+	if _, ok := pu.mutation.AuthorID(); pu.mutation.AuthorCleared() && !ok {
+		return errors.New(`model: clearing a required unique edge "Post.author"`)
+	}
+	return nil
 }
 
 func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -684,12 +690,47 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: post.FieldCategoryId,
 		})
 	}
+	if pu.mutation.AuthorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.AuthorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if pu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -702,10 +743,10 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !pu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -721,10 +762,10 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -738,33 +779,33 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.AuthorCleared() {
+	if pu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedAuthorIDs(); len(nodes) > 0 && !pu.mutation.AuthorCleared() {
+	if nodes := pu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !pu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
@@ -773,17 +814,17 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
@@ -794,10 +835,10 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: []string{post.RootColumn},
+			Columns: post.RootPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -808,12 +849,31 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RootIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.RemovedRootIDs(); len(nodes) > 0 && !pu.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: []string{post.RootColumn},
+			Columns: post.RootPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RootIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RootTable,
+			Columns: post.RootPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -829,10 +889,10 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -845,10 +905,10 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !pu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -864,10 +924,64 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.RepliesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !pu.mutation.RepliesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -887,7 +1001,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
@@ -903,7 +1017,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
@@ -922,119 +1036,11 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !pu.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RepliesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !pu.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.TagsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
+					Column: post.FieldID,
 				},
 			},
 		}
@@ -1286,6 +1292,17 @@ func (puo *PostUpdateOne) ClearCategoryId() *PostUpdateOne {
 	return puo
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (puo *PostUpdateOne) SetAuthorID(id uuid.UUID) *PostUpdateOne {
+	puo.mutation.SetAuthorID(id)
+	return puo
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (puo *PostUpdateOne) SetAuthor(u *User) *PostUpdateOne {
+	return puo.SetAuthorID(u.ID)
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (puo *PostUpdateOne) AddCategoryIDs(ids ...string) *PostUpdateOne {
 	puo.mutation.AddCategoryIDs(ids...)
@@ -1301,38 +1318,34 @@ func (puo *PostUpdateOne) AddCategory(c ...*Category) *PostUpdateOne {
 	return puo.AddCategoryIDs(ids...)
 }
 
-// AddAuthorIDs adds the "author" edge to the User entity by IDs.
-func (puo *PostUpdateOne) AddAuthorIDs(ids ...uuid.UUID) *PostUpdateOne {
-	puo.mutation.AddAuthorIDs(ids...)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (puo *PostUpdateOne) AddTagIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.AddTagIDs(ids...)
 	return puo
 }
 
-// AddAuthor adds the "author" edges to the User entity.
-func (puo *PostUpdateOne) AddAuthor(u ...*User) *PostUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddTags adds the "tags" edges to the Tag entity.
+func (puo *PostUpdateOne) AddTags(t ...*Tag) *PostUpdateOne {
+	ids := make([]string, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return puo.AddAuthorIDs(ids...)
+	return puo.AddTagIDs(ids...)
 }
 
-// SetRootID sets the "root" edge to the Post entity by ID.
-func (puo *PostUpdateOne) SetRootID(id string) *PostUpdateOne {
-	puo.mutation.SetRootID(id)
+// AddRootIDs adds the "root" edge to the Post entity by IDs.
+func (puo *PostUpdateOne) AddRootIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.AddRootIDs(ids...)
 	return puo
 }
 
-// SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableRootID(id *string) *PostUpdateOne {
-	if id != nil {
-		puo = puo.SetRootID(*id)
+// AddRoot adds the "root" edges to the Post entity.
+func (puo *PostUpdateOne) AddRoot(p ...*Post) *PostUpdateOne {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return puo
-}
-
-// SetRoot sets the "root" edge to the Post entity.
-func (puo *PostUpdateOne) SetRoot(p *Post) *PostUpdateOne {
-	return puo.SetRootID(p.ID)
+	return puo.AddRootIDs(ids...)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -1350,21 +1363,6 @@ func (puo *PostUpdateOne) AddPosts(p ...*Post) *PostUpdateOne {
 	return puo.AddPostIDs(ids...)
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
-func (puo *PostUpdateOne) AddReplyToIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.AddReplyToIDs(ids...)
-	return puo
-}
-
-// AddReplyTo adds the "replyTo" edges to the Post entity.
-func (puo *PostUpdateOne) AddReplyTo(p ...*Post) *PostUpdateOne {
-	ids := make([]string, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return puo.AddReplyToIDs(ids...)
-}
-
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
 func (puo *PostUpdateOne) AddReplyIDs(ids ...string) *PostUpdateOne {
 	puo.mutation.AddReplyIDs(ids...)
@@ -1380,19 +1378,19 @@ func (puo *PostUpdateOne) AddReplies(p ...*Post) *PostUpdateOne {
 	return puo.AddReplyIDs(ids...)
 }
 
-// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (puo *PostUpdateOne) AddTagIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.AddTagIDs(ids...)
+// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
+func (puo *PostUpdateOne) AddReplyToIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.AddReplyToIDs(ids...)
 	return puo
 }
 
-// AddTags adds the "tags" edges to the Tag entity.
-func (puo *PostUpdateOne) AddTags(t ...*Tag) *PostUpdateOne {
-	ids := make([]string, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddReplyTo adds the "replyTo" edges to the Post entity.
+func (puo *PostUpdateOne) AddReplyTo(p ...*Post) *PostUpdateOne {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return puo.AddTagIDs(ids...)
+	return puo.AddReplyToIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -1413,6 +1411,12 @@ func (puo *PostUpdateOne) AddReacts(r ...*React) *PostUpdateOne {
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
+	puo.mutation.ClearAuthor()
+	return puo
 }
 
 // ClearCategory clears all "category" edges to the Category entity.
@@ -1436,31 +1440,46 @@ func (puo *PostUpdateOne) RemoveCategory(c ...*Category) *PostUpdateOne {
 	return puo.RemoveCategoryIDs(ids...)
 }
 
-// ClearAuthor clears all "author" edges to the User entity.
-func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
-	puo.mutation.ClearAuthor()
+// ClearTags clears all "tags" edges to the Tag entity.
+func (puo *PostUpdateOne) ClearTags() *PostUpdateOne {
+	puo.mutation.ClearTags()
 	return puo
 }
 
-// RemoveAuthorIDs removes the "author" edge to User entities by IDs.
-func (puo *PostUpdateOne) RemoveAuthorIDs(ids ...uuid.UUID) *PostUpdateOne {
-	puo.mutation.RemoveAuthorIDs(ids...)
+// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
+func (puo *PostUpdateOne) RemoveTagIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.RemoveTagIDs(ids...)
 	return puo
 }
 
-// RemoveAuthor removes "author" edges to User entities.
-func (puo *PostUpdateOne) RemoveAuthor(u ...*User) *PostUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// RemoveTags removes "tags" edges to Tag entities.
+func (puo *PostUpdateOne) RemoveTags(t ...*Tag) *PostUpdateOne {
+	ids := make([]string, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return puo.RemoveAuthorIDs(ids...)
+	return puo.RemoveTagIDs(ids...)
 }
 
-// ClearRoot clears the "root" edge to the Post entity.
+// ClearRoot clears all "root" edges to the Post entity.
 func (puo *PostUpdateOne) ClearRoot() *PostUpdateOne {
 	puo.mutation.ClearRoot()
 	return puo
+}
+
+// RemoveRootIDs removes the "root" edge to Post entities by IDs.
+func (puo *PostUpdateOne) RemoveRootIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.RemoveRootIDs(ids...)
+	return puo
+}
+
+// RemoveRoot removes "root" edges to Post entities.
+func (puo *PostUpdateOne) RemoveRoot(p ...*Post) *PostUpdateOne {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return puo.RemoveRootIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -1484,27 +1503,6 @@ func (puo *PostUpdateOne) RemovePosts(p ...*Post) *PostUpdateOne {
 	return puo.RemovePostIDs(ids...)
 }
 
-// ClearReplyTo clears all "replyTo" edges to the Post entity.
-func (puo *PostUpdateOne) ClearReplyTo() *PostUpdateOne {
-	puo.mutation.ClearReplyTo()
-	return puo
-}
-
-// RemoveReplyToIDs removes the "replyTo" edge to Post entities by IDs.
-func (puo *PostUpdateOne) RemoveReplyToIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.RemoveReplyToIDs(ids...)
-	return puo
-}
-
-// RemoveReplyTo removes "replyTo" edges to Post entities.
-func (puo *PostUpdateOne) RemoveReplyTo(p ...*Post) *PostUpdateOne {
-	ids := make([]string, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return puo.RemoveReplyToIDs(ids...)
-}
-
 // ClearReplies clears all "replies" edges to the Post entity.
 func (puo *PostUpdateOne) ClearReplies() *PostUpdateOne {
 	puo.mutation.ClearReplies()
@@ -1526,25 +1524,25 @@ func (puo *PostUpdateOne) RemoveReplies(p ...*Post) *PostUpdateOne {
 	return puo.RemoveReplyIDs(ids...)
 }
 
-// ClearTags clears all "tags" edges to the Tag entity.
-func (puo *PostUpdateOne) ClearTags() *PostUpdateOne {
-	puo.mutation.ClearTags()
+// ClearReplyTo clears all "replyTo" edges to the Post entity.
+func (puo *PostUpdateOne) ClearReplyTo() *PostUpdateOne {
+	puo.mutation.ClearReplyTo()
 	return puo
 }
 
-// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (puo *PostUpdateOne) RemoveTagIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.RemoveTagIDs(ids...)
+// RemoveReplyToIDs removes the "replyTo" edge to Post entities by IDs.
+func (puo *PostUpdateOne) RemoveReplyToIDs(ids ...string) *PostUpdateOne {
+	puo.mutation.RemoveReplyToIDs(ids...)
 	return puo
 }
 
-// RemoveTags removes "tags" edges to Tag entities.
-func (puo *PostUpdateOne) RemoveTags(t ...*Tag) *PostUpdateOne {
-	ids := make([]string, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// RemoveReplyTo removes "replyTo" edges to Post entities.
+func (puo *PostUpdateOne) RemoveReplyTo(p ...*Post) *PostUpdateOne {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return puo.RemoveTagIDs(ids...)
+	return puo.RemoveReplyToIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
@@ -1582,12 +1580,18 @@ func (puo *PostUpdateOne) Save(ctx context.Context) (*Post, error) {
 		node *Post
 	)
 	if len(puo.hooks) == 0 {
+		if err = puo.check(); err != nil {
+			return nil, err
+		}
 		node, err = puo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*PostMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = puo.check(); err != nil {
+				return nil, err
 			}
 			puo.mutation = mutation
 			node, err = puo.sqlSave(ctx)
@@ -1627,6 +1631,14 @@ func (puo *PostUpdateOne) ExecX(ctx context.Context) {
 	if err := puo.Exec(ctx); err != nil {
 		panic(err)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (puo *PostUpdateOne) check() error {
+	if _, ok := puo.mutation.AuthorID(); puo.mutation.AuthorCleared() && !ok {
+		return errors.New(`model: clearing a required unique edge "Post.author"`)
+	}
+	return nil
 }
 
 func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
@@ -1791,12 +1803,47 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Column: post.FieldCategoryId,
 		})
 	}
+	if puo.mutation.AuthorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.AuthorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if puo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1809,10 +1856,10 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if nodes := puo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !puo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1828,10 +1875,10 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if nodes := puo.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
+			Columns: post.CategoryPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1845,33 +1892,33 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.AuthorCleared() {
+	if puo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedAuthorIDs(); len(nodes) > 0 && !puo.mutation.AuthorCleared() {
+	if nodes := puo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !puo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
@@ -1880,17 +1927,17 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.AuthorTable,
-			Columns: []string{post.AuthorColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}
@@ -1901,10 +1948,10 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if puo.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: []string{post.RootColumn},
+			Columns: post.RootPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1915,12 +1962,31 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RootIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.RemovedRootIDs(); len(nodes) > 0 && !puo.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: []string{post.RootColumn},
+			Columns: post.RootPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RootIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RootTable,
+			Columns: post.RootPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1936,10 +2002,10 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if puo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1952,10 +2018,10 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if nodes := puo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !puo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1971,10 +2037,64 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if nodes := puo.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.RepliesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !puo.mutation.RepliesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -1994,7 +2114,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
@@ -2010,7 +2130,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
+			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
@@ -2029,119 +2149,11 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !puo.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RepliesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !puo.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.TagsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
+					Column: post.FieldID,
 				},
 			},
 		}

@@ -33,57 +33,49 @@ const (
 	FieldReplyPostId = "reply_post_id"
 	// FieldCategoryId holds the string denoting the categoryid field in the database.
 	FieldCategoryId = "category_id"
-	// EdgeCategory holds the string denoting the category edge name in mutations.
-	EdgeCategory = "category"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
+	// EdgeCategory holds the string denoting the category edge name in mutations.
+	EdgeCategory = "category"
+	// EdgeTags holds the string denoting the tags edge name in mutations.
+	EdgeTags = "tags"
 	// EdgeRoot holds the string denoting the root edge name in mutations.
 	EdgeRoot = "root"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
-	// EdgeReplyTo holds the string denoting the replyto edge name in mutations.
-	EdgeReplyTo = "replyTo"
 	// EdgeReplies holds the string denoting the replies edge name in mutations.
 	EdgeReplies = "replies"
-	// EdgeTags holds the string denoting the tags edge name in mutations.
-	EdgeTags = "tags"
+	// EdgeReplyTo holds the string denoting the replyto edge name in mutations.
+	EdgeReplyTo = "replyTo"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
-	// CategoryTable is the table that holds the category relation/edge.
-	CategoryTable = "categories"
-	// CategoryInverseTable is the table name for the Category entity.
-	// It exists in this package in order to avoid circular dependency with the "category" package.
-	CategoryInverseTable = "categories"
-	// CategoryColumn is the table column denoting the category relation/edge.
-	CategoryColumn = "post_category"
 	// AuthorTable is the table that holds the author relation/edge.
-	AuthorTable = "users"
+	AuthorTable = "posts"
 	// AuthorInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	AuthorInverseTable = "users"
 	// AuthorColumn is the table column denoting the author relation/edge.
-	AuthorColumn = "post_author"
-	// RootTable is the table that holds the root relation/edge.
-	RootTable = "posts"
-	// RootColumn is the table column denoting the root relation/edge.
-	RootColumn = "post_posts"
-	// PostsTable is the table that holds the posts relation/edge.
-	PostsTable = "posts"
-	// PostsColumn is the table column denoting the posts relation/edge.
-	PostsColumn = "post_posts"
-	// ReplyToTable is the table that holds the replyTo relation/edge. The primary key declared below.
-	ReplyToTable = "post_replyTo"
-	// RepliesTable is the table that holds the replies relation/edge. The primary key declared below.
-	RepliesTable = "post_replies"
-	// TagsTable is the table that holds the tags relation/edge.
-	TagsTable = "tags"
+	AuthorColumn = "user_posts"
+	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
+	CategoryTable = "category_posts"
+	// CategoryInverseTable is the table name for the Category entity.
+	// It exists in this package in order to avoid circular dependency with the "category" package.
+	CategoryInverseTable = "categories"
+	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
+	TagsTable = "tag_posts"
 	// TagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	TagsInverseTable = "tags"
-	// TagsColumn is the table column denoting the tags relation/edge.
-	TagsColumn = "post_tags"
+	// RootTable is the table that holds the root relation/edge. The primary key declared below.
+	RootTable = "post_posts"
+	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
+	PostsTable = "post_posts"
+	// RepliesTable is the table that holds the replies relation/edge. The primary key declared below.
+	RepliesTable = "post_replyTo"
+	// ReplyToTable is the table that holds the replyTo relation/edge. The primary key declared below.
+	ReplyToTable = "post_replyTo"
 	// ReactsTable is the table that holds the reacts relation/edge.
 	ReactsTable = "reacts"
 	// ReactsInverseTable is the table name for the React entity.
@@ -114,20 +106,29 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"category_posts",
-	"post_posts",
 	"react_post",
-	"tag_posts",
 	"user_posts",
 }
 
 var (
-	// ReplyToPrimaryKey and ReplyToColumn2 are the table columns denoting the
-	// primary key for the replyTo relation (M2M).
-	ReplyToPrimaryKey = []string{"post_id", "replyTo_id"}
+	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
+	// primary key for the category relation (M2M).
+	CategoryPrimaryKey = []string{"category_id", "post_id"}
+	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
+	// primary key for the tags relation (M2M).
+	TagsPrimaryKey = []string{"tag_id", "post_id"}
+	// RootPrimaryKey and RootColumn2 are the table columns denoting the
+	// primary key for the root relation (M2M).
+	RootPrimaryKey = []string{"post_id", "root_id"}
+	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
+	// primary key for the posts relation (M2M).
+	PostsPrimaryKey = []string{"post_id", "root_id"}
 	// RepliesPrimaryKey and RepliesColumn2 are the table columns denoting the
 	// primary key for the replies relation (M2M).
 	RepliesPrimaryKey = []string{"post_id", "reply_id"}
+	// ReplyToPrimaryKey and ReplyToColumn2 are the table columns denoting the
+	// primary key for the replyTo relation (M2M).
+	ReplyToPrimaryKey = []string{"post_id", "reply_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

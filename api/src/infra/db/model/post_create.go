@@ -168,6 +168,17 @@ func (pc *PostCreate) SetID(s string) *PostCreate {
 	return pc
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (pc *PostCreate) SetAuthorID(id uuid.UUID) *PostCreate {
+	pc.mutation.SetAuthorID(id)
+	return pc
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (pc *PostCreate) SetAuthor(u *User) *PostCreate {
+	return pc.SetAuthorID(u.ID)
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by IDs.
 func (pc *PostCreate) AddCategoryIDs(ids ...string) *PostCreate {
 	pc.mutation.AddCategoryIDs(ids...)
@@ -183,38 +194,34 @@ func (pc *PostCreate) AddCategory(c ...*Category) *PostCreate {
 	return pc.AddCategoryIDs(ids...)
 }
 
-// AddAuthorIDs adds the "author" edge to the User entity by IDs.
-func (pc *PostCreate) AddAuthorIDs(ids ...uuid.UUID) *PostCreate {
-	pc.mutation.AddAuthorIDs(ids...)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (pc *PostCreate) AddTagIDs(ids ...string) *PostCreate {
+	pc.mutation.AddTagIDs(ids...)
 	return pc
 }
 
-// AddAuthor adds the "author" edges to the User entity.
-func (pc *PostCreate) AddAuthor(u ...*User) *PostCreate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// AddTags adds the "tags" edges to the Tag entity.
+func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
+	ids := make([]string, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
-	return pc.AddAuthorIDs(ids...)
+	return pc.AddTagIDs(ids...)
 }
 
-// SetRootID sets the "root" edge to the Post entity by ID.
-func (pc *PostCreate) SetRootID(id string) *PostCreate {
-	pc.mutation.SetRootID(id)
+// AddRootIDs adds the "root" edge to the Post entity by IDs.
+func (pc *PostCreate) AddRootIDs(ids ...string) *PostCreate {
+	pc.mutation.AddRootIDs(ids...)
 	return pc
 }
 
-// SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (pc *PostCreate) SetNillableRootID(id *string) *PostCreate {
-	if id != nil {
-		pc = pc.SetRootID(*id)
+// AddRoot adds the "root" edges to the Post entity.
+func (pc *PostCreate) AddRoot(p ...*Post) *PostCreate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pc
-}
-
-// SetRoot sets the "root" edge to the Post entity.
-func (pc *PostCreate) SetRoot(p *Post) *PostCreate {
-	return pc.SetRootID(p.ID)
+	return pc.AddRootIDs(ids...)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -232,21 +239,6 @@ func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
 	return pc.AddPostIDs(ids...)
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyToIDs(ids ...string) *PostCreate {
-	pc.mutation.AddReplyToIDs(ids...)
-	return pc
-}
-
-// AddReplyTo adds the "replyTo" edges to the Post entity.
-func (pc *PostCreate) AddReplyTo(p ...*Post) *PostCreate {
-	ids := make([]string, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return pc.AddReplyToIDs(ids...)
-}
-
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
 func (pc *PostCreate) AddReplyIDs(ids ...string) *PostCreate {
 	pc.mutation.AddReplyIDs(ids...)
@@ -262,19 +254,19 @@ func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
 	return pc.AddReplyIDs(ids...)
 }
 
-// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pc *PostCreate) AddTagIDs(ids ...string) *PostCreate {
-	pc.mutation.AddTagIDs(ids...)
+// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
+func (pc *PostCreate) AddReplyToIDs(ids ...string) *PostCreate {
+	pc.mutation.AddReplyToIDs(ids...)
 	return pc
 }
 
-// AddTags adds the "tags" edges to the Tag entity.
-func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
-	ids := make([]string, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+// AddReplyTo adds the "replyTo" edges to the Post entity.
+func (pc *PostCreate) AddReplyTo(p ...*Post) *PostCreate {
+	ids := make([]string, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pc.AddTagIDs(ids...)
+	return pc.AddReplyToIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -391,6 +383,9 @@ func (pc *PostCreate) check() error {
 	}
 	if _, ok := pc.mutation.UserId(); !ok {
 		return &ValidationError{Name: "userId", err: errors.New(`model: missing required field "Post.userId"`)}
+	}
+	if _, ok := pc.mutation.AuthorID(); !ok {
+		return &ValidationError{Name: "author", err: errors.New(`model: missing required edge "Post.author"`)}
 	}
 	return nil
 }
@@ -533,29 +528,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		})
 		_node.CategoryId = value
 	}
-	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.CategoryTable,
-			Columns: []string{post.CategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: category.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
 			Table:   post.AuthorTable,
 			Columns: []string{post.AuthorColumn},
 			Bidi:    false,
@@ -569,14 +545,53 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.user_posts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: post.CategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: category.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.TagsTable,
+			Columns: post.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: tag.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.RootIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: []string{post.RootColumn},
+			Columns: post.RootPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -588,15 +603,33 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.post_posts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: []string{post.PostsColumn},
+			Columns: post.PostsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.RepliesTable,
+			Columns: post.RepliesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -616,49 +649,11 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Inverse: false,
 			Table:   post.ReplyToTable,
 			Columns: post.ReplyToPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.RepliesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
-			Bidi:    true,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.TagsTable,
-			Columns: []string{post.TagsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
-					Column: tag.FieldID,
+					Column: post.FieldID,
 				},
 			},
 		}

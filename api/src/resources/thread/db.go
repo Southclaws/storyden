@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/api/src/infra/db"
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
 	"github.com/Southclaws/storyden/api/src/resources/post"
+	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
 var (
@@ -19,17 +21,19 @@ var (
 	ErrUnauthorised = errors.New("unauthorised")
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) CreateThread(
+func (d *database) CreateThread(
 	ctx context.Context,
-	title, body, authorID, categoryName string,
+	title, body string,
+	authorID user.UserID,
+	categoryName string,
 	tags []string,
 ) (*post.Post, error) {
 	slug := slug.Make(title)
@@ -40,23 +44,16 @@ func (d *DB) CreateThread(
 		return nil, errors.Wrap(err, "failed to upsert tags for linking to post")
 	}
 
-	additional := []db.PostSetParam{
-		db.Post.Title.Set(title),
-		db.Post.Category.Link(db.Category.Name.Equals(categoryName)),
-		db.Post.Tags.Link(tagset...),
-	}
-
-	p, err := d.db.Post.
-		CreateOne(
-			db.Post.Body.Set(body),
-			db.Post.Short.Set(short),
-			db.Post.First.Set(true),
-			db.Post.Author.Link(db.User.ID.Equals(authorID)),
-
-			additional...,
-		).
-		With(db.Post.Author.Fetch()).
-		Exec(ctx)
+	d.db.Post.
+		Create().
+		SetBody(body).
+		SetShort(short).
+		SetFirst(true).
+		SetAuthorID(uuid.UUID(authorID)).
+		SetTitle(title).
+		// SetCategoryID(categoryName).
+		AddTagIDs(tagset).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +78,7 @@ func (d *DB) CreateThread(
 	return post.FromModel(p), nil
 }
 
-func (d *DB) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
+func (d *database) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
 	setters := []db.TagWhereParam{}
 	for _, tag := range tags {
 		if len(tag) > 24 {
@@ -100,7 +97,7 @@ func (d *DB) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam,
 	return setters, nil
 }
 
-func (d *DB) CreateLegacyThread(
+func (d *database) CreateLegacyThread(
 	ctx context.Context,
 	title string,
 	categoryName string,
@@ -197,7 +194,7 @@ func (d *DB) CreateLegacyThread(
 	return post.FromModel(p), nil
 }
 
-func (d *DB) GetThreads(
+func (d *database) GetThreads(
 	ctx context.Context,
 	tags []string,
 	category string,
@@ -324,7 +321,7 @@ func (d *DB) GetThreads(
 	return result, nil
 }
 
-func (d *DB) GetPostCounts(ctx context.Context) (map[string]int, error) {
+func (d *database) GetPostCounts(ctx context.Context) (map[string]int, error) {
 	type PostCount struct {
 		PostID string `json:"rootPostId"`
 		Count  int    `json:"count"`
@@ -357,7 +354,7 @@ func (d *DB) GetPostCounts(ctx context.Context) (map[string]int, error) {
 	return result, nil
 }
 
-func (d *DB) Update(ctx context.Context, userID, id string, title, categoryID *string, pinned *bool) (*post.Post, error) {
+func (d *database) Update(ctx context.Context, userID, id string, title, categoryID *string, pinned *bool) (*post.Post, error) {
 	updates := []db.PostSetParam{
 		db.Post.Title.SetIfPresent(title),
 		db.Post.CategoryID.SetIfPresent(categoryID),
@@ -386,7 +383,7 @@ func (d *DB) Update(ctx context.Context, userID, id string, title, categoryID *s
 	return post.FromModel(p), nil
 }
 
-func (d *DB) Delete(ctx context.Context, id, authorID string) (int, error) {
+func (d *database) Delete(ctx context.Context, id, authorID string) (int, error) {
 	// NOTE:
 	// We really want this authorID to eventually be removed from this API.
 	// Because this API should be user-agnostic, and should be usable by non-

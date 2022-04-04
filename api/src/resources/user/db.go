@@ -12,15 +12,15 @@ import (
 	"github.com/Southclaws/storyden/api/src/utils"
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) CreateUser(ctx context.Context, email string, username string) (*User, error) {
+func (d *database) CreateUser(ctx context.Context, email string, username string) (*User, error) {
 	u, err := d.db.User.
 		Create().
 		SetEmail(email).
@@ -33,7 +33,7 @@ func (d *DB) CreateUser(ctx context.Context, email string, username string) (*Us
 	return utils.Ref(FromModel(*u)), nil
 }
 
-func (d *DB) GetUser(ctx context.Context, userId UserID, public bool) (*User, error) {
+func (d *database) GetUser(ctx context.Context, userId UserID, public bool) (*User, error) {
 	user, err := d.db.User.Get(ctx, uuid.UUID(userId))
 	if err != nil {
 		if model.IsNotFound(err) {
@@ -54,7 +54,7 @@ func (d *DB) GetUser(ctx context.Context, userId UserID, public bool) (*User, er
 	return &u, nil
 }
 
-// func (d *DB) getUserPostCounts(ctx context.Context, id string) (int, int, error) {
+// func (d *database) getUserPostCounts(ctx context.Context, id string) (int, int, error) {
 // 	type R struct {
 // 		Threads int `json:"threads"`
 // 		Posts   int `json:"posts"`
@@ -83,7 +83,7 @@ func (d *DB) GetUser(ctx context.Context, userId UserID, public bool) (*User, er
 // 	return count[0].Threads, count[0].Posts, nil
 // }
 
-func (d *DB) GetUserByEmail(ctx context.Context, email string, public bool) (*User, error) {
+func (d *database) GetUserByEmail(ctx context.Context, email string, public bool) (*User, error) {
 	user, err := d.db.User.
 		Query().
 		Where(user.Email(email)).
@@ -99,7 +99,7 @@ func (d *DB) GetUserByEmail(ctx context.Context, email string, public bool) (*Us
 	return utils.Ref(FromModel(*user)), nil
 }
 
-func (d *DB) GetUsers(ctx context.Context, sort string, limit, offset int, public bool) ([]User, error) {
+func (d *database) GetUsers(ctx context.Context, sort string, limit, offset int, public bool) ([]User, error) {
 	users, err := d.db.User.
 		Query().
 		Limit(limit).
@@ -123,7 +123,7 @@ func (d *DB) GetUsers(ctx context.Context, sort string, limit, offset int, publi
 	), nil
 }
 
-func (d *DB) UpdateUser(ctx context.Context, userId UserID, email, name, bio *string) (*User, error) {
+func (d *database) UpdateUser(ctx context.Context, userId UserID, email, name, bio *string) (*User, error) {
 	update := d.db.User.UpdateOneID(uuid.UUID(userId))
 
 	// TODO: This is awful. Make this more ergonomic.
@@ -145,7 +145,7 @@ func (d *DB) UpdateUser(ctx context.Context, userId UserID, email, name, bio *st
 	return utils.Ref(FromModel(*u)), nil
 }
 
-func (d *DB) SetAdmin(ctx context.Context, userId UserID, status bool) error {
+func (d *database) SetAdmin(ctx context.Context, userId UserID, status bool) error {
 	_, err := d.db.User.
 		UpdateOneID(uuid.UUID(userId)).
 		SetAdmin(status).
@@ -157,7 +157,7 @@ func (d *DB) SetAdmin(ctx context.Context, userId UserID, status bool) error {
 	return nil
 }
 
-func (d *DB) Ban(ctx context.Context, userId UserID) (*User, error) {
+func (d *database) Ban(ctx context.Context, userId UserID) (*User, error) {
 	u, err := d.db.User.
 		UpdateOneID(uuid.UUID(userId)).
 		SetDeletedAt(time.Now()).
@@ -169,7 +169,7 @@ func (d *DB) Ban(ctx context.Context, userId UserID) (*User, error) {
 	return utils.Ref(FromModel(*u)), nil
 }
 
-func (d *DB) Unban(ctx context.Context, userId UserID) (*User, error) {
+func (d *database) Unban(ctx context.Context, userId UserID) (*User, error) {
 	u, err := d.db.User.
 		UpdateOneID(uuid.UUID(userId)).
 		ClearDeletedAt().

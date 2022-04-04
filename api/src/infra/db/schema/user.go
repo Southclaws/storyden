@@ -11,33 +11,35 @@ import (
 
 // User holds the schema definition for the User entity.
 type User struct {
-    ent.Schema
+	ent.Schema
 }
 
 // Fields of User.
 func (User) Fields() []ent.Field {
-    return []ent.Field{
-        field.UUID("id", uuid.UUID{}).
-            Unique().
-            Immutable().
-            Default(uuid.New),
+	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).
+			Unique().
+			Immutable().
+			Default(uuid.New),
 
-        field.String("email").Unique(),
-        field.String("name").NotEmpty(),
-        field.String("bio").Optional(),
-        field.Bool("admin").Default(false),
+		field.String("email").Unique(),
+		field.String("name").NotEmpty(),
+		field.String("bio").Optional(),
+		field.Bool("admin").Default(false),
 
-        field.Time("createdAt").Default(time.Now()),
-        field.Time("updatedAt").Default(time.Now()),
-        field.Time("deletedAt").Optional(),
-    }
+		field.Time("createdAt").Default(time.Now()),
+		field.Time("updatedAt").Default(time.Now()),
+		field.Time("deletedAt").Optional(),
+	}
 }
 
 // Edges of User.
 func (User) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("posts", Post.Type),
-        edge.To("reacts", React.Type),
-        edge.To("subscriptions", Subscription.Type),
-    }
+	return []ent.Edge{
+		edge.To("posts", Post.Type),
+
+		edge.To("reacts", React.Type),
+
+		edge.To("subscriptions", Subscription.Type),
+	}
 }

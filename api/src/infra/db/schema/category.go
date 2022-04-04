@@ -8,24 +8,24 @@ import (
 
 // Category holds the schema definition for the Category entity.
 type Category struct {
-    ent.Schema
+	ent.Schema
 }
 
 // Fields of Category.
 func (Category) Fields() []ent.Field {
-    return []ent.Field{
-        field.String("id"),
-        field.String("name"),
-        field.String("description").Default("(No description)"),
-        field.String("colour").Default("#8577ce"),
-        field.Int("sort").Default(-1),
-        field.Bool("admin").Default(false),
-    }
+	return []ent.Field{
+		field.String("id"),
+		field.String("name"),
+		field.String("description").Default("(No description)"),
+		field.String("colour").Default("#8577ce"),
+		field.Int("sort").Default(-1),
+		field.Bool("admin").Default(false),
+	}
 }
 
 // Edges of Category.
 func (Category) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("posts", Post.Type),
-    }
+	return []ent.Edge{
+		edge.To("posts", Post.Type),
+	}
 }

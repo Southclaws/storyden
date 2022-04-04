@@ -1406,26 +1406,26 @@ type PostMutation struct {
 	replyPostId     *string
 	categoryId      *string
 	clearedFields   map[string]struct{}
+	author          *uuid.UUID
+	clearedauthor   bool
 	category        map[string]struct{}
 	removedcategory map[string]struct{}
 	clearedcategory bool
-	author          map[uuid.UUID]struct{}
-	removedauthor   map[uuid.UUID]struct{}
-	clearedauthor   bool
-	root            *string
+	tags            map[string]struct{}
+	removedtags     map[string]struct{}
+	clearedtags     bool
+	root            map[string]struct{}
+	removedroot     map[string]struct{}
 	clearedroot     bool
 	posts           map[string]struct{}
 	removedposts    map[string]struct{}
 	clearedposts    bool
-	replyTo         map[string]struct{}
-	removedreplyTo  map[string]struct{}
-	clearedreplyTo  bool
 	replies         map[string]struct{}
 	removedreplies  map[string]struct{}
 	clearedreplies  bool
-	tags            map[string]struct{}
-	removedtags     map[string]struct{}
-	clearedtags     bool
+	replyTo         map[string]struct{}
+	removedreplyTo  map[string]struct{}
+	clearedreplyTo  bool
 	reacts          map[string]struct{}
 	removedreacts   map[string]struct{}
 	clearedreacts   bool
@@ -2084,6 +2084,45 @@ func (m *PostMutation) ResetCategoryId() {
 	delete(m.clearedFields, post.FieldCategoryId)
 }
 
+// SetAuthorID sets the "author" edge to the User entity by id.
+func (m *PostMutation) SetAuthorID(id uuid.UUID) {
+	m.author = &id
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (m *PostMutation) ClearAuthor() {
+	m.clearedauthor = true
+}
+
+// AuthorCleared reports if the "author" edge to the User entity was cleared.
+func (m *PostMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorID returns the "author" edge ID in the mutation.
+func (m *PostMutation) AuthorID() (id uuid.UUID, exists bool) {
+	if m.author != nil {
+		return *m.author, true
+	}
+	return
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *PostMutation) AuthorIDs() (ids []uuid.UUID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *PostMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
 // AddCategoryIDs adds the "category" edge to the Category entity by ids.
 func (m *PostMutation) AddCategoryIDs(ids ...string) {
 	if m.category == nil {
@@ -2138,63 +2177,68 @@ func (m *PostMutation) ResetCategory() {
 	m.removedcategory = nil
 }
 
-// AddAuthorIDs adds the "author" edge to the User entity by ids.
-func (m *PostMutation) AddAuthorIDs(ids ...uuid.UUID) {
-	if m.author == nil {
-		m.author = make(map[uuid.UUID]struct{})
+// AddTagIDs adds the "tags" edge to the Tag entity by ids.
+func (m *PostMutation) AddTagIDs(ids ...string) {
+	if m.tags == nil {
+		m.tags = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.author[ids[i]] = struct{}{}
+		m.tags[ids[i]] = struct{}{}
 	}
 }
 
-// ClearAuthor clears the "author" edge to the User entity.
-func (m *PostMutation) ClearAuthor() {
-	m.clearedauthor = true
+// ClearTags clears the "tags" edge to the Tag entity.
+func (m *PostMutation) ClearTags() {
+	m.clearedtags = true
 }
 
-// AuthorCleared reports if the "author" edge to the User entity was cleared.
-func (m *PostMutation) AuthorCleared() bool {
-	return m.clearedauthor
+// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
+func (m *PostMutation) TagsCleared() bool {
+	return m.clearedtags
 }
 
-// RemoveAuthorIDs removes the "author" edge to the User entity by IDs.
-func (m *PostMutation) RemoveAuthorIDs(ids ...uuid.UUID) {
-	if m.removedauthor == nil {
-		m.removedauthor = make(map[uuid.UUID]struct{})
+// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
+func (m *PostMutation) RemoveTagIDs(ids ...string) {
+	if m.removedtags == nil {
+		m.removedtags = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.author, ids[i])
-		m.removedauthor[ids[i]] = struct{}{}
+		delete(m.tags, ids[i])
+		m.removedtags[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedAuthor returns the removed IDs of the "author" edge to the User entity.
-func (m *PostMutation) RemovedAuthorIDs() (ids []uuid.UUID) {
-	for id := range m.removedauthor {
+// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
+func (m *PostMutation) RemovedTagsIDs() (ids []string) {
+	for id := range m.removedtags {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// AuthorIDs returns the "author" edge IDs in the mutation.
-func (m *PostMutation) AuthorIDs() (ids []uuid.UUID) {
-	for id := range m.author {
+// TagsIDs returns the "tags" edge IDs in the mutation.
+func (m *PostMutation) TagsIDs() (ids []string) {
+	for id := range m.tags {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetAuthor resets all changes to the "author" edge.
-func (m *PostMutation) ResetAuthor() {
-	m.author = nil
-	m.clearedauthor = false
-	m.removedauthor = nil
+// ResetTags resets all changes to the "tags" edge.
+func (m *PostMutation) ResetTags() {
+	m.tags = nil
+	m.clearedtags = false
+	m.removedtags = nil
 }
 
-// SetRootID sets the "root" edge to the Post entity by id.
-func (m *PostMutation) SetRootID(id string) {
-	m.root = &id
+// AddRootIDs adds the "root" edge to the Post entity by ids.
+func (m *PostMutation) AddRootIDs(ids ...string) {
+	if m.root == nil {
+		m.root = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.root[ids[i]] = struct{}{}
+	}
 }
 
 // ClearRoot clears the "root" edge to the Post entity.
@@ -2207,20 +2251,29 @@ func (m *PostMutation) RootCleared() bool {
 	return m.clearedroot
 }
 
-// RootID returns the "root" edge ID in the mutation.
-func (m *PostMutation) RootID() (id string, exists bool) {
-	if m.root != nil {
-		return *m.root, true
+// RemoveRootIDs removes the "root" edge to the Post entity by IDs.
+func (m *PostMutation) RemoveRootIDs(ids ...string) {
+	if m.removedroot == nil {
+		m.removedroot = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.root, ids[i])
+		m.removedroot[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRoot returns the removed IDs of the "root" edge to the Post entity.
+func (m *PostMutation) RemovedRootIDs() (ids []string) {
+	for id := range m.removedroot {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // RootIDs returns the "root" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// RootID instead. It exists only for internal usage by the builders.
 func (m *PostMutation) RootIDs() (ids []string) {
-	if id := m.root; id != nil {
-		ids = append(ids, *id)
+	for id := range m.root {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -2229,6 +2282,7 @@ func (m *PostMutation) RootIDs() (ids []string) {
 func (m *PostMutation) ResetRoot() {
 	m.root = nil
 	m.clearedroot = false
+	m.removedroot = nil
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
@@ -2285,60 +2339,6 @@ func (m *PostMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by ids.
-func (m *PostMutation) AddReplyToIDs(ids ...string) {
-	if m.replyTo == nil {
-		m.replyTo = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.replyTo[ids[i]] = struct{}{}
-	}
-}
-
-// ClearReplyTo clears the "replyTo" edge to the Post entity.
-func (m *PostMutation) ClearReplyTo() {
-	m.clearedreplyTo = true
-}
-
-// ReplyToCleared reports if the "replyTo" edge to the Post entity was cleared.
-func (m *PostMutation) ReplyToCleared() bool {
-	return m.clearedreplyTo
-}
-
-// RemoveReplyToIDs removes the "replyTo" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveReplyToIDs(ids ...string) {
-	if m.removedreplyTo == nil {
-		m.removedreplyTo = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.replyTo, ids[i])
-		m.removedreplyTo[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedReplyTo returns the removed IDs of the "replyTo" edge to the Post entity.
-func (m *PostMutation) RemovedReplyToIDs() (ids []string) {
-	for id := range m.removedreplyTo {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReplyToIDs returns the "replyTo" edge IDs in the mutation.
-func (m *PostMutation) ReplyToIDs() (ids []string) {
-	for id := range m.replyTo {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReplyTo resets all changes to the "replyTo" edge.
-func (m *PostMutation) ResetReplyTo() {
-	m.replyTo = nil
-	m.clearedreplyTo = false
-	m.removedreplyTo = nil
-}
-
 // AddReplyIDs adds the "replies" edge to the Post entity by ids.
 func (m *PostMutation) AddReplyIDs(ids ...string) {
 	if m.replies == nil {
@@ -2393,58 +2393,58 @@ func (m *PostMutation) ResetReplies() {
 	m.removedreplies = nil
 }
 
-// AddTagIDs adds the "tags" edge to the Tag entity by ids.
-func (m *PostMutation) AddTagIDs(ids ...string) {
-	if m.tags == nil {
-		m.tags = make(map[string]struct{})
+// AddReplyToIDs adds the "replyTo" edge to the Post entity by ids.
+func (m *PostMutation) AddReplyToIDs(ids ...string) {
+	if m.replyTo == nil {
+		m.replyTo = make(map[string]struct{})
 	}
 	for i := range ids {
-		m.tags[ids[i]] = struct{}{}
+		m.replyTo[ids[i]] = struct{}{}
 	}
 }
 
-// ClearTags clears the "tags" edge to the Tag entity.
-func (m *PostMutation) ClearTags() {
-	m.clearedtags = true
+// ClearReplyTo clears the "replyTo" edge to the Post entity.
+func (m *PostMutation) ClearReplyTo() {
+	m.clearedreplyTo = true
 }
 
-// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
-func (m *PostMutation) TagsCleared() bool {
-	return m.clearedtags
+// ReplyToCleared reports if the "replyTo" edge to the Post entity was cleared.
+func (m *PostMutation) ReplyToCleared() bool {
+	return m.clearedreplyTo
 }
 
-// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
-func (m *PostMutation) RemoveTagIDs(ids ...string) {
-	if m.removedtags == nil {
-		m.removedtags = make(map[string]struct{})
+// RemoveReplyToIDs removes the "replyTo" edge to the Post entity by IDs.
+func (m *PostMutation) RemoveReplyToIDs(ids ...string) {
+	if m.removedreplyTo == nil {
+		m.removedreplyTo = make(map[string]struct{})
 	}
 	for i := range ids {
-		delete(m.tags, ids[i])
-		m.removedtags[ids[i]] = struct{}{}
+		delete(m.replyTo, ids[i])
+		m.removedreplyTo[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
-func (m *PostMutation) RemovedTagsIDs() (ids []string) {
-	for id := range m.removedtags {
+// RemovedReplyTo returns the removed IDs of the "replyTo" edge to the Post entity.
+func (m *PostMutation) RemovedReplyToIDs() (ids []string) {
+	for id := range m.removedreplyTo {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// TagsIDs returns the "tags" edge IDs in the mutation.
-func (m *PostMutation) TagsIDs() (ids []string) {
-	for id := range m.tags {
+// ReplyToIDs returns the "replyTo" edge IDs in the mutation.
+func (m *PostMutation) ReplyToIDs() (ids []string) {
+	for id := range m.replyTo {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetTags resets all changes to the "tags" edge.
-func (m *PostMutation) ResetTags() {
-	m.tags = nil
-	m.clearedtags = false
-	m.removedtags = nil
+// ResetReplyTo resets all changes to the "replyTo" edge.
+func (m *PostMutation) ResetReplyTo() {
+	m.replyTo = nil
+	m.clearedreplyTo = false
+	m.removedreplyTo = nil
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by ids.
@@ -2863,11 +2863,14 @@ func (m *PostMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
 	edges := make([]string, 0, 8)
+	if m.author != nil {
+		edges = append(edges, post.EdgeAuthor)
+	}
 	if m.category != nil {
 		edges = append(edges, post.EdgeCategory)
 	}
-	if m.author != nil {
-		edges = append(edges, post.EdgeAuthor)
+	if m.tags != nil {
+		edges = append(edges, post.EdgeTags)
 	}
 	if m.root != nil {
 		edges = append(edges, post.EdgeRoot)
@@ -2875,14 +2878,11 @@ func (m *PostMutation) AddedEdges() []string {
 	if m.posts != nil {
 		edges = append(edges, post.EdgePosts)
 	}
-	if m.replyTo != nil {
-		edges = append(edges, post.EdgeReplyTo)
-	}
 	if m.replies != nil {
 		edges = append(edges, post.EdgeReplies)
 	}
-	if m.tags != nil {
-		edges = append(edges, post.EdgeTags)
+	if m.replyTo != nil {
+		edges = append(edges, post.EdgeReplyTo)
 	}
 	if m.reacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -2894,31 +2894,31 @@ func (m *PostMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *PostMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case post.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
 	case post.EdgeCategory:
 		ids := make([]ent.Value, 0, len(m.category))
 		for id := range m.category {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeAuthor:
-		ids := make([]ent.Value, 0, len(m.author))
-		for id := range m.author {
+	case post.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.tags))
+		for id := range m.tags {
 			ids = append(ids, id)
 		}
 		return ids
 	case post.EdgeRoot:
-		if id := m.root; id != nil {
-			return []ent.Value{*id}
-		}
-	case post.EdgePosts:
-		ids := make([]ent.Value, 0, len(m.posts))
-		for id := range m.posts {
+		ids := make([]ent.Value, 0, len(m.root))
+		for id := range m.root {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeReplyTo:
-		ids := make([]ent.Value, 0, len(m.replyTo))
-		for id := range m.replyTo {
+	case post.EdgePosts:
+		ids := make([]ent.Value, 0, len(m.posts))
+		for id := range m.posts {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2928,9 +2928,9 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeTags:
-		ids := make([]ent.Value, 0, len(m.tags))
-		for id := range m.tags {
+	case post.EdgeReplyTo:
+		ids := make([]ent.Value, 0, len(m.replyTo))
+		for id := range m.replyTo {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2950,20 +2950,20 @@ func (m *PostMutation) RemovedEdges() []string {
 	if m.removedcategory != nil {
 		edges = append(edges, post.EdgeCategory)
 	}
-	if m.removedauthor != nil {
-		edges = append(edges, post.EdgeAuthor)
+	if m.removedtags != nil {
+		edges = append(edges, post.EdgeTags)
+	}
+	if m.removedroot != nil {
+		edges = append(edges, post.EdgeRoot)
 	}
 	if m.removedposts != nil {
 		edges = append(edges, post.EdgePosts)
 	}
-	if m.removedreplyTo != nil {
-		edges = append(edges, post.EdgeReplyTo)
-	}
 	if m.removedreplies != nil {
 		edges = append(edges, post.EdgeReplies)
 	}
-	if m.removedtags != nil {
-		edges = append(edges, post.EdgeTags)
+	if m.removedreplyTo != nil {
+		edges = append(edges, post.EdgeReplyTo)
 	}
 	if m.removedreacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -2981,9 +2981,15 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeAuthor:
-		ids := make([]ent.Value, 0, len(m.removedauthor))
-		for id := range m.removedauthor {
+	case post.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.removedtags))
+		for id := range m.removedtags {
+			ids = append(ids, id)
+		}
+		return ids
+	case post.EdgeRoot:
+		ids := make([]ent.Value, 0, len(m.removedroot))
+		for id := range m.removedroot {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2993,21 +2999,15 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeReplyTo:
-		ids := make([]ent.Value, 0, len(m.removedreplyTo))
-		for id := range m.removedreplyTo {
-			ids = append(ids, id)
-		}
-		return ids
 	case post.EdgeReplies:
 		ids := make([]ent.Value, 0, len(m.removedreplies))
 		for id := range m.removedreplies {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeTags:
-		ids := make([]ent.Value, 0, len(m.removedtags))
-		for id := range m.removedtags {
+	case post.EdgeReplyTo:
+		ids := make([]ent.Value, 0, len(m.removedreplyTo))
+		for id := range m.removedreplyTo {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3024,11 +3024,14 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 8)
+	if m.clearedauthor {
+		edges = append(edges, post.EdgeAuthor)
+	}
 	if m.clearedcategory {
 		edges = append(edges, post.EdgeCategory)
 	}
-	if m.clearedauthor {
-		edges = append(edges, post.EdgeAuthor)
+	if m.clearedtags {
+		edges = append(edges, post.EdgeTags)
 	}
 	if m.clearedroot {
 		edges = append(edges, post.EdgeRoot)
@@ -3036,14 +3039,11 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedposts {
 		edges = append(edges, post.EdgePosts)
 	}
-	if m.clearedreplyTo {
-		edges = append(edges, post.EdgeReplyTo)
-	}
 	if m.clearedreplies {
 		edges = append(edges, post.EdgeReplies)
 	}
-	if m.clearedtags {
-		edges = append(edges, post.EdgeTags)
+	if m.clearedreplyTo {
+		edges = append(edges, post.EdgeReplyTo)
 	}
 	if m.clearedreacts {
 		edges = append(edges, post.EdgeReacts)
@@ -3055,20 +3055,20 @@ func (m *PostMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *PostMutation) EdgeCleared(name string) bool {
 	switch name {
-	case post.EdgeCategory:
-		return m.clearedcategory
 	case post.EdgeAuthor:
 		return m.clearedauthor
+	case post.EdgeCategory:
+		return m.clearedcategory
+	case post.EdgeTags:
+		return m.clearedtags
 	case post.EdgeRoot:
 		return m.clearedroot
 	case post.EdgePosts:
 		return m.clearedposts
-	case post.EdgeReplyTo:
-		return m.clearedreplyTo
 	case post.EdgeReplies:
 		return m.clearedreplies
-	case post.EdgeTags:
-		return m.clearedtags
+	case post.EdgeReplyTo:
+		return m.clearedreplyTo
 	case post.EdgeReacts:
 		return m.clearedreacts
 	}
@@ -3079,8 +3079,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *PostMutation) ClearEdge(name string) error {
 	switch name {
-	case post.EdgeRoot:
-		m.ClearRoot()
+	case post.EdgeAuthor:
+		m.ClearAuthor()
 		return nil
 	}
 	return fmt.Errorf("unknown Post unique edge %s", name)
@@ -3090,11 +3090,14 @@ func (m *PostMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *PostMutation) ResetEdge(name string) error {
 	switch name {
+	case post.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
 	case post.EdgeCategory:
 		m.ResetCategory()
 		return nil
-	case post.EdgeAuthor:
-		m.ResetAuthor()
+	case post.EdgeTags:
+		m.ResetTags()
 		return nil
 	case post.EdgeRoot:
 		m.ResetRoot()
@@ -3102,14 +3105,11 @@ func (m *PostMutation) ResetEdge(name string) error {
 	case post.EdgePosts:
 		m.ResetPosts()
 		return nil
-	case post.EdgeReplyTo:
-		m.ResetReplyTo()
-		return nil
 	case post.EdgeReplies:
 		m.ResetReplies()
 		return nil
-	case post.EdgeTags:
-		m.ResetTags()
+	case post.EdgeReplyTo:
+		m.ResetReplyTo()
 		return nil
 	case post.EdgeReacts:
 		m.ResetReacts()

@@ -27,8 +27,7 @@ type Category struct {
 	Admin bool `json:"admin,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CategoryQuery when eager-loading is set.
-	Edges         CategoryEdges `json:"edges"`
-	post_category *string
+	Edges CategoryEdges `json:"edges"`
 }
 
 // CategoryEdges holds the relations/edges for other nodes in the graph.
@@ -59,8 +58,6 @@ func (*Category) scanValues(columns []string) ([]interface{}, error) {
 		case category.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case category.FieldID, category.FieldName, category.FieldDescription, category.FieldColour:
-			values[i] = new(sql.NullString)
-		case category.ForeignKeys[0]: // post_category
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Category", columns[i])
@@ -112,13 +109,6 @@ func (c *Category) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
 				c.Admin = value.Bool
-			}
-		case category.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field post_category", values[i])
-			} else if value.Valid {
-				c.post_category = new(string)
-				*c.post_category = value.String
 			}
 		}
 	}
