@@ -94,9 +94,25 @@ func (pc *PostCreate) SetCreatedAt(t time.Time) *PostCreate {
 	return pc
 }
 
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+func (pc *PostCreate) SetNillableCreatedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetCreatedAt(*t)
+	}
+	return pc
+}
+
 // SetUpdatedAt sets the "updatedAt" field.
 func (pc *PostCreate) SetUpdatedAt(t time.Time) *PostCreate {
 	pc.mutation.SetUpdatedAt(t)
+	return pc
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (pc *PostCreate) SetNillableUpdatedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetUpdatedAt(*t)
+	}
 	return pc
 }
 
@@ -111,12 +127,6 @@ func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
 	if t != nil {
 		pc.SetDeletedAt(*t)
 	}
-	return pc
-}
-
-// SetUserId sets the "userId" field.
-func (pc *PostCreate) SetUserId(s string) *PostCreate {
-	pc.mutation.SetUserId(s)
 	return pc
 }
 
@@ -163,8 +173,16 @@ func (pc *PostCreate) SetNillableCategoryId(s *string) *PostCreate {
 }
 
 // SetID sets the "id" field.
-func (pc *PostCreate) SetID(s string) *PostCreate {
-	pc.mutation.SetID(s)
+func (pc *PostCreate) SetID(u uuid.UUID) *PostCreate {
+	pc.mutation.SetID(u)
+	return pc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (pc *PostCreate) SetNillableID(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetID(*u)
+	}
 	return pc
 }
 
@@ -195,14 +213,14 @@ func (pc *PostCreate) AddCategory(c ...*Category) *PostCreate {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pc *PostCreate) AddTagIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddTagIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddTagIDs(ids...)
 	return pc
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
 func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
-	ids := make([]string, len(t))
+	ids := make([]uuid.UUID, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -210,14 +228,14 @@ func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
 }
 
 // AddRootIDs adds the "root" edge to the Post entity by IDs.
-func (pc *PostCreate) AddRootIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddRootIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddRootIDs(ids...)
 	return pc
 }
 
 // AddRoot adds the "root" edges to the Post entity.
 func (pc *PostCreate) AddRoot(p ...*Post) *PostCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -225,14 +243,14 @@ func (pc *PostCreate) AddRoot(p ...*Post) *PostCreate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (pc *PostCreate) AddPostIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddPostIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddPostIDs(ids...)
 	return pc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -240,14 +258,14 @@ func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddReplyIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddReplyIDs(ids...)
 	return pc
 }
 
 // AddReplies adds the "replies" edges to the Post entity.
 func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -255,14 +273,14 @@ func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
 }
 
 // AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyToIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddReplyToIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddReplyToIDs(ids...)
 	return pc
 }
 
 // AddReplyTo adds the "replyTo" edges to the Post entity.
 func (pc *PostCreate) AddReplyTo(p ...*Post) *PostCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -359,6 +377,18 @@ func (pc *PostCreate) defaults() {
 		v := post.DefaultPinned
 		pc.mutation.SetPinned(v)
 	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		v := post.DefaultCreatedAt()
+		pc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		v := post.DefaultUpdatedAt()
+		pc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := pc.mutation.ID(); !ok {
+		v := post.DefaultID()
+		pc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -381,9 +411,6 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updatedAt", err: errors.New(`model: missing required field "Post.updatedAt"`)}
 	}
-	if _, ok := pc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`model: missing required field "Post.userId"`)}
-	}
 	if _, ok := pc.mutation.AuthorID(); !ok {
 		return &ValidationError{Name: "author", err: errors.New(`model: missing required edge "Post.author"`)}
 	}
@@ -399,10 +426,10 @@ func (pc *PostCreate) sqlSave(ctx context.Context) (*Post, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Post.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	return _node, nil
@@ -414,7 +441,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: post.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: post.FieldID,
 			},
 		}
@@ -422,7 +449,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = pc.conflict
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := pc.mutation.Title(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -496,14 +523,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		})
 		_node.DeletedAt = value
 	}
-	if value, ok := pc.mutation.UserId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldUserId,
-		})
-		_node.UserId = value
-	}
 	if value, ok := pc.mutation.RootPostId(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -576,7 +595,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: tag.FieldID,
 				},
 			},
@@ -595,7 +614,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -614,7 +633,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -633,7 +652,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -652,7 +671,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -858,18 +877,6 @@ func (u *PostUpsert) UpdateDeletedAt() *PostUpsert {
 // ClearDeletedAt clears the value of the "deletedAt" field.
 func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
 	u.SetNull(post.FieldDeletedAt)
-	return u
-}
-
-// SetUserId sets the "userId" field.
-func (u *PostUpsert) SetUserId(v string) *PostUpsert {
-	u.Set(post.FieldUserId, v)
-	return u
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *PostUpsert) UpdateUserId() *PostUpsert {
-	u.SetExcluded(post.FieldUserId)
 	return u
 }
 
@@ -1124,20 +1131,6 @@ func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
 	})
 }
 
-// SetUserId sets the "userId" field.
-func (u *PostUpsertOne) SetUserId(v string) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetUserId(v)
-	})
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateUserId() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateUserId()
-	})
-}
-
 // SetRootPostId sets the "rootPostId" field.
 func (u *PostUpsertOne) SetRootPostId(v string) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
@@ -1217,7 +1210,7 @@ func (u *PostUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *PostUpsertOne) ID(ctx context.Context) (id string, err error) {
+func (u *PostUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -1231,7 +1224,7 @@ func (u *PostUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *PostUpsertOne) IDX(ctx context.Context) string {
+func (u *PostUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1561,20 +1554,6 @@ func (u *PostUpsertBulk) UpdateDeletedAt() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearDeletedAt()
-	})
-}
-
-// SetUserId sets the "userId" field.
-func (u *PostUpsertBulk) SetUserId(v string) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetUserId(v)
-	})
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateUserId() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateUserId()
 	})
 }
 

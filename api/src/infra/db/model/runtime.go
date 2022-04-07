@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/Southclaws/storyden/api/src/infra/db/schema"
 	"github.com/google/uuid"
@@ -40,6 +41,24 @@ func init() {
 	postDescPinned := postFields[6].Descriptor()
 	// post.DefaultPinned holds the default value on creation for the pinned field.
 	post.DefaultPinned = postDescPinned.Default.(bool)
+	// postDescCreatedAt is the schema descriptor for createdAt field.
+	postDescCreatedAt := postFields[7].Descriptor()
+	// post.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
+	// postDescUpdatedAt is the schema descriptor for updatedAt field.
+	postDescUpdatedAt := postFields[8].Descriptor()
+	// post.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
+	// postDescID is the schema descriptor for id field.
+	postDescID := postFields[0].Descriptor()
+	// post.DefaultID holds the default value on creation for the id field.
+	post.DefaultID = postDescID.Default.(func() uuid.UUID)
+	tagFields := schema.Tag{}.Fields()
+	_ = tagFields
+	// tagDescID is the schema descriptor for id field.
+	tagDescID := tagFields[0].Descriptor()
+	// tag.DefaultID holds the default value on creation for the id field.
+	tag.DefaultID = tagDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.

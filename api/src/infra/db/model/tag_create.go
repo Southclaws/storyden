@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
+	"github.com/google/uuid"
 )
 
 // TagCreate is the builder for creating a Tag entity.
@@ -30,20 +31,28 @@ func (tc *TagCreate) SetName(s string) *TagCreate {
 }
 
 // SetID sets the "id" field.
-func (tc *TagCreate) SetID(s string) *TagCreate {
-	tc.mutation.SetID(s)
+func (tc *TagCreate) SetID(u uuid.UUID) *TagCreate {
+	tc.mutation.SetID(u)
+	return tc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (tc *TagCreate) SetNillableID(u *uuid.UUID) *TagCreate {
+	if u != nil {
+		tc.SetID(*u)
+	}
 	return tc
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tc *TagCreate) AddPostIDs(ids ...string) *TagCreate {
+func (tc *TagCreate) AddPostIDs(ids ...uuid.UUID) *TagCreate {
 	tc.mutation.AddPostIDs(ids...)
 	return tc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (tc *TagCreate) AddPosts(p ...*Post) *TagCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -61,6 +70,7 @@ func (tc *TagCreate) Save(ctx context.Context) (*Tag, error) {
 		err  error
 		node *Tag
 	)
+	tc.defaults()
 	if len(tc.hooks) == 0 {
 		if err = tc.check(); err != nil {
 			return nil, err
@@ -118,6 +128,14 @@ func (tc *TagCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (tc *TagCreate) defaults() {
+	if _, ok := tc.mutation.ID(); !ok {
+		v := tag.DefaultID()
+		tc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (tc *TagCreate) check() error {
 	if _, ok := tc.mutation.Name(); !ok {
@@ -135,10 +153,10 @@ func (tc *TagCreate) sqlSave(ctx context.Context) (*Tag, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Tag.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	return _node, nil
@@ -150,7 +168,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: tag.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: tag.FieldID,
 			},
 		}
@@ -158,7 +176,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = tc.conflict
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := tc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -177,7 +195,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -271,6 +289,9 @@ func (u *TagUpsertOne) UpdateNewValues() *TagUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(tag.FieldID)
 		}
+		if _, exists := u.create.mutation.Name(); exists {
+			s.SetIgnore(tag.FieldName)
+		}
 	}))
 	return u
 }
@@ -333,7 +354,7 @@ func (u *TagUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *TagUpsertOne) ID(ctx context.Context) (id string, err error) {
+func (u *TagUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -347,7 +368,7 @@ func (u *TagUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *TagUpsertOne) IDX(ctx context.Context) string {
+func (u *TagUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -370,6 +391,7 @@ func (tcb *TagCreateBulk) Save(ctx context.Context) ([]*Tag, error) {
 	for i := range tcb.builders {
 		func(i int, root context.Context) {
 			builder := tcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TagMutation)
 				if !ok {
@@ -498,6 +520,9 @@ func (u *TagUpsertBulk) UpdateNewValues() *TagUpsertBulk {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(tag.FieldID)
 				return
+			}
+			if _, exists := b.mutation.Name(); exists {
+				s.SetIgnore(tag.FieldName)
 			}
 		}
 	}))

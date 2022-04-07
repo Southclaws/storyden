@@ -8,13 +8,14 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
+	"github.com/google/uuid"
 )
 
 // Tag is the model entity for the Tag schema.
 type Tag struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -45,8 +46,10 @@ func (*Tag) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tag.FieldID, tag.FieldName:
+		case tag.FieldName:
 			values[i] = new(sql.NullString)
+		case tag.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Tag", columns[i])
 		}
@@ -63,10 +66,10 @@ func (t *Tag) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case tag.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				t.ID = value.String
+			} else if value != nil {
+				t.ID = *value
 			}
 		case tag.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {

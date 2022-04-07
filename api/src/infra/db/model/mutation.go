@@ -57,8 +57,8 @@ type CategoryMutation struct {
 	addsort       *int
 	admin         *bool
 	clearedFields map[string]struct{}
-	posts         map[string]struct{}
-	removedposts  map[string]struct{}
+	posts         map[uuid.UUID]struct{}
+	removedposts  map[uuid.UUID]struct{}
 	clearedposts  bool
 	done          bool
 	oldValue      func(context.Context) (*Category, error)
@@ -370,9 +370,9 @@ func (m *CategoryMutation) ResetAdmin() {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
-func (m *CategoryMutation) AddPostIDs(ids ...string) {
+func (m *CategoryMutation) AddPostIDs(ids ...uuid.UUID) {
 	if m.posts == nil {
-		m.posts = make(map[string]struct{})
+		m.posts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.posts[ids[i]] = struct{}{}
@@ -390,9 +390,9 @@ func (m *CategoryMutation) PostsCleared() bool {
 }
 
 // RemovePostIDs removes the "posts" edge to the Post entity by IDs.
-func (m *CategoryMutation) RemovePostIDs(ids ...string) {
+func (m *CategoryMutation) RemovePostIDs(ids ...uuid.UUID) {
 	if m.removedposts == nil {
-		m.removedposts = make(map[string]struct{})
+		m.removedposts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.posts, ids[i])
@@ -401,7 +401,7 @@ func (m *CategoryMutation) RemovePostIDs(ids ...string) {
 }
 
 // RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
-func (m *CategoryMutation) RemovedPostsIDs() (ids []string) {
+func (m *CategoryMutation) RemovedPostsIDs() (ids []uuid.UUID) {
 	for id := range m.removedposts {
 		ids = append(ids, id)
 	}
@@ -409,7 +409,7 @@ func (m *CategoryMutation) RemovedPostsIDs() (ids []string) {
 }
 
 // PostsIDs returns the "posts" edge IDs in the mutation.
-func (m *CategoryMutation) PostsIDs() (ids []string) {
+func (m *CategoryMutation) PostsIDs() (ids []uuid.UUID) {
 	for id := range m.posts {
 		ids = append(ids, id)
 	}
@@ -1391,7 +1391,7 @@ type PostMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *string
+	id              *uuid.UUID
 	title           *string
 	slug            *string
 	body            *string
@@ -1401,7 +1401,6 @@ type PostMutation struct {
 	createdAt       *time.Time
 	updatedAt       *time.Time
 	deletedAt       *time.Time
-	userId          *string
 	rootPostId      *string
 	replyPostId     *string
 	categoryId      *string
@@ -1411,20 +1410,20 @@ type PostMutation struct {
 	category        map[string]struct{}
 	removedcategory map[string]struct{}
 	clearedcategory bool
-	tags            map[string]struct{}
-	removedtags     map[string]struct{}
+	tags            map[uuid.UUID]struct{}
+	removedtags     map[uuid.UUID]struct{}
 	clearedtags     bool
-	root            map[string]struct{}
-	removedroot     map[string]struct{}
+	root            map[uuid.UUID]struct{}
+	removedroot     map[uuid.UUID]struct{}
 	clearedroot     bool
-	posts           map[string]struct{}
-	removedposts    map[string]struct{}
+	posts           map[uuid.UUID]struct{}
+	removedposts    map[uuid.UUID]struct{}
 	clearedposts    bool
-	replies         map[string]struct{}
-	removedreplies  map[string]struct{}
+	replies         map[uuid.UUID]struct{}
+	removedreplies  map[uuid.UUID]struct{}
 	clearedreplies  bool
-	replyTo         map[string]struct{}
-	removedreplyTo  map[string]struct{}
+	replyTo         map[uuid.UUID]struct{}
+	removedreplyTo  map[uuid.UUID]struct{}
 	clearedreplyTo  bool
 	reacts          map[string]struct{}
 	removedreacts   map[string]struct{}
@@ -1454,7 +1453,7 @@ func newPostMutation(c config, op Op, opts ...postOption) *PostMutation {
 }
 
 // withPostID sets the ID field of the mutation.
-func withPostID(id string) postOption {
+func withPostID(id uuid.UUID) postOption {
 	return func(m *PostMutation) {
 		var (
 			err   error
@@ -1506,13 +1505,13 @@ func (m PostMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Post entities.
-func (m *PostMutation) SetID(id string) {
+func (m *PostMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *PostMutation) ID() (id string, exists bool) {
+func (m *PostMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1523,12 +1522,12 @@ func (m *PostMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *PostMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *PostMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1901,42 +1900,6 @@ func (m *PostMutation) ResetDeletedAt() {
 	delete(m.clearedFields, post.FieldDeletedAt)
 }
 
-// SetUserId sets the "userId" field.
-func (m *PostMutation) SetUserId(s string) {
-	m.userId = &s
-}
-
-// UserId returns the value of the "userId" field in the mutation.
-func (m *PostMutation) UserId() (r string, exists bool) {
-	v := m.userId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserId returns the old "userId" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldUserId(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserId: %w", err)
-	}
-	return oldValue.UserId, nil
-}
-
-// ResetUserId resets all changes to the "userId" field.
-func (m *PostMutation) ResetUserId() {
-	m.userId = nil
-}
-
 // SetRootPostId sets the "rootPostId" field.
 func (m *PostMutation) SetRootPostId(s string) {
 	m.rootPostId = &s
@@ -2178,9 +2141,9 @@ func (m *PostMutation) ResetCategory() {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
-func (m *PostMutation) AddTagIDs(ids ...string) {
+func (m *PostMutation) AddTagIDs(ids ...uuid.UUID) {
 	if m.tags == nil {
-		m.tags = make(map[string]struct{})
+		m.tags = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.tags[ids[i]] = struct{}{}
@@ -2198,9 +2161,9 @@ func (m *PostMutation) TagsCleared() bool {
 }
 
 // RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
-func (m *PostMutation) RemoveTagIDs(ids ...string) {
+func (m *PostMutation) RemoveTagIDs(ids ...uuid.UUID) {
 	if m.removedtags == nil {
-		m.removedtags = make(map[string]struct{})
+		m.removedtags = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.tags, ids[i])
@@ -2209,7 +2172,7 @@ func (m *PostMutation) RemoveTagIDs(ids ...string) {
 }
 
 // RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
-func (m *PostMutation) RemovedTagsIDs() (ids []string) {
+func (m *PostMutation) RemovedTagsIDs() (ids []uuid.UUID) {
 	for id := range m.removedtags {
 		ids = append(ids, id)
 	}
@@ -2217,7 +2180,7 @@ func (m *PostMutation) RemovedTagsIDs() (ids []string) {
 }
 
 // TagsIDs returns the "tags" edge IDs in the mutation.
-func (m *PostMutation) TagsIDs() (ids []string) {
+func (m *PostMutation) TagsIDs() (ids []uuid.UUID) {
 	for id := range m.tags {
 		ids = append(ids, id)
 	}
@@ -2232,9 +2195,9 @@ func (m *PostMutation) ResetTags() {
 }
 
 // AddRootIDs adds the "root" edge to the Post entity by ids.
-func (m *PostMutation) AddRootIDs(ids ...string) {
+func (m *PostMutation) AddRootIDs(ids ...uuid.UUID) {
 	if m.root == nil {
-		m.root = make(map[string]struct{})
+		m.root = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.root[ids[i]] = struct{}{}
@@ -2252,9 +2215,9 @@ func (m *PostMutation) RootCleared() bool {
 }
 
 // RemoveRootIDs removes the "root" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveRootIDs(ids ...string) {
+func (m *PostMutation) RemoveRootIDs(ids ...uuid.UUID) {
 	if m.removedroot == nil {
-		m.removedroot = make(map[string]struct{})
+		m.removedroot = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.root, ids[i])
@@ -2263,7 +2226,7 @@ func (m *PostMutation) RemoveRootIDs(ids ...string) {
 }
 
 // RemovedRoot returns the removed IDs of the "root" edge to the Post entity.
-func (m *PostMutation) RemovedRootIDs() (ids []string) {
+func (m *PostMutation) RemovedRootIDs() (ids []uuid.UUID) {
 	for id := range m.removedroot {
 		ids = append(ids, id)
 	}
@@ -2271,7 +2234,7 @@ func (m *PostMutation) RemovedRootIDs() (ids []string) {
 }
 
 // RootIDs returns the "root" edge IDs in the mutation.
-func (m *PostMutation) RootIDs() (ids []string) {
+func (m *PostMutation) RootIDs() (ids []uuid.UUID) {
 	for id := range m.root {
 		ids = append(ids, id)
 	}
@@ -2286,9 +2249,9 @@ func (m *PostMutation) ResetRoot() {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
-func (m *PostMutation) AddPostIDs(ids ...string) {
+func (m *PostMutation) AddPostIDs(ids ...uuid.UUID) {
 	if m.posts == nil {
-		m.posts = make(map[string]struct{})
+		m.posts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.posts[ids[i]] = struct{}{}
@@ -2306,9 +2269,9 @@ func (m *PostMutation) PostsCleared() bool {
 }
 
 // RemovePostIDs removes the "posts" edge to the Post entity by IDs.
-func (m *PostMutation) RemovePostIDs(ids ...string) {
+func (m *PostMutation) RemovePostIDs(ids ...uuid.UUID) {
 	if m.removedposts == nil {
-		m.removedposts = make(map[string]struct{})
+		m.removedposts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.posts, ids[i])
@@ -2317,7 +2280,7 @@ func (m *PostMutation) RemovePostIDs(ids ...string) {
 }
 
 // RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
-func (m *PostMutation) RemovedPostsIDs() (ids []string) {
+func (m *PostMutation) RemovedPostsIDs() (ids []uuid.UUID) {
 	for id := range m.removedposts {
 		ids = append(ids, id)
 	}
@@ -2325,7 +2288,7 @@ func (m *PostMutation) RemovedPostsIDs() (ids []string) {
 }
 
 // PostsIDs returns the "posts" edge IDs in the mutation.
-func (m *PostMutation) PostsIDs() (ids []string) {
+func (m *PostMutation) PostsIDs() (ids []uuid.UUID) {
 	for id := range m.posts {
 		ids = append(ids, id)
 	}
@@ -2340,9 +2303,9 @@ func (m *PostMutation) ResetPosts() {
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by ids.
-func (m *PostMutation) AddReplyIDs(ids ...string) {
+func (m *PostMutation) AddReplyIDs(ids ...uuid.UUID) {
 	if m.replies == nil {
-		m.replies = make(map[string]struct{})
+		m.replies = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.replies[ids[i]] = struct{}{}
@@ -2360,9 +2323,9 @@ func (m *PostMutation) RepliesCleared() bool {
 }
 
 // RemoveReplyIDs removes the "replies" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveReplyIDs(ids ...string) {
+func (m *PostMutation) RemoveReplyIDs(ids ...uuid.UUID) {
 	if m.removedreplies == nil {
-		m.removedreplies = make(map[string]struct{})
+		m.removedreplies = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.replies, ids[i])
@@ -2371,7 +2334,7 @@ func (m *PostMutation) RemoveReplyIDs(ids ...string) {
 }
 
 // RemovedReplies returns the removed IDs of the "replies" edge to the Post entity.
-func (m *PostMutation) RemovedRepliesIDs() (ids []string) {
+func (m *PostMutation) RemovedRepliesIDs() (ids []uuid.UUID) {
 	for id := range m.removedreplies {
 		ids = append(ids, id)
 	}
@@ -2379,7 +2342,7 @@ func (m *PostMutation) RemovedRepliesIDs() (ids []string) {
 }
 
 // RepliesIDs returns the "replies" edge IDs in the mutation.
-func (m *PostMutation) RepliesIDs() (ids []string) {
+func (m *PostMutation) RepliesIDs() (ids []uuid.UUID) {
 	for id := range m.replies {
 		ids = append(ids, id)
 	}
@@ -2394,9 +2357,9 @@ func (m *PostMutation) ResetReplies() {
 }
 
 // AddReplyToIDs adds the "replyTo" edge to the Post entity by ids.
-func (m *PostMutation) AddReplyToIDs(ids ...string) {
+func (m *PostMutation) AddReplyToIDs(ids ...uuid.UUID) {
 	if m.replyTo == nil {
-		m.replyTo = make(map[string]struct{})
+		m.replyTo = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.replyTo[ids[i]] = struct{}{}
@@ -2414,9 +2377,9 @@ func (m *PostMutation) ReplyToCleared() bool {
 }
 
 // RemoveReplyToIDs removes the "replyTo" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveReplyToIDs(ids ...string) {
+func (m *PostMutation) RemoveReplyToIDs(ids ...uuid.UUID) {
 	if m.removedreplyTo == nil {
-		m.removedreplyTo = make(map[string]struct{})
+		m.removedreplyTo = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.replyTo, ids[i])
@@ -2425,7 +2388,7 @@ func (m *PostMutation) RemoveReplyToIDs(ids ...string) {
 }
 
 // RemovedReplyTo returns the removed IDs of the "replyTo" edge to the Post entity.
-func (m *PostMutation) RemovedReplyToIDs() (ids []string) {
+func (m *PostMutation) RemovedReplyToIDs() (ids []uuid.UUID) {
 	for id := range m.removedreplyTo {
 		ids = append(ids, id)
 	}
@@ -2433,7 +2396,7 @@ func (m *PostMutation) RemovedReplyToIDs() (ids []string) {
 }
 
 // ReplyToIDs returns the "replyTo" edge IDs in the mutation.
-func (m *PostMutation) ReplyToIDs() (ids []string) {
+func (m *PostMutation) ReplyToIDs() (ids []uuid.UUID) {
 	for id := range m.replyTo {
 		ids = append(ids, id)
 	}
@@ -2520,7 +2483,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 12)
 	if m.title != nil {
 		fields = append(fields, post.FieldTitle)
 	}
@@ -2547,9 +2510,6 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.deletedAt != nil {
 		fields = append(fields, post.FieldDeletedAt)
-	}
-	if m.userId != nil {
-		fields = append(fields, post.FieldUserId)
 	}
 	if m.rootPostId != nil {
 		fields = append(fields, post.FieldRootPostId)
@@ -2586,8 +2546,6 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case post.FieldDeletedAt:
 		return m.DeletedAt()
-	case post.FieldUserId:
-		return m.UserId()
 	case post.FieldRootPostId:
 		return m.RootPostId()
 	case post.FieldReplyPostId:
@@ -2621,8 +2579,6 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case post.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case post.FieldUserId:
-		return m.OldUserId(ctx)
 	case post.FieldRootPostId:
 		return m.OldRootPostId(ctx)
 	case post.FieldReplyPostId:
@@ -2700,13 +2656,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
-		return nil
-	case post.FieldUserId:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserId(v)
 		return nil
 	case post.FieldRootPostId:
 		v, ok := value.(string)
@@ -2843,9 +2792,6 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldDeletedAt:
 		m.ResetDeletedAt()
-		return nil
-	case post.FieldUserId:
-		m.ResetUserId()
 		return nil
 	case post.FieldRootPostId:
 		m.ResetRootPostId()
@@ -3132,8 +3078,8 @@ type ReactMutation struct {
 	user          map[uuid.UUID]struct{}
 	removeduser   map[uuid.UUID]struct{}
 	cleareduser   bool
-	_Post         map[string]struct{}
-	removed_Post  map[string]struct{}
+	_Post         map[uuid.UUID]struct{}
+	removed_Post  map[uuid.UUID]struct{}
 	cleared_Post  bool
 	done          bool
 	oldValue      func(context.Context) (*React, error)
@@ -3443,9 +3389,9 @@ func (m *ReactMutation) ResetUser() {
 }
 
 // AddPostIDs adds the "Post" edge to the Post entity by ids.
-func (m *ReactMutation) AddPostIDs(ids ...string) {
+func (m *ReactMutation) AddPostIDs(ids ...uuid.UUID) {
 	if m._Post == nil {
-		m._Post = make(map[string]struct{})
+		m._Post = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m._Post[ids[i]] = struct{}{}
@@ -3463,9 +3409,9 @@ func (m *ReactMutation) PostCleared() bool {
 }
 
 // RemovePostIDs removes the "Post" edge to the Post entity by IDs.
-func (m *ReactMutation) RemovePostIDs(ids ...string) {
+func (m *ReactMutation) RemovePostIDs(ids ...uuid.UUID) {
 	if m.removed_Post == nil {
-		m.removed_Post = make(map[string]struct{})
+		m.removed_Post = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m._Post, ids[i])
@@ -3474,7 +3420,7 @@ func (m *ReactMutation) RemovePostIDs(ids ...string) {
 }
 
 // RemovedPost returns the removed IDs of the "Post" edge to the Post entity.
-func (m *ReactMutation) RemovedPostIDs() (ids []string) {
+func (m *ReactMutation) RemovedPostIDs() (ids []uuid.UUID) {
 	for id := range m.removed_Post {
 		ids = append(ids, id)
 	}
@@ -3482,7 +3428,7 @@ func (m *ReactMutation) RemovedPostIDs() (ids []string) {
 }
 
 // PostIDs returns the "Post" edge IDs in the mutation.
-func (m *ReactMutation) PostIDs() (ids []string) {
+func (m *ReactMutation) PostIDs() (ids []uuid.UUID) {
 	for id := range m._Post {
 		ids = append(ids, id)
 	}
@@ -6519,11 +6465,11 @@ type TagMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *string
+	id            *uuid.UUID
 	name          *string
 	clearedFields map[string]struct{}
-	posts         map[string]struct{}
-	removedposts  map[string]struct{}
+	posts         map[uuid.UUID]struct{}
+	removedposts  map[uuid.UUID]struct{}
 	clearedposts  bool
 	done          bool
 	oldValue      func(context.Context) (*Tag, error)
@@ -6550,7 +6496,7 @@ func newTagMutation(c config, op Op, opts ...tagOption) *TagMutation {
 }
 
 // withTagID sets the ID field of the mutation.
-func withTagID(id string) tagOption {
+func withTagID(id uuid.UUID) tagOption {
 	return func(m *TagMutation) {
 		var (
 			err   error
@@ -6602,13 +6548,13 @@ func (m TagMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Tag entities.
-func (m *TagMutation) SetID(id string) {
+func (m *TagMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TagMutation) ID() (id string, exists bool) {
+func (m *TagMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -6619,12 +6565,12 @@ func (m *TagMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *TagMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *TagMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -6671,9 +6617,9 @@ func (m *TagMutation) ResetName() {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
-func (m *TagMutation) AddPostIDs(ids ...string) {
+func (m *TagMutation) AddPostIDs(ids ...uuid.UUID) {
 	if m.posts == nil {
-		m.posts = make(map[string]struct{})
+		m.posts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.posts[ids[i]] = struct{}{}
@@ -6691,9 +6637,9 @@ func (m *TagMutation) PostsCleared() bool {
 }
 
 // RemovePostIDs removes the "posts" edge to the Post entity by IDs.
-func (m *TagMutation) RemovePostIDs(ids ...string) {
+func (m *TagMutation) RemovePostIDs(ids ...uuid.UUID) {
 	if m.removedposts == nil {
-		m.removedposts = make(map[string]struct{})
+		m.removedposts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.posts, ids[i])
@@ -6702,7 +6648,7 @@ func (m *TagMutation) RemovePostIDs(ids ...string) {
 }
 
 // RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
-func (m *TagMutation) RemovedPostsIDs() (ids []string) {
+func (m *TagMutation) RemovedPostsIDs() (ids []uuid.UUID) {
 	for id := range m.removedposts {
 		ids = append(ids, id)
 	}
@@ -6710,7 +6656,7 @@ func (m *TagMutation) RemovedPostsIDs() (ids []string) {
 }
 
 // PostsIDs returns the "posts" edge IDs in the mutation.
-func (m *TagMutation) PostsIDs() (ids []string) {
+func (m *TagMutation) PostsIDs() (ids []uuid.UUID) {
 	for id := range m.posts {
 		ids = append(ids, id)
 	}
@@ -6938,8 +6884,8 @@ type UserMutation struct {
 	updatedAt            *time.Time
 	deletedAt            *time.Time
 	clearedFields        map[string]struct{}
-	posts                map[string]struct{}
-	removedposts         map[string]struct{}
+	posts                map[uuid.UUID]struct{}
+	removedposts         map[uuid.UUID]struct{}
 	clearedposts         bool
 	reacts               map[string]struct{}
 	removedreacts        map[string]struct{}
@@ -7335,9 +7281,9 @@ func (m *UserMutation) ResetDeletedAt() {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
-func (m *UserMutation) AddPostIDs(ids ...string) {
+func (m *UserMutation) AddPostIDs(ids ...uuid.UUID) {
 	if m.posts == nil {
-		m.posts = make(map[string]struct{})
+		m.posts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.posts[ids[i]] = struct{}{}
@@ -7355,9 +7301,9 @@ func (m *UserMutation) PostsCleared() bool {
 }
 
 // RemovePostIDs removes the "posts" edge to the Post entity by IDs.
-func (m *UserMutation) RemovePostIDs(ids ...string) {
+func (m *UserMutation) RemovePostIDs(ids ...uuid.UUID) {
 	if m.removedposts == nil {
-		m.removedposts = make(map[string]struct{})
+		m.removedposts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.posts, ids[i])
@@ -7366,7 +7312,7 @@ func (m *UserMutation) RemovePostIDs(ids ...string) {
 }
 
 // RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
-func (m *UserMutation) RemovedPostsIDs() (ids []string) {
+func (m *UserMutation) RemovedPostsIDs() (ids []uuid.UUID) {
 	for id := range m.removedposts {
 		ids = append(ids, id)
 	}
@@ -7374,7 +7320,7 @@ func (m *UserMutation) RemovedPostsIDs() (ids []string) {
 }
 
 // PostsIDs returns the "posts" edge IDs in the mutation.
-func (m *UserMutation) PostsIDs() (ids []string) {
+func (m *UserMutation) PostsIDs() (ids []uuid.UUID) {
 	for id := range m.posts {
 		ids = append(ids, id)
 	}

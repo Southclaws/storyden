@@ -50,7 +50,7 @@ var (
 	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
 		{Name: "body", Type: field.TypeString},
@@ -60,7 +60,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "user_id", Type: field.TypeString},
 		{Name: "root_post_id", Type: field.TypeString, Nullable: true},
 		{Name: "reply_post_id", Type: field.TypeString, Nullable: true},
 		{Name: "category_id", Type: field.TypeString, Nullable: true},
@@ -75,13 +74,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_reacts_Post",
-				Columns:    []*schema.Column{PostsColumns[14]},
+				Columns:    []*schema.Column{PostsColumns[13]},
 				RefColumns: []*schema.Column{ReactsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_users_posts",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[14]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -94,7 +93,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "post_id", Type: field.TypeString},
 		{Name: "user_id", Type: field.TypeString},
-		{Name: "post_reacts", Type: field.TypeString, Nullable: true},
+		{Name: "post_reacts", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_reacts", Type: field.TypeUUID, Nullable: true},
 	}
 	// ReactsTable holds the schema information for the "reacts" table.
@@ -207,8 +206,8 @@ var (
 	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "name", Type: field.TypeString},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
 	TagsTable = &schema.Table{
@@ -259,7 +258,7 @@ var (
 	// CategoryPostsColumns holds the columns for the "category_posts" table.
 	CategoryPostsColumns = []*schema.Column{
 		{Name: "category_id", Type: field.TypeString},
-		{Name: "post_id", Type: field.TypeString},
+		{Name: "post_id", Type: field.TypeUUID},
 	}
 	// CategoryPostsTable holds the schema information for the "category_posts" table.
 	CategoryPostsTable = &schema.Table{
@@ -283,8 +282,8 @@ var (
 	}
 	// PostPostsColumns holds the columns for the "post_posts" table.
 	PostPostsColumns = []*schema.Column{
-		{Name: "post_id", Type: field.TypeString},
-		{Name: "root_id", Type: field.TypeString},
+		{Name: "post_id", Type: field.TypeUUID},
+		{Name: "root_id", Type: field.TypeUUID},
 	}
 	// PostPostsTable holds the schema information for the "post_posts" table.
 	PostPostsTable = &schema.Table{
@@ -308,8 +307,8 @@ var (
 	}
 	// PostReplyToColumns holds the columns for the "post_replyTo" table.
 	PostReplyToColumns = []*schema.Column{
-		{Name: "post_id", Type: field.TypeString},
-		{Name: "reply_id", Type: field.TypeString},
+		{Name: "post_id", Type: field.TypeUUID},
+		{Name: "reply_id", Type: field.TypeUUID},
 	}
 	// PostReplyToTable holds the schema information for the "post_replyTo" table.
 	PostReplyToTable = &schema.Table{
@@ -333,8 +332,8 @@ var (
 	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
-		{Name: "tag_id", Type: field.TypeString},
-		{Name: "post_id", Type: field.TypeString},
+		{Name: "tag_id", Type: field.TypeUUID},
+		{Name: "post_id", Type: field.TypeUUID},
 	}
 	// TagPostsTable holds the schema information for the "tag_posts" table.
 	TagPostsTable = &schema.Table{

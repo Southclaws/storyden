@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
+	"github.com/google/uuid"
 )
 
 // TagQuery is the builder for querying Tag entities.
@@ -28,6 +29,7 @@ type TagQuery struct {
 	predicates []predicate.Tag
 	// eager-loading edges.
 	withPosts *PostQuery
+	modifiers []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -110,8 +112,8 @@ func (tq *TagQuery) FirstX(ctx context.Context) *Tag {
 
 // FirstID returns the first Tag ID from the query.
 // Returns a *NotFoundError when no Tag ID was found.
-func (tq *TagQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (tq *TagQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +125,7 @@ func (tq *TagQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tq *TagQuery) FirstIDX(ctx context.Context) string {
+func (tq *TagQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := tq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +163,8 @@ func (tq *TagQuery) OnlyX(ctx context.Context) *Tag {
 // OnlyID is like Only, but returns the only Tag ID in the query.
 // Returns a *NotSingularError when more than one Tag ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (tq *TagQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (tq *TagQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +180,7 @@ func (tq *TagQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tq *TagQuery) OnlyIDX(ctx context.Context) string {
+func (tq *TagQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := tq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +206,8 @@ func (tq *TagQuery) AllX(ctx context.Context) []*Tag {
 }
 
 // IDs executes the query and returns a list of Tag IDs.
-func (tq *TagQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (tq *TagQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := tq.Select(tag.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +215,7 @@ func (tq *TagQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tq *TagQuery) IDsX(ctx context.Context) []string {
+func (tq *TagQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := tq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -368,6 +370,9 @@ func (tq *TagQuery) sqlAll(ctx context.Context) ([]*Tag, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(tq.modifiers) > 0 {
+		_spec.Modifiers = tq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, tq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -377,15 +382,15 @@ func (tq *TagQuery) sqlAll(ctx context.Context) ([]*Tag, error) {
 
 	if query := tq.withPosts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Tag, len(nodes))
+		ids := make(map[uuid.UUID]*Tag, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Posts = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Tag)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Tag)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -397,19 +402,19 @@ func (tq *TagQuery) sqlAll(ctx context.Context) ([]*Tag, error) {
 				s.Where(sql.InValues(tag.PostsPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -445,6 +450,9 @@ func (tq *TagQuery) sqlAll(ctx context.Context) ([]*Tag, error) {
 
 func (tq *TagQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := tq.querySpec()
+	if len(tq.modifiers) > 0 {
+		_spec.Modifiers = tq.modifiers
+	}
 	_spec.Node.Columns = tq.fields
 	if len(tq.fields) > 0 {
 		_spec.Unique = tq.unique != nil && *tq.unique
@@ -466,7 +474,7 @@ func (tq *TagQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   tag.Table,
 			Columns: tag.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: tag.FieldID,
 			},
 		},
@@ -523,6 +531,9 @@ func (tq *TagQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if tq.unique != nil && *tq.unique {
 		selector.Distinct()
 	}
+	for _, m := range tq.modifiers {
+		m(selector)
+	}
 	for _, p := range tq.predicates {
 		p(selector)
 	}
@@ -538,6 +549,12 @@ func (tq *TagQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (tq *TagQuery) Modify(modifiers ...func(s *sql.Selector)) *TagSelect {
+	tq.modifiers = append(tq.modifiers, modifiers...)
+	return tq.Select()
 }
 
 // TagGroupBy is the group-by builder for Tag entities.
@@ -1026,4 +1043,10 @@ func (ts *TagSelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ts *TagSelect) Modify(modifiers ...func(s *sql.Selector)) *TagSelect {
+	ts.modifiers = append(ts.modifiers, modifiers...)
+	return ts
 }

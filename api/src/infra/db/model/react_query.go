@@ -28,9 +28,10 @@ type ReactQuery struct {
 	fields     []string
 	predicates []predicate.React
 	// eager-loading edges.
-	withUser *UserQuery
-	withPost *PostQuery
-	withFKs  bool
+	withUser  *UserQuery
+	withPost  *PostQuery
+	withFKs   bool
+	modifiers []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -410,6 +411,9 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, rq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -480,6 +484,9 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 
 func (rq *ReactQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rq.querySpec()
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	_spec.Node.Columns = rq.fields
 	if len(rq.fields) > 0 {
 		_spec.Unique = rq.unique != nil && *rq.unique
@@ -558,6 +565,9 @@ func (rq *ReactQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if rq.unique != nil && *rq.unique {
 		selector.Distinct()
 	}
+	for _, m := range rq.modifiers {
+		m(selector)
+	}
 	for _, p := range rq.predicates {
 		p(selector)
 	}
@@ -573,6 +583,12 @@ func (rq *ReactQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (rq *ReactQuery) Modify(modifiers ...func(s *sql.Selector)) *ReactSelect {
+	rq.modifiers = append(rq.modifiers, modifiers...)
+	return rq.Select()
 }
 
 // ReactGroupBy is the group-by builder for React entities.
@@ -1061,4 +1077,10 @@ func (rs *ReactSelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (rs *ReactSelect) Modify(modifiers ...func(s *sql.Selector)) *ReactSelect {
+	rs.modifiers = append(rs.modifiers, modifiers...)
+	return rs
 }

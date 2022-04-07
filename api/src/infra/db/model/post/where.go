@@ -8,31 +8,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Post {
+func ID(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Post {
+func IDEQ(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Post {
+func IDNEQ(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Post {
+func IDIn(ids ...uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...string) predicate.Post {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Post {
+func IDNotIn(ids ...uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,28 +67,28 @@ func IDNotIn(ids ...string) predicate.Post {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Post {
+func IDGT(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Post {
+func IDGTE(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Post {
+func IDLT(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Post {
+func IDLTE(id uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -153,13 +154,6 @@ func UpdatedAt(v time.Time) predicate.Post {
 func DeletedAt(v time.Time) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldDeletedAt), v))
-	})
-}
-
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
 	})
 }
 
@@ -923,117 +917,6 @@ func DeletedAtIsNil() predicate.Post {
 func DeletedAtNotNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldDeletedAt)))
-	})
-}
-
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdGT applies the GT predicate on the "userId" field.
-func UserIdGT(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdGTE applies the GTE predicate on the "userId" field.
-func UserIdGTE(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLT applies the LT predicate on the "userId" field.
-func UserIdLT(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLTE applies the LTE predicate on the "userId" field.
-func UserIdLTE(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContains applies the Contains predicate on the "userId" field.
-func UserIdContains(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasPrefix applies the HasPrefix predicate on the "userId" field.
-func UserIdHasPrefix(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasSuffix applies the HasSuffix predicate on the "userId" field.
-func UserIdHasSuffix(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdEqualFold applies the EqualFold predicate on the "userId" field.
-func UserIdEqualFold(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContainsFold applies the ContainsFold predicate on the "userId" field.
-func UserIdContainsFold(v string) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldUserId), v))
 	})
 }
 

@@ -2,6 +2,12 @@
 
 package post
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the post type in the database.
 	Label = "post"
@@ -25,8 +31,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deletedat field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
 	// FieldRootPostId holds the string denoting the rootpostid field in the database.
 	FieldRootPostId = "root_post_id"
 	// FieldReplyPostId holds the string denoting the replypostid field in the database.
@@ -97,7 +101,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldUserId,
 	FieldRootPostId,
 	FieldReplyPostId,
 	FieldCategoryId,
@@ -149,4 +152,10 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultPinned holds the default value on creation for the "pinned" field.
 	DefaultPinned bool
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
+	DefaultUpdatedAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

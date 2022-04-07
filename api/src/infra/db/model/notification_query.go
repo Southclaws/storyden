@@ -29,6 +29,7 @@ type NotificationQuery struct {
 	// eager-loading edges.
 	withSubscription *SubscriptionQuery
 	withFKs          bool
+	modifiers        []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -373,6 +374,9 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context) ([]*Notification, error
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(nq.modifiers) > 0 {
+		_spec.Modifiers = nq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, nq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -414,6 +418,9 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context) ([]*Notification, error
 
 func (nq *NotificationQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := nq.querySpec()
+	if len(nq.modifiers) > 0 {
+		_spec.Modifiers = nq.modifiers
+	}
 	_spec.Node.Columns = nq.fields
 	if len(nq.fields) > 0 {
 		_spec.Unique = nq.unique != nil && *nq.unique
@@ -492,6 +499,9 @@ func (nq *NotificationQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if nq.unique != nil && *nq.unique {
 		selector.Distinct()
 	}
+	for _, m := range nq.modifiers {
+		m(selector)
+	}
 	for _, p := range nq.predicates {
 		p(selector)
 	}
@@ -507,6 +517,12 @@ func (nq *NotificationQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (nq *NotificationQuery) Modify(modifiers ...func(s *sql.Selector)) *NotificationSelect {
+	nq.modifiers = append(nq.modifiers, modifiers...)
+	return nq.Select()
 }
 
 // NotificationGroupBy is the group-by builder for Notification entities.
@@ -995,4 +1011,10 @@ func (ns *NotificationSelect) sqlScan(ctx context.Context, v interface{}) error 
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ns *NotificationSelect) Modify(modifiers ...func(s *sql.Selector)) *NotificationSelect {
+	ns.modifiers = append(ns.modifiers, modifiers...)
+	return ns
 }

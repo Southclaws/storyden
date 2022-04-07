@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
+	"github.com/google/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -126,14 +127,14 @@ func (uu *UserUpdate) ClearDeletedAt() *UserUpdate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (uu *UserUpdate) AddPostIDs(ids ...string) *UserUpdate {
+func (uu *UserUpdate) AddPostIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddPostIDs(ids...)
 	return uu
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (uu *UserUpdate) AddPosts(p ...*Post) *UserUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -182,14 +183,14 @@ func (uu *UserUpdate) ClearPosts() *UserUpdate {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (uu *UserUpdate) RemovePostIDs(ids ...string) *UserUpdate {
+func (uu *UserUpdate) RemovePostIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemovePostIDs(ids...)
 	return uu
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (uu *UserUpdate) RemovePosts(p ...*Post) *UserUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -396,7 +397,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -412,7 +413,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -431,7 +432,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -663,14 +664,14 @@ func (uuo *UserUpdateOne) ClearDeletedAt() *UserUpdateOne {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (uuo *UserUpdateOne) AddPostIDs(ids ...string) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddPostIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddPostIDs(ids...)
 	return uuo
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (uuo *UserUpdateOne) AddPosts(p ...*Post) *UserUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -719,14 +720,14 @@ func (uuo *UserUpdateOne) ClearPosts() *UserUpdateOne {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (uuo *UserUpdateOne) RemovePostIDs(ids ...string) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemovePostIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemovePostIDs(ids...)
 	return uuo
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (uuo *UserUpdateOne) RemovePosts(p ...*Post) *UserUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -957,7 +958,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -973,7 +974,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -992,7 +993,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},

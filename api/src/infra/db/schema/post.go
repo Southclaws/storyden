@@ -1,9 +1,12 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Post holds the schema definition for the Post entity.
@@ -14,17 +17,20 @@ type Post struct {
 // Fields of Post.
 func (Post) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id"),
+		field.UUID("id", uuid.UUID{}).
+			Unique().
+			Immutable().
+			Default(uuid.New),
+
 		field.String("title").Optional(),
 		field.String("slug").Optional(),
 		field.String("body"),
 		field.String("short"),
 		field.Bool("first"),
 		field.Bool("pinned").Default(false),
-		field.Time("createdAt"),
-		field.Time("updatedAt"),
+		field.Time("createdAt").Default(time.Now),
+		field.Time("updatedAt").Default(time.Now),
 		field.Time("deletedAt").Optional(),
-		field.String("userId"),
 		field.String("rootPostId").Optional(),
 		field.String("replyPostId").Optional(),
 		field.String("categoryId").Optional(),

@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // CategoryQuery is the builder for querying Category entities.
@@ -28,6 +29,7 @@ type CategoryQuery struct {
 	predicates []predicate.Category
 	// eager-loading edges.
 	withPosts *PostQuery
+	modifiers []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -368,6 +370,9 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context) ([]*Category, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, cq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -384,8 +389,8 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context) ([]*Category, error) {
 			node.Edges.Posts = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Category)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Category)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -397,19 +402,19 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context) ([]*Category, error) {
 				s.Where(sql.InValues(category.PostsPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(sql.NullString), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
 				eout, ok := out.(*sql.NullString)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
 				outValue := eout.String
-				inValue := ein.String
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -445,6 +450,9 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context) ([]*Category, error) {
 
 func (cq *CategoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	_spec.Node.Columns = cq.fields
 	if len(cq.fields) > 0 {
 		_spec.Unique = cq.unique != nil && *cq.unique
@@ -523,6 +531,9 @@ func (cq *CategoryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if cq.unique != nil && *cq.unique {
 		selector.Distinct()
 	}
+	for _, m := range cq.modifiers {
+		m(selector)
+	}
 	for _, p := range cq.predicates {
 		p(selector)
 	}
@@ -538,6 +549,12 @@ func (cq *CategoryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cq *CategoryQuery) Modify(modifiers ...func(s *sql.Selector)) *CategorySelect {
+	cq.modifiers = append(cq.modifiers, modifiers...)
+	return cq.Select()
 }
 
 // CategoryGroupBy is the group-by builder for Category entities.
@@ -1026,4 +1043,10 @@ func (cs *CategorySelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (cs *CategorySelect) Modify(modifiers ...func(s *sql.Selector)) *CategorySelect {
+	cs.modifiers = append(cs.modifiers, modifiers...)
+	return cs
 }

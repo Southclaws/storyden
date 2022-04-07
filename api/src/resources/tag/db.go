@@ -3,38 +3,40 @@ package tag
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
+
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) GetTags(ctx context.Context, query string) ([]Tag, error) {
-	var tags []Tag
-	err := d.db.Prisma.Raw.QueryRaw(`
-		select
-			t.id, t.name, count(*) as posts
-		from
-			"_TagToPost" ttp
-		inner join
-			"Tag" t on ttp."B" = t.id
-		inner join
-			"Post" p on ttp."A" = p.id
-		where t.name like $1
-		group by t.id
-		order by posts desc
-	`, query+"%").Exec(ctx, &tags)
+func (d *database) GetTags(ctx context.Context, query string) ([]Tag, error) {
+	tags := []Tag{}
+
+	err := d.db.Tag.Query().Modify(func(s *sql.Selector) {
+		s.
+			Select(
+				sql.As(sql.Table("t").C("id"), "id"),
+				sql.As("name", "name"),
+				sql.As(sql.Count("*"), "posts"),
+			).
+			From(sql.Table(tag.PostsTable)).
+			Where(sql.HasPrefix(sql.Table("t").C("name"), query)).
+			Join(sql.Table(tag.Table).As("t")).On(sql.Table("t").C(tag.FieldID), "tag_id").
+			Join(sql.Table(post.Table).As("p")).On(sql.Table("p").C(post.FieldID), "post_id").
+			GroupBy(sql.Table("t").C("id")).
+			OrderBy(sql.Desc("posts"))
+	}).Scan(ctx, &tags)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(tags) == 0 {
-		return nil, nil
 	}
 
 	return tags, nil

@@ -72,14 +72,14 @@ func (rc *ReactCreate) AddUser(u ...*User) *ReactCreate {
 }
 
 // AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (rc *ReactCreate) AddPostIDs(ids ...string) *ReactCreate {
+func (rc *ReactCreate) AddPostIDs(ids ...uuid.UUID) *ReactCreate {
 	rc.mutation.AddPostIDs(ids...)
 	return rc
 }
 
 // AddPost adds the "Post" edges to the Post entity.
 func (rc *ReactCreate) AddPost(p ...*Post) *ReactCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -265,7 +265,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},

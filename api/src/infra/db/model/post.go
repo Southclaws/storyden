@@ -17,7 +17,7 @@ import (
 type Post struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -36,8 +36,6 @@ type Post struct {
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// DeletedAt holds the value of the "deletedAt" field.
 	DeletedAt time.Time `json:"deletedAt,omitempty"`
-	// UserId holds the value of the "userId" field.
-	UserId string `json:"userId,omitempty"`
 	// RootPostId holds the value of the "rootPostId" field.
 	RootPostId string `json:"rootPostId,omitempty"`
 	// ReplyPostId holds the value of the "replyPostId" field.
@@ -158,10 +156,12 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldID, post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldUserId, post.FieldRootPostId, post.FieldReplyPostId, post.FieldCategoryId:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldRootPostId, post.FieldReplyPostId, post.FieldCategoryId:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
+		case post.FieldID:
+			values[i] = new(uuid.UUID)
 		case post.ForeignKeys[0]: // react_post
 			values[i] = new(sql.NullString)
 		case post.ForeignKeys[1]: // user_posts
@@ -182,10 +182,10 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case post.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				po.ID = value.String
+			} else if value != nil {
+				po.ID = *value
 			}
 		case post.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -240,12 +240,6 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
 			} else if value.Valid {
 				po.DeletedAt = value.Time
-			}
-		case post.FieldUserId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
-			} else if value.Valid {
-				po.UserId = value.String
 			}
 		case post.FieldRootPostId:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -365,8 +359,6 @@ func (po *Post) String() string {
 	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", deletedAt=")
 	builder.WriteString(po.DeletedAt.Format(time.ANSIC))
-	builder.WriteString(", userId=")
-	builder.WriteString(po.UserId)
 	builder.WriteString(", rootPostId=")
 	builder.WriteString(po.RootPostId)
 	builder.WriteString(", replyPostId=")

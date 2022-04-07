@@ -71,14 +71,14 @@ func (ru *ReactUpdate) AddUser(u ...*User) *ReactUpdate {
 }
 
 // AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (ru *ReactUpdate) AddPostIDs(ids ...string) *ReactUpdate {
+func (ru *ReactUpdate) AddPostIDs(ids ...uuid.UUID) *ReactUpdate {
 	ru.mutation.AddPostIDs(ids...)
 	return ru
 }
 
 // AddPost adds the "Post" edges to the Post entity.
 func (ru *ReactUpdate) AddPost(p ...*Post) *ReactUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -118,14 +118,14 @@ func (ru *ReactUpdate) ClearPost() *ReactUpdate {
 }
 
 // RemovePostIDs removes the "Post" edge to Post entities by IDs.
-func (ru *ReactUpdate) RemovePostIDs(ids ...string) *ReactUpdate {
+func (ru *ReactUpdate) RemovePostIDs(ids ...uuid.UUID) *ReactUpdate {
 	ru.mutation.RemovePostIDs(ids...)
 	return ru
 }
 
 // RemovePost removes "Post" edges to Post entities.
 func (ru *ReactUpdate) RemovePost(p ...*Post) *ReactUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -295,7 +295,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -311,7 +311,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -330,7 +330,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -399,14 +399,14 @@ func (ruo *ReactUpdateOne) AddUser(u ...*User) *ReactUpdateOne {
 }
 
 // AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (ruo *ReactUpdateOne) AddPostIDs(ids ...string) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) AddPostIDs(ids ...uuid.UUID) *ReactUpdateOne {
 	ruo.mutation.AddPostIDs(ids...)
 	return ruo
 }
 
 // AddPost adds the "Post" edges to the Post entity.
 func (ruo *ReactUpdateOne) AddPost(p ...*Post) *ReactUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -446,14 +446,14 @@ func (ruo *ReactUpdateOne) ClearPost() *ReactUpdateOne {
 }
 
 // RemovePostIDs removes the "Post" edge to Post entities by IDs.
-func (ruo *ReactUpdateOne) RemovePostIDs(ids ...string) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) RemovePostIDs(ids ...uuid.UUID) *ReactUpdateOne {
 	ruo.mutation.RemovePostIDs(ids...)
 	return ruo
 }
 
 // RemovePost removes "Post" edges to Post entities.
 func (ruo *ReactUpdateOne) RemovePost(p ...*Post) *ReactUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -647,7 +647,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -663,7 +663,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -682,7 +682,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},

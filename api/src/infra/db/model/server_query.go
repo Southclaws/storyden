@@ -28,9 +28,10 @@ type ServerQuery struct {
 	fields     []string
 	predicates []predicate.Server
 	// eager-loading edges.
-	withRu   *RuleQuery
-	withUser *UserQuery
-	withFKs  bool
+	withRu    *RuleQuery
+	withUser  *UserQuery
+	withFKs   bool
+	modifiers []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -410,6 +411,9 @@ func (sq *ServerQuery) sqlAll(ctx context.Context) ([]*Server, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(sq.modifiers) > 0 {
+		_spec.Modifiers = sq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, sq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -480,6 +484,9 @@ func (sq *ServerQuery) sqlAll(ctx context.Context) ([]*Server, error) {
 
 func (sq *ServerQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
+	if len(sq.modifiers) > 0 {
+		_spec.Modifiers = sq.modifiers
+	}
 	_spec.Node.Columns = sq.fields
 	if len(sq.fields) > 0 {
 		_spec.Unique = sq.unique != nil && *sq.unique
@@ -558,6 +565,9 @@ func (sq *ServerQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if sq.unique != nil && *sq.unique {
 		selector.Distinct()
 	}
+	for _, m := range sq.modifiers {
+		m(selector)
+	}
 	for _, p := range sq.predicates {
 		p(selector)
 	}
@@ -573,6 +583,12 @@ func (sq *ServerQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (sq *ServerQuery) Modify(modifiers ...func(s *sql.Selector)) *ServerSelect {
+	sq.modifiers = append(sq.modifiers, modifiers...)
+	return sq.Select()
 }
 
 // ServerGroupBy is the group-by builder for Server entities.
@@ -1061,4 +1077,10 @@ func (ss *ServerSelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ss *ServerSelect) Modify(modifiers ...func(s *sql.Selector)) *ServerSelect {
+	ss.modifiers = append(ss.modifiers, modifiers...)
+	return ss
 }

@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Tag holds the schema definition for the Tag entity.
@@ -14,8 +15,14 @@ type Tag struct {
 // Fields of Tag.
 func (Tag) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id"),
-		field.String("name"),
+		field.UUID("id", uuid.UUID{}).
+			Unique().
+			Immutable().
+			Default(uuid.New),
+
+		field.String("name").
+			Unique().
+			Immutable(),
 	}
 }
 

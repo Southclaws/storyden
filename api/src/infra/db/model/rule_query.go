@@ -29,6 +29,7 @@ type RuleQuery struct {
 	// eager-loading edges.
 	withServer *ServerQuery
 	withFKs    bool
+	modifiers  []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -373,6 +374,9 @@ func (rq *RuleQuery) sqlAll(ctx context.Context) ([]*Rule, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, rq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -414,6 +418,9 @@ func (rq *RuleQuery) sqlAll(ctx context.Context) ([]*Rule, error) {
 
 func (rq *RuleQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rq.querySpec()
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	_spec.Node.Columns = rq.fields
 	if len(rq.fields) > 0 {
 		_spec.Unique = rq.unique != nil && *rq.unique
@@ -492,6 +499,9 @@ func (rq *RuleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if rq.unique != nil && *rq.unique {
 		selector.Distinct()
 	}
+	for _, m := range rq.modifiers {
+		m(selector)
+	}
 	for _, p := range rq.predicates {
 		p(selector)
 	}
@@ -507,6 +517,12 @@ func (rq *RuleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (rq *RuleQuery) Modify(modifiers ...func(s *sql.Selector)) *RuleSelect {
+	rq.modifiers = append(rq.modifiers, modifiers...)
+	return rq.Select()
 }
 
 // RuleGroupBy is the group-by builder for Rule entities.
@@ -995,4 +1011,10 @@ func (rs *RuleSelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (rs *RuleSelect) Modify(modifiers ...func(s *sql.Selector)) *RuleSelect {
+	rs.modifiers = append(rs.modifiers, modifiers...)
+	return rs
 }

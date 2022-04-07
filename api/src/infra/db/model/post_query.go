@@ -40,6 +40,7 @@ type PostQuery struct {
 	withReplyTo  *PostQuery
 	withReacts   *ReactQuery
 	withFKs      bool
+	modifiers    []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -276,8 +277,8 @@ func (pq *PostQuery) FirstX(ctx context.Context) *Post {
 
 // FirstID returns the first Post ID from the query.
 // Returns a *NotFoundError when no Post ID was found.
-func (pq *PostQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (pq *PostQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = pq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -289,7 +290,7 @@ func (pq *PostQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *PostQuery) FirstIDX(ctx context.Context) string {
+func (pq *PostQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -327,8 +328,8 @@ func (pq *PostQuery) OnlyX(ctx context.Context) *Post {
 // OnlyID is like Only, but returns the only Post ID in the query.
 // Returns a *NotSingularError when more than one Post ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *PostQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (pq *PostQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = pq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -344,7 +345,7 @@ func (pq *PostQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *PostQuery) OnlyIDX(ctx context.Context) string {
+func (pq *PostQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -370,8 +371,8 @@ func (pq *PostQuery) AllX(ctx context.Context) []*Post {
 }
 
 // IDs executes the query and returns a list of Post IDs.
-func (pq *PostQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (pq *PostQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := pq.Select(post.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -379,7 +380,7 @@ func (pq *PostQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *PostQuery) IDsX(ctx context.Context) []string {
+func (pq *PostQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -632,6 +633,9 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, pq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -670,7 +674,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withCategory; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
@@ -690,10 +694,10 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.CategoryPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(sql.NullString)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
@@ -701,7 +705,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
+				outValue := *eout
 				inValue := ein.String
 				node, ok := ids[outValue]
 				if !ok {
@@ -735,15 +739,15 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withTags; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Tags = []*Tag{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Post)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -755,19 +759,19 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.TagsPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -800,15 +804,15 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withRoot; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Root = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Post)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -820,19 +824,19 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.RootPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -865,15 +869,15 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withPosts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Posts = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Post)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -885,19 +889,19 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.PostsPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -930,15 +934,15 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withReplies; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Replies = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Post)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -950,19 +954,19 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.RepliesPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -995,15 +999,15 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withReplyTo; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Post, len(nodes))
+		ids := make(map[uuid.UUID]*Post, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.ReplyTo = []*Post{}
 		}
 		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Post)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -1015,19 +1019,19 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 				s.Where(sql.InValues(post.ReplyToPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(sql.NullString)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullString)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := eout.String
-				inValue := ein.String
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -1060,7 +1064,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 	if query := pq.withReacts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*Post)
+		nodeids := make(map[uuid.UUID]*Post)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -1092,6 +1096,9 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 
 func (pq *PostQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	_spec.Node.Columns = pq.fields
 	if len(pq.fields) > 0 {
 		_spec.Unique = pq.unique != nil && *pq.unique
@@ -1113,7 +1120,7 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   post.Table,
 			Columns: post.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: post.FieldID,
 			},
 		},
@@ -1170,6 +1177,9 @@ func (pq *PostQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if pq.unique != nil && *pq.unique {
 		selector.Distinct()
 	}
+	for _, m := range pq.modifiers {
+		m(selector)
+	}
 	for _, p := range pq.predicates {
 		p(selector)
 	}
@@ -1185,6 +1195,12 @@ func (pq *PostQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (pq *PostQuery) Modify(modifiers ...func(s *sql.Selector)) *PostSelect {
+	pq.modifiers = append(pq.modifiers, modifiers...)
+	return pq.Select()
 }
 
 // PostGroupBy is the group-by builder for Post entities.
@@ -1673,4 +1689,10 @@ func (ps *PostSelect) sqlScan(ctx context.Context, v interface{}) error {
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
+}
+
+// Modify adds a query modifier for attaching custom logic to queries.
+func (ps *PostSelect) Modify(modifiers ...func(s *sql.Selector)) *PostSelect {
+	ps.modifiers = append(ps.modifiers, modifiers...)
+	return ps
 }

@@ -28,7 +28,7 @@ type React struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReactQuery when eager-loading is set.
 	Edges       ReactEdges `json:"edges"`
-	post_reacts *string
+	post_reacts *uuid.UUID
 	user_reacts *uuid.UUID
 }
 
@@ -71,7 +71,7 @@ func (*React) scanValues(columns []string) ([]interface{}, error) {
 		case react.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case react.ForeignKeys[0]: // post_reacts
-			values[i] = new(sql.NullString)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case react.ForeignKeys[1]: // user_reacts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
@@ -120,11 +120,11 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 				r.UserId = value.String
 			}
 		case react.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field post_reacts", values[i])
 			} else if value.Valid {
-				r.post_reacts = new(string)
-				*r.post_reacts = value.String
+				r.post_reacts = new(uuid.UUID)
+				*r.post_reacts = *value.S.(*uuid.UUID)
 			}
 		case react.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

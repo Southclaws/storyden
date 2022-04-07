@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/google/uuid"
 )
 
 // CategoryCreate is the builder for creating a Category entity.
@@ -92,14 +93,14 @@ func (cc *CategoryCreate) SetID(s string) *CategoryCreate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cc *CategoryCreate) AddPostIDs(ids ...string) *CategoryCreate {
+func (cc *CategoryCreate) AddPostIDs(ids ...uuid.UUID) *CategoryCreate {
 	cc.mutation.AddPostIDs(ids...)
 	return cc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cc *CategoryCreate) AddPosts(p ...*Post) *CategoryCreate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -298,7 +299,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},

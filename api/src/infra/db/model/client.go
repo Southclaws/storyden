@@ -432,7 +432,7 @@ func (c *PostClient) UpdateOne(po *Post) *PostUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *PostClient) UpdateOneID(id string) *PostUpdateOne {
+func (c *PostClient) UpdateOneID(id uuid.UUID) *PostUpdateOne {
 	mutation := newPostMutation(c.config, OpUpdateOne, withPostID(id))
 	return &PostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -449,7 +449,7 @@ func (c *PostClient) DeleteOne(po *Post) *PostDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *PostClient) DeleteOneID(id string) *PostDeleteOne {
+func (c *PostClient) DeleteOneID(id uuid.UUID) *PostDeleteOne {
 	builder := c.Delete().Where(post.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -464,12 +464,12 @@ func (c *PostClient) Query() *PostQuery {
 }
 
 // Get returns a Post entity by its id.
-func (c *PostClient) Get(ctx context.Context, id string) (*Post, error) {
+func (c *PostClient) Get(ctx context.Context, id uuid.UUID) (*Post, error) {
 	return c.Query().Where(post.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *PostClient) GetX(ctx context.Context, id string) *Post {
+func (c *PostClient) GetX(ctx context.Context, id uuid.UUID) *Post {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1122,7 +1122,7 @@ func (c *TagClient) UpdateOne(t *Tag) *TagUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TagClient) UpdateOneID(id string) *TagUpdateOne {
+func (c *TagClient) UpdateOneID(id uuid.UUID) *TagUpdateOne {
 	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
 	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1139,7 +1139,7 @@ func (c *TagClient) DeleteOne(t *Tag) *TagDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *TagClient) DeleteOneID(id string) *TagDeleteOne {
+func (c *TagClient) DeleteOneID(id uuid.UUID) *TagDeleteOne {
 	builder := c.Delete().Where(tag.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1154,12 +1154,12 @@ func (c *TagClient) Query() *TagQuery {
 }
 
 // Get returns a Tag entity by its id.
-func (c *TagClient) Get(ctx context.Context, id string) (*Tag, error) {
+func (c *TagClient) Get(ctx context.Context, id uuid.UUID) (*Tag, error) {
 	return c.Query().Where(tag.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TagClient) GetX(ctx context.Context, id string) *Tag {
+func (c *TagClient) GetX(ctx context.Context, id uuid.UUID) *Tag {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
+	"github.com/google/uuid"
 )
 
 // TagUpdate is the builder for updating Tag entities.
@@ -28,21 +29,15 @@ func (tu *TagUpdate) Where(ps ...predicate.Tag) *TagUpdate {
 	return tu
 }
 
-// SetName sets the "name" field.
-func (tu *TagUpdate) SetName(s string) *TagUpdate {
-	tu.mutation.SetName(s)
-	return tu
-}
-
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tu *TagUpdate) AddPostIDs(ids ...string) *TagUpdate {
+func (tu *TagUpdate) AddPostIDs(ids ...uuid.UUID) *TagUpdate {
 	tu.mutation.AddPostIDs(ids...)
 	return tu
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (tu *TagUpdate) AddPosts(p ...*Post) *TagUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -61,14 +56,14 @@ func (tu *TagUpdate) ClearPosts() *TagUpdate {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (tu *TagUpdate) RemovePostIDs(ids ...string) *TagUpdate {
+func (tu *TagUpdate) RemovePostIDs(ids ...uuid.UUID) *TagUpdate {
 	tu.mutation.RemovePostIDs(ids...)
 	return tu
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (tu *TagUpdate) RemovePosts(p ...*Post) *TagUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -135,7 +130,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   tag.Table,
 			Columns: tag.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: tag.FieldID,
 			},
 		},
@@ -147,13 +142,6 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := tu.mutation.Name(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: tag.FieldName,
-		})
-	}
 	if tu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -163,7 +151,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -179,7 +167,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -198,7 +186,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -227,21 +215,15 @@ type TagUpdateOne struct {
 	mutation *TagMutation
 }
 
-// SetName sets the "name" field.
-func (tuo *TagUpdateOne) SetName(s string) *TagUpdateOne {
-	tuo.mutation.SetName(s)
-	return tuo
-}
-
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tuo *TagUpdateOne) AddPostIDs(ids ...string) *TagUpdateOne {
+func (tuo *TagUpdateOne) AddPostIDs(ids ...uuid.UUID) *TagUpdateOne {
 	tuo.mutation.AddPostIDs(ids...)
 	return tuo
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (tuo *TagUpdateOne) AddPosts(p ...*Post) *TagUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -260,14 +242,14 @@ func (tuo *TagUpdateOne) ClearPosts() *TagUpdateOne {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (tuo *TagUpdateOne) RemovePostIDs(ids ...string) *TagUpdateOne {
+func (tuo *TagUpdateOne) RemovePostIDs(ids ...uuid.UUID) *TagUpdateOne {
 	tuo.mutation.RemovePostIDs(ids...)
 	return tuo
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (tuo *TagUpdateOne) RemovePosts(p ...*Post) *TagUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -341,7 +323,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Table:   tag.Table,
 			Columns: tag.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: tag.FieldID,
 			},
 		},
@@ -370,13 +352,6 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			}
 		}
 	}
-	if value, ok := tuo.mutation.Name(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: tag.FieldName,
-		})
-	}
 	if tuo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -386,7 +361,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -402,7 +377,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -421,7 +396,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},

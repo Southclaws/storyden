@@ -1,6 +1,6 @@
 package db
 
-//go:generate go run -mod=mod entgo.io/ent/cmd/ent generate --feature sql/upsert ./schema --target ./model
+//go:generate go run -mod=mod entgo.io/ent/cmd/ent generate --feature sql/upsert --feature sql/modifier ./schema --target ./model
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/schema"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"go.uber.org/fx"
 
@@ -45,8 +46,13 @@ func connect(url string) (*model.Client, *sql.DB, error) {
 
 	client := model.NewClient(model.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
+	opts := []schema.MigrateOption{
+		schema.WithDropColumn(true),
+		schema.WithDropIndex(true),
+	}
+
 	// Run only additive migrations
-	if err := client.Schema.Create(context.Background()); err != nil {
+	if err := client.Schema.Create(context.Background(), opts...); err != nil {
 		return nil, nil, err
 	}
 

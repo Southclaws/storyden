@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // CategoryUpdate is the builder for updating Category entities.
@@ -98,14 +99,14 @@ func (cu *CategoryUpdate) SetNillableAdmin(b *bool) *CategoryUpdate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cu *CategoryUpdate) AddPostIDs(ids ...string) *CategoryUpdate {
+func (cu *CategoryUpdate) AddPostIDs(ids ...uuid.UUID) *CategoryUpdate {
 	cu.mutation.AddPostIDs(ids...)
 	return cu
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cu *CategoryUpdate) AddPosts(p ...*Post) *CategoryUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -124,14 +125,14 @@ func (cu *CategoryUpdate) ClearPosts() *CategoryUpdate {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cu *CategoryUpdate) RemovePostIDs(ids ...string) *CategoryUpdate {
+func (cu *CategoryUpdate) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdate {
 	cu.mutation.RemovePostIDs(ids...)
 	return cu
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -261,7 +262,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -277,7 +278,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -296,7 +297,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -395,14 +396,14 @@ func (cuo *CategoryUpdateOne) SetNillableAdmin(b *bool) *CategoryUpdateOne {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cuo *CategoryUpdateOne) AddPostIDs(ids ...string) *CategoryUpdateOne {
+func (cuo *CategoryUpdateOne) AddPostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
 	cuo.mutation.AddPostIDs(ids...)
 	return cuo
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cuo *CategoryUpdateOne) AddPosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -421,14 +422,14 @@ func (cuo *CategoryUpdateOne) ClearPosts() *CategoryUpdateOne {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...string) *CategoryUpdateOne {
+func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
 	cuo.mutation.RemovePostIDs(ids...)
 	return cuo
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]string, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -582,7 +583,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -598,7 +599,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
@@ -617,7 +618,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: post.FieldID,
 				},
 			},
