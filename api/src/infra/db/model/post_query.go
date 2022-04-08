@@ -113,7 +113,7 @@ func (pq *PostQuery) QueryCategory() *CategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(category.Table, category.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.CategoryTable, post.CategoryPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.CategoryTable, post.CategoryColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -614,7 +614,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 			pq.withReacts != nil,
 		}
 	)
-	if pq.withAuthor != nil {
+	if pq.withAuthor != nil || pq.withCategory != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -673,66 +673,27 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 	}
 
 	if query := pq.withCategory; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*Post, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Category = []*Category{}
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Post)
+		for i := range nodes {
+			fk := nodes[i].CategoryID
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		var (
-			edgeids []string
-			edges   = make(map[string][]*Post)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   post.CategoryTable,
-				Columns: post.CategoryPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(post.CategoryPrimaryKey[1], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(sql.NullString)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullString)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := ein.String
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "category": %w`, err)
-		}
-		query.Where(category.IDIn(edgeids...))
+		query.Where(category.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "category" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "category_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Category = append(nodes[i].Edges.Category, n)
+				nodes[i].Edges.Category = n
 			}
 		}
 	}

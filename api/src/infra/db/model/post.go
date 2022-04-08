@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/google/uuid"
@@ -37,11 +38,11 @@ type Post struct {
 	// DeletedAt holds the value of the "deletedAt" field.
 	DeletedAt time.Time `json:"deletedAt,omitempty"`
 	// RootPostId holds the value of the "rootPostId" field.
-	RootPostId string `json:"rootPostId,omitempty"`
+	RootPostId uuid.UUID `json:"rootPostId,omitempty"`
 	// ReplyPostId holds the value of the "replyPostId" field.
-	ReplyPostId string `json:"replyPostId,omitempty"`
-	// CategoryId holds the value of the "categoryId" field.
-	CategoryId string `json:"categoryId,omitempty"`
+	ReplyPostId uuid.UUID `json:"replyPostId,omitempty"`
+	// CategoryID holds the value of the "category_id" field.
+	CategoryID uuid.UUID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges      PostEdges `json:"edges"`
@@ -54,7 +55,7 @@ type PostEdges struct {
 	// Author holds the value of the author edge.
 	Author *User `json:"author,omitempty"`
 	// Category holds the value of the category edge.
-	Category []*Category `json:"category,omitempty"`
+	Category *Category `json:"category,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
 	// Root holds the value of the root edge.
@@ -87,9 +88,14 @@ func (e PostEdges) AuthorOrErr() (*User, error) {
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) CategoryOrErr() ([]*Category, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) CategoryOrErr() (*Category, error) {
 	if e.loadedTypes[1] {
+		if e.Category == nil {
+			// The edge category was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: category.Label}
+		}
 		return e.Category, nil
 	}
 	return nil, &NotLoadedError{edge: "category"}
@@ -156,11 +162,11 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldRootPostId, post.FieldReplyPostId, post.FieldCategoryId:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID:
+		case post.FieldID, post.FieldRootPostId, post.FieldReplyPostId, post.FieldCategoryID:
 			values[i] = new(uuid.UUID)
 		case post.ForeignKeys[0]: // react_post
 			values[i] = new(sql.NullString)
@@ -242,22 +248,22 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 				po.DeletedAt = value.Time
 			}
 		case post.FieldRootPostId:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field rootPostId", values[i])
-			} else if value.Valid {
-				po.RootPostId = value.String
+			} else if value != nil {
+				po.RootPostId = *value
 			}
 		case post.FieldReplyPostId:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field replyPostId", values[i])
-			} else if value.Valid {
-				po.ReplyPostId = value.String
+			} else if value != nil {
+				po.ReplyPostId = *value
 			}
-		case post.FieldCategoryId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field categoryId", values[i])
-			} else if value.Valid {
-				po.CategoryId = value.String
+		case post.FieldCategoryID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field category_id", values[i])
+			} else if value != nil {
+				po.CategoryID = *value
 			}
 		case post.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -360,11 +366,11 @@ func (po *Post) String() string {
 	builder.WriteString(", deletedAt=")
 	builder.WriteString(po.DeletedAt.Format(time.ANSIC))
 	builder.WriteString(", rootPostId=")
-	builder.WriteString(po.RootPostId)
+	builder.WriteString(fmt.Sprintf("%v", po.RootPostId))
 	builder.WriteString(", replyPostId=")
-	builder.WriteString(po.ReplyPostId)
-	builder.WriteString(", categoryId=")
-	builder.WriteString(po.CategoryId)
+	builder.WriteString(fmt.Sprintf("%v", po.ReplyPostId))
+	builder.WriteString(", category_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
 	builder.WriteByte(')')
 	return builder.String()
 }

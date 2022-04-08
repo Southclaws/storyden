@@ -80,7 +80,7 @@ func (cq *CategoryQuery) QueryPosts() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, category.PostsTable, category.PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, category.PostsTable, category.PostsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -112,8 +112,8 @@ func (cq *CategoryQuery) FirstX(ctx context.Context) *Category {
 
 // FirstID returns the first Category ID from the query.
 // Returns a *NotFoundError when no Category ID was found.
-func (cq *CategoryQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *CategoryQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -125,7 +125,7 @@ func (cq *CategoryQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CategoryQuery) FirstIDX(ctx context.Context) string {
+func (cq *CategoryQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -163,8 +163,8 @@ func (cq *CategoryQuery) OnlyX(ctx context.Context) *Category {
 // OnlyID is like Only, but returns the only Category ID in the query.
 // Returns a *NotSingularError when more than one Category ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CategoryQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *CategoryQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -180,7 +180,7 @@ func (cq *CategoryQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CategoryQuery) OnlyIDX(ctx context.Context) string {
+func (cq *CategoryQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,8 +206,8 @@ func (cq *CategoryQuery) AllX(ctx context.Context) []*Category {
 }
 
 // IDs executes the query and returns a list of Category IDs.
-func (cq *CategoryQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (cq *CategoryQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := cq.Select(category.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (cq *CategoryQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CategoryQuery) IDsX(ctx context.Context) []string {
+func (cq *CategoryQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -382,66 +382,27 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context) ([]*Category, error) {
 
 	if query := cq.withPosts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[string]*Category, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Posts = []*Post{}
+		nodeids := make(map[uuid.UUID]*Category)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Posts = []*Post{}
 		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*Category)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   category.PostsTable,
-				Columns: category.PostsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(category.PostsPrimaryKey[0], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullString), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullString)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := eout.String
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, cq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "posts": %w`, err)
-		}
-		query.Where(post.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Post(func(s *sql.Selector) {
+			s.Where(sql.InValues(category.PostsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.CategoryID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "posts" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "category_id" returned %v for node %v`, fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Posts = append(nodes[i].Edges.Posts, n)
-			}
+			node.Edges.Posts = append(node.Edges.Posts, n)
 		}
 	}
 
@@ -474,7 +435,7 @@ func (cq *CategoryQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   category.Table,
 			Columns: category.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: category.FieldID,
 			},
 		},

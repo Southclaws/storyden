@@ -1,17 +1,23 @@
 package category
 
-import "github.com/Southclaws/storyden/api/src/infra/db"
+import (
+	"github.com/google/uuid"
+
+	"github.com/Southclaws/storyden/api/src/infra/db/model"
+)
+
+type CategoryID uuid.UUID
 
 type PostMeta struct {
-	Author string `json:"author"`
-	PostID string `json:"postId"`
-	Slug   string `json:"slug"`
-	Title  string `json:"title"`
-	Short  string `json:"short"`
+	Author string    `json:"author"`
+	PostID uuid.UUID `json:"postId"`
+	Slug   string    `json:"slug"`
+	Title  string    `json:"title"`
+	Short  string    `json:"short"`
 }
 
 type Category struct {
-	ID          string     `json:"id"`
+	ID          CategoryID `json:"id"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Colour      string     `json:"colour"`
@@ -21,17 +27,13 @@ type Category struct {
 	PostCount   int        `json:"postCount"`
 }
 
-func PostMetaFromModel(p *db.PostModel) *PostMeta {
-	slug, ok := p.Slug()
-	if !ok {
-		slug = ""
-	}
-	title, ok := p.Title()
-	if !ok {
-		title = ""
-	}
+func PostMetaFromModel(p *model.Post) *PostMeta {
+	slug := p.Slug
+
+	title := p.Title
+
 	return &PostMeta{
-		Author: p.RelationsPost.Author.Name,
+		Author: p.Edges.Author.Name,
 		PostID: p.ID,
 		Slug:   slug,
 		Title:  title,
@@ -39,14 +41,14 @@ func PostMetaFromModel(p *db.PostModel) *PostMeta {
 	}
 }
 
-func FromModel(c *db.CategoryModel) *Category {
+func FromModel(c *model.Category) *Category {
 	recent := []PostMeta{}
-	for _, p := range c.RelationsCategory.Posts {
-		recent = append(recent, *PostMetaFromModel(&p))
+	for _, p := range c.Edges.Posts {
+		recent = append(recent, *PostMetaFromModel(p))
 	}
 
 	return &Category{
-		ID:          c.ID,
+		ID:          CategoryID(c.ID),
 		Name:        c.Name,
 		Description: c.Description,
 		Colour:      c.Colour,

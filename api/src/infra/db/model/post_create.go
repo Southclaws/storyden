@@ -131,43 +131,43 @@ func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (pc *PostCreate) SetRootPostId(s string) *PostCreate {
-	pc.mutation.SetRootPostId(s)
+func (pc *PostCreate) SetRootPostId(u uuid.UUID) *PostCreate {
+	pc.mutation.SetRootPostId(u)
 	return pc
 }
 
 // SetNillableRootPostId sets the "rootPostId" field if the given value is not nil.
-func (pc *PostCreate) SetNillableRootPostId(s *string) *PostCreate {
-	if s != nil {
-		pc.SetRootPostId(*s)
+func (pc *PostCreate) SetNillableRootPostId(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetRootPostId(*u)
 	}
 	return pc
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (pc *PostCreate) SetReplyPostId(s string) *PostCreate {
-	pc.mutation.SetReplyPostId(s)
+func (pc *PostCreate) SetReplyPostId(u uuid.UUID) *PostCreate {
+	pc.mutation.SetReplyPostId(u)
 	return pc
 }
 
 // SetNillableReplyPostId sets the "replyPostId" field if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyPostId(s *string) *PostCreate {
-	if s != nil {
-		pc.SetReplyPostId(*s)
+func (pc *PostCreate) SetNillableReplyPostId(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetReplyPostId(*u)
 	}
 	return pc
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (pc *PostCreate) SetCategoryId(s string) *PostCreate {
-	pc.mutation.SetCategoryId(s)
+// SetCategoryID sets the "category_id" field.
+func (pc *PostCreate) SetCategoryID(u uuid.UUID) *PostCreate {
+	pc.mutation.SetCategoryID(u)
 	return pc
 }
 
-// SetNillableCategoryId sets the "categoryId" field if the given value is not nil.
-func (pc *PostCreate) SetNillableCategoryId(s *string) *PostCreate {
-	if s != nil {
-		pc.SetCategoryId(*s)
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (pc *PostCreate) SetNillableCategoryID(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetCategoryID(*u)
 	}
 	return pc
 }
@@ -197,19 +197,9 @@ func (pc *PostCreate) SetAuthor(u *User) *PostCreate {
 	return pc.SetAuthorID(u.ID)
 }
 
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (pc *PostCreate) AddCategoryIDs(ids ...string) *PostCreate {
-	pc.mutation.AddCategoryIDs(ids...)
-	return pc
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (pc *PostCreate) AddCategory(c ...*Category) *PostCreate {
-	ids := make([]string, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pc.AddCategoryIDs(ids...)
+// SetCategory sets the "category" edge to the Category entity.
+func (pc *PostCreate) SetCategory(c *Category) *PostCreate {
+	return pc.SetCategoryID(c.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -525,7 +515,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.RootPostId(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldRootPostId,
 		})
@@ -533,19 +523,11 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.ReplyPostId(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldReplyPostId,
 		})
 		_node.ReplyPostId = value
-	}
-	if value, ok := pc.mutation.CategoryId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldCategoryId,
-		})
-		_node.CategoryId = value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -569,14 +551,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
+			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: category.FieldID,
 				},
 			},
@@ -584,6 +566,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.CategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
@@ -881,7 +864,7 @@ func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsert) SetRootPostId(v string) *PostUpsert {
+func (u *PostUpsert) SetRootPostId(v uuid.UUID) *PostUpsert {
 	u.Set(post.FieldRootPostId, v)
 	return u
 }
@@ -899,7 +882,7 @@ func (u *PostUpsert) ClearRootPostId() *PostUpsert {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsert) SetReplyPostId(v string) *PostUpsert {
+func (u *PostUpsert) SetReplyPostId(v uuid.UUID) *PostUpsert {
 	u.Set(post.FieldReplyPostId, v)
 	return u
 }
@@ -916,21 +899,21 @@ func (u *PostUpsert) ClearReplyPostId() *PostUpsert {
 	return u
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (u *PostUpsert) SetCategoryId(v string) *PostUpsert {
-	u.Set(post.FieldCategoryId, v)
+// SetCategoryID sets the "category_id" field.
+func (u *PostUpsert) SetCategoryID(v uuid.UUID) *PostUpsert {
+	u.Set(post.FieldCategoryID, v)
 	return u
 }
 
-// UpdateCategoryId sets the "categoryId" field to the value that was provided on create.
-func (u *PostUpsert) UpdateCategoryId() *PostUpsert {
-	u.SetExcluded(post.FieldCategoryId)
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *PostUpsert) UpdateCategoryID() *PostUpsert {
+	u.SetExcluded(post.FieldCategoryID)
 	return u
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (u *PostUpsert) ClearCategoryId() *PostUpsert {
-	u.SetNull(post.FieldCategoryId)
+// ClearCategoryID clears the value of the "category_id" field.
+func (u *PostUpsert) ClearCategoryID() *PostUpsert {
+	u.SetNull(post.FieldCategoryID)
 	return u
 }
 
@@ -1132,7 +1115,7 @@ func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsertOne) SetRootPostId(v string) *PostUpsertOne {
+func (u *PostUpsertOne) SetRootPostId(v uuid.UUID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetRootPostId(v)
 	})
@@ -1153,7 +1136,7 @@ func (u *PostUpsertOne) ClearRootPostId() *PostUpsertOne {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsertOne) SetReplyPostId(v string) *PostUpsertOne {
+func (u *PostUpsertOne) SetReplyPostId(v uuid.UUID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetReplyPostId(v)
 	})
@@ -1173,24 +1156,24 @@ func (u *PostUpsertOne) ClearReplyPostId() *PostUpsertOne {
 	})
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (u *PostUpsertOne) SetCategoryId(v string) *PostUpsertOne {
+// SetCategoryID sets the "category_id" field.
+func (u *PostUpsertOne) SetCategoryID(v uuid.UUID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
-		s.SetCategoryId(v)
+		s.SetCategoryID(v)
 	})
 }
 
-// UpdateCategoryId sets the "categoryId" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateCategoryId() *PostUpsertOne {
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateCategoryID() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
-		s.UpdateCategoryId()
+		s.UpdateCategoryID()
 	})
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (u *PostUpsertOne) ClearCategoryId() *PostUpsertOne {
+// ClearCategoryID clears the value of the "category_id" field.
+func (u *PostUpsertOne) ClearCategoryID() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
-		s.ClearCategoryId()
+		s.ClearCategoryID()
 	})
 }
 
@@ -1558,7 +1541,7 @@ func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsertBulk) SetRootPostId(v string) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetRootPostId(v uuid.UUID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetRootPostId(v)
 	})
@@ -1579,7 +1562,7 @@ func (u *PostUpsertBulk) ClearRootPostId() *PostUpsertBulk {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsertBulk) SetReplyPostId(v string) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetReplyPostId(v uuid.UUID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetReplyPostId(v)
 	})
@@ -1599,24 +1582,24 @@ func (u *PostUpsertBulk) ClearReplyPostId() *PostUpsertBulk {
 	})
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (u *PostUpsertBulk) SetCategoryId(v string) *PostUpsertBulk {
+// SetCategoryID sets the "category_id" field.
+func (u *PostUpsertBulk) SetCategoryID(v uuid.UUID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
-		s.SetCategoryId(v)
+		s.SetCategoryID(v)
 	})
 }
 
-// UpdateCategoryId sets the "categoryId" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateCategoryId() *PostUpsertBulk {
+// UpdateCategoryID sets the "category_id" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateCategoryID() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
-		s.UpdateCategoryId()
+		s.UpdateCategoryID()
 	})
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (u *PostUpsertBulk) ClearCategoryId() *PostUpsertBulk {
+// ClearCategoryID clears the value of the "category_id" field.
+func (u *PostUpsertBulk) ClearCategoryID() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
-		s.ClearCategoryId()
+		s.ClearCategoryID()
 	})
 }
 

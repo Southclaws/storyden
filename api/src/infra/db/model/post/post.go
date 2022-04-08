@@ -35,8 +35,8 @@ const (
 	FieldRootPostId = "root_post_id"
 	// FieldReplyPostId holds the string denoting the replypostid field in the database.
 	FieldReplyPostId = "reply_post_id"
-	// FieldCategoryId holds the string denoting the categoryid field in the database.
-	FieldCategoryId = "category_id"
+	// FieldCategoryID holds the string denoting the category_id field in the database.
+	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
@@ -62,11 +62,13 @@ const (
 	AuthorInverseTable = "users"
 	// AuthorColumn is the table column denoting the author relation/edge.
 	AuthorColumn = "user_posts"
-	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
-	CategoryTable = "category_posts"
+	// CategoryTable is the table that holds the category relation/edge.
+	CategoryTable = "posts"
 	// CategoryInverseTable is the table name for the Category entity.
 	// It exists in this package in order to avoid circular dependency with the "category" package.
 	CategoryInverseTable = "categories"
+	// CategoryColumn is the table column denoting the category relation/edge.
+	CategoryColumn = "category_id"
 	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
 	TagsTable = "tag_posts"
 	// TagsInverseTable is the table name for the Tag entity.
@@ -103,7 +105,7 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldRootPostId,
 	FieldReplyPostId,
-	FieldCategoryId,
+	FieldCategoryID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
@@ -114,9 +116,6 @@ var ForeignKeys = []string{
 }
 
 var (
-	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
-	// primary key for the category relation (M2M).
-	CategoryPrimaryKey = []string{"category_id", "post_id"}
 	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
 	// primary key for the tags relation (M2M).
 	TagsPrimaryKey = []string{"tag_id", "post_id"}

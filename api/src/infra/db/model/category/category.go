@@ -2,6 +2,10 @@
 
 package category
 
+import (
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the category type in the database.
 	Label = "category"
@@ -21,11 +25,13 @@ const (
 	EdgePosts = "posts"
 	// Table holds the table name of the category in the database.
 	Table = "categories"
-	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
-	PostsTable = "category_posts"
+	// PostsTable is the table that holds the posts relation/edge.
+	PostsTable = "posts"
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
+	// PostsColumn is the table column denoting the posts relation/edge.
+	PostsColumn = "category_id"
 )
 
 // Columns holds all SQL columns for category fields.
@@ -37,12 +43,6 @@ var Columns = []string{
 	FieldSort,
 	FieldAdmin,
 }
-
-var (
-	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
-	// primary key for the posts relation (M2M).
-	PostsPrimaryKey = []string{"category_id", "post_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -63,4 +63,6 @@ var (
 	DefaultSort int
 	// DefaultAdmin holds the default value on creation for the "admin" field.
 	DefaultAdmin bool
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

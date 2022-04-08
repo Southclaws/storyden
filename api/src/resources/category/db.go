@@ -3,106 +3,114 @@ package category
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/Southclaws/storyden/api/src/infra/db"
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool) (*Category, error) {
-	c, err := d.db.Category.
-		UpsertOne(db.Category.Name.Equals(name)).
-		Create(
-			db.Category.Name.Set(name),
-			db.Category.Description.Set(desc),
-			db.Category.Colour.Set(colour),
-			db.Category.Sort.Set(sort),
-			db.Category.Admin.Set(admin),
-		).
-		Update(
-			db.Category.Name.Set(name),
-			db.Category.Description.Set(desc),
-			db.Category.Colour.Set(colour),
-			db.Category.Sort.Set(sort),
-			db.Category.Admin.Set(admin),
-		).
-		Exec(ctx)
+func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool) (*Category, error) {
+	id, err := d.db.Category.
+		Create().
+		SetName(name).
+		SetDescription(desc).
+		SetColour(colour).
+		SetSort(sort).
+		SetAdmin(admin).
+		OnConflict().
+		UpdateNewValues().
+		ID(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	c, err := d.db.Category.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
 	return FromModel(c), nil
 }
 
-func (d *DB) GetCategories(ctx context.Context, admin bool) ([]Category, error) {
-	filters := []db.CategoryWhereParam{}
+func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, error) {
+	filters := []predicate.Category{}
 
 	if !admin {
-		filters = append(filters, db.Category.Admin.Equals(false))
+		filters = append(filters, category.AdminEQ(false))
 	}
 
 	categories, err := d.db.Category.
-		FindMany(filters...).
-		OrderBy(
-			db.Category.Sort.Order(db.SortOrderAsc),
-		).
-		With(
-			db.Category.Posts.
-				Fetch(
-					db.Post.First.Equals(true),
-					db.Post.DeletedAt.IsNull(),
+		Query().
+		Where(filters...).
+		WithPosts(func(pq *model.PostQuery) {
+			pq.
+				Where(
+					post.FirstEQ(true),
+					post.DeletedAtIsNil(),
 				).
-				With(
-					db.Post.Author.Fetch(),
-				).
-				Take(5).
-				OrderBy(db.Post.UpdatedAt.Order(db.SortOrderDesc)),
-		).
-		Exec(ctx)
+				WithAuthor().
+				Limit(5).
+				Order(model.Desc(post.FieldUpdatedAt))
+		}).
+		Order(model.Asc(category.FieldSort)).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(categories) == 0 {
-		return nil, nil
+		return []Category{}, nil
 	}
 
 	// NOTE:
-	// Lazy two queries because Prisma doesn't yet support Count aggregations.
+	// Lazy two queries because Ent doesn't yet support Count aggregations.
 	// I could write the above query as raw SQL too but... screw that. Joins are
 	// super annoying to get nested data out of because SQL is awful. So for now
 	// there are two separate queries and the data is joined below. Besides,
 	// there won't be many categories anyway so it's not going to affect
 	// performance much.
 	type CategoryPostCount struct {
-		ID    string `json:"id"`
-		Name  string `json:"name"`
-		Sort  string `json:"sort"`
-		Posts int    `json:"posts"`
+		ID    uuid.UUID `json:"id"`
+		Posts int       `json:"posts"`
 	}
+
 	var categoryPostsList []CategoryPostCount
-	d.db.Prisma.QueryRaw(`
-		select c.id, c.name, c.sort, count(*) as posts
-		from "Category" c
-		inner join "Post" p on c.id = p."categoryId"
-		group by c.id
-		order by c.sort asc
-	`).Exec(ctx, &categoryPostsList)
-	categoryPosts := make(map[string]int)
+
+	err = d.db.Category.Query().Modify(func(s *sql.Selector) {
+		s.
+			Select(
+				sql.As(s.C("id"), "id"),
+				sql.As(sql.Count("*"), "posts"),
+			).
+			Join(sql.Table(post.Table).As("p")).On(s.C(post.FieldID), "category_id").
+			GroupBy(s.C("id")).
+			OrderBy(sql.Desc("posts"))
+	}).Scan(ctx, &categoryPostsList)
+	if err != nil {
+		return nil, err
+	}
+
+	categoryPosts := make(map[uuid.UUID]int)
 	for _, c := range categoryPostsList {
 		categoryPosts[c.ID] = c.Posts
 	}
 
 	result := []Category{}
+
 	for _, c := range categories {
-		category := FromModel(&c)
+		category := FromModel(c)
 		category.PostCount = categoryPosts[c.ID]
 		result = append(result, *category)
 	}
@@ -110,47 +118,61 @@ func (d *DB) GetCategories(ctx context.Context, admin bool) ([]Category, error) 
 	return result, nil
 }
 
-func (d *DB) UpdateCategory(ctx context.Context, id string, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {
-	c, err := d.db.Category.
-		FindUnique(db.Category.ID.Equals(id)).
-		Update(
-			db.Category.Name.SetIfPresent(name),
-			db.Category.Description.SetIfPresent(desc),
-			db.Category.Colour.SetIfPresent(colour),
-			db.Category.Sort.SetIfPresent(sort),
-			db.Category.Admin.SetIfPresent(admin),
-		).
-		Exec(ctx)
+func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {
+	u := d.db.Category.UpdateOneID(uuid.UUID(id))
 
-	return FromModel(c), err
+	//nocheck:wsl
+	if name != nil {
+		u.SetName(*name)
+	}
+	if desc != nil {
+		u.SetDescription(*desc)
+	}
+	if colour != nil {
+		u.SetColour(*colour)
+	}
+	if sort != nil {
+		u.SetSort(*sort)
+	}
+	if admin != nil {
+		u.SetAdmin(*admin)
+	}
+
+	c, err := u.Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return FromModel(c), nil
 }
 
-func (d *DB) DeleteCategory(ctx context.Context, id string, moveto string) (*Category, error) {
-	movePosts := d.db.Post.
-		FindMany(
-			db.Post.Category.Where(
-				db.Category.ID.Equals(id),
-			),
-		).
-		Update(
-			db.Post.CategoryID.Set(moveto),
-		).
-		Tx()
+func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto CategoryID) (*Category, error) {
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	deleteCategory := d.db.Category.
-		FindUnique(
-			db.Category.ID.Equals(id),
-		).
-		Delete().
-		Tx()
+	defer tx.Rollback()
 
-	err := d.db.Prisma.Transaction(
-		movePosts,
-		deleteCategory,
-	).Exec(ctx)
+	c, err := tx.Category.Get(ctx, uuid.UUID(id))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.Post.Update().Where(post.CategoryID(uuid.UUID(id))).SetCategoryID(uuid.UUID(moveto)).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Category.DeleteOneID(uuid.UUID(id)).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	tx.Commit()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to perform move+delete transaction")
 	}
 
-	return FromModel(deleteCategory.Result()), nil
+	return FromModel(c), nil
 }

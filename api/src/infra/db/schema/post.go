@@ -31,9 +31,9 @@ func (Post) Fields() []ent.Field {
 		field.Time("createdAt").Default(time.Now),
 		field.Time("updatedAt").Default(time.Now),
 		field.Time("deletedAt").Optional(),
-		field.String("rootPostId").Optional(),
-		field.String("replyPostId").Optional(),
-		field.String("categoryId").Optional(),
+		field.UUID("rootPostId", uuid.UUID{}).Optional(),
+		field.UUID("replyPostId", uuid.UUID{}).Optional(),
+		field.UUID("category_id", uuid.UUID{}).Optional(),
 	}
 }
 
@@ -46,7 +46,9 @@ func (Post) Edges() []ent.Edge {
 			Required(),
 
 		edge.From("category", Category.Type).
+			Field("category_id").
 			Ref("posts").
+			Unique().
 			Comment("Category is only required for root posts. It should never be added to a child post."),
 
 		edge.From("tags", Tag.Type).

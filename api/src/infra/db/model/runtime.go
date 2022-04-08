@@ -35,6 +35,10 @@ func init() {
 	categoryDescAdmin := categoryFields[5].Descriptor()
 	// category.DefaultAdmin holds the default value on creation for the admin field.
 	category.DefaultAdmin = categoryDescAdmin.Default.(bool)
+	// categoryDescID is the schema descriptor for id field.
+	categoryDescID := categoryFields[0].Descriptor()
+	// category.DefaultID holds the default value on creation for the id field.
+	category.DefaultID = categoryDescID.Default.(func() uuid.UUID)
 	postFields := schema.Post{}.Fields()
 	_ = postFields
 	// postDescPinned is the schema descriptor for pinned field.

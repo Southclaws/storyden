@@ -154,15 +154,15 @@ func (pu *PostUpdate) ClearDeletedAt() *PostUpdate {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (pu *PostUpdate) SetRootPostId(s string) *PostUpdate {
-	pu.mutation.SetRootPostId(s)
+func (pu *PostUpdate) SetRootPostId(u uuid.UUID) *PostUpdate {
+	pu.mutation.SetRootPostId(u)
 	return pu
 }
 
 // SetNillableRootPostId sets the "rootPostId" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableRootPostId(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetRootPostId(*s)
+func (pu *PostUpdate) SetNillableRootPostId(u *uuid.UUID) *PostUpdate {
+	if u != nil {
+		pu.SetRootPostId(*u)
 	}
 	return pu
 }
@@ -174,15 +174,15 @@ func (pu *PostUpdate) ClearRootPostId() *PostUpdate {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (pu *PostUpdate) SetReplyPostId(s string) *PostUpdate {
-	pu.mutation.SetReplyPostId(s)
+func (pu *PostUpdate) SetReplyPostId(u uuid.UUID) *PostUpdate {
+	pu.mutation.SetReplyPostId(u)
 	return pu
 }
 
 // SetNillableReplyPostId sets the "replyPostId" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableReplyPostId(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetReplyPostId(*s)
+func (pu *PostUpdate) SetNillableReplyPostId(u *uuid.UUID) *PostUpdate {
+	if u != nil {
+		pu.SetReplyPostId(*u)
 	}
 	return pu
 }
@@ -193,23 +193,23 @@ func (pu *PostUpdate) ClearReplyPostId() *PostUpdate {
 	return pu
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (pu *PostUpdate) SetCategoryId(s string) *PostUpdate {
-	pu.mutation.SetCategoryId(s)
+// SetCategoryID sets the "category_id" field.
+func (pu *PostUpdate) SetCategoryID(u uuid.UUID) *PostUpdate {
+	pu.mutation.SetCategoryID(u)
 	return pu
 }
 
-// SetNillableCategoryId sets the "categoryId" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableCategoryId(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetCategoryId(*s)
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableCategoryID(u *uuid.UUID) *PostUpdate {
+	if u != nil {
+		pu.SetCategoryID(*u)
 	}
 	return pu
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (pu *PostUpdate) ClearCategoryId() *PostUpdate {
-	pu.mutation.ClearCategoryId()
+// ClearCategoryID clears the value of the "category_id" field.
+func (pu *PostUpdate) ClearCategoryID() *PostUpdate {
+	pu.mutation.ClearCategoryID()
 	return pu
 }
 
@@ -224,19 +224,9 @@ func (pu *PostUpdate) SetAuthor(u *User) *PostUpdate {
 	return pu.SetAuthorID(u.ID)
 }
 
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (pu *PostUpdate) AddCategoryIDs(ids ...string) *PostUpdate {
-	pu.mutation.AddCategoryIDs(ids...)
-	return pu
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (pu *PostUpdate) AddCategory(c ...*Category) *PostUpdate {
-	ids := make([]string, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.AddCategoryIDs(ids...)
+// SetCategory sets the "category" edge to the Category entity.
+func (pu *PostUpdate) SetCategory(c *Category) *PostUpdate {
+	return pu.SetCategoryID(c.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -340,25 +330,10 @@ func (pu *PostUpdate) ClearAuthor() *PostUpdate {
 	return pu
 }
 
-// ClearCategory clears all "category" edges to the Category entity.
+// ClearCategory clears the "category" edge to the Category entity.
 func (pu *PostUpdate) ClearCategory() *PostUpdate {
 	pu.mutation.ClearCategory()
 	return pu
-}
-
-// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
-func (pu *PostUpdate) RemoveCategoryIDs(ids ...string) *PostUpdate {
-	pu.mutation.RemoveCategoryIDs(ids...)
-	return pu
-}
-
-// RemoveCategory removes "category" edges to Category entities.
-func (pu *PostUpdate) RemoveCategory(c ...*Category) *PostUpdate {
-	ids := make([]string, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.RemoveCategoryIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -656,41 +631,28 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.RootPostId(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldRootPostId,
 		})
 	}
 	if pu.mutation.RootPostIdCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Column: post.FieldRootPostId,
 		})
 	}
 	if value, ok := pu.mutation.ReplyPostId(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldReplyPostId,
 		})
 	}
 	if pu.mutation.ReplyPostIdCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Column: post.FieldReplyPostId,
-		})
-	}
-	if value, ok := pu.mutation.CategoryId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldCategoryId,
-		})
-	}
-	if pu.mutation.CategoryIdCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Column: post.FieldCategoryId,
 		})
 	}
 	if pu.mutation.AuthorCleared() {
@@ -730,49 +692,30 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
+			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: category.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !pu.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: category.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := pu.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
+			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: category.FieldID,
 				},
 			},
@@ -1246,15 +1189,15 @@ func (puo *PostUpdateOne) ClearDeletedAt() *PostUpdateOne {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (puo *PostUpdateOne) SetRootPostId(s string) *PostUpdateOne {
-	puo.mutation.SetRootPostId(s)
+func (puo *PostUpdateOne) SetRootPostId(u uuid.UUID) *PostUpdateOne {
+	puo.mutation.SetRootPostId(u)
 	return puo
 }
 
 // SetNillableRootPostId sets the "rootPostId" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableRootPostId(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetRootPostId(*s)
+func (puo *PostUpdateOne) SetNillableRootPostId(u *uuid.UUID) *PostUpdateOne {
+	if u != nil {
+		puo.SetRootPostId(*u)
 	}
 	return puo
 }
@@ -1266,15 +1209,15 @@ func (puo *PostUpdateOne) ClearRootPostId() *PostUpdateOne {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (puo *PostUpdateOne) SetReplyPostId(s string) *PostUpdateOne {
-	puo.mutation.SetReplyPostId(s)
+func (puo *PostUpdateOne) SetReplyPostId(u uuid.UUID) *PostUpdateOne {
+	puo.mutation.SetReplyPostId(u)
 	return puo
 }
 
 // SetNillableReplyPostId sets the "replyPostId" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableReplyPostId(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetReplyPostId(*s)
+func (puo *PostUpdateOne) SetNillableReplyPostId(u *uuid.UUID) *PostUpdateOne {
+	if u != nil {
+		puo.SetReplyPostId(*u)
 	}
 	return puo
 }
@@ -1285,23 +1228,23 @@ func (puo *PostUpdateOne) ClearReplyPostId() *PostUpdateOne {
 	return puo
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (puo *PostUpdateOne) SetCategoryId(s string) *PostUpdateOne {
-	puo.mutation.SetCategoryId(s)
+// SetCategoryID sets the "category_id" field.
+func (puo *PostUpdateOne) SetCategoryID(u uuid.UUID) *PostUpdateOne {
+	puo.mutation.SetCategoryID(u)
 	return puo
 }
 
-// SetNillableCategoryId sets the "categoryId" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableCategoryId(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetCategoryId(*s)
+// SetNillableCategoryID sets the "category_id" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableCategoryID(u *uuid.UUID) *PostUpdateOne {
+	if u != nil {
+		puo.SetCategoryID(*u)
 	}
 	return puo
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (puo *PostUpdateOne) ClearCategoryId() *PostUpdateOne {
-	puo.mutation.ClearCategoryId()
+// ClearCategoryID clears the value of the "category_id" field.
+func (puo *PostUpdateOne) ClearCategoryID() *PostUpdateOne {
+	puo.mutation.ClearCategoryID()
 	return puo
 }
 
@@ -1316,19 +1259,9 @@ func (puo *PostUpdateOne) SetAuthor(u *User) *PostUpdateOne {
 	return puo.SetAuthorID(u.ID)
 }
 
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (puo *PostUpdateOne) AddCategoryIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.AddCategoryIDs(ids...)
-	return puo
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (puo *PostUpdateOne) AddCategory(c ...*Category) *PostUpdateOne {
-	ids := make([]string, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.AddCategoryIDs(ids...)
+// SetCategory sets the "category" edge to the Category entity.
+func (puo *PostUpdateOne) SetCategory(c *Category) *PostUpdateOne {
+	return puo.SetCategoryID(c.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -1432,25 +1365,10 @@ func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
 	return puo
 }
 
-// ClearCategory clears all "category" edges to the Category entity.
+// ClearCategory clears the "category" edge to the Category entity.
 func (puo *PostUpdateOne) ClearCategory() *PostUpdateOne {
 	puo.mutation.ClearCategory()
 	return puo
-}
-
-// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
-func (puo *PostUpdateOne) RemoveCategoryIDs(ids ...string) *PostUpdateOne {
-	puo.mutation.RemoveCategoryIDs(ids...)
-	return puo
-}
-
-// RemoveCategory removes "category" edges to Category entities.
-func (puo *PostUpdateOne) RemoveCategory(c ...*Category) *PostUpdateOne {
-	ids := make([]string, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.RemoveCategoryIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -1772,41 +1690,28 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.RootPostId(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldRootPostId,
 		})
 	}
 	if puo.mutation.RootPostIdCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Column: post.FieldRootPostId,
 		})
 	}
 	if value, ok := puo.mutation.ReplyPostId(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Value:  value,
 			Column: post.FieldReplyPostId,
 		})
 	}
 	if puo.mutation.ReplyPostIdCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUUID,
 			Column: post.FieldReplyPostId,
-		})
-	}
-	if value, ok := puo.mutation.CategoryId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldCategoryId,
-		})
-	}
-	if puo.mutation.CategoryIdCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Column: post.FieldCategoryId,
 		})
 	}
 	if puo.mutation.AuthorCleared() {
@@ -1846,49 +1751,30 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if puo.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
+			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: category.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !puo.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: category.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := puo.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.CategoryTable,
-			Columns: post.CategoryPrimaryKey,
+			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: category.FieldID,
 				},
 			},

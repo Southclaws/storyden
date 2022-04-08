@@ -49,7 +49,7 @@ type CategoryMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *string
+	id            *uuid.UUID
 	name          *string
 	description   *string
 	colour        *string
@@ -85,7 +85,7 @@ func newCategoryMutation(c config, op Op, opts ...categoryOption) *CategoryMutat
 }
 
 // withCategoryID sets the ID field of the mutation.
-func withCategoryID(id string) categoryOption {
+func withCategoryID(id uuid.UUID) categoryOption {
 	return func(m *CategoryMutation) {
 		var (
 			err   error
@@ -137,13 +137,13 @@ func (m CategoryMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Category entities.
-func (m *CategoryMutation) SetID(id string) {
+func (m *CategoryMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CategoryMutation) ID() (id string, exists bool) {
+func (m *CategoryMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -154,12 +154,12 @@ func (m *CategoryMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CategoryMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *CategoryMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1401,14 +1401,12 @@ type PostMutation struct {
 	createdAt       *time.Time
 	updatedAt       *time.Time
 	deletedAt       *time.Time
-	rootPostId      *string
-	replyPostId     *string
-	categoryId      *string
+	rootPostId      *uuid.UUID
+	replyPostId     *uuid.UUID
 	clearedFields   map[string]struct{}
 	author          *uuid.UUID
 	clearedauthor   bool
-	category        map[string]struct{}
-	removedcategory map[string]struct{}
+	category        *uuid.UUID
 	clearedcategory bool
 	tags            map[uuid.UUID]struct{}
 	removedtags     map[uuid.UUID]struct{}
@@ -1901,12 +1899,12 @@ func (m *PostMutation) ResetDeletedAt() {
 }
 
 // SetRootPostId sets the "rootPostId" field.
-func (m *PostMutation) SetRootPostId(s string) {
-	m.rootPostId = &s
+func (m *PostMutation) SetRootPostId(u uuid.UUID) {
+	m.rootPostId = &u
 }
 
 // RootPostId returns the value of the "rootPostId" field in the mutation.
-func (m *PostMutation) RootPostId() (r string, exists bool) {
+func (m *PostMutation) RootPostId() (r uuid.UUID, exists bool) {
 	v := m.rootPostId
 	if v == nil {
 		return
@@ -1917,7 +1915,7 @@ func (m *PostMutation) RootPostId() (r string, exists bool) {
 // OldRootPostId returns the old "rootPostId" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldRootPostId(ctx context.Context) (v string, err error) {
+func (m *PostMutation) OldRootPostId(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRootPostId is only allowed on UpdateOne operations")
 	}
@@ -1950,12 +1948,12 @@ func (m *PostMutation) ResetRootPostId() {
 }
 
 // SetReplyPostId sets the "replyPostId" field.
-func (m *PostMutation) SetReplyPostId(s string) {
-	m.replyPostId = &s
+func (m *PostMutation) SetReplyPostId(u uuid.UUID) {
+	m.replyPostId = &u
 }
 
 // ReplyPostId returns the value of the "replyPostId" field in the mutation.
-func (m *PostMutation) ReplyPostId() (r string, exists bool) {
+func (m *PostMutation) ReplyPostId() (r uuid.UUID, exists bool) {
 	v := m.replyPostId
 	if v == nil {
 		return
@@ -1966,7 +1964,7 @@ func (m *PostMutation) ReplyPostId() (r string, exists bool) {
 // OldReplyPostId returns the old "replyPostId" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldReplyPostId(ctx context.Context) (v string, err error) {
+func (m *PostMutation) OldReplyPostId(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldReplyPostId is only allowed on UpdateOne operations")
 	}
@@ -1998,53 +1996,53 @@ func (m *PostMutation) ResetReplyPostId() {
 	delete(m.clearedFields, post.FieldReplyPostId)
 }
 
-// SetCategoryId sets the "categoryId" field.
-func (m *PostMutation) SetCategoryId(s string) {
-	m.categoryId = &s
+// SetCategoryID sets the "category_id" field.
+func (m *PostMutation) SetCategoryID(u uuid.UUID) {
+	m.category = &u
 }
 
-// CategoryId returns the value of the "categoryId" field in the mutation.
-func (m *PostMutation) CategoryId() (r string, exists bool) {
-	v := m.categoryId
+// CategoryID returns the value of the "category_id" field in the mutation.
+func (m *PostMutation) CategoryID() (r uuid.UUID, exists bool) {
+	v := m.category
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCategoryId returns the old "categoryId" field's value of the Post entity.
+// OldCategoryID returns the old "category_id" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldCategoryId(ctx context.Context) (v string, err error) {
+func (m *PostMutation) OldCategoryID(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCategoryId is only allowed on UpdateOne operations")
+		return v, errors.New("OldCategoryID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCategoryId requires an ID field in the mutation")
+		return v, errors.New("OldCategoryID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCategoryId: %w", err)
+		return v, fmt.Errorf("querying old value for OldCategoryID: %w", err)
 	}
-	return oldValue.CategoryId, nil
+	return oldValue.CategoryID, nil
 }
 
-// ClearCategoryId clears the value of the "categoryId" field.
-func (m *PostMutation) ClearCategoryId() {
-	m.categoryId = nil
-	m.clearedFields[post.FieldCategoryId] = struct{}{}
+// ClearCategoryID clears the value of the "category_id" field.
+func (m *PostMutation) ClearCategoryID() {
+	m.category = nil
+	m.clearedFields[post.FieldCategoryID] = struct{}{}
 }
 
-// CategoryIdCleared returns if the "categoryId" field was cleared in this mutation.
-func (m *PostMutation) CategoryIdCleared() bool {
-	_, ok := m.clearedFields[post.FieldCategoryId]
+// CategoryIDCleared returns if the "category_id" field was cleared in this mutation.
+func (m *PostMutation) CategoryIDCleared() bool {
+	_, ok := m.clearedFields[post.FieldCategoryID]
 	return ok
 }
 
-// ResetCategoryId resets all changes to the "categoryId" field.
-func (m *PostMutation) ResetCategoryId() {
-	m.categoryId = nil
-	delete(m.clearedFields, post.FieldCategoryId)
+// ResetCategoryID resets all changes to the "category_id" field.
+func (m *PostMutation) ResetCategoryID() {
+	m.category = nil
+	delete(m.clearedFields, post.FieldCategoryID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by id.
@@ -2086,16 +2084,6 @@ func (m *PostMutation) ResetAuthor() {
 	m.clearedauthor = false
 }
 
-// AddCategoryIDs adds the "category" edge to the Category entity by ids.
-func (m *PostMutation) AddCategoryIDs(ids ...string) {
-	if m.category == nil {
-		m.category = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.category[ids[i]] = struct{}{}
-	}
-}
-
 // ClearCategory clears the "category" edge to the Category entity.
 func (m *PostMutation) ClearCategory() {
 	m.clearedcategory = true
@@ -2103,32 +2091,15 @@ func (m *PostMutation) ClearCategory() {
 
 // CategoryCleared reports if the "category" edge to the Category entity was cleared.
 func (m *PostMutation) CategoryCleared() bool {
-	return m.clearedcategory
-}
-
-// RemoveCategoryIDs removes the "category" edge to the Category entity by IDs.
-func (m *PostMutation) RemoveCategoryIDs(ids ...string) {
-	if m.removedcategory == nil {
-		m.removedcategory = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.category, ids[i])
-		m.removedcategory[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedCategory returns the removed IDs of the "category" edge to the Category entity.
-func (m *PostMutation) RemovedCategoryIDs() (ids []string) {
-	for id := range m.removedcategory {
-		ids = append(ids, id)
-	}
-	return
+	return m.CategoryIDCleared() || m.clearedcategory
 }
 
 // CategoryIDs returns the "category" edge IDs in the mutation.
-func (m *PostMutation) CategoryIDs() (ids []string) {
-	for id := range m.category {
-		ids = append(ids, id)
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CategoryID instead. It exists only for internal usage by the builders.
+func (m *PostMutation) CategoryIDs() (ids []uuid.UUID) {
+	if id := m.category; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2137,7 +2108,6 @@ func (m *PostMutation) CategoryIDs() (ids []string) {
 func (m *PostMutation) ResetCategory() {
 	m.category = nil
 	m.clearedcategory = false
-	m.removedcategory = nil
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
@@ -2517,8 +2487,8 @@ func (m *PostMutation) Fields() []string {
 	if m.replyPostId != nil {
 		fields = append(fields, post.FieldReplyPostId)
 	}
-	if m.categoryId != nil {
-		fields = append(fields, post.FieldCategoryId)
+	if m.category != nil {
+		fields = append(fields, post.FieldCategoryID)
 	}
 	return fields
 }
@@ -2550,8 +2520,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.RootPostId()
 	case post.FieldReplyPostId:
 		return m.ReplyPostId()
-	case post.FieldCategoryId:
-		return m.CategoryId()
+	case post.FieldCategoryID:
+		return m.CategoryID()
 	}
 	return nil, false
 }
@@ -2583,8 +2553,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRootPostId(ctx)
 	case post.FieldReplyPostId:
 		return m.OldReplyPostId(ctx)
-	case post.FieldCategoryId:
-		return m.OldCategoryId(ctx)
+	case post.FieldCategoryID:
+		return m.OldCategoryID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Post field %s", name)
 }
@@ -2658,25 +2628,25 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		m.SetDeletedAt(v)
 		return nil
 	case post.FieldRootPostId:
-		v, ok := value.(string)
+		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRootPostId(v)
 		return nil
 	case post.FieldReplyPostId:
-		v, ok := value.(string)
+		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetReplyPostId(v)
 		return nil
-	case post.FieldCategoryId:
-		v, ok := value.(string)
+	case post.FieldCategoryID:
+		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCategoryId(v)
+		m.SetCategoryID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
@@ -2723,8 +2693,8 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldReplyPostId) {
 		fields = append(fields, post.FieldReplyPostId)
 	}
-	if m.FieldCleared(post.FieldCategoryId) {
-		fields = append(fields, post.FieldCategoryId)
+	if m.FieldCleared(post.FieldCategoryID) {
+		fields = append(fields, post.FieldCategoryID)
 	}
 	return fields
 }
@@ -2755,8 +2725,8 @@ func (m *PostMutation) ClearField(name string) error {
 	case post.FieldReplyPostId:
 		m.ClearReplyPostId()
 		return nil
-	case post.FieldCategoryId:
-		m.ClearCategoryId()
+	case post.FieldCategoryID:
+		m.ClearCategoryID()
 		return nil
 	}
 	return fmt.Errorf("unknown Post nullable field %s", name)
@@ -2799,8 +2769,8 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldReplyPostId:
 		m.ResetReplyPostId()
 		return nil
-	case post.FieldCategoryId:
-		m.ResetCategoryId()
+	case post.FieldCategoryID:
+		m.ResetCategoryID()
 		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
@@ -2845,11 +2815,9 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case post.EdgeCategory:
-		ids := make([]ent.Value, 0, len(m.category))
-		for id := range m.category {
-			ids = append(ids, id)
+		if id := m.category; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case post.EdgeTags:
 		ids := make([]ent.Value, 0, len(m.tags))
 		for id := range m.tags {
@@ -2893,9 +2861,6 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 8)
-	if m.removedcategory != nil {
-		edges = append(edges, post.EdgeCategory)
-	}
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -2921,12 +2886,6 @@ func (m *PostMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case post.EdgeCategory:
-		ids := make([]ent.Value, 0, len(m.removedcategory))
-		for id := range m.removedcategory {
-			ids = append(ids, id)
-		}
-		return ids
 	case post.EdgeTags:
 		ids := make([]ent.Value, 0, len(m.removedtags))
 		for id := range m.removedtags {
@@ -3027,6 +2986,9 @@ func (m *PostMutation) ClearEdge(name string) error {
 	switch name {
 	case post.EdgeAuthor:
 		m.ClearAuthor()
+		return nil
+	case post.EdgeCategory:
+		m.ClearCategory()
 		return nil
 	}
 	return fmt.Errorf("unknown Post unique edge %s", name)

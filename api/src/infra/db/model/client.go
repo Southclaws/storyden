@@ -220,7 +220,7 @@ func (c *CategoryClient) UpdateOne(ca *Category) *CategoryUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CategoryClient) UpdateOneID(id string) *CategoryUpdateOne {
+func (c *CategoryClient) UpdateOneID(id uuid.UUID) *CategoryUpdateOne {
 	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategoryID(id))
 	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -237,7 +237,7 @@ func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *CategoryClient) DeleteOneID(id string) *CategoryDeleteOne {
+func (c *CategoryClient) DeleteOneID(id uuid.UUID) *CategoryDeleteOne {
 	builder := c.Delete().Where(category.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -252,12 +252,12 @@ func (c *CategoryClient) Query() *CategoryQuery {
 }
 
 // Get returns a Category entity by its id.
-func (c *CategoryClient) Get(ctx context.Context, id string) (*Category, error) {
+func (c *CategoryClient) Get(ctx context.Context, id uuid.UUID) (*Category, error) {
 	return c.Query().Where(category.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CategoryClient) GetX(ctx context.Context, id string) *Category {
+func (c *CategoryClient) GetX(ctx context.Context, id uuid.UUID) *Category {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -273,7 +273,7 @@ func (c *CategoryClient) QueryPosts(ca *Category) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, category.PostsTable, category.PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, category.PostsTable, category.PostsColumn),
 		)
 		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
 		return fromV, nil
@@ -501,7 +501,7 @@ func (c *PostClient) QueryCategory(po *Post) *CategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(category.Table, category.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.CategoryTable, post.CategoryPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.CategoryTable, post.CategoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil

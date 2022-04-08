@@ -87,8 +87,16 @@ func (cc *CategoryCreate) SetNillableAdmin(b *bool) *CategoryCreate {
 }
 
 // SetID sets the "id" field.
-func (cc *CategoryCreate) SetID(s string) *CategoryCreate {
-	cc.mutation.SetID(s)
+func (cc *CategoryCreate) SetID(u uuid.UUID) *CategoryCreate {
+	cc.mutation.SetID(u)
+	return cc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (cc *CategoryCreate) SetNillableID(u *uuid.UUID) *CategoryCreate {
+	if u != nil {
+		cc.SetID(*u)
+	}
 	return cc
 }
 
@@ -194,6 +202,10 @@ func (cc *CategoryCreate) defaults() {
 		v := category.DefaultAdmin
 		cc.mutation.SetAdmin(v)
 	}
+	if _, ok := cc.mutation.ID(); !ok {
+		v := category.DefaultID()
+		cc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -225,10 +237,10 @@ func (cc *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Category.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	return _node, nil
@@ -240,7 +252,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: category.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: category.FieldID,
 			},
 		}
@@ -248,7 +260,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = cc.conflict
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -292,10 +304,10 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   category.PostsTable,
-			Columns: category.PostsPrimaryKey,
+			Columns: []string{category.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -572,7 +584,7 @@ func (u *CategoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CategoryUpsertOne) ID(ctx context.Context) (id string, err error) {
+func (u *CategoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -586,7 +598,7 @@ func (u *CategoryUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CategoryUpsertOne) IDX(ctx context.Context) string {
+func (u *CategoryUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
