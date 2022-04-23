@@ -13,28 +13,28 @@ const (
 	Label = "post"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldFirst holds the string denoting the first field in the database.
+	FieldFirst = "first"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldSlug holds the string denoting the slug field in the database.
 	FieldSlug = "slug"
+	// FieldPinned holds the string denoting the pinned field in the database.
+	FieldPinned = "pinned"
+	// FieldRootPostID holds the string denoting the root_post_id field in the database.
+	FieldRootPostID = "root_post_id"
+	// FieldReplyToPostID holds the string denoting the reply_to_post_id field in the database.
+	FieldReplyToPostID = "reply_to_post_id"
 	// FieldBody holds the string denoting the body field in the database.
 	FieldBody = "body"
 	// FieldShort holds the string denoting the short field in the database.
 	FieldShort = "short"
-	// FieldFirst holds the string denoting the first field in the database.
-	FieldFirst = "first"
-	// FieldPinned holds the string denoting the pinned field in the database.
-	FieldPinned = "pinned"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deletedat field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldRootPostId holds the string denoting the rootpostid field in the database.
-	FieldRootPostId = "root_post_id"
-	// FieldReplyPostId holds the string denoting the replypostid field in the database.
-	FieldReplyPostId = "reply_post_id"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -47,10 +47,10 @@ const (
 	EdgeRoot = "root"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
-	// EdgeReplies holds the string denoting the replies edge name in mutations.
-	EdgeReplies = "replies"
 	// EdgeReplyTo holds the string denoting the replyto edge name in mutations.
 	EdgeReplyTo = "replyTo"
+	// EdgeReplies holds the string denoting the replies edge name in mutations.
+	EdgeReplies = "replies"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
 	// Table holds the table name of the post in the database.
@@ -74,14 +74,22 @@ const (
 	// TagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	TagsInverseTable = "tags"
-	// RootTable is the table that holds the root relation/edge. The primary key declared below.
-	RootTable = "post_posts"
-	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
-	PostsTable = "post_posts"
-	// RepliesTable is the table that holds the replies relation/edge. The primary key declared below.
-	RepliesTable = "post_replyTo"
-	// ReplyToTable is the table that holds the replyTo relation/edge. The primary key declared below.
-	ReplyToTable = "post_replyTo"
+	// RootTable is the table that holds the root relation/edge.
+	RootTable = "posts"
+	// RootColumn is the table column denoting the root relation/edge.
+	RootColumn = "root_post_id"
+	// PostsTable is the table that holds the posts relation/edge.
+	PostsTable = "posts"
+	// PostsColumn is the table column denoting the posts relation/edge.
+	PostsColumn = "root_post_id"
+	// ReplyToTable is the table that holds the replyTo relation/edge.
+	ReplyToTable = "posts"
+	// ReplyToColumn is the table column denoting the replyTo relation/edge.
+	ReplyToColumn = "reply_to_post_id"
+	// RepliesTable is the table that holds the replies relation/edge.
+	RepliesTable = "posts"
+	// RepliesColumn is the table column denoting the replies relation/edge.
+	RepliesColumn = "reply_to_post_id"
 	// ReactsTable is the table that holds the reacts relation/edge.
 	ReactsTable = "reacts"
 	// ReactsInverseTable is the table name for the React entity.
@@ -94,24 +102,23 @@ const (
 // Columns holds all SQL columns for post fields.
 var Columns = []string{
 	FieldID,
+	FieldFirst,
 	FieldTitle,
 	FieldSlug,
+	FieldPinned,
+	FieldRootPostID,
+	FieldReplyToPostID,
 	FieldBody,
 	FieldShort,
-	FieldFirst,
-	FieldPinned,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldRootPostId,
-	FieldReplyPostId,
 	FieldCategoryID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"react_post",
 	"user_posts",
 }
 
@@ -119,18 +126,6 @@ var (
 	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
 	// primary key for the tags relation (M2M).
 	TagsPrimaryKey = []string{"tag_id", "post_id"}
-	// RootPrimaryKey and RootColumn2 are the table columns denoting the
-	// primary key for the root relation (M2M).
-	RootPrimaryKey = []string{"post_id", "root_id"}
-	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
-	// primary key for the posts relation (M2M).
-	PostsPrimaryKey = []string{"post_id", "root_id"}
-	// RepliesPrimaryKey and RepliesColumn2 are the table columns denoting the
-	// primary key for the replies relation (M2M).
-	RepliesPrimaryKey = []string{"post_id", "reply_id"}
-	// ReplyToPrimaryKey and ReplyToColumn2 are the table columns denoting the
-	// primary key for the replyTo relation (M2M).
-	ReplyToPrimaryKey = []string{"post_id", "reply_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -533,7 +533,7 @@ func (c *PostClient) QueryRoot(po *Post) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.RootTable, post.RootPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.RootTable, post.RootColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil
@@ -549,23 +549,7 @@ func (c *PostClient) QueryPosts(po *Post) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, post.PostsTable, post.PostsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryReplies queries the replies edge of a Post.
-func (c *PostClient) QueryReplies(po *Post) *PostQuery {
-	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := po.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(post.Table, post.FieldID, id),
-			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.RepliesTable, post.RepliesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.PostsTable, post.PostsColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil
@@ -581,7 +565,23 @@ func (c *PostClient) QueryReplyTo(po *Post) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, post.ReplyToTable, post.ReplyToPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.ReplyToTable, post.ReplyToColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReplies queries the replies edge of a Post.
+func (c *PostClient) QueryReplies(po *Post) *PostQuery {
+	query := &PostQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.RepliesTable, post.RepliesColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil
@@ -650,7 +650,7 @@ func (c *ReactClient) UpdateOne(r *React) *ReactUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ReactClient) UpdateOneID(id string) *ReactUpdateOne {
+func (c *ReactClient) UpdateOneID(id uuid.UUID) *ReactUpdateOne {
 	mutation := newReactMutation(c.config, OpUpdateOne, withReactID(id))
 	return &ReactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -667,7 +667,7 @@ func (c *ReactClient) DeleteOne(r *React) *ReactDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *ReactClient) DeleteOneID(id string) *ReactDeleteOne {
+func (c *ReactClient) DeleteOneID(id uuid.UUID) *ReactDeleteOne {
 	builder := c.Delete().Where(react.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -682,12 +682,12 @@ func (c *ReactClient) Query() *ReactQuery {
 }
 
 // Get returns a React entity by its id.
-func (c *ReactClient) Get(ctx context.Context, id string) (*React, error) {
+func (c *ReactClient) Get(ctx context.Context, id uuid.UUID) (*React, error) {
 	return c.Query().Where(react.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ReactClient) GetX(ctx context.Context, id string) *React {
+func (c *ReactClient) GetX(ctx context.Context, id uuid.UUID) *React {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -703,7 +703,7 @@ func (c *ReactClient) QueryUser(r *React) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, react.UserTable, react.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.UserTable, react.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -719,7 +719,7 @@ func (c *ReactClient) QueryPost(r *React) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, react.PostTable, react.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.PostTable, react.PostColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

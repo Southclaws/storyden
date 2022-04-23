@@ -3,9 +3,9 @@ package react
 import (
 	"context"
 	"errors"
-	"strings"
 
-	"github.com/Southclaws/storyden/api/src/infra/db"
+	"github.com/google/uuid"
+
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
 )
 
@@ -15,87 +15,51 @@ var (
 	ErrUnauthorised   = errors.New("not allowed to remove another user's react")
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) Add(ctx context.Context, userID, postID, emojiID string) (*React, error) {
+func (d *database) Add(ctx context.Context, userID uuid.UUID, postID uuid.UUID, emojiID string) (*React, error) {
 	e, ok := IsValidEmoji(emojiID)
 	if !ok {
 		return nil, ErrInvalidEmoji
 	}
 
 	react, err := d.db.React.
-		CreateOne(
-			db.React.Emoji.Set(e),
-			db.React.User.Link(
-				db.User.ID.Equals(userID),
-			),
-			db.React.Post.Link(
-				db.Post.ID.Equals(postID),
-			),
-		).
-		With(
-			db.React.User.Fetch(),
-			db.React.Post.Fetch(),
-		).
-		Exec(ctx)
+		Create().
+		SetEmoji(e).
+		SetUserID(uuid.UUID(userID)).
+		SetPostID(uuid.UUID(postID)).
+		Save(ctx)
 	if err != nil {
-		// NOTE: This depends on internal Prisma error implementation details
-		// and may change without notice. This will be reflected by the frontend
-		// showing an Internal Server Error when a user attempts to react to a
-		// post with an emoji they have already reacted with. This comment
-		// signposts this possibility.
-		// TODO: Clean this up when Prisma's Go client adds better errors.
-		if strings.Contains(err.Error(), "UniqueConstraintViolation") {
+		if model.IsConstraintError(err) {
 			return nil, ErrAlreadyReacted
 		}
 		return nil, err
 	}
 
-	_, err = d.db.Post.
-		FindUnique(db.Post.ID.Equals(postID)).
-		Update(
-			db.Post.Reacts.Link(
-				db.React.ID.Equals(react.ID),
-			),
-		).
-		Exec(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return FromModel(react, react.RelationsReact.Post.ID), nil
+	return FromModel(react), nil
 }
 
-func (d *DB) Remove(ctx context.Context, userID, reactID string) (*React, error) {
+func (d *database) Remove(ctx context.Context, userID uuid.UUID, reactID ReactID) (*React, error) {
 	// First, look up the react to check if this user has permissions to remove.
-	p, err := d.db.React.
-		FindUnique(db.React.ID.Equals(reactID)).
-		With(
-			db.React.User.Fetch(),
-			db.React.Post.Fetch(),
-		).
-		Exec(ctx)
+	p, err := d.db.React.Get(ctx, uuid.UUID(reactID))
 	if err != nil {
 		return nil, err
 	}
 
-	if !p.RelationsReact.User.Admin && p.UserID != userID {
+	if !p.Edges.User.Admin && p.Edges.User.ID != uuid.UUID(userID) {
 		return nil, ErrUnauthorised
 	}
 
 	// the user has permission, remove it.
-	if _, err = d.db.React.
-		FindUnique(db.React.ID.Equals(reactID)).
-		Delete().
-		Exec(ctx); err != nil {
+	if err := d.db.React.DeleteOneID(uuid.UUID(reactID)).Exec(ctx); err != nil {
 		return nil, err
 	}
 
-	return FromModel(p, p.RelationsReact.Post.ID), nil
+	return FromModel(p), nil
 }

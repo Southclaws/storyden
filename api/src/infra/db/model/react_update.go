@@ -43,46 +43,50 @@ func (ru *ReactUpdate) SetCreatedAt(t time.Time) *ReactUpdate {
 	return ru
 }
 
-// SetPostId sets the "postId" field.
-func (ru *ReactUpdate) SetPostId(s string) *ReactUpdate {
-	ru.mutation.SetPostId(s)
-	return ru
-}
-
-// SetUserId sets the "userId" field.
-func (ru *ReactUpdate) SetUserId(s string) *ReactUpdate {
-	ru.mutation.SetUserId(s)
-	return ru
-}
-
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (ru *ReactUpdate) AddUserIDs(ids ...uuid.UUID) *ReactUpdate {
-	ru.mutation.AddUserIDs(ids...)
-	return ru
-}
-
-// AddUser adds the "user" edges to the User entity.
-func (ru *ReactUpdate) AddUser(u ...*User) *ReactUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+func (ru *ReactUpdate) SetNillableCreatedAt(t *time.Time) *ReactUpdate {
+	if t != nil {
+		ru.SetCreatedAt(*t)
 	}
-	return ru.AddUserIDs(ids...)
-}
-
-// AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (ru *ReactUpdate) AddPostIDs(ids ...uuid.UUID) *ReactUpdate {
-	ru.mutation.AddPostIDs(ids...)
 	return ru
 }
 
-// AddPost adds the "Post" edges to the Post entity.
-func (ru *ReactUpdate) AddPost(p ...*Post) *ReactUpdate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetUserID sets the "user" edge to the User entity by ID.
+func (ru *ReactUpdate) SetUserID(id uuid.UUID) *ReactUpdate {
+	ru.mutation.SetUserID(id)
+	return ru
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (ru *ReactUpdate) SetNillableUserID(id *uuid.UUID) *ReactUpdate {
+	if id != nil {
+		ru = ru.SetUserID(*id)
 	}
-	return ru.AddPostIDs(ids...)
+	return ru
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (ru *ReactUpdate) SetUser(u *User) *ReactUpdate {
+	return ru.SetUserID(u.ID)
+}
+
+// SetPostID sets the "Post" edge to the Post entity by ID.
+func (ru *ReactUpdate) SetPostID(id uuid.UUID) *ReactUpdate {
+	ru.mutation.SetPostID(id)
+	return ru
+}
+
+// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
+func (ru *ReactUpdate) SetNillablePostID(id *uuid.UUID) *ReactUpdate {
+	if id != nil {
+		ru = ru.SetPostID(*id)
+	}
+	return ru
+}
+
+// SetPost sets the "Post" edge to the Post entity.
+func (ru *ReactUpdate) SetPost(p *Post) *ReactUpdate {
+	return ru.SetPostID(p.ID)
 }
 
 // Mutation returns the ReactMutation object of the builder.
@@ -90,46 +94,16 @@ func (ru *ReactUpdate) Mutation() *ReactMutation {
 	return ru.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
+// ClearUser clears the "user" edge to the User entity.
 func (ru *ReactUpdate) ClearUser() *ReactUpdate {
 	ru.mutation.ClearUser()
 	return ru
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (ru *ReactUpdate) RemoveUserIDs(ids ...uuid.UUID) *ReactUpdate {
-	ru.mutation.RemoveUserIDs(ids...)
-	return ru
-}
-
-// RemoveUser removes "user" edges to User entities.
-func (ru *ReactUpdate) RemoveUser(u ...*User) *ReactUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ru.RemoveUserIDs(ids...)
-}
-
-// ClearPost clears all "Post" edges to the Post entity.
+// ClearPost clears the "Post" edge to the Post entity.
 func (ru *ReactUpdate) ClearPost() *ReactUpdate {
 	ru.mutation.ClearPost()
 	return ru
-}
-
-// RemovePostIDs removes the "Post" edge to Post entities by IDs.
-func (ru *ReactUpdate) RemovePostIDs(ids ...uuid.UUID) *ReactUpdate {
-	ru.mutation.RemovePostIDs(ids...)
-	return ru
-}
-
-// RemovePost removes "Post" edges to Post entities.
-func (ru *ReactUpdate) RemovePost(p ...*Post) *ReactUpdate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return ru.RemovePostIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -192,7 +166,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: react.FieldID,
 			},
 		},
@@ -218,23 +192,9 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: react.FieldCreatedAt,
 		})
 	}
-	if value, ok := ru.mutation.PostId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldPostId,
-		})
-	}
-	if value, ok := ru.mutation.UserId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldUserId,
-		})
-	}
 	if ru.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.UserTable,
 			Columns: []string{react.UserColumn},
@@ -245,31 +205,12 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: user.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ru.mutation.RemovedUserIDs(); len(nodes) > 0 && !ru.mutation.UserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ru.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.UserTable,
 			Columns: []string{react.UserColumn},
@@ -288,7 +229,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ru.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
@@ -299,31 +240,12 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: post.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ru.mutation.RemovedPostIDs(); len(nodes) > 0 && !ru.mutation.PostCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   react.PostTable,
-			Columns: []string{react.PostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ru.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
@@ -371,46 +293,50 @@ func (ruo *ReactUpdateOne) SetCreatedAt(t time.Time) *ReactUpdateOne {
 	return ruo
 }
 
-// SetPostId sets the "postId" field.
-func (ruo *ReactUpdateOne) SetPostId(s string) *ReactUpdateOne {
-	ruo.mutation.SetPostId(s)
-	return ruo
-}
-
-// SetUserId sets the "userId" field.
-func (ruo *ReactUpdateOne) SetUserId(s string) *ReactUpdateOne {
-	ruo.mutation.SetUserId(s)
-	return ruo
-}
-
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (ruo *ReactUpdateOne) AddUserIDs(ids ...uuid.UUID) *ReactUpdateOne {
-	ruo.mutation.AddUserIDs(ids...)
-	return ruo
-}
-
-// AddUser adds the "user" edges to the User entity.
-func (ruo *ReactUpdateOne) AddUser(u ...*User) *ReactUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillableCreatedAt(t *time.Time) *ReactUpdateOne {
+	if t != nil {
+		ruo.SetCreatedAt(*t)
 	}
-	return ruo.AddUserIDs(ids...)
-}
-
-// AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (ruo *ReactUpdateOne) AddPostIDs(ids ...uuid.UUID) *ReactUpdateOne {
-	ruo.mutation.AddPostIDs(ids...)
 	return ruo
 }
 
-// AddPost adds the "Post" edges to the Post entity.
-func (ruo *ReactUpdateOne) AddPost(p ...*Post) *ReactUpdateOne {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetUserID sets the "user" edge to the User entity by ID.
+func (ruo *ReactUpdateOne) SetUserID(id uuid.UUID) *ReactUpdateOne {
+	ruo.mutation.SetUserID(id)
+	return ruo
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillableUserID(id *uuid.UUID) *ReactUpdateOne {
+	if id != nil {
+		ruo = ruo.SetUserID(*id)
 	}
-	return ruo.AddPostIDs(ids...)
+	return ruo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (ruo *ReactUpdateOne) SetUser(u *User) *ReactUpdateOne {
+	return ruo.SetUserID(u.ID)
+}
+
+// SetPostID sets the "Post" edge to the Post entity by ID.
+func (ruo *ReactUpdateOne) SetPostID(id uuid.UUID) *ReactUpdateOne {
+	ruo.mutation.SetPostID(id)
+	return ruo
+}
+
+// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillablePostID(id *uuid.UUID) *ReactUpdateOne {
+	if id != nil {
+		ruo = ruo.SetPostID(*id)
+	}
+	return ruo
+}
+
+// SetPost sets the "Post" edge to the Post entity.
+func (ruo *ReactUpdateOne) SetPost(p *Post) *ReactUpdateOne {
+	return ruo.SetPostID(p.ID)
 }
 
 // Mutation returns the ReactMutation object of the builder.
@@ -418,46 +344,16 @@ func (ruo *ReactUpdateOne) Mutation() *ReactMutation {
 	return ruo.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
+// ClearUser clears the "user" edge to the User entity.
 func (ruo *ReactUpdateOne) ClearUser() *ReactUpdateOne {
 	ruo.mutation.ClearUser()
 	return ruo
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (ruo *ReactUpdateOne) RemoveUserIDs(ids ...uuid.UUID) *ReactUpdateOne {
-	ruo.mutation.RemoveUserIDs(ids...)
-	return ruo
-}
-
-// RemoveUser removes "user" edges to User entities.
-func (ruo *ReactUpdateOne) RemoveUser(u ...*User) *ReactUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return ruo.RemoveUserIDs(ids...)
-}
-
-// ClearPost clears all "Post" edges to the Post entity.
+// ClearPost clears the "Post" edge to the Post entity.
 func (ruo *ReactUpdateOne) ClearPost() *ReactUpdateOne {
 	ruo.mutation.ClearPost()
 	return ruo
-}
-
-// RemovePostIDs removes the "Post" edge to Post entities by IDs.
-func (ruo *ReactUpdateOne) RemovePostIDs(ids ...uuid.UUID) *ReactUpdateOne {
-	ruo.mutation.RemovePostIDs(ids...)
-	return ruo
-}
-
-// RemovePost removes "Post" edges to Post entities.
-func (ruo *ReactUpdateOne) RemovePost(p ...*Post) *ReactUpdateOne {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return ruo.RemovePostIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -527,7 +423,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: react.FieldID,
 			},
 		},
@@ -570,23 +466,9 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Column: react.FieldCreatedAt,
 		})
 	}
-	if value, ok := ruo.mutation.PostId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldPostId,
-		})
-	}
-	if value, ok := ruo.mutation.UserId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldUserId,
-		})
-	}
 	if ruo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.UserTable,
 			Columns: []string{react.UserColumn},
@@ -597,31 +479,12 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 					Column: user.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ruo.mutation.RemovedUserIDs(); len(nodes) > 0 && !ruo.mutation.UserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ruo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.UserTable,
 			Columns: []string{react.UserColumn},
@@ -640,7 +503,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 	}
 	if ruo.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
@@ -651,31 +514,12 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 					Column: post.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ruo.mutation.RemovedPostIDs(); len(nodes) > 0 && !ruo.mutation.PostCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   react.PostTable,
-			Columns: []string{react.PostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ruo.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},

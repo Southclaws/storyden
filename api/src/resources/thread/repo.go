@@ -2,9 +2,7 @@ package thread
 
 import (
 	"context"
-	"time"
 
-	"github.com/Southclaws/storyden/api/src/resources/post"
 	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
@@ -18,22 +16,27 @@ import (
 type Repository interface {
 	CreateThread(
 		ctx context.Context,
-		title, body, authorID user.UserID, categoryName string,
+		title string,
+		body string,
+		authorID user.UserID,
+		categoryName string,
 		tags []string,
-	) (*post.Post, error)
+	) (*Thread, error)
 
-	GetThreads(
-		ctx context.Context,
-		tags []string, category string, query string,
-		before time.Time, sort string, offset, max int,
-		includePosts bool,
-		includeDeleted bool,
-		includeAdmin bool,
-	) ([]post.Post, error)
+	// GetThreads(
+	// 	ctx context.Context,
+	// 	tags []string, category string, query string,
+	// 	before time.Time, sort string, offset, max int,
+	// 	includePosts bool,
+	// 	includeDeleted bool,
+	// 	includeAdmin bool,
+	// ) ([]post.Post, error)
 
-	GetPostCounts(ctx context.Context) (map[string]int, error)
+	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	Update(ctx context.Context, userID user.UserID, id string, title, category *string, pinned *bool) (*post.Post, error)
+	// GetThread(ctx context.Context, slug string, max, skip int, deleted, admin bool) (Thread, error)
 
-	Delete(ctx context.Context, id, authorID user.UserID) (int, error)
+	// Update(ctx context.Context, userID user.UserID, id string, title, category *string, pinned *bool) (*post.Post, error)
+
+	// Delete(ctx context.Context, id, authorID user.UserID) (int, error)
 }

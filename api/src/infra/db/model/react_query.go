@@ -4,7 +4,6 @@ package model
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -16,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
+	"github.com/google/uuid"
 )
 
 // ReactQuery is the builder for querying React entities.
@@ -82,7 +82,7 @@ func (rq *ReactQuery) QueryUser() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, react.UserTable, react.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.UserTable, react.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -104,7 +104,7 @@ func (rq *ReactQuery) QueryPost() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, react.PostTable, react.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.PostTable, react.PostColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -136,8 +136,8 @@ func (rq *ReactQuery) FirstX(ctx context.Context) *React {
 
 // FirstID returns the first React ID from the query.
 // Returns a *NotFoundError when no React ID was found.
-func (rq *ReactQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (rq *ReactQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -149,7 +149,7 @@ func (rq *ReactQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *ReactQuery) FirstIDX(ctx context.Context) string {
+func (rq *ReactQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -187,8 +187,8 @@ func (rq *ReactQuery) OnlyX(ctx context.Context) *React {
 // OnlyID is like Only, but returns the only React ID in the query.
 // Returns a *NotSingularError when more than one React ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *ReactQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (rq *ReactQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -204,7 +204,7 @@ func (rq *ReactQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *ReactQuery) OnlyIDX(ctx context.Context) string {
+func (rq *ReactQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -230,8 +230,8 @@ func (rq *ReactQuery) AllX(ctx context.Context) []*React {
 }
 
 // IDs executes the query and returns a list of React IDs.
-func (rq *ReactQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (rq *ReactQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := rq.Select(react.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (rq *ReactQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *ReactQuery) IDsX(ctx context.Context) []string {
+func (rq *ReactQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -395,6 +395,9 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 			rq.withPost != nil,
 		}
 	)
+	if rq.withUser != nil || rq.withPost != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, react.ForeignKeys...)
 	}
@@ -422,60 +425,60 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 	}
 
 	if query := rq.withUser; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*React)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*React)
 		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.User = []*User{}
+			if nodes[i].react_user == nil {
+				continue
+			}
+			fk := *nodes[i].react_user
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.withFKs = true
-		query.Where(predicate.User(func(s *sql.Selector) {
-			s.Where(sql.InValues(react.UserColumn, fks...))
-		}))
+		query.Where(user.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.react_user
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "react_user" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "react_user" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "react_user" returned %v`, n.ID)
 			}
-			node.Edges.User = append(node.Edges.User, n)
+			for i := range nodes {
+				nodes[i].Edges.User = n
+			}
 		}
 	}
 
 	if query := rq.withPost; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*React)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*React)
 		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Post = []*Post{}
+			if nodes[i].react_post == nil {
+				continue
+			}
+			fk := *nodes[i].react_post
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.withFKs = true
-		query.Where(predicate.Post(func(s *sql.Selector) {
-			s.Where(sql.InValues(react.PostColumn, fks...))
-		}))
+		query.Where(post.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.react_post
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "react_post" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "react_post" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "react_post" returned %v`, n.ID)
 			}
-			node.Edges.Post = append(node.Edges.Post, n)
+			for i := range nodes {
+				nodes[i].Edges.Post = n
+			}
 		}
 	}
 
@@ -508,7 +511,7 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: react.FieldID,
 			},
 		},

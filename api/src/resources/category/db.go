@@ -121,6 +121,8 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {
 	u := d.db.Category.UpdateOneID(uuid.UUID(id))
 
+	// TODO: Write a less explicit, more ergonomic way to do this:
+
 	//nocheck:wsl
 	if name != nil {
 		u.SetName(*name)

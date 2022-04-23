@@ -8,31 +8,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.React {
+func ID(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.React {
+func IDEQ(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.React {
+func IDNEQ(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.React {
+func IDIn(ids ...uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...string) predicate.React {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.React {
+func IDNotIn(ids ...uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,28 +67,28 @@ func IDNotIn(ids ...string) predicate.React {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.React {
+func IDGT(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.React {
+func IDGTE(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.React {
+func IDLT(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.React {
+func IDLTE(id uuid.UUID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -104,20 +105,6 @@ func Emoji(v string) predicate.React {
 func CreatedAt(v time.Time) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
-}
-
-// PostId applies equality check predicate on the "postId" field. It's identical to PostIdEQ.
-func PostId(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPostId), v))
-	})
-}
-
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
 	})
 }
 
@@ -308,235 +295,13 @@ func CreatedAtLTE(v time.Time) predicate.React {
 	})
 }
 
-// PostIdEQ applies the EQ predicate on the "postId" field.
-func PostIdEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdNEQ applies the NEQ predicate on the "postId" field.
-func PostIdNEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdIn applies the In predicate on the "postId" field.
-func PostIdIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldPostId), v...))
-	})
-}
-
-// PostIdNotIn applies the NotIn predicate on the "postId" field.
-func PostIdNotIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldPostId), v...))
-	})
-}
-
-// PostIdGT applies the GT predicate on the "postId" field.
-func PostIdGT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdGTE applies the GTE predicate on the "postId" field.
-func PostIdGTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdLT applies the LT predicate on the "postId" field.
-func PostIdLT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdLTE applies the LTE predicate on the "postId" field.
-func PostIdLTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdContains applies the Contains predicate on the "postId" field.
-func PostIdContains(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdHasPrefix applies the HasPrefix predicate on the "postId" field.
-func PostIdHasPrefix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdHasSuffix applies the HasSuffix predicate on the "postId" field.
-func PostIdHasSuffix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdEqualFold applies the EqualFold predicate on the "postId" field.
-func PostIdEqualFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPostId), v))
-	})
-}
-
-// PostIdContainsFold applies the ContainsFold predicate on the "postId" field.
-func PostIdContainsFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPostId), v))
-	})
-}
-
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdGT applies the GT predicate on the "userId" field.
-func UserIdGT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdGTE applies the GTE predicate on the "userId" field.
-func UserIdGTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLT applies the LT predicate on the "userId" field.
-func UserIdLT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLTE applies the LTE predicate on the "userId" field.
-func UserIdLTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContains applies the Contains predicate on the "userId" field.
-func UserIdContains(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasPrefix applies the HasPrefix predicate on the "userId" field.
-func UserIdHasPrefix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasSuffix applies the HasSuffix predicate on the "userId" field.
-func UserIdHasSuffix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdEqualFold applies the EqualFold predicate on the "userId" field.
-func UserIdEqualFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContainsFold applies the ContainsFold predicate on the "userId" field.
-func UserIdContainsFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldUserId), v))
-	})
-}
-
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(UserTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -548,7 +313,7 @@ func HasUserWith(preds ...predicate.User) predicate.React {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(UserInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -564,7 +329,7 @@ func HasPost() predicate.React {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(PostTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, PostTable, PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, PostTable, PostColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -576,7 +341,7 @@ func HasPostWith(preds ...predicate.Post) predicate.React {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(PostInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, PostTable, PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, PostTable, PostColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

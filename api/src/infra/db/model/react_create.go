@@ -38,52 +38,64 @@ func (rc *ReactCreate) SetCreatedAt(t time.Time) *ReactCreate {
 	return rc
 }
 
-// SetPostId sets the "postId" field.
-func (rc *ReactCreate) SetPostId(s string) *ReactCreate {
-	rc.mutation.SetPostId(s)
-	return rc
-}
-
-// SetUserId sets the "userId" field.
-func (rc *ReactCreate) SetUserId(s string) *ReactCreate {
-	rc.mutation.SetUserId(s)
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+func (rc *ReactCreate) SetNillableCreatedAt(t *time.Time) *ReactCreate {
+	if t != nil {
+		rc.SetCreatedAt(*t)
+	}
 	return rc
 }
 
 // SetID sets the "id" field.
-func (rc *ReactCreate) SetID(s string) *ReactCreate {
-	rc.mutation.SetID(s)
+func (rc *ReactCreate) SetID(u uuid.UUID) *ReactCreate {
+	rc.mutation.SetID(u)
 	return rc
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (rc *ReactCreate) AddUserIDs(ids ...uuid.UUID) *ReactCreate {
-	rc.mutation.AddUserIDs(ids...)
-	return rc
-}
-
-// AddUser adds the "user" edges to the User entity.
-func (rc *ReactCreate) AddUser(u ...*User) *ReactCreate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableID sets the "id" field if the given value is not nil.
+func (rc *ReactCreate) SetNillableID(u *uuid.UUID) *ReactCreate {
+	if u != nil {
+		rc.SetID(*u)
 	}
-	return rc.AddUserIDs(ids...)
-}
-
-// AddPostIDs adds the "Post" edge to the Post entity by IDs.
-func (rc *ReactCreate) AddPostIDs(ids ...uuid.UUID) *ReactCreate {
-	rc.mutation.AddPostIDs(ids...)
 	return rc
 }
 
-// AddPost adds the "Post" edges to the Post entity.
-func (rc *ReactCreate) AddPost(p ...*Post) *ReactCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetUserID sets the "user" edge to the User entity by ID.
+func (rc *ReactCreate) SetUserID(id uuid.UUID) *ReactCreate {
+	rc.mutation.SetUserID(id)
+	return rc
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (rc *ReactCreate) SetNillableUserID(id *uuid.UUID) *ReactCreate {
+	if id != nil {
+		rc = rc.SetUserID(*id)
 	}
-	return rc.AddPostIDs(ids...)
+	return rc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (rc *ReactCreate) SetUser(u *User) *ReactCreate {
+	return rc.SetUserID(u.ID)
+}
+
+// SetPostID sets the "Post" edge to the Post entity by ID.
+func (rc *ReactCreate) SetPostID(id uuid.UUID) *ReactCreate {
+	rc.mutation.SetPostID(id)
+	return rc
+}
+
+// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
+func (rc *ReactCreate) SetNillablePostID(id *uuid.UUID) *ReactCreate {
+	if id != nil {
+		rc = rc.SetPostID(*id)
+	}
+	return rc
+}
+
+// SetPost sets the "Post" edge to the Post entity.
+func (rc *ReactCreate) SetPost(p *Post) *ReactCreate {
+	return rc.SetPostID(p.ID)
 }
 
 // Mutation returns the ReactMutation object of the builder.
@@ -97,6 +109,7 @@ func (rc *ReactCreate) Save(ctx context.Context) (*React, error) {
 		err  error
 		node *React
 	)
+	rc.defaults()
 	if len(rc.hooks) == 0 {
 		if err = rc.check(); err != nil {
 			return nil, err
@@ -154,6 +167,18 @@ func (rc *ReactCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (rc *ReactCreate) defaults() {
+	if _, ok := rc.mutation.CreatedAt(); !ok {
+		v := react.DefaultCreatedAt()
+		rc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := rc.mutation.ID(); !ok {
+		v := react.DefaultID()
+		rc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (rc *ReactCreate) check() error {
 	if _, ok := rc.mutation.Emoji(); !ok {
@@ -161,12 +186,6 @@ func (rc *ReactCreate) check() error {
 	}
 	if _, ok := rc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "React.createdAt"`)}
-	}
-	if _, ok := rc.mutation.PostId(); !ok {
-		return &ValidationError{Name: "postId", err: errors.New(`model: missing required field "React.postId"`)}
-	}
-	if _, ok := rc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`model: missing required field "React.userId"`)}
 	}
 	return nil
 }
@@ -180,10 +199,10 @@ func (rc *ReactCreate) sqlSave(ctx context.Context) (*React, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected React.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	return _node, nil
@@ -195,7 +214,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: react.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: react.FieldID,
 			},
 		}
@@ -203,7 +222,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = rc.conflict
 	if id, ok := rc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := rc.mutation.Emoji(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -221,25 +240,9 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		})
 		_node.CreatedAt = value
 	}
-	if value, ok := rc.mutation.PostId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldPostId,
-		})
-		_node.PostId = value
-	}
-	if value, ok := rc.mutation.UserId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldUserId,
-		})
-		_node.UserId = value
-	}
 	if nodes := rc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.UserTable,
 			Columns: []string{react.UserColumn},
@@ -254,11 +257,12 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.react_user = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
@@ -273,6 +277,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.react_post = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -350,30 +355,6 @@ func (u *ReactUpsert) SetCreatedAt(v time.Time) *ReactUpsert {
 // UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
 func (u *ReactUpsert) UpdateCreatedAt() *ReactUpsert {
 	u.SetExcluded(react.FieldCreatedAt)
-	return u
-}
-
-// SetPostId sets the "postId" field.
-func (u *ReactUpsert) SetPostId(v string) *ReactUpsert {
-	u.Set(react.FieldPostId, v)
-	return u
-}
-
-// UpdatePostId sets the "postId" field to the value that was provided on create.
-func (u *ReactUpsert) UpdatePostId() *ReactUpsert {
-	u.SetExcluded(react.FieldPostId)
-	return u
-}
-
-// SetUserId sets the "userId" field.
-func (u *ReactUpsert) SetUserId(v string) *ReactUpsert {
-	u.Set(react.FieldUserId, v)
-	return u
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *ReactUpsert) UpdateUserId() *ReactUpsert {
-	u.SetExcluded(react.FieldUserId)
 	return u
 }
 
@@ -455,34 +436,6 @@ func (u *ReactUpsertOne) UpdateCreatedAt() *ReactUpsertOne {
 	})
 }
 
-// SetPostId sets the "postId" field.
-func (u *ReactUpsertOne) SetPostId(v string) *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetPostId(v)
-	})
-}
-
-// UpdatePostId sets the "postId" field to the value that was provided on create.
-func (u *ReactUpsertOne) UpdatePostId() *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdatePostId()
-	})
-}
-
-// SetUserId sets the "userId" field.
-func (u *ReactUpsertOne) SetUserId(v string) *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetUserId(v)
-	})
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *ReactUpsertOne) UpdateUserId() *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateUserId()
-	})
-}
-
 // Exec executes the query.
 func (u *ReactUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -499,7 +452,7 @@ func (u *ReactUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ReactUpsertOne) ID(ctx context.Context) (id string, err error) {
+func (u *ReactUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -513,7 +466,7 @@ func (u *ReactUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ReactUpsertOne) IDX(ctx context.Context) string {
+func (u *ReactUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -536,6 +489,7 @@ func (rcb *ReactCreateBulk) Save(ctx context.Context) ([]*React, error) {
 	for i := range rcb.builders {
 		func(i int, root context.Context) {
 			builder := rcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ReactMutation)
 				if !ok {
@@ -723,34 +677,6 @@ func (u *ReactUpsertBulk) SetCreatedAt(v time.Time) *ReactUpsertBulk {
 func (u *ReactUpsertBulk) UpdateCreatedAt() *ReactUpsertBulk {
 	return u.Update(func(s *ReactUpsert) {
 		s.UpdateCreatedAt()
-	})
-}
-
-// SetPostId sets the "postId" field.
-func (u *ReactUpsertBulk) SetPostId(v string) *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetPostId(v)
-	})
-}
-
-// UpdatePostId sets the "postId" field to the value that was provided on create.
-func (u *ReactUpsertBulk) UpdatePostId() *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdatePostId()
-	})
-}
-
-// SetUserId sets the "userId" field.
-func (u *ReactUpsertBulk) SetUserId(v string) *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetUserId(v)
-	})
-}
-
-// UpdateUserId sets the "userId" field to the value that was provided on create.
-func (u *ReactUpsertBulk) UpdateUserId() *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateUserId()
 	})
 }
 

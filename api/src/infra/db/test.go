@@ -49,7 +49,7 @@ func TestDB(t *testing.T) *model.Client {
 		}
 		c.Close()
 
-		fmt.Println("--- Cleaned database after test", d)
+		fmt.Println("--- Cleaned database after test")
 	})
 
 	return c

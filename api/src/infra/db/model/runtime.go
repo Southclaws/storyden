@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/Southclaws/storyden/api/src/infra/db/schema"
@@ -42,21 +43,31 @@ func init() {
 	postFields := schema.Post{}.Fields()
 	_ = postFields
 	// postDescPinned is the schema descriptor for pinned field.
-	postDescPinned := postFields[6].Descriptor()
+	postDescPinned := postFields[4].Descriptor()
 	// post.DefaultPinned holds the default value on creation for the pinned field.
 	post.DefaultPinned = postDescPinned.Default.(bool)
 	// postDescCreatedAt is the schema descriptor for createdAt field.
-	postDescCreatedAt := postFields[7].Descriptor()
+	postDescCreatedAt := postFields[9].Descriptor()
 	// post.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
 	// postDescUpdatedAt is the schema descriptor for updatedAt field.
-	postDescUpdatedAt := postFields[8].Descriptor()
+	postDescUpdatedAt := postFields[10].Descriptor()
 	// post.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
 	// postDescID is the schema descriptor for id field.
 	postDescID := postFields[0].Descriptor()
 	// post.DefaultID holds the default value on creation for the id field.
 	post.DefaultID = postDescID.Default.(func() uuid.UUID)
+	reactFields := schema.React{}.Fields()
+	_ = reactFields
+	// reactDescCreatedAt is the schema descriptor for createdAt field.
+	reactDescCreatedAt := reactFields[2].Descriptor()
+	// react.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	react.DefaultCreatedAt = reactDescCreatedAt.Default.(func() time.Time)
+	// reactDescID is the schema descriptor for id field.
+	reactDescID := reactFields[0].Descriptor()
+	// react.DefaultID holds the default value on creation for the id field.
+	react.DefaultID = reactDescID.Default.(func() uuid.UUID)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
 	// tagDescID is the schema descriptor for id field.

@@ -36,8 +36,8 @@ type PostQuery struct {
 	withTags     *TagQuery
 	withRoot     *PostQuery
 	withPosts    *PostQuery
-	withReplies  *PostQuery
 	withReplyTo  *PostQuery
+	withReplies  *PostQuery
 	withReacts   *ReactQuery
 	withFKs      bool
 	modifiers    []func(s *sql.Selector)
@@ -157,7 +157,7 @@ func (pq *PostQuery) QueryRoot() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.RootTable, post.RootPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.RootTable, post.RootColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -179,29 +179,7 @@ func (pq *PostQuery) QueryPosts() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, post.PostsTable, post.PostsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryReplies chains the current query on the "replies" edge.
-func (pq *PostQuery) QueryReplies() *PostQuery {
-	query := &PostQuery{config: pq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(post.Table, post.FieldID, selector),
-			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.RepliesTable, post.RepliesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.PostsTable, post.PostsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -223,7 +201,29 @@ func (pq *PostQuery) QueryReplyTo() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, post.ReplyToTable, post.ReplyToPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.ReplyToTable, post.ReplyToColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReplies chains the current query on the "replies" edge.
+func (pq *PostQuery) QueryReplies() *PostQuery {
+	query := &PostQuery{config: pq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.RepliesTable, post.RepliesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -439,8 +439,8 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withTags:     pq.withTags.Clone(),
 		withRoot:     pq.withRoot.Clone(),
 		withPosts:    pq.withPosts.Clone(),
-		withReplies:  pq.withReplies.Clone(),
 		withReplyTo:  pq.withReplyTo.Clone(),
+		withReplies:  pq.withReplies.Clone(),
 		withReacts:   pq.withReacts.Clone(),
 		// clone intermediate query.
 		sql:    pq.sql.Clone(),
@@ -504,17 +504,6 @@ func (pq *PostQuery) WithPosts(opts ...func(*PostQuery)) *PostQuery {
 	return pq
 }
 
-// WithReplies tells the query-builder to eager-load the nodes that are connected to
-// the "replies" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *PostQuery) WithReplies(opts ...func(*PostQuery)) *PostQuery {
-	query := &PostQuery{config: pq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withReplies = query
-	return pq
-}
-
 // WithReplyTo tells the query-builder to eager-load the nodes that are connected to
 // the "replyTo" edge. The optional arguments are used to configure the query builder of the edge.
 func (pq *PostQuery) WithReplyTo(opts ...func(*PostQuery)) *PostQuery {
@@ -523,6 +512,17 @@ func (pq *PostQuery) WithReplyTo(opts ...func(*PostQuery)) *PostQuery {
 		opt(query)
 	}
 	pq.withReplyTo = query
+	return pq
+}
+
+// WithReplies tells the query-builder to eager-load the nodes that are connected to
+// the "replies" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithReplies(opts ...func(*PostQuery)) *PostQuery {
+	query := &PostQuery{config: pq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withReplies = query
 	return pq
 }
 
@@ -543,12 +543,12 @@ func (pq *PostQuery) WithReacts(opts ...func(*ReactQuery)) *PostQuery {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		First bool `json:"first,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Post.Query().
-//		GroupBy(post.FieldTitle).
+//		GroupBy(post.FieldFirst).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -570,11 +570,11 @@ func (pq *PostQuery) GroupBy(field string, fields ...string) *PostGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		First bool `json:"first,omitempty"`
 //	}
 //
 //	client.Post.Query().
-//		Select(post.FieldTitle).
+//		Select(post.FieldFirst).
 //		Scan(ctx, &v)
 //
 func (pq *PostQuery) Select(fields ...string) *PostSelect {
@@ -609,12 +609,12 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 			pq.withTags != nil,
 			pq.withRoot != nil,
 			pq.withPosts != nil,
-			pq.withReplies != nil,
 			pq.withReplyTo != nil,
+			pq.withReplies != nil,
 			pq.withReacts != nil,
 		}
 	)
-	if pq.withAuthor != nil || pq.withCategory != nil {
+	if pq.withAuthor != nil || pq.withCategory != nil || pq.withRoot != nil || pq.withReplyTo != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -764,262 +764,106 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 	}
 
 	if query := pq.withRoot; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*Post, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Root = []*Post{}
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Post)
+		for i := range nodes {
+			fk := nodes[i].RootPostID
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*Post)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   post.RootTable,
-				Columns: post.RootPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(post.RootPrimaryKey[1], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "root": %w`, err)
-		}
-		query.Where(post.IDIn(edgeids...))
+		query.Where(post.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "root" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "root_post_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Root = append(nodes[i].Edges.Root, n)
+				nodes[i].Edges.Root = n
 			}
 		}
 	}
 
 	if query := pq.withPosts; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*Post, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Posts = []*Post{}
+		nodeids := make(map[uuid.UUID]*Post)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Posts = []*Post{}
 		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*Post)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   post.PostsTable,
-				Columns: post.PostsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(post.PostsPrimaryKey[0], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "posts": %w`, err)
-		}
-		query.Where(post.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Post(func(s *sql.Selector) {
+			s.Where(sql.InValues(post.PostsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.RootPostID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "posts" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "root_post_id" returned %v for node %v`, fk, n.ID)
+			}
+			node.Edges.Posts = append(node.Edges.Posts, n)
+		}
+	}
+
+	if query := pq.withReplyTo; query != nil {
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Post)
+		for i := range nodes {
+			fk := nodes[i].ReplyToPostID
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(post.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "reply_to_post_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Posts = append(nodes[i].Edges.Posts, n)
+				nodes[i].Edges.ReplyTo = n
 			}
 		}
 	}
 
 	if query := pq.withReplies; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*Post, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Replies = []*Post{}
+		nodeids := make(map[uuid.UUID]*Post)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Replies = []*Post{}
 		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*Post)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   post.RepliesTable,
-				Columns: post.RepliesPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(post.RepliesPrimaryKey[1], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "replies": %w`, err)
-		}
-		query.Where(post.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Post(func(s *sql.Selector) {
+			s.Where(sql.InValues(post.RepliesColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.ReplyToPostID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "replies" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "reply_to_post_id" returned %v for node %v`, fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Replies = append(nodes[i].Edges.Replies, n)
-			}
-		}
-	}
-
-	if query := pq.withReplyTo; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*Post, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.ReplyTo = []*Post{}
-		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*Post)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   post.ReplyToTable,
-				Columns: post.ReplyToPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(post.ReplyToPrimaryKey[0], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, pq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "replyTo": %w`, err)
-		}
-		query.Where(post.IDIn(edgeids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected "replyTo" node returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.ReplyTo = append(nodes[i].Edges.ReplyTo, n)
-			}
+			node.Edges.Replies = append(node.Edges.Replies, n)
 		}
 	}
 

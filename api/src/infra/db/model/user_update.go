@@ -142,14 +142,14 @@ func (uu *UserUpdate) AddPosts(p ...*Post) *UserUpdate {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (uu *UserUpdate) AddReactIDs(ids ...string) *UserUpdate {
+func (uu *UserUpdate) AddReactIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddReactIDs(ids...)
 	return uu
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (uu *UserUpdate) AddReacts(r ...*React) *UserUpdate {
-	ids := make([]string, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -204,14 +204,14 @@ func (uu *UserUpdate) ClearReacts() *UserUpdate {
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (uu *UserUpdate) RemoveReactIDs(ids ...string) *UserUpdate {
+func (uu *UserUpdate) RemoveReactIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveReactIDs(ids...)
 	return uu
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
 func (uu *UserUpdate) RemoveReacts(r ...*React) *UserUpdate {
-	ids := make([]string, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -451,7 +451,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -467,7 +467,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -486,7 +486,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -679,14 +679,14 @@ func (uuo *UserUpdateOne) AddPosts(p ...*Post) *UserUpdateOne {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (uuo *UserUpdateOne) AddReactIDs(ids ...string) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddReactIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddReactIDs(ids...)
 	return uuo
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (uuo *UserUpdateOne) AddReacts(r ...*React) *UserUpdateOne {
-	ids := make([]string, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -741,14 +741,14 @@ func (uuo *UserUpdateOne) ClearReacts() *UserUpdateOne {
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (uuo *UserUpdateOne) RemoveReactIDs(ids ...string) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveReactIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveReactIDs(ids...)
 	return uuo
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
 func (uuo *UserUpdateOne) RemoveReacts(r ...*React) *UserUpdateOne {
-	ids := make([]string, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -1012,7 +1012,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -1028,7 +1028,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -1047,7 +1047,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},

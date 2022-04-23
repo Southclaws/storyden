@@ -94,6 +94,13 @@ func IDLTE(id uuid.UUID) predicate.Post {
 	})
 }
 
+// First applies equality check predicate on the "first" field. It's identical to FirstEQ.
+func First(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldFirst), v))
+	})
+}
+
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -108,6 +115,27 @@ func Slug(v string) predicate.Post {
 	})
 }
 
+// Pinned applies equality check predicate on the "pinned" field. It's identical to PinnedEQ.
+func Pinned(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPinned), v))
+	})
+}
+
+// RootPostID applies equality check predicate on the "root_post_id" field. It's identical to RootPostIDEQ.
+func RootPostID(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRootPostID), v))
+	})
+}
+
+// ReplyToPostID applies equality check predicate on the "reply_to_post_id" field. It's identical to ReplyToPostIDEQ.
+func ReplyToPostID(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldReplyToPostID), v))
+	})
+}
+
 // Body applies equality check predicate on the "body" field. It's identical to BodyEQ.
 func Body(v string) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -119,20 +147,6 @@ func Body(v string) predicate.Post {
 func Short(v string) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldShort), v))
-	})
-}
-
-// First applies equality check predicate on the "first" field. It's identical to FirstEQ.
-func First(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldFirst), v))
-	})
-}
-
-// Pinned applies equality check predicate on the "pinned" field. It's identical to PinnedEQ.
-func Pinned(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPinned), v))
 	})
 }
 
@@ -157,24 +171,24 @@ func DeletedAt(v time.Time) predicate.Post {
 	})
 }
 
-// RootPostId applies equality check predicate on the "rootPostId" field. It's identical to RootPostIdEQ.
-func RootPostId(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRootPostId), v))
-	})
-}
-
-// ReplyPostId applies equality check predicate on the "replyPostId" field. It's identical to ReplyPostIdEQ.
-func ReplyPostId(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldReplyPostId), v))
-	})
-}
-
 // CategoryID applies equality check predicate on the "category_id" field. It's identical to CategoryIDEQ.
 func CategoryID(v uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCategoryID), v))
+	})
+}
+
+// FirstEQ applies the EQ predicate on the "first" field.
+func FirstEQ(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldFirst), v))
+	})
+}
+
+// FirstNEQ applies the NEQ predicate on the "first" field.
+func FirstNEQ(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldFirst), v))
 	})
 }
 
@@ -428,6 +442,144 @@ func SlugContainsFold(v string) predicate.Post {
 	})
 }
 
+// PinnedEQ applies the EQ predicate on the "pinned" field.
+func PinnedEQ(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPinned), v))
+	})
+}
+
+// PinnedNEQ applies the NEQ predicate on the "pinned" field.
+func PinnedNEQ(v bool) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPinned), v))
+	})
+}
+
+// RootPostIDEQ applies the EQ predicate on the "root_post_id" field.
+func RootPostIDEQ(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDNEQ applies the NEQ predicate on the "root_post_id" field.
+func RootPostIDNEQ(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDIn applies the In predicate on the "root_post_id" field.
+func RootPostIDIn(vs ...uuid.UUID) predicate.Post {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Post(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldRootPostID), v...))
+	})
+}
+
+// RootPostIDNotIn applies the NotIn predicate on the "root_post_id" field.
+func RootPostIDNotIn(vs ...uuid.UUID) predicate.Post {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Post(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldRootPostID), v...))
+	})
+}
+
+// RootPostIDIsNil applies the IsNil predicate on the "root_post_id" field.
+func RootPostIDIsNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldRootPostID)))
+	})
+}
+
+// RootPostIDNotNil applies the NotNil predicate on the "root_post_id" field.
+func RootPostIDNotNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldRootPostID)))
+	})
+}
+
+// ReplyToPostIDEQ applies the EQ predicate on the "reply_to_post_id" field.
+func ReplyToPostIDEQ(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDNEQ applies the NEQ predicate on the "reply_to_post_id" field.
+func ReplyToPostIDNEQ(v uuid.UUID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDIn applies the In predicate on the "reply_to_post_id" field.
+func ReplyToPostIDIn(vs ...uuid.UUID) predicate.Post {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Post(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldReplyToPostID), v...))
+	})
+}
+
+// ReplyToPostIDNotIn applies the NotIn predicate on the "reply_to_post_id" field.
+func ReplyToPostIDNotIn(vs ...uuid.UUID) predicate.Post {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Post(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldReplyToPostID), v...))
+	})
+}
+
+// ReplyToPostIDIsNil applies the IsNil predicate on the "reply_to_post_id" field.
+func ReplyToPostIDIsNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldReplyToPostID)))
+	})
+}
+
+// ReplyToPostIDNotNil applies the NotNil predicate on the "reply_to_post_id" field.
+func ReplyToPostIDNotNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldReplyToPostID)))
+	})
+}
+
 // BodyEQ applies the EQ predicate on the "body" field.
 func BodyEQ(v string) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -647,34 +799,6 @@ func ShortEqualFold(v string) predicate.Post {
 func ShortContainsFold(v string) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldShort), v))
-	})
-}
-
-// FirstEQ applies the EQ predicate on the "first" field.
-func FirstEQ(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldFirst), v))
-	})
-}
-
-// FirstNEQ applies the NEQ predicate on the "first" field.
-func FirstNEQ(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldFirst), v))
-	})
-}
-
-// PinnedEQ applies the EQ predicate on the "pinned" field.
-func PinnedEQ(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPinned), v))
-	})
-}
-
-// PinnedNEQ applies the NEQ predicate on the "pinned" field.
-func PinnedNEQ(v bool) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPinned), v))
 	})
 }
 
@@ -920,186 +1044,6 @@ func DeletedAtNotNil() predicate.Post {
 	})
 }
 
-// RootPostIdEQ applies the EQ predicate on the "rootPostId" field.
-func RootPostIdEQ(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdNEQ applies the NEQ predicate on the "rootPostId" field.
-func RootPostIdNEQ(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdIn applies the In predicate on the "rootPostId" field.
-func RootPostIdIn(vs ...uuid.UUID) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldRootPostId), v...))
-	})
-}
-
-// RootPostIdNotIn applies the NotIn predicate on the "rootPostId" field.
-func RootPostIdNotIn(vs ...uuid.UUID) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldRootPostId), v...))
-	})
-}
-
-// RootPostIdGT applies the GT predicate on the "rootPostId" field.
-func RootPostIdGT(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdGTE applies the GTE predicate on the "rootPostId" field.
-func RootPostIdGTE(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdLT applies the LT predicate on the "rootPostId" field.
-func RootPostIdLT(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdLTE applies the LTE predicate on the "rootPostId" field.
-func RootPostIdLTE(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRootPostId), v))
-	})
-}
-
-// RootPostIdIsNil applies the IsNil predicate on the "rootPostId" field.
-func RootPostIdIsNil() predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldRootPostId)))
-	})
-}
-
-// RootPostIdNotNil applies the NotNil predicate on the "rootPostId" field.
-func RootPostIdNotNil() predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldRootPostId)))
-	})
-}
-
-// ReplyPostIdEQ applies the EQ predicate on the "replyPostId" field.
-func ReplyPostIdEQ(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdNEQ applies the NEQ predicate on the "replyPostId" field.
-func ReplyPostIdNEQ(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdIn applies the In predicate on the "replyPostId" field.
-func ReplyPostIdIn(vs ...uuid.UUID) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldReplyPostId), v...))
-	})
-}
-
-// ReplyPostIdNotIn applies the NotIn predicate on the "replyPostId" field.
-func ReplyPostIdNotIn(vs ...uuid.UUID) predicate.Post {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Post(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldReplyPostId), v...))
-	})
-}
-
-// ReplyPostIdGT applies the GT predicate on the "replyPostId" field.
-func ReplyPostIdGT(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdGTE applies the GTE predicate on the "replyPostId" field.
-func ReplyPostIdGTE(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdLT applies the LT predicate on the "replyPostId" field.
-func ReplyPostIdLT(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdLTE applies the LTE predicate on the "replyPostId" field.
-func ReplyPostIdLTE(v uuid.UUID) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldReplyPostId), v))
-	})
-}
-
-// ReplyPostIdIsNil applies the IsNil predicate on the "replyPostId" field.
-func ReplyPostIdIsNil() predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldReplyPostId)))
-	})
-}
-
-// ReplyPostIdNotNil applies the NotNil predicate on the "replyPostId" field.
-func ReplyPostIdNotNil() predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldReplyPostId)))
-	})
-}
-
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.
 func CategoryIDEQ(v uuid.UUID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -1252,7 +1196,7 @@ func HasRoot() predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(RootTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RootTable, RootPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, RootTable, RootColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1264,7 +1208,7 @@ func HasRootWith(preds ...predicate.Post) predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RootTable, RootPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, RootTable, RootColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1280,7 +1224,7 @@ func HasPosts() predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(PostsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1292,35 +1236,7 @@ func HasPostsWith(preds ...predicate.Post) predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasReplies applies the HasEdge predicate on the "replies" edge.
-func HasReplies() predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(RepliesTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RepliesTable, RepliesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRepliesWith applies the HasEdge predicate on the "replies" edge with a given conditions (other predicates).
-func HasRepliesWith(preds ...predicate.Post) predicate.Post {
-	return predicate.Post(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RepliesTable, RepliesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -1336,7 +1252,7 @@ func HasReplyTo() predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReplyToTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReplyToTable, ReplyToPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ReplyToTable, ReplyToColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1348,7 +1264,35 @@ func HasReplyToWith(preds ...predicate.Post) predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ReplyToTable, ReplyToPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ReplyToTable, ReplyToColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasReplies applies the HasEdge predicate on the "replies" edge.
+func HasReplies() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(RepliesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RepliesTable, RepliesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRepliesWith applies the HasEdge predicate on the "replies" edge with a given conditions (other predicates).
+func HasRepliesWith(preds ...predicate.Post) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RepliesTable, RepliesColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

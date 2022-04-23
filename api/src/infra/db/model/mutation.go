@@ -1392,17 +1392,15 @@ type PostMutation struct {
 	op              Op
 	typ             string
 	id              *uuid.UUID
+	first           *bool
 	title           *string
 	slug            *string
+	pinned          *bool
 	body            *string
 	short           *string
-	first           *bool
-	pinned          *bool
 	createdAt       *time.Time
 	updatedAt       *time.Time
 	deletedAt       *time.Time
-	rootPostId      *uuid.UUID
-	replyPostId     *uuid.UUID
 	clearedFields   map[string]struct{}
 	author          *uuid.UUID
 	clearedauthor   bool
@@ -1411,20 +1409,18 @@ type PostMutation struct {
 	tags            map[uuid.UUID]struct{}
 	removedtags     map[uuid.UUID]struct{}
 	clearedtags     bool
-	root            map[uuid.UUID]struct{}
-	removedroot     map[uuid.UUID]struct{}
+	root            *uuid.UUID
 	clearedroot     bool
 	posts           map[uuid.UUID]struct{}
 	removedposts    map[uuid.UUID]struct{}
 	clearedposts    bool
+	replyTo         *uuid.UUID
+	clearedreplyTo  bool
 	replies         map[uuid.UUID]struct{}
 	removedreplies  map[uuid.UUID]struct{}
 	clearedreplies  bool
-	replyTo         map[uuid.UUID]struct{}
-	removedreplyTo  map[uuid.UUID]struct{}
-	clearedreplyTo  bool
-	reacts          map[string]struct{}
-	removedreacts   map[string]struct{}
+	reacts          map[uuid.UUID]struct{}
+	removedreacts   map[uuid.UUID]struct{}
 	clearedreacts   bool
 	done            bool
 	oldValue        func(context.Context) (*Post, error)
@@ -1535,6 +1531,42 @@ func (m *PostMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	}
 }
 
+// SetFirst sets the "first" field.
+func (m *PostMutation) SetFirst(b bool) {
+	m.first = &b
+}
+
+// First returns the value of the "first" field in the mutation.
+func (m *PostMutation) First() (r bool, exists bool) {
+	v := m.first
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirst returns the old "first" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldFirst(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFirst is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFirst requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirst: %w", err)
+	}
+	return oldValue.First, nil
+}
+
+// ResetFirst resets all changes to the "first" field.
+func (m *PostMutation) ResetFirst() {
+	m.first = nil
+}
+
 // SetTitle sets the "title" field.
 func (m *PostMutation) SetTitle(s string) {
 	m.title = &s
@@ -1633,6 +1665,140 @@ func (m *PostMutation) ResetSlug() {
 	delete(m.clearedFields, post.FieldSlug)
 }
 
+// SetPinned sets the "pinned" field.
+func (m *PostMutation) SetPinned(b bool) {
+	m.pinned = &b
+}
+
+// Pinned returns the value of the "pinned" field in the mutation.
+func (m *PostMutation) Pinned() (r bool, exists bool) {
+	v := m.pinned
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPinned returns the old "pinned" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldPinned(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPinned is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPinned requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPinned: %w", err)
+	}
+	return oldValue.Pinned, nil
+}
+
+// ResetPinned resets all changes to the "pinned" field.
+func (m *PostMutation) ResetPinned() {
+	m.pinned = nil
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (m *PostMutation) SetRootPostID(u uuid.UUID) {
+	m.root = &u
+}
+
+// RootPostID returns the value of the "root_post_id" field in the mutation.
+func (m *PostMutation) RootPostID() (r uuid.UUID, exists bool) {
+	v := m.root
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRootPostID returns the old "root_post_id" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldRootPostID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRootPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRootPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRootPostID: %w", err)
+	}
+	return oldValue.RootPostID, nil
+}
+
+// ClearRootPostID clears the value of the "root_post_id" field.
+func (m *PostMutation) ClearRootPostID() {
+	m.root = nil
+	m.clearedFields[post.FieldRootPostID] = struct{}{}
+}
+
+// RootPostIDCleared returns if the "root_post_id" field was cleared in this mutation.
+func (m *PostMutation) RootPostIDCleared() bool {
+	_, ok := m.clearedFields[post.FieldRootPostID]
+	return ok
+}
+
+// ResetRootPostID resets all changes to the "root_post_id" field.
+func (m *PostMutation) ResetRootPostID() {
+	m.root = nil
+	delete(m.clearedFields, post.FieldRootPostID)
+}
+
+// SetReplyToPostID sets the "reply_to_post_id" field.
+func (m *PostMutation) SetReplyToPostID(u uuid.UUID) {
+	m.replyTo = &u
+}
+
+// ReplyToPostID returns the value of the "reply_to_post_id" field in the mutation.
+func (m *PostMutation) ReplyToPostID() (r uuid.UUID, exists bool) {
+	v := m.replyTo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReplyToPostID returns the old "reply_to_post_id" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldReplyToPostID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReplyToPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReplyToPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReplyToPostID: %w", err)
+	}
+	return oldValue.ReplyToPostID, nil
+}
+
+// ClearReplyToPostID clears the value of the "reply_to_post_id" field.
+func (m *PostMutation) ClearReplyToPostID() {
+	m.replyTo = nil
+	m.clearedFields[post.FieldReplyToPostID] = struct{}{}
+}
+
+// ReplyToPostIDCleared returns if the "reply_to_post_id" field was cleared in this mutation.
+func (m *PostMutation) ReplyToPostIDCleared() bool {
+	_, ok := m.clearedFields[post.FieldReplyToPostID]
+	return ok
+}
+
+// ResetReplyToPostID resets all changes to the "reply_to_post_id" field.
+func (m *PostMutation) ResetReplyToPostID() {
+	m.replyTo = nil
+	delete(m.clearedFields, post.FieldReplyToPostID)
+}
+
 // SetBody sets the "body" field.
 func (m *PostMutation) SetBody(s string) {
 	m.body = &s
@@ -1703,78 +1869,6 @@ func (m *PostMutation) OldShort(ctx context.Context) (v string, err error) {
 // ResetShort resets all changes to the "short" field.
 func (m *PostMutation) ResetShort() {
 	m.short = nil
-}
-
-// SetFirst sets the "first" field.
-func (m *PostMutation) SetFirst(b bool) {
-	m.first = &b
-}
-
-// First returns the value of the "first" field in the mutation.
-func (m *PostMutation) First() (r bool, exists bool) {
-	v := m.first
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFirst returns the old "first" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldFirst(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFirst is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFirst requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFirst: %w", err)
-	}
-	return oldValue.First, nil
-}
-
-// ResetFirst resets all changes to the "first" field.
-func (m *PostMutation) ResetFirst() {
-	m.first = nil
-}
-
-// SetPinned sets the "pinned" field.
-func (m *PostMutation) SetPinned(b bool) {
-	m.pinned = &b
-}
-
-// Pinned returns the value of the "pinned" field in the mutation.
-func (m *PostMutation) Pinned() (r bool, exists bool) {
-	v := m.pinned
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPinned returns the old "pinned" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldPinned(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPinned is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPinned requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPinned: %w", err)
-	}
-	return oldValue.Pinned, nil
-}
-
-// ResetPinned resets all changes to the "pinned" field.
-func (m *PostMutation) ResetPinned() {
-	m.pinned = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -1896,104 +1990,6 @@ func (m *PostMutation) DeletedAtCleared() bool {
 func (m *PostMutation) ResetDeletedAt() {
 	m.deletedAt = nil
 	delete(m.clearedFields, post.FieldDeletedAt)
-}
-
-// SetRootPostId sets the "rootPostId" field.
-func (m *PostMutation) SetRootPostId(u uuid.UUID) {
-	m.rootPostId = &u
-}
-
-// RootPostId returns the value of the "rootPostId" field in the mutation.
-func (m *PostMutation) RootPostId() (r uuid.UUID, exists bool) {
-	v := m.rootPostId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRootPostId returns the old "rootPostId" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldRootPostId(ctx context.Context) (v uuid.UUID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRootPostId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRootPostId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRootPostId: %w", err)
-	}
-	return oldValue.RootPostId, nil
-}
-
-// ClearRootPostId clears the value of the "rootPostId" field.
-func (m *PostMutation) ClearRootPostId() {
-	m.rootPostId = nil
-	m.clearedFields[post.FieldRootPostId] = struct{}{}
-}
-
-// RootPostIdCleared returns if the "rootPostId" field was cleared in this mutation.
-func (m *PostMutation) RootPostIdCleared() bool {
-	_, ok := m.clearedFields[post.FieldRootPostId]
-	return ok
-}
-
-// ResetRootPostId resets all changes to the "rootPostId" field.
-func (m *PostMutation) ResetRootPostId() {
-	m.rootPostId = nil
-	delete(m.clearedFields, post.FieldRootPostId)
-}
-
-// SetReplyPostId sets the "replyPostId" field.
-func (m *PostMutation) SetReplyPostId(u uuid.UUID) {
-	m.replyPostId = &u
-}
-
-// ReplyPostId returns the value of the "replyPostId" field in the mutation.
-func (m *PostMutation) ReplyPostId() (r uuid.UUID, exists bool) {
-	v := m.replyPostId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldReplyPostId returns the old "replyPostId" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldReplyPostId(ctx context.Context) (v uuid.UUID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldReplyPostId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldReplyPostId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldReplyPostId: %w", err)
-	}
-	return oldValue.ReplyPostId, nil
-}
-
-// ClearReplyPostId clears the value of the "replyPostId" field.
-func (m *PostMutation) ClearReplyPostId() {
-	m.replyPostId = nil
-	m.clearedFields[post.FieldReplyPostId] = struct{}{}
-}
-
-// ReplyPostIdCleared returns if the "replyPostId" field was cleared in this mutation.
-func (m *PostMutation) ReplyPostIdCleared() bool {
-	_, ok := m.clearedFields[post.FieldReplyPostId]
-	return ok
-}
-
-// ResetReplyPostId resets all changes to the "replyPostId" field.
-func (m *PostMutation) ResetReplyPostId() {
-	m.replyPostId = nil
-	delete(m.clearedFields, post.FieldReplyPostId)
 }
 
 // SetCategoryID sets the "category_id" field.
@@ -2164,14 +2160,9 @@ func (m *PostMutation) ResetTags() {
 	m.removedtags = nil
 }
 
-// AddRootIDs adds the "root" edge to the Post entity by ids.
-func (m *PostMutation) AddRootIDs(ids ...uuid.UUID) {
-	if m.root == nil {
-		m.root = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.root[ids[i]] = struct{}{}
-	}
+// SetRootID sets the "root" edge to the Post entity by id.
+func (m *PostMutation) SetRootID(id uuid.UUID) {
+	m.root = &id
 }
 
 // ClearRoot clears the "root" edge to the Post entity.
@@ -2181,32 +2172,23 @@ func (m *PostMutation) ClearRoot() {
 
 // RootCleared reports if the "root" edge to the Post entity was cleared.
 func (m *PostMutation) RootCleared() bool {
-	return m.clearedroot
+	return m.RootPostIDCleared() || m.clearedroot
 }
 
-// RemoveRootIDs removes the "root" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveRootIDs(ids ...uuid.UUID) {
-	if m.removedroot == nil {
-		m.removedroot = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.root, ids[i])
-		m.removedroot[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedRoot returns the removed IDs of the "root" edge to the Post entity.
-func (m *PostMutation) RemovedRootIDs() (ids []uuid.UUID) {
-	for id := range m.removedroot {
-		ids = append(ids, id)
+// RootID returns the "root" edge ID in the mutation.
+func (m *PostMutation) RootID() (id uuid.UUID, exists bool) {
+	if m.root != nil {
+		return *m.root, true
 	}
 	return
 }
 
 // RootIDs returns the "root" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RootID instead. It exists only for internal usage by the builders.
 func (m *PostMutation) RootIDs() (ids []uuid.UUID) {
-	for id := range m.root {
-		ids = append(ids, id)
+	if id := m.root; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -2215,7 +2197,6 @@ func (m *PostMutation) RootIDs() (ids []uuid.UUID) {
 func (m *PostMutation) ResetRoot() {
 	m.root = nil
 	m.clearedroot = false
-	m.removedroot = nil
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
@@ -2272,6 +2253,45 @@ func (m *PostMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// SetReplyToID sets the "replyTo" edge to the Post entity by id.
+func (m *PostMutation) SetReplyToID(id uuid.UUID) {
+	m.replyTo = &id
+}
+
+// ClearReplyTo clears the "replyTo" edge to the Post entity.
+func (m *PostMutation) ClearReplyTo() {
+	m.clearedreplyTo = true
+}
+
+// ReplyToCleared reports if the "replyTo" edge to the Post entity was cleared.
+func (m *PostMutation) ReplyToCleared() bool {
+	return m.ReplyToPostIDCleared() || m.clearedreplyTo
+}
+
+// ReplyToID returns the "replyTo" edge ID in the mutation.
+func (m *PostMutation) ReplyToID() (id uuid.UUID, exists bool) {
+	if m.replyTo != nil {
+		return *m.replyTo, true
+	}
+	return
+}
+
+// ReplyToIDs returns the "replyTo" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ReplyToID instead. It exists only for internal usage by the builders.
+func (m *PostMutation) ReplyToIDs() (ids []uuid.UUID) {
+	if id := m.replyTo; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetReplyTo resets all changes to the "replyTo" edge.
+func (m *PostMutation) ResetReplyTo() {
+	m.replyTo = nil
+	m.clearedreplyTo = false
+}
+
 // AddReplyIDs adds the "replies" edge to the Post entity by ids.
 func (m *PostMutation) AddReplyIDs(ids ...uuid.UUID) {
 	if m.replies == nil {
@@ -2326,64 +2346,10 @@ func (m *PostMutation) ResetReplies() {
 	m.removedreplies = nil
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by ids.
-func (m *PostMutation) AddReplyToIDs(ids ...uuid.UUID) {
-	if m.replyTo == nil {
-		m.replyTo = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.replyTo[ids[i]] = struct{}{}
-	}
-}
-
-// ClearReplyTo clears the "replyTo" edge to the Post entity.
-func (m *PostMutation) ClearReplyTo() {
-	m.clearedreplyTo = true
-}
-
-// ReplyToCleared reports if the "replyTo" edge to the Post entity was cleared.
-func (m *PostMutation) ReplyToCleared() bool {
-	return m.clearedreplyTo
-}
-
-// RemoveReplyToIDs removes the "replyTo" edge to the Post entity by IDs.
-func (m *PostMutation) RemoveReplyToIDs(ids ...uuid.UUID) {
-	if m.removedreplyTo == nil {
-		m.removedreplyTo = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.replyTo, ids[i])
-		m.removedreplyTo[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedReplyTo returns the removed IDs of the "replyTo" edge to the Post entity.
-func (m *PostMutation) RemovedReplyToIDs() (ids []uuid.UUID) {
-	for id := range m.removedreplyTo {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReplyToIDs returns the "replyTo" edge IDs in the mutation.
-func (m *PostMutation) ReplyToIDs() (ids []uuid.UUID) {
-	for id := range m.replyTo {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReplyTo resets all changes to the "replyTo" edge.
-func (m *PostMutation) ResetReplyTo() {
-	m.replyTo = nil
-	m.clearedreplyTo = false
-	m.removedreplyTo = nil
-}
-
 // AddReactIDs adds the "reacts" edge to the React entity by ids.
-func (m *PostMutation) AddReactIDs(ids ...string) {
+func (m *PostMutation) AddReactIDs(ids ...uuid.UUID) {
 	if m.reacts == nil {
-		m.reacts = make(map[string]struct{})
+		m.reacts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.reacts[ids[i]] = struct{}{}
@@ -2401,9 +2367,9 @@ func (m *PostMutation) ReactsCleared() bool {
 }
 
 // RemoveReactIDs removes the "reacts" edge to the React entity by IDs.
-func (m *PostMutation) RemoveReactIDs(ids ...string) {
+func (m *PostMutation) RemoveReactIDs(ids ...uuid.UUID) {
 	if m.removedreacts == nil {
-		m.removedreacts = make(map[string]struct{})
+		m.removedreacts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.reacts, ids[i])
@@ -2412,7 +2378,7 @@ func (m *PostMutation) RemoveReactIDs(ids ...string) {
 }
 
 // RemovedReacts returns the removed IDs of the "reacts" edge to the React entity.
-func (m *PostMutation) RemovedReactsIDs() (ids []string) {
+func (m *PostMutation) RemovedReactsIDs() (ids []uuid.UUID) {
 	for id := range m.removedreacts {
 		ids = append(ids, id)
 	}
@@ -2420,7 +2386,7 @@ func (m *PostMutation) RemovedReactsIDs() (ids []string) {
 }
 
 // ReactsIDs returns the "reacts" edge IDs in the mutation.
-func (m *PostMutation) ReactsIDs() (ids []string) {
+func (m *PostMutation) ReactsIDs() (ids []uuid.UUID) {
 	for id := range m.reacts {
 		ids = append(ids, id)
 	}
@@ -2454,23 +2420,29 @@ func (m *PostMutation) Type() string {
 // AddedFields().
 func (m *PostMutation) Fields() []string {
 	fields := make([]string, 0, 12)
+	if m.first != nil {
+		fields = append(fields, post.FieldFirst)
+	}
 	if m.title != nil {
 		fields = append(fields, post.FieldTitle)
 	}
 	if m.slug != nil {
 		fields = append(fields, post.FieldSlug)
 	}
+	if m.pinned != nil {
+		fields = append(fields, post.FieldPinned)
+	}
+	if m.root != nil {
+		fields = append(fields, post.FieldRootPostID)
+	}
+	if m.replyTo != nil {
+		fields = append(fields, post.FieldReplyToPostID)
+	}
 	if m.body != nil {
 		fields = append(fields, post.FieldBody)
 	}
 	if m.short != nil {
 		fields = append(fields, post.FieldShort)
-	}
-	if m.first != nil {
-		fields = append(fields, post.FieldFirst)
-	}
-	if m.pinned != nil {
-		fields = append(fields, post.FieldPinned)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, post.FieldCreatedAt)
@@ -2480,12 +2452,6 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.deletedAt != nil {
 		fields = append(fields, post.FieldDeletedAt)
-	}
-	if m.rootPostId != nil {
-		fields = append(fields, post.FieldRootPostId)
-	}
-	if m.replyPostId != nil {
-		fields = append(fields, post.FieldReplyPostId)
 	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
@@ -2498,28 +2464,28 @@ func (m *PostMutation) Fields() []string {
 // schema.
 func (m *PostMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case post.FieldFirst:
+		return m.First()
 	case post.FieldTitle:
 		return m.Title()
 	case post.FieldSlug:
 		return m.Slug()
+	case post.FieldPinned:
+		return m.Pinned()
+	case post.FieldRootPostID:
+		return m.RootPostID()
+	case post.FieldReplyToPostID:
+		return m.ReplyToPostID()
 	case post.FieldBody:
 		return m.Body()
 	case post.FieldShort:
 		return m.Short()
-	case post.FieldFirst:
-		return m.First()
-	case post.FieldPinned:
-		return m.Pinned()
 	case post.FieldCreatedAt:
 		return m.CreatedAt()
 	case post.FieldUpdatedAt:
 		return m.UpdatedAt()
 	case post.FieldDeletedAt:
 		return m.DeletedAt()
-	case post.FieldRootPostId:
-		return m.RootPostId()
-	case post.FieldReplyPostId:
-		return m.ReplyPostId()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -2531,28 +2497,28 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case post.FieldFirst:
+		return m.OldFirst(ctx)
 	case post.FieldTitle:
 		return m.OldTitle(ctx)
 	case post.FieldSlug:
 		return m.OldSlug(ctx)
+	case post.FieldPinned:
+		return m.OldPinned(ctx)
+	case post.FieldRootPostID:
+		return m.OldRootPostID(ctx)
+	case post.FieldReplyToPostID:
+		return m.OldReplyToPostID(ctx)
 	case post.FieldBody:
 		return m.OldBody(ctx)
 	case post.FieldShort:
 		return m.OldShort(ctx)
-	case post.FieldFirst:
-		return m.OldFirst(ctx)
-	case post.FieldPinned:
-		return m.OldPinned(ctx)
 	case post.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case post.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	case post.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case post.FieldRootPostId:
-		return m.OldRootPostId(ctx)
-	case post.FieldReplyPostId:
-		return m.OldReplyPostId(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -2564,6 +2530,13 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *PostMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case post.FieldFirst:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirst(v)
+		return nil
 	case post.FieldTitle:
 		v, ok := value.(string)
 		if !ok {
@@ -2578,6 +2551,27 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSlug(v)
 		return nil
+	case post.FieldPinned:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPinned(v)
+		return nil
+	case post.FieldRootPostID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRootPostID(v)
+		return nil
+	case post.FieldReplyToPostID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReplyToPostID(v)
+		return nil
 	case post.FieldBody:
 		v, ok := value.(string)
 		if !ok {
@@ -2591,20 +2585,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetShort(v)
-		return nil
-	case post.FieldFirst:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFirst(v)
-		return nil
-	case post.FieldPinned:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPinned(v)
 		return nil
 	case post.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -2626,20 +2606,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
-		return nil
-	case post.FieldRootPostId:
-		v, ok := value.(uuid.UUID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRootPostId(v)
-		return nil
-	case post.FieldReplyPostId:
-		v, ok := value.(uuid.UUID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetReplyPostId(v)
 		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(uuid.UUID)
@@ -2684,14 +2650,14 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldSlug) {
 		fields = append(fields, post.FieldSlug)
 	}
+	if m.FieldCleared(post.FieldRootPostID) {
+		fields = append(fields, post.FieldRootPostID)
+	}
+	if m.FieldCleared(post.FieldReplyToPostID) {
+		fields = append(fields, post.FieldReplyToPostID)
+	}
 	if m.FieldCleared(post.FieldDeletedAt) {
 		fields = append(fields, post.FieldDeletedAt)
-	}
-	if m.FieldCleared(post.FieldRootPostId) {
-		fields = append(fields, post.FieldRootPostId)
-	}
-	if m.FieldCleared(post.FieldReplyPostId) {
-		fields = append(fields, post.FieldReplyPostId)
 	}
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
@@ -2716,14 +2682,14 @@ func (m *PostMutation) ClearField(name string) error {
 	case post.FieldSlug:
 		m.ClearSlug()
 		return nil
+	case post.FieldRootPostID:
+		m.ClearRootPostID()
+		return nil
+	case post.FieldReplyToPostID:
+		m.ClearReplyToPostID()
+		return nil
 	case post.FieldDeletedAt:
 		m.ClearDeletedAt()
-		return nil
-	case post.FieldRootPostId:
-		m.ClearRootPostId()
-		return nil
-	case post.FieldReplyPostId:
-		m.ClearReplyPostId()
 		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
@@ -2736,23 +2702,29 @@ func (m *PostMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *PostMutation) ResetField(name string) error {
 	switch name {
+	case post.FieldFirst:
+		m.ResetFirst()
+		return nil
 	case post.FieldTitle:
 		m.ResetTitle()
 		return nil
 	case post.FieldSlug:
 		m.ResetSlug()
 		return nil
+	case post.FieldPinned:
+		m.ResetPinned()
+		return nil
+	case post.FieldRootPostID:
+		m.ResetRootPostID()
+		return nil
+	case post.FieldReplyToPostID:
+		m.ResetReplyToPostID()
+		return nil
 	case post.FieldBody:
 		m.ResetBody()
 		return nil
 	case post.FieldShort:
 		m.ResetShort()
-		return nil
-	case post.FieldFirst:
-		m.ResetFirst()
-		return nil
-	case post.FieldPinned:
-		m.ResetPinned()
 		return nil
 	case post.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -2762,12 +2734,6 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldDeletedAt:
 		m.ResetDeletedAt()
-		return nil
-	case post.FieldRootPostId:
-		m.ResetRootPostId()
-		return nil
-	case post.FieldReplyPostId:
-		m.ResetReplyPostId()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()
@@ -2794,11 +2760,11 @@ func (m *PostMutation) AddedEdges() []string {
 	if m.posts != nil {
 		edges = append(edges, post.EdgePosts)
 	}
-	if m.replies != nil {
-		edges = append(edges, post.EdgeReplies)
-	}
 	if m.replyTo != nil {
 		edges = append(edges, post.EdgeReplyTo)
+	}
+	if m.replies != nil {
+		edges = append(edges, post.EdgeReplies)
 	}
 	if m.reacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -2825,26 +2791,22 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case post.EdgeRoot:
-		ids := make([]ent.Value, 0, len(m.root))
-		for id := range m.root {
-			ids = append(ids, id)
+		if id := m.root; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case post.EdgePosts:
 		ids := make([]ent.Value, 0, len(m.posts))
 		for id := range m.posts {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeReplyTo:
+		if id := m.replyTo; id != nil {
+			return []ent.Value{*id}
+		}
 	case post.EdgeReplies:
 		ids := make([]ent.Value, 0, len(m.replies))
 		for id := range m.replies {
-			ids = append(ids, id)
-		}
-		return ids
-	case post.EdgeReplyTo:
-		ids := make([]ent.Value, 0, len(m.replyTo))
-		for id := range m.replyTo {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2864,17 +2826,11 @@ func (m *PostMutation) RemovedEdges() []string {
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
-	if m.removedroot != nil {
-		edges = append(edges, post.EdgeRoot)
-	}
 	if m.removedposts != nil {
 		edges = append(edges, post.EdgePosts)
 	}
 	if m.removedreplies != nil {
 		edges = append(edges, post.EdgeReplies)
-	}
-	if m.removedreplyTo != nil {
-		edges = append(edges, post.EdgeReplyTo)
 	}
 	if m.removedreacts != nil {
 		edges = append(edges, post.EdgeReacts)
@@ -2892,12 +2848,6 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeRoot:
-		ids := make([]ent.Value, 0, len(m.removedroot))
-		for id := range m.removedroot {
-			ids = append(ids, id)
-		}
-		return ids
 	case post.EdgePosts:
 		ids := make([]ent.Value, 0, len(m.removedposts))
 		for id := range m.removedposts {
@@ -2907,12 +2857,6 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 	case post.EdgeReplies:
 		ids := make([]ent.Value, 0, len(m.removedreplies))
 		for id := range m.removedreplies {
-			ids = append(ids, id)
-		}
-		return ids
-	case post.EdgeReplyTo:
-		ids := make([]ent.Value, 0, len(m.removedreplyTo))
-		for id := range m.removedreplyTo {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2944,11 +2888,11 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedposts {
 		edges = append(edges, post.EdgePosts)
 	}
-	if m.clearedreplies {
-		edges = append(edges, post.EdgeReplies)
-	}
 	if m.clearedreplyTo {
 		edges = append(edges, post.EdgeReplyTo)
+	}
+	if m.clearedreplies {
+		edges = append(edges, post.EdgeReplies)
 	}
 	if m.clearedreacts {
 		edges = append(edges, post.EdgeReacts)
@@ -2970,10 +2914,10 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedroot
 	case post.EdgePosts:
 		return m.clearedposts
-	case post.EdgeReplies:
-		return m.clearedreplies
 	case post.EdgeReplyTo:
 		return m.clearedreplyTo
+	case post.EdgeReplies:
+		return m.clearedreplies
 	case post.EdgeReacts:
 		return m.clearedreacts
 	}
@@ -2989,6 +2933,12 @@ func (m *PostMutation) ClearEdge(name string) error {
 		return nil
 	case post.EdgeCategory:
 		m.ClearCategory()
+		return nil
+	case post.EdgeRoot:
+		m.ClearRoot()
+		return nil
+	case post.EdgeReplyTo:
+		m.ClearReplyTo()
 		return nil
 	}
 	return fmt.Errorf("unknown Post unique edge %s", name)
@@ -3013,11 +2963,11 @@ func (m *PostMutation) ResetEdge(name string) error {
 	case post.EdgePosts:
 		m.ResetPosts()
 		return nil
-	case post.EdgeReplies:
-		m.ResetReplies()
-		return nil
 	case post.EdgeReplyTo:
 		m.ResetReplyTo()
+		return nil
+	case post.EdgeReplies:
+		m.ResetReplies()
 		return nil
 	case post.EdgeReacts:
 		m.ResetReacts()
@@ -3031,17 +2981,13 @@ type ReactMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *string
+	id            *uuid.UUID
 	emoji         *string
 	createdAt     *time.Time
-	postId        *string
-	userId        *string
 	clearedFields map[string]struct{}
-	user          map[uuid.UUID]struct{}
-	removeduser   map[uuid.UUID]struct{}
+	user          *uuid.UUID
 	cleareduser   bool
-	_Post         map[uuid.UUID]struct{}
-	removed_Post  map[uuid.UUID]struct{}
+	_Post         *uuid.UUID
 	cleared_Post  bool
 	done          bool
 	oldValue      func(context.Context) (*React, error)
@@ -3068,7 +3014,7 @@ func newReactMutation(c config, op Op, opts ...reactOption) *ReactMutation {
 }
 
 // withReactID sets the ID field of the mutation.
-func withReactID(id string) reactOption {
+func withReactID(id uuid.UUID) reactOption {
 	return func(m *ReactMutation) {
 		var (
 			err   error
@@ -3120,13 +3066,13 @@ func (m ReactMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of React entities.
-func (m *ReactMutation) SetID(id string) {
+func (m *ReactMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ReactMutation) ID() (id string, exists bool) {
+func (m *ReactMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3137,12 +3083,12 @@ func (m *ReactMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ReactMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *ReactMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -3224,86 +3170,9 @@ func (m *ReactMutation) ResetCreatedAt() {
 	m.createdAt = nil
 }
 
-// SetPostId sets the "postId" field.
-func (m *ReactMutation) SetPostId(s string) {
-	m.postId = &s
-}
-
-// PostId returns the value of the "postId" field in the mutation.
-func (m *ReactMutation) PostId() (r string, exists bool) {
-	v := m.postId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPostId returns the old "postId" field's value of the React entity.
-// If the React object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReactMutation) OldPostId(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPostId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPostId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPostId: %w", err)
-	}
-	return oldValue.PostId, nil
-}
-
-// ResetPostId resets all changes to the "postId" field.
-func (m *ReactMutation) ResetPostId() {
-	m.postId = nil
-}
-
-// SetUserId sets the "userId" field.
-func (m *ReactMutation) SetUserId(s string) {
-	m.userId = &s
-}
-
-// UserId returns the value of the "userId" field in the mutation.
-func (m *ReactMutation) UserId() (r string, exists bool) {
-	v := m.userId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserId returns the old "userId" field's value of the React entity.
-// If the React object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReactMutation) OldUserId(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserId: %w", err)
-	}
-	return oldValue.UserId, nil
-}
-
-// ResetUserId resets all changes to the "userId" field.
-func (m *ReactMutation) ResetUserId() {
-	m.userId = nil
-}
-
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *ReactMutation) AddUserIDs(ids ...uuid.UUID) {
-	if m.user == nil {
-		m.user = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.user[ids[i]] = struct{}{}
-	}
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *ReactMutation) SetUserID(id uuid.UUID) {
+	m.user = &id
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -3316,29 +3185,20 @@ func (m *ReactMutation) UserCleared() bool {
 	return m.cleareduser
 }
 
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *ReactMutation) RemoveUserIDs(ids ...uuid.UUID) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *ReactMutation) RemovedUserIDs() (ids []uuid.UUID) {
-	for id := range m.removeduser {
-		ids = append(ids, id)
+// UserID returns the "user" edge ID in the mutation.
+func (m *ReactMutation) UserID() (id uuid.UUID, exists bool) {
+	if m.user != nil {
+		return *m.user, true
 	}
 	return
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
 func (m *ReactMutation) UserIDs() (ids []uuid.UUID) {
-	for id := range m.user {
-		ids = append(ids, id)
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -3347,17 +3207,11 @@ func (m *ReactMutation) UserIDs() (ids []uuid.UUID) {
 func (m *ReactMutation) ResetUser() {
 	m.user = nil
 	m.cleareduser = false
-	m.removeduser = nil
 }
 
-// AddPostIDs adds the "Post" edge to the Post entity by ids.
-func (m *ReactMutation) AddPostIDs(ids ...uuid.UUID) {
-	if m._Post == nil {
-		m._Post = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m._Post[ids[i]] = struct{}{}
-	}
+// SetPostID sets the "Post" edge to the Post entity by id.
+func (m *ReactMutation) SetPostID(id uuid.UUID) {
+	m._Post = &id
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
@@ -3370,29 +3224,20 @@ func (m *ReactMutation) PostCleared() bool {
 	return m.cleared_Post
 }
 
-// RemovePostIDs removes the "Post" edge to the Post entity by IDs.
-func (m *ReactMutation) RemovePostIDs(ids ...uuid.UUID) {
-	if m.removed_Post == nil {
-		m.removed_Post = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m._Post, ids[i])
-		m.removed_Post[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedPost returns the removed IDs of the "Post" edge to the Post entity.
-func (m *ReactMutation) RemovedPostIDs() (ids []uuid.UUID) {
-	for id := range m.removed_Post {
-		ids = append(ids, id)
+// PostID returns the "Post" edge ID in the mutation.
+func (m *ReactMutation) PostID() (id uuid.UUID, exists bool) {
+	if m._Post != nil {
+		return *m._Post, true
 	}
 	return
 }
 
 // PostIDs returns the "Post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PostID instead. It exists only for internal usage by the builders.
 func (m *ReactMutation) PostIDs() (ids []uuid.UUID) {
-	for id := range m._Post {
-		ids = append(ids, id)
+	if id := m._Post; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -3401,7 +3246,6 @@ func (m *ReactMutation) PostIDs() (ids []uuid.UUID) {
 func (m *ReactMutation) ResetPost() {
 	m._Post = nil
 	m.cleared_Post = false
-	m.removed_Post = nil
 }
 
 // Where appends a list predicates to the ReactMutation builder.
@@ -3423,18 +3267,12 @@ func (m *ReactMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ReactMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 2)
 	if m.emoji != nil {
 		fields = append(fields, react.FieldEmoji)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, react.FieldCreatedAt)
-	}
-	if m.postId != nil {
-		fields = append(fields, react.FieldPostId)
-	}
-	if m.userId != nil {
-		fields = append(fields, react.FieldUserId)
 	}
 	return fields
 }
@@ -3448,10 +3286,6 @@ func (m *ReactMutation) Field(name string) (ent.Value, bool) {
 		return m.Emoji()
 	case react.FieldCreatedAt:
 		return m.CreatedAt()
-	case react.FieldPostId:
-		return m.PostId()
-	case react.FieldUserId:
-		return m.UserId()
 	}
 	return nil, false
 }
@@ -3465,10 +3299,6 @@ func (m *ReactMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldEmoji(ctx)
 	case react.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case react.FieldPostId:
-		return m.OldPostId(ctx)
-	case react.FieldUserId:
-		return m.OldUserId(ctx)
 	}
 	return nil, fmt.Errorf("unknown React field %s", name)
 }
@@ -3491,20 +3321,6 @@ func (m *ReactMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
-		return nil
-	case react.FieldPostId:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPostId(v)
-		return nil
-	case react.FieldUserId:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserId(v)
 		return nil
 	}
 	return fmt.Errorf("unknown React field %s", name)
@@ -3561,12 +3377,6 @@ func (m *ReactMutation) ResetField(name string) error {
 	case react.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case react.FieldPostId:
-		m.ResetPostId()
-		return nil
-	case react.FieldUserId:
-		m.ResetUserId()
-		return nil
 	}
 	return fmt.Errorf("unknown React field %s", name)
 }
@@ -3588,17 +3398,13 @@ func (m *ReactMutation) AddedEdges() []string {
 func (m *ReactMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case react.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
-			ids = append(ids, id)
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case react.EdgePost:
-		ids := make([]ent.Value, 0, len(m._Post))
-		for id := range m._Post {
-			ids = append(ids, id)
+		if id := m._Post; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -3606,12 +3412,6 @@ func (m *ReactMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ReactMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removeduser != nil {
-		edges = append(edges, react.EdgeUser)
-	}
-	if m.removed_Post != nil {
-		edges = append(edges, react.EdgePost)
-	}
 	return edges
 }
 
@@ -3619,18 +3419,6 @@ func (m *ReactMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ReactMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case react.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
-			ids = append(ids, id)
-		}
-		return ids
-	case react.EdgePost:
-		ids := make([]ent.Value, 0, len(m.removed_Post))
-		for id := range m.removed_Post {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -3663,6 +3451,12 @@ func (m *ReactMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ReactMutation) ClearEdge(name string) error {
 	switch name {
+	case react.EdgeUser:
+		m.ClearUser()
+		return nil
+	case react.EdgePost:
+		m.ClearPost()
+		return nil
 	}
 	return fmt.Errorf("unknown React unique edge %s", name)
 }
@@ -6849,8 +6643,8 @@ type UserMutation struct {
 	posts                map[uuid.UUID]struct{}
 	removedposts         map[uuid.UUID]struct{}
 	clearedposts         bool
-	reacts               map[string]struct{}
-	removedreacts        map[string]struct{}
+	reacts               map[uuid.UUID]struct{}
+	removedreacts        map[uuid.UUID]struct{}
 	clearedreacts        bool
 	subscriptions        map[string]struct{}
 	removedsubscriptions map[string]struct{}
@@ -7297,9 +7091,9 @@ func (m *UserMutation) ResetPosts() {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by ids.
-func (m *UserMutation) AddReactIDs(ids ...string) {
+func (m *UserMutation) AddReactIDs(ids ...uuid.UUID) {
 	if m.reacts == nil {
-		m.reacts = make(map[string]struct{})
+		m.reacts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.reacts[ids[i]] = struct{}{}
@@ -7317,9 +7111,9 @@ func (m *UserMutation) ReactsCleared() bool {
 }
 
 // RemoveReactIDs removes the "reacts" edge to the React entity by IDs.
-func (m *UserMutation) RemoveReactIDs(ids ...string) {
+func (m *UserMutation) RemoveReactIDs(ids ...uuid.UUID) {
 	if m.removedreacts == nil {
-		m.removedreacts = make(map[string]struct{})
+		m.removedreacts = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.reacts, ids[i])
@@ -7328,7 +7122,7 @@ func (m *UserMutation) RemoveReactIDs(ids ...string) {
 }
 
 // RemovedReacts returns the removed IDs of the "reacts" edge to the React entity.
-func (m *UserMutation) RemovedReactsIDs() (ids []string) {
+func (m *UserMutation) RemovedReactsIDs() (ids []uuid.UUID) {
 	for id := range m.removedreacts {
 		ids = append(ids, id)
 	}
@@ -7336,7 +7130,7 @@ func (m *UserMutation) RemovedReactsIDs() (ids []string) {
 }
 
 // ReactsIDs returns the "reacts" edge IDs in the mutation.
-func (m *UserMutation) ReactsIDs() (ids []string) {
+func (m *UserMutation) ReactsIDs() (ids []uuid.UUID) {
 	for id := range m.reacts {
 		ids = append(ids, id)
 	}

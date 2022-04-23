@@ -51,19 +51,18 @@ var (
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "first", Type: field.TypeBool},
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
+		{Name: "pinned", Type: field.TypeBool, Default: false},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
-		{Name: "first", Type: field.TypeBool},
-		{Name: "pinned", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "root_post_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "reply_post_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "category_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "react_post", Type: field.TypeString, Nullable: true},
+		{Name: "root_post_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "reply_to_post_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_posts", Type: field.TypeUUID},
 	}
 	// PostsTable holds the schema information for the "posts" table.
@@ -74,19 +73,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[12]},
+				Columns:    []*schema.Column{PostsColumns[10]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "posts_reacts_Post",
-				Columns:    []*schema.Column{PostsColumns[13]},
-				RefColumns: []*schema.Column{ReactsColumns[0]},
+				Symbol:     "posts_posts_posts",
+				Columns:    []*schema.Column{PostsColumns[11]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "posts_posts_replies",
+				Columns:    []*schema.Column{PostsColumns[12]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_users_posts",
-				Columns:    []*schema.Column{PostsColumns[14]},
+				Columns:    []*schema.Column{PostsColumns[13]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -94,12 +99,12 @@ var (
 	}
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "emoji", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "post_id", Type: field.TypeString},
-		{Name: "user_id", Type: field.TypeString},
 		{Name: "post_reacts", Type: field.TypeUUID, Nullable: true},
+		{Name: "react_user", Type: field.TypeUUID, Nullable: true},
+		{Name: "react_post", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_reacts", Type: field.TypeUUID, Nullable: true},
 	}
 	// ReactsTable holds the schema information for the "reacts" table.
@@ -110,6 +115,18 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "reacts_posts_reacts",
+				Columns:    []*schema.Column{ReactsColumns[3]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "reacts_users_user",
+				Columns:    []*schema.Column{ReactsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "reacts_posts_Post",
 				Columns:    []*schema.Column{ReactsColumns[5]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -231,7 +248,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "react_user", Type: field.TypeString, Nullable: true},
 		{Name: "server_user", Type: field.TypeString, Nullable: true},
 		{Name: "subscription_user", Type: field.TypeString, Nullable: true},
 	}
@@ -242,72 +258,16 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "users_reacts_user",
-				Columns:    []*schema.Column{UsersColumns[8]},
-				RefColumns: []*schema.Column{ReactsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "users_servers_User",
-				Columns:    []*schema.Column{UsersColumns[9]},
+				Columns:    []*schema.Column{UsersColumns[8]},
 				RefColumns: []*schema.Column{ServersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "users_subscriptions_user",
-				Columns:    []*schema.Column{UsersColumns[10]},
+				Columns:    []*schema.Column{UsersColumns[9]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// PostPostsColumns holds the columns for the "post_posts" table.
-	PostPostsColumns = []*schema.Column{
-		{Name: "post_id", Type: field.TypeUUID},
-		{Name: "root_id", Type: field.TypeUUID},
-	}
-	// PostPostsTable holds the schema information for the "post_posts" table.
-	PostPostsTable = &schema.Table{
-		Name:       "post_posts",
-		Columns:    PostPostsColumns,
-		PrimaryKey: []*schema.Column{PostPostsColumns[0], PostPostsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "post_posts_post_id",
-				Columns:    []*schema.Column{PostPostsColumns[0]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "post_posts_root_id",
-				Columns:    []*schema.Column{PostPostsColumns[1]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// PostReplyToColumns holds the columns for the "post_replyTo" table.
-	PostReplyToColumns = []*schema.Column{
-		{Name: "post_id", Type: field.TypeUUID},
-		{Name: "reply_id", Type: field.TypeUUID},
-	}
-	// PostReplyToTable holds the schema information for the "post_replyTo" table.
-	PostReplyToTable = &schema.Table{
-		Name:       "post_replyTo",
-		Columns:    PostReplyToColumns,
-		PrimaryKey: []*schema.Column{PostReplyToColumns[0], PostReplyToColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "post_replyTo_post_id",
-				Columns:    []*schema.Column{PostReplyToColumns[0]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "post_replyTo_reply_id",
-				Columns:    []*schema.Column{PostReplyToColumns[1]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -347,8 +307,6 @@ var (
 		SubscriptionsTable,
 		TagsTable,
 		UsersTable,
-		PostPostsTable,
-		PostReplyToTable,
 		TagPostsTable,
 	}
 )
@@ -356,21 +314,19 @@ var (
 func init() {
 	NotificationsTable.ForeignKeys[0].RefTable = SubscriptionsTable
 	PostsTable.ForeignKeys[0].RefTable = CategoriesTable
-	PostsTable.ForeignKeys[1].RefTable = ReactsTable
-	PostsTable.ForeignKeys[2].RefTable = UsersTable
+	PostsTable.ForeignKeys[1].RefTable = PostsTable
+	PostsTable.ForeignKeys[2].RefTable = PostsTable
+	PostsTable.ForeignKeys[3].RefTable = UsersTable
 	ReactsTable.ForeignKeys[0].RefTable = PostsTable
 	ReactsTable.ForeignKeys[1].RefTable = UsersTable
+	ReactsTable.ForeignKeys[2].RefTable = PostsTable
+	ReactsTable.ForeignKeys[3].RefTable = UsersTable
 	RulesTable.ForeignKeys[0].RefTable = ServersTable
 	ServersTable.ForeignKeys[0].RefTable = RulesTable
 	SubscriptionsTable.ForeignKeys[0].RefTable = NotificationsTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = UsersTable
-	UsersTable.ForeignKeys[0].RefTable = ReactsTable
-	UsersTable.ForeignKeys[1].RefTable = ServersTable
-	UsersTable.ForeignKeys[2].RefTable = SubscriptionsTable
-	PostPostsTable.ForeignKeys[0].RefTable = PostsTable
-	PostPostsTable.ForeignKeys[1].RefTable = PostsTable
-	PostReplyToTable.ForeignKeys[0].RefTable = PostsTable
-	PostReplyToTable.ForeignKeys[1].RefTable = PostsTable
+	UsersTable.ForeignKeys[0].RefTable = ServersTable
+	UsersTable.ForeignKeys[1].RefTable = SubscriptionsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

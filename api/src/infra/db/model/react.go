@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -16,46 +18,54 @@ import (
 type React struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Emoji holds the value of the "emoji" field.
 	Emoji string `json:"emoji,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// PostId holds the value of the "postId" field.
-	PostId string `json:"postId,omitempty"`
-	// UserId holds the value of the "userId" field.
-	UserId string `json:"userId,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReactQuery when eager-loading is set.
 	Edges       ReactEdges `json:"edges"`
 	post_reacts *uuid.UUID
+	react_user  *uuid.UUID
+	react_post  *uuid.UUID
 	user_reacts *uuid.UUID
 }
 
 // ReactEdges holds the relations/edges for other nodes in the graph.
 type ReactEdges struct {
 	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	User *User `json:"user,omitempty"`
 	// Post holds the value of the Post edge.
-	Post []*Post `json:"Post,omitempty"`
+	Post *Post `json:"Post,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
-// was not loaded in eager-loading.
-func (e ReactEdges) UserOrErr() ([]*User, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ReactEdges) UserOrErr() (*User, error) {
 	if e.loadedTypes[0] {
+		if e.User == nil {
+			// The edge user was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
 
 // PostOrErr returns the Post value or an error if the edge
-// was not loaded in eager-loading.
-func (e ReactEdges) PostOrErr() ([]*Post, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ReactEdges) PostOrErr() (*Post, error) {
 	if e.loadedTypes[1] {
+		if e.Post == nil {
+			// The edge Post was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: post.Label}
+		}
 		return e.Post, nil
 	}
 	return nil, &NotLoadedError{edge: "Post"}
@@ -66,13 +76,19 @@ func (*React) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case react.FieldID, react.FieldEmoji, react.FieldPostId, react.FieldUserId:
+		case react.FieldEmoji:
 			values[i] = new(sql.NullString)
 		case react.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
+		case react.FieldID:
+			values[i] = new(uuid.UUID)
 		case react.ForeignKeys[0]: // post_reacts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case react.ForeignKeys[1]: // user_reacts
+		case react.ForeignKeys[1]: // react_user
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case react.ForeignKeys[2]: // react_post
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case react.ForeignKeys[3]: // user_reacts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type React", columns[i])
@@ -90,10 +106,10 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case react.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				r.ID = value.String
+			} else if value != nil {
+				r.ID = *value
 			}
 		case react.FieldEmoji:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -107,18 +123,6 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.CreatedAt = value.Time
 			}
-		case react.FieldPostId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field postId", values[i])
-			} else if value.Valid {
-				r.PostId = value.String
-			}
-		case react.FieldUserId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
-			} else if value.Valid {
-				r.UserId = value.String
-			}
 		case react.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field post_reacts", values[i])
@@ -127,6 +131,20 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 				*r.post_reacts = *value.S.(*uuid.UUID)
 			}
 		case react.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field react_user", values[i])
+			} else if value.Valid {
+				r.react_user = new(uuid.UUID)
+				*r.react_user = *value.S.(*uuid.UUID)
+			}
+		case react.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field react_post", values[i])
+			} else if value.Valid {
+				r.react_post = new(uuid.UUID)
+				*r.react_post = *value.S.(*uuid.UUID)
+			}
+		case react.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_reacts", values[i])
 			} else if value.Valid {
@@ -175,10 +193,6 @@ func (r *React) String() string {
 	builder.WriteString(r.Emoji)
 	builder.WriteString(", createdAt=")
 	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", postId=")
-	builder.WriteString(r.PostId)
-	builder.WriteString(", userId=")
-	builder.WriteString(r.UserId)
 	builder.WriteByte(')')
 	return builder.String()
 }

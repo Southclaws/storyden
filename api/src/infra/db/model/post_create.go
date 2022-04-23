@@ -28,6 +28,12 @@ type PostCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetFirst sets the "first" field.
+func (pc *PostCreate) SetFirst(b bool) *PostCreate {
+	pc.mutation.SetFirst(b)
+	return pc
+}
+
 // SetTitle sets the "title" field.
 func (pc *PostCreate) SetTitle(s string) *PostCreate {
 	pc.mutation.SetTitle(s)
@@ -56,24 +62,6 @@ func (pc *PostCreate) SetNillableSlug(s *string) *PostCreate {
 	return pc
 }
 
-// SetBody sets the "body" field.
-func (pc *PostCreate) SetBody(s string) *PostCreate {
-	pc.mutation.SetBody(s)
-	return pc
-}
-
-// SetShort sets the "short" field.
-func (pc *PostCreate) SetShort(s string) *PostCreate {
-	pc.mutation.SetShort(s)
-	return pc
-}
-
-// SetFirst sets the "first" field.
-func (pc *PostCreate) SetFirst(b bool) *PostCreate {
-	pc.mutation.SetFirst(b)
-	return pc
-}
-
 // SetPinned sets the "pinned" field.
 func (pc *PostCreate) SetPinned(b bool) *PostCreate {
 	pc.mutation.SetPinned(b)
@@ -85,6 +73,46 @@ func (pc *PostCreate) SetNillablePinned(b *bool) *PostCreate {
 	if b != nil {
 		pc.SetPinned(*b)
 	}
+	return pc
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (pc *PostCreate) SetRootPostID(u uuid.UUID) *PostCreate {
+	pc.mutation.SetRootPostID(u)
+	return pc
+}
+
+// SetNillableRootPostID sets the "root_post_id" field if the given value is not nil.
+func (pc *PostCreate) SetNillableRootPostID(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetRootPostID(*u)
+	}
+	return pc
+}
+
+// SetReplyToPostID sets the "reply_to_post_id" field.
+func (pc *PostCreate) SetReplyToPostID(u uuid.UUID) *PostCreate {
+	pc.mutation.SetReplyToPostID(u)
+	return pc
+}
+
+// SetNillableReplyToPostID sets the "reply_to_post_id" field if the given value is not nil.
+func (pc *PostCreate) SetNillableReplyToPostID(u *uuid.UUID) *PostCreate {
+	if u != nil {
+		pc.SetReplyToPostID(*u)
+	}
+	return pc
+}
+
+// SetBody sets the "body" field.
+func (pc *PostCreate) SetBody(s string) *PostCreate {
+	pc.mutation.SetBody(s)
+	return pc
+}
+
+// SetShort sets the "short" field.
+func (pc *PostCreate) SetShort(s string) *PostCreate {
+	pc.mutation.SetShort(s)
 	return pc
 }
 
@@ -126,34 +154,6 @@ func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
 func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
 	if t != nil {
 		pc.SetDeletedAt(*t)
-	}
-	return pc
-}
-
-// SetRootPostId sets the "rootPostId" field.
-func (pc *PostCreate) SetRootPostId(u uuid.UUID) *PostCreate {
-	pc.mutation.SetRootPostId(u)
-	return pc
-}
-
-// SetNillableRootPostId sets the "rootPostId" field if the given value is not nil.
-func (pc *PostCreate) SetNillableRootPostId(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetRootPostId(*u)
-	}
-	return pc
-}
-
-// SetReplyPostId sets the "replyPostId" field.
-func (pc *PostCreate) SetReplyPostId(u uuid.UUID) *PostCreate {
-	pc.mutation.SetReplyPostId(u)
-	return pc
-}
-
-// SetNillableReplyPostId sets the "replyPostId" field if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyPostId(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetReplyPostId(*u)
 	}
 	return pc
 }
@@ -217,19 +217,23 @@ func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
 	return pc.AddTagIDs(ids...)
 }
 
-// AddRootIDs adds the "root" edge to the Post entity by IDs.
-func (pc *PostCreate) AddRootIDs(ids ...uuid.UUID) *PostCreate {
-	pc.mutation.AddRootIDs(ids...)
+// SetRootID sets the "root" edge to the Post entity by ID.
+func (pc *PostCreate) SetRootID(id uuid.UUID) *PostCreate {
+	pc.mutation.SetRootID(id)
 	return pc
 }
 
-// AddRoot adds the "root" edges to the Post entity.
-func (pc *PostCreate) AddRoot(p ...*Post) *PostCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
+func (pc *PostCreate) SetNillableRootID(id *uuid.UUID) *PostCreate {
+	if id != nil {
+		pc = pc.SetRootID(*id)
 	}
-	return pc.AddRootIDs(ids...)
+	return pc
+}
+
+// SetRoot sets the "root" edge to the Post entity.
+func (pc *PostCreate) SetRoot(p *Post) *PostCreate {
+	return pc.SetRootID(p.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -247,6 +251,25 @@ func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
 	return pc.AddPostIDs(ids...)
 }
 
+// SetReplyToID sets the "replyTo" edge to the Post entity by ID.
+func (pc *PostCreate) SetReplyToID(id uuid.UUID) *PostCreate {
+	pc.mutation.SetReplyToID(id)
+	return pc
+}
+
+// SetNillableReplyToID sets the "replyTo" edge to the Post entity by ID if the given value is not nil.
+func (pc *PostCreate) SetNillableReplyToID(id *uuid.UUID) *PostCreate {
+	if id != nil {
+		pc = pc.SetReplyToID(*id)
+	}
+	return pc
+}
+
+// SetReplyTo sets the "replyTo" edge to the Post entity.
+func (pc *PostCreate) SetReplyTo(p *Post) *PostCreate {
+	return pc.SetReplyToID(p.ID)
+}
+
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
 func (pc *PostCreate) AddReplyIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddReplyIDs(ids...)
@@ -262,30 +285,15 @@ func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
 	return pc.AddReplyIDs(ids...)
 }
 
-// AddReplyToIDs adds the "replyTo" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyToIDs(ids ...uuid.UUID) *PostCreate {
-	pc.mutation.AddReplyToIDs(ids...)
-	return pc
-}
-
-// AddReplyTo adds the "replyTo" edges to the Post entity.
-func (pc *PostCreate) AddReplyTo(p ...*Post) *PostCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return pc.AddReplyToIDs(ids...)
-}
-
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (pc *PostCreate) AddReactIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddReactIDs(ids ...uuid.UUID) *PostCreate {
 	pc.mutation.AddReactIDs(ids...)
 	return pc
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
-	ids := make([]string, len(r))
+	ids := make([]uuid.UUID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -383,17 +391,17 @@ func (pc *PostCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PostCreate) check() error {
-	if _, ok := pc.mutation.Body(); !ok {
-		return &ValidationError{Name: "body", err: errors.New(`model: missing required field "Post.body"`)}
-	}
-	if _, ok := pc.mutation.Short(); !ok {
-		return &ValidationError{Name: "short", err: errors.New(`model: missing required field "Post.short"`)}
-	}
 	if _, ok := pc.mutation.First(); !ok {
 		return &ValidationError{Name: "first", err: errors.New(`model: missing required field "Post.first"`)}
 	}
 	if _, ok := pc.mutation.Pinned(); !ok {
 		return &ValidationError{Name: "pinned", err: errors.New(`model: missing required field "Post.pinned"`)}
+	}
+	if _, ok := pc.mutation.Body(); !ok {
+		return &ValidationError{Name: "body", err: errors.New(`model: missing required field "Post.body"`)}
+	}
+	if _, ok := pc.mutation.Short(); !ok {
+		return &ValidationError{Name: "short", err: errors.New(`model: missing required field "Post.short"`)}
 	}
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "Post.createdAt"`)}
@@ -441,6 +449,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
+	if value, ok := pc.mutation.First(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: post.FieldFirst,
+		})
+		_node.First = value
+	}
 	if value, ok := pc.mutation.Title(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -457,6 +473,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		})
 		_node.Slug = value
 	}
+	if value, ok := pc.mutation.Pinned(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: post.FieldPinned,
+		})
+		_node.Pinned = value
+	}
 	if value, ok := pc.mutation.Body(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -472,22 +496,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Column: post.FieldShort,
 		})
 		_node.Short = value
-	}
-	if value, ok := pc.mutation.First(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: post.FieldFirst,
-		})
-		_node.First = value
-	}
-	if value, ok := pc.mutation.Pinned(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: post.FieldPinned,
-		})
-		_node.Pinned = value
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -512,22 +520,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Column: post.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
-	}
-	if value, ok := pc.mutation.RootPostId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Value:  value,
-			Column: post.FieldRootPostId,
-		})
-		_node.RootPostId = value
-	}
-	if value, ok := pc.mutation.ReplyPostId(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUUID,
-			Value:  value,
-			Column: post.FieldReplyPostId,
-		})
-		_node.ReplyPostId = value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -590,10 +582,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if nodes := pc.mutation.RootIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   post.RootTable,
-			Columns: post.RootPrimaryKey,
+			Columns: []string{post.RootColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -605,33 +597,15 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.RootPostID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   post.PostsTable,
-			Columns: post.PostsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: post.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.RepliesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   post.RepliesTable,
-			Columns: post.RepliesPrimaryKey,
+			Columns: []string{post.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -647,10 +621,30 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if nodes := pc.mutation.ReplyToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
 			Table:   post.ReplyToTable,
-			Columns: post.ReplyToPrimaryKey,
+			Columns: []string{post.ReplyToColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ReplyToPostID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.RepliesTable,
+			Columns: []string{post.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -673,7 +667,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: react.FieldID,
 				},
 			},
@@ -690,7 +684,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Post.Create().
-//		SetTitle(v).
+//		SetFirst(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -699,7 +693,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PostUpsert) {
-//			SetTitle(v+v).
+//			SetFirst(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -737,6 +731,18 @@ type (
 	}
 )
 
+// SetFirst sets the "first" field.
+func (u *PostUpsert) SetFirst(v bool) *PostUpsert {
+	u.Set(post.FieldFirst, v)
+	return u
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *PostUpsert) UpdateFirst() *PostUpsert {
+	u.SetExcluded(post.FieldFirst)
+	return u
+}
+
 // SetTitle sets the "title" field.
 func (u *PostUpsert) SetTitle(v string) *PostUpsert {
 	u.Set(post.FieldTitle, v)
@@ -773,6 +779,54 @@ func (u *PostUpsert) ClearSlug() *PostUpsert {
 	return u
 }
 
+// SetPinned sets the "pinned" field.
+func (u *PostUpsert) SetPinned(v bool) *PostUpsert {
+	u.Set(post.FieldPinned, v)
+	return u
+}
+
+// UpdatePinned sets the "pinned" field to the value that was provided on create.
+func (u *PostUpsert) UpdatePinned() *PostUpsert {
+	u.SetExcluded(post.FieldPinned)
+	return u
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (u *PostUpsert) SetRootPostID(v uuid.UUID) *PostUpsert {
+	u.Set(post.FieldRootPostID, v)
+	return u
+}
+
+// UpdateRootPostID sets the "root_post_id" field to the value that was provided on create.
+func (u *PostUpsert) UpdateRootPostID() *PostUpsert {
+	u.SetExcluded(post.FieldRootPostID)
+	return u
+}
+
+// ClearRootPostID clears the value of the "root_post_id" field.
+func (u *PostUpsert) ClearRootPostID() *PostUpsert {
+	u.SetNull(post.FieldRootPostID)
+	return u
+}
+
+// SetReplyToPostID sets the "reply_to_post_id" field.
+func (u *PostUpsert) SetReplyToPostID(v uuid.UUID) *PostUpsert {
+	u.Set(post.FieldReplyToPostID, v)
+	return u
+}
+
+// UpdateReplyToPostID sets the "reply_to_post_id" field to the value that was provided on create.
+func (u *PostUpsert) UpdateReplyToPostID() *PostUpsert {
+	u.SetExcluded(post.FieldReplyToPostID)
+	return u
+}
+
+// ClearReplyToPostID clears the value of the "reply_to_post_id" field.
+func (u *PostUpsert) ClearReplyToPostID() *PostUpsert {
+	u.SetNull(post.FieldReplyToPostID)
+	return u
+}
+
 // SetBody sets the "body" field.
 func (u *PostUpsert) SetBody(v string) *PostUpsert {
 	u.Set(post.FieldBody, v)
@@ -794,30 +848,6 @@ func (u *PostUpsert) SetShort(v string) *PostUpsert {
 // UpdateShort sets the "short" field to the value that was provided on create.
 func (u *PostUpsert) UpdateShort() *PostUpsert {
 	u.SetExcluded(post.FieldShort)
-	return u
-}
-
-// SetFirst sets the "first" field.
-func (u *PostUpsert) SetFirst(v bool) *PostUpsert {
-	u.Set(post.FieldFirst, v)
-	return u
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsert) UpdateFirst() *PostUpsert {
-	u.SetExcluded(post.FieldFirst)
-	return u
-}
-
-// SetPinned sets the "pinned" field.
-func (u *PostUpsert) SetPinned(v bool) *PostUpsert {
-	u.Set(post.FieldPinned, v)
-	return u
-}
-
-// UpdatePinned sets the "pinned" field to the value that was provided on create.
-func (u *PostUpsert) UpdatePinned() *PostUpsert {
-	u.SetExcluded(post.FieldPinned)
 	return u
 }
 
@@ -860,42 +890,6 @@ func (u *PostUpsert) UpdateDeletedAt() *PostUpsert {
 // ClearDeletedAt clears the value of the "deletedAt" field.
 func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
 	u.SetNull(post.FieldDeletedAt)
-	return u
-}
-
-// SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsert) SetRootPostId(v uuid.UUID) *PostUpsert {
-	u.Set(post.FieldRootPostId, v)
-	return u
-}
-
-// UpdateRootPostId sets the "rootPostId" field to the value that was provided on create.
-func (u *PostUpsert) UpdateRootPostId() *PostUpsert {
-	u.SetExcluded(post.FieldRootPostId)
-	return u
-}
-
-// ClearRootPostId clears the value of the "rootPostId" field.
-func (u *PostUpsert) ClearRootPostId() *PostUpsert {
-	u.SetNull(post.FieldRootPostId)
-	return u
-}
-
-// SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsert) SetReplyPostId(v uuid.UUID) *PostUpsert {
-	u.Set(post.FieldReplyPostId, v)
-	return u
-}
-
-// UpdateReplyPostId sets the "replyPostId" field to the value that was provided on create.
-func (u *PostUpsert) UpdateReplyPostId() *PostUpsert {
-	u.SetExcluded(post.FieldReplyPostId)
-	return u
-}
-
-// ClearReplyPostId clears the value of the "replyPostId" field.
-func (u *PostUpsert) ClearReplyPostId() *PostUpsert {
-	u.SetNull(post.FieldReplyPostId)
 	return u
 }
 
@@ -967,6 +961,20 @@ func (u *PostUpsertOne) Update(set func(*PostUpsert)) *PostUpsertOne {
 	return u
 }
 
+// SetFirst sets the "first" field.
+func (u *PostUpsertOne) SetFirst(v bool) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetFirst(v)
+	})
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateFirst() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateFirst()
+	})
+}
+
 // SetTitle sets the "title" field.
 func (u *PostUpsertOne) SetTitle(v string) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
@@ -1009,6 +1017,62 @@ func (u *PostUpsertOne) ClearSlug() *PostUpsertOne {
 	})
 }
 
+// SetPinned sets the "pinned" field.
+func (u *PostUpsertOne) SetPinned(v bool) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetPinned(v)
+	})
+}
+
+// UpdatePinned sets the "pinned" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdatePinned() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdatePinned()
+	})
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (u *PostUpsertOne) SetRootPostID(v uuid.UUID) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetRootPostID(v)
+	})
+}
+
+// UpdateRootPostID sets the "root_post_id" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateRootPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateRootPostID()
+	})
+}
+
+// ClearRootPostID clears the value of the "root_post_id" field.
+func (u *PostUpsertOne) ClearRootPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearRootPostID()
+	})
+}
+
+// SetReplyToPostID sets the "reply_to_post_id" field.
+func (u *PostUpsertOne) SetReplyToPostID(v uuid.UUID) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetReplyToPostID(v)
+	})
+}
+
+// UpdateReplyToPostID sets the "reply_to_post_id" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateReplyToPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateReplyToPostID()
+	})
+}
+
+// ClearReplyToPostID clears the value of the "reply_to_post_id" field.
+func (u *PostUpsertOne) ClearReplyToPostID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearReplyToPostID()
+	})
+}
+
 // SetBody sets the "body" field.
 func (u *PostUpsertOne) SetBody(v string) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
@@ -1034,34 +1098,6 @@ func (u *PostUpsertOne) SetShort(v string) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateShort() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateShort()
-	})
-}
-
-// SetFirst sets the "first" field.
-func (u *PostUpsertOne) SetFirst(v bool) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetFirst(v)
-	})
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateFirst() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateFirst()
-	})
-}
-
-// SetPinned sets the "pinned" field.
-func (u *PostUpsertOne) SetPinned(v bool) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetPinned(v)
-	})
-}
-
-// UpdatePinned sets the "pinned" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdatePinned() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdatePinned()
 	})
 }
 
@@ -1111,48 +1147,6 @@ func (u *PostUpsertOne) UpdateDeletedAt() *PostUpsertOne {
 func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearDeletedAt()
-	})
-}
-
-// SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsertOne) SetRootPostId(v uuid.UUID) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetRootPostId(v)
-	})
-}
-
-// UpdateRootPostId sets the "rootPostId" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateRootPostId() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateRootPostId()
-	})
-}
-
-// ClearRootPostId clears the value of the "rootPostId" field.
-func (u *PostUpsertOne) ClearRootPostId() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearRootPostId()
-	})
-}
-
-// SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsertOne) SetReplyPostId(v uuid.UUID) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetReplyPostId(v)
-	})
-}
-
-// UpdateReplyPostId sets the "replyPostId" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateReplyPostId() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateReplyPostId()
-	})
-}
-
-// ClearReplyPostId clears the value of the "replyPostId" field.
-func (u *PostUpsertOne) ClearReplyPostId() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearReplyPostId()
 	})
 }
 
@@ -1309,7 +1303,7 @@ func (pcb *PostCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PostUpsert) {
-//			SetTitle(v+v).
+//			SetFirst(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -1393,6 +1387,20 @@ func (u *PostUpsertBulk) Update(set func(*PostUpsert)) *PostUpsertBulk {
 	return u
 }
 
+// SetFirst sets the "first" field.
+func (u *PostUpsertBulk) SetFirst(v bool) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetFirst(v)
+	})
+}
+
+// UpdateFirst sets the "first" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateFirst() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateFirst()
+	})
+}
+
 // SetTitle sets the "title" field.
 func (u *PostUpsertBulk) SetTitle(v string) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
@@ -1435,6 +1443,62 @@ func (u *PostUpsertBulk) ClearSlug() *PostUpsertBulk {
 	})
 }
 
+// SetPinned sets the "pinned" field.
+func (u *PostUpsertBulk) SetPinned(v bool) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetPinned(v)
+	})
+}
+
+// UpdatePinned sets the "pinned" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdatePinned() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdatePinned()
+	})
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (u *PostUpsertBulk) SetRootPostID(v uuid.UUID) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetRootPostID(v)
+	})
+}
+
+// UpdateRootPostID sets the "root_post_id" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateRootPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateRootPostID()
+	})
+}
+
+// ClearRootPostID clears the value of the "root_post_id" field.
+func (u *PostUpsertBulk) ClearRootPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearRootPostID()
+	})
+}
+
+// SetReplyToPostID sets the "reply_to_post_id" field.
+func (u *PostUpsertBulk) SetReplyToPostID(v uuid.UUID) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetReplyToPostID(v)
+	})
+}
+
+// UpdateReplyToPostID sets the "reply_to_post_id" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateReplyToPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateReplyToPostID()
+	})
+}
+
+// ClearReplyToPostID clears the value of the "reply_to_post_id" field.
+func (u *PostUpsertBulk) ClearReplyToPostID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearReplyToPostID()
+	})
+}
+
 // SetBody sets the "body" field.
 func (u *PostUpsertBulk) SetBody(v string) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
@@ -1460,34 +1524,6 @@ func (u *PostUpsertBulk) SetShort(v string) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateShort() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateShort()
-	})
-}
-
-// SetFirst sets the "first" field.
-func (u *PostUpsertBulk) SetFirst(v bool) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetFirst(v)
-	})
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateFirst() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateFirst()
-	})
-}
-
-// SetPinned sets the "pinned" field.
-func (u *PostUpsertBulk) SetPinned(v bool) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetPinned(v)
-	})
-}
-
-// UpdatePinned sets the "pinned" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdatePinned() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdatePinned()
 	})
 }
 
@@ -1537,48 +1573,6 @@ func (u *PostUpsertBulk) UpdateDeletedAt() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearDeletedAt()
-	})
-}
-
-// SetRootPostId sets the "rootPostId" field.
-func (u *PostUpsertBulk) SetRootPostId(v uuid.UUID) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetRootPostId(v)
-	})
-}
-
-// UpdateRootPostId sets the "rootPostId" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateRootPostId() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateRootPostId()
-	})
-}
-
-// ClearRootPostId clears the value of the "rootPostId" field.
-func (u *PostUpsertBulk) ClearRootPostId() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearRootPostId()
-	})
-}
-
-// SetReplyPostId sets the "replyPostId" field.
-func (u *PostUpsertBulk) SetReplyPostId(v uuid.UUID) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetReplyPostId(v)
-	})
-}
-
-// UpdateReplyPostId sets the "replyPostId" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateReplyPostId() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateReplyPostId()
-	})
-}
-
-// ClearReplyPostId clears the value of the "replyPostId" field.
-func (u *PostUpsertBulk) ClearReplyPostId() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearReplyPostId()
 	})
 }
 

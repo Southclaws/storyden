@@ -19,34 +19,33 @@ type Post struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// First holds the value of the "first" field.
+	First bool `json:"first,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
+	// Pinned holds the value of the "pinned" field.
+	Pinned bool `json:"pinned,omitempty"`
+	// RootPostID holds the value of the "root_post_id" field.
+	RootPostID uuid.UUID `json:"root_post_id,omitempty"`
+	// ReplyToPostID holds the value of the "reply_to_post_id" field.
+	ReplyToPostID uuid.UUID `json:"reply_to_post_id,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
 	// Short holds the value of the "short" field.
 	Short string `json:"short,omitempty"`
-	// First holds the value of the "first" field.
-	First bool `json:"first,omitempty"`
-	// Pinned holds the value of the "pinned" field.
-	Pinned bool `json:"pinned,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// DeletedAt holds the value of the "deletedAt" field.
 	DeletedAt time.Time `json:"deletedAt,omitempty"`
-	// RootPostId holds the value of the "rootPostId" field.
-	RootPostId uuid.UUID `json:"rootPostId,omitempty"`
-	// ReplyPostId holds the value of the "replyPostId" field.
-	ReplyPostId uuid.UUID `json:"replyPostId,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID uuid.UUID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges      PostEdges `json:"edges"`
-	react_post *string
 	user_posts *uuid.UUID
 }
 
@@ -59,13 +58,13 @@ type PostEdges struct {
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
 	// Root holds the value of the root edge.
-	Root []*Post `json:"root,omitempty"`
+	Root *Post `json:"root,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// ReplyTo holds the value of the replyTo edge.
+	ReplyTo *Post `json:"replyTo,omitempty"`
 	// Replies holds the value of the replies edge.
 	Replies []*Post `json:"replies,omitempty"`
-	// ReplyTo holds the value of the replyTo edge.
-	ReplyTo []*Post `json:"replyTo,omitempty"`
 	// Reacts holds the value of the reacts edge.
 	Reacts []*React `json:"reacts,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -111,9 +110,14 @@ func (e PostEdges) TagsOrErr() ([]*Tag, error) {
 }
 
 // RootOrErr returns the Root value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) RootOrErr() ([]*Post, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) RootOrErr() (*Post, error) {
 	if e.loadedTypes[3] {
+		if e.Root == nil {
+			// The edge root was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: post.Label}
+		}
 		return e.Root, nil
 	}
 	return nil, &NotLoadedError{edge: "root"}
@@ -128,22 +132,27 @@ func (e PostEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
-// RepliesOrErr returns the Replies value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) RepliesOrErr() ([]*Post, error) {
-	if e.loadedTypes[5] {
-		return e.Replies, nil
-	}
-	return nil, &NotLoadedError{edge: "replies"}
-}
-
 // ReplyToOrErr returns the ReplyTo value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) ReplyToOrErr() ([]*Post, error) {
-	if e.loadedTypes[6] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) ReplyToOrErr() (*Post, error) {
+	if e.loadedTypes[5] {
+		if e.ReplyTo == nil {
+			// The edge replyTo was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: post.Label}
+		}
 		return e.ReplyTo, nil
 	}
 	return nil, &NotLoadedError{edge: "replyTo"}
+}
+
+// RepliesOrErr returns the Replies value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) RepliesOrErr() ([]*Post, error) {
+	if e.loadedTypes[6] {
+		return e.Replies, nil
+	}
+	return nil, &NotLoadedError{edge: "replies"}
 }
 
 // ReactsOrErr returns the Reacts value or an error if the edge
@@ -166,11 +175,9 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID, post.FieldRootPostId, post.FieldReplyPostId, post.FieldCategoryID:
+		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID:
 			values[i] = new(uuid.UUID)
-		case post.ForeignKeys[0]: // react_post
-			values[i] = new(sql.NullString)
-		case post.ForeignKeys[1]: // user_posts
+		case post.ForeignKeys[0]: // user_posts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
@@ -193,6 +200,12 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			} else if value != nil {
 				po.ID = *value
 			}
+		case post.FieldFirst:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field first", values[i])
+			} else if value.Valid {
+				po.First = value.Bool
+			}
 		case post.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
@@ -205,6 +218,24 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				po.Slug = value.String
 			}
+		case post.FieldPinned:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field pinned", values[i])
+			} else if value.Valid {
+				po.Pinned = value.Bool
+			}
+		case post.FieldRootPostID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field root_post_id", values[i])
+			} else if value != nil {
+				po.RootPostID = *value
+			}
+		case post.FieldReplyToPostID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field reply_to_post_id", values[i])
+			} else if value != nil {
+				po.ReplyToPostID = *value
+			}
 		case post.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
@@ -216,18 +247,6 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field short", values[i])
 			} else if value.Valid {
 				po.Short = value.String
-			}
-		case post.FieldFirst:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field first", values[i])
-			} else if value.Valid {
-				po.First = value.Bool
-			}
-		case post.FieldPinned:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field pinned", values[i])
-			} else if value.Valid {
-				po.Pinned = value.Bool
 			}
 		case post.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -247,18 +266,6 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				po.DeletedAt = value.Time
 			}
-		case post.FieldRootPostId:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field rootPostId", values[i])
-			} else if value != nil {
-				po.RootPostId = *value
-			}
-		case post.FieldReplyPostId:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field replyPostId", values[i])
-			} else if value != nil {
-				po.ReplyPostId = *value
-			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
@@ -266,13 +273,6 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 				po.CategoryID = *value
 			}
 		case post.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field react_post", values[i])
-			} else if value.Valid {
-				po.react_post = new(string)
-				*po.react_post = value.String
-			}
-		case post.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field user_posts", values[i])
 			} else if value.Valid {
@@ -309,14 +309,14 @@ func (po *Post) QueryPosts() *PostQuery {
 	return (&PostClient{config: po.config}).QueryPosts(po)
 }
 
-// QueryReplies queries the "replies" edge of the Post entity.
-func (po *Post) QueryReplies() *PostQuery {
-	return (&PostClient{config: po.config}).QueryReplies(po)
-}
-
 // QueryReplyTo queries the "replyTo" edge of the Post entity.
 func (po *Post) QueryReplyTo() *PostQuery {
 	return (&PostClient{config: po.config}).QueryReplyTo(po)
+}
+
+// QueryReplies queries the "replies" edge of the Post entity.
+func (po *Post) QueryReplies() *PostQuery {
+	return (&PostClient{config: po.config}).QueryReplies(po)
 }
 
 // QueryReacts queries the "reacts" edge of the Post entity.
@@ -347,28 +347,28 @@ func (po *Post) String() string {
 	var builder strings.Builder
 	builder.WriteString("Post(")
 	builder.WriteString(fmt.Sprintf("id=%v", po.ID))
+	builder.WriteString(", first=")
+	builder.WriteString(fmt.Sprintf("%v", po.First))
 	builder.WriteString(", title=")
 	builder.WriteString(po.Title)
 	builder.WriteString(", slug=")
 	builder.WriteString(po.Slug)
+	builder.WriteString(", pinned=")
+	builder.WriteString(fmt.Sprintf("%v", po.Pinned))
+	builder.WriteString(", root_post_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.RootPostID))
+	builder.WriteString(", reply_to_post_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.ReplyToPostID))
 	builder.WriteString(", body=")
 	builder.WriteString(po.Body)
 	builder.WriteString(", short=")
 	builder.WriteString(po.Short)
-	builder.WriteString(", first=")
-	builder.WriteString(fmt.Sprintf("%v", po.First))
-	builder.WriteString(", pinned=")
-	builder.WriteString(fmt.Sprintf("%v", po.Pinned))
 	builder.WriteString(", createdAt=")
 	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updatedAt=")
 	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", deletedAt=")
 	builder.WriteString(po.DeletedAt.Format(time.ANSIC))
-	builder.WriteString(", rootPostId=")
-	builder.WriteString(fmt.Sprintf("%v", po.RootPostId))
-	builder.WriteString(", replyPostId=")
-	builder.WriteString(fmt.Sprintf("%v", po.ReplyPostId))
 	builder.WriteString(", category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
 	builder.WriteByte(')')

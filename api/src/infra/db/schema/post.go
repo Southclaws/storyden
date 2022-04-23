@@ -22,17 +22,26 @@ func (Post) Fields() []ent.Field {
 			Immutable().
 			Default(uuid.New),
 
+		field.Bool("first"),
+
+		// parent posts
 		field.String("title").Optional(),
 		field.String("slug").Optional(),
+		field.Bool("pinned").Default(false),
+
+		// child posts
+		field.UUID("root_post_id", uuid.UUID{}).Optional(),
+		field.UUID("reply_to_post_id", uuid.UUID{}).Optional(),
+
+		// All posts
 		field.String("body"),
 		field.String("short"),
-		field.Bool("first"),
-		field.Bool("pinned").Default(false),
+
 		field.Time("createdAt").Default(time.Now),
 		field.Time("updatedAt").Default(time.Now),
 		field.Time("deletedAt").Optional(),
-		field.UUID("rootPostId", uuid.UUID{}).Optional(),
-		field.UUID("replyPostId", uuid.UUID{}).Optional(),
+
+		// Edges
 		field.UUID("category_id", uuid.UUID{}).Optional(),
 	}
 }
@@ -57,10 +66,14 @@ func (Post) Edges() []ent.Edge {
 
 		edge.To("posts", Post.Type).
 			From("root").
+			Unique().
+			Field("root_post_id").
 			Comment("A many-to-many recursive self reference. The root post is the first post in the thread."),
 
-		edge.To("replyTo", Post.Type).
-			From("replies").
+		edge.To("replies", Post.Type).
+			From("replyTo").
+			Unique().
+			Field("reply_to_post_id").
 			Comment("A many-to-many recursive self reference. The replyTo post is an optional post that this post is in reply to."),
 
 		edge.To("reacts", React.Type),
