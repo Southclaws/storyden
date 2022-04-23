@@ -3,9 +3,11 @@ package thread
 import (
 	"context"
 
+	"github.com/google/uuid"
+
+	"github.com/Southclaws/storyden/api/src/resources/category"
 	"github.com/Southclaws/storyden/api/src/resources/post"
 	"github.com/Southclaws/storyden/api/src/resources/user"
-	"github.com/google/uuid"
 )
 
 type local struct {
@@ -21,7 +23,7 @@ func (l *local) CreateThread(
 	title string,
 	body string,
 	authorID user.UserID,
-	categoryName string,
+	categoryID category.CategoryID,
 	tags []string,
 ) (*Thread, error) {
 	id := post.PostID(uuid.New())

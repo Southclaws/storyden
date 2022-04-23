@@ -35,7 +35,7 @@ func TestCreatePost(t *testing.T) {
 		category.Seed(category.New(d))
 		user.Seed(user.New(d))
 
-		p, err := repo.CreateThread(ctx, "title", "body", user.SeedUser_02_User.ID, "", []string{})
+		p, err := repo.CreateThread(ctx, "title", "body", user.SeedUser_02_User.ID, category.SeedCategory_01_General.ID, []string{})
 		r.NoError(err)
 		r.NotNil(p)
 	})
