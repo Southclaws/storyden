@@ -16,23 +16,21 @@ import (
 type Subscription struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
-	// RefersType holds the value of the "refersType" field.
-	RefersType subscription.RefersType `json:"refersType,omitempty"`
-	// RefersTo holds the value of the "refersTo" field.
-	RefersTo string `json:"refersTo,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
-	// DeletedAt holds the value of the "deletedAt" field.
-	DeletedAt time.Time `json:"deletedAt,omitempty"`
-	// UserId holds the value of the "userId" field.
-	UserId string `json:"userId,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// RefersType holds the value of the "refers_type" field.
+	RefersType string `json:"refers_type,omitempty"`
+	// RefersTo holds the value of the "refers_to" field.
+	RefersTo string `json:"refers_to,omitempty"`
+	// DeleteTime holds the value of the "delete_time" field.
+	DeleteTime time.Time `json:"delete_time,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
+	// UpdateTime holds the value of the "update_time" field.
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubscriptionQuery when eager-loading is set.
 	Edges                     SubscriptionEdges `json:"edges"`
-	notification_subscription *string
+	notification_subscription *uuid.UUID
 	user_subscriptions        *uuid.UUID
 }
 
@@ -70,12 +68,14 @@ func (*Subscription) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subscription.FieldID, subscription.FieldRefersType, subscription.FieldRefersTo, subscription.FieldUserId:
+		case subscription.FieldRefersType, subscription.FieldRefersTo:
 			values[i] = new(sql.NullString)
-		case subscription.FieldCreatedAt, subscription.FieldUpdatedAt, subscription.FieldDeletedAt:
+		case subscription.FieldDeleteTime, subscription.FieldCreateTime, subscription.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
+		case subscription.FieldID:
+			values[i] = new(uuid.UUID)
 		case subscription.ForeignKeys[0]: // notification_subscription
-			values[i] = new(sql.NullString)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case subscription.ForeignKeys[1]: // user_subscriptions
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
@@ -94,53 +94,47 @@ func (s *Subscription) assignValues(columns []string, values []interface{}) erro
 	for i := range columns {
 		switch columns[i] {
 		case subscription.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				s.ID = value.String
+			} else if value != nil {
+				s.ID = *value
 			}
 		case subscription.FieldRefersType:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field refersType", values[i])
+				return fmt.Errorf("unexpected type %T for field refers_type", values[i])
 			} else if value.Valid {
-				s.RefersType = subscription.RefersType(value.String)
+				s.RefersType = value.String
 			}
 		case subscription.FieldRefersTo:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field refersTo", values[i])
+				return fmt.Errorf("unexpected type %T for field refers_to", values[i])
 			} else if value.Valid {
 				s.RefersTo = value.String
 			}
-		case subscription.FieldCreatedAt:
+		case subscription.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				s.CreatedAt = value.Time
+				s.DeleteTime = value.Time
 			}
-		case subscription.FieldUpdatedAt:
+		case subscription.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				s.UpdatedAt = value.Time
+				s.CreateTime = value.Time
 			}
-		case subscription.FieldDeletedAt:
+		case subscription.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				s.DeletedAt = value.Time
-			}
-		case subscription.FieldUserId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
-			} else if value.Valid {
-				s.UserId = value.String
+				s.UpdateTime = value.Time
 			}
 		case subscription.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field notification_subscription", values[i])
 			} else if value.Valid {
-				s.notification_subscription = new(string)
-				*s.notification_subscription = value.String
+				s.notification_subscription = new(uuid.UUID)
+				*s.notification_subscription = *value.S.(*uuid.UUID)
 			}
 		case subscription.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -187,18 +181,16 @@ func (s *Subscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("Subscription(")
 	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
-	builder.WriteString(", refersType=")
-	builder.WriteString(fmt.Sprintf("%v", s.RefersType))
-	builder.WriteString(", refersTo=")
+	builder.WriteString(", refers_type=")
+	builder.WriteString(s.RefersType)
+	builder.WriteString(", refers_to=")
 	builder.WriteString(s.RefersTo)
-	builder.WriteString(", createdAt=")
-	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", updatedAt=")
-	builder.WriteString(s.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", deletedAt=")
-	builder.WriteString(s.DeletedAt.Format(time.ANSIC))
-	builder.WriteString(", userId=")
-	builder.WriteString(s.UserId)
+	builder.WriteString(", delete_time=")
+	builder.WriteString(s.DeleteTime.Format(time.ANSIC))
+	builder.WriteString(", create_time=")
+	builder.WriteString(s.CreateTime.Format(time.ANSIC))
+	builder.WriteString(", update_time=")
+	builder.WriteString(s.UpdateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
+	"github.com/google/uuid"
 )
 
 // NotificationUpdate is the builder for updating Notification entities.
@@ -53,27 +54,29 @@ func (nu *NotificationUpdate) SetRead(b bool) *NotificationUpdate {
 	return nu
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (nu *NotificationUpdate) SetCreatedAt(t time.Time) *NotificationUpdate {
-	nu.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (nu *NotificationUpdate) SetCreateTime(t time.Time) *NotificationUpdate {
+	nu.mutation.SetCreateTime(t)
 	return nu
 }
 
-// SetSubscriptionId sets the "subscriptionId" field.
-func (nu *NotificationUpdate) SetSubscriptionId(s string) *NotificationUpdate {
-	nu.mutation.SetSubscriptionId(s)
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableCreateTime(t *time.Time) *NotificationUpdate {
+	if t != nil {
+		nu.SetCreateTime(*t)
+	}
 	return nu
 }
 
 // AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by IDs.
-func (nu *NotificationUpdate) AddSubscriptionIDs(ids ...string) *NotificationUpdate {
+func (nu *NotificationUpdate) AddSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdate {
 	nu.mutation.AddSubscriptionIDs(ids...)
 	return nu
 }
 
 // AddSubscription adds the "subscription" edges to the Subscription entity.
 func (nu *NotificationUpdate) AddSubscription(s ...*Subscription) *NotificationUpdate {
-	ids := make([]string, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -92,14 +95,14 @@ func (nu *NotificationUpdate) ClearSubscription() *NotificationUpdate {
 }
 
 // RemoveSubscriptionIDs removes the "subscription" edge to Subscription entities by IDs.
-func (nu *NotificationUpdate) RemoveSubscriptionIDs(ids ...string) *NotificationUpdate {
+func (nu *NotificationUpdate) RemoveSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdate {
 	nu.mutation.RemoveSubscriptionIDs(ids...)
 	return nu
 }
 
 // RemoveSubscription removes "subscription" edges to Subscription entities.
 func (nu *NotificationUpdate) RemoveSubscription(s ...*Subscription) *NotificationUpdate {
-	ids := make([]string, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -166,7 +169,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: notification.FieldID,
 			},
 		},
@@ -206,18 +209,11 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: notification.FieldRead,
 		})
 	}
-	if value, ok := nu.mutation.CreatedAt(); ok {
+	if value, ok := nu.mutation.CreateTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: notification.FieldCreatedAt,
-		})
-	}
-	if value, ok := nu.mutation.SubscriptionId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldSubscriptionId,
+			Column: notification.FieldCreateTime,
 		})
 	}
 	if nu.mutation.SubscriptionCleared() {
@@ -229,7 +225,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},
@@ -245,7 +241,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},
@@ -264,7 +260,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},
@@ -317,27 +313,29 @@ func (nuo *NotificationUpdateOne) SetRead(b bool) *NotificationUpdateOne {
 	return nuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (nuo *NotificationUpdateOne) SetCreatedAt(t time.Time) *NotificationUpdateOne {
-	nuo.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (nuo *NotificationUpdateOne) SetCreateTime(t time.Time) *NotificationUpdateOne {
+	nuo.mutation.SetCreateTime(t)
 	return nuo
 }
 
-// SetSubscriptionId sets the "subscriptionId" field.
-func (nuo *NotificationUpdateOne) SetSubscriptionId(s string) *NotificationUpdateOne {
-	nuo.mutation.SetSubscriptionId(s)
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableCreateTime(t *time.Time) *NotificationUpdateOne {
+	if t != nil {
+		nuo.SetCreateTime(*t)
+	}
 	return nuo
 }
 
 // AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by IDs.
-func (nuo *NotificationUpdateOne) AddSubscriptionIDs(ids ...string) *NotificationUpdateOne {
+func (nuo *NotificationUpdateOne) AddSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdateOne {
 	nuo.mutation.AddSubscriptionIDs(ids...)
 	return nuo
 }
 
 // AddSubscription adds the "subscription" edges to the Subscription entity.
 func (nuo *NotificationUpdateOne) AddSubscription(s ...*Subscription) *NotificationUpdateOne {
-	ids := make([]string, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -356,14 +354,14 @@ func (nuo *NotificationUpdateOne) ClearSubscription() *NotificationUpdateOne {
 }
 
 // RemoveSubscriptionIDs removes the "subscription" edge to Subscription entities by IDs.
-func (nuo *NotificationUpdateOne) RemoveSubscriptionIDs(ids ...string) *NotificationUpdateOne {
+func (nuo *NotificationUpdateOne) RemoveSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdateOne {
 	nuo.mutation.RemoveSubscriptionIDs(ids...)
 	return nuo
 }
 
 // RemoveSubscription removes "subscription" edges to Subscription entities.
 func (nuo *NotificationUpdateOne) RemoveSubscription(s ...*Subscription) *NotificationUpdateOne {
-	ids := make([]string, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -437,7 +435,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: notification.FieldID,
 			},
 		},
@@ -494,18 +492,11 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Column: notification.FieldRead,
 		})
 	}
-	if value, ok := nuo.mutation.CreatedAt(); ok {
+	if value, ok := nuo.mutation.CreateTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: notification.FieldCreatedAt,
-		})
-	}
-	if value, ok := nuo.mutation.SubscriptionId(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldSubscriptionId,
+			Column: notification.FieldCreateTime,
 		})
 	}
 	if nuo.mutation.SubscriptionCleared() {
@@ -517,7 +508,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},
@@ -533,7 +524,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},
@@ -552,7 +543,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},

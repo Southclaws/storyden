@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/Southclaws/storyden/api/src/infra/db/schema"
@@ -40,6 +42,16 @@ func init() {
 	categoryDescID := categoryFields[0].Descriptor()
 	// category.DefaultID holds the default value on creation for the id field.
 	category.DefaultID = categoryDescID.Default.(func() uuid.UUID)
+	notificationFields := schema.Notification{}.Fields()
+	_ = notificationFields
+	// notificationDescCreateTime is the schema descriptor for create_time field.
+	notificationDescCreateTime := notificationFields[5].Descriptor()
+	// notification.DefaultCreateTime holds the default value on creation for the create_time field.
+	notification.DefaultCreateTime = notificationDescCreateTime.Default.(func() time.Time)
+	// notificationDescID is the schema descriptor for id field.
+	notificationDescID := notificationFields[0].Descriptor()
+	// notification.DefaultID holds the default value on creation for the id field.
+	notification.DefaultID = notificationDescID.Default.(func() uuid.UUID)
 	postFields := schema.Post{}.Fields()
 	_ = postFields
 	// postDescPinned is the schema descriptor for pinned field.
@@ -68,6 +80,30 @@ func init() {
 	reactDescID := reactFields[0].Descriptor()
 	// react.DefaultID holds the default value on creation for the id field.
 	react.DefaultID = reactDescID.Default.(func() uuid.UUID)
+	subscriptionFields := schema.Subscription{}.Fields()
+	_ = subscriptionFields
+	// subscriptionDescRefersType is the schema descriptor for refers_type field.
+	subscriptionDescRefersType := subscriptionFields[1].Descriptor()
+	// subscription.RefersTypeValidator is a validator for the "refers_type" field. It is called by the builders before save.
+	subscription.RefersTypeValidator = subscriptionDescRefersType.Validators[0].(func(string) error)
+	// subscriptionDescRefersTo is the schema descriptor for refers_to field.
+	subscriptionDescRefersTo := subscriptionFields[2].Descriptor()
+	// subscription.RefersToValidator is a validator for the "refers_to" field. It is called by the builders before save.
+	subscription.RefersToValidator = subscriptionDescRefersTo.Validators[0].(func(string) error)
+	// subscriptionDescCreateTime is the schema descriptor for create_time field.
+	subscriptionDescCreateTime := subscriptionFields[4].Descriptor()
+	// subscription.DefaultCreateTime holds the default value on creation for the create_time field.
+	subscription.DefaultCreateTime = subscriptionDescCreateTime.Default.(func() time.Time)
+	// subscriptionDescUpdateTime is the schema descriptor for update_time field.
+	subscriptionDescUpdateTime := subscriptionFields[5].Descriptor()
+	// subscription.DefaultUpdateTime holds the default value on creation for the update_time field.
+	subscription.DefaultUpdateTime = subscriptionDescUpdateTime.Default.(func() time.Time)
+	// subscription.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	subscription.UpdateDefaultUpdateTime = subscriptionDescUpdateTime.UpdateDefault.(func() time.Time)
+	// subscriptionDescID is the schema descriptor for id field.
+	subscriptionDescID := subscriptionFields[0].Descriptor()
+	// subscription.DefaultID holds the default value on creation for the id field.
+	subscription.DefaultID = subscriptionDescID.Default.(func() uuid.UUID)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
 	// tagDescID is the schema descriptor for id field.
@@ -87,11 +123,11 @@ func init() {
 	// userDescCreatedAt is the schema descriptor for createdAt field.
 	userDescCreatedAt := userFields[5].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	user.DefaultCreatedAt = userDescCreatedAt.Default.(time.Time)
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updatedAt field.
 	userDescUpdatedAt := userFields[6].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
-	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(time.Time)
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.

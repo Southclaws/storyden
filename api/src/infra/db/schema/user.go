@@ -26,8 +26,8 @@ func (User) Fields() []ent.Field {
 		field.String("bio").Optional(),
 		field.Bool("admin").Default(false),
 
-		field.Time("createdAt").Default(time.Now()),
-		field.Time("updatedAt").Default(time.Now()),
+		field.Time("createdAt").Default(time.Now),
+		field.Time("updatedAt").Default(time.Now),
 		field.Time("deletedAt").Optional(),
 	}
 }

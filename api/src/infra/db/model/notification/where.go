@@ -8,31 +8,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Notification {
+func ID(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Notification {
+func IDEQ(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Notification {
+func IDNEQ(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Notification {
+func IDIn(ids ...uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...string) predicate.Notification {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Notification {
+func IDNotIn(ids ...uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,28 +67,28 @@ func IDNotIn(ids ...string) predicate.Notification {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Notification {
+func IDGT(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Notification {
+func IDGTE(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Notification {
+func IDLT(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Notification {
+func IDLTE(id uuid.UUID) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -121,17 +122,10 @@ func Read(v bool) predicate.Notification {
 	})
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Notification {
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
-}
-
-// SubscriptionId applies equality check predicate on the "subscriptionId" field. It's identical to SubscriptionIdEQ.
-func SubscriptionId(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSubscriptionId), v))
+		s.Where(sql.EQ(s.C(FieldCreateTime), v))
 	})
 }
 
@@ -482,22 +476,22 @@ func ReadNEQ(v bool) predicate.Notification {
 	})
 }
 
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
-func CreatedAtEQ(v time.Time) predicate.Notification {
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
+		s.Where(sql.EQ(s.C(FieldCreateTime), v))
 	})
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
-func CreatedAtNEQ(v time.Time) predicate.Notification {
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
+		s.Where(sql.NEQ(s.C(FieldCreateTime), v))
 	})
 }
 
-// CreatedAtIn applies the In predicate on the "createdAt" field.
-func CreatedAtIn(vs ...time.Time) predicate.Notification {
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Notification {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -509,12 +503,12 @@ func CreatedAtIn(vs ...time.Time) predicate.Notification {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
+		s.Where(sql.In(s.C(FieldCreateTime), v...))
 	})
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Notification {
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Notification {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -526,146 +520,35 @@ func CreatedAtNotIn(vs ...time.Time) predicate.Notification {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
+		s.Where(sql.NotIn(s.C(FieldCreateTime), v...))
 	})
 }
 
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
-func CreatedAtGT(v time.Time) predicate.Notification {
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
+		s.Where(sql.GT(s.C(FieldCreateTime), v))
 	})
 }
 
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
-func CreatedAtGTE(v time.Time) predicate.Notification {
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
+		s.Where(sql.GTE(s.C(FieldCreateTime), v))
 	})
 }
 
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
-func CreatedAtLT(v time.Time) predicate.Notification {
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
+		s.Where(sql.LT(s.C(FieldCreateTime), v))
 	})
 }
 
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
-func CreatedAtLTE(v time.Time) predicate.Notification {
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Notification {
 	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
-}
-
-// SubscriptionIdEQ applies the EQ predicate on the "subscriptionId" field.
-func SubscriptionIdEQ(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdNEQ applies the NEQ predicate on the "subscriptionId" field.
-func SubscriptionIdNEQ(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdIn applies the In predicate on the "subscriptionId" field.
-func SubscriptionIdIn(vs ...string) predicate.Notification {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Notification(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldSubscriptionId), v...))
-	})
-}
-
-// SubscriptionIdNotIn applies the NotIn predicate on the "subscriptionId" field.
-func SubscriptionIdNotIn(vs ...string) predicate.Notification {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Notification(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldSubscriptionId), v...))
-	})
-}
-
-// SubscriptionIdGT applies the GT predicate on the "subscriptionId" field.
-func SubscriptionIdGT(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdGTE applies the GTE predicate on the "subscriptionId" field.
-func SubscriptionIdGTE(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdLT applies the LT predicate on the "subscriptionId" field.
-func SubscriptionIdLT(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdLTE applies the LTE predicate on the "subscriptionId" field.
-func SubscriptionIdLTE(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdContains applies the Contains predicate on the "subscriptionId" field.
-func SubscriptionIdContains(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdHasPrefix applies the HasPrefix predicate on the "subscriptionId" field.
-func SubscriptionIdHasPrefix(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdHasSuffix applies the HasSuffix predicate on the "subscriptionId" field.
-func SubscriptionIdHasSuffix(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdEqualFold applies the EqualFold predicate on the "subscriptionId" field.
-func SubscriptionIdEqualFold(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSubscriptionId), v))
-	})
-}
-
-// SubscriptionIdContainsFold applies the ContainsFold predicate on the "subscriptionId" field.
-func SubscriptionIdContainsFold(v string) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSubscriptionId), v))
+		s.Where(sql.LTE(s.C(FieldCreateTime), v))
 	})
 }
 

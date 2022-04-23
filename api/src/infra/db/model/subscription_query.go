@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
+	"github.com/google/uuid"
 )
 
 // SubscriptionQuery is the builder for querying Subscription entities.
@@ -136,8 +137,8 @@ func (sq *SubscriptionQuery) FirstX(ctx context.Context) *Subscription {
 
 // FirstID returns the first Subscription ID from the query.
 // Returns a *NotFoundError when no Subscription ID was found.
-func (sq *SubscriptionQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SubscriptionQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -149,7 +150,7 @@ func (sq *SubscriptionQuery) FirstID(ctx context.Context) (id string, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SubscriptionQuery) FirstIDX(ctx context.Context) string {
+func (sq *SubscriptionQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -187,8 +188,8 @@ func (sq *SubscriptionQuery) OnlyX(ctx context.Context) *Subscription {
 // OnlyID is like Only, but returns the only Subscription ID in the query.
 // Returns a *NotSingularError when more than one Subscription ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SubscriptionQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SubscriptionQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -204,7 +205,7 @@ func (sq *SubscriptionQuery) OnlyID(ctx context.Context) (id string, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SubscriptionQuery) OnlyIDX(ctx context.Context) string {
+func (sq *SubscriptionQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -230,8 +231,8 @@ func (sq *SubscriptionQuery) AllX(ctx context.Context) []*Subscription {
 }
 
 // IDs executes the query and returns a list of Subscription IDs.
-func (sq *SubscriptionQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (sq *SubscriptionQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := sq.Select(subscription.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -239,7 +240,7 @@ func (sq *SubscriptionQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SubscriptionQuery) IDsX(ctx context.Context) []string {
+func (sq *SubscriptionQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -330,7 +331,7 @@ func (sq *SubscriptionQuery) WithNotifications(opts ...func(*NotificationQuery))
 // Example:
 //
 //	var v []struct {
-//		RefersType subscription.RefersType `json:"refersType,omitempty"`
+//		RefersType string `json:"refers_type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -357,7 +358,7 @@ func (sq *SubscriptionQuery) GroupBy(field string, fields ...string) *Subscripti
 // Example:
 //
 //	var v []struct {
-//		RefersType subscription.RefersType `json:"refersType,omitempty"`
+//		RefersType string `json:"refers_type,omitempty"`
 //	}
 //
 //	client.Subscription.Query().
@@ -423,7 +424,7 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 
 	if query := sq.withUser; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*Subscription)
+		nodeids := make(map[uuid.UUID]*Subscription)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -452,7 +453,7 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 
 	if query := sq.withNotifications; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*Subscription)
+		nodeids := make(map[uuid.UUID]*Subscription)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -508,7 +509,7 @@ func (sq *SubscriptionQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   subscription.Table,
 			Columns: subscription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: subscription.FieldID,
 			},
 		},

@@ -31,53 +31,55 @@ func (su *SubscriptionUpdate) Where(ps ...predicate.Subscription) *SubscriptionU
 	return su
 }
 
-// SetRefersType sets the "refersType" field.
-func (su *SubscriptionUpdate) SetRefersType(st subscription.RefersType) *SubscriptionUpdate {
-	su.mutation.SetRefersType(st)
+// SetRefersType sets the "refers_type" field.
+func (su *SubscriptionUpdate) SetRefersType(s string) *SubscriptionUpdate {
+	su.mutation.SetRefersType(s)
 	return su
 }
 
-// SetRefersTo sets the "refersTo" field.
+// SetRefersTo sets the "refers_to" field.
 func (su *SubscriptionUpdate) SetRefersTo(s string) *SubscriptionUpdate {
 	su.mutation.SetRefersTo(s)
 	return su
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (su *SubscriptionUpdate) SetCreatedAt(t time.Time) *SubscriptionUpdate {
-	su.mutation.SetCreatedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (su *SubscriptionUpdate) SetDeleteTime(t time.Time) *SubscriptionUpdate {
+	su.mutation.SetDeleteTime(t)
 	return su
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
-func (su *SubscriptionUpdate) SetUpdatedAt(t time.Time) *SubscriptionUpdate {
-	su.mutation.SetUpdatedAt(t)
-	return su
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (su *SubscriptionUpdate) SetDeletedAt(t time.Time) *SubscriptionUpdate {
-	su.mutation.SetDeletedAt(t)
-	return su
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableDeletedAt(t *time.Time) *SubscriptionUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableDeleteTime(t *time.Time) *SubscriptionUpdate {
 	if t != nil {
-		su.SetDeletedAt(*t)
+		su.SetDeleteTime(*t)
 	}
 	return su
 }
 
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (su *SubscriptionUpdate) ClearDeletedAt() *SubscriptionUpdate {
-	su.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (su *SubscriptionUpdate) ClearDeleteTime() *SubscriptionUpdate {
+	su.mutation.ClearDeleteTime()
 	return su
 }
 
-// SetUserId sets the "userId" field.
-func (su *SubscriptionUpdate) SetUserId(s string) *SubscriptionUpdate {
-	su.mutation.SetUserId(s)
+// SetCreateTime sets the "create_time" field.
+func (su *SubscriptionUpdate) SetCreateTime(t time.Time) *SubscriptionUpdate {
+	su.mutation.SetCreateTime(t)
+	return su
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableCreateTime(t *time.Time) *SubscriptionUpdate {
+	if t != nil {
+		su.SetCreateTime(*t)
+	}
+	return su
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (su *SubscriptionUpdate) SetUpdateTime(t time.Time) *SubscriptionUpdate {
+	su.mutation.SetUpdateTime(t)
 	return su
 }
 
@@ -97,14 +99,14 @@ func (su *SubscriptionUpdate) AddUser(u ...*User) *SubscriptionUpdate {
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (su *SubscriptionUpdate) AddNotificationIDs(ids ...string) *SubscriptionUpdate {
+func (su *SubscriptionUpdate) AddNotificationIDs(ids ...uuid.UUID) *SubscriptionUpdate {
 	su.mutation.AddNotificationIDs(ids...)
 	return su
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
 func (su *SubscriptionUpdate) AddNotifications(n ...*Notification) *SubscriptionUpdate {
-	ids := make([]string, len(n))
+	ids := make([]uuid.UUID, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
@@ -144,14 +146,14 @@ func (su *SubscriptionUpdate) ClearNotifications() *SubscriptionUpdate {
 }
 
 // RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
-func (su *SubscriptionUpdate) RemoveNotificationIDs(ids ...string) *SubscriptionUpdate {
+func (su *SubscriptionUpdate) RemoveNotificationIDs(ids ...uuid.UUID) *SubscriptionUpdate {
 	su.mutation.RemoveNotificationIDs(ids...)
 	return su
 }
 
 // RemoveNotifications removes "notifications" edges to Notification entities.
 func (su *SubscriptionUpdate) RemoveNotifications(n ...*Notification) *SubscriptionUpdate {
-	ids := make([]string, len(n))
+	ids := make([]uuid.UUID, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
@@ -164,6 +166,7 @@ func (su *SubscriptionUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	su.defaults()
 	if len(su.hooks) == 0 {
 		if err = su.check(); err != nil {
 			return 0, err
@@ -218,11 +221,24 @@ func (su *SubscriptionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (su *SubscriptionUpdate) defaults() {
+	if _, ok := su.mutation.UpdateTime(); !ok {
+		v := subscription.UpdateDefaultUpdateTime()
+		su.mutation.SetUpdateTime(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (su *SubscriptionUpdate) check() error {
 	if v, ok := su.mutation.RefersType(); ok {
 		if err := subscription.RefersTypeValidator(v); err != nil {
-			return &ValidationError{Name: "refersType", err: fmt.Errorf(`model: validator failed for field "Subscription.refersType": %w`, err)}
+			return &ValidationError{Name: "refers_type", err: fmt.Errorf(`model: validator failed for field "Subscription.refers_type": %w`, err)}
+		}
+	}
+	if v, ok := su.mutation.RefersTo(); ok {
+		if err := subscription.RefersToValidator(v); err != nil {
+			return &ValidationError{Name: "refers_to", err: fmt.Errorf(`model: validator failed for field "Subscription.refers_to": %w`, err)}
 		}
 	}
 	return nil
@@ -234,7 +250,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   subscription.Table,
 			Columns: subscription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: subscription.FieldID,
 			},
 		},
@@ -248,7 +264,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.RefersType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: subscription.FieldRefersType,
 		})
@@ -260,38 +276,31 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: subscription.FieldRefersTo,
 		})
 	}
-	if value, ok := su.mutation.CreatedAt(); ok {
+	if value, ok := su.mutation.DeleteTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: subscription.FieldCreatedAt,
+			Column: subscription.FieldDeleteTime,
 		})
 	}
-	if value, ok := su.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldUpdatedAt,
-		})
-	}
-	if value, ok := su.mutation.DeletedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldDeletedAt,
-		})
-	}
-	if su.mutation.DeletedAtCleared() {
+	if su.mutation.DeleteTimeCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
-			Column: subscription.FieldDeletedAt,
+			Column: subscription.FieldDeleteTime,
 		})
 	}
-	if value, ok := su.mutation.UserId(); ok {
+	if value, ok := su.mutation.CreateTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeTime,
 			Value:  value,
-			Column: subscription.FieldUserId,
+			Column: subscription.FieldCreateTime,
+		})
+	}
+	if value, ok := su.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: subscription.FieldUpdateTime,
 		})
 	}
 	if su.mutation.UserCleared() {
@@ -357,7 +366,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},
@@ -373,7 +382,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},
@@ -392,7 +401,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},
@@ -421,53 +430,55 @@ type SubscriptionUpdateOne struct {
 	mutation *SubscriptionMutation
 }
 
-// SetRefersType sets the "refersType" field.
-func (suo *SubscriptionUpdateOne) SetRefersType(st subscription.RefersType) *SubscriptionUpdateOne {
-	suo.mutation.SetRefersType(st)
+// SetRefersType sets the "refers_type" field.
+func (suo *SubscriptionUpdateOne) SetRefersType(s string) *SubscriptionUpdateOne {
+	suo.mutation.SetRefersType(s)
 	return suo
 }
 
-// SetRefersTo sets the "refersTo" field.
+// SetRefersTo sets the "refers_to" field.
 func (suo *SubscriptionUpdateOne) SetRefersTo(s string) *SubscriptionUpdateOne {
 	suo.mutation.SetRefersTo(s)
 	return suo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (suo *SubscriptionUpdateOne) SetCreatedAt(t time.Time) *SubscriptionUpdateOne {
-	suo.mutation.SetCreatedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (suo *SubscriptionUpdateOne) SetDeleteTime(t time.Time) *SubscriptionUpdateOne {
+	suo.mutation.SetDeleteTime(t)
 	return suo
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
-func (suo *SubscriptionUpdateOne) SetUpdatedAt(t time.Time) *SubscriptionUpdateOne {
-	suo.mutation.SetUpdatedAt(t)
-	return suo
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (suo *SubscriptionUpdateOne) SetDeletedAt(t time.Time) *SubscriptionUpdateOne {
-	suo.mutation.SetDeletedAt(t)
-	return suo
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableDeletedAt(t *time.Time) *SubscriptionUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableDeleteTime(t *time.Time) *SubscriptionUpdateOne {
 	if t != nil {
-		suo.SetDeletedAt(*t)
+		suo.SetDeleteTime(*t)
 	}
 	return suo
 }
 
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (suo *SubscriptionUpdateOne) ClearDeletedAt() *SubscriptionUpdateOne {
-	suo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (suo *SubscriptionUpdateOne) ClearDeleteTime() *SubscriptionUpdateOne {
+	suo.mutation.ClearDeleteTime()
 	return suo
 }
 
-// SetUserId sets the "userId" field.
-func (suo *SubscriptionUpdateOne) SetUserId(s string) *SubscriptionUpdateOne {
-	suo.mutation.SetUserId(s)
+// SetCreateTime sets the "create_time" field.
+func (suo *SubscriptionUpdateOne) SetCreateTime(t time.Time) *SubscriptionUpdateOne {
+	suo.mutation.SetCreateTime(t)
+	return suo
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableCreateTime(t *time.Time) *SubscriptionUpdateOne {
+	if t != nil {
+		suo.SetCreateTime(*t)
+	}
+	return suo
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (suo *SubscriptionUpdateOne) SetUpdateTime(t time.Time) *SubscriptionUpdateOne {
+	suo.mutation.SetUpdateTime(t)
 	return suo
 }
 
@@ -487,14 +498,14 @@ func (suo *SubscriptionUpdateOne) AddUser(u ...*User) *SubscriptionUpdateOne {
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (suo *SubscriptionUpdateOne) AddNotificationIDs(ids ...string) *SubscriptionUpdateOne {
+func (suo *SubscriptionUpdateOne) AddNotificationIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
 	suo.mutation.AddNotificationIDs(ids...)
 	return suo
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
 func (suo *SubscriptionUpdateOne) AddNotifications(n ...*Notification) *SubscriptionUpdateOne {
-	ids := make([]string, len(n))
+	ids := make([]uuid.UUID, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
@@ -534,14 +545,14 @@ func (suo *SubscriptionUpdateOne) ClearNotifications() *SubscriptionUpdateOne {
 }
 
 // RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
-func (suo *SubscriptionUpdateOne) RemoveNotificationIDs(ids ...string) *SubscriptionUpdateOne {
+func (suo *SubscriptionUpdateOne) RemoveNotificationIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
 	suo.mutation.RemoveNotificationIDs(ids...)
 	return suo
 }
 
 // RemoveNotifications removes "notifications" edges to Notification entities.
 func (suo *SubscriptionUpdateOne) RemoveNotifications(n ...*Notification) *SubscriptionUpdateOne {
-	ids := make([]string, len(n))
+	ids := make([]uuid.UUID, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
@@ -561,6 +572,7 @@ func (suo *SubscriptionUpdateOne) Save(ctx context.Context) (*Subscription, erro
 		err  error
 		node *Subscription
 	)
+	suo.defaults()
 	if len(suo.hooks) == 0 {
 		if err = suo.check(); err != nil {
 			return nil, err
@@ -615,11 +627,24 @@ func (suo *SubscriptionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (suo *SubscriptionUpdateOne) defaults() {
+	if _, ok := suo.mutation.UpdateTime(); !ok {
+		v := subscription.UpdateDefaultUpdateTime()
+		suo.mutation.SetUpdateTime(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (suo *SubscriptionUpdateOne) check() error {
 	if v, ok := suo.mutation.RefersType(); ok {
 		if err := subscription.RefersTypeValidator(v); err != nil {
-			return &ValidationError{Name: "refersType", err: fmt.Errorf(`model: validator failed for field "Subscription.refersType": %w`, err)}
+			return &ValidationError{Name: "refers_type", err: fmt.Errorf(`model: validator failed for field "Subscription.refers_type": %w`, err)}
+		}
+	}
+	if v, ok := suo.mutation.RefersTo(); ok {
+		if err := subscription.RefersToValidator(v); err != nil {
+			return &ValidationError{Name: "refers_to", err: fmt.Errorf(`model: validator failed for field "Subscription.refers_to": %w`, err)}
 		}
 	}
 	return nil
@@ -631,7 +656,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			Table:   subscription.Table,
 			Columns: subscription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: subscription.FieldID,
 			},
 		},
@@ -662,7 +687,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 	}
 	if value, ok := suo.mutation.RefersType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
 			Column: subscription.FieldRefersType,
 		})
@@ -674,38 +699,31 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			Column: subscription.FieldRefersTo,
 		})
 	}
-	if value, ok := suo.mutation.CreatedAt(); ok {
+	if value, ok := suo.mutation.DeleteTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: subscription.FieldCreatedAt,
+			Column: subscription.FieldDeleteTime,
 		})
 	}
-	if value, ok := suo.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldUpdatedAt,
-		})
-	}
-	if value, ok := suo.mutation.DeletedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldDeletedAt,
-		})
-	}
-	if suo.mutation.DeletedAtCleared() {
+	if suo.mutation.DeleteTimeCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
-			Column: subscription.FieldDeletedAt,
+			Column: subscription.FieldDeleteTime,
 		})
 	}
-	if value, ok := suo.mutation.UserId(); ok {
+	if value, ok := suo.mutation.CreateTime(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeTime,
 			Value:  value,
-			Column: subscription.FieldUserId,
+			Column: subscription.FieldCreateTime,
+		})
+	}
+	if value, ok := suo.mutation.UpdateTime(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: subscription.FieldUpdateTime,
 		})
 	}
 	if suo.mutation.UserCleared() {
@@ -771,7 +789,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},
@@ -787,7 +805,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},
@@ -806,7 +824,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: notification.FieldID,
 				},
 			},

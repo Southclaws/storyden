@@ -154,14 +154,14 @@ func (uc *UserCreate) AddReacts(r ...*React) *UserCreate {
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (uc *UserCreate) AddSubscriptionIDs(ids ...string) *UserCreate {
+func (uc *UserCreate) AddSubscriptionIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddSubscriptionIDs(ids...)
 	return uc
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
 func (uc *UserCreate) AddSubscriptions(s ...*Subscription) *UserCreate {
-	ids := make([]string, len(s))
+	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -244,11 +244,11 @@ func (uc *UserCreate) defaults() {
 		uc.mutation.SetAdmin(v)
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
-		v := user.DefaultCreatedAt
+		v := user.DefaultCreatedAt()
 		uc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
-		v := user.DefaultUpdatedAt
+		v := user.DefaultUpdatedAt()
 		uc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := uc.mutation.ID(); !ok {
@@ -419,7 +419,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
+					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
 				},
 			},

@@ -4,6 +4,12 @@ import (
 	"time"
 
 	"github.com/Southclaws/storyden/api/src/infra/db"
+	"github.com/google/uuid"
+)
+
+type (
+	NotificationID uuid.UUID
+	SubscriptionID uuid.UUID
 )
 
 type NotificationType string
@@ -13,17 +19,17 @@ const (
 )
 
 type Notification struct {
-	ID           string        `json:"id"`
-	Title        string        `json:"title"`
-	Description  string        `json:"description"`
-	Link         string        `json:"link"`
-	Read         bool          `json:"read"`
-	CreatedAt    time.Time     `json:"createdAt"`
-	Subscription *Subscription `json:"subscription"`
+	ID           NotificationID `json:"id"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
+	Link         string         `json:"link"`
+	Read         bool           `json:"read"`
+	CreatedAt    time.Time      `json:"createdAt"`
+	Subscription *Subscription  `json:"subscription"`
 }
 
 type Subscription struct {
-	ID         string           `json:"id"`
+	ID         SubscriptionID   `json:"id"`
 	RefersType NotificationType `json:"refersType"`
 	RefersTo   string           `json:"refersTo"`
 	CreatedAt  time.Time        `json:"createdAt"`

@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
+	"github.com/google/uuid"
 )
 
 // NotificationQuery is the builder for querying Notification entities.
@@ -112,8 +113,8 @@ func (nq *NotificationQuery) FirstX(ctx context.Context) *Notification {
 
 // FirstID returns the first Notification ID from the query.
 // Returns a *NotFoundError when no Notification ID was found.
-func (nq *NotificationQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (nq *NotificationQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = nq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -125,7 +126,7 @@ func (nq *NotificationQuery) FirstID(ctx context.Context) (id string, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (nq *NotificationQuery) FirstIDX(ctx context.Context) string {
+func (nq *NotificationQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := nq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -163,8 +164,8 @@ func (nq *NotificationQuery) OnlyX(ctx context.Context) *Notification {
 // OnlyID is like Only, but returns the only Notification ID in the query.
 // Returns a *NotSingularError when more than one Notification ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (nq *NotificationQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (nq *NotificationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = nq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -180,7 +181,7 @@ func (nq *NotificationQuery) OnlyID(ctx context.Context) (id string, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (nq *NotificationQuery) OnlyIDX(ctx context.Context) string {
+func (nq *NotificationQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := nq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,8 +207,8 @@ func (nq *NotificationQuery) AllX(ctx context.Context) []*Notification {
 }
 
 // IDs executes the query and returns a list of Notification IDs.
-func (nq *NotificationQuery) IDs(ctx context.Context) ([]string, error) {
-	var ids []string
+func (nq *NotificationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := nq.Select(notification.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -215,7 +216,7 @@ func (nq *NotificationQuery) IDs(ctx context.Context) ([]string, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (nq *NotificationQuery) IDsX(ctx context.Context) []string {
+func (nq *NotificationQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := nq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -386,7 +387,7 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context) ([]*Notification, error
 
 	if query := nq.withSubscription; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[string]*Notification)
+		nodeids := make(map[uuid.UUID]*Notification)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -442,7 +443,7 @@ func (nq *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
+				Type:   field.TypeUUID,
 				Column: notification.FieldID,
 			},
 		},

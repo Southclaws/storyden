@@ -9,13 +9,14 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
+	"github.com/google/uuid"
 )
 
 // Notification is the model entity for the Notification schema.
 type Notification struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
@@ -24,14 +25,12 @@ type Notification struct {
 	Link string `json:"link,omitempty"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// SubscriptionId holds the value of the "subscriptionId" field.
-	SubscriptionId string `json:"subscriptionId,omitempty"`
+	// CreateTime holds the value of the "create_time" field.
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NotificationQuery when eager-loading is set.
 	Edges                      NotificationEdges `json:"edges"`
-	subscription_notifications *string
+	subscription_notifications *uuid.UUID
 }
 
 // NotificationEdges holds the relations/edges for other nodes in the graph.
@@ -59,12 +58,14 @@ func (*Notification) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case notification.FieldRead:
 			values[i] = new(sql.NullBool)
-		case notification.FieldID, notification.FieldTitle, notification.FieldDescription, notification.FieldLink, notification.FieldSubscriptionId:
+		case notification.FieldTitle, notification.FieldDescription, notification.FieldLink:
 			values[i] = new(sql.NullString)
-		case notification.FieldCreatedAt:
+		case notification.FieldCreateTime:
 			values[i] = new(sql.NullTime)
+		case notification.FieldID:
+			values[i] = new(uuid.UUID)
 		case notification.ForeignKeys[0]: // subscription_notifications
-			values[i] = new(sql.NullString)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Notification", columns[i])
 		}
@@ -81,10 +82,10 @@ func (n *Notification) assignValues(columns []string, values []interface{}) erro
 	for i := range columns {
 		switch columns[i] {
 		case notification.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				n.ID = value.String
+			} else if value != nil {
+				n.ID = *value
 			}
 		case notification.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -110,24 +111,18 @@ func (n *Notification) assignValues(columns []string, values []interface{}) erro
 			} else if value.Valid {
 				n.Read = value.Bool
 			}
-		case notification.FieldCreatedAt:
+		case notification.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				n.CreatedAt = value.Time
-			}
-		case notification.FieldSubscriptionId:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field subscriptionId", values[i])
-			} else if value.Valid {
-				n.SubscriptionId = value.String
+				n.CreateTime = value.Time
 			}
 		case notification.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field subscription_notifications", values[i])
 			} else if value.Valid {
-				n.subscription_notifications = new(string)
-				*n.subscription_notifications = value.String
+				n.subscription_notifications = new(uuid.UUID)
+				*n.subscription_notifications = *value.S.(*uuid.UUID)
 			}
 		}
 	}
@@ -170,10 +165,8 @@ func (n *Notification) String() string {
 	builder.WriteString(n.Link)
 	builder.WriteString(", read=")
 	builder.WriteString(fmt.Sprintf("%v", n.Read))
-	builder.WriteString(", createdAt=")
-	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", subscriptionId=")
-	builder.WriteString(n.SubscriptionId)
+	builder.WriteString(", create_time=")
+	builder.WriteString(n.CreateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

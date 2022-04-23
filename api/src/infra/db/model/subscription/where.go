@@ -8,31 +8,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Subscription {
+func ID(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Subscription {
+func IDEQ(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Subscription {
+func IDNEQ(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Subscription {
+func IDIn(ids ...uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...string) predicate.Subscription {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Subscription {
+func IDNotIn(ids ...uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,84 +67,84 @@ func IDNotIn(ids ...string) predicate.Subscription {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Subscription {
+func IDGT(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Subscription {
+func IDGTE(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Subscription {
+func IDLT(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Subscription {
+func IDLTE(id uuid.UUID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
 }
 
-// RefersTo applies equality check predicate on the "refersTo" field. It's identical to RefersToEQ.
+// RefersType applies equality check predicate on the "refers_type" field. It's identical to RefersTypeEQ.
+func RefersType(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTo applies equality check predicate on the "refers_to" field. It's identical to RefersToEQ.
 func RefersTo(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRefersTo), v))
 	})
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Subscription {
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
+		s.Where(sql.EQ(s.C(FieldDeleteTime), v))
 	})
 }
 
-// UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Subscription {
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
+		s.Where(sql.EQ(s.C(FieldCreateTime), v))
 	})
 }
 
-// DeletedAt applies equality check predicate on the "deletedAt" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Subscription {
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDeletedAt), v))
+		s.Where(sql.EQ(s.C(FieldUpdateTime), v))
 	})
 }
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
-	})
-}
-
-// RefersTypeEQ applies the EQ predicate on the "refersType" field.
-func RefersTypeEQ(v RefersType) predicate.Subscription {
+// RefersTypeEQ applies the EQ predicate on the "refers_type" field.
+func RefersTypeEQ(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRefersType), v))
 	})
 }
 
-// RefersTypeNEQ applies the NEQ predicate on the "refersType" field.
-func RefersTypeNEQ(v RefersType) predicate.Subscription {
+// RefersTypeNEQ applies the NEQ predicate on the "refers_type" field.
+func RefersTypeNEQ(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldRefersType), v))
 	})
 }
 
-// RefersTypeIn applies the In predicate on the "refersType" field.
-func RefersTypeIn(vs ...RefersType) predicate.Subscription {
+// RefersTypeIn applies the In predicate on the "refers_type" field.
+func RefersTypeIn(vs ...string) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -159,8 +160,8 @@ func RefersTypeIn(vs ...RefersType) predicate.Subscription {
 	})
 }
 
-// RefersTypeNotIn applies the NotIn predicate on the "refersType" field.
-func RefersTypeNotIn(vs ...RefersType) predicate.Subscription {
+// RefersTypeNotIn applies the NotIn predicate on the "refers_type" field.
+func RefersTypeNotIn(vs ...string) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -176,21 +177,84 @@ func RefersTypeNotIn(vs ...RefersType) predicate.Subscription {
 	})
 }
 
-// RefersToEQ applies the EQ predicate on the "refersTo" field.
+// RefersTypeGT applies the GT predicate on the "refers_type" field.
+func RefersTypeGT(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeGTE applies the GTE predicate on the "refers_type" field.
+func RefersTypeGTE(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeLT applies the LT predicate on the "refers_type" field.
+func RefersTypeLT(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeLTE applies the LTE predicate on the "refers_type" field.
+func RefersTypeLTE(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeContains applies the Contains predicate on the "refers_type" field.
+func RefersTypeContains(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeHasPrefix applies the HasPrefix predicate on the "refers_type" field.
+func RefersTypeHasPrefix(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeHasSuffix applies the HasSuffix predicate on the "refers_type" field.
+func RefersTypeHasSuffix(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeEqualFold applies the EqualFold predicate on the "refers_type" field.
+func RefersTypeEqualFold(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersTypeContainsFold applies the ContainsFold predicate on the "refers_type" field.
+func RefersTypeContainsFold(v string) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldRefersType), v))
+	})
+}
+
+// RefersToEQ applies the EQ predicate on the "refers_to" field.
 func RefersToEQ(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToNEQ applies the NEQ predicate on the "refersTo" field.
+// RefersToNEQ applies the NEQ predicate on the "refers_to" field.
 func RefersToNEQ(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToIn applies the In predicate on the "refersTo" field.
+// RefersToIn applies the In predicate on the "refers_to" field.
 func RefersToIn(vs ...string) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
@@ -207,7 +271,7 @@ func RefersToIn(vs ...string) predicate.Subscription {
 	})
 }
 
-// RefersToNotIn applies the NotIn predicate on the "refersTo" field.
+// RefersToNotIn applies the NotIn predicate on the "refers_to" field.
 func RefersToNotIn(vs ...string) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
@@ -224,85 +288,85 @@ func RefersToNotIn(vs ...string) predicate.Subscription {
 	})
 }
 
-// RefersToGT applies the GT predicate on the "refersTo" field.
+// RefersToGT applies the GT predicate on the "refers_to" field.
 func RefersToGT(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToGTE applies the GTE predicate on the "refersTo" field.
+// RefersToGTE applies the GTE predicate on the "refers_to" field.
 func RefersToGTE(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToLT applies the LT predicate on the "refersTo" field.
+// RefersToLT applies the LT predicate on the "refers_to" field.
 func RefersToLT(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToLTE applies the LTE predicate on the "refersTo" field.
+// RefersToLTE applies the LTE predicate on the "refers_to" field.
 func RefersToLTE(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToContains applies the Contains predicate on the "refersTo" field.
+// RefersToContains applies the Contains predicate on the "refers_to" field.
 func RefersToContains(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.Contains(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToHasPrefix applies the HasPrefix predicate on the "refersTo" field.
+// RefersToHasPrefix applies the HasPrefix predicate on the "refers_to" field.
 func RefersToHasPrefix(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.HasPrefix(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToHasSuffix applies the HasSuffix predicate on the "refersTo" field.
+// RefersToHasSuffix applies the HasSuffix predicate on the "refers_to" field.
 func RefersToHasSuffix(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.HasSuffix(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToEqualFold applies the EqualFold predicate on the "refersTo" field.
+// RefersToEqualFold applies the EqualFold predicate on the "refers_to" field.
 func RefersToEqualFold(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.EqualFold(s.C(FieldRefersTo), v))
 	})
 }
 
-// RefersToContainsFold applies the ContainsFold predicate on the "refersTo" field.
+// RefersToContainsFold applies the ContainsFold predicate on the "refers_to" field.
 func RefersToContainsFold(v string) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldRefersTo), v))
 	})
 }
 
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
-func CreatedAtEQ(v time.Time) predicate.Subscription {
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
+		s.Where(sql.EQ(s.C(FieldDeleteTime), v))
 	})
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
-func CreatedAtNEQ(v time.Time) predicate.Subscription {
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
+		s.Where(sql.NEQ(s.C(FieldDeleteTime), v))
 	})
 }
 
-// CreatedAtIn applies the In predicate on the "createdAt" field.
-func CreatedAtIn(vs ...time.Time) predicate.Subscription {
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -314,12 +378,12 @@ func CreatedAtIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
+		s.Where(sql.In(s.C(FieldDeleteTime), v...))
 	})
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Subscription {
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -331,54 +395,68 @@ func CreatedAtNotIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
+		s.Where(sql.NotIn(s.C(FieldDeleteTime), v...))
 	})
 }
 
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
-func CreatedAtGT(v time.Time) predicate.Subscription {
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
+		s.Where(sql.GT(s.C(FieldDeleteTime), v))
 	})
 }
 
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
-func CreatedAtGTE(v time.Time) predicate.Subscription {
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
+		s.Where(sql.GTE(s.C(FieldDeleteTime), v))
 	})
 }
 
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
-func CreatedAtLT(v time.Time) predicate.Subscription {
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
+		s.Where(sql.LT(s.C(FieldDeleteTime), v))
 	})
 }
 
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
-func CreatedAtLTE(v time.Time) predicate.Subscription {
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
+		s.Where(sql.LTE(s.C(FieldDeleteTime), v))
 	})
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updatedAt" field.
-func UpdatedAtEQ(v time.Time) predicate.Subscription {
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
+		s.Where(sql.IsNull(s.C(FieldDeleteTime)))
 	})
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updatedAt" field.
-func UpdatedAtNEQ(v time.Time) predicate.Subscription {
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdatedAt), v))
+		s.Where(sql.NotNull(s.C(FieldDeleteTime)))
 	})
 }
 
-// UpdatedAtIn applies the In predicate on the "updatedAt" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Subscription {
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreateTime), v))
+	})
+}
+
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Subscription {
+	return predicate.Subscription(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCreateTime), v))
+	})
+}
+
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -390,12 +468,12 @@ func UpdatedAtIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldUpdatedAt), v...))
+		s.Where(sql.In(s.C(FieldCreateTime), v...))
 	})
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updatedAt" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Subscription {
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -407,54 +485,54 @@ func UpdatedAtNotIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldUpdatedAt), v...))
+		s.Where(sql.NotIn(s.C(FieldCreateTime), v...))
 	})
 }
 
-// UpdatedAtGT applies the GT predicate on the "updatedAt" field.
-func UpdatedAtGT(v time.Time) predicate.Subscription {
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdatedAt), v))
+		s.Where(sql.GT(s.C(FieldCreateTime), v))
 	})
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updatedAt" field.
-func UpdatedAtGTE(v time.Time) predicate.Subscription {
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdatedAt), v))
+		s.Where(sql.GTE(s.C(FieldCreateTime), v))
 	})
 }
 
-// UpdatedAtLT applies the LT predicate on the "updatedAt" field.
-func UpdatedAtLT(v time.Time) predicate.Subscription {
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdatedAt), v))
+		s.Where(sql.LT(s.C(FieldCreateTime), v))
 	})
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
-func UpdatedAtLTE(v time.Time) predicate.Subscription {
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
+		s.Where(sql.LTE(s.C(FieldCreateTime), v))
 	})
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deletedAt" field.
-func DeletedAtEQ(v time.Time) predicate.Subscription {
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDeletedAt), v))
+		s.Where(sql.EQ(s.C(FieldUpdateTime), v))
 	})
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deletedAt" field.
-func DeletedAtNEQ(v time.Time) predicate.Subscription {
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDeletedAt), v))
+		s.Where(sql.NEQ(s.C(FieldUpdateTime), v))
 	})
 }
 
-// DeletedAtIn applies the In predicate on the "deletedAt" field.
-func DeletedAtIn(vs ...time.Time) predicate.Subscription {
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -466,12 +544,12 @@ func DeletedAtIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldDeletedAt), v...))
+		s.Where(sql.In(s.C(FieldUpdateTime), v...))
 	})
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deletedAt" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Subscription {
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Subscription {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -483,160 +561,35 @@ func DeletedAtNotIn(vs ...time.Time) predicate.Subscription {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldDeletedAt), v...))
+		s.Where(sql.NotIn(s.C(FieldUpdateTime), v...))
 	})
 }
 
-// DeletedAtGT applies the GT predicate on the "deletedAt" field.
-func DeletedAtGT(v time.Time) predicate.Subscription {
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDeletedAt), v))
+		s.Where(sql.GT(s.C(FieldUpdateTime), v))
 	})
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deletedAt" field.
-func DeletedAtGTE(v time.Time) predicate.Subscription {
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDeletedAt), v))
+		s.Where(sql.GTE(s.C(FieldUpdateTime), v))
 	})
 }
 
-// DeletedAtLT applies the LT predicate on the "deletedAt" field.
-func DeletedAtLT(v time.Time) predicate.Subscription {
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDeletedAt), v))
+		s.Where(sql.LT(s.C(FieldUpdateTime), v))
 	})
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deletedAt" field.
-func DeletedAtLTE(v time.Time) predicate.Subscription {
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDeletedAt), v))
-	})
-}
-
-// DeletedAtIsNil applies the IsNil predicate on the "deletedAt" field.
-func DeletedAtIsNil() predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldDeletedAt)))
-	})
-}
-
-// DeletedAtNotNil applies the NotNil predicate on the "deletedAt" field.
-func DeletedAtNotNil() predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldDeletedAt)))
-	})
-}
-
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Subscription(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Subscription(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldUserId), v...))
-	})
-}
-
-// UserIdGT applies the GT predicate on the "userId" field.
-func UserIdGT(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdGTE applies the GTE predicate on the "userId" field.
-func UserIdGTE(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLT applies the LT predicate on the "userId" field.
-func UserIdLT(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdLTE applies the LTE predicate on the "userId" field.
-func UserIdLTE(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContains applies the Contains predicate on the "userId" field.
-func UserIdContains(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasPrefix applies the HasPrefix predicate on the "userId" field.
-func UserIdHasPrefix(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdHasSuffix applies the HasSuffix predicate on the "userId" field.
-func UserIdHasSuffix(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdEqualFold applies the EqualFold predicate on the "userId" field.
-func UserIdEqualFold(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldUserId), v))
-	})
-}
-
-// UserIdContainsFold applies the ContainsFold predicate on the "userId" field.
-func UserIdContainsFold(v string) predicate.Subscription {
-	return predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldUserId), v))
+		s.Where(sql.LTE(s.C(FieldUpdateTime), v))
 	})
 }
 

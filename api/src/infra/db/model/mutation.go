@@ -707,16 +707,15 @@ type NotificationMutation struct {
 	config
 	op                  Op
 	typ                 string
-	id                  *string
+	id                  *uuid.UUID
 	title               *string
 	description         *string
 	link                *string
 	read                *bool
-	createdAt           *time.Time
-	subscriptionId      *string
+	create_time         *time.Time
 	clearedFields       map[string]struct{}
-	subscription        map[string]struct{}
-	removedsubscription map[string]struct{}
+	subscription        map[uuid.UUID]struct{}
+	removedsubscription map[uuid.UUID]struct{}
 	clearedsubscription bool
 	done                bool
 	oldValue            func(context.Context) (*Notification, error)
@@ -743,7 +742,7 @@ func newNotificationMutation(c config, op Op, opts ...notificationOption) *Notif
 }
 
 // withNotificationID sets the ID field of the mutation.
-func withNotificationID(id string) notificationOption {
+func withNotificationID(id uuid.UUID) notificationOption {
 	return func(m *NotificationMutation) {
 		var (
 			err   error
@@ -795,13 +794,13 @@ func (m NotificationMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Notification entities.
-func (m *NotificationMutation) SetID(id string) {
+func (m *NotificationMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *NotificationMutation) ID() (id string, exists bool) {
+func (m *NotificationMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -812,12 +811,12 @@ func (m *NotificationMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *NotificationMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *NotificationMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -971,82 +970,46 @@ func (m *NotificationMutation) ResetRead() {
 	m.read = nil
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (m *NotificationMutation) SetCreatedAt(t time.Time) {
-	m.createdAt = &t
+// SetCreateTime sets the "create_time" field.
+func (m *NotificationMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
-// CreatedAt returns the value of the "createdAt" field in the mutation.
-func (m *NotificationMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.createdAt
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *NotificationMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "createdAt" field's value of the Notification entity.
+// OldCreateTime returns the old "create_time" field's value of the Notification entity.
 // If the Notification object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NotificationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *NotificationMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
 	}
-	return oldValue.CreatedAt, nil
+	return oldValue.CreateTime, nil
 }
 
-// ResetCreatedAt resets all changes to the "createdAt" field.
-func (m *NotificationMutation) ResetCreatedAt() {
-	m.createdAt = nil
-}
-
-// SetSubscriptionId sets the "subscriptionId" field.
-func (m *NotificationMutation) SetSubscriptionId(s string) {
-	m.subscriptionId = &s
-}
-
-// SubscriptionId returns the value of the "subscriptionId" field in the mutation.
-func (m *NotificationMutation) SubscriptionId() (r string, exists bool) {
-	v := m.subscriptionId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSubscriptionId returns the old "subscriptionId" field's value of the Notification entity.
-// If the Notification object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NotificationMutation) OldSubscriptionId(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSubscriptionId is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSubscriptionId requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSubscriptionId: %w", err)
-	}
-	return oldValue.SubscriptionId, nil
-}
-
-// ResetSubscriptionId resets all changes to the "subscriptionId" field.
-func (m *NotificationMutation) ResetSubscriptionId() {
-	m.subscriptionId = nil
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *NotificationMutation) ResetCreateTime() {
+	m.create_time = nil
 }
 
 // AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by ids.
-func (m *NotificationMutation) AddSubscriptionIDs(ids ...string) {
+func (m *NotificationMutation) AddSubscriptionIDs(ids ...uuid.UUID) {
 	if m.subscription == nil {
-		m.subscription = make(map[string]struct{})
+		m.subscription = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.subscription[ids[i]] = struct{}{}
@@ -1064,9 +1027,9 @@ func (m *NotificationMutation) SubscriptionCleared() bool {
 }
 
 // RemoveSubscriptionIDs removes the "subscription" edge to the Subscription entity by IDs.
-func (m *NotificationMutation) RemoveSubscriptionIDs(ids ...string) {
+func (m *NotificationMutation) RemoveSubscriptionIDs(ids ...uuid.UUID) {
 	if m.removedsubscription == nil {
-		m.removedsubscription = make(map[string]struct{})
+		m.removedsubscription = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.subscription, ids[i])
@@ -1075,7 +1038,7 @@ func (m *NotificationMutation) RemoveSubscriptionIDs(ids ...string) {
 }
 
 // RemovedSubscription returns the removed IDs of the "subscription" edge to the Subscription entity.
-func (m *NotificationMutation) RemovedSubscriptionIDs() (ids []string) {
+func (m *NotificationMutation) RemovedSubscriptionIDs() (ids []uuid.UUID) {
 	for id := range m.removedsubscription {
 		ids = append(ids, id)
 	}
@@ -1083,7 +1046,7 @@ func (m *NotificationMutation) RemovedSubscriptionIDs() (ids []string) {
 }
 
 // SubscriptionIDs returns the "subscription" edge IDs in the mutation.
-func (m *NotificationMutation) SubscriptionIDs() (ids []string) {
+func (m *NotificationMutation) SubscriptionIDs() (ids []uuid.UUID) {
 	for id := range m.subscription {
 		ids = append(ids, id)
 	}
@@ -1116,7 +1079,7 @@ func (m *NotificationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NotificationMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.title != nil {
 		fields = append(fields, notification.FieldTitle)
 	}
@@ -1129,11 +1092,8 @@ func (m *NotificationMutation) Fields() []string {
 	if m.read != nil {
 		fields = append(fields, notification.FieldRead)
 	}
-	if m.createdAt != nil {
-		fields = append(fields, notification.FieldCreatedAt)
-	}
-	if m.subscriptionId != nil {
-		fields = append(fields, notification.FieldSubscriptionId)
+	if m.create_time != nil {
+		fields = append(fields, notification.FieldCreateTime)
 	}
 	return fields
 }
@@ -1151,10 +1111,8 @@ func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
 		return m.Link()
 	case notification.FieldRead:
 		return m.Read()
-	case notification.FieldCreatedAt:
-		return m.CreatedAt()
-	case notification.FieldSubscriptionId:
-		return m.SubscriptionId()
+	case notification.FieldCreateTime:
+		return m.CreateTime()
 	}
 	return nil, false
 }
@@ -1172,10 +1130,8 @@ func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldLink(ctx)
 	case notification.FieldRead:
 		return m.OldRead(ctx)
-	case notification.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case notification.FieldSubscriptionId:
-		return m.OldSubscriptionId(ctx)
+	case notification.FieldCreateTime:
+		return m.OldCreateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Notification field %s", name)
 }
@@ -1213,19 +1169,12 @@ func (m *NotificationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRead(v)
 		return nil
-	case notification.FieldCreatedAt:
+	case notification.FieldCreateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCreatedAt(v)
-		return nil
-	case notification.FieldSubscriptionId:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubscriptionId(v)
+		m.SetCreateTime(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Notification field %s", name)
@@ -1288,11 +1237,8 @@ func (m *NotificationMutation) ResetField(name string) error {
 	case notification.FieldRead:
 		m.ResetRead()
 		return nil
-	case notification.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case notification.FieldSubscriptionId:
-		m.ResetSubscriptionId()
+	case notification.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Notification field %s", name)
@@ -3476,19 +3422,18 @@ type SubscriptionMutation struct {
 	config
 	op                   Op
 	typ                  string
-	id                   *string
-	refersType           *subscription.RefersType
-	refersTo             *string
-	createdAt            *time.Time
-	updatedAt            *time.Time
-	deletedAt            *time.Time
-	userId               *string
+	id                   *uuid.UUID
+	refers_type          *string
+	refers_to            *string
+	delete_time          *time.Time
+	create_time          *time.Time
+	update_time          *time.Time
 	clearedFields        map[string]struct{}
 	user                 map[uuid.UUID]struct{}
 	removeduser          map[uuid.UUID]struct{}
 	cleareduser          bool
-	notifications        map[string]struct{}
-	removednotifications map[string]struct{}
+	notifications        map[uuid.UUID]struct{}
+	removednotifications map[uuid.UUID]struct{}
 	clearednotifications bool
 	done                 bool
 	oldValue             func(context.Context) (*Subscription, error)
@@ -3515,7 +3460,7 @@ func newSubscriptionMutation(c config, op Op, opts ...subscriptionOption) *Subsc
 }
 
 // withSubscriptionID sets the ID field of the mutation.
-func withSubscriptionID(id string) subscriptionOption {
+func withSubscriptionID(id uuid.UUID) subscriptionOption {
 	return func(m *SubscriptionMutation) {
 		var (
 			err   error
@@ -3567,13 +3512,13 @@ func (m SubscriptionMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Subscription entities.
-func (m *SubscriptionMutation) SetID(id string) {
+func (m *SubscriptionMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SubscriptionMutation) ID() (id string, exists bool) {
+func (m *SubscriptionMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3584,12 +3529,12 @@ func (m *SubscriptionMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *SubscriptionMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *SubscriptionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -3599,24 +3544,24 @@ func (m *SubscriptionMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetRefersType sets the "refersType" field.
-func (m *SubscriptionMutation) SetRefersType(st subscription.RefersType) {
-	m.refersType = &st
+// SetRefersType sets the "refers_type" field.
+func (m *SubscriptionMutation) SetRefersType(s string) {
+	m.refers_type = &s
 }
 
-// RefersType returns the value of the "refersType" field in the mutation.
-func (m *SubscriptionMutation) RefersType() (r subscription.RefersType, exists bool) {
-	v := m.refersType
+// RefersType returns the value of the "refers_type" field in the mutation.
+func (m *SubscriptionMutation) RefersType() (r string, exists bool) {
+	v := m.refers_type
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRefersType returns the old "refersType" field's value of the Subscription entity.
+// OldRefersType returns the old "refers_type" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldRefersType(ctx context.Context) (v subscription.RefersType, err error) {
+func (m *SubscriptionMutation) OldRefersType(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRefersType is only allowed on UpdateOne operations")
 	}
@@ -3630,26 +3575,26 @@ func (m *SubscriptionMutation) OldRefersType(ctx context.Context) (v subscriptio
 	return oldValue.RefersType, nil
 }
 
-// ResetRefersType resets all changes to the "refersType" field.
+// ResetRefersType resets all changes to the "refers_type" field.
 func (m *SubscriptionMutation) ResetRefersType() {
-	m.refersType = nil
+	m.refers_type = nil
 }
 
-// SetRefersTo sets the "refersTo" field.
+// SetRefersTo sets the "refers_to" field.
 func (m *SubscriptionMutation) SetRefersTo(s string) {
-	m.refersTo = &s
+	m.refers_to = &s
 }
 
-// RefersTo returns the value of the "refersTo" field in the mutation.
+// RefersTo returns the value of the "refers_to" field in the mutation.
 func (m *SubscriptionMutation) RefersTo() (r string, exists bool) {
-	v := m.refersTo
+	v := m.refers_to
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRefersTo returns the old "refersTo" field's value of the Subscription entity.
+// OldRefersTo returns the old "refers_to" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *SubscriptionMutation) OldRefersTo(ctx context.Context) (v string, err error) {
@@ -3666,166 +3611,130 @@ func (m *SubscriptionMutation) OldRefersTo(ctx context.Context) (v string, err e
 	return oldValue.RefersTo, nil
 }
 
-// ResetRefersTo resets all changes to the "refersTo" field.
+// ResetRefersTo resets all changes to the "refers_to" field.
 func (m *SubscriptionMutation) ResetRefersTo() {
-	m.refersTo = nil
+	m.refers_to = nil
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (m *SubscriptionMutation) SetCreatedAt(t time.Time) {
-	m.createdAt = &t
+// SetDeleteTime sets the "delete_time" field.
+func (m *SubscriptionMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
 }
 
-// CreatedAt returns the value of the "createdAt" field in the mutation.
-func (m *SubscriptionMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.createdAt
+// DeleteTime returns the value of the "delete_time" field in the mutation.
+func (m *SubscriptionMutation) DeleteTime() (r time.Time, exists bool) {
+	v := m.delete_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "createdAt" field's value of the Subscription entity.
+// OldDeleteTime returns the old "delete_time" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *SubscriptionMutation) OldDeleteTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+		return v, errors.New("OldDeleteTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldDeleteTime: %w", err)
 	}
-	return oldValue.CreatedAt, nil
+	return oldValue.DeleteTime, nil
 }
 
-// ResetCreatedAt resets all changes to the "createdAt" field.
-func (m *SubscriptionMutation) ResetCreatedAt() {
-	m.createdAt = nil
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (m *SubscriptionMutation) ClearDeleteTime() {
+	m.delete_time = nil
+	m.clearedFields[subscription.FieldDeleteTime] = struct{}{}
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
-func (m *SubscriptionMutation) SetUpdatedAt(t time.Time) {
-	m.updatedAt = &t
-}
-
-// UpdatedAt returns the value of the "updatedAt" field in the mutation.
-func (m *SubscriptionMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updatedAt
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updatedAt" field's value of the Subscription entity.
-// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updatedAt" field.
-func (m *SubscriptionMutation) ResetUpdatedAt() {
-	m.updatedAt = nil
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (m *SubscriptionMutation) SetDeletedAt(t time.Time) {
-	m.deletedAt = &t
-}
-
-// DeletedAt returns the value of the "deletedAt" field in the mutation.
-func (m *SubscriptionMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deletedAt
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deletedAt" field's value of the Subscription entity.
-// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (m *SubscriptionMutation) ClearDeletedAt() {
-	m.deletedAt = nil
-	m.clearedFields[subscription.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deletedAt" field was cleared in this mutation.
-func (m *SubscriptionMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[subscription.FieldDeletedAt]
+// DeleteTimeCleared returns if the "delete_time" field was cleared in this mutation.
+func (m *SubscriptionMutation) DeleteTimeCleared() bool {
+	_, ok := m.clearedFields[subscription.FieldDeleteTime]
 	return ok
 }
 
-// ResetDeletedAt resets all changes to the "deletedAt" field.
-func (m *SubscriptionMutation) ResetDeletedAt() {
-	m.deletedAt = nil
-	delete(m.clearedFields, subscription.FieldDeletedAt)
+// ResetDeleteTime resets all changes to the "delete_time" field.
+func (m *SubscriptionMutation) ResetDeleteTime() {
+	m.delete_time = nil
+	delete(m.clearedFields, subscription.FieldDeleteTime)
 }
 
-// SetUserId sets the "userId" field.
-func (m *SubscriptionMutation) SetUserId(s string) {
-	m.userId = &s
+// SetCreateTime sets the "create_time" field.
+func (m *SubscriptionMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
 }
 
-// UserId returns the value of the "userId" field in the mutation.
-func (m *SubscriptionMutation) UserId() (r string, exists bool) {
-	v := m.userId
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *SubscriptionMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUserId returns the old "userId" field's value of the Subscription entity.
+// OldCreateTime returns the old "create_time" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldUserId(ctx context.Context) (v string, err error) {
+func (m *SubscriptionMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserId is only allowed on UpdateOne operations")
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserId requires an ID field in the mutation")
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserId: %w", err)
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
 	}
-	return oldValue.UserId, nil
+	return oldValue.CreateTime, nil
 }
 
-// ResetUserId resets all changes to the "userId" field.
-func (m *SubscriptionMutation) ResetUserId() {
-	m.userId = nil
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *SubscriptionMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *SubscriptionMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *SubscriptionMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the Subscription entity.
+// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubscriptionMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *SubscriptionMutation) ResetUpdateTime() {
+	m.update_time = nil
 }
 
 // AddUserIDs adds the "user" edge to the User entity by ids.
@@ -3883,9 +3792,9 @@ func (m *SubscriptionMutation) ResetUser() {
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
-func (m *SubscriptionMutation) AddNotificationIDs(ids ...string) {
+func (m *SubscriptionMutation) AddNotificationIDs(ids ...uuid.UUID) {
 	if m.notifications == nil {
-		m.notifications = make(map[string]struct{})
+		m.notifications = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.notifications[ids[i]] = struct{}{}
@@ -3903,9 +3812,9 @@ func (m *SubscriptionMutation) NotificationsCleared() bool {
 }
 
 // RemoveNotificationIDs removes the "notifications" edge to the Notification entity by IDs.
-func (m *SubscriptionMutation) RemoveNotificationIDs(ids ...string) {
+func (m *SubscriptionMutation) RemoveNotificationIDs(ids ...uuid.UUID) {
 	if m.removednotifications == nil {
-		m.removednotifications = make(map[string]struct{})
+		m.removednotifications = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.notifications, ids[i])
@@ -3914,7 +3823,7 @@ func (m *SubscriptionMutation) RemoveNotificationIDs(ids ...string) {
 }
 
 // RemovedNotifications returns the removed IDs of the "notifications" edge to the Notification entity.
-func (m *SubscriptionMutation) RemovedNotificationsIDs() (ids []string) {
+func (m *SubscriptionMutation) RemovedNotificationsIDs() (ids []uuid.UUID) {
 	for id := range m.removednotifications {
 		ids = append(ids, id)
 	}
@@ -3922,7 +3831,7 @@ func (m *SubscriptionMutation) RemovedNotificationsIDs() (ids []string) {
 }
 
 // NotificationsIDs returns the "notifications" edge IDs in the mutation.
-func (m *SubscriptionMutation) NotificationsIDs() (ids []string) {
+func (m *SubscriptionMutation) NotificationsIDs() (ids []uuid.UUID) {
 	for id := range m.notifications {
 		ids = append(ids, id)
 	}
@@ -3955,24 +3864,21 @@ func (m *SubscriptionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
-	if m.refersType != nil {
+	fields := make([]string, 0, 5)
+	if m.refers_type != nil {
 		fields = append(fields, subscription.FieldRefersType)
 	}
-	if m.refersTo != nil {
+	if m.refers_to != nil {
 		fields = append(fields, subscription.FieldRefersTo)
 	}
-	if m.createdAt != nil {
-		fields = append(fields, subscription.FieldCreatedAt)
+	if m.delete_time != nil {
+		fields = append(fields, subscription.FieldDeleteTime)
 	}
-	if m.updatedAt != nil {
-		fields = append(fields, subscription.FieldUpdatedAt)
+	if m.create_time != nil {
+		fields = append(fields, subscription.FieldCreateTime)
 	}
-	if m.deletedAt != nil {
-		fields = append(fields, subscription.FieldDeletedAt)
-	}
-	if m.userId != nil {
-		fields = append(fields, subscription.FieldUserId)
+	if m.update_time != nil {
+		fields = append(fields, subscription.FieldUpdateTime)
 	}
 	return fields
 }
@@ -3986,14 +3892,12 @@ func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
 		return m.RefersType()
 	case subscription.FieldRefersTo:
 		return m.RefersTo()
-	case subscription.FieldCreatedAt:
-		return m.CreatedAt()
-	case subscription.FieldUpdatedAt:
-		return m.UpdatedAt()
-	case subscription.FieldDeletedAt:
-		return m.DeletedAt()
-	case subscription.FieldUserId:
-		return m.UserId()
+	case subscription.FieldDeleteTime:
+		return m.DeleteTime()
+	case subscription.FieldCreateTime:
+		return m.CreateTime()
+	case subscription.FieldUpdateTime:
+		return m.UpdateTime()
 	}
 	return nil, false
 }
@@ -4007,14 +3911,12 @@ func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldRefersType(ctx)
 	case subscription.FieldRefersTo:
 		return m.OldRefersTo(ctx)
-	case subscription.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case subscription.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
-	case subscription.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
-	case subscription.FieldUserId:
-		return m.OldUserId(ctx)
+	case subscription.FieldDeleteTime:
+		return m.OldDeleteTime(ctx)
+	case subscription.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case subscription.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
 	}
 	return nil, fmt.Errorf("unknown Subscription field %s", name)
 }
@@ -4025,7 +3927,7 @@ func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.V
 func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case subscription.FieldRefersType:
-		v, ok := value.(subscription.RefersType)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4038,33 +3940,26 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRefersTo(v)
 		return nil
-	case subscription.FieldCreatedAt:
+	case subscription.FieldDeleteTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCreatedAt(v)
+		m.SetDeleteTime(v)
 		return nil
-	case subscription.FieldUpdatedAt:
+	case subscription.FieldCreateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUpdatedAt(v)
+		m.SetCreateTime(v)
 		return nil
-	case subscription.FieldDeletedAt:
+	case subscription.FieldUpdateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDeletedAt(v)
-		return nil
-	case subscription.FieldUserId:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserId(v)
+		m.SetUpdateTime(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Subscription field %s", name)
@@ -4096,8 +3991,8 @@ func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *SubscriptionMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(subscription.FieldDeletedAt) {
-		fields = append(fields, subscription.FieldDeletedAt)
+	if m.FieldCleared(subscription.FieldDeleteTime) {
+		fields = append(fields, subscription.FieldDeleteTime)
 	}
 	return fields
 }
@@ -4113,8 +4008,8 @@ func (m *SubscriptionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *SubscriptionMutation) ClearField(name string) error {
 	switch name {
-	case subscription.FieldDeletedAt:
-		m.ClearDeletedAt()
+	case subscription.FieldDeleteTime:
+		m.ClearDeleteTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Subscription nullable field %s", name)
@@ -4130,17 +4025,14 @@ func (m *SubscriptionMutation) ResetField(name string) error {
 	case subscription.FieldRefersTo:
 		m.ResetRefersTo()
 		return nil
-	case subscription.FieldCreatedAt:
-		m.ResetCreatedAt()
+	case subscription.FieldDeleteTime:
+		m.ResetDeleteTime()
 		return nil
-	case subscription.FieldUpdatedAt:
-		m.ResetUpdatedAt()
+	case subscription.FieldCreateTime:
+		m.ResetCreateTime()
 		return nil
-	case subscription.FieldDeletedAt:
-		m.ResetDeletedAt()
-		return nil
-	case subscription.FieldUserId:
-		m.ResetUserId()
+	case subscription.FieldUpdateTime:
+		m.ResetUpdateTime()
 		return nil
 	}
 	return fmt.Errorf("unknown Subscription field %s", name)
@@ -4686,8 +4578,8 @@ type UserMutation struct {
 	reacts               map[uuid.UUID]struct{}
 	removedreacts        map[uuid.UUID]struct{}
 	clearedreacts        bool
-	subscriptions        map[string]struct{}
-	removedsubscriptions map[string]struct{}
+	subscriptions        map[uuid.UUID]struct{}
+	removedsubscriptions map[uuid.UUID]struct{}
 	clearedsubscriptions bool
 	done                 bool
 	oldValue             func(context.Context) (*User, error)
@@ -5185,9 +5077,9 @@ func (m *UserMutation) ResetReacts() {
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by ids.
-func (m *UserMutation) AddSubscriptionIDs(ids ...string) {
+func (m *UserMutation) AddSubscriptionIDs(ids ...uuid.UUID) {
 	if m.subscriptions == nil {
-		m.subscriptions = make(map[string]struct{})
+		m.subscriptions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.subscriptions[ids[i]] = struct{}{}
@@ -5205,9 +5097,9 @@ func (m *UserMutation) SubscriptionsCleared() bool {
 }
 
 // RemoveSubscriptionIDs removes the "subscriptions" edge to the Subscription entity by IDs.
-func (m *UserMutation) RemoveSubscriptionIDs(ids ...string) {
+func (m *UserMutation) RemoveSubscriptionIDs(ids ...uuid.UUID) {
 	if m.removedsubscriptions == nil {
-		m.removedsubscriptions = make(map[string]struct{})
+		m.removedsubscriptions = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.subscriptions, ids[i])
@@ -5216,7 +5108,7 @@ func (m *UserMutation) RemoveSubscriptionIDs(ids ...string) {
 }
 
 // RemovedSubscriptions returns the removed IDs of the "subscriptions" edge to the Subscription entity.
-func (m *UserMutation) RemovedSubscriptionsIDs() (ids []string) {
+func (m *UserMutation) RemovedSubscriptionsIDs() (ids []uuid.UUID) {
 	for id := range m.removedsubscriptions {
 		ids = append(ids, id)
 	}
@@ -5224,7 +5116,7 @@ func (m *UserMutation) RemovedSubscriptionsIDs() (ids []string) {
 }
 
 // SubscriptionsIDs returns the "subscriptions" edge IDs in the mutation.
-func (m *UserMutation) SubscriptionsIDs() (ids []string) {
+func (m *UserMutation) SubscriptionsIDs() (ids []uuid.UUID) {
 	for id := range m.subscriptions {
 		ids = append(ids, id)
 	}

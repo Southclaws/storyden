@@ -52,18 +52,24 @@ func run() error {
 	client := model.NewClient(model.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 	defer client.Close()
 
-	d, err := migrate.NewLocalDir("migrations")
-	if err != nil {
-		return err
-	}
+	// d, err := migrate.NewLocalDir("migrations")
+	// if err != nil {
+	// 	return err
+	// }
 
-	// Write migration diff.
-	err = client.Schema.Diff(context.Background(), schema.WithDir(d), schema.WithFormatter(GolangMigrateFormatter))
-	if err != nil {
-		return err
-	}
+	// // Write migration diff.
+	// err = client.Schema.Diff(context.Background(), schema.WithDir(d), schema.WithFormatter(GolangMigrateFormatter))
+	// if err != nil {
+	// 	return err
+	// }
 
-	return nil
+	err = client.Schema.Create(context.Background(),
+		schema.WithAtlas(true),
+		schema.WithDropColumn(true),
+		schema.WithDropIndex(true),
+	)
+
+	return err
 }
 
 var (

@@ -2,6 +2,12 @@
 
 package notification
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the notification type in the database.
 	Label = "notification"
@@ -15,10 +21,8 @@ const (
 	FieldLink = "link"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldSubscriptionId holds the string denoting the subscriptionid field in the database.
-	FieldSubscriptionId = "subscription_id"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
 	// EdgeSubscription holds the string denoting the subscription edge name in mutations.
 	EdgeSubscription = "subscription"
 	// Table holds the table name of the notification in the database.
@@ -39,8 +43,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldLink,
 	FieldRead,
-	FieldCreatedAt,
-	FieldSubscriptionId,
+	FieldCreateTime,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
@@ -63,3 +66,10 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
+)

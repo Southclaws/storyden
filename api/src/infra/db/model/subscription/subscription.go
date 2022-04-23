@@ -3,7 +3,9 @@
 package subscription
 
 import (
-	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,18 +13,16 @@ const (
 	Label = "subscription"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldRefersType holds the string denoting the referstype field in the database.
+	// FieldRefersType holds the string denoting the refers_type field in the database.
 	FieldRefersType = "refers_type"
-	// FieldRefersTo holds the string denoting the refersto field in the database.
+	// FieldRefersTo holds the string denoting the refers_to field in the database.
 	FieldRefersTo = "refers_to"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
-	FieldUpdatedAt = "updated_at"
-	// FieldDeletedAt holds the string denoting the deletedat field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
@@ -50,10 +50,9 @@ var Columns = []string{
 	FieldID,
 	FieldRefersType,
 	FieldRefersTo,
-	FieldCreatedAt,
-	FieldUpdatedAt,
-	FieldDeletedAt,
-	FieldUserId,
+	FieldDeleteTime,
+	FieldCreateTime,
+	FieldUpdateTime,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subscriptions"
@@ -78,24 +77,17 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-// RefersType defines the type for the "refersType" enum field.
-type RefersType string
-
-// RefersType values.
-const (
-	RefersTypeFORUM_POST_RESPONSE RefersType = "FORUM_POST_RESPONSE"
+var (
+	// RefersTypeValidator is a validator for the "refers_type" field. It is called by the builders before save.
+	RefersTypeValidator func(string) error
+	// RefersToValidator is a validator for the "refers_to" field. It is called by the builders before save.
+	RefersToValidator func(string) error
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
-
-func (rt RefersType) String() string {
-	return string(rt)
-}
-
-// RefersTypeValidator is a validator for the "refersType" field enum values. It is called by the builders before save.
-func RefersTypeValidator(rt RefersType) error {
-	switch rt {
-	case RefersTypeFORUM_POST_RESPONSE:
-		return nil
-	default:
-		return fmt.Errorf("subscription: invalid enum value for refersType field: %q", rt)
-	}
-}

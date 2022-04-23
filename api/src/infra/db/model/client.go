@@ -312,7 +312,7 @@ func (c *NotificationClient) UpdateOne(n *Notification) *NotificationUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *NotificationClient) UpdateOneID(id string) *NotificationUpdateOne {
+func (c *NotificationClient) UpdateOneID(id uuid.UUID) *NotificationUpdateOne {
 	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotificationID(id))
 	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -329,7 +329,7 @@ func (c *NotificationClient) DeleteOne(n *Notification) *NotificationDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *NotificationClient) DeleteOneID(id string) *NotificationDeleteOne {
+func (c *NotificationClient) DeleteOneID(id uuid.UUID) *NotificationDeleteOne {
 	builder := c.Delete().Where(notification.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -344,12 +344,12 @@ func (c *NotificationClient) Query() *NotificationQuery {
 }
 
 // Get returns a Notification entity by its id.
-func (c *NotificationClient) Get(ctx context.Context, id string) (*Notification, error) {
+func (c *NotificationClient) Get(ctx context.Context, id uuid.UUID) (*Notification, error) {
 	return c.Query().Where(notification.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *NotificationClient) GetX(ctx context.Context, id string) *Notification {
+func (c *NotificationClient) GetX(ctx context.Context, id uuid.UUID) *Notification {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -758,7 +758,7 @@ func (c *SubscriptionClient) UpdateOne(s *Subscription) *SubscriptionUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SubscriptionClient) UpdateOneID(id string) *SubscriptionUpdateOne {
+func (c *SubscriptionClient) UpdateOneID(id uuid.UUID) *SubscriptionUpdateOne {
 	mutation := newSubscriptionMutation(c.config, OpUpdateOne, withSubscriptionID(id))
 	return &SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -775,7 +775,7 @@ func (c *SubscriptionClient) DeleteOne(s *Subscription) *SubscriptionDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *SubscriptionClient) DeleteOneID(id string) *SubscriptionDeleteOne {
+func (c *SubscriptionClient) DeleteOneID(id uuid.UUID) *SubscriptionDeleteOne {
 	builder := c.Delete().Where(subscription.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -790,12 +790,12 @@ func (c *SubscriptionClient) Query() *SubscriptionQuery {
 }
 
 // Get returns a Subscription entity by its id.
-func (c *SubscriptionClient) Get(ctx context.Context, id string) (*Subscription, error) {
+func (c *SubscriptionClient) Get(ctx context.Context, id uuid.UUID) (*Subscription, error) {
 	return c.Query().Where(subscription.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SubscriptionClient) GetX(ctx context.Context, id string) *Subscription {
+func (c *SubscriptionClient) GetX(ctx context.Context, id uuid.UUID) *Subscription {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

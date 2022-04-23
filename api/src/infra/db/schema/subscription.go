@@ -1,9 +1,13 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/mixin"
+	"github.com/google/uuid"
 )
 
 // Subscription holds the schema definition for the Subscription entity.
@@ -14,13 +18,18 @@ type Subscription struct {
 // Fields of Subscription.
 func (Subscription) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id"),
-		field.Enum("refersType").Values("FORUM_POST_RESPONSE"),
-		field.String("refersTo"),
-		field.Time("createdAt"),
-		field.Time("updatedAt"),
-		field.Time("deletedAt").Optional(),
-		field.String("userId"),
+		field.UUID("id", uuid.UUID{}).
+			Immutable().
+			Default(uuid.New),
+
+		field.String("refers_type").NotEmpty(),
+		field.String("refers_to").NotEmpty(),
+
+		field.Time("delete_time").Optional(),
+
+		// BUG: ent does not do this automatically.
+		field.Time("create_time").Default(time.Now),
+		field.Time("update_time").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
@@ -29,5 +38,11 @@ func (Subscription) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user", User.Type),
 		edge.To("notifications", Notification.Type),
+	}
+}
+
+func (Subscription) Mixins() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
 	}
 }

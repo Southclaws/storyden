@@ -97,9 +97,9 @@ var (
 	// DefaultAdmin holds the default value on creation for the "admin" field.
 	DefaultAdmin bool
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
-	DefaultCreatedAt time.Time
+	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
-	DefaultUpdatedAt time.Time
+	DefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

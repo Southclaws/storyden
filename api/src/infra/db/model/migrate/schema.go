@@ -25,14 +25,13 @@ var (
 	}
 	// NotificationsColumns holds the columns for the "notifications" table.
 	NotificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
 		{Name: "link", Type: field.TypeString},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "subscription_id", Type: field.TypeString},
-		{Name: "subscription_notifications", Type: field.TypeString, Nullable: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "subscription_notifications", Type: field.TypeUUID, Nullable: true},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.
 	NotificationsTable = &schema.Table{
@@ -42,7 +41,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "notifications_subscriptions_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[7]},
+				Columns:    []*schema.Column{NotificationsColumns[6]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -141,14 +140,13 @@ var (
 	}
 	// SubscriptionsColumns holds the columns for the "subscriptions" table.
 	SubscriptionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "refers_type", Type: field.TypeEnum, Enums: []string{"FORUM_POST_RESPONSE"}},
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "refers_type", Type: field.TypeString},
 		{Name: "refers_to", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "user_id", Type: field.TypeString},
-		{Name: "notification_subscription", Type: field.TypeString, Nullable: true},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "notification_subscription", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_subscriptions", Type: field.TypeUUID, Nullable: true},
 	}
 	// SubscriptionsTable holds the schema information for the "subscriptions" table.
@@ -159,13 +157,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "subscriptions_notifications_subscription",
-				Columns:    []*schema.Column{SubscriptionsColumns[7]},
+				Columns:    []*schema.Column{SubscriptionsColumns[6]},
 				RefColumns: []*schema.Column{NotificationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "subscriptions_users_subscriptions",
-				Columns:    []*schema.Column{SubscriptionsColumns[8]},
+				Columns:    []*schema.Column{SubscriptionsColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -192,7 +190,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "subscription_user", Type: field.TypeString, Nullable: true},
+		{Name: "subscription_user", Type: field.TypeUUID, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
