@@ -14,10 +14,9 @@ import (
 
 type local struct {
 	m map[UserID]User
-	r MockRepository
 }
 
-func NewMock() Repository {
+func NewLocal() Repository {
 	return &local{m: map[UserID]User{}}
 }
 

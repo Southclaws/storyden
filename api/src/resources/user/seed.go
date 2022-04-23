@@ -27,8 +27,8 @@ var (
 	}
 )
 
-func NewMockWithSeed() Repository {
-	m := NewMock()
+func NewLocalWithSeed() Repository {
+	m := NewLocal()
 	Seed(m)
 	return m
 }

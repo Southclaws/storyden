@@ -27,7 +27,7 @@ func TestDB(t *testing.T) *model.Client {
 		t.Fatal(err)
 	}
 
-	t.Cleanup(func() {
+	truncate := func() {
 		tables := []string{
 			notification.Table,
 			subscription.Table,
@@ -43,6 +43,12 @@ func TestDB(t *testing.T) *model.Client {
 		if _, err := d.Exec(q); err != nil {
 			t.Fatal(err)
 		}
+	}
+
+	// truncate the database before tests and after.
+	truncate()
+	t.Cleanup(func() {
+		truncate()
 		c.Close()
 
 		fmt.Println("--- Cleaned database after test")

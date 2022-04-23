@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
 	post_model "github.com/Southclaws/storyden/api/src/infra/db/model/post"
+	"github.com/Southclaws/storyden/api/src/resources/category"
 	"github.com/Southclaws/storyden/api/src/resources/post"
 	"github.com/Southclaws/storyden/api/src/resources/user"
 )
@@ -33,7 +34,7 @@ func (d *database) CreateThread(
 	title string,
 	body string,
 	authorID user.UserID,
-	categoryName string,
+	categoryID category.CategoryID,
 	tags []string,
 ) (*Thread, error) {
 	short := post.MakeShortBody(body)
@@ -43,6 +44,11 @@ func (d *database) CreateThread(
 	// 	return nil, errors.Wrap(err, "failed to upsert tags for linking to post")
 	// }
 
+	cat, err := d.db.Category.Get(ctx, uuid.UUID(categoryID))
+	if err != nil {
+		return nil, err
+	}
+
 	p, err := d.db.Post.
 		Create().
 		SetFirst(true).
@@ -50,7 +56,7 @@ func (d *database) CreateThread(
 		SetBody(body).
 		SetAuthorID(uuid.UUID(authorID)).
 		SetTitle(title).
-		// SetCategoryID(categoryName).
+		SetCategory(cat).
 		// AddTagIDs(tagset).
 		Save(ctx)
 	if err != nil {

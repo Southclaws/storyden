@@ -3,6 +3,7 @@ package thread
 import (
 	"context"
 
+	"github.com/Southclaws/storyden/api/src/resources/category"
 	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
@@ -19,7 +20,7 @@ type Repository interface {
 		title string,
 		body string,
 		authorID user.UserID,
-		categoryName string,
+		categoryID category.CategoryID,
 		tags []string,
 	) (*Thread, error)
 

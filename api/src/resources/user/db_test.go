@@ -17,12 +17,12 @@ func implementations(t *testing.T, seed bool) []utils.ImplConstructor[Repository
 	if seed {
 		return []utils.ImplConstructor[Repository]{
 			func() Repository { return NewWithSeed(db.TestDB(t)) },
-			func() Repository { return NewMockWithSeed() },
+			func() Repository { return NewLocalWithSeed() },
 		}
 	} else {
 		return []utils.ImplConstructor[Repository]{
 			func() Repository { return New(db.TestDB(t)) },
-			func() Repository { return NewMock() },
+			func() Repository { return NewLocal() },
 		}
 	}
 }
