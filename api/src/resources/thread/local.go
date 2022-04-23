@@ -28,7 +28,7 @@ func (l *local) CreateThread(
 ) (*Thread, error) {
 	id := post.PostID(uuid.New())
 
-	l.m[id] = Thread{
+	t := Thread{
 		ID: id,
 
 		Posts: []post.Post{
@@ -38,5 +38,7 @@ func (l *local) CreateThread(
 		},
 	}
 
-	return nil, nil
+	l.m[id] = t
+
+	return &t, nil
 }

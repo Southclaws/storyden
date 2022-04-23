@@ -12,7 +12,6 @@ require (
 	github.com/forPelevin/gomoji v0.0.0-20210718160015-5fcf0e405128
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.1.1
-	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/gomarkdown/markdown v0.0.0-20211105120026-16f708f914c3
 	github.com/google/uuid v1.3.0

@@ -18,7 +18,6 @@ type Post struct {
 func (Post) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Unique().
 			Immutable().
 			Default(uuid.New),
 
@@ -62,7 +61,7 @@ func (Post) Edges() []ent.Edge {
 
 		edge.From("tags", Tag.Type).
 			Ref("posts").
-			Comment("Tagss are only required for root posts. It should never be added to a child post."),
+			Comment("Tags are only required for root posts. It should never be added to a child post."),
 
 		edge.To("posts", Post.Type).
 			From("root").

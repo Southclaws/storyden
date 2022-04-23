@@ -16,7 +16,6 @@ type Category struct {
 func (Category) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Unique().
 			Immutable().
 			Default(uuid.New),
 

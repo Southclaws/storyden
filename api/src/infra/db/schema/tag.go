@@ -16,7 +16,6 @@ type Tag struct {
 func (Tag) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Unique().
 			Immutable().
 			Default(uuid.New),
 

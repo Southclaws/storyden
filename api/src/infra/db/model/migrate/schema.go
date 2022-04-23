@@ -10,7 +10,7 @@ import (
 var (
 	// CategoriesColumns holds the columns for the "categories" table.
 	CategoriesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Default: "(No description)"},
 		{Name: "colour", Type: field.TypeString, Default: "#8577ce"},
@@ -50,7 +50,7 @@ var (
 	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "first", Type: field.TypeBool},
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
@@ -99,7 +99,7 @@ var (
 	}
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "emoji", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "post_reacts", Type: field.TypeUUID, Nullable: true},
@@ -173,7 +173,7 @@ var (
 	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "name", Type: field.TypeString, Unique: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
@@ -184,7 +184,7 @@ var (
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "bio", Type: field.TypeString, Nullable: true},

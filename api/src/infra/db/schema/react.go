@@ -18,7 +18,6 @@ type React struct {
 func (React) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
-			Unique().
 			Immutable().
 			Default(uuid.New),
 

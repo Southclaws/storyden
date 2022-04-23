@@ -14,6 +14,19 @@ import (
 	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
+func TestCreateCategory(t *testing.T) {
+	// a := assert.New(t)
+	r := require.New(t)
+	ctx := context.Background()
+
+	d := db.TestDB(t)
+	repo := New(d)
+
+	c, err := repo.CreateCategory(ctx, "test", "desc", "fffff", 1, false)
+	r.NoError(err)
+	r.NotNil(c)
+}
+
 func TestGetCategories(t *testing.T) {
 	a := assert.New(t)
 	r := require.New(t)

@@ -29,7 +29,7 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 		SetColour(colour).
 		SetSort(sort).
 		SetAdmin(admin).
-		OnConflict().
+		OnConflictColumns(category.FieldID).
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
