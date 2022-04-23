@@ -139,62 +139,6 @@ var (
 			},
 		},
 	}
-	// RulesColumns holds the columns for the "rules" table.
-	RulesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "value", Type: field.TypeString},
-		{Name: "server_id", Type: field.TypeString, Nullable: true},
-		{Name: "server_ru", Type: field.TypeString, Nullable: true},
-	}
-	// RulesTable holds the schema information for the "rules" table.
-	RulesTable = &schema.Table{
-		Name:       "rules",
-		Columns:    RulesColumns,
-		PrimaryKey: []*schema.Column{RulesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "rules_servers_ru",
-				Columns:    []*schema.Column{RulesColumns[4]},
-				RefColumns: []*schema.Column{ServersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// ServersColumns holds the columns for the "servers" table.
-	ServersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString},
-		{Name: "ip", Type: field.TypeString},
-		{Name: "hn", Type: field.TypeString},
-		{Name: "pc", Type: field.TypeInt},
-		{Name: "pm", Type: field.TypeInt},
-		{Name: "gm", Type: field.TypeString},
-		{Name: "la", Type: field.TypeString},
-		{Name: "pa", Type: field.TypeBool},
-		{Name: "vn", Type: field.TypeString},
-		{Name: "domain", Type: field.TypeString, Nullable: true},
-		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "banner", Type: field.TypeString, Nullable: true},
-		{Name: "user_id", Type: field.TypeString, Nullable: true},
-		{Name: "active", Type: field.TypeBool},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "rule_server", Type: field.TypeInt, Nullable: true},
-	}
-	// ServersTable holds the schema information for the "servers" table.
-	ServersTable = &schema.Table{
-		Name:       "servers",
-		Columns:    ServersColumns,
-		PrimaryKey: []*schema.Column{ServersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "servers_rules_Server",
-				Columns:    []*schema.Column{ServersColumns[16]},
-				RefColumns: []*schema.Column{RulesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// SubscriptionsColumns holds the columns for the "subscriptions" table.
 	SubscriptionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -248,7 +192,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "server_user", Type: field.TypeString, Nullable: true},
 		{Name: "subscription_user", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
@@ -258,14 +201,8 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "users_servers_User",
-				Columns:    []*schema.Column{UsersColumns[8]},
-				RefColumns: []*schema.Column{ServersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "users_subscriptions_user",
-				Columns:    []*schema.Column{UsersColumns[9]},
+				Columns:    []*schema.Column{UsersColumns[8]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -302,8 +239,6 @@ var (
 		NotificationsTable,
 		PostsTable,
 		ReactsTable,
-		RulesTable,
-		ServersTable,
 		SubscriptionsTable,
 		TagsTable,
 		UsersTable,
@@ -321,12 +256,9 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = UsersTable
 	ReactsTable.ForeignKeys[2].RefTable = PostsTable
 	ReactsTable.ForeignKeys[3].RefTable = UsersTable
-	RulesTable.ForeignKeys[0].RefTable = ServersTable
-	ServersTable.ForeignKeys[0].RefTable = RulesTable
 	SubscriptionsTable.ForeignKeys[0].RefTable = NotificationsTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = UsersTable
-	UsersTable.ForeignKeys[0].RefTable = ServersTable
-	UsersTable.ForeignKeys[1].RefTable = SubscriptionsTable
+	UsersTable.ForeignKeys[0].RefTable = SubscriptionsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

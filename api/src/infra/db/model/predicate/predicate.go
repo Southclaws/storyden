@@ -18,12 +18,6 @@ type Post func(*sql.Selector)
 // React is the predicate function for react builders.
 type React func(*sql.Selector)
 
-// Rule is the predicate function for rule builders.
-type Rule func(*sql.Selector)
-
-// Server is the predicate function for server builders.
-type Server func(*sql.Selector)
-
 // Subscription is the predicate function for subscription builders.
 type Subscription func(*sql.Selector)
 

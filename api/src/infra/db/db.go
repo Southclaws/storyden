@@ -22,7 +22,7 @@ func Build() fx.Option {
 
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) (err error) {
-				client, _, err = connect(cfg.DatabaseURL)
+				client, _, err = connect(cfg.DatabaseURL, true)
 				if err != nil {
 					return err
 				}
@@ -38,7 +38,7 @@ func Build() fx.Option {
 	})
 }
 
-func connect(url string) (*model.Client, *sql.DB, error) {
+func connect(url string, prod bool) (*model.Client, *sql.DB, error) {
 	driver, err := sql.Open("pgx", url)
 	if err != nil {
 		return nil, nil, err
@@ -47,8 +47,12 @@ func connect(url string) (*model.Client, *sql.DB, error) {
 	client := model.NewClient(model.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
 	opts := []schema.MigrateOption{
-		schema.WithDropColumn(true),
-		schema.WithDropIndex(true),
+		schema.WithAtlas(true),
+	}
+
+	if !prod {
+		opts = append(opts, schema.WithDropColumn(true))
+		opts = append(opts, schema.WithDropIndex(true))
 	}
 
 	// Run only additive migrations

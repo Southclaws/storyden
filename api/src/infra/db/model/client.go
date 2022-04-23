@@ -14,8 +14,6 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/rule"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/server"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
@@ -38,10 +36,6 @@ type Client struct {
 	Post *PostClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
-	// Rule is the client for interacting with the Rule builders.
-	Rule *RuleClient
-	// Server is the client for interacting with the Server builders.
-	Server *ServerClient
 	// Subscription is the client for interacting with the Subscription builders.
 	Subscription *SubscriptionClient
 	// Tag is the client for interacting with the Tag builders.
@@ -65,8 +59,6 @@ func (c *Client) init() {
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.React = NewReactClient(c.config)
-	c.Rule = NewRuleClient(c.config)
-	c.Server = NewServerClient(c.config)
 	c.Subscription = NewSubscriptionClient(c.config)
 	c.Tag = NewTagClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -107,8 +99,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Notification: NewNotificationClient(cfg),
 		Post:         NewPostClient(cfg),
 		React:        NewReactClient(cfg),
-		Rule:         NewRuleClient(cfg),
-		Server:       NewServerClient(cfg),
 		Subscription: NewSubscriptionClient(cfg),
 		Tag:          NewTagClient(cfg),
 		User:         NewUserClient(cfg),
@@ -135,8 +125,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Notification: NewNotificationClient(cfg),
 		Post:         NewPostClient(cfg),
 		React:        NewReactClient(cfg),
-		Rule:         NewRuleClient(cfg),
-		Server:       NewServerClient(cfg),
 		Subscription: NewSubscriptionClient(cfg),
 		Tag:          NewTagClient(cfg),
 		User:         NewUserClient(cfg),
@@ -173,8 +161,6 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Notification.Use(hooks...)
 	c.Post.Use(hooks...)
 	c.React.Use(hooks...)
-	c.Rule.Use(hooks...)
-	c.Server.Use(hooks...)
 	c.Subscription.Use(hooks...)
 	c.Tag.Use(hooks...)
 	c.User.Use(hooks...)
@@ -730,234 +716,6 @@ func (c *ReactClient) QueryPost(r *React) *PostQuery {
 // Hooks returns the client hooks.
 func (c *ReactClient) Hooks() []Hook {
 	return c.hooks.React
-}
-
-// RuleClient is a client for the Rule schema.
-type RuleClient struct {
-	config
-}
-
-// NewRuleClient returns a client for the Rule from the given config.
-func NewRuleClient(c config) *RuleClient {
-	return &RuleClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `rule.Hooks(f(g(h())))`.
-func (c *RuleClient) Use(hooks ...Hook) {
-	c.hooks.Rule = append(c.hooks.Rule, hooks...)
-}
-
-// Create returns a create builder for Rule.
-func (c *RuleClient) Create() *RuleCreate {
-	mutation := newRuleMutation(c.config, OpCreate)
-	return &RuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Rule entities.
-func (c *RuleClient) CreateBulk(builders ...*RuleCreate) *RuleCreateBulk {
-	return &RuleCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Rule.
-func (c *RuleClient) Update() *RuleUpdate {
-	mutation := newRuleMutation(c.config, OpUpdate)
-	return &RuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *RuleClient) UpdateOne(r *Rule) *RuleUpdateOne {
-	mutation := newRuleMutation(c.config, OpUpdateOne, withRule(r))
-	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *RuleClient) UpdateOneID(id int) *RuleUpdateOne {
-	mutation := newRuleMutation(c.config, OpUpdateOne, withRuleID(id))
-	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Rule.
-func (c *RuleClient) Delete() *RuleDelete {
-	mutation := newRuleMutation(c.config, OpDelete)
-	return &RuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *RuleClient) DeleteOne(r *Rule) *RuleDeleteOne {
-	return c.DeleteOneID(r.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *RuleClient) DeleteOneID(id int) *RuleDeleteOne {
-	builder := c.Delete().Where(rule.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &RuleDeleteOne{builder}
-}
-
-// Query returns a query builder for Rule.
-func (c *RuleClient) Query() *RuleQuery {
-	return &RuleQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a Rule entity by its id.
-func (c *RuleClient) Get(ctx context.Context, id int) (*Rule, error) {
-	return c.Query().Where(rule.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *RuleClient) GetX(ctx context.Context, id int) *Rule {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryServer queries the Server edge of a Rule.
-func (c *RuleClient) QueryServer(r *Rule) *ServerQuery {
-	query := &ServerQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(rule.Table, rule.FieldID, id),
-			sqlgraph.To(server.Table, server.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, rule.ServerTable, rule.ServerColumn),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *RuleClient) Hooks() []Hook {
-	return c.hooks.Rule
-}
-
-// ServerClient is a client for the Server schema.
-type ServerClient struct {
-	config
-}
-
-// NewServerClient returns a client for the Server from the given config.
-func NewServerClient(c config) *ServerClient {
-	return &ServerClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `server.Hooks(f(g(h())))`.
-func (c *ServerClient) Use(hooks ...Hook) {
-	c.hooks.Server = append(c.hooks.Server, hooks...)
-}
-
-// Create returns a create builder for Server.
-func (c *ServerClient) Create() *ServerCreate {
-	mutation := newServerMutation(c.config, OpCreate)
-	return &ServerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Server entities.
-func (c *ServerClient) CreateBulk(builders ...*ServerCreate) *ServerCreateBulk {
-	return &ServerCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Server.
-func (c *ServerClient) Update() *ServerUpdate {
-	mutation := newServerMutation(c.config, OpUpdate)
-	return &ServerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ServerClient) UpdateOne(s *Server) *ServerUpdateOne {
-	mutation := newServerMutation(c.config, OpUpdateOne, withServer(s))
-	return &ServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ServerClient) UpdateOneID(id string) *ServerUpdateOne {
-	mutation := newServerMutation(c.config, OpUpdateOne, withServerID(id))
-	return &ServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Server.
-func (c *ServerClient) Delete() *ServerDelete {
-	mutation := newServerMutation(c.config, OpDelete)
-	return &ServerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *ServerClient) DeleteOne(s *Server) *ServerDeleteOne {
-	return c.DeleteOneID(s.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *ServerClient) DeleteOneID(id string) *ServerDeleteOne {
-	builder := c.Delete().Where(server.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ServerDeleteOne{builder}
-}
-
-// Query returns a query builder for Server.
-func (c *ServerClient) Query() *ServerQuery {
-	return &ServerQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a Server entity by its id.
-func (c *ServerClient) Get(ctx context.Context, id string) (*Server, error) {
-	return c.Query().Where(server.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ServerClient) GetX(ctx context.Context, id string) *Server {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryRu queries the ru edge of a Server.
-func (c *ServerClient) QueryRu(s *Server) *RuleQuery {
-	query := &RuleQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(server.Table, server.FieldID, id),
-			sqlgraph.To(rule.Table, rule.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, server.RuTable, server.RuColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUser queries the User edge of a Server.
-func (c *ServerClient) QueryUser(s *Server) *UserQuery {
-	query := &UserQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(server.Table, server.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, server.UserTable, server.UserColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ServerClient) Hooks() []Hook {
-	return c.hooks.Server
 }
 
 // SubscriptionClient is a client for the Subscription schema.

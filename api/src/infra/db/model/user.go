@@ -34,7 +34,6 @@ type User struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges             UserEdges `json:"edges"`
-	server_user       *string
 	subscription_user *string
 }
 
@@ -91,9 +90,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullTime)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
-		case user.ForeignKeys[0]: // server_user
-			values[i] = new(sql.NullString)
-		case user.ForeignKeys[1]: // subscription_user
+		case user.ForeignKeys[0]: // subscription_user
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
@@ -159,13 +156,6 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				u.DeletedAt = value.Time
 			}
 		case user.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field server_user", values[i])
-			} else if value.Valid {
-				u.server_user = new(string)
-				*u.server_user = value.String
-			}
-		case user.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field subscription_user", values[i])
 			} else if value.Valid {

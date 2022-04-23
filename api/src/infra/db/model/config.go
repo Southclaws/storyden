@@ -28,8 +28,6 @@ type hooks struct {
 	Notification []ent.Hook
 	Post         []ent.Hook
 	React        []ent.Hook
-	Rule         []ent.Hook
-	Server       []ent.Hook
 	Subscription []ent.Hook
 	Tag          []ent.Hook
 	User         []ent.Hook

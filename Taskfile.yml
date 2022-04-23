@@ -3,6 +3,7 @@ version: 3
 vars:
   VERSION:
     sh: git describe --always --dirty --tags
+  LOCAL_DB: postgres://default:default@localhost:5432/postgres?sslmode=disable
 
 tasks:
   default:
@@ -42,3 +43,24 @@ tasks:
     cmds:
       - swag fmt --dir ./api
       - swag init --dir ./api --output ./api/src/interfaces/swagger
+
+  # -
+  # Database
+  # -
+
+  db:migrate:
+    deps: [db:migrate:generate, db:migrate:run]
+
+  db:migrate:generate:
+    desc: Generate migrations from schema changes.
+    cmds:
+      - go run ./cmd/generate/main.go
+
+  db:migrate:run:
+    desc: Execute migrations against database.
+    cmds:
+      - go run ./cmd/migrate/main.go
+
+  db:ui:
+    cmds:
+      - atlas schema inspect -d {{.LOCAL_DB}} -w

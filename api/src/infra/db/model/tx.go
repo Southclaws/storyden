@@ -20,10 +20,6 @@ type Tx struct {
 	Post *PostClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
-	// Rule is the client for interacting with the Rule builders.
-	Rule *RuleClient
-	// Server is the client for interacting with the Server builders.
-	Server *ServerClient
 	// Subscription is the client for interacting with the Subscription builders.
 	Subscription *SubscriptionClient
 	// Tag is the client for interacting with the Tag builders.
@@ -169,8 +165,6 @@ func (tx *Tx) init() {
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.React = NewReactClient(tx.config)
-	tx.Rule = NewRuleClient(tx.config)
-	tx.Server = NewServerClient(tx.config)
 	tx.Subscription = NewSubscriptionClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.User = NewUserClient(tx.config)

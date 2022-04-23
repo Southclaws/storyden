@@ -11,8 +11,6 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/rule"
-	"github.com/Southclaws/storyden/api/src/infra/db/model/server"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/tag"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
@@ -24,7 +22,7 @@ func TestDB(t *testing.T) *model.Client {
 		url = "postgresql://default:default@localhost:5432/postgres"
 	}
 
-	c, d, err := connect(url)
+	c, d, err := connect(url, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,8 +32,6 @@ func TestDB(t *testing.T) *model.Client {
 			notification.Table,
 			subscription.Table,
 			react.Table,
-			rule.Table,
-			server.Table,
 			user.Table,
 			category.Table,
 			tag.Table,

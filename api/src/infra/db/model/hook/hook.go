@@ -61,32 +61,6 @@ func (f ReactFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, e
 	return f(ctx, mv)
 }
 
-// The RuleFunc type is an adapter to allow the use of ordinary
-// function as Rule mutator.
-type RuleFunc func(context.Context, *model.RuleMutation) (model.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f RuleFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
-	mv, ok := m.(*model.RuleMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.RuleMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The ServerFunc type is an adapter to allow the use of ordinary
-// function as Server mutator.
-type ServerFunc func(context.Context, *model.ServerMutation) (model.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServerFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
-	mv, ok := m.(*model.ServerMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.ServerMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The SubscriptionFunc type is an adapter to allow the use of ordinary
 // function as Subscription mutator.
 type SubscriptionFunc func(context.Context, *model.SubscriptionMutation) (model.Value, error)
