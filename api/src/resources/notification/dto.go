@@ -3,7 +3,9 @@ package notification
 import (
 	"time"
 
-	"github.com/Southclaws/storyden/api/src/infra/db"
+	"4d63.com/optional"
+	"github.com/Southclaws/storyden/api/src/infra/db/model"
+	"github.com/Southclaws/storyden/api/src/utils"
 	"github.com/google/uuid"
 )
 
@@ -15,7 +17,7 @@ type (
 type NotificationType string
 
 const (
-	NotificationTypeForumPostResponse NotificationType = NotificationType(db.NotificationTypeFORUMPOSTRESPONSE)
+	NotificationTypeForumPostResponse NotificationType = NotificationType(model.RefersTyp)
 )
 
 type Notification struct {
@@ -29,29 +31,29 @@ type Notification struct {
 }
 
 type Subscription struct {
-	ID         SubscriptionID   `json:"id"`
-	RefersType NotificationType `json:"refersType"`
-	RefersTo   string           `json:"refersTo"`
-	CreatedAt  time.Time        `json:"createdAt"`
-	UpdatedAt  time.Time        `json:"updatedAt"`
-	DeletedAt  *time.Time       `json:"deletedAt"`
+	ID         SubscriptionID               `json:"id"`
+	RefersType NotificationType             `json:"refersType"`
+	RefersTo   string                       `json:"refersTo"`
+	CreatedAt  time.Time                    `json:"createdAt"`
+	UpdatedAt  time.Time                    `json:"updatedAt"`
+	DeletedAt  optional.Optional[time.Time] `json:"deletedAt"`
 }
 
-func SubFromModel(m *db.SubscriptionModel) *Subscription {
+func SubFromModel(m *model.Subscription) *Subscription {
 	return &Subscription{
-		ID:         m.ID,
+		ID:         SubscriptionID(m.ID),
 		RefersType: NotificationType(m.RefersType),
 		RefersTo:   m.RefersTo,
-		CreatedAt:  m.CreatedAt,
-		UpdatedAt:  m.UpdatedAt,
-		DeletedAt:  m.InnerSubscription.DeletedAt,
+		CreatedAt:  m.CreateTime,
+		UpdatedAt:  m.UpdateTime,
+		DeletedAt:  utils.OptionalZero(m.DeleteTime),
 	}
 }
 
-func FromModel(m *db.NotificationModel) *Notification {
+func FromModel(m *model.Notification) *Notification {
 	var sub *Subscription
-	if m.RelationsNotification.Subscription != nil {
-		sub = SubFromModel(m.RelationsNotification.Subscription)
+	if m.Subscription != nil {
+		sub = SubFromModel(m.Subscription)
 	}
 
 	return &Notification{
