@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -29,15 +30,15 @@ type Subscription struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubscriptionQuery when eager-loading is set.
-	Edges                     SubscriptionEdges `json:"edges"`
-	notification_subscription *uuid.UUID
-	user_subscriptions        *uuid.UUID
+	Edges              SubscriptionEdges `json:"edges"`
+	subscription_user  *uuid.UUID
+	user_subscriptions *uuid.UUID
 }
 
 // SubscriptionEdges holds the relations/edges for other nodes in the graph.
 type SubscriptionEdges struct {
 	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	User *User `json:"user,omitempty"`
 	// Notifications holds the value of the notifications edge.
 	Notifications []*Notification `json:"notifications,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -46,9 +47,14 @@ type SubscriptionEdges struct {
 }
 
 // UserOrErr returns the User value or an error if the edge
-// was not loaded in eager-loading.
-func (e SubscriptionEdges) UserOrErr() ([]*User, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubscriptionEdges) UserOrErr() (*User, error) {
 	if e.loadedTypes[0] {
+		if e.User == nil {
+			// The edge user was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
 		return e.User, nil
 	}
 	return nil, &NotLoadedError{edge: "user"}
@@ -74,7 +80,7 @@ func (*Subscription) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullTime)
 		case subscription.FieldID:
 			values[i] = new(uuid.UUID)
-		case subscription.ForeignKeys[0]: // notification_subscription
+		case subscription.ForeignKeys[0]: // subscription_user
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case subscription.ForeignKeys[1]: // user_subscriptions
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
@@ -131,10 +137,10 @@ func (s *Subscription) assignValues(columns []string, values []interface{}) erro
 			}
 		case subscription.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field notification_subscription", values[i])
+				return fmt.Errorf("unexpected type %T for field subscription_user", values[i])
 			} else if value.Valid {
-				s.notification_subscription = new(uuid.UUID)
-				*s.notification_subscription = *value.S.(*uuid.UUID)
+				s.subscription_user = new(uuid.UUID)
+				*s.subscription_user = *value.S.(*uuid.UUID)
 			}
 		case subscription.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {

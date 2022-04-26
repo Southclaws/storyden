@@ -83,19 +83,23 @@ func (su *SubscriptionUpdate) SetUpdateTime(t time.Time) *SubscriptionUpdate {
 	return su
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (su *SubscriptionUpdate) AddUserIDs(ids ...uuid.UUID) *SubscriptionUpdate {
-	su.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (su *SubscriptionUpdate) SetUserID(id uuid.UUID) *SubscriptionUpdate {
+	su.mutation.SetUserID(id)
 	return su
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (su *SubscriptionUpdate) AddUser(u ...*User) *SubscriptionUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableUserID(id *uuid.UUID) *SubscriptionUpdate {
+	if id != nil {
+		su = su.SetUserID(*id)
 	}
-	return su.AddUserIDs(ids...)
+	return su
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (su *SubscriptionUpdate) SetUser(u *User) *SubscriptionUpdate {
+	return su.SetUserID(u.ID)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -118,25 +122,10 @@ func (su *SubscriptionUpdate) Mutation() *SubscriptionMutation {
 	return su.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
+// ClearUser clears the "user" edge to the User entity.
 func (su *SubscriptionUpdate) ClearUser() *SubscriptionUpdate {
 	su.mutation.ClearUser()
 	return su
-}
-
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (su *SubscriptionUpdate) RemoveUserIDs(ids ...uuid.UUID) *SubscriptionUpdate {
-	su.mutation.RemoveUserIDs(ids...)
-	return su
-}
-
-// RemoveUser removes "user" edges to User entities.
-func (su *SubscriptionUpdate) RemoveUser(u ...*User) *SubscriptionUpdate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return su.RemoveUserIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -305,7 +294,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   subscription.UserTable,
 			Columns: []string{subscription.UserColumn},
@@ -316,31 +305,12 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: user.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.RemovedUserIDs(); len(nodes) > 0 && !su.mutation.UserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   subscription.UserTable,
-			Columns: []string{subscription.UserColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   subscription.UserTable,
 			Columns: []string{subscription.UserColumn},
@@ -482,19 +452,23 @@ func (suo *SubscriptionUpdateOne) SetUpdateTime(t time.Time) *SubscriptionUpdate
 	return suo
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (suo *SubscriptionUpdateOne) AddUserIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (suo *SubscriptionUpdateOne) SetUserID(id uuid.UUID) *SubscriptionUpdateOne {
+	suo.mutation.SetUserID(id)
 	return suo
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (suo *SubscriptionUpdateOne) AddUser(u ...*User) *SubscriptionUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableUserID(id *uuid.UUID) *SubscriptionUpdateOne {
+	if id != nil {
+		suo = suo.SetUserID(*id)
 	}
-	return suo.AddUserIDs(ids...)
+	return suo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (suo *SubscriptionUpdateOne) SetUser(u *User) *SubscriptionUpdateOne {
+	return suo.SetUserID(u.ID)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -517,25 +491,10 @@ func (suo *SubscriptionUpdateOne) Mutation() *SubscriptionMutation {
 	return suo.mutation
 }
 
-// ClearUser clears all "user" edges to the User entity.
+// ClearUser clears the "user" edge to the User entity.
 func (suo *SubscriptionUpdateOne) ClearUser() *SubscriptionUpdateOne {
 	suo.mutation.ClearUser()
 	return suo
-}
-
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (suo *SubscriptionUpdateOne) RemoveUserIDs(ids ...uuid.UUID) *SubscriptionUpdateOne {
-	suo.mutation.RemoveUserIDs(ids...)
-	return suo
-}
-
-// RemoveUser removes "user" edges to User entities.
-func (suo *SubscriptionUpdateOne) RemoveUser(u ...*User) *SubscriptionUpdateOne {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return suo.RemoveUserIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
@@ -728,7 +687,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 	}
 	if suo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   subscription.UserTable,
 			Columns: []string{subscription.UserColumn},
@@ -739,31 +698,12 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 					Column: user.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.RemovedUserIDs(); len(nodes) > 0 && !suo.mutation.UserCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   subscription.UserTable,
-			Columns: []string{subscription.UserColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: user.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   subscription.UserTable,
 			Columns: []string{subscription.UserColumn},

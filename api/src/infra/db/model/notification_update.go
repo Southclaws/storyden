@@ -68,19 +68,23 @@ func (nu *NotificationUpdate) SetNillableCreateTime(t *time.Time) *NotificationU
 	return nu
 }
 
-// AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by IDs.
-func (nu *NotificationUpdate) AddSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdate {
-	nu.mutation.AddSubscriptionIDs(ids...)
+// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
+func (nu *NotificationUpdate) SetSubscriptionID(id uuid.UUID) *NotificationUpdate {
+	nu.mutation.SetSubscriptionID(id)
 	return nu
 }
 
-// AddSubscription adds the "subscription" edges to the Subscription entity.
-func (nu *NotificationUpdate) AddSubscription(s ...*Subscription) *NotificationUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSubscriptionID(id *uuid.UUID) *NotificationUpdate {
+	if id != nil {
+		nu = nu.SetSubscriptionID(*id)
 	}
-	return nu.AddSubscriptionIDs(ids...)
+	return nu
+}
+
+// SetSubscription sets the "subscription" edge to the Subscription entity.
+func (nu *NotificationUpdate) SetSubscription(s *Subscription) *NotificationUpdate {
+	return nu.SetSubscriptionID(s.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -88,25 +92,10 @@ func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 	return nu.mutation
 }
 
-// ClearSubscription clears all "subscription" edges to the Subscription entity.
+// ClearSubscription clears the "subscription" edge to the Subscription entity.
 func (nu *NotificationUpdate) ClearSubscription() *NotificationUpdate {
 	nu.mutation.ClearSubscription()
 	return nu
-}
-
-// RemoveSubscriptionIDs removes the "subscription" edge to Subscription entities by IDs.
-func (nu *NotificationUpdate) RemoveSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdate {
-	nu.mutation.RemoveSubscriptionIDs(ids...)
-	return nu
-}
-
-// RemoveSubscription removes "subscription" edges to Subscription entities.
-func (nu *NotificationUpdate) RemoveSubscription(s ...*Subscription) *NotificationUpdate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return nu.RemoveSubscriptionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -218,7 +207,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nu.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   notification.SubscriptionTable,
 			Columns: []string{notification.SubscriptionColumn},
@@ -229,31 +218,12 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 					Column: subscription.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.RemovedSubscriptionIDs(); len(nodes) > 0 && !nu.mutation.SubscriptionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nu.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   notification.SubscriptionTable,
 			Columns: []string{notification.SubscriptionColumn},
@@ -327,19 +297,23 @@ func (nuo *NotificationUpdateOne) SetNillableCreateTime(t *time.Time) *Notificat
 	return nuo
 }
 
-// AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by IDs.
-func (nuo *NotificationUpdateOne) AddSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdateOne {
-	nuo.mutation.AddSubscriptionIDs(ids...)
+// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
+func (nuo *NotificationUpdateOne) SetSubscriptionID(id uuid.UUID) *NotificationUpdateOne {
+	nuo.mutation.SetSubscriptionID(id)
 	return nuo
 }
 
-// AddSubscription adds the "subscription" edges to the Subscription entity.
-func (nuo *NotificationUpdateOne) AddSubscription(s ...*Subscription) *NotificationUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSubscriptionID(id *uuid.UUID) *NotificationUpdateOne {
+	if id != nil {
+		nuo = nuo.SetSubscriptionID(*id)
 	}
-	return nuo.AddSubscriptionIDs(ids...)
+	return nuo
+}
+
+// SetSubscription sets the "subscription" edge to the Subscription entity.
+func (nuo *NotificationUpdateOne) SetSubscription(s *Subscription) *NotificationUpdateOne {
+	return nuo.SetSubscriptionID(s.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -347,25 +321,10 @@ func (nuo *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return nuo.mutation
 }
 
-// ClearSubscription clears all "subscription" edges to the Subscription entity.
+// ClearSubscription clears the "subscription" edge to the Subscription entity.
 func (nuo *NotificationUpdateOne) ClearSubscription() *NotificationUpdateOne {
 	nuo.mutation.ClearSubscription()
 	return nuo
-}
-
-// RemoveSubscriptionIDs removes the "subscription" edge to Subscription entities by IDs.
-func (nuo *NotificationUpdateOne) RemoveSubscriptionIDs(ids ...uuid.UUID) *NotificationUpdateOne {
-	nuo.mutation.RemoveSubscriptionIDs(ids...)
-	return nuo
-}
-
-// RemoveSubscription removes "subscription" edges to Subscription entities.
-func (nuo *NotificationUpdateOne) RemoveSubscription(s ...*Subscription) *NotificationUpdateOne {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return nuo.RemoveSubscriptionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -501,7 +460,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	}
 	if nuo.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   notification.SubscriptionTable,
 			Columns: []string{notification.SubscriptionColumn},
@@ -512,31 +471,12 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 					Column: subscription.FieldID,
 				},
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.RemovedSubscriptionIDs(); len(nodes) > 0 && !nuo.mutation.SubscriptionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nuo.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   notification.SubscriptionTable,
 			Columns: []string{notification.SubscriptionColumn},

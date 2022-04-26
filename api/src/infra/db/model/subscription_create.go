@@ -94,19 +94,23 @@ func (sc *SubscriptionCreate) SetNillableID(u *uuid.UUID) *SubscriptionCreate {
 	return sc
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (sc *SubscriptionCreate) AddUserIDs(ids ...uuid.UUID) *SubscriptionCreate {
-	sc.mutation.AddUserIDs(ids...)
+// SetUserID sets the "user" edge to the User entity by ID.
+func (sc *SubscriptionCreate) SetUserID(id uuid.UUID) *SubscriptionCreate {
+	sc.mutation.SetUserID(id)
 	return sc
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (sc *SubscriptionCreate) AddUser(u ...*User) *SubscriptionCreate {
-	ids := make([]uuid.UUID, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillableUserID(id *uuid.UUID) *SubscriptionCreate {
+	if id != nil {
+		sc = sc.SetUserID(*id)
 	}
-	return sc.AddUserIDs(ids...)
+	return sc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (sc *SubscriptionCreate) SetUser(u *User) *SubscriptionCreate {
+	return sc.SetUserID(u.ID)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -312,7 +316,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 	}
 	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   subscription.UserTable,
 			Columns: []string{subscription.UserColumn},
@@ -327,6 +331,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.subscription_user = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.NotificationsIDs(); len(nodes) > 0 {

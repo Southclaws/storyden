@@ -28,7 +28,7 @@ const (
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
 	// SubscriptionTable is the table that holds the subscription relation/edge.
-	SubscriptionTable = "subscriptions"
+	SubscriptionTable = "notifications"
 	// SubscriptionInverseTable is the table name for the Subscription entity.
 	// It exists in this package in order to avoid circular dependency with the "subscription" package.
 	SubscriptionInverseTable = "subscriptions"
@@ -49,6 +49,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"notification_subscription",
 	"subscription_notifications",
 }
 

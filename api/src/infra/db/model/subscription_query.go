@@ -83,7 +83,7 @@ func (sq *SubscriptionQuery) QueryUser() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, subscription.UserTable, subscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, subscription.UserTable, subscription.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -396,6 +396,9 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 			sq.withNotifications != nil,
 		}
 	)
+	if sq.withUser != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, subscription.ForeignKeys...)
 	}
@@ -423,31 +426,31 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 	}
 
 	if query := sq.withUser; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[uuid.UUID]*Subscription)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Subscription)
 		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.User = []*User{}
+			if nodes[i].subscription_user == nil {
+				continue
+			}
+			fk := *nodes[i].subscription_user
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.withFKs = true
-		query.Where(predicate.User(func(s *sql.Selector) {
-			s.Where(sql.InValues(subscription.UserColumn, fks...))
-		}))
+		query.Where(user.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.subscription_user
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "subscription_user" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "subscription_user" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "subscription_user" returned %v`, n.ID)
 			}
-			node.Edges.User = append(node.Edges.User, n)
+			for i := range nodes {
+				nodes[i].Edges.User = n
+			}
 		}
 	}
 

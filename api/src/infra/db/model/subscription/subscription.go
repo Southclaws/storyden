@@ -30,7 +30,7 @@ const (
 	// Table holds the table name of the subscription in the database.
 	Table = "subscriptions"
 	// UserTable is the table that holds the user relation/edge.
-	UserTable = "users"
+	UserTable = "subscriptions"
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
@@ -58,7 +58,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subscriptions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"notification_subscription",
+	"subscription_user",
 	"user_subscriptions",
 }
 

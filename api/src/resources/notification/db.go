@@ -4,136 +4,112 @@ import (
 	"context"
 	"time"
 
-	"github.com/Southclaws/storyden/api/src/infra/db"
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
+	model_user "github.com/Southclaws/storyden/api/src/infra/db/model/user"
 	"github.com/Southclaws/storyden/api/src/resources/post"
+	"github.com/Southclaws/storyden/api/src/resources/user"
+	"github.com/google/uuid"
 )
 
-type DB struct {
+type database struct {
 	db *model.Client
 }
 
 func New(db *model.Client) Repository {
-	return &DB{db}
+	return &database{db}
 }
 
-func (d *DB) Subscribe(ctx context.Context, userID string, refersType NotificationType, refersTo string) (*Subscription, error) {
-	sub, err := d.db.Subscription.CreateOne(
-		db.Subscription.User.Link(db.User.ID.Equals(userID)),
-		db.Subscription.RefersType.Set(db.NotificationType(refersType)),
-		db.Subscription.RefersTo.Set(refersTo),
-	).Exec(ctx)
+func (d *database) Subscribe(ctx context.Context, userID user.UserID, refersType NotificationType, refersTo string) (*Subscription, error) {
+	sub, err := d.db.Subscription.Create().
+		SetUserID(uuid.UUID(userID)).
+		SetRefersType(string(refersType)).
+		SetRefersTo(refersTo).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return SubFromModel(sub), nil
 }
 
-func (d *DB) Unsubscribe(ctx context.Context, userID, subID string) (int, error) {
-	updateSubscription := d.db.Subscription.
-		FindMany(
-			db.Subscription.ID.Equals(subID),
-			db.Subscription.UserID.Equals(userID),
-		).
-		With(
-			db.Subscription.Notifications.Fetch(),
-		).
-		Update(
-			db.Subscription.DeletedAt.Set(time.Now()),
-		).
-		Tx()
-
-	deleteNotifications := d.db.Notification.
-		FindMany(
-			db.Notification.SubscriptionID.Equals(subID),
-		).
-		Delete().
-		Tx()
-
-	err := d.db.Prisma.TX.Transaction(
-		updateSubscription,
-		deleteNotifications,
-	).Exec(ctx)
+func (d *database) Unsubscribe(ctx context.Context, userID user.UserID, subID SubscriptionID) (int, error) {
+	i, err := d.db.Subscription.Delete().
+		Where(
+			subscription.IDEQ(uuid.UUID(subID)),
+			subscription.HasUserWith(
+				model_user.IDEQ(uuid.UUID(userID)),
+			),
+		).Exec(ctx)
 	if err != nil {
 		return 0, err
 	}
 
-	return deleteNotifications.Result().Count, nil
+	return i, nil
 }
 
-func (d *DB) GetSubscriptionsForUser(ctx context.Context, userID string) ([]Subscription, error) {
-	subs, err := d.db.Subscription.
-		FindMany(
-			db.Subscription.UserID.Equals(userID),
-			db.Subscription.DeletedAt.IsNull(),
+func (d *database) GetSubscriptionsForUser(ctx context.Context, userID user.UserID) ([]Subscription, error) {
+	subs, err := d.db.Subscription.Query().
+		Where(
+			subscription.HasUserWith(
+				model_user.IDEQ(uuid.UUID(userID)),
+			),
 		).
-		Exec(ctx)
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	result := []Subscription{}
-	for _, s := range subs {
-		result = append(result, *SubFromModel(&s))
-	}
-	return result, nil
+	return SubFromModelMany(subs), nil
 }
 
-func (d *DB) GetSubscriptionsForItem(ctx context.Context, refersType NotificationType, refersTo string) ([]Subscription, error) {
-	subs, err := d.db.Subscription.
-		FindMany(
-			db.Subscription.RefersType.Equals(db.NotificationType(refersType)),
-			db.Subscription.RefersTo.Equals(refersTo),
-			db.Subscription.DeletedAt.IsNull(),
+func (d *database) GetSubscriptionsForItem(ctx context.Context, refersType NotificationType, refersTo string) ([]Subscription, error) {
+	subs, err := d.db.Subscription.Query().
+		Where(
+			subscription.RefersTypeEQ(string(refersType)),
+			subscription.RefersToEQ(refersTo),
+			subscription.DeleteTimeIsNil(),
 		).
-		Exec(ctx)
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	result := []Subscription{}
-	for _, s := range subs {
-		result = append(result, *SubFromModel(&s))
-	}
-	return result, nil
+	return SubFromModelMany(subs), nil
 }
 
-func (d *DB) GetNotifications(ctx context.Context, userID string, read bool, after time.Time) ([]Notification, error) {
-	filters := []db.NotificationWhereParam{
-		db.Notification.Subscription.Where(
-			db.Subscription.UserID.Equals(userID),
-		),
-	}
+func (d *database) GetNotifications(ctx context.Context, userID user.UserID, read bool, after time.Time) ([]Notification, error) {
+	q := d.db.Notification.Query().
+		Where(
+			notification.HasSubscriptionWith(
+				subscription.HasUserWith(
+					model_user.IDEQ(uuid.UUID(userID)),
+				),
+			),
+		).
+		WithSubscription()
 
 	// if read is false (default), only return unread notifications, otherwise, all.
 	if !read {
-		filters = append(filters, db.Notification.Read.Equals(false))
+		q.Where(notification.ReadEQ(false))
 	}
 
 	if !after.IsZero() {
-		filters = append(filters, db.Notification.CreatedAt.After(after))
+		q.Where(notification.CreateTimeGT(after))
 	}
 
-	notifs, err := d.db.Notification.
-		FindMany(filters...).
-		With(db.Notification.Subscription.Fetch()).
-		Exec(ctx)
+	notifs, err := q.All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	result := []Notification{}
-	for _, n := range notifs {
-		result = append(result, *FromModel(&n))
-	}
-
-	return result, nil
+	return FromModelMany(notifs), nil
 }
 
-func (d *DB) Notify(ctx context.Context, refersType NotificationType, refersTo string, title, desc, link string) (int, error) {
+func (d *database) Notify(ctx context.Context, refersType NotificationType, refersTo string, title, desc, link string) (int, error) {
 	// NOTE: This is extremely inefficient for large forums!
 	// TODO: Figure out a better way to do this. There are two options:
-	//       1. A message queue, just to defer the DB ops. This would
+	//       1. A message queue, just to defer the database ops. This would
 	//          effectively be the same code, just spread over time.
 	//       2. A new table that stores subscription notifiation events that
 	//          aren't associated with specific users. Then, when a user queries
@@ -146,16 +122,13 @@ func (d *DB) Notify(ctx context.Context, refersType NotificationType, refersTo s
 
 	for _, sub := range subs {
 		_, err := d.db.Notification.
-			CreateOne(
-				db.Notification.Title.Set(title),
-				db.Notification.Description.Set(desc),
-				db.Notification.Link.Set(link),
-				db.Notification.Read.Set(false),
-				db.Notification.Subscription.Link(
-					db.Subscription.ID.Equals(sub.ID),
-				),
-			).
-			Exec(ctx)
+			Create().
+			SetTitle(title).
+			SetDescription(desc).
+			SetLink(link).
+			SetRead(false).
+			SetSubscriptionID(uuid.UUID(sub.ID)).
+			Save(ctx)
 		if err != nil {
 			return 0, err
 		}
@@ -164,7 +137,7 @@ func (d *DB) Notify(ctx context.Context, refersType NotificationType, refersTo s
 	return len(subs), nil
 }
 
-func (d *DB) SetReadState(ctx context.Context, userID string, notificationID string, read bool) (*Notification, error) {
+func (d *database) SetReadState(ctx context.Context, userID user.UserID, notificationID NotificationID, read bool) (*Notification, error) {
 	ok, err := d.userHasRightsForNotification(ctx, userID, notificationID)
 	if err != nil {
 		return nil, err
@@ -174,13 +147,9 @@ func (d *DB) SetReadState(ctx context.Context, userID string, notificationID str
 	}
 
 	notif, err := d.db.Notification.
-		FindUnique(
-			db.Notification.ID.Equals(notificationID),
-		).
-		Update(
-			db.Notification.Read.Set(read),
-		).
-		Exec(ctx)
+		UpdateOneID(uuid.UUID(notificationID)).
+		SetRead(read).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -189,18 +158,20 @@ func (d *DB) SetReadState(ctx context.Context, userID string, notificationID str
 }
 
 // TODO: Cache these. Or do more clever queries.
-func (d *DB) userHasRightsForNotification(ctx context.Context, userID, notificationID string) (bool, error) {
-	n, err := d.db.Notification.
-		FindUnique(db.Notification.ID.Equals(notificationID)).
-		With(db.Notification.Subscription.Fetch().With(db.Subscription.User.Fetch())).
-		Exec(ctx)
+func (d *database) userHasRightsForNotification(ctx context.Context, userID user.UserID, notificationID NotificationID) (bool, error) {
+	n, err := d.db.Notification.Query().
+		Where(notification.IDEQ(uuid.UUID(notificationID))).
+		WithSubscription(func(sq *model.SubscriptionQuery) {
+			sq.WithUser()
+		}).
+		Only(ctx)
 	if err != nil {
 		return false, err
 	}
-	return n.Subscription().User().ID == userID, nil
+	return user.UserID(n.Edges.Subscription.Edges.User.ID) == userID, nil
 }
 
-func (d *DB) Delete(ctx context.Context, userID, notificationID string) (*Notification, error) {
+func (d *database) Delete(ctx context.Context, userID user.UserID, notificationID NotificationID) (*Notification, error) {
 	ok, err := d.userHasRightsForNotification(ctx, userID, notificationID)
 	if err != nil {
 		return nil, err
@@ -209,10 +180,12 @@ func (d *DB) Delete(ctx context.Context, userID, notificationID string) (*Notifi
 		return nil, post.ErrUnauthorised
 	}
 
-	n, err := d.db.Notification.
-		FindUnique(db.Notification.ID.Equals(notificationID)).
-		Delete().
-		Exec(ctx)
+	n, err := d.db.Notification.Get(ctx, uuid.UUID(notificationID))
+	if err != nil {
+		return nil, err
+	}
+
+	err = d.db.Notification.DeleteOne(n).Exec(ctx)
 	if err != nil {
 		return nil, err
 	}

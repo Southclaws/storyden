@@ -4,7 +4,6 @@ package model
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -81,7 +80,7 @@ func (nq *NotificationQuery) QuerySubscription() *SubscriptionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notification.Table, notification.FieldID, selector),
 			sqlgraph.To(subscription.Table, subscription.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, notification.SubscriptionTable, notification.SubscriptionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, notification.SubscriptionTable, notification.SubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -359,6 +358,9 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context) ([]*Notification, error
 			nq.withSubscription != nil,
 		}
 	)
+	if nq.withSubscription != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, notification.ForeignKeys...)
 	}
@@ -386,31 +388,31 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context) ([]*Notification, error
 	}
 
 	if query := nq.withSubscription; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[uuid.UUID]*Notification)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Notification)
 		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Subscription = []*Subscription{}
+			if nodes[i].notification_subscription == nil {
+				continue
+			}
+			fk := *nodes[i].notification_subscription
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.withFKs = true
-		query.Where(predicate.Subscription(func(s *sql.Selector) {
-			s.Where(sql.InValues(notification.SubscriptionColumn, fks...))
-		}))
+		query.Where(subscription.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.notification_subscription
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "notification_subscription" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "notification_subscription" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "notification_subscription" returned %v`, n.ID)
 			}
-			node.Edges.Subscription = append(node.Edges.Subscription, n)
+			for i := range nodes {
+				nodes[i].Edges.Subscription = n
+			}
 		}
 	}
 

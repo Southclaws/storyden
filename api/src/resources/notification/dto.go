@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
 	"github.com/Southclaws/storyden/api/src/utils"
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 )
 
 type (
@@ -16,10 +17,6 @@ type (
 
 type NotificationType string
 
-const (
-	NotificationTypeForumPostResponse NotificationType = NotificationType(model.RefersTyp)
-)
-
 type Notification struct {
 	ID           NotificationID `json:"id"`
 	Title        string         `json:"title"`
@@ -27,7 +24,7 @@ type Notification struct {
 	Link         string         `json:"link"`
 	Read         bool           `json:"read"`
 	CreatedAt    time.Time      `json:"createdAt"`
-	Subscription *Subscription  `json:"subscription"`
+	Subscription Subscription   `json:"subscription"`
 }
 
 type Subscription struct {
@@ -51,18 +48,21 @@ func SubFromModel(m *model.Subscription) *Subscription {
 }
 
 func FromModel(m *model.Notification) *Notification {
-	var sub *Subscription
-	if m.Subscription != nil {
-		sub = SubFromModel(m.Subscription)
-	}
-
 	return &Notification{
-		ID:           m.InnerNotification.ID,
-		Title:        m.InnerNotification.Title,
-		Description:  m.InnerNotification.Description,
-		Link:         m.InnerNotification.Link,
-		Read:         m.InnerNotification.Read,
-		CreatedAt:    m.InnerNotification.CreatedAt,
-		Subscription: sub,
+		ID:           NotificationID(m.ID),
+		Title:        m.Title,
+		Description:  m.Description,
+		Link:         m.Link,
+		Read:         m.Read,
+		CreatedAt:    m.CreateTime,
+		Subscription: utils.Deref(SubFromModel(m.Edges.Subscription), 0),
 	}
+}
+
+func FromModelMany(m []*model.Notification) []Notification {
+	return lo.Map(m, func(t *model.Notification, i int) Notification { return utils.Deref(FromModel(t), 0) })
+}
+
+func SubFromModelMany(m []*model.Subscription) []Subscription {
+	return lo.Map(m, func(t *model.Subscription, i int) Subscription { return utils.Deref(SubFromModel(t), 0) })
 }

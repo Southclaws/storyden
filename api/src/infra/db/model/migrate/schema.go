@@ -31,6 +31,7 @@ var (
 		{Name: "link", Type: field.TypeString},
 		{Name: "read", Type: field.TypeBool},
 		{Name: "create_time", Type: field.TypeTime},
+		{Name: "notification_subscription", Type: field.TypeUUID, Nullable: true},
 		{Name: "subscription_notifications", Type: field.TypeUUID, Nullable: true},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.
@@ -40,8 +41,14 @@ var (
 		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "notifications_subscriptions_notifications",
+				Symbol:     "notifications_subscriptions_subscription",
 				Columns:    []*schema.Column{NotificationsColumns[6]},
+				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "notifications_subscriptions_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[7]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -146,7 +153,7 @@ var (
 		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
-		{Name: "notification_subscription", Type: field.TypeUUID, Nullable: true},
+		{Name: "subscription_user", Type: field.TypeUUID, Nullable: true},
 		{Name: "user_subscriptions", Type: field.TypeUUID, Nullable: true},
 	}
 	// SubscriptionsTable holds the schema information for the "subscriptions" table.
@@ -156,9 +163,9 @@ var (
 		PrimaryKey: []*schema.Column{SubscriptionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "subscriptions_notifications_subscription",
+				Symbol:     "subscriptions_users_user",
 				Columns:    []*schema.Column{SubscriptionsColumns[6]},
-				RefColumns: []*schema.Column{NotificationsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
@@ -190,21 +197,12 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "subscription_user", Type: field.TypeUUID, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "users_subscriptions_user",
-				Columns:    []*schema.Column{UsersColumns[8]},
-				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
@@ -246,6 +244,7 @@ var (
 
 func init() {
 	NotificationsTable.ForeignKeys[0].RefTable = SubscriptionsTable
+	NotificationsTable.ForeignKeys[1].RefTable = SubscriptionsTable
 	PostsTable.ForeignKeys[0].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[1].RefTable = PostsTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
@@ -254,9 +253,8 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = UsersTable
 	ReactsTable.ForeignKeys[2].RefTable = PostsTable
 	ReactsTable.ForeignKeys[3].RefTable = UsersTable
-	SubscriptionsTable.ForeignKeys[0].RefTable = NotificationsTable
+	SubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = UsersTable
-	UsersTable.ForeignKeys[0].RefTable = SubscriptionsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

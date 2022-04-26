@@ -365,7 +365,7 @@ func (c *NotificationClient) QuerySubscription(n *Notification) *SubscriptionQue
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notification.Table, notification.FieldID, id),
 			sqlgraph.To(subscription.Table, subscription.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, notification.SubscriptionTable, notification.SubscriptionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, notification.SubscriptionTable, notification.SubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -811,7 +811,7 @@ func (c *SubscriptionClient) QueryUser(s *Subscription) *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, subscription.UserTable, subscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, subscription.UserTable, subscription.UserColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -714,8 +714,7 @@ type NotificationMutation struct {
 	read                *bool
 	create_time         *time.Time
 	clearedFields       map[string]struct{}
-	subscription        map[uuid.UUID]struct{}
-	removedsubscription map[uuid.UUID]struct{}
+	subscription        *uuid.UUID
 	clearedsubscription bool
 	done                bool
 	oldValue            func(context.Context) (*Notification, error)
@@ -1006,14 +1005,9 @@ func (m *NotificationMutation) ResetCreateTime() {
 	m.create_time = nil
 }
 
-// AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by ids.
-func (m *NotificationMutation) AddSubscriptionIDs(ids ...uuid.UUID) {
-	if m.subscription == nil {
-		m.subscription = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.subscription[ids[i]] = struct{}{}
-	}
+// SetSubscriptionID sets the "subscription" edge to the Subscription entity by id.
+func (m *NotificationMutation) SetSubscriptionID(id uuid.UUID) {
+	m.subscription = &id
 }
 
 // ClearSubscription clears the "subscription" edge to the Subscription entity.
@@ -1026,29 +1020,20 @@ func (m *NotificationMutation) SubscriptionCleared() bool {
 	return m.clearedsubscription
 }
 
-// RemoveSubscriptionIDs removes the "subscription" edge to the Subscription entity by IDs.
-func (m *NotificationMutation) RemoveSubscriptionIDs(ids ...uuid.UUID) {
-	if m.removedsubscription == nil {
-		m.removedsubscription = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.subscription, ids[i])
-		m.removedsubscription[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscription returns the removed IDs of the "subscription" edge to the Subscription entity.
-func (m *NotificationMutation) RemovedSubscriptionIDs() (ids []uuid.UUID) {
-	for id := range m.removedsubscription {
-		ids = append(ids, id)
+// SubscriptionID returns the "subscription" edge ID in the mutation.
+func (m *NotificationMutation) SubscriptionID() (id uuid.UUID, exists bool) {
+	if m.subscription != nil {
+		return *m.subscription, true
 	}
 	return
 }
 
 // SubscriptionIDs returns the "subscription" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SubscriptionID instead. It exists only for internal usage by the builders.
 func (m *NotificationMutation) SubscriptionIDs() (ids []uuid.UUID) {
-	for id := range m.subscription {
-		ids = append(ids, id)
+	if id := m.subscription; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -1057,7 +1042,6 @@ func (m *NotificationMutation) SubscriptionIDs() (ids []uuid.UUID) {
 func (m *NotificationMutation) ResetSubscription() {
 	m.subscription = nil
 	m.clearedsubscription = false
-	m.removedsubscription = nil
 }
 
 // Where appends a list predicates to the NotificationMutation builder.
@@ -1258,11 +1242,9 @@ func (m *NotificationMutation) AddedEdges() []string {
 func (m *NotificationMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case notification.EdgeSubscription:
-		ids := make([]ent.Value, 0, len(m.subscription))
-		for id := range m.subscription {
-			ids = append(ids, id)
+		if id := m.subscription; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -1270,9 +1252,6 @@ func (m *NotificationMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NotificationMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedsubscription != nil {
-		edges = append(edges, notification.EdgeSubscription)
-	}
 	return edges
 }
 
@@ -1280,12 +1259,6 @@ func (m *NotificationMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *NotificationMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case notification.EdgeSubscription:
-		ids := make([]ent.Value, 0, len(m.removedsubscription))
-		for id := range m.removedsubscription {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -1313,6 +1286,9 @@ func (m *NotificationMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *NotificationMutation) ClearEdge(name string) error {
 	switch name {
+	case notification.EdgeSubscription:
+		m.ClearSubscription()
+		return nil
 	}
 	return fmt.Errorf("unknown Notification unique edge %s", name)
 }
@@ -3429,8 +3405,7 @@ type SubscriptionMutation struct {
 	create_time          *time.Time
 	update_time          *time.Time
 	clearedFields        map[string]struct{}
-	user                 map[uuid.UUID]struct{}
-	removeduser          map[uuid.UUID]struct{}
+	user                 *uuid.UUID
 	cleareduser          bool
 	notifications        map[uuid.UUID]struct{}
 	removednotifications map[uuid.UUID]struct{}
@@ -3737,14 +3712,9 @@ func (m *SubscriptionMutation) ResetUpdateTime() {
 	m.update_time = nil
 }
 
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *SubscriptionMutation) AddUserIDs(ids ...uuid.UUID) {
-	if m.user == nil {
-		m.user = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		m.user[ids[i]] = struct{}{}
-	}
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *SubscriptionMutation) SetUserID(id uuid.UUID) {
+	m.user = &id
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -3757,29 +3727,20 @@ func (m *SubscriptionMutation) UserCleared() bool {
 	return m.cleareduser
 }
 
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *SubscriptionMutation) RemoveUserIDs(ids ...uuid.UUID) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[uuid.UUID]struct{})
-	}
-	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *SubscriptionMutation) RemovedUserIDs() (ids []uuid.UUID) {
-	for id := range m.removeduser {
-		ids = append(ids, id)
+// UserID returns the "user" edge ID in the mutation.
+func (m *SubscriptionMutation) UserID() (id uuid.UUID, exists bool) {
+	if m.user != nil {
+		return *m.user, true
 	}
 	return
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
 func (m *SubscriptionMutation) UserIDs() (ids []uuid.UUID) {
-	for id := range m.user {
-		ids = append(ids, id)
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -3788,7 +3749,6 @@ func (m *SubscriptionMutation) UserIDs() (ids []uuid.UUID) {
 func (m *SubscriptionMutation) ResetUser() {
 	m.user = nil
 	m.cleareduser = false
-	m.removeduser = nil
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
@@ -4055,11 +4015,9 @@ func (m *SubscriptionMutation) AddedEdges() []string {
 func (m *SubscriptionMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case subscription.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
-			ids = append(ids, id)
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case subscription.EdgeNotifications:
 		ids := make([]ent.Value, 0, len(m.notifications))
 		for id := range m.notifications {
@@ -4073,9 +4031,6 @@ func (m *SubscriptionMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SubscriptionMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removeduser != nil {
-		edges = append(edges, subscription.EdgeUser)
-	}
 	if m.removednotifications != nil {
 		edges = append(edges, subscription.EdgeNotifications)
 	}
@@ -4086,12 +4041,6 @@ func (m *SubscriptionMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *SubscriptionMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case subscription.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
-			ids = append(ids, id)
-		}
-		return ids
 	case subscription.EdgeNotifications:
 		ids := make([]ent.Value, 0, len(m.removednotifications))
 		for id := range m.removednotifications {
@@ -4130,6 +4079,9 @@ func (m *SubscriptionMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *SubscriptionMutation) ClearEdge(name string) error {
 	switch name {
+	case subscription.EdgeUser:
+		m.ClearUser()
+		return nil
 	}
 	return fmt.Errorf("unknown Subscription unique edge %s", name)
 }

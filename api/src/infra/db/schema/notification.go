@@ -35,7 +35,7 @@ func (Notification) Fields() []ent.Field {
 // Edges of Notification.
 func (Notification) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("subscription", Subscription.Type),
+		edge.To("subscription", Subscription.Type).Unique(),
 	}
 }
 

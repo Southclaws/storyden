@@ -77,19 +77,23 @@ func (nc *NotificationCreate) SetNillableID(u *uuid.UUID) *NotificationCreate {
 	return nc
 }
 
-// AddSubscriptionIDs adds the "subscription" edge to the Subscription entity by IDs.
-func (nc *NotificationCreate) AddSubscriptionIDs(ids ...uuid.UUID) *NotificationCreate {
-	nc.mutation.AddSubscriptionIDs(ids...)
+// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
+func (nc *NotificationCreate) SetSubscriptionID(id uuid.UUID) *NotificationCreate {
+	nc.mutation.SetSubscriptionID(id)
 	return nc
 }
 
-// AddSubscription adds the "subscription" edges to the Subscription entity.
-func (nc *NotificationCreate) AddSubscription(s ...*Subscription) *NotificationCreate {
-	ids := make([]uuid.UUID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSubscriptionID(id *uuid.UUID) *NotificationCreate {
+	if id != nil {
+		nc = nc.SetSubscriptionID(*id)
 	}
-	return nc.AddSubscriptionIDs(ids...)
+	return nc
+}
+
+// SetSubscription sets the "subscription" edge to the Subscription entity.
+func (nc *NotificationCreate) SetSubscription(s *Subscription) *NotificationCreate {
+	return nc.SetSubscriptionID(s.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -269,7 +273,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 	}
 	if nodes := nc.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   notification.SubscriptionTable,
 			Columns: []string{notification.SubscriptionColumn},
@@ -284,6 +288,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.notification_subscription = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

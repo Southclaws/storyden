@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
@@ -36,8 +37,11 @@ func (Subscription) Fields() []ent.Field {
 // Edges of Subscription.
 func (Subscription) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type),
-		edge.To("notifications", Notification.Type),
+		edge.To("user", User.Type).Unique(),
+		edge.To("notifications", Notification.Type).
+			Annotations(entsql.Annotation{
+				OnDelete: entsql.Cascade,
+			}),
 	}
 }
 
