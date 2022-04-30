@@ -44,9 +44,11 @@ type UserEdges struct {
 	Reacts []*React `json:"reacts,omitempty"`
 	// Subscriptions holds the value of the subscriptions edge.
 	Subscriptions []*Subscription `json:"subscriptions,omitempty"`
+	// Authentication holds the value of the authentication edge.
+	Authentication []*Authentication `json:"authentication,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -74,6 +76,15 @@ func (e UserEdges) SubscriptionsOrErr() ([]*Subscription, error) {
 		return e.Subscriptions, nil
 	}
 	return nil, &NotLoadedError{edge: "subscriptions"}
+}
+
+// AuthenticationOrErr returns the Authentication value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) AuthenticationOrErr() ([]*Authentication, error) {
+	if e.loadedTypes[3] {
+		return e.Authentication, nil
+	}
+	return nil, &NotLoadedError{edge: "authentication"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -170,6 +181,11 @@ func (u *User) QueryReacts() *ReactQuery {
 // QuerySubscriptions queries the "subscriptions" edge of the User entity.
 func (u *User) QuerySubscriptions() *SubscriptionQuery {
 	return (&UserClient{config: u.config}).QuerySubscriptions(u)
+}
+
+// QueryAuthentication queries the "authentication" edge of the User entity.
+func (u *User) QueryAuthentication() *AuthenticationQuery {
+	return (&UserClient{config: u.config}).QueryAuthentication(u)
 }
 
 // Update returns a builder for updating this User.

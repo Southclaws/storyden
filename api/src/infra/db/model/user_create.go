@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/authentication"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/react"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/subscription"
@@ -166,6 +167,21 @@ func (uc *UserCreate) AddSubscriptions(s ...*Subscription) *UserCreate {
 		ids[i] = s[i].ID
 	}
 	return uc.AddSubscriptionIDs(ids...)
+}
+
+// AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
+func (uc *UserCreate) AddAuthenticationIDs(ids ...int) *UserCreate {
+	uc.mutation.AddAuthenticationIDs(ids...)
+	return uc
+}
+
+// AddAuthentication adds the "authentication" edges to the Authentication entity.
+func (uc *UserCreate) AddAuthentication(a ...*Authentication) *UserCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return uc.AddAuthenticationIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -421,6 +437,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: subscription.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.AuthenticationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AuthenticationTable,
+			Columns: []string{user.AuthenticationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: authentication.FieldID,
 				},
 			},
 		}

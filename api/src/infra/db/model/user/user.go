@@ -33,6 +33,8 @@ const (
 	EdgeReacts = "reacts"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
 	EdgeSubscriptions = "subscriptions"
+	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
+	EdgeAuthentication = "authentication"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// PostsTable is the table that holds the posts relation/edge.
@@ -56,6 +58,13 @@ const (
 	SubscriptionsInverseTable = "subscriptions"
 	// SubscriptionsColumn is the table column denoting the subscriptions relation/edge.
 	SubscriptionsColumn = "user_subscriptions"
+	// AuthenticationTable is the table that holds the authentication relation/edge.
+	AuthenticationTable = "authentications"
+	// AuthenticationInverseTable is the table name for the Authentication entity.
+	// It exists in this package in order to avoid circular dependency with the "authentication" package.
+	AuthenticationInverseTable = "authentications"
+	// AuthenticationColumn is the table column denoting the authentication relation/edge.
+	AuthenticationColumn = "user_authentication"
 )
 
 // Columns holds all SQL columns for user fields.

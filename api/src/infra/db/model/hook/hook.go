@@ -9,6 +9,19 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model"
 )
 
+// The AuthenticationFunc type is an adapter to allow the use of ordinary
+// function as Authentication mutator.
+type AuthenticationFunc func(context.Context, *model.AuthenticationMutation) (model.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AuthenticationFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
+	mv, ok := m.(*model.AuthenticationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.AuthenticationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CategoryFunc type is an adapter to allow the use of ordinary
 // function as Category mutator.
 type CategoryFunc func(context.Context, *model.CategoryMutation) (model.Value, error)

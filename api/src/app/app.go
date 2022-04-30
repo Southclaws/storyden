@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/api/src/config"
 	"github.com/Southclaws/storyden/api/src/infra"
+	"github.com/Southclaws/storyden/api/src/interfaces"
 	"github.com/Southclaws/storyden/api/src/resources"
 )
 
@@ -26,7 +27,7 @@ func Start(ctx context.Context) {
 		infra.Build(),
 		resources.Build(),
 		// services.Build(),
-		// interfaces.Build(),
+		interfaces.Build(),
 	)
 
 	err := app.Start(ctx)

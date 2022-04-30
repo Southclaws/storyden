@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/db/model/migrate"
 	"github.com/google/uuid"
 
+	"github.com/Southclaws/storyden/api/src/infra/db/model/authentication"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
@@ -28,6 +29,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Authentication is the client for interacting with the Authentication builders.
+	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
 	// Notification is the client for interacting with the Notification builders.
@@ -55,6 +58,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
@@ -93,15 +97,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		Category:     NewCategoryClient(cfg),
-		Notification: NewNotificationClient(cfg),
-		Post:         NewPostClient(cfg),
-		React:        NewReactClient(cfg),
-		Subscription: NewSubscriptionClient(cfg),
-		Tag:          NewTagClient(cfg),
-		User:         NewUserClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Authentication: NewAuthenticationClient(cfg),
+		Category:       NewCategoryClient(cfg),
+		Notification:   NewNotificationClient(cfg),
+		Post:           NewPostClient(cfg),
+		React:          NewReactClient(cfg),
+		Subscription:   NewSubscriptionClient(cfg),
+		Tag:            NewTagClient(cfg),
+		User:           NewUserClient(cfg),
 	}, nil
 }
 
@@ -119,22 +124,23 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		Category:     NewCategoryClient(cfg),
-		Notification: NewNotificationClient(cfg),
-		Post:         NewPostClient(cfg),
-		React:        NewReactClient(cfg),
-		Subscription: NewSubscriptionClient(cfg),
-		Tag:          NewTagClient(cfg),
-		User:         NewUserClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Authentication: NewAuthenticationClient(cfg),
+		Category:       NewCategoryClient(cfg),
+		Notification:   NewNotificationClient(cfg),
+		Post:           NewPostClient(cfg),
+		React:          NewReactClient(cfg),
+		Subscription:   NewSubscriptionClient(cfg),
+		Tag:            NewTagClient(cfg),
+		User:           NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Category.
+//		Authentication.
 //		Query().
 //		Count(ctx)
 //
@@ -157,6 +163,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Authentication.Use(hooks...)
 	c.Category.Use(hooks...)
 	c.Notification.Use(hooks...)
 	c.Post.Use(hooks...)
@@ -164,6 +171,112 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Subscription.Use(hooks...)
 	c.Tag.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// AuthenticationClient is a client for the Authentication schema.
+type AuthenticationClient struct {
+	config
+}
+
+// NewAuthenticationClient returns a client for the Authentication from the given config.
+func NewAuthenticationClient(c config) *AuthenticationClient {
+	return &AuthenticationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `authentication.Hooks(f(g(h())))`.
+func (c *AuthenticationClient) Use(hooks ...Hook) {
+	c.hooks.Authentication = append(c.hooks.Authentication, hooks...)
+}
+
+// Create returns a create builder for Authentication.
+func (c *AuthenticationClient) Create() *AuthenticationCreate {
+	mutation := newAuthenticationMutation(c.config, OpCreate)
+	return &AuthenticationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Authentication entities.
+func (c *AuthenticationClient) CreateBulk(builders ...*AuthenticationCreate) *AuthenticationCreateBulk {
+	return &AuthenticationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Authentication.
+func (c *AuthenticationClient) Update() *AuthenticationUpdate {
+	mutation := newAuthenticationMutation(c.config, OpUpdate)
+	return &AuthenticationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AuthenticationClient) UpdateOne(a *Authentication) *AuthenticationUpdateOne {
+	mutation := newAuthenticationMutation(c.config, OpUpdateOne, withAuthentication(a))
+	return &AuthenticationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AuthenticationClient) UpdateOneID(id int) *AuthenticationUpdateOne {
+	mutation := newAuthenticationMutation(c.config, OpUpdateOne, withAuthenticationID(id))
+	return &AuthenticationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Authentication.
+func (c *AuthenticationClient) Delete() *AuthenticationDelete {
+	mutation := newAuthenticationMutation(c.config, OpDelete)
+	return &AuthenticationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AuthenticationClient) DeleteOne(a *Authentication) *AuthenticationDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AuthenticationClient) DeleteOneID(id int) *AuthenticationDeleteOne {
+	builder := c.Delete().Where(authentication.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AuthenticationDeleteOne{builder}
+}
+
+// Query returns a query builder for Authentication.
+func (c *AuthenticationClient) Query() *AuthenticationQuery {
+	return &AuthenticationQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Authentication entity by its id.
+func (c *AuthenticationClient) Get(ctx context.Context, id int) (*Authentication, error) {
+	return c.Query().Where(authentication.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AuthenticationClient) GetX(ctx context.Context, id int) *Authentication {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Authentication.
+func (c *AuthenticationClient) QueryUser(a *Authentication) *UserQuery {
+	query := &UserQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(authentication.Table, authentication.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, authentication.UserTable, authentication.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AuthenticationClient) Hooks() []Hook {
+	return c.hooks.Authentication
 }
 
 // CategoryClient is a client for the Category schema.
@@ -1072,6 +1185,22 @@ func (c *UserClient) QuerySubscriptions(u *User) *SubscriptionQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(subscription.Table, subscription.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SubscriptionsTable, user.SubscriptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthentication queries the authentication edge of a User.
+func (c *UserClient) QueryAuthentication(u *User) *AuthenticationQuery {
+	query := &AuthenticationQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(authentication.Table, authentication.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.AuthenticationTable, user.AuthenticationColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

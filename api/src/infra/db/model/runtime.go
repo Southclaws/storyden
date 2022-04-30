@@ -5,6 +5,7 @@ package model
 import (
 	"time"
 
+	"github.com/Southclaws/storyden/api/src/infra/db/model/authentication"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
@@ -20,6 +21,23 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	authenticationMixin := schema.Authentication{}.Mixin()
+	authenticationMixinFields0 := authenticationMixin[0].Fields()
+	_ = authenticationMixinFields0
+	authenticationFields := schema.Authentication{}.Fields()
+	_ = authenticationFields
+	// authenticationDescCreateTime is the schema descriptor for create_time field.
+	authenticationDescCreateTime := authenticationMixinFields0[0].Descriptor()
+	// authentication.DefaultCreateTime holds the default value on creation for the create_time field.
+	authentication.DefaultCreateTime = authenticationDescCreateTime.Default.(func() time.Time)
+	// authenticationDescService is the schema descriptor for service field.
+	authenticationDescService := authenticationFields[0].Descriptor()
+	// authentication.ServiceValidator is a validator for the "service" field. It is called by the builders before save.
+	authentication.ServiceValidator = authenticationDescService.Validators[0].(func(string) error)
+	// authenticationDescToken is the schema descriptor for token field.
+	authenticationDescToken := authenticationFields[2].Descriptor()
+	// authentication.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	authentication.TokenValidator = authenticationDescToken.Validators[0].(func(string) error)
 	categoryFields := schema.Category{}.Fields()
 	_ = categoryFields
 	// categoryDescDescription is the schema descriptor for description field.

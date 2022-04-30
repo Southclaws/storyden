@@ -40,5 +40,7 @@ func (User) Edges() []ent.Edge {
 		edge.To("reacts", React.Type),
 
 		edge.To("subscriptions", Subscription.Type),
+
+		edge.To("authentication", Authentication.Type),
 	}
 }

@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/api/src/infra/db/model/authentication"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/category"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/notification"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/post"
@@ -35,13 +36,14 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		category.Table:     category.ValidColumn,
-		notification.Table: notification.ValidColumn,
-		post.Table:         post.ValidColumn,
-		react.Table:        react.ValidColumn,
-		subscription.Table: subscription.ValidColumn,
-		tag.Table:          tag.ValidColumn,
-		user.Table:         user.ValidColumn,
+		authentication.Table: authentication.ValidColumn,
+		category.Table:       category.ValidColumn,
+		notification.Table:   notification.ValidColumn,
+		post.Table:           post.ValidColumn,
+		react.Table:          react.ValidColumn,
+		subscription.Table:   subscription.ValidColumn,
+		tag.Table:            tag.ValidColumn,
+		user.Table:           user.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

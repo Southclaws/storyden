@@ -830,6 +830,34 @@ func HasSubscriptionsWith(preds ...predicate.Subscription) predicate.User {
 	})
 }
 
+// HasAuthentication applies the HasEdge predicate on the "authentication" edge.
+func HasAuthentication() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(AuthenticationTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AuthenticationTable, AuthenticationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAuthenticationWith applies the HasEdge predicate on the "authentication" edge with a given conditions (other predicates).
+func HasAuthenticationWith(preds ...predicate.Authentication) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(AuthenticationInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AuthenticationTable, AuthenticationColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(func(s *sql.Selector) {

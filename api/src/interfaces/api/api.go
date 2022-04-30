@@ -13,16 +13,7 @@ import (
 	"github.com/Southclaws/storyden/api/src/config"
 	"github.com/Southclaws/storyden/api/src/infra/web"
 	"github.com/Southclaws/storyden/api/src/interfaces/api/auth"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/categories"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/metrics"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/posts"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/reacts"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/subscriptions"
 	"github.com/Southclaws/storyden/api/src/interfaces/api/swagger"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/tags"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/test"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/threads"
-	"github.com/Southclaws/storyden/api/src/interfaces/api/users"
 	"github.com/Southclaws/storyden/api/src/services/authentication"
 )
 
@@ -30,15 +21,15 @@ func Build() fx.Option {
 	return fx.Options(
 		swagger.Build(),
 		auth.Build(),
-		categories.Build(),
-		metrics.Build(),
-		posts.Build(),
-		reacts.Build(),
-		subscriptions.Build(),
-		tags.Build(),
-		test.Build(),
-		threads.Build(),
-		users.Build(),
+		// users.Build(),
+		// categories.Build(),
+		// metrics.Build(),
+		// posts.Build(),
+		// reacts.Build(),
+		// subscriptions.Build(),
+		// tags.Build(),
+		// test.Build(),
+		// threads.Build(),
 
 		// Starts the HTTP server in a goroutine and fatals if it errors.
 		fx.Invoke(func(l *zap.Logger, server *http.Server) {
