@@ -1,8 +1,9 @@
 package magiclink
 
 import (
-	"github.com/Southclaws/storyden/api/src/resources/user"
 	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
 type Magiclink interface {

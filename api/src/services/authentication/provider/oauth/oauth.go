@@ -3,8 +3,9 @@ package oauth
 import (
 	"context"
 
-	"github.com/Southclaws/storyden/api/src/resources/user"
 	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
 // OAuthProvider describes a type that can provide an OAuth2 authentication
