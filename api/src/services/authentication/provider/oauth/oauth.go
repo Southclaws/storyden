@@ -1,8 +1,10 @@
-package provider
+package oauth
 
 import (
 	"context"
-	"os/user"
+
+	"github.com/Southclaws/storyden/api/src/resources/user"
+	"go.uber.org/fx"
 )
 
 // OAuthProvider describes a type that can provide an OAuth2 authentication
@@ -15,4 +17,10 @@ import (
 type OAuthProvider interface {
 	Link() string
 	Login(ctx context.Context, state, code string) (*user.User, error)
+}
+
+func Build() fx.Option {
+	return fx.Options(
+	// github.Build(),
+	)
 }

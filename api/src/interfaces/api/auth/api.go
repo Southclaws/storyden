@@ -20,7 +20,14 @@ func Build() fx.Option {
 			rtr := chi.NewRouter()
 			r.Mount("/auth", rtr)
 
-			// TODO: Auth endpoints
+			// Return a list of auth methods
+			// rtr.Get("/methods", c.methods)
+
+			// Initiate an auth flow.
+			rtr.Post("/initiate/{method}", c.start)
+
+			// Finish auth flow.
+			rtr.Post("/callback/{method}", c.callback)
 		}),
 	)
 }
