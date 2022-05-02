@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -57,15 +58,21 @@ func (ac *AuthenticationCreate) SetToken(s string) *AuthenticationCreate {
 }
 
 // SetMetadata sets the "metadata" field.
-func (ac *AuthenticationCreate) SetMetadata(s string) *AuthenticationCreate {
-	ac.mutation.SetMetadata(s)
+func (ac *AuthenticationCreate) SetMetadata(m map[string]interface{}) *AuthenticationCreate {
+	ac.mutation.SetMetadata(m)
 	return ac
 }
 
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableMetadata(s *string) *AuthenticationCreate {
-	if s != nil {
-		ac.SetMetadata(*s)
+// SetID sets the "id" field.
+func (ac *AuthenticationCreate) SetID(u uuid.UUID) *AuthenticationCreate {
+	ac.mutation.SetID(u)
+	return ac
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableID(u *uuid.UUID) *AuthenticationCreate {
+	if u != nil {
+		ac.SetID(*u)
 	}
 	return ac
 }
@@ -164,6 +171,10 @@ func (ac *AuthenticationCreate) defaults() {
 		v := authentication.DefaultCreateTime()
 		ac.mutation.SetCreateTime(v)
 	}
+	if _, ok := ac.mutation.ID(); !ok {
+		v := authentication.DefaultID()
+		ac.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -201,8 +212,13 @@ func (ac *AuthenticationCreate) sqlSave(ctx context.Context) (*Authentication, e
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	return _node, nil
 }
 
@@ -212,12 +228,16 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec = &sqlgraph.CreateSpec{
 			Table: authentication.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: authentication.FieldID,
 			},
 		}
 	)
 	_spec.OnConflict = ac.conflict
+	if id, ok := ac.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	if value, ok := ac.mutation.CreateTime(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -252,7 +272,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 	}
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Value:  value,
 			Column: authentication.FieldMetadata,
 		})
@@ -381,7 +401,7 @@ func (u *AuthenticationUpsert) UpdateToken() *AuthenticationUpsert {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AuthenticationUpsert) SetMetadata(v string) *AuthenticationUpsert {
+func (u *AuthenticationUpsert) SetMetadata(v map[string]interface{}) *AuthenticationUpsert {
 	u.Set(authentication.FieldMetadata, v)
 	return u
 }
@@ -398,18 +418,24 @@ func (u *AuthenticationUpsert) ClearMetadata() *AuthenticationUpsert {
 	return u
 }
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.Authentication.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(authentication.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *AuthenticationUpsertOne) UpdateNewValues() *AuthenticationUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(authentication.FieldID)
+		}
 		if _, exists := u.create.mutation.CreateTime(); exists {
 			s.SetIgnore(authentication.FieldCreateTime)
 		}
@@ -502,7 +528,7 @@ func (u *AuthenticationUpsertOne) UpdateToken() *AuthenticationUpsertOne {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AuthenticationUpsertOne) SetMetadata(v string) *AuthenticationUpsertOne {
+func (u *AuthenticationUpsertOne) SetMetadata(v map[string]interface{}) *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.SetMetadata(v)
 	})
@@ -538,7 +564,12 @@ func (u *AuthenticationUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("model: AuthenticationUpsertOne.ID is not supported by MySQL driver. Use AuthenticationUpsertOne.Exec instead")
+	}
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -547,7 +578,7 @@ func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AuthenticationUpsertOne) IDX(ctx context.Context) int {
+func (u *AuthenticationUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -599,10 +630,6 @@ func (acb *AuthenticationCreateBulk) Save(ctx context.Context) ([]*Authenticatio
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {
@@ -690,6 +717,9 @@ type AuthenticationUpsertBulk struct {
 //	client.Authentication.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(authentication.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
@@ -697,6 +727,10 @@ func (u *AuthenticationUpsertBulk) UpdateNewValues() *AuthenticationUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(authentication.FieldID)
+				return
+			}
 			if _, exists := b.mutation.CreateTime(); exists {
 				s.SetIgnore(authentication.FieldCreateTime)
 			}
@@ -790,7 +824,7 @@ func (u *AuthenticationUpsertBulk) UpdateToken() *AuthenticationUpsertBulk {
 }
 
 // SetMetadata sets the "metadata" field.
-func (u *AuthenticationUpsertBulk) SetMetadata(v string) *AuthenticationUpsertBulk {
+func (u *AuthenticationUpsertBulk) SetMetadata(v map[string]interface{}) *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.SetMetadata(v)
 	})

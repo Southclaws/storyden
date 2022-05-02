@@ -48,16 +48,8 @@ func (au *AuthenticationUpdate) SetToken(s string) *AuthenticationUpdate {
 }
 
 // SetMetadata sets the "metadata" field.
-func (au *AuthenticationUpdate) SetMetadata(s string) *AuthenticationUpdate {
-	au.mutation.SetMetadata(s)
-	return au
-}
-
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableMetadata(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetMetadata(*s)
-	}
+func (au *AuthenticationUpdate) SetMetadata(m map[string]interface{}) *AuthenticationUpdate {
+	au.mutation.SetMetadata(m)
 	return au
 }
 
@@ -178,7 +170,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: authentication.FieldID,
 			},
 		},
@@ -213,14 +205,14 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if value, ok := au.mutation.Metadata(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Value:  value,
 			Column: authentication.FieldMetadata,
 		})
 	}
 	if au.mutation.MetadataCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Column: authentication.FieldMetadata,
 		})
 	}
@@ -297,16 +289,8 @@ func (auo *AuthenticationUpdateOne) SetToken(s string) *AuthenticationUpdateOne 
 }
 
 // SetMetadata sets the "metadata" field.
-func (auo *AuthenticationUpdateOne) SetMetadata(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetMetadata(s)
-	return auo
-}
-
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableMetadata(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetMetadata(*s)
-	}
+func (auo *AuthenticationUpdateOne) SetMetadata(m map[string]interface{}) *AuthenticationUpdateOne {
+	auo.mutation.SetMetadata(m)
 	return auo
 }
 
@@ -434,7 +418,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: authentication.FieldID,
 			},
 		},
@@ -486,14 +470,14 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Value:  value,
 			Column: authentication.FieldMetadata,
 		})
 	}
 	if auo.mutation.MetadataCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeJSON,
 			Column: authentication.FieldMetadata,
 		})
 	}

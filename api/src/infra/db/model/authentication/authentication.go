@@ -4,6 +4,8 @@ package authentication
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -72,4 +74,6 @@ var (
 	ServiceValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )

@@ -4,7 +4,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+	"github.com/google/uuid"
 )
 
 type Authentication struct {
@@ -13,6 +15,10 @@ type Authentication struct {
 
 func (Authentication) Fields() []ent.Field {
 	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).
+			Immutable().
+			Default(uuid.New),
+
 		field.String("service").
 			NotEmpty().
 			Comment("The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth"),
@@ -25,7 +31,7 @@ func (Authentication) Fields() []ent.Field {
 			Sensitive().
 			Comment("The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string."),
 
-		field.String("metadata").
+		field.JSON("metadata", map[string]interface{}{}).
 			Optional().
 			Comment("Any necessary metadata specific to the authentication method."),
 	}
@@ -35,6 +41,14 @@ func (Authentication) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
 			Ref("authentication").
+			Unique(),
+	}
+}
+
+func (Authentication) Indexes() []ent.Index {
+	return []ent.Index{
+		// a given identifier should be unique within the context of a service.
+		index.Fields("service", "identifier").
 			Unique(),
 	}
 }

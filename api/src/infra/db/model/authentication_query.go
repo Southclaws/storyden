@@ -112,8 +112,8 @@ func (aq *AuthenticationQuery) FirstX(ctx context.Context) *Authentication {
 
 // FirstID returns the first Authentication ID from the query.
 // Returns a *NotFoundError when no Authentication ID was found.
-func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -125,7 +125,7 @@ func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id int, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AuthenticationQuery) FirstIDX(ctx context.Context) int {
+func (aq *AuthenticationQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -163,8 +163,8 @@ func (aq *AuthenticationQuery) OnlyX(ctx context.Context) *Authentication {
 // OnlyID is like Only, but returns the only Authentication ID in the query.
 // Returns a *NotSingularError when more than one Authentication ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -180,7 +180,7 @@ func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AuthenticationQuery) OnlyIDX(ctx context.Context) int {
+func (aq *AuthenticationQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,8 +206,8 @@ func (aq *AuthenticationQuery) AllX(ctx context.Context) []*Authentication {
 }
 
 // IDs executes the query and returns a list of Authentication IDs.
-func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := aq.Select(authentication.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AuthenticationQuery) IDsX(ctx context.Context) []int {
+func (aq *AuthenticationQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -445,7 +445,7 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: authentication.FieldID,
 			},
 		},

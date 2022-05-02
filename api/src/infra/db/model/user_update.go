@@ -173,14 +173,14 @@ func (uu *UserUpdate) AddSubscriptions(s ...*Subscription) *UserUpdate {
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (uu *UserUpdate) AddAuthenticationIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) AddAuthenticationIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddAuthenticationIDs(ids...)
 	return uu
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (uu *UserUpdate) AddAuthentication(a ...*Authentication) *UserUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -262,14 +262,14 @@ func (uu *UserUpdate) ClearAuthentication() *UserUpdate {
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (uu *UserUpdate) RemoveAuthenticationIDs(ids ...int) *UserUpdate {
+func (uu *UserUpdate) RemoveAuthenticationIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveAuthenticationIDs(ids...)
 	return uu
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
 func (uu *UserUpdate) RemoveAuthentication(a ...*Authentication) *UserUpdate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -596,7 +596,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
@@ -612,7 +612,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
@@ -631,7 +631,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
@@ -800,14 +800,14 @@ func (uuo *UserUpdateOne) AddSubscriptions(s ...*Subscription) *UserUpdateOne {
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (uuo *UserUpdateOne) AddAuthenticationIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddAuthenticationIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddAuthenticationIDs(ids...)
 	return uuo
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (uuo *UserUpdateOne) AddAuthentication(a ...*Authentication) *UserUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -889,14 +889,14 @@ func (uuo *UserUpdateOne) ClearAuthentication() *UserUpdateOne {
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (uuo *UserUpdateOne) RemoveAuthenticationIDs(ids ...int) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveAuthenticationIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveAuthenticationIDs(ids...)
 	return uuo
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
 func (uuo *UserUpdateOne) RemoveAuthentication(a ...*Authentication) *UserUpdateOne {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1247,7 +1247,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1263,7 +1263,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1282,7 +1282,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},

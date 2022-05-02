@@ -213,7 +213,7 @@ func (c *AuthenticationClient) UpdateOne(a *Authentication) *AuthenticationUpdat
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AuthenticationClient) UpdateOneID(id int) *AuthenticationUpdateOne {
+func (c *AuthenticationClient) UpdateOneID(id uuid.UUID) *AuthenticationUpdateOne {
 	mutation := newAuthenticationMutation(c.config, OpUpdateOne, withAuthenticationID(id))
 	return &AuthenticationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -230,7 +230,7 @@ func (c *AuthenticationClient) DeleteOne(a *Authentication) *AuthenticationDelet
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *AuthenticationClient) DeleteOneID(id int) *AuthenticationDeleteOne {
+func (c *AuthenticationClient) DeleteOneID(id uuid.UUID) *AuthenticationDeleteOne {
 	builder := c.Delete().Where(authentication.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -245,12 +245,12 @@ func (c *AuthenticationClient) Query() *AuthenticationQuery {
 }
 
 // Get returns a Authentication entity by its id.
-func (c *AuthenticationClient) Get(ctx context.Context, id int) (*Authentication, error) {
+func (c *AuthenticationClient) Get(ctx context.Context, id uuid.UUID) (*Authentication, error) {
 	return c.Query().Where(authentication.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AuthenticationClient) GetX(ctx context.Context, id int) *Authentication {
+func (c *AuthenticationClient) GetX(ctx context.Context, id uuid.UUID) *Authentication {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

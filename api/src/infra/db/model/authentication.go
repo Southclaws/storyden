@@ -3,6 +3,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -17,7 +18,7 @@ import (
 type Authentication struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreateTime holds the value of the "create_time" field.
 	CreateTime time.Time `json:"create_time,omitempty"`
 	// Service holds the value of the "service" field.
@@ -31,7 +32,7 @@ type Authentication struct {
 	Token string `json:"-"`
 	// Metadata holds the value of the "metadata" field.
 	// Any necessary metadata specific to the authentication method.
-	Metadata string `json:"metadata,omitempty"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
 	Edges               AuthenticationEdges `json:"edges"`
@@ -66,12 +67,14 @@ func (*Authentication) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case authentication.FieldID:
-			values[i] = new(sql.NullInt64)
-		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldMetadata:
+		case authentication.FieldMetadata:
+			values[i] = new([]byte)
+		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken:
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreateTime:
 			values[i] = new(sql.NullTime)
+		case authentication.FieldID:
+			values[i] = new(uuid.UUID)
 		case authentication.ForeignKeys[0]: // user_authentication
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
@@ -90,11 +93,11 @@ func (a *Authentication) assignValues(columns []string, values []interface{}) er
 	for i := range columns {
 		switch columns[i] {
 		case authentication.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				a.ID = *value
 			}
-			a.ID = int(value.Int64)
 		case authentication.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
@@ -120,10 +123,12 @@ func (a *Authentication) assignValues(columns []string, values []interface{}) er
 				a.Token = value.String
 			}
 		case authentication.FieldMetadata:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
-			} else if value.Valid {
-				a.Metadata = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
+				}
 			}
 		case authentication.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -173,7 +178,7 @@ func (a *Authentication) String() string {
 	builder.WriteString(a.Identifier)
 	builder.WriteString(", token=<sensitive>")
 	builder.WriteString(", metadata=")
-	builder.WriteString(a.Metadata)
+	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

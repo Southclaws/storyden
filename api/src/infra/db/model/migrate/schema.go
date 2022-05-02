@@ -10,12 +10,12 @@ import (
 var (
 	// AuthenticationsColumns holds the columns for the "authentications" table.
 	AuthenticationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "service", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
-		{Name: "metadata", Type: field.TypeString, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "user_authentication", Type: field.TypeUUID, Nullable: true},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
@@ -29,6 +29,13 @@ var (
 				Columns:    []*schema.Column{AuthenticationsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "authentication_service_identifier",
+				Unique:  true,
+				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[3]},
 			},
 		},
 	}

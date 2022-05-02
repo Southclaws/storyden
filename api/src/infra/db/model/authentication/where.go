@@ -8,31 +8,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/api/src/infra/db/model/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Authentication {
+func ID(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Authentication {
+func IDEQ(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Authentication {
+func IDNEQ(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Authentication {
+func IDIn(ids ...uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -49,7 +50,7 @@ func IDIn(ids ...int) predicate.Authentication {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Authentication {
+func IDNotIn(ids ...uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -66,28 +67,28 @@ func IDNotIn(ids ...int) predicate.Authentication {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Authentication {
+func IDGT(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Authentication {
+func IDGTE(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Authentication {
+func IDLT(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Authentication {
+func IDLTE(id uuid.UUID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -118,13 +119,6 @@ func Identifier(v string) predicate.Authentication {
 func Token(v string) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldToken), v))
-	})
-}
-
-// Metadata applies equality check predicate on the "metadata" field. It's identical to MetadataEQ.
-func Metadata(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMetadata), v))
 	})
 }
 
@@ -537,103 +531,6 @@ func TokenContainsFold(v string) predicate.Authentication {
 	})
 }
 
-// MetadataEQ applies the EQ predicate on the "metadata" field.
-func MetadataEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataNEQ applies the NEQ predicate on the "metadata" field.
-func MetadataNEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataIn applies the In predicate on the "metadata" field.
-func MetadataIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldMetadata), v...))
-	})
-}
-
-// MetadataNotIn applies the NotIn predicate on the "metadata" field.
-func MetadataNotIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldMetadata), v...))
-	})
-}
-
-// MetadataGT applies the GT predicate on the "metadata" field.
-func MetadataGT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataGTE applies the GTE predicate on the "metadata" field.
-func MetadataGTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataLT applies the LT predicate on the "metadata" field.
-func MetadataLT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataLTE applies the LTE predicate on the "metadata" field.
-func MetadataLTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataContains applies the Contains predicate on the "metadata" field.
-func MetadataContains(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataHasPrefix applies the HasPrefix predicate on the "metadata" field.
-func MetadataHasPrefix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataHasSuffix applies the HasSuffix predicate on the "metadata" field.
-func MetadataHasSuffix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldMetadata), v))
-	})
-}
-
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.
 func MetadataIsNil() predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
@@ -645,20 +542,6 @@ func MetadataIsNil() predicate.Authentication {
 func MetadataNotNil() predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldMetadata)))
-	})
-}
-
-// MetadataEqualFold applies the EqualFold predicate on the "metadata" field.
-func MetadataEqualFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldMetadata), v))
-	})
-}
-
-// MetadataContainsFold applies the ContainsFold predicate on the "metadata" field.
-func MetadataContainsFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldMetadata), v))
 	})
 }
 

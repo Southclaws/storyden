@@ -31,13 +31,17 @@ func init() {
 	// authentication.DefaultCreateTime holds the default value on creation for the create_time field.
 	authentication.DefaultCreateTime = authenticationDescCreateTime.Default.(func() time.Time)
 	// authenticationDescService is the schema descriptor for service field.
-	authenticationDescService := authenticationFields[0].Descriptor()
+	authenticationDescService := authenticationFields[1].Descriptor()
 	// authentication.ServiceValidator is a validator for the "service" field. It is called by the builders before save.
 	authentication.ServiceValidator = authenticationDescService.Validators[0].(func(string) error)
 	// authenticationDescToken is the schema descriptor for token field.
-	authenticationDescToken := authenticationFields[2].Descriptor()
+	authenticationDescToken := authenticationFields[3].Descriptor()
 	// authentication.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	authentication.TokenValidator = authenticationDescToken.Validators[0].(func(string) error)
+	// authenticationDescID is the schema descriptor for id field.
+	authenticationDescID := authenticationFields[0].Descriptor()
+	// authentication.DefaultID holds the default value on creation for the id field.
+	authentication.DefaultID = authenticationDescID.Default.(func() uuid.UUID)
 	categoryFields := schema.Category{}.Fields()
 	_ = categoryFields
 	// categoryDescDescription is the schema descriptor for description field.

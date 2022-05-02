@@ -170,14 +170,14 @@ func (uc *UserCreate) AddSubscriptions(s ...*Subscription) *UserCreate {
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (uc *UserCreate) AddAuthenticationIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddAuthenticationIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddAuthenticationIDs(ids...)
 	return uc
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (uc *UserCreate) AddAuthentication(a ...*Authentication) *UserCreate {
-	ids := make([]int, len(a))
+	ids := make([]uuid.UUID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -454,7 +454,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: authentication.FieldID,
 				},
 			},
