@@ -3,56 +3,36 @@ package authentication
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/api/src/config"
 	"github.com/Southclaws/storyden/api/src/infra/web"
+	"github.com/Southclaws/storyden/api/src/resources/authentication"
 	"github.com/Southclaws/storyden/api/src/resources/user"
 )
 
-// State stores state for performing authentication
-type State struct {
+// CookieAuth implements Authentication for cookies
+type CookieAuth struct {
+	repo   authentication.Repository
 	sc     *securecookie.SecureCookie
 	domain string
-	users  user.Repository
-}
-
-// OAuthProvider describes a type that can provide an OAuth2 authentication
-// method for users.
-//
-// Link simply returns a URL to start the OAuth2 process.
-//
-// Login is called by the callback and handles the code/token exchange and
-// returns a User object to the caller to be encoded into a cookie.
-type OAuthProvider interface {
-	Link() string
-	Login(ctx context.Context, state, code string) (*user.User, error)
 }
 
 // New initialises a new authentication service
-func New(cfg config.Config, users user.Repository) *State {
-	a := &State{
-		sc:     securecookie.New(cfg.HashKey, cfg.BlockKey),
-		domain: cfg.CookieDomain,
-		users:  users,
+func NewCookieAuth(cfg config.Config, repo authentication.Repository) Contract {
+	return &CookieAuth{
+		repo,
+		securecookie.New(cfg.HashKey, cfg.BlockKey),
+		cfg.CookieDomain,
 	}
-
-	return a
 }
 
-// EncodeAuthCookie writes the secure user auth cookie to the response writer.
-func (a *State) EncodeAuthCookie(w http.ResponseWriter, user user.User) {
-	encoded, err := a.sc.Encode(secureCookieName, Cookie{
-		UserID:  user.ID,
-		Admin:   user.Admin,
-		Created: time.Now(),
-	})
+func (a *CookieAuth) Encode(w http.ResponseWriter, user user.User) error {
+	encoded, err := a.sc.Encode(secureCookieName, user)
 	if err != nil {
-		web.StatusUnauthorized(w, err)
-		return
+		return err
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -63,6 +43,23 @@ func (a *State) EncodeAuthCookie(w http.ResponseWriter, user user.User) {
 		Secure:   true,
 		HttpOnly: true,
 	})
+
+	return nil
+}
+
+func (a *CookieAuth) Decode(r *http.Request) (*user.User, error) {
+	cookie, err := r.Cookie(secureCookieName)
+	if err != nil {
+		return nil, err
+	}
+
+	u := user.User{}
+
+	if err = a.sc.Decode(secureCookieName, cookie.Value, &u); err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 // GetAuthenticationInfo extracts auth info from a request context and, if not
@@ -75,6 +72,7 @@ func GetAuthenticationInfo(
 	if auth, ok := GetAuthenticationInfoFromContext(r.Context()); ok {
 		return auth, true
 	}
+
 	web.StatusInternalServerError(w, web.WithSuggestion(
 		errors.New("failed to extract auth context from request"),
 		"Could not read session data from cookies.",

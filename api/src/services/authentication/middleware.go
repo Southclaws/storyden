@@ -2,11 +2,8 @@ package authentication
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"time"
-
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/api/src/infra/web"
 )
@@ -18,18 +15,9 @@ type Info struct {
 	Cookie        Cookie
 }
 
-// Cookie represents the data structure that is stored inside the securecookie
-// value. It is sent to the client in an encrypted (HMAC) form and decrypted on
-// any future requests and propagated to handlers.
-type Cookie struct {
-	UserID  string
-	Admin   bool
-	Created time.Time
-}
-
 var contextKey = struct{}{}
 
-const secureCookieName = "openmultiplayer-session"
+const secureCookieName = "storyden-session"
 
 // WithAuthentication provides middleware for enforcing authentication
 func (a *State) WithAuthentication(next http.Handler) http.Handler {
@@ -38,10 +26,6 @@ func (a *State) WithAuthentication(next http.Handler) http.Handler {
 
 		if a.doCookieAuth(r, &auth) {
 			auth.Authenticated = true
-			// } else if a.doTokenAuth(r, &auth) {
-			// 	auth.Authenticated = true
-		} else {
-			auth.Authenticated = false
 		}
 
 		// If the request contained a valid cookie, `auth.Authenticated` is now
@@ -54,20 +38,6 @@ func (a *State) WithAuthentication(next http.Handler) http.Handler {
 			auth,
 		)))
 	})
-}
-
-func (a *State) doCookieAuth(r *http.Request, auth *Info) bool {
-	cookie, err := r.Cookie(secureCookieName)
-	if err != nil {
-		return false
-	}
-
-	if err = a.sc.Decode(secureCookieName, cookie.Value, &auth.Cookie); err != nil {
-		zap.L().Debug("failed to decode auth cookie", zap.Error(err))
-		return false
-	}
-
-	return true
 }
 
 func MustBeAuthenticated(next http.Handler) http.Handler {
