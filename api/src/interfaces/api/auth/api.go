@@ -15,7 +15,7 @@ func Build() fx.Option {
 		fx.Invoke(func(
 			r chi.Router,
 			c *controller,
-			auth *authentication.State,
+			auth *authentication.CookieAuth,
 		) {
 			rtr := chi.NewRouter()
 			r.Mount("/auth", rtr)

@@ -8,64 +8,44 @@ import (
 	"github.com/Southclaws/storyden/api/src/infra/web"
 )
 
-// Info represents data that is extracted from the path, validated
-// against auth and stored in request context.
-type Info struct {
-	Authenticated bool
-	Cookie        Cookie
-}
-
-var contextKey = struct{}{}
-
-const secureCookieName = "storyden-session"
-
-// WithAuthentication provides middleware for enforcing authentication
-func (a *State) WithAuthentication(next http.Handler) http.Handler {
+// WithAuthentication provides middleware for extracting session data.
+func (a *CookieAuth) WithAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := Info{}
-
-		if a.doCookieAuth(r, &auth) {
-			auth.Authenticated = true
+		user, err := a.Decode(r)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
 		}
 
-		// If the request contained a valid cookie, `auth.Authenticated` is now
-		// true and `auth.Cookie` contains the user information.
-		// Otherwise, `auth.Authenticated` is false and `auth.Cookie` is empty.
-
-		next.ServeHTTP(w, r.WithContext(context.WithValue(
+		ctx := context.WithValue(
 			r.Context(),
 			contextKey,
-			auth,
-		)))
+			user,
+		)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 func MustBeAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth, ok := GetAuthenticationInfo(w, r)
+		_, ok := GetUser(w, r)
 		if !ok {
 			return
 		}
-		if !auth.Authenticated {
-			web.StatusUnauthorized(w, web.WithSuggestion(
-				errors.New("user not authenticated"),
-				"The request did not have any authentication information with it.",
-				"Ensure you are logged in, try logging out and back in again. If issues persist, please contact us.",
-			))
-			return
-		}
+
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (a *State) MustBeAdmin(next http.Handler) http.Handler {
+func MustBeAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth, ok := GetAuthenticationInfo(w, r)
+		user, ok := GetUser(w, r)
 		if !ok {
 			return
 		}
 
-		if !auth.Cookie.Admin {
+		if !user.Admin {
 			web.StatusUnauthorized(w, errors.New("user is not an administrator"))
 			return
 		}

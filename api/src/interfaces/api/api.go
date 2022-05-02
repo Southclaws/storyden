@@ -41,7 +41,7 @@ func Build() fx.Option {
 			}()
 		}),
 
-		fx.Provide(func(as *authentication.State, l *zap.Logger, cfg config.Config) chi.Router {
+		fx.Provide(func(as *authentication.CookieAuth, l *zap.Logger, cfg config.Config) chi.Router {
 			router := chi.NewRouter()
 
 			origins := []string{
