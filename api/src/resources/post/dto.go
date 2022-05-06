@@ -29,6 +29,10 @@ type Post struct {
 	DeletedAt optional.Optional[time.Time] `json:"deletedAt"`
 }
 
+const Role = "Post"
+
+func (u *Post) GetRole() string { return Role }
+
 type Author struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`

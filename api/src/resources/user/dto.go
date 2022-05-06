@@ -28,6 +28,10 @@ type User struct {
 	DeletedAt optional.Optional[time.Time] `json:"deletedAt"`
 }
 
+const Role = "User"
+
+func (u *User) GetRole() string { return Role }
+
 func FromModel(u model.User) (o User) {
 	result := User{
 		ID:        UserID(u.ID),
