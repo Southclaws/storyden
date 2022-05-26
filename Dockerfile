@@ -14,9 +14,6 @@ RUN npm install --global prisma
 # Install Taskfile
 RUN go install github.com/go-task/task/v3/cmd/task@latest
 
-# Install prisma client code generation tool and generate prisma bindings
-RUN task generate
-
 # Build the API server binary
 RUN task api
 
