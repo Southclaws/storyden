@@ -7,24 +7,24 @@ vars:
 
 tasks:
   default:
-    deps: [api]
+    deps: [backend]
     cmds:
-      - ./api.exe
+      - ./backend.exe
     sources:
-      - api/**/*.go
+      - backend/**/*.go
 
   production:
     cmds:
-      - ./api.exe
+      - ./backend.exe
 
-  api:
+  backend:
     cmds:
-      - go build -o api.exe -ldflags="-X 'github.com/Southclaws/storyden/api/src/config.Version={{.VERSION}}'" ./api/
-  api:test:
+      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/backend/internal/config.Version={{.VERSION}}'" ./backend/cmd/api
+  backend:test:
     cmds:
-      - go test -p 1 -race ./api/...
+      - go test -p 1 -race ./backend/...
 
-  api:image:
+  backend:image:
     cmds:
       - docker build -t {{.DOCKER_IMAGE_TAG}} .
 
@@ -39,10 +39,9 @@ tasks:
     cmds:
       - go generate ./api/src/infra/db/...
 
-  generate:swagger:
+  generate:openapi:
     cmds:
-      - swag fmt --dir ./api
-      - swag init --dir ./api --output ./api/src/interfaces/swagger
+      - oapi-codegen --config ./api/config.yaml ./api/openapi.yaml
 
   # -
   # Database

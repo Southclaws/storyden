@@ -1,0 +1,60 @@
+openapi: 3.0.1
+
+info:
+  title: storyden
+  version: "1"
+
+security:
+  - cookieAuth: []
+
+paths:
+  /v1/auth/password:
+    get:
+      tags:
+        - "user"
+      summary: "Login via username and password"
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIError"
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: storyden-session
+  schemas:
+    AuthenticationRequest:
+      type: object
+    AuthenticationRequestForm:
+      type: object
+    APIError:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        suggested:
+          type: string
