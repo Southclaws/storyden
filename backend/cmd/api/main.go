@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure"
 	"github.com/Southclaws/storyden/backend/pkg/resources"
 	"github.com/Southclaws/storyden/backend/pkg/services"
-	"github.com/Southclaws/storyden/backend/pkg/transport"
+	transport "github.com/Southclaws/storyden/backend/pkg/transports"
 )
 
 // Start starts the application and blocks until fatal error

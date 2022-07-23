@@ -1,10 +1,7 @@
 package http
 
 import (
-	"net/http"
-
 	"github.com/Southclaws/storyden/backend/internal/config"
-	"github.com/Southclaws/storyden/backend/internal/web"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
@@ -18,10 +15,7 @@ func newRouter(l *zap.Logger, cfg config.Config) chi.Router {
 		cfg.PublicWebAddress,    // Live public website
 	}
 
-	l.Debug("preparing router", zap.Strings("origins", origins))
-
 	router.Use(
-		web.WithLogger,
 		cors.Handler(cors.Options{
 			AllowedOrigins:   origins,
 			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -32,17 +26,11 @@ func newRouter(l *zap.Logger, cfg config.Config) chi.Router {
 		}),
 	)
 
-	router.Get("/version", func(w http.ResponseWriter, r *http.Request) {
-		web.Write(w, map[string]string{"version": config.Version}) //nolint:errcheck
-	})
+	// Router must add all middleware before mounting routes. To add middleware,
+	// simply depend on the router in a provider or invoker and do `router.Use`.
+	// To mount routes use the lifecycle `OnStart` hook and mount them normally.
 
-	router.HandleFunc(
-		"/{rest:[a-zA-Z0-9=\\-\\/]+}",
-		func(w http.ResponseWriter, r *http.Request) {
-			if _, err := w.Write([]byte("no module found for that route")); err != nil {
-				zap.L().Warn("failed to write error", zap.Error(err))
-			}
-		})
+	l.Info("created router", zap.Strings("origins", origins))
 
 	return router
 }

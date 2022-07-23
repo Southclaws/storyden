@@ -37,5 +37,7 @@ func newServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router chi.Rou
 		},
 	})
 
+	l.Info("created http server")
+
 	return server
 }

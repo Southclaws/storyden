@@ -3,7 +3,7 @@ package transport
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/backend/pkg/transport/http"
+	"github.com/Southclaws/storyden/backend/pkg/transports/http"
 )
 
 func Build() fx.Option {
