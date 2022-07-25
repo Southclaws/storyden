@@ -1,4 +1,4 @@
-package user
+package user_test
 
 import (
 	"context"
@@ -6,178 +6,188 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db"
-	"github.com/Southclaws/storyden/backend/internal/utils"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/backend/internal/utils"
+	"github.com/Southclaws/storyden/backend/internal/utils/bdd"
+	"github.com/Southclaws/storyden/backend/pkg/resources"
+	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
-func implementations(t *testing.T, seed bool) []utils.ImplConstructor[Repository] {
-	if seed {
-		return []utils.ImplConstructor[Repository]{
-			func() Repository { return NewWithSeed(db.TestDB(t)) },
-			func() Repository { return NewLocalWithSeed() },
-		}
-	} else {
-		return []utils.ImplConstructor[Repository]{
-			func() Repository { return New(db.TestDB(t)) },
-			func() Repository { return NewLocal() },
-		}
-	}
-}
-
 func TestCreateUser(t *testing.T) {
-	utils.TestAll(t, implementations(t, false),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-			require.NoError(t, err)
-			require.NotNil(t, u)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			assert.Equal(t, SeedUser_01_Admin.Email, u.Email)
-			assert.Equal(t, SeedUser_01_Admin.Name, u.Name)
+		u, err := repo.CreateUser(ctx, user.SeedUser_01_Admin.Email, user.SeedUser_01_Admin.Name)
+		r.NoError(err)
+		r.NotNil(u)
 
-			u1, err := r.GetUser(ctx, u.ID, false)
-			require.NoError(t, err)
-			assert.NotNil(t, u1)
+		a.Equal(user.SeedUser_01_Admin.Email, u.Email)
+		a.Equal(user.SeedUser_01_Admin.Name, u.Name)
 
-			assert.Equal(t, SeedUser_01_Admin.Email, u1.Email)
-			assert.Equal(t, SeedUser_01_Admin.Name, u1.Name)
+		u1, err := repo.GetUser(ctx, u.ID, false)
+		r.NoError(err)
+		a.NotNil(u1)
 
-			// Duplicate email address should fail.
-			u2, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-			require.Error(t, err)
-			assert.Nil(t, u2)
-		})
+		a.Equal(user.SeedUser_01_Admin.Email, u1.Email)
+		a.Equal(user.SeedUser_01_Admin.Name, u1.Name)
+
+		// Duplicate email address should fail.
+		u2, err := repo.CreateUser(ctx, user.SeedUser_01_Admin.Email, user.SeedUser_01_Admin.Name)
+		r.Error(err)
+		a.Nil(u2)
+	}))
 }
 
 func TestGetByID(t *testing.T) {
-	utils.TestAll(t, implementations(t, false),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			none, err := r.GetUser(ctx, SeedUser_01_Admin.ID, false)
-			require.NoError(t, err)
-			assert.Nil(t, none)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-			require.NoError(t, err)
+		none, err := repo.GetUser(ctx, user.SeedUser_01_Admin.ID, false)
+		r.NoError(err)
+		a.Nil(none)
 
-			u, err = r.GetUser(ctx, u.ID, false)
-			require.NoError(t, err)
-			assert.NotNil(t, u)
-		})
+		u, err := repo.CreateUser(ctx, user.SeedUser_01_Admin.Email, user.SeedUser_01_Admin.Name)
+		r.NoError(err)
+
+		u, err = repo.GetUser(ctx, u.ID, false)
+		r.NoError(err)
+		a.NotNil(u)
+	}))
 }
 
 func TestGetByEmail(t *testing.T) {
-	utils.TestAll(t, implementations(t, false),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			none, err := r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
-			require.NoError(t, err)
-			assert.Nil(t, none)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			u, err := r.CreateUser(ctx, SeedUser_01_Admin.Email, SeedUser_01_Admin.Name)
-			require.NoError(t, err)
+		none, err := repo.GetUserByEmail(ctx, user.SeedUser_01_Admin.Email, false)
+		r.NoError(err)
+		a.Nil(none)
 
-			u, err = r.GetUserByEmail(ctx, SeedUser_01_Admin.Email, false)
-			require.NoError(t, err)
-			assert.NotNil(t, u)
-		})
+		u, err := repo.CreateUser(ctx, user.SeedUser_01_Admin.Email, user.SeedUser_01_Admin.Name)
+		r.NoError(err)
+
+		u, err = repo.GetUserByEmail(ctx, user.SeedUser_01_Admin.Email, false)
+		r.NoError(err)
+		a.NotNil(u)
+	}))
 }
 
 func TestGetAll(t *testing.T) {
-	utils.TestAll(t, implementations(t, true),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			u, err := r.GetUsers(ctx, "asc", 10, 0, false)
-			require.NoError(t, err)
-			assert.NotNil(t, u)
+	bdd.Test(t, nil, fx.Invoke(
+		func(
+			_ resources.Seeded,
+			repo user.Repository,
+		) {
+			r := require.New(t)
+			a := assert.New(t)
 
-			emails := lo.Map(u, func(t User, i int) string { return t.Email })
+			u, err := repo.GetUsers(ctx, "asc", 10, 0, false)
+			r.NoError(err)
+			a.NotNil(u)
 
-			assert.Contains(t, emails, SeedUser_01_Admin.Email)
-			assert.Contains(t, emails, SeedUser_02_User.Email)
-		})
+			emails := lo.Map(u, func(t user.User, i int) string { return t.Email })
+
+			a.Contains(emails, user.SeedUser_01_Admin.Email)
+			a.Contains(emails, user.SeedUser_02_User.Email)
+		}))
 }
 
 func TestUpdateUser(t *testing.T) {
-	utils.TestAll(t, implementations(t, true),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			fmt.Println("BEFORE GET", SeedUser_02_User.ID)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			before, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-			fmt.Println(before, err, SeedUser_02_User.ID)
-			require.NoError(t, err)
-			assert.NotNil(t, before)
+		fmt.Println("BEFORE GET", user.SeedUser_02_User.ID)
 
-			after, err := r.UpdateUser(ctx, SeedUser_02_User.ID, utils.Ref("timmy@storyd.en"), nil, nil)
-			require.NoError(t, err)
-			require.NotNil(t, after)
+		before, err := repo.GetUser(ctx, user.SeedUser_02_User.ID, false)
+		fmt.Println(before, err, user.SeedUser_02_User.ID)
+		r.NoError(err)
+		a.NotNil(before)
 
-			assert.Equal(t, "timmy@storyd.en", after.Email)
-		})
+		after, err := repo.UpdateUser(ctx, user.SeedUser_02_User.ID, utils.Ref("timmy@storyd.en"), nil, nil)
+		r.NoError(err)
+		r.NotNil(after)
+
+		a.Equal("timmy@storyd.en", after.Email)
+	}))
 }
 
 func TestSetAdmin(t *testing.T) {
-	utils.TestAll(t, implementations(t, true),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			err := r.SetAdmin(ctx, SeedUser_02_User.ID, true)
-			require.NoError(t, err)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-			require.NoError(t, err)
-			require.NotNil(t, after)
-			assert.True(t, after.Admin)
-		})
+		err := repo.SetAdmin(ctx, user.SeedUser_02_User.ID, true)
+		r.NoError(err)
+
+		after, err := repo.GetUser(ctx, user.SeedUser_02_User.ID, false)
+		r.NoError(err)
+		r.NotNil(after)
+		a.True(after.Admin)
+	}))
 }
 
 func TestBan(t *testing.T) {
-	utils.TestAll(t, implementations(t, true),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			u, err := r.Ban(ctx, SeedUser_02_User.ID)
-			require.NoError(t, err)
-			require.NotNil(t, u)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			after, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-			require.NoError(t, err)
-			require.NotNil(t, after)
+		u, err := repo.Ban(ctx, user.SeedUser_02_User.ID)
+		r.NoError(err)
+		r.NotNil(u)
 
-			assert.True(t, after.DeletedAt.IsPresent())
-			assert.WithinDuration(t, time.Now(), after.DeletedAt.ElseZero(), time.Second)
-		})
+		after, err := repo.GetUser(ctx, user.SeedUser_02_User.ID, false)
+		r.NoError(err)
+		r.NotNil(after)
+
+		a.True(after.DeletedAt.IsPresent())
+		a.WithinDuration(time.Now(), after.DeletedAt.ElseZero(), time.Second)
+	}))
 }
 
 func TestUnban(t *testing.T) {
-	utils.TestAll(t, implementations(t, true),
-		func(t *testing.T, r Repository) {
-			ctx := context.Background()
+	ctx := context.Background()
 
-			u1, err := r.Ban(ctx, SeedUser_02_User.ID)
-			require.NoError(t, err)
-			require.NotNil(t, u1)
+	bdd.Test(t, nil, fx.Invoke(func(repo user.Repository) {
+		r := require.New(t)
+		a := assert.New(t)
 
-			u2, err := r.GetUser(ctx, SeedUser_02_User.ID, false)
-			require.NoError(t, err)
-			require.NotNil(t, u2)
+		u1, err := repo.Ban(ctx, user.SeedUser_02_User.ID)
+		r.NoError(err)
+		r.NotNil(u1)
 
-			assert.True(t, u2.DeletedAt.IsPresent())
-			assert.WithinDuration(t, time.Now(), u2.DeletedAt.ElseZero(), time.Second)
+		u2, err := repo.GetUser(ctx, user.SeedUser_02_User.ID, false)
+		r.NoError(err)
+		r.NotNil(u2)
 
-			u3, err := r.Unban(ctx, SeedUser_02_User.ID)
-			require.NoError(t, err)
-			require.NotNil(t, u3)
+		a.True(u2.DeletedAt.IsPresent())
+		a.WithinDuration(time.Now(), u2.DeletedAt.ElseZero(), time.Second)
 
-			assert.False(t, u3.DeletedAt.IsPresent())
-		})
+		u3, err := repo.Unban(ctx, user.SeedUser_02_User.ID)
+		r.NoError(err)
+		r.NotNil(u3)
+
+		a.False(u3.DeletedAt.IsPresent())
+	}))
 }

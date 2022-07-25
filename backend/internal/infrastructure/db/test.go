@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -22,7 +23,7 @@ func TestDB(t *testing.T) *model.Client {
 		url = "postgresql://default:default@localhost:5432/postgres"
 	}
 
-	c, d, err := connect(url, false)
+	c, d, err := connect(context.Background(), url, false)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -17,28 +17,29 @@ import (
 )
 
 func Build() fx.Option {
-	return fx.Provide(func(lc fx.Lifecycle, cfg config.Config) (*model.Client, error) {
-		var client *model.Client
-
-		lc.Append(fx.Hook{
-			OnStart: func(ctx context.Context) (err error) {
-				client, _, err = connect(cfg.DatabaseURL, true)
-				if err != nil {
-					return err
-				}
-
-				return nil
-			},
-			OnStop: func(ctx context.Context) error {
-				return client.Close()
-			},
-		})
-
-		return client, nil
-	})
+	return fx.Provide(newDB)
 }
 
-func connect(url string, prod bool) (*model.Client, *sql.DB, error) {
+func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, error) {
+	wctx, cancel := context.WithCancel(context.Background())
+
+	client, _, err := connect(wctx, cfg.DatabaseURL, true)
+	if err != nil {
+		cancel()
+		return nil, err
+	}
+
+	lc.Append(fx.Hook{
+		OnStop: func(_ context.Context) error {
+			defer cancel()
+			return client.Close()
+		},
+	})
+
+	return client, nil
+}
+
+func connect(ctx context.Context, url string, prod bool) (*model.Client, *sql.DB, error) {
 	driver, err := sql.Open("pgx", url)
 	if err != nil {
 		return nil, nil, err
@@ -56,7 +57,7 @@ func connect(url string, prod bool) (*model.Client, *sql.DB, error) {
 	}
 
 	// Run only additive migrations
-	if err := client.Schema.Create(context.Background(), opts...); err != nil {
+	if err := client.Schema.Create(ctx, opts...); err != nil {
 		return nil, nil, err
 	}
 

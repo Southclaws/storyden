@@ -1,10 +1,11 @@
 package http
 
 import (
-	"github.com/Southclaws/storyden/backend/internal/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
+
+	"github.com/Southclaws/storyden/backend/internal/config"
 )
 
 func newRouter(l *zap.Logger, cfg config.Config) chi.Router {

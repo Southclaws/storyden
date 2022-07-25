@@ -21,7 +21,7 @@ func newServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router chi.Rou
 	wctx, cancel := context.WithCancel(context.Background())
 
 	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(_ context.Context) error {
 			l.Info("http server starting", zap.String("address", cfg.ListenAddr))
 			server.BaseContext = func(ln net.Listener) context.Context { return wctx }
 			go func() {
@@ -31,7 +31,7 @@ func newServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router chi.Rou
 			}()
 			return nil
 		},
-		OnStop: func(ctx context.Context) error {
+		OnStop: func(_ context.Context) error {
 			cancel()
 			return nil
 		},
