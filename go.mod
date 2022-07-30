@@ -43,11 +43,12 @@ require (
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387 // indirect
 	github.com/andybalholm/brotli v1.0.1 // indirect
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/deepmap/oapi-codegen v1.10.1 // indirect
+	github.com/deepmap/oapi-codegen v1.11.1-0.20220728213615-b9782fb00949 // indirect
 	github.com/el-mike/restrict v1.0.0 // indirect
 	github.com/getkin/kin-openapi v0.94.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -97,15 +98,15 @@ require (
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
+	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/net v0.0.0-20220418201149-a630d4f3e7a2 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
+	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

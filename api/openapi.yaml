@@ -8,22 +8,17 @@ security:
   - cookieAuth: []
 
 paths:
-  /v1/auth/password:
-    get:
-      tags:
-        - "user"
-      summary: "Login via username and password"
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
+  /v1/auth/password/signup:
+    post:
+      operationId: signup
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
       responses:
         200:
           description: OK
@@ -37,6 +32,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/APIError"
+  /v1/auth/password/signin:
+    post:
+      operationId: signin
+      requestBody:
+        content:
+          application/x-www-form-urlencoded,application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
+      responses:
+        200:
+          description: OK
 
 components:
   securitySchemes:
@@ -44,11 +53,18 @@ components:
       type: apiKey
       in: cookie
       name: storyden-session
+
   schemas:
     AuthenticationRequest:
       type: object
-    AuthenticationRequestForm:
-      type: object
+      properties:
+        identifier:
+          required:
+            - ""
+          type: string
+        token:
+          type: string
+
     APIError:
       type: object
       properties:

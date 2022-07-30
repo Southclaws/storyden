@@ -2,13 +2,11 @@ package bindings
 
 import (
 	"context"
-	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/backend/internal/config"
 	"github.com/Southclaws/storyden/backend/internal/web"
 	"github.com/Southclaws/storyden/backend/pkg/transports/http/openapi"
 )
@@ -22,15 +20,15 @@ type Bindings struct {
 	Authentication
 }
 
-func mountBindings(lc fx.Lifecycle, l *zap.Logger, router chi.Router, si openapi.ServerInterface) {
+func mountBindings(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictServerInterface) {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			openapi.HandlerFromMux(si, router)
+			openapi.RegisterHandlers(router, openapi.NewStrictHandler(si, nil))
 
 			// quick and simple version handler
-			router.Get("/version", func(w http.ResponseWriter, _ *http.Request) {
-				web.Write(w, map[string]string{"version": config.Version}) //nolint:errcheck
-			})
+			// router.Get("/version", func(w http.ResponseWriter, _ *http.Request) {
+			// 	web.Write(w, map[string]string{"version": config.Version}) //nolint:errcheck
+			// })
 
 			return nil
 		},
@@ -39,9 +37,9 @@ func mountBindings(lc fx.Lifecycle, l *zap.Logger, router chi.Router, si openapi
 	l.Info("mounted OpenAPI to service bindings")
 }
 
-func addMiddleware(l *zap.Logger, router chi.Router, a Authentication) {
-	router.Use(web.WithLogger)
-	router.Use(a.middleware)
+func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) {
+	router.Use(echo.WrapMiddleware(web.WithLogger))
+	router.Use(echo.WrapMiddleware(a.middleware))
 
 	l.Info("added router middleware")
 }
@@ -51,7 +49,7 @@ func Build() fx.Option {
 		// Provide the bindings struct which implements the generated OpenAPI
 		// interface by composing together all of the service bindings into a
 		// single struct.
-		fx.Provide(func(s Bindings) openapi.ServerInterface { return &s }),
+		fx.Provide(func(s Bindings) openapi.StrictServerInterface { return &s }),
 
 		// Add the middleware bindings.
 		fx.Invoke(addMiddleware),

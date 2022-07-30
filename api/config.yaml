@@ -1,6 +1,8 @@
 package: openapi
 generate:
-  chi-server: true
+  server: true
+  echo-server: true
+  strict-server: true
   models: true
   embedded-spec: true
 output: ./backend/pkg/transports/http/openapi/generated_server.go

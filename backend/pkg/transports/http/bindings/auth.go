@@ -1,6 +1,7 @@
 package bindings
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Southclaws/storyden/backend/pkg/services/authentication"
@@ -11,8 +12,12 @@ type Authentication struct{ s authentication.Service }
 
 func NewAuthentication(s authentication.Service) Authentication { return Authentication{s} }
 
-func (i *Authentication) GetV1AuthPassword(w http.ResponseWriter, r *http.Request, params openapi.GetV1AuthPasswordParams) {
-	//
+func (i *Authentication) Signin(ctx context.Context, request openapi.SigninRequestObject) any {
+	return nil
+}
+
+func (i *Authentication) Signup(ctx context.Context, request openapi.SignupRequestObject) any {
+	return nil
 }
 
 func (i *Authentication) middleware(next http.Handler) http.Handler {
