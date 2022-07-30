@@ -7,7 +7,7 @@ import (
 )
 
 func Build() fx.Option {
-	return fx.Provide(
-		authentication.New,
+	return fx.Options(
+		authentication.Build(),
 	)
 }

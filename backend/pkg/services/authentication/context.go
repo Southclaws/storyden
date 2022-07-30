@@ -5,9 +5,15 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/web"
+	"github.com/Southclaws/storyden/backend/internal/web"
 	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
+
+var contextKey = struct{}{}
+
+func AddUserToContext(ctx context.Context, u *user.User) context.Context {
+	return context.WithValue(ctx, contextKey, u)
+}
 
 // GetUser extracts auth info from a request context and, if not present, will
 // write a 500 error to the response and return not-ok. In this failure case,

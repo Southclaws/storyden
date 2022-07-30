@@ -17,6 +17,11 @@ func (i *Authentication) GetV1AuthPassword(w http.ResponseWriter, r *http.Reques
 
 func (i *Authentication) middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r)
+		if session, ok := i.s.DecodeSession(r); ok {
+			ctx := authentication.AddUserToContext(r.Context(), session)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			next.ServeHTTP(w, r)
+		}
 	})
 }

@@ -33,7 +33,7 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:swagger]
+    deps: [generate:db, generate:openapi]
 
   generate:db:
     cmds:
