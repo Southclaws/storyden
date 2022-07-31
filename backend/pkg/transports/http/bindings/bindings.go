@@ -17,6 +17,7 @@ import (
 // invoke call can mount them onto the router using the OpenAPI ServerInterface.
 type Bindings struct {
 	fx.In
+	Version
 	Authentication
 }
 
@@ -24,12 +25,7 @@ func mountBindings(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			openapi.RegisterHandlers(router, openapi.NewStrictHandler(si, nil))
-
-			// quick and simple version handler
-			// router.Get("/version", func(w http.ResponseWriter, _ *http.Request) {
-			// 	web.Write(w, map[string]string{"version": config.Version}) //nolint:errcheck
-			// })
-
+			router.GET("/openapi.json", spec)
 			return nil
 		},
 	})
@@ -60,6 +56,7 @@ func Build() fx.Option {
 		// Provide all service layer bindings to the DI system so they can be
 		// depended upon during the binding provider above.
 		fx.Provide(
+			NewVersion,
 			NewAuthentication,
 		),
 	)

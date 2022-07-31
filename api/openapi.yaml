@@ -8,6 +8,17 @@ security:
   - cookieAuth: []
 
 paths:
+  /version:
+    get:
+      operationId: getVersion
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+
   /v1/auth/password/signup:
     post:
       operationId: signup
@@ -24,8 +35,6 @@ paths:
           description: OK
         401:
           description: Unauthorized
-        404:
-          description: User not found
         500:
           description: Internal Server Error
           content:
@@ -46,6 +55,14 @@ paths:
       responses:
         200:
           description: OK
+        404:
+          description: User not found
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIError"
 
 components:
   securitySchemes:

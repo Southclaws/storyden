@@ -13,6 +13,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 
 	origins := []string{
 		"http://localhost:3000", // Local development
+		"http://localhost:8001", // Swagger UI
 		cfg.PublicWebAddress,    // Live public website
 	}
 

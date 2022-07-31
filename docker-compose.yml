@@ -18,3 +18,10 @@ services:
     ports:
       - 5672:5672
       - 8080:15672
+
+  swaggerui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8001:8080
+    environment:
+      SWAGGER_JSON_URL: "http://localhost:8000/openapi.json"
