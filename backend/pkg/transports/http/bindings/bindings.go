@@ -2,7 +2,10 @@ package bindings
 
 import (
 	"context"
+	"errors"
 
+	"github.com/deepmap/oapi-codegen/pkg/middleware"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -33,11 +36,25 @@ func mountBindings(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi
 	l.Info("mounted OpenAPI to service bindings")
 }
 
-func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) {
+func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) error {
+	spec, err := openapi.GetSwagger()
+	if err != nil {
+		return err
+	}
+
 	router.Use(echo.WrapMiddleware(web.WithLogger))
 	router.Use(echo.WrapMiddleware(a.middleware))
+	router.Use(middleware.OapiRequestValidatorWithOptions(spec, &middleware.Options{
+		Options: openapi3filter.Options{
+			AuthenticationFunc: func(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
+				return errors.New("not allowed")
+			},
+		},
+	}))
 
 	l.Info("added router middleware")
+
+	return nil
 }
 
 func Build() fx.Option {
