@@ -41,6 +41,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/APIError"
+
   /v1/auth/password/signin:
     post:
       operationId: signin

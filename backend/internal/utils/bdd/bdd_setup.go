@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/backend/pkg/resources"
+	"github.com/Southclaws/storyden/backend/pkg/resources/seed"
 	"github.com/Southclaws/storyden/backend/pkg/services"
 )
 
@@ -40,7 +41,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 		application(),
 
 		// seeded database
-		resources.Seed(),
+		seed.Create(),
 
 		// database client
 		fx.Invoke(func() *model.Client { return db.TestDB(t) }),
