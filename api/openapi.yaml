@@ -10,7 +10,19 @@ security:
 paths:
   /version:
     get:
+      security: []
       operationId: getVersion
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /openapi.json:
+    get:
+      security: []
+      operationId: getSpec
       responses:
         200:
           description: OK

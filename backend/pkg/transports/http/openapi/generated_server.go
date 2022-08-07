@@ -49,6 +49,9 @@ type SignupFormdataRequestBody = AuthenticationRequest
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /openapi.json)
+	GetSpec(ctx echo.Context) error
+
 	// (POST /v1/auth/password/signin)
 	Signin(ctx echo.Context) error
 
@@ -62,6 +65,15 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// GetSpec converts echo context to params.
+func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetSpec(ctx)
+	return err
 }
 
 // Signin converts echo context to params.
@@ -89,8 +101,6 @@ func (w *ServerInterfaceWrapper) Signup(ctx echo.Context) error {
 // GetVersion converts echo context to params.
 func (w *ServerInterfaceWrapper) GetVersion(ctx echo.Context) error {
 	var err error
-
-	ctx.Set(CookieAuthScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetVersion(ctx)
@@ -125,11 +135,17 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.Signin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.Signup)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
+
+type GetSpecRequestObject struct {
+}
+
+type GetSpec200TextResponse string
 
 type SigninRequestObject struct {
 	JSONBody *SigninJSONRequestBody
@@ -173,6 +189,9 @@ type GetVersion200TextResponse string
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
+	// (GET /openapi.json)
+	GetSpec(ctx context.Context, request GetSpecRequestObject) interface{}
+
 	// (POST /v1/auth/password/signin)
 	Signin(ctx context.Context, request SigninRequestObject) interface{}
 
@@ -194,6 +213,31 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
+}
+
+// GetSpec operation middleware
+func (sh *strictHandler) GetSpec(ctx echo.Context) error {
+	var request GetSpecRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.GetSpec(ctx.Request().Context(), request.(GetSpecRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSpec")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case GetSpec200TextResponse:
+		return ctx.Blob(200, "text/plain", []byte(v))
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
 }
 
 // Signin operation middleware
@@ -312,15 +356,15 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8yUwW7bMAyGXyXgdnTqZOsuvnXAMAQ9bFiwXYIcNJtx1CakStJJs8DvPkhO2rTxhh2K",
-	"oScLIkV+/H9Zeyh5HZiQTKHYg5ZLXLu0vPo6+STCEtdBOKCYxxTB47btAkIBauKphjaDNaq6Gntj2tQ1",
-	"qmHVE22z4w7/vMHSYv5VY0sk86Uzz/QN7xpUO4fxVUxaeExEgneNl9hjBjDPzimMb5H+iSAiY9mIt900",
-	"qtK1K5lvPUa21JygOGxBBuTWXUmWXYU0VFT1TPBQ2gV/jTtoY21PC04c3lanpyCDDUo6V8A4InNAcsFD",
-	"Ae8vRhdjyCA4WyaafDPOXWPLPDjVLUuVq6/JpwEDd3JFsZKEkwoKmHbxLCmFah+52nVzkSGlAy6E1UH1",
-	"/EaZHu9FXL0VXEABb/LHi5Mfbk3eb1mc9rTm/XC73Q4XLOthIyukkiusspfvGvsKamDSzrt3o1H8VKil",
-	"+GCdxF+uo8aXo8vz0HdFGRDbYMENVTHtQ1fhZcQ6/l8J9GnnCRkKudVgirJBGTwkttkfPG/C3z1vwuvz",
-	"/H9bPO6xmKKULP4XviKDj///Hmrs8fMz2o9DSv/4J/iG95aHlfPPwJ8/f2eEUbSO5/gKQjF7+v7N5u28",
-	"/R0AAP//tYukm0IGAAA=",
+	"H4sIAAAAAAAC/8yUwW4aQQyGXwW5PQ4stOllb6lUVSiHVkXtBXGY7pplErAnHi+ERvvu1cxCCN1NValR",
+	"lNsy9tjf/L/xPRS88UxIGiC/h1CscGPT5+XX6ScRlvjthT2KOkwRPB7r3iPkEFQcVdAY2GAItsLeWKir",
+	"CoNi2RNtzPGEf15joTH/stYVkrrCqmP6hrc1Bu3CuDImLR0mIsHb2knsMQdYmC6F8g3SPxFEZCxqcbqf",
+	"RVXadgXzjcPIlpoT5IcjMEB205Zk2ZdIw4AhOCZ4KG29u8I9NLG2oyUnDqfrx7fAwBYl3cthEpHZI1nv",
+	"IIf3o/FoAga81VWiyQ6x0XXg9KoKk0RRoCTbtIQcPqPOPBZgQDB4ptA+5d143L6IFCldU7zTzK+to9Ms",
+	"9GnVGCgxFOK8tpxfrs70gny+iL+z7SSzta4yb0PYsZRZcBW11T2HHtRZGzfJSAz6kcv9H5DW+/VhKLLj",
+	"s0+obwWXkMOb7DTX2WGos/6JiqCPa94Nd7vdcMmyGdayRiq4xNI8f9fYt8+PrrIGLsYX3dD3gDIg1sGS",
+	"aypj2oeOo/+Bffz799g9JUUhux7MULYog4fEJz2v/d89r/3r8/ylLZ70WExRShb3C1+Rwcf19PS6+XFI",
+	"eeGNc35wvqzni2bR/A4AAP//FqWmKO8GAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -2,10 +2,13 @@ package bindings
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/Southclaws/storyden/backend/pkg/services/authentication"
 	"github.com/Southclaws/storyden/backend/pkg/transports/http/openapi"
+	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/kr/pretty"
 )
 
 type Authentication struct{ s authentication.Service }
@@ -29,4 +32,9 @@ func (i *Authentication) middleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		}
 	})
+}
+
+func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
+	pretty.Println(ai.SecurityScheme)
+	return errors.New("not allowed")
 }

@@ -2,11 +2,11 @@ package bindings
 
 import (
 	"context"
-	"errors"
 
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -22,18 +22,19 @@ type Bindings struct {
 	fx.In
 	Version
 	Authentication
+	Spec
 }
 
 func mountBindings(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictServerInterface) {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			openapi.RegisterHandlers(router, openapi.NewStrictHandler(si, nil))
-			router.GET("/openapi.json", spec)
+
+			l.Info("mounted OpenAPI to service bindings",
+				zap.Strings("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string { return r.Path })))
 			return nil
 		},
 	})
-
-	l.Info("mounted OpenAPI to service bindings")
 }
 
 func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) error {
@@ -46,9 +47,11 @@ func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) error {
 	router.Use(echo.WrapMiddleware(a.middleware))
 	router.Use(middleware.OapiRequestValidatorWithOptions(spec, &middleware.Options{
 		Options: openapi3filter.Options{
-			AuthenticationFunc: func(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
-				return errors.New("not allowed")
-			},
+			AuthenticationFunc: a.validator,
+		},
+		ErrorHandler: func(c echo.Context, err *echo.HTTPError) error {
+			l.Error("request error", zap.Error(err))
+			return nil
 		},
 	}))
 
@@ -75,6 +78,7 @@ func Build() fx.Option {
 		fx.Provide(
 			NewVersion,
 			NewAuthentication,
+			NewSpec,
 		),
 	)
 }

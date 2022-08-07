@@ -5,11 +5,11 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/backend/internal/config"
-	"github.com/labstack/echo/v4"
 )
 
 func newServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *echo.Echo) *http.Server {

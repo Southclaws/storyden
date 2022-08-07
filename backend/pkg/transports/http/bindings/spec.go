@@ -1,16 +1,26 @@
 package bindings
 
 import (
-	"github.com/labstack/echo/v4"
+	"context"
+	"encoding/json"
 
 	"github.com/Southclaws/storyden/backend/pkg/transports/http/openapi"
 )
 
-func spec(c echo.Context) error {
+type Spec struct{}
+
+func NewSpec() Spec { return Spec{} }
+
+func (v *Spec) GetSpec(ctx context.Context, request openapi.GetSpecRequestObject) any {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
 		return err
 	}
-	c.JSON(200, spec)
-	return nil
+
+	b, err := json.Marshal(spec)
+	if err != nil {
+		return err
+	}
+
+	return openapi.GetSpec200TextResponse(b)
 }
