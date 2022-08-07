@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"strings"
 
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
@@ -46,11 +47,12 @@ func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) error {
 	router.Use(echo.WrapMiddleware(web.WithLogger))
 	router.Use(echo.WrapMiddleware(a.middleware))
 	router.Use(middleware.OapiRequestValidatorWithOptions(spec, &middleware.Options{
+		Skipper: openApiSkipper,
 		Options: openapi3filter.Options{
 			AuthenticationFunc: a.validator,
 		},
 		ErrorHandler: func(c echo.Context, err *echo.HTTPError) error {
-			l.Error("request error", zap.Error(err))
+			l.Info("request error", zap.Error(err))
 			return nil
 		},
 	}))
@@ -58,6 +60,10 @@ func addMiddleware(l *zap.Logger, router *echo.Echo, a Authentication) error {
 	l.Info("added router middleware")
 
 	return nil
+}
+
+func openApiSkipper(c echo.Context) bool {
+	return strings.HasPrefix(c.Path(), "/api/openapi.json")
 }
 
 func Build() fx.Option {

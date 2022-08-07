@@ -4,6 +4,9 @@ info:
   title: storyden
   version: "1"
 
+servers:
+  - url: "/api"
+
 security:
   - cookieAuth: []
 
@@ -12,6 +15,7 @@ paths:
     get:
       security: []
       operationId: getVersion
+      tags: [misc]
       responses:
         200:
           description: OK
@@ -23,6 +27,7 @@ paths:
     get:
       security: []
       operationId: getSpec
+      tags: [misc]
       responses:
         200:
           description: OK
@@ -34,6 +39,8 @@ paths:
   /v1/auth/password/signup:
     post:
       operationId: signup
+      tags: [auth]
+      security: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -45,6 +52,10 @@ paths:
       responses:
         200:
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationResponse"
         401:
           description: Unauthorized
         500:
@@ -57,9 +68,11 @@ paths:
   /v1/auth/password/signin:
     post:
       operationId: signin
+      tags: [auth]
+      security: []
       requestBody:
         content:
-          application/x-www-form-urlencoded,application/json:
+          application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/AuthenticationRequest"
           application/json:
@@ -68,6 +81,10 @@ paths:
       responses:
         200:
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationResponse"
         404:
           description: User not found
         500:
@@ -76,6 +93,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/APIError"
+
+  # /v1/auth/oauth/{provider}/link:
+  #   get:
+  #     operationId: oauthLink
+  #     security: []
+  #     parameters:
+  #       - name: provider
+  #         in: path
+  #         schema:
+  #           type: string
+  #     responses:
+  #       200:
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/AuthenticationResponse"
+  #       404:
+  #         description: User not found
+  #       500:
+  #         description: Internal Server Error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/APIError"
 
 components:
   securitySchemes:
@@ -87,16 +129,25 @@ components:
   schemas:
     AuthenticationRequest:
       type: object
+      required: [identifier, token]
       properties:
         identifier:
-          required:
-            - ""
+          example: "southclaws@storyden.org"
           type: string
         token:
+          example: "password"
+          type: string
+
+    AuthenticationResponse:
+      type: object
+      required: [id]
+      properties:
+        id:
           type: string
 
     APIError:
       type: object
+      required: [error]
       properties:
         error:
           type: string

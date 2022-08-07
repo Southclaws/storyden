@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"path"
 	"strings"
@@ -20,25 +19,29 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const (
-	CookieAuthScopes = "cookieAuth.Scopes"
-)
-
 // APIError defines model for APIError.
 type APIError struct {
-	Error     *string `json:"error,omitempty"`
+	Error     string  `json:"error"`
 	Message   *string `json:"message,omitempty"`
 	Suggested *string `json:"suggested,omitempty"`
 }
 
 // AuthenticationRequest defines model for AuthenticationRequest.
 type AuthenticationRequest struct {
-	Identifier *string `json:"identifier,omitempty"`
-	Token      *string `json:"token,omitempty"`
+	Identifier string `json:"identifier"`
+	Token      string `json:"token"`
+}
+
+// AuthenticationResponse defines model for AuthenticationResponse.
+type AuthenticationResponse struct {
+	Id string `json:"id"`
 }
 
 // SigninJSONRequestBody defines body for Signin for application/json ContentType.
 type SigninJSONRequestBody = AuthenticationRequest
+
+// SigninFormdataRequestBody defines body for Signin for application/x-www-form-urlencoded ContentType.
+type SigninFormdataRequestBody = AuthenticationRequest
 
 // SignupJSONRequestBody defines body for Signup for application/json ContentType.
 type SignupJSONRequestBody = AuthenticationRequest
@@ -80,8 +83,6 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) Signin(ctx echo.Context) error {
 	var err error
 
-	ctx.Set(CookieAuthScopes, []string{""})
-
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.Signin(ctx)
 	return err
@@ -90,8 +91,6 @@ func (w *ServerInterfaceWrapper) Signin(ctx echo.Context) error {
 // Signup converts echo context to params.
 func (w *ServerInterfaceWrapper) Signup(ctx echo.Context) error {
 	var err error
-
-	ctx.Set(CookieAuthScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.Signup(ctx)
@@ -148,11 +147,14 @@ type GetSpecRequestObject struct {
 type GetSpec200TextResponse string
 
 type SigninRequestObject struct {
-	JSONBody *SigninJSONRequestBody
-	Body     io.Reader
+	JSONBody     *SigninJSONRequestBody
+	FormdataBody *SigninFormdataRequestBody
 }
 
-type Signin200Response struct {
+type Signin200JSONResponse AuthenticationResponse
+
+func (t Signin200JSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((AuthenticationResponse)(t))
 }
 
 type Signin404Response struct {
@@ -169,7 +171,10 @@ type SignupRequestObject struct {
 	FormdataBody *SignupFormdataRequestBody
 }
 
-type Signup200Response struct {
+type Signup200JSONResponse AuthenticationResponse
+
+func (t Signup200JSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((AuthenticationResponse)(t))
 }
 
 type Signup401Response struct {
@@ -251,8 +256,16 @@ func (sh *strictHandler) Signin(ctx echo.Context) error {
 		}
 		request.JSONBody = &body
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded,application/json") {
-		request.Body = ctx.Request().Body
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		if form, err := ctx.FormParams(); err == nil {
+			var body SigninFormdataRequestBody
+			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+				return err
+			}
+			request.FormdataBody = &body
+		} else {
+			return err
+		}
 	}
 
 	handler := func(ctx echo.Context, request interface{}) interface{} {
@@ -265,8 +278,8 @@ func (sh *strictHandler) Signin(ctx echo.Context) error {
 	response := handler(ctx, request)
 
 	switch v := response.(type) {
-	case Signin200Response:
-		return ctx.NoContent(200)
+	case Signin200JSONResponse:
+		return ctx.JSON(200, v)
 	case Signin404Response:
 		return ctx.NoContent(404)
 	case Signin500JSONResponse:
@@ -313,8 +326,8 @@ func (sh *strictHandler) Signup(ctx echo.Context) error {
 	response := handler(ctx, request)
 
 	switch v := response.(type) {
-	case Signup200Response:
-		return ctx.NoContent(200)
+	case Signup200JSONResponse:
+		return ctx.JSON(200, v)
 	case Signup401Response:
 		return ctx.NoContent(401)
 	case Signup500JSONResponse:
@@ -356,15 +369,16 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8yUwW4aQQyGXwW5PQ4stOllb6lUVSiHVkXtBXGY7pplErAnHi+ERvvu1cxCCN1NValR",
-	"lNsy9tjf/L/xPRS88UxIGiC/h1CscGPT5+XX6ScRlvjthT2KOkwRPB7r3iPkEFQcVdAY2GAItsLeWKir",
-	"CoNi2RNtzPGEf15joTH/stYVkrrCqmP6hrc1Bu3CuDImLR0mIsHb2knsMQdYmC6F8g3SPxFEZCxqcbqf",
-	"RVXadgXzjcPIlpoT5IcjMEB205Zk2ZdIw4AhOCZ4KG29u8I9NLG2oyUnDqfrx7fAwBYl3cthEpHZI1nv",
-	"IIf3o/FoAga81VWiyQ6x0XXg9KoKk0RRoCTbtIQcPqPOPBZgQDB4ptA+5d143L6IFCldU7zTzK+to9Ms",
-	"9GnVGCgxFOK8tpxfrs70gny+iL+z7SSzta4yb0PYsZRZcBW11T2HHtRZGzfJSAz6kcv9H5DW+/VhKLLj",
-	"s0+obwWXkMOb7DTX2WGos/6JiqCPa94Nd7vdcMmyGdayRiq4xNI8f9fYt8+PrrIGLsYX3dD3gDIg1sGS",
-	"aypj2oeOo/+Bffz799g9JUUhux7MULYog4fEJz2v/d89r/3r8/ylLZ70WExRShb3C1+Rwcf19PS6+XFI",
-	"eeGNc35wvqzni2bR/A4AAP//FqWmKO8GAAA=",
+	"H4sIAAAAAAAC/+xVwW7TQBD9lWjg6MQJlItPFAmhqgcQEVyqHBZ74mxr72x3ZpuEyv+Odm0rSeMEJIoQ",
+	"EjfLb3bmzZs3u4+QU23JoBGG7BE4X2Gt4uflp6v3zpEL39aRRScaI4L9b9lahAxYnDYlNAnUyKxKHMTY",
+	"lyWyYDGANgk4vPfaBfSmK7BI+jD6dou5hCSXXlZoROdKNJnPeO+R5ZihLkLQUmOkiRtV2yrWIy+rvFJr",
+	"fstCblugmZArITmmK3SH5vC0VcxrcsVx+BP+e+X7RL/SDFsyjEPd/FwyXQyUCKpj7p2W7TwMtk2XE91p",
+	"DMVjcgNZ9wsSMKpui7TijBmZNZldx8rqa9xCE3Jrs6TITEu1fwoSeEAXz2UwC52SRaOshgxeT6aTGSRg",
+	"lawim7TDJrdMUe8S40CDAFGXqwIy+IAyt5hDaLqVKR5+NZ22HRlBE48JbiS1ldJmZ+ch9ZoECuTcaSst",
+	"z4/XB3pBdhP0VCUHdWvNOSwCnj7MUuVllfZmSFmXpq1miQeoz1u8HReyvKNi+4S0srbqXJD2Muyov3S4",
+	"hAxepLtVTbs9TYf3IRDdz7kZr9fr8ZJcPfauQpNT0a7h7xVpPXh2HM/XWbccJyaXwMX0IqQ8hL4wupEh",
+	"GS3JmyKEvXlOiv0NOUDqygg6o6rRHN0DulEfeMphwVPnHObteYd5+99hf9xhswGHmTArcvo7/jP+6u/m",
+	"03ft1y7kL1+3hwGHL9fNolkEOHTPEfWuggzS8M40i+ZHAAAA///UbFXE2ggAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

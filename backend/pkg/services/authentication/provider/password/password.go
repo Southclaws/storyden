@@ -1,4 +1,4 @@
-package basic
+package password
 
 import (
 	"context"
@@ -12,9 +12,9 @@ import (
 	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
-const AuthServiceName = `basic`
+const AuthServiceName = `password`
 
-type Basic struct {
+type Password struct {
 	auth authentication.Repository
 	user user.Repository
 }
@@ -23,11 +23,11 @@ func ErrExists(id string) error {
 	return errors.Errorf("an account with the email '%s' already exists", id)
 }
 
-func NewBasicAuth(auth authentication.Repository, user user.Repository) *Basic {
-	return &Basic{auth, user}
+func NewBasicAuth(auth authentication.Repository, user user.Repository) *Password {
+	return &Password{auth, user}
 }
 
-func (b *Basic) Register(ctx context.Context, identifier string, password string) (*user.User, error) {
+func (b *Password) Register(ctx context.Context, identifier string, password string) (*user.User, error) {
 	addr, err := mail.ParseAddress(identifier)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (b *Basic) Register(ctx context.Context, identifier string, password string
 	return u, nil
 }
 
-func (b *Basic) Login(ctx context.Context, identifier string, password string) (*user.User, error) {
+func (b *Password) Login(ctx context.Context, identifier string, password string) (*user.User, error) {
 	a, err := b.auth.GetByIdentifier(ctx, AuthServiceName, identifier)
 	if err != nil {
 		return nil, err
