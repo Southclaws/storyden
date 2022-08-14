@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -77,23 +77,23 @@ func (ac *AuthenticationCreate) SetNillableID(u *uuid.UUID) *AuthenticationCreat
 	return ac
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ac *AuthenticationCreate) SetUserID(id uuid.UUID) *AuthenticationCreate {
-	ac.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (ac *AuthenticationCreate) SetAccountID(id uuid.UUID) *AuthenticationCreate {
+	ac.mutation.SetAccountID(id)
 	return ac
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableUserID(id *uuid.UUID) *AuthenticationCreate {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableAccountID(id *uuid.UUID) *AuthenticationCreate {
 	if id != nil {
-		ac = ac.SetUserID(*id)
+		ac = ac.SetAccountID(*id)
 	}
 	return ac
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (ac *AuthenticationCreate) SetUser(u *User) *AuthenticationCreate {
-	return ac.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (ac *AuthenticationCreate) SetAccount(a *Account) *AuthenticationCreate {
+	return ac.SetAccountID(a.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -278,24 +278,24 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		})
 		_node.Metadata = value
 	}
-	if nodes := ac.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   authentication.UserTable,
-			Columns: []string{authentication.UserColumn},
+			Table:   authentication.AccountTable,
+			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_authentication = &nodes[0]
+		_node.account_authentication = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

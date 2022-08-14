@@ -24,6 +24,7 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
+	Account        []ent.Hook
 	Authentication []ent.Hook
 	Category       []ent.Hook
 	Notification   []ent.Hook
@@ -31,7 +32,6 @@ type hooks struct {
 	React          []ent.Hook
 	Subscription   []ent.Hook
 	Tag            []ent.Hook
-	User           []ent.Hook
 }
 
 // Options applies the options on the config object.

@@ -5,6 +5,7 @@ package model
 import (
 	"time"
 
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
@@ -12,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/schema"
 	"github.com/google/uuid"
 )
@@ -21,6 +21,28 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	accountFields := schema.Account{}.Fields()
+	_ = accountFields
+	// accountDescName is the schema descriptor for name field.
+	accountDescName := accountFields[2].Descriptor()
+	// account.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	account.NameValidator = accountDescName.Validators[0].(func(string) error)
+	// accountDescAdmin is the schema descriptor for admin field.
+	accountDescAdmin := accountFields[4].Descriptor()
+	// account.DefaultAdmin holds the default value on creation for the admin field.
+	account.DefaultAdmin = accountDescAdmin.Default.(bool)
+	// accountDescCreatedAt is the schema descriptor for createdAt field.
+	accountDescCreatedAt := accountFields[5].Descriptor()
+	// account.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	account.DefaultCreatedAt = accountDescCreatedAt.Default.(func() time.Time)
+	// accountDescUpdatedAt is the schema descriptor for updatedAt field.
+	accountDescUpdatedAt := accountFields[6].Descriptor()
+	// account.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	account.DefaultUpdatedAt = accountDescUpdatedAt.Default.(func() time.Time)
+	// accountDescID is the schema descriptor for id field.
+	accountDescID := accountFields[0].Descriptor()
+	// account.DefaultID holds the default value on creation for the id field.
+	account.DefaultID = accountDescID.Default.(func() uuid.UUID)
 	authenticationMixin := schema.Authentication{}.Mixin()
 	authenticationMixinFields0 := authenticationMixin[0].Fields()
 	_ = authenticationMixinFields0
@@ -132,26 +154,4 @@ func init() {
 	tagDescID := tagFields[0].Descriptor()
 	// tag.DefaultID holds the default value on creation for the id field.
 	tag.DefaultID = tagDescID.Default.(func() uuid.UUID)
-	userFields := schema.User{}.Fields()
-	_ = userFields
-	// userDescName is the schema descriptor for name field.
-	userDescName := userFields[2].Descriptor()
-	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	user.NameValidator = userDescName.Validators[0].(func(string) error)
-	// userDescAdmin is the schema descriptor for admin field.
-	userDescAdmin := userFields[4].Descriptor()
-	// user.DefaultAdmin holds the default value on creation for the admin field.
-	user.DefaultAdmin = userDescAdmin.Default.(bool)
-	// userDescCreatedAt is the schema descriptor for createdAt field.
-	userDescCreatedAt := userFields[5].Descriptor()
-	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
-	// userDescUpdatedAt is the schema descriptor for updatedAt field.
-	userDescUpdatedAt := userFields[6].Descriptor()
-	// user.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
-	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
-	// userDescID is the schema descriptor for id field.
-	userDescID := userFields[0].Descriptor()
-	// user.DefaultID holds the default value on creation for the id field.
-	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }

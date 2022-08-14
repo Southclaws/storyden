@@ -30,7 +30,7 @@ func (React) Fields() []ent.Field {
 // Edges of React.
 func (React) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type).Unique(),
+		edge.To("account", Account.Type).Unique(),
 		edge.To("Post", Post.Type).Unique(),
 	}
 }

@@ -9,6 +9,19 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 )
 
+// The AccountFunc type is an adapter to allow the use of ordinary
+// function as Account mutator.
+type AccountFunc func(context.Context, *model.AccountMutation) (model.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AccountFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
+	mv, ok := m.(*model.AccountMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.AccountMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The AuthenticationFunc type is an adapter to allow the use of ordinary
 // function as Authentication mutator.
 type AuthenticationFunc func(context.Context, *model.AuthenticationMutation) (model.Value, error)
@@ -96,19 +109,6 @@ func (f TagFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, err
 	mv, ok := m.(*model.TagMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.TagMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The UserFunc type is an adapter to allow the use of ordinary
-// function as User mutator.
-type UserFunc func(context.Context, *model.UserMutation) (model.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
-	mv, ok := m.(*model.UserMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.UserMutation", m)
 	}
 	return f(ctx, mv)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/migrate"
 	"github.com/google/uuid"
 
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
@@ -17,7 +18,6 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -29,6 +29,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Account is the client for interacting with the Account builders.
+	Account *AccountClient
 	// Authentication is the client for interacting with the Authentication builders.
 	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
@@ -43,8 +45,6 @@ type Client struct {
 	Subscription *SubscriptionClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
-	// User is the client for interacting with the User builders.
-	User *UserClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -58,6 +58,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Account = NewAccountClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
@@ -65,7 +66,6 @@ func (c *Client) init() {
 	c.React = NewReactClient(c.config)
 	c.Subscription = NewSubscriptionClient(c.config)
 	c.Tag = NewTagClient(c.config)
-	c.User = NewUserClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -99,6 +99,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		Account:        NewAccountClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -106,7 +107,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		React:          NewReactClient(cfg),
 		Subscription:   NewSubscriptionClient(cfg),
 		Tag:            NewTagClient(cfg),
-		User:           NewUserClient(cfg),
 	}, nil
 }
 
@@ -126,6 +126,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		Account:        NewAccountClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -133,14 +134,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		React:          NewReactClient(cfg),
 		Subscription:   NewSubscriptionClient(cfg),
 		Tag:            NewTagClient(cfg),
-		User:           NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Authentication.
+//		Account.
 //		Query().
 //		Count(ctx)
 //
@@ -163,6 +163,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Account.Use(hooks...)
 	c.Authentication.Use(hooks...)
 	c.Category.Use(hooks...)
 	c.Notification.Use(hooks...)
@@ -170,7 +171,160 @@ func (c *Client) Use(hooks ...Hook) {
 	c.React.Use(hooks...)
 	c.Subscription.Use(hooks...)
 	c.Tag.Use(hooks...)
-	c.User.Use(hooks...)
+}
+
+// AccountClient is a client for the Account schema.
+type AccountClient struct {
+	config
+}
+
+// NewAccountClient returns a client for the Account from the given config.
+func NewAccountClient(c config) *AccountClient {
+	return &AccountClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `account.Hooks(f(g(h())))`.
+func (c *AccountClient) Use(hooks ...Hook) {
+	c.hooks.Account = append(c.hooks.Account, hooks...)
+}
+
+// Create returns a create builder for Account.
+func (c *AccountClient) Create() *AccountCreate {
+	mutation := newAccountMutation(c.config, OpCreate)
+	return &AccountCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Account entities.
+func (c *AccountClient) CreateBulk(builders ...*AccountCreate) *AccountCreateBulk {
+	return &AccountCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Account.
+func (c *AccountClient) Update() *AccountUpdate {
+	mutation := newAccountMutation(c.config, OpUpdate)
+	return &AccountUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AccountClient) UpdateOne(a *Account) *AccountUpdateOne {
+	mutation := newAccountMutation(c.config, OpUpdateOne, withAccount(a))
+	return &AccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AccountClient) UpdateOneID(id uuid.UUID) *AccountUpdateOne {
+	mutation := newAccountMutation(c.config, OpUpdateOne, withAccountID(id))
+	return &AccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Account.
+func (c *AccountClient) Delete() *AccountDelete {
+	mutation := newAccountMutation(c.config, OpDelete)
+	return &AccountDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AccountClient) DeleteOne(a *Account) *AccountDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AccountClient) DeleteOneID(id uuid.UUID) *AccountDeleteOne {
+	builder := c.Delete().Where(account.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AccountDeleteOne{builder}
+}
+
+// Query returns a query builder for Account.
+func (c *AccountClient) Query() *AccountQuery {
+	return &AccountQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Account entity by its id.
+func (c *AccountClient) Get(ctx context.Context, id uuid.UUID) (*Account, error) {
+	return c.Query().Where(account.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AccountClient) GetX(ctx context.Context, id uuid.UUID) *Account {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPosts queries the posts edge of a Account.
+func (c *AccountClient) QueryPosts(a *Account) *PostQuery {
+	query := &PostQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PostsTable, account.PostsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReacts queries the reacts edge of a Account.
+func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
+	query := &ReactQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(react.Table, react.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ReactsTable, account.ReactsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscriptions queries the subscriptions edge of a Account.
+func (c *AccountClient) QuerySubscriptions(a *Account) *SubscriptionQuery {
+	query := &SubscriptionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(subscription.Table, subscription.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.SubscriptionsTable, account.SubscriptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthentication queries the authentication edge of a Account.
+func (c *AccountClient) QueryAuthentication(a *Account) *AuthenticationQuery {
+	query := &AuthenticationQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(authentication.Table, authentication.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AccountClient) Hooks() []Hook {
+	return c.hooks.Account
 }
 
 // AuthenticationClient is a client for the Authentication schema.
@@ -258,15 +412,15 @@ func (c *AuthenticationClient) GetX(ctx context.Context, id uuid.UUID) *Authenti
 	return obj
 }
 
-// QueryUser queries the user edge of a Authentication.
-func (c *AuthenticationClient) QueryUser(a *Authentication) *UserQuery {
-	query := &UserQuery{config: c.config}
+// QueryAccount queries the account edge of a Authentication.
+func (c *AuthenticationClient) QueryAccount(a *Authentication) *AccountQuery {
+	query := &AccountQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(authentication.Table, authentication.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, authentication.UserTable, authentication.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, authentication.AccountTable, authentication.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -577,13 +731,13 @@ func (c *PostClient) GetX(ctx context.Context, id uuid.UUID) *Post {
 }
 
 // QueryAuthor queries the author edge of a Post.
-func (c *PostClient) QueryAuthor(po *Post) *UserQuery {
-	query := &UserQuery{config: c.config}
+func (c *PostClient) QueryAuthor(po *Post) *AccountQuery {
+	query := &AccountQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, post.AuthorTable, post.AuthorColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
@@ -794,15 +948,15 @@ func (c *ReactClient) GetX(ctx context.Context, id uuid.UUID) *React {
 	return obj
 }
 
-// QueryUser queries the user edge of a React.
-func (c *ReactClient) QueryUser(r *React) *UserQuery {
-	query := &UserQuery{config: c.config}
+// QueryAccount queries the account edge of a React.
+func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
+	query := &AccountQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.UserTable, react.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.AccountTable, react.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -916,15 +1070,15 @@ func (c *SubscriptionClient) GetX(ctx context.Context, id uuid.UUID) *Subscripti
 	return obj
 }
 
-// QueryUser queries the user edge of a Subscription.
-func (c *SubscriptionClient) QueryUser(s *Subscription) *UserQuery {
-	query := &UserQuery{config: c.config}
+// QueryAccount queries the account edge of a Subscription.
+func (c *SubscriptionClient) QueryAccount(s *Subscription) *AccountQuery {
+	query := &AccountQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, subscription.UserTable, subscription.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, subscription.AccountTable, subscription.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1057,158 +1211,4 @@ func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
 // Hooks returns the client hooks.
 func (c *TagClient) Hooks() []Hook {
 	return c.hooks.Tag
-}
-
-// UserClient is a client for the User schema.
-type UserClient struct {
-	config
-}
-
-// NewUserClient returns a client for the User from the given config.
-func NewUserClient(c config) *UserClient {
-	return &UserClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
-func (c *UserClient) Use(hooks ...Hook) {
-	c.hooks.User = append(c.hooks.User, hooks...)
-}
-
-// Create returns a create builder for User.
-func (c *UserClient) Create() *UserCreate {
-	mutation := newUserMutation(c.config, OpCreate)
-	return &UserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of User entities.
-func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
-	return &UserCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for User.
-func (c *UserClient) Update() *UserUpdate {
-	mutation := newUserMutation(c.config, OpUpdate)
-	return &UserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id uuid.UUID) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for User.
-func (c *UserClient) Delete() *UserDelete {
-	mutation := newUserMutation(c.config, OpDelete)
-	return &UserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *UserClient) DeleteOneID(id uuid.UUID) *UserDeleteOne {
-	builder := c.Delete().Where(user.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &UserDeleteOne{builder}
-}
-
-// Query returns a query builder for User.
-func (c *UserClient) Query() *UserQuery {
-	return &UserQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id uuid.UUID) (*User, error) {
-	return c.Query().Where(user.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryPosts queries the posts edge of a User.
-func (c *UserClient) QueryPosts(u *User) *PostQuery {
-	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.PostsTable, user.PostsColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryReacts queries the reacts edge of a User.
-func (c *UserClient) QueryReacts(u *User) *ReactQuery {
-	query := &ReactQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(react.Table, react.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.ReactsTable, user.ReactsColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscriptions queries the subscriptions edge of a User.
-func (c *UserClient) QuerySubscriptions(u *User) *SubscriptionQuery {
-	query := &SubscriptionQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(subscription.Table, subscription.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.SubscriptionsTable, user.SubscriptionsColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAuthentication queries the authentication edge of a User.
-func (c *UserClient) QueryAuthentication(u *User) *AuthenticationQuery {
-	query := &AuthenticationQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(authentication.Table, authentication.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.AuthenticationTable, user.AuthenticationColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *UserClient) Hooks() []Hook {
-	return c.hooks.User
 }

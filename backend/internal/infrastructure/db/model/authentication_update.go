@@ -10,9 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -59,23 +59,23 @@ func (au *AuthenticationUpdate) ClearMetadata() *AuthenticationUpdate {
 	return au
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (au *AuthenticationUpdate) SetUserID(id uuid.UUID) *AuthenticationUpdate {
-	au.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (au *AuthenticationUpdate) SetAccountID(id uuid.UUID) *AuthenticationUpdate {
+	au.mutation.SetAccountID(id)
 	return au
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableUserID(id *uuid.UUID) *AuthenticationUpdate {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableAccountID(id *uuid.UUID) *AuthenticationUpdate {
 	if id != nil {
-		au = au.SetUserID(*id)
+		au = au.SetAccountID(*id)
 	}
 	return au
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (au *AuthenticationUpdate) SetUser(u *User) *AuthenticationUpdate {
-	return au.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (au *AuthenticationUpdate) SetAccount(a *Account) *AuthenticationUpdate {
+	return au.SetAccountID(a.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -83,9 +83,9 @@ func (au *AuthenticationUpdate) Mutation() *AuthenticationMutation {
 	return au.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (au *AuthenticationUpdate) ClearUser() *AuthenticationUpdate {
-	au.mutation.ClearUser()
+// ClearAccount clears the "account" edge to the Account entity.
+func (au *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
+	au.mutation.ClearAccount()
 	return au
 }
 
@@ -216,33 +216,33 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Column: authentication.FieldMetadata,
 		})
 	}
-	if au.mutation.UserCleared() {
+	if au.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   authentication.UserTable,
-			Columns: []string{authentication.UserColumn},
+			Table:   authentication.AccountTable,
+			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   authentication.UserTable,
-			Columns: []string{authentication.UserColumn},
+			Table:   authentication.AccountTable,
+			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
@@ -300,23 +300,23 @@ func (auo *AuthenticationUpdateOne) ClearMetadata() *AuthenticationUpdateOne {
 	return auo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (auo *AuthenticationUpdateOne) SetUserID(id uuid.UUID) *AuthenticationUpdateOne {
-	auo.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (auo *AuthenticationUpdateOne) SetAccountID(id uuid.UUID) *AuthenticationUpdateOne {
+	auo.mutation.SetAccountID(id)
 	return auo
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableUserID(id *uuid.UUID) *AuthenticationUpdateOne {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableAccountID(id *uuid.UUID) *AuthenticationUpdateOne {
 	if id != nil {
-		auo = auo.SetUserID(*id)
+		auo = auo.SetAccountID(*id)
 	}
 	return auo
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (auo *AuthenticationUpdateOne) SetUser(u *User) *AuthenticationUpdateOne {
-	return auo.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (auo *AuthenticationUpdateOne) SetAccount(a *Account) *AuthenticationUpdateOne {
+	return auo.SetAccountID(a.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -324,9 +324,9 @@ func (auo *AuthenticationUpdateOne) Mutation() *AuthenticationMutation {
 	return auo.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (auo *AuthenticationUpdateOne) ClearUser() *AuthenticationUpdateOne {
-	auo.mutation.ClearUser()
+// ClearAccount clears the "account" edge to the Account entity.
+func (auo *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
+	auo.mutation.ClearAccount()
 	return auo
 }
 
@@ -481,33 +481,33 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Column: authentication.FieldMetadata,
 		})
 	}
-	if auo.mutation.UserCleared() {
+	if auo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   authentication.UserTable,
-			Columns: []string{authentication.UserColumn},
+			Table:   authentication.AccountTable,
+			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   authentication.UserTable,
-			Columns: []string{authentication.UserColumn},
+			Table:   authentication.AccountTable,
+			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}

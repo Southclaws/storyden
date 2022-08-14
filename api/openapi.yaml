@@ -60,6 +60,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationResponse"
+        400:
+          description: Email address already registered
         500:
           description: Internal Server Error
           content:
@@ -114,14 +116,16 @@ paths:
           description: Account ID
           required: true
           schema:
-            type: string
+            $ref: "#/components/schemas/UUID"
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationResponse"
+                $ref: "#/components/schemas/Account"
+        401:
+          description: Unauthorized
         404:
           description: User not found
         500:
@@ -164,6 +168,10 @@ components:
       name: storyden-session
 
   schemas:
+    UUID:
+      type: string
+      format: uuid
+
     AuthenticationRequest:
       type: object
       required: [identifier, token]
@@ -180,6 +188,25 @@ components:
       required: [id]
       properties:
         id:
+          type: string
+
+    Account:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        email:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        deletedAt:
           type: string
 
     APIError:

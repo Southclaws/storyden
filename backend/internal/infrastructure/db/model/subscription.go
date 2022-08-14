@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -30,15 +30,15 @@ type Subscription struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubscriptionQuery when eager-loading is set.
-	Edges              SubscriptionEdges `json:"edges"`
-	subscription_user  *uuid.UUID
-	user_subscriptions *uuid.UUID
+	Edges                 SubscriptionEdges `json:"edges"`
+	account_subscriptions *uuid.UUID
+	subscription_account  *uuid.UUID
 }
 
 // SubscriptionEdges holds the relations/edges for other nodes in the graph.
 type SubscriptionEdges struct {
-	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	// Account holds the value of the account edge.
+	Account *Account `json:"account,omitempty"`
 	// Notifications holds the value of the notifications edge.
 	Notifications []*Notification `json:"notifications,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -46,18 +46,18 @@ type SubscriptionEdges struct {
 	loadedTypes [2]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
+// AccountOrErr returns the Account value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e SubscriptionEdges) UserOrErr() (*User, error) {
+func (e SubscriptionEdges) AccountOrErr() (*Account, error) {
 	if e.loadedTypes[0] {
-		if e.User == nil {
-			// The edge user was loaded in eager-loading,
+		if e.Account == nil {
+			// The edge account was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: user.Label}
+			return nil, &NotFoundError{label: account.Label}
 		}
-		return e.User, nil
+		return e.Account, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "account"}
 }
 
 // NotificationsOrErr returns the Notifications value or an error if the edge
@@ -80,9 +80,9 @@ func (*Subscription) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullTime)
 		case subscription.FieldID:
 			values[i] = new(uuid.UUID)
-		case subscription.ForeignKeys[0]: // subscription_user
+		case subscription.ForeignKeys[0]: // account_subscriptions
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case subscription.ForeignKeys[1]: // user_subscriptions
+		case subscription.ForeignKeys[1]: // subscription_account
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Subscription", columns[i])
@@ -137,26 +137,26 @@ func (s *Subscription) assignValues(columns []string, values []interface{}) erro
 			}
 		case subscription.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field subscription_user", values[i])
+				return fmt.Errorf("unexpected type %T for field account_subscriptions", values[i])
 			} else if value.Valid {
-				s.subscription_user = new(uuid.UUID)
-				*s.subscription_user = *value.S.(*uuid.UUID)
+				s.account_subscriptions = new(uuid.UUID)
+				*s.account_subscriptions = *value.S.(*uuid.UUID)
 			}
 		case subscription.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field user_subscriptions", values[i])
+				return fmt.Errorf("unexpected type %T for field subscription_account", values[i])
 			} else if value.Valid {
-				s.user_subscriptions = new(uuid.UUID)
-				*s.user_subscriptions = *value.S.(*uuid.UUID)
+				s.subscription_account = new(uuid.UUID)
+				*s.subscription_account = *value.S.(*uuid.UUID)
 			}
 		}
 	}
 	return nil
 }
 
-// QueryUser queries the "user" edge of the Subscription entity.
-func (s *Subscription) QueryUser() *UserQuery {
-	return (&SubscriptionClient{config: s.config}).QueryUser(s)
+// QueryAccount queries the "account" edge of the Subscription entity.
+func (s *Subscription) QueryAccount() *AccountQuery {
+	return (&SubscriptionClient{config: s.config}).QueryAccount(s)
 }
 
 // QueryNotifications queries the "notifications" edge of the Subscription entity.

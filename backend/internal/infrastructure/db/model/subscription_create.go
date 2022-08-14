@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -94,23 +94,23 @@ func (sc *SubscriptionCreate) SetNillableID(u *uuid.UUID) *SubscriptionCreate {
 	return sc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (sc *SubscriptionCreate) SetUserID(id uuid.UUID) *SubscriptionCreate {
-	sc.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (sc *SubscriptionCreate) SetAccountID(id uuid.UUID) *SubscriptionCreate {
+	sc.mutation.SetAccountID(id)
 	return sc
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableUserID(id *uuid.UUID) *SubscriptionCreate {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillableAccountID(id *uuid.UUID) *SubscriptionCreate {
 	if id != nil {
-		sc = sc.SetUserID(*id)
+		sc = sc.SetAccountID(*id)
 	}
 	return sc
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (sc *SubscriptionCreate) SetUser(u *User) *SubscriptionCreate {
-	return sc.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (sc *SubscriptionCreate) SetAccount(a *Account) *SubscriptionCreate {
+	return sc.SetAccountID(a.ID)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
@@ -314,24 +314,24 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		})
 		_node.UpdateTime = value
 	}
-	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   subscription.UserTable,
-			Columns: []string{subscription.UserColumn},
+			Table:   subscription.AccountTable,
+			Columns: []string{subscription.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.subscription_user = &nodes[0]
+		_node.subscription_account = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.NotificationsIDs(); len(nodes) > 0 {

@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
+	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 )
@@ -31,6 +32,17 @@ type APIError struct {
 	Suggested *string `json:"suggested,omitempty"`
 }
 
+// Account defines model for Account.
+type Account struct {
+	Bio       *string `json:"bio,omitempty"`
+	CreatedAt *string `json:"createdAt,omitempty"`
+	DeletedAt *string `json:"deletedAt,omitempty"`
+	Email     *string `json:"email,omitempty"`
+	Id        UUID    `json:"id"`
+	Name      *string `json:"name,omitempty"`
+	UpdatedAt *string `json:"updatedAt,omitempty"`
+}
+
 // AuthenticationRequest defines model for AuthenticationRequest.
 type AuthenticationRequest struct {
 	Identifier string `json:"identifier"`
@@ -41,6 +53,9 @@ type AuthenticationRequest struct {
 type AuthenticationResponse struct {
 	Id string `json:"id"`
 }
+
+// UUID defines model for UUID.
+type UUID = openapi_types.UUID
 
 // SigninJSONRequestBody defines body for Signin for application/json ContentType.
 type SigninJSONRequestBody = AuthenticationRequest
@@ -61,7 +76,7 @@ type ServerInterface interface {
 	GetSpec(ctx echo.Context) error
 
 	// (GET /v1/accounts/{id})
-	GetAccount(ctx echo.Context, id string) error
+	GetAccount(ctx echo.Context, id UUID) error
 
 	// (POST /v1/auth/password/signin)
 	Signin(ctx echo.Context) error
@@ -91,7 +106,7 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetAccount(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id string
+	var id UUID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -174,13 +189,16 @@ type GetSpecRequestObject struct {
 type GetSpec200TextResponse string
 
 type GetAccountRequestObject struct {
-	Id string `json:"id"`
+	Id UUID `json:"id"`
 }
 
-type GetAccount200JSONResponse AuthenticationResponse
+type GetAccount200JSONResponse Account
 
 func (t GetAccount200JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((AuthenticationResponse)(t))
+	return json.Marshal((Account)(t))
+}
+
+type GetAccount401Response struct {
 }
 
 type GetAccount404Response struct {
@@ -238,6 +256,9 @@ type Signup200JSONResponse struct {
 
 func (t Signup200JSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
+}
+
+type Signup400Response struct {
 }
 
 type Signup500JSONResponse APIError
@@ -309,7 +330,7 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 }
 
 // GetAccount operation middleware
-func (sh *strictHandler) GetAccount(ctx echo.Context, id string) error {
+func (sh *strictHandler) GetAccount(ctx echo.Context, id UUID) error {
 	var request GetAccountRequestObject
 
 	request.Id = id
@@ -326,6 +347,8 @@ func (sh *strictHandler) GetAccount(ctx echo.Context, id string) error {
 	switch v := response.(type) {
 	case GetAccount200JSONResponse:
 		return ctx.JSON(200, v)
+	case GetAccount401Response:
+		return ctx.NoContent(401)
 	case GetAccount404Response:
 		return ctx.NoContent(404)
 	case GetAccount500JSONResponse:
@@ -426,6 +449,8 @@ func (sh *strictHandler) Signup(ctx echo.Context) error {
 	case Signup200JSONResponse:
 		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
 		return ctx.JSON(200, v)
+	case Signup400Response:
+		return ctx.NoContent(400)
 	case Signup500JSONResponse:
 		return ctx.JSON(500, v)
 	case error:
@@ -465,18 +490,19 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xWTW/bMAz9KwG3oxMnW3fxad0HhqCHDQu2S5GDajO2WltSRappFvi/D5JixGnddMA2",
-	"rAV2ihFS5ON7z5S3kOvGaIWKCbItUF5hI8Lj6Zf5R2u19c/GaoOWJYYIdn/zxiBkQGylKqFNoEEiUeJg",
-	"jFxZIjEWA9E2AYvXTlofPd81WCZdmr64xJx9kVPHFSqWuWCp1Ve8dkh8H6EsfNJKYoCJt6IxdeinHVd5",
-	"Ldb0lljbTYFqom0JyX24rK9QHZ42gmitbXE//Q7+Xvuu0K8MQ0YrwqFpHqdMFgMtPOuYOyt5s/DCxnIX",
-	"Vq8pMiMVZJBrfSURElCiiR0iM2NCIqnVflxh5BluoPWFpVrpAEty3T8FCdygDecymPkxtUEljIQMXk+m",
-	"kxkkYARXAUq6i00uSQeySwxq+ukDKfMCMviEvDCYg584chQOv5pO/U+uFaMKxxhvOTW1kGrv5SHq2gQK",
-	"pNxKwxHn57MDsiA792SKkjy1jaQclj6e3sxSkefaKaZ0K4v2GOTTmBjGtaJBRuvLbe+03qWN5h8giXp4",
-	"dvZqyAL6SrN1mBwZbfkoScKYeme5tKN9X++lxRVk8CLd74V0txTSB/z6AJ8JnExPfMnD0DdCO1KaRyvt",
-	"VOHT3vxJiN3SGgA1V4xWiXq0QHuDdtQlHujeez3Ol23PBZ3uPSc4rtJuJ6QkSxV9ZzQNOGIR41FLJH6n",
-	"i81fUyauRQ+0X/N2vF6vxyttm7GzNapcF3Eb/16TuIqegucSqFAU4T3bwgJ5/D6utuPLIDh1NuBU5RXW",
-	"Vv7A4rnauW9gx9Ux8zpz3LzO/DfvkzTvczBc90Xw8HX5fZfyjy/5R24DCqPHe9zZGjJI/adNu2x/BgAA",
-	"///PzaDrSgsAAA==",
+	"H4sIAAAAAAAC/+xWTW/jNhD9K8a0Rzly2u1Fp6bdRWHsoUWN9BL4wBXHEnclkjszjOMa+u8FKat21oyz",
+	"aFP0Az1Z8Azn4703Q+6hdr13Fq0wVHvgusVepc+bn5ZviBzFb0/OI4nBZMHpb9l5hApYyNgGhgJ6ZFYN",
+	"Zm0cmgZZUGesQwGEH4OhaL07JFgXk5t79x5riUFu6toFK+c1vTMum7UmVIL6RrJWjR0+bcVemS5rMamJ",
+	"Lwk3UMEX5RHD8gBgeXu7fB09rerzcASvnyzsEziMzmMRpEUrplZinP0ZPwbkDDJGR6eNwUQZPqjedymZ",
+	"C9LWndrytyyOdhrtlaMGivNaxX1A+/i0V8xbR/rc/az439NPgT6nGfbOMua6+cN4JUqqPWwc9UqgghBM",
+	"vn7GOpCR3SqSedAXuS2PEBoLFdTOfTAIE8EwQThnZDbOHuMqb97iDoYY2NjNKFMj3ekpKOAeKZ2r4DoW",
+	"6zxa5Q1U8PXV4uoaCvBK2lRKebBdvWeXWGkw0R5hSugtNVTwA8rKYw0RmhHMdPirxSL+1M4KjnMk+CCl",
+	"75SxxwWQwziNC9dkvIx1/vj2EVhQ3UXUVcORg95wDetoL++vSzWOLZd7o4dLJU/zHdsl1aMgxXD7T1If",
+	"3GbL11CMfER0jmwkXo+SEApYnLT2/OAO62dxU953B7mWExOfl2Jq8glMC3i1uI4xHpturQrSOjK/oh6d",
+	"XmWcGGlmncw2Ltjk9s1LFj5dCZnKl1aQrOpmK6R7pNnk+EggJ3N0tx5O5DIJ5EQyQdpy2jIlm8aOAvWO",
+	"M9JZjfaRdGT5zundy7WdXbSx0NOYD/PtdjuPy2UeqENbOz3edX8uybjc/iol5rduXpgFtKh0Gsg9rFDm",
+	"34878PLW+C/L+VTAQdpL4g3+sniD/1+8/1DxLs51+Sa+DGdKa0LmmeoIld7NCBvDgoT/GqVOb46nL+Rf",
+	"Di5/8zPimWuEU+vjSyFQBxWU8fE0rIffAgAA//+3o34a4QwAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

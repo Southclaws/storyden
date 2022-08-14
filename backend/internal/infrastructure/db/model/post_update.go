@@ -11,12 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -213,15 +213,15 @@ func (pu *PostUpdate) ClearCategoryID() *PostUpdate {
 	return pu
 }
 
-// SetAuthorID sets the "author" edge to the User entity by ID.
+// SetAuthorID sets the "author" edge to the Account entity by ID.
 func (pu *PostUpdate) SetAuthorID(id uuid.UUID) *PostUpdate {
 	pu.mutation.SetAuthorID(id)
 	return pu
 }
 
-// SetAuthor sets the "author" edge to the User entity.
-func (pu *PostUpdate) SetAuthor(u *User) *PostUpdate {
-	return pu.SetAuthorID(u.ID)
+// SetAuthor sets the "author" edge to the Account entity.
+func (pu *PostUpdate) SetAuthor(a *Account) *PostUpdate {
+	return pu.SetAuthorID(a.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
@@ -332,7 +332,7 @@ func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
 }
 
-// ClearAuthor clears the "author" edge to the User entity.
+// ClearAuthor clears the "author" edge to the Account entity.
 func (pu *PostUpdate) ClearAuthor() *PostUpdate {
 	pu.mutation.ClearAuthor()
 	return pu
@@ -617,7 +617,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
@@ -633,7 +633,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
@@ -1162,15 +1162,15 @@ func (puo *PostUpdateOne) ClearCategoryID() *PostUpdateOne {
 	return puo
 }
 
-// SetAuthorID sets the "author" edge to the User entity by ID.
+// SetAuthorID sets the "author" edge to the Account entity by ID.
 func (puo *PostUpdateOne) SetAuthorID(id uuid.UUID) *PostUpdateOne {
 	puo.mutation.SetAuthorID(id)
 	return puo
 }
 
-// SetAuthor sets the "author" edge to the User entity.
-func (puo *PostUpdateOne) SetAuthor(u *User) *PostUpdateOne {
-	return puo.SetAuthorID(u.ID)
+// SetAuthor sets the "author" edge to the Account entity.
+func (puo *PostUpdateOne) SetAuthor(a *Account) *PostUpdateOne {
+	return puo.SetAuthorID(a.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
@@ -1281,7 +1281,7 @@ func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
 }
 
-// ClearAuthor clears the "author" edge to the User entity.
+// ClearAuthor clears the "author" edge to the Account entity.
 func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
 	puo.mutation.ClearAuthor()
 	return puo
@@ -1590,7 +1590,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
@@ -1606,7 +1606,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}

@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
+	model_account "github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
-	model_user "github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 type database struct {
@@ -20,14 +20,14 @@ func New(db *model.Client) Repository {
 }
 
 func (d *database) Create(ctx context.Context,
-	userID user.UserID,
+	id account.AccountID,
 	service Service,
 	identifier string,
 	token string,
 	metadata map[string]any,
 ) (*Authentication, error) {
 	r, err := d.db.Authentication.Create().
-		SetUserID(uuid.UUID(userID)).
+		SetAccountID(uuid.UUID(id)).
 		SetService(string(service)).
 		SetIdentifier(identifier).
 		SetToken(token).
@@ -40,7 +40,7 @@ func (d *database) Create(ctx context.Context,
 	r, err = d.db.Authentication.
 		Query().
 		Where(authentication.ID(r.ID)).
-		WithUser().
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 			authentication.IdentifierEQ(identifier),
 			authentication.ServiceEQ(string(service)),
 		).
-		WithUser().
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		return nil, err
@@ -64,10 +64,10 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 	return FromModel(r), nil
 }
 
-func (d *database) GetAuthMethods(ctx context.Context, userID user.UserID) ([]Authentication, error) {
+func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]Authentication, error) {
 	r, err := d.db.Authentication.
 		Query().
-		Where(authentication.HasUserWith(model_user.IDEQ(uuid.UUID(userID)))).
+		Where(authentication.HasAccountWith(model_account.IDEQ(uuid.UUID(id)))).
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -75,11 +75,11 @@ func (d *database) GetAuthMethods(ctx context.Context, userID user.UserID) ([]Au
 	return FromModelMany(r), nil
 }
 
-func (d *database) IsEqual(ctx context.Context, userID user.UserID, identifier string, token string) (bool, error) {
+func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier string, token string) (bool, error) {
 	r, err := d.db.Authentication.
 		Query().
 		Where(
-			authentication.HasUserWith(model_user.IDEQ(uuid.UUID(userID))),
+			authentication.HasAccountWith(model_account.IDEQ(uuid.UUID(id))),
 			authentication.IdentifierEQ(identifier),
 		).
 		Only(ctx)

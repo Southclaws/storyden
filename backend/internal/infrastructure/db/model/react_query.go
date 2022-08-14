@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -28,10 +28,10 @@ type ReactQuery struct {
 	fields     []string
 	predicates []predicate.React
 	// eager-loading edges.
-	withUser  *UserQuery
-	withPost  *PostQuery
-	withFKs   bool
-	modifiers []func(s *sql.Selector)
+	withAccount *AccountQuery
+	withPost    *PostQuery
+	withFKs     bool
+	modifiers   []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -68,9 +68,9 @@ func (rq *ReactQuery) Order(o ...OrderFunc) *ReactQuery {
 	return rq
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (rq *ReactQuery) QueryUser() *UserQuery {
-	query := &UserQuery{config: rq.config}
+// QueryAccount chains the current query on the "account" edge.
+func (rq *ReactQuery) QueryAccount() *AccountQuery {
+	query := &AccountQuery{config: rq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -81,8 +81,8 @@ func (rq *ReactQuery) QueryUser() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.UserTable, react.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, react.AccountTable, react.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -288,13 +288,13 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 		return nil
 	}
 	return &ReactQuery{
-		config:     rq.config,
-		limit:      rq.limit,
-		offset:     rq.offset,
-		order:      append([]OrderFunc{}, rq.order...),
-		predicates: append([]predicate.React{}, rq.predicates...),
-		withUser:   rq.withUser.Clone(),
-		withPost:   rq.withPost.Clone(),
+		config:      rq.config,
+		limit:       rq.limit,
+		offset:      rq.offset,
+		order:       append([]OrderFunc{}, rq.order...),
+		predicates:  append([]predicate.React{}, rq.predicates...),
+		withAccount: rq.withAccount.Clone(),
+		withPost:    rq.withPost.Clone(),
 		// clone intermediate query.
 		sql:    rq.sql.Clone(),
 		path:   rq.path,
@@ -302,14 +302,14 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *ReactQuery) WithUser(opts ...func(*UserQuery)) *ReactQuery {
-	query := &UserQuery{config: rq.config}
+// WithAccount tells the query-builder to eager-load the nodes that are connected to
+// the "account" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *ReactQuery) WithAccount(opts ...func(*AccountQuery)) *ReactQuery {
+	query := &AccountQuery{config: rq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	rq.withUser = query
+	rq.withAccount = query
 	return rq
 }
 
@@ -391,11 +391,11 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [2]bool{
-			rq.withUser != nil,
+			rq.withAccount != nil,
 			rq.withPost != nil,
 		}
 	)
-	if rq.withUser != nil || rq.withPost != nil {
+	if rq.withAccount != nil || rq.withPost != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -424,20 +424,20 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 		return nodes, nil
 	}
 
-	if query := rq.withUser; query != nil {
+	if query := rq.withAccount; query != nil {
 		ids := make([]uuid.UUID, 0, len(nodes))
 		nodeids := make(map[uuid.UUID][]*React)
 		for i := range nodes {
-			if nodes[i].react_user == nil {
+			if nodes[i].react_account == nil {
 				continue
 			}
-			fk := *nodes[i].react_user
+			fk := *nodes[i].react_account
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
 			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.Where(user.IDIn(ids...))
+		query.Where(account.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -445,10 +445,10 @@ func (rq *ReactQuery) sqlAll(ctx context.Context) ([]*React, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "react_user" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "react_account" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.User = n
+				nodes[i].Edges.Account = n
 			}
 		}
 	}

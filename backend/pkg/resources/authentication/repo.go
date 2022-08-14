@@ -3,13 +3,13 @@ package authentication
 import (
 	"context"
 
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 type Repository interface {
-	// Create an auth method for a user.
+	// Create an auth method for a account.
 	Create(ctx context.Context,
-		userID user.UserID,
+		userID account.AccountID,
 		service Service,
 		identifier string,
 		token string,
@@ -19,9 +19,9 @@ type Repository interface {
 	// Gets an auth method based on a service's external account ID.
 	GetByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, error)
 
-	// Gets all auth methods that a user has.
-	GetAuthMethods(ctx context.Context, userID user.UserID) ([]Authentication, error)
+	// Gets all auth methods that a account has.
+	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]Authentication, error)
 
 	// Checks if the given token is equal to the stored auth method's token.
-	IsEqual(ctx context.Context, userID user.UserID, identifier string, token string) (bool, error)
+	IsEqual(ctx context.Context, userID account.AccountID, identifier string, token string) (bool, error)
 }

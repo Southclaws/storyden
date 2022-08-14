@@ -3,12 +3,12 @@ package magiclink
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 type Magiclink interface {
-	Send(email string) (*user.User, error)
-	Callback(token []byte) (*user.User, error)
+	Send(email string) (*account.Account, error)
+	Callback(token []byte) (*account.Account, error)
 }
 
 func Build() fx.Option {

@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 )
 
 func TestDB(t *testing.T) *model.Client {
@@ -33,7 +33,7 @@ func TestDB(t *testing.T) *model.Client {
 			notification.Table,
 			subscription.Table,
 			react.Table,
-			user.Table,
+			account.Table,
 			category.Table,
 			tag.Table,
 			post.Table,

@@ -39,7 +39,7 @@ func (Authentication) Fields() []ent.Field {
 
 func (Authentication) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("user", User.Type).
+		edge.From("account", Account.Type).
 			Ref("authentication").
 			Unique(),
 	}

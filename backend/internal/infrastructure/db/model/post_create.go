@@ -12,11 +12,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -186,15 +186,15 @@ func (pc *PostCreate) SetNillableID(u *uuid.UUID) *PostCreate {
 	return pc
 }
 
-// SetAuthorID sets the "author" edge to the User entity by ID.
+// SetAuthorID sets the "author" edge to the Account entity by ID.
 func (pc *PostCreate) SetAuthorID(id uuid.UUID) *PostCreate {
 	pc.mutation.SetAuthorID(id)
 	return pc
 }
 
-// SetAuthor sets the "author" edge to the User entity.
-func (pc *PostCreate) SetAuthor(u *User) *PostCreate {
-	return pc.SetAuthorID(u.ID)
+// SetAuthor sets the "author" edge to the Account entity.
+func (pc *PostCreate) SetAuthor(a *Account) *PostCreate {
+	return pc.SetAuthorID(a.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
@@ -531,14 +531,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_posts = &nodes[0]
+		_node.account_posts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {

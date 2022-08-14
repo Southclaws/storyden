@@ -11,14 +11,12 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/backend/internal/config"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
-	"github.com/Southclaws/storyden/backend/pkg/services/authentication"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/backend/pkg/transports/http/openapi"
 )
 
 type Authentication struct {
-	// s      authentication.Service
 	p      *password.Password
 	sc     *securecookie.SecureCookie
 	domain string
@@ -26,7 +24,6 @@ type Authentication struct {
 
 func NewAuthentication(
 	cfg config.Config,
-	// s authentication.Service,
 	p *password.Password,
 	sc *securecookie.SecureCookie,
 ) Authentication {
@@ -34,7 +31,7 @@ func NewAuthentication(
 }
 
 func (i *Authentication) Signin(ctx context.Context, request openapi.SigninRequestObject) any {
-	u, err := func() (*user.User, error) {
+	u, err := func() (*account.Account, error) {
 		if request.JSONBody != nil {
 			return i.p.Login(ctx, request.JSONBody.Identifier, request.JSONBody.Token)
 		} else if request.FormdataBody != nil {
@@ -61,7 +58,7 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 }
 
 func (i *Authentication) Signup(ctx context.Context, request openapi.SignupRequestObject) any {
-	u, err := func() (*user.User, error) {
+	u, err := func() (*account.Account, error) {
 		if request.JSONBody != nil {
 			return i.p.Register(ctx, request.JSONBody.Identifier, request.JSONBody.Token)
 		} else if request.FormdataBody != nil {
@@ -70,6 +67,9 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 		return nil, errors.New("missing body")
 	}()
 	if err != nil {
+		if errors.Is(err, password.ErrExists) {
+			return openapi.Signup400Response{}
+		}
 		return openapi.Signup500JSONResponse{Error: err.Error()}
 	}
 
@@ -88,12 +88,13 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	echo := ctx.Value(middleware.EchoContextKey).(echo.Context)
 	req := echo.Request()
 
-	session, ok := i.decodeSession(req)
+	_, ok := i.decodeSession(req)
 	if !ok {
 		return errors.New("no cookie found in request")
 	}
 
-	req.WithContext(authentication.AddUserToContext(req.Context(), session.UserID))
+	// TODO: Move this to middleware
+	// req.WithContext(authentication.WithAccountID(req.Context(), session.UserID))
 
 	return nil
 }
@@ -101,11 +102,11 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 const secureCookieName = "storyden-session"
 
 type session struct {
-	UserID user.UserID
+	UserID account.AccountID
 }
 
-func (i *Authentication) encodeSession(userID user.UserID) (string, error) {
-	encoded, err := i.sc.Encode(secureCookieName, userID)
+func (i *Authentication) encodeSession(userID account.AccountID) (string, error) {
+	encoded, err := i.sc.Encode(secureCookieName, session{userID})
 	if err != nil {
 		return "", err
 	}

@@ -12,10 +12,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -29,7 +29,7 @@ type SubscriptionQuery struct {
 	fields     []string
 	predicates []predicate.Subscription
 	// eager-loading edges.
-	withUser          *UserQuery
+	withAccount       *AccountQuery
 	withNotifications *NotificationQuery
 	withFKs           bool
 	modifiers         []func(s *sql.Selector)
@@ -69,9 +69,9 @@ func (sq *SubscriptionQuery) Order(o ...OrderFunc) *SubscriptionQuery {
 	return sq
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (sq *SubscriptionQuery) QueryUser() *UserQuery {
-	query := &UserQuery{config: sq.config}
+// QueryAccount chains the current query on the "account" edge.
+func (sq *SubscriptionQuery) QueryAccount() *AccountQuery {
+	query := &AccountQuery{config: sq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -82,8 +82,8 @@ func (sq *SubscriptionQuery) QueryUser() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, subscription.UserTable, subscription.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, subscription.AccountTable, subscription.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,7 +294,7 @@ func (sq *SubscriptionQuery) Clone() *SubscriptionQuery {
 		offset:            sq.offset,
 		order:             append([]OrderFunc{}, sq.order...),
 		predicates:        append([]predicate.Subscription{}, sq.predicates...),
-		withUser:          sq.withUser.Clone(),
+		withAccount:       sq.withAccount.Clone(),
 		withNotifications: sq.withNotifications.Clone(),
 		// clone intermediate query.
 		sql:    sq.sql.Clone(),
@@ -303,14 +303,14 @@ func (sq *SubscriptionQuery) Clone() *SubscriptionQuery {
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *SubscriptionQuery) WithUser(opts ...func(*UserQuery)) *SubscriptionQuery {
-	query := &UserQuery{config: sq.config}
+// WithAccount tells the query-builder to eager-load the nodes that are connected to
+// the "account" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubscriptionQuery) WithAccount(opts ...func(*AccountQuery)) *SubscriptionQuery {
+	query := &AccountQuery{config: sq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withUser = query
+	sq.withAccount = query
 	return sq
 }
 
@@ -392,11 +392,11 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
-			sq.withUser != nil,
+			sq.withAccount != nil,
 			sq.withNotifications != nil,
 		}
 	)
-	if sq.withUser != nil {
+	if sq.withAccount != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -425,20 +425,20 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 		return nodes, nil
 	}
 
-	if query := sq.withUser; query != nil {
+	if query := sq.withAccount; query != nil {
 		ids := make([]uuid.UUID, 0, len(nodes))
 		nodeids := make(map[uuid.UUID][]*Subscription)
 		for i := range nodes {
-			if nodes[i].subscription_user == nil {
+			if nodes[i].subscription_account == nil {
 				continue
 			}
-			fk := *nodes[i].subscription_user
+			fk := *nodes[i].subscription_account
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
 			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.Where(user.IDIn(ids...))
+		query.Where(account.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -446,10 +446,10 @@ func (sq *SubscriptionQuery) sqlAll(ctx context.Context) ([]*Subscription, error
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "subscription_user" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "subscription_account" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.User = n
+				nodes[i].Edges.Account = n
 			}
 		}
 	}

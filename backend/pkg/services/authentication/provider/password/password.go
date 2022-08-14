@@ -8,8 +8,8 @@ import (
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
 
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/authentication"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
 const AuthServiceName = `password`
@@ -17,19 +17,21 @@ const AuthServiceName = `password`
 var ErrPasswordMismatch = errors.New("password mismatch")
 
 type Password struct {
-	auth authentication.Repository
-	user user.Repository
+	auth    authentication.Repository
+	account account.Repository
 }
 
-func ErrExists(id string) error {
-	return errors.Errorf("an account with the email '%s' already exists", id)
+var ErrExists = errors.New("already exists")
+
+func errExists(id string) error {
+	return errors.Wrapf(ErrExists, "with email '%s'", id)
 }
 
-func NewBasicAuth(auth authentication.Repository, user user.Repository) *Password {
-	return &Password{auth, user}
+func NewBasicAuth(auth authentication.Repository, account account.Repository) *Password {
+	return &Password{auth, account}
 }
 
-func (b *Password) Register(ctx context.Context, identifier string, password string) (*user.User, error) {
+func (b *Password) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
 	addr, err := mail.ParseAddress(identifier)
 	if err != nil {
 		return nil, err
@@ -37,20 +39,20 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 
 	username := strings.Split(addr.Address, "@")[0]
 
-	u, err := b.user.GetUserByEmail(ctx, identifier, false)
+	u, exists, err := b.account.LookupByEmail(ctx, identifier)
 	if err != nil {
 		return nil, err
 	}
-	if u != nil {
-		return nil, ErrExists(identifier)
+	if exists {
+		return nil, errExists(identifier)
 	}
 
-	u, err = b.user.CreateUser(ctx, identifier, username)
+	u, err = b.account.Create(ctx, identifier, username)
 	if err != nil {
 		return nil, err
 	}
 
-	hashed, err := argon2id.CreateHash(identifier, argon2id.DefaultParams)
+	hashed, err := argon2id.CreateHash(password, argon2id.DefaultParams)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +65,7 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 	return u, nil
 }
 
-func (b *Password) Login(ctx context.Context, identifier string, password string) (*user.User, error) {
+func (b *Password) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
 	a, err := b.auth.GetByIdentifier(ctx, AuthServiceName, identifier)
 	if err != nil {
 		return nil, err
@@ -78,5 +80,5 @@ func (b *Password) Login(ctx context.Context, identifier string, password string
 		return nil, ErrPasswordMismatch
 	}
 
-	return &a.User, nil
+	return &a.Account, nil
 }

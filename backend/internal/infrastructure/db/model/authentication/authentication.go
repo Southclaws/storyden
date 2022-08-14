@@ -23,17 +23,17 @@ const (
 	FieldToken = "token"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeAccount holds the string denoting the account edge name in mutations.
+	EdgeAccount = "account"
 	// Table holds the table name of the authentication in the database.
 	Table = "authentications"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "authentications"
-	// UserInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_authentication"
+	// AccountTable is the table that holds the account relation/edge.
+	AccountTable = "authentications"
+	// AccountInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountInverseTable = "accounts"
+	// AccountColumn is the table column denoting the account relation/edge.
+	AccountColumn = "account_authentication"
 )
 
 // Columns holds all SQL columns for authentication fields.
@@ -49,7 +49,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "authentications"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_authentication",
+	"account_authentication",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

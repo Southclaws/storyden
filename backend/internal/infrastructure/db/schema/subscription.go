@@ -37,7 +37,7 @@ func (Subscription) Fields() []ent.Field {
 // Edges of Subscription.
 func (Subscription) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("user", User.Type).Unique(),
+		edge.To("account", Account.Type).Unique(),
 		edge.To("notifications", Notification.Type).
 			Annotations(entsql.Annotation{
 				OnDelete: entsql.Cascade,

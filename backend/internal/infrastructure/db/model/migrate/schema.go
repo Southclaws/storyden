@@ -8,6 +8,23 @@ import (
 )
 
 var (
+	// AccountsColumns holds the columns for the "accounts" table.
+	AccountsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "bio", Type: field.TypeString, Nullable: true},
+		{Name: "admin", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+	}
+	// AccountsTable holds the schema information for the "accounts" table.
+	AccountsTable = &schema.Table{
+		Name:       "accounts",
+		Columns:    AccountsColumns,
+		PrimaryKey: []*schema.Column{AccountsColumns[0]},
+	}
 	// AuthenticationsColumns holds the columns for the "authentications" table.
 	AuthenticationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -16,7 +33,7 @@ var (
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
-		{Name: "user_authentication", Type: field.TypeUUID, Nullable: true},
+		{Name: "account_authentication", Type: field.TypeUUID, Nullable: true},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
 	AuthenticationsTable = &schema.Table{
@@ -25,9 +42,9 @@ var (
 		PrimaryKey: []*schema.Column{AuthenticationsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "authentications_users_authentication",
+				Symbol:     "authentications_accounts_authentication",
 				Columns:    []*schema.Column{AuthenticationsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -97,10 +114,10 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_posts", Type: field.TypeUUID},
 		{Name: "category_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "root_post_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "reply_to_post_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "user_posts", Type: field.TypeUUID},
 	}
 	// PostsTable holds the schema information for the "posts" table.
 	PostsTable = &schema.Table{
@@ -109,28 +126,28 @@ var (
 		PrimaryKey: []*schema.Column{PostsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "posts_categories_posts",
+				Symbol:     "posts_accounts_posts",
 				Columns:    []*schema.Column{PostsColumns[10]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "posts_categories_posts",
+				Columns:    []*schema.Column{PostsColumns[11]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[11]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "posts_posts_replies",
 				Columns:    []*schema.Column{PostsColumns[12]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "posts_users_posts",
+				Symbol:     "posts_posts_replies",
 				Columns:    []*schema.Column{PostsColumns[13]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -139,10 +156,10 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "emoji", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "account_reacts", Type: field.TypeUUID, Nullable: true},
 		{Name: "post_reacts", Type: field.TypeUUID, Nullable: true},
-		{Name: "react_user", Type: field.TypeUUID, Nullable: true},
+		{Name: "react_account", Type: field.TypeUUID, Nullable: true},
 		{Name: "react_post", Type: field.TypeUUID, Nullable: true},
-		{Name: "user_reacts", Type: field.TypeUUID, Nullable: true},
 	}
 	// ReactsTable holds the schema information for the "reacts" table.
 	ReactsTable = &schema.Table{
@@ -151,27 +168,27 @@ var (
 		PrimaryKey: []*schema.Column{ReactsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "reacts_posts_reacts",
+				Symbol:     "reacts_accounts_reacts",
 				Columns:    []*schema.Column{ReactsColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "reacts_posts_reacts",
+				Columns:    []*schema.Column{ReactsColumns[4]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "reacts_users_user",
-				Columns:    []*schema.Column{ReactsColumns[4]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				Symbol:     "reacts_accounts_account",
+				Columns:    []*schema.Column{ReactsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "reacts_posts_Post",
-				Columns:    []*schema.Column{ReactsColumns[5]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "reacts_users_reacts",
 				Columns:    []*schema.Column{ReactsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -184,8 +201,8 @@ var (
 		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
-		{Name: "subscription_user", Type: field.TypeUUID, Nullable: true},
-		{Name: "user_subscriptions", Type: field.TypeUUID, Nullable: true},
+		{Name: "account_subscriptions", Type: field.TypeUUID, Nullable: true},
+		{Name: "subscription_account", Type: field.TypeUUID, Nullable: true},
 	}
 	// SubscriptionsTable holds the schema information for the "subscriptions" table.
 	SubscriptionsTable = &schema.Table{
@@ -194,15 +211,15 @@ var (
 		PrimaryKey: []*schema.Column{SubscriptionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "subscriptions_users_user",
+				Symbol:     "subscriptions_accounts_subscriptions",
 				Columns:    []*schema.Column{SubscriptionsColumns[6]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "subscriptions_users_subscriptions",
+				Symbol:     "subscriptions_accounts_account",
 				Columns:    []*schema.Column{SubscriptionsColumns[7]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -217,23 +234,6 @@ var (
 		Name:       "tags",
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
-	}
-	// UsersColumns holds the columns for the "users" table.
-	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID},
-		{Name: "email", Type: field.TypeString, Unique: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "bio", Type: field.TypeString, Nullable: true},
-		{Name: "admin", Type: field.TypeBool, Default: false},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-	}
-	// UsersTable holds the schema information for the "users" table.
-	UsersTable = &schema.Table{
-		Name:       "users",
-		Columns:    UsersColumns,
-		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
@@ -262,6 +262,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AccountsTable,
 		AuthenticationsTable,
 		CategoriesTable,
 		NotificationsTable,
@@ -269,25 +270,24 @@ var (
 		ReactsTable,
 		SubscriptionsTable,
 		TagsTable,
-		UsersTable,
 		TagPostsTable,
 	}
 )
 
 func init() {
-	AuthenticationsTable.ForeignKeys[0].RefTable = UsersTable
+	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[0].RefTable = SubscriptionsTable
 	NotificationsTable.ForeignKeys[1].RefTable = SubscriptionsTable
-	PostsTable.ForeignKeys[0].RefTable = CategoriesTable
-	PostsTable.ForeignKeys[1].RefTable = PostsTable
+	PostsTable.ForeignKeys[0].RefTable = AccountsTable
+	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
-	PostsTable.ForeignKeys[3].RefTable = UsersTable
-	ReactsTable.ForeignKeys[0].RefTable = PostsTable
-	ReactsTable.ForeignKeys[1].RefTable = UsersTable
-	ReactsTable.ForeignKeys[2].RefTable = PostsTable
-	ReactsTable.ForeignKeys[3].RefTable = UsersTable
-	SubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
-	SubscriptionsTable.ForeignKeys[1].RefTable = UsersTable
+	PostsTable.ForeignKeys[3].RefTable = PostsTable
+	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
+	ReactsTable.ForeignKeys[1].RefTable = PostsTable
+	ReactsTable.ForeignKeys[2].RefTable = AccountsTable
+	ReactsTable.ForeignKeys[3].RefTable = PostsTable
+	SubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
+	SubscriptionsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

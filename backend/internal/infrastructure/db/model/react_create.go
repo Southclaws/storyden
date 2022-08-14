@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -60,23 +60,23 @@ func (rc *ReactCreate) SetNillableID(u *uuid.UUID) *ReactCreate {
 	return rc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (rc *ReactCreate) SetUserID(id uuid.UUID) *ReactCreate {
-	rc.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (rc *ReactCreate) SetAccountID(id uuid.UUID) *ReactCreate {
+	rc.mutation.SetAccountID(id)
 	return rc
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (rc *ReactCreate) SetNillableUserID(id *uuid.UUID) *ReactCreate {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (rc *ReactCreate) SetNillableAccountID(id *uuid.UUID) *ReactCreate {
 	if id != nil {
-		rc = rc.SetUserID(*id)
+		rc = rc.SetAccountID(*id)
 	}
 	return rc
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (rc *ReactCreate) SetUser(u *User) *ReactCreate {
-	return rc.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (rc *ReactCreate) SetAccount(a *Account) *ReactCreate {
+	return rc.SetAccountID(a.ID)
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
@@ -240,24 +240,24 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		})
 		_node.CreatedAt = value
 	}
-	if nodes := rc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
+			Table:   react.AccountTable,
+			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.react_user = &nodes[0]
+		_node.react_account = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.PostIDs(); len(nodes) > 0 {

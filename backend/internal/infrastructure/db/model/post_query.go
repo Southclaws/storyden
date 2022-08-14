@@ -12,12 +12,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -31,7 +31,7 @@ type PostQuery struct {
 	fields     []string
 	predicates []predicate.Post
 	// eager-loading edges.
-	withAuthor   *UserQuery
+	withAuthor   *AccountQuery
 	withCategory *CategoryQuery
 	withTags     *TagQuery
 	withRoot     *PostQuery
@@ -78,8 +78,8 @@ func (pq *PostQuery) Order(o ...OrderFunc) *PostQuery {
 }
 
 // QueryAuthor chains the current query on the "author" edge.
-func (pq *PostQuery) QueryAuthor() *UserQuery {
-	query := &UserQuery{config: pq.config}
+func (pq *PostQuery) QueryAuthor() *AccountQuery {
+	query := &AccountQuery{config: pq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -90,7 +90,7 @@ func (pq *PostQuery) QueryAuthor() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, post.AuthorTable, post.AuthorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
@@ -451,8 +451,8 @@ func (pq *PostQuery) Clone() *PostQuery {
 
 // WithAuthor tells the query-builder to eager-load the nodes that are connected to
 // the "author" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *PostQuery) WithAuthor(opts ...func(*UserQuery)) *PostQuery {
-	query := &UserQuery{config: pq.config}
+func (pq *PostQuery) WithAuthor(opts ...func(*AccountQuery)) *PostQuery {
+	query := &AccountQuery{config: pq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -647,16 +647,16 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 		ids := make([]uuid.UUID, 0, len(nodes))
 		nodeids := make(map[uuid.UUID][]*Post)
 		for i := range nodes {
-			if nodes[i].user_posts == nil {
+			if nodes[i].account_posts == nil {
 				continue
 			}
-			fk := *nodes[i].user_posts
+			fk := *nodes[i].account_posts
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
 			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.Where(user.IDIn(ids...))
+		query.Where(account.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -664,7 +664,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context) ([]*Post, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "user_posts" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "account_posts" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.Author = n

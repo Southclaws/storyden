@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -35,31 +35,31 @@ type Authentication struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
-	Edges               AuthenticationEdges `json:"edges"`
-	user_authentication *uuid.UUID
+	Edges                  AuthenticationEdges `json:"edges"`
+	account_authentication *uuid.UUID
 }
 
 // AuthenticationEdges holds the relations/edges for other nodes in the graph.
 type AuthenticationEdges struct {
-	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	// Account holds the value of the account edge.
+	Account *Account `json:"account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
+// AccountOrErr returns the Account value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e AuthenticationEdges) UserOrErr() (*User, error) {
+func (e AuthenticationEdges) AccountOrErr() (*Account, error) {
 	if e.loadedTypes[0] {
-		if e.User == nil {
-			// The edge user was loaded in eager-loading,
+		if e.Account == nil {
+			// The edge account was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: user.Label}
+			return nil, &NotFoundError{label: account.Label}
 		}
-		return e.User, nil
+		return e.Account, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "account"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -75,7 +75,7 @@ func (*Authentication) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullTime)
 		case authentication.FieldID:
 			values[i] = new(uuid.UUID)
-		case authentication.ForeignKeys[0]: // user_authentication
+		case authentication.ForeignKeys[0]: // account_authentication
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Authentication", columns[i])
@@ -132,19 +132,19 @@ func (a *Authentication) assignValues(columns []string, values []interface{}) er
 			}
 		case authentication.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field user_authentication", values[i])
+				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
 			} else if value.Valid {
-				a.user_authentication = new(uuid.UUID)
-				*a.user_authentication = *value.S.(*uuid.UUID)
+				a.account_authentication = new(uuid.UUID)
+				*a.account_authentication = *value.S.(*uuid.UUID)
 			}
 		}
 	}
 	return nil
 }
 
-// QueryUser queries the "user" edge of the Authentication entity.
-func (a *Authentication) QueryUser() *UserQuery {
-	return (&AuthenticationClient{config: a.config}).QueryUser(a)
+// QueryAccount queries the "account" edge of the Authentication entity.
+func (a *Authentication) QueryAccount() *AccountQuery {
+	return (&AuthenticationClient{config: a.config}).QueryAccount(a)
 }
 
 // Update returns a builder for updating this Authentication.

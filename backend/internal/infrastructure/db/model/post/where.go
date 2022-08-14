@@ -1119,7 +1119,7 @@ func HasAuthor() predicate.Post {
 }
 
 // HasAuthorWith applies the HasEdge predicate on the "author" edge with a given conditions (other predicates).
-func HasAuthorWith(preds ...predicate.User) predicate.Post {
+func HasAuthorWith(preds ...predicate.Account) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),

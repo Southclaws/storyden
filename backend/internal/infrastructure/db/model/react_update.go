@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/react"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -51,23 +51,23 @@ func (ru *ReactUpdate) SetNillableCreatedAt(t *time.Time) *ReactUpdate {
 	return ru
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ru *ReactUpdate) SetUserID(id uuid.UUID) *ReactUpdate {
-	ru.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (ru *ReactUpdate) SetAccountID(id uuid.UUID) *ReactUpdate {
+	ru.mutation.SetAccountID(id)
 	return ru
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (ru *ReactUpdate) SetNillableUserID(id *uuid.UUID) *ReactUpdate {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (ru *ReactUpdate) SetNillableAccountID(id *uuid.UUID) *ReactUpdate {
 	if id != nil {
-		ru = ru.SetUserID(*id)
+		ru = ru.SetAccountID(*id)
 	}
 	return ru
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (ru *ReactUpdate) SetUser(u *User) *ReactUpdate {
-	return ru.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (ru *ReactUpdate) SetAccount(a *Account) *ReactUpdate {
+	return ru.SetAccountID(a.ID)
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
@@ -94,9 +94,9 @@ func (ru *ReactUpdate) Mutation() *ReactMutation {
 	return ru.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (ru *ReactUpdate) ClearUser() *ReactUpdate {
-	ru.mutation.ClearUser()
+// ClearAccount clears the "account" edge to the Account entity.
+func (ru *ReactUpdate) ClearAccount() *ReactUpdate {
+	ru.mutation.ClearAccount()
 	return ru
 }
 
@@ -192,33 +192,33 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: react.FieldCreatedAt,
 		})
 	}
-	if ru.mutation.UserCleared() {
+	if ru.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
+			Table:   react.AccountTable,
+			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
+			Table:   react.AccountTable,
+			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
@@ -301,23 +301,23 @@ func (ruo *ReactUpdateOne) SetNillableCreatedAt(t *time.Time) *ReactUpdateOne {
 	return ruo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ruo *ReactUpdateOne) SetUserID(id uuid.UUID) *ReactUpdateOne {
-	ruo.mutation.SetUserID(id)
+// SetAccountID sets the "account" edge to the Account entity by ID.
+func (ruo *ReactUpdateOne) SetAccountID(id uuid.UUID) *ReactUpdateOne {
+	ruo.mutation.SetAccountID(id)
 	return ruo
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableUserID(id *uuid.UUID) *ReactUpdateOne {
+// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillableAccountID(id *uuid.UUID) *ReactUpdateOne {
 	if id != nil {
-		ruo = ruo.SetUserID(*id)
+		ruo = ruo.SetAccountID(*id)
 	}
 	return ruo
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (ruo *ReactUpdateOne) SetUser(u *User) *ReactUpdateOne {
-	return ruo.SetUserID(u.ID)
+// SetAccount sets the "account" edge to the Account entity.
+func (ruo *ReactUpdateOne) SetAccount(a *Account) *ReactUpdateOne {
+	return ruo.SetAccountID(a.ID)
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
@@ -344,9 +344,9 @@ func (ruo *ReactUpdateOne) Mutation() *ReactMutation {
 	return ruo.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (ruo *ReactUpdateOne) ClearUser() *ReactUpdateOne {
-	ruo.mutation.ClearUser()
+// ClearAccount clears the "account" edge to the Account entity.
+func (ruo *ReactUpdateOne) ClearAccount() *ReactUpdateOne {
+	ruo.mutation.ClearAccount()
 	return ruo
 }
 
@@ -466,33 +466,33 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Column: react.FieldCreatedAt,
 		})
 	}
-	if ruo.mutation.UserCleared() {
+	if ruo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
+			Table:   react.AccountTable,
+			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   react.UserTable,
-			Columns: []string{react.UserColumn},
+			Table:   react.AccountTable,
+			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
-					Column: user.FieldID,
+					Column: account.FieldID,
 				},
 			},
 		}

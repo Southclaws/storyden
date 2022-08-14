@@ -23,19 +23,19 @@ const (
 	FieldCreateTime = "create_time"
 	// FieldUpdateTime holds the string denoting the update_time field in the database.
 	FieldUpdateTime = "update_time"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeAccount holds the string denoting the account edge name in mutations.
+	EdgeAccount = "account"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
 	EdgeNotifications = "notifications"
 	// Table holds the table name of the subscription in the database.
 	Table = "subscriptions"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "subscriptions"
-	// UserInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "subscription_user"
+	// AccountTable is the table that holds the account relation/edge.
+	AccountTable = "subscriptions"
+	// AccountInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountInverseTable = "accounts"
+	// AccountColumn is the table column denoting the account relation/edge.
+	AccountColumn = "subscription_account"
 	// NotificationsTable is the table that holds the notifications relation/edge.
 	NotificationsTable = "notifications"
 	// NotificationsInverseTable is the table name for the Notification entity.
@@ -58,8 +58,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subscriptions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"subscription_user",
-	"user_subscriptions",
+	"account_subscriptions",
+	"subscription_account",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -48,7 +48,7 @@ func (Post) Fields() []ent.Field {
 // Edges of Post.
 func (Post) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("author", User.Type).
+		edge.From("author", Account.Type).
 			Ref("posts").
 			Unique().
 			Required(),

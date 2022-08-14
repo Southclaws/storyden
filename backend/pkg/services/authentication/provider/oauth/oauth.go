@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 // OAuthProvider describes a type that can provide an OAuth2 authentication
@@ -17,7 +17,7 @@ import (
 // returns a User object to the caller to be encoded into a cookie.
 type OAuthProvider interface {
 	Link() string
-	Login(ctx context.Context, state, code string) (*user.User, error)
+	Login(ctx context.Context, state, code string) (*account.Account, error)
 }
 
 func Build() fx.Option {

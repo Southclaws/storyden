@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -45,14 +45,14 @@ type Post struct {
 	CategoryID uuid.UUID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
-	Edges      PostEdges `json:"edges"`
-	user_posts *uuid.UUID
+	Edges         PostEdges `json:"edges"`
+	account_posts *uuid.UUID
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
 type PostEdges struct {
 	// Author holds the value of the author edge.
-	Author *User `json:"author,omitempty"`
+	Author *Account `json:"author,omitempty"`
 	// Category holds the value of the category edge.
 	Category *Category `json:"category,omitempty"`
 	// Tags holds the value of the tags edge.
@@ -74,12 +74,12 @@ type PostEdges struct {
 
 // AuthorOrErr returns the Author value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e PostEdges) AuthorOrErr() (*User, error) {
+func (e PostEdges) AuthorOrErr() (*Account, error) {
 	if e.loadedTypes[0] {
 		if e.Author == nil {
 			// The edge author was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: user.Label}
+			return nil, &NotFoundError{label: account.Label}
 		}
 		return e.Author, nil
 	}
@@ -177,7 +177,7 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullTime)
 		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID:
 			values[i] = new(uuid.UUID)
-		case post.ForeignKeys[0]: // user_posts
+		case post.ForeignKeys[0]: // account_posts
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
@@ -274,10 +274,10 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			}
 		case post.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field user_posts", values[i])
+				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
 			} else if value.Valid {
-				po.user_posts = new(uuid.UUID)
-				*po.user_posts = *value.S.(*uuid.UUID)
+				po.account_posts = new(uuid.UUID)
+				*po.account_posts = *value.S.(*uuid.UUID)
 			}
 		}
 	}
@@ -285,7 +285,7 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 }
 
 // QueryAuthor queries the "author" edge of the Post entity.
-func (po *Post) QueryAuthor() *UserQuery {
+func (po *Post) QueryAuthor() *AccountQuery {
 	return (&PostClient{config: po.config}).QueryAuthor(po)
 }
 

@@ -17,19 +17,19 @@ const (
 	FieldEmoji = "emoji"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeAccount holds the string denoting the account edge name in mutations.
+	EdgeAccount = "account"
 	// EdgePost holds the string denoting the post edge name in mutations.
 	EdgePost = "Post"
 	// Table holds the table name of the react in the database.
 	Table = "reacts"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "reacts"
-	// UserInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "react_user"
+	// AccountTable is the table that holds the account relation/edge.
+	AccountTable = "reacts"
+	// AccountInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountInverseTable = "accounts"
+	// AccountColumn is the table column denoting the account relation/edge.
+	AccountColumn = "react_account"
 	// PostTable is the table that holds the Post relation/edge.
 	PostTable = "reacts"
 	// PostInverseTable is the table name for the Post entity.
@@ -49,10 +49,10 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "reacts"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"account_reacts",
 	"post_reacts",
-	"react_user",
+	"react_account",
 	"react_post",
-	"user_reacts",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

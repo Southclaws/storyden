@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/predicate"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
 	"github.com/google/uuid"
 )
 
@@ -27,9 +27,9 @@ type AuthenticationQuery struct {
 	fields     []string
 	predicates []predicate.Authentication
 	// eager-loading edges.
-	withUser  *UserQuery
-	withFKs   bool
-	modifiers []func(s *sql.Selector)
+	withAccount *AccountQuery
+	withFKs     bool
+	modifiers   []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,9 +66,9 @@ func (aq *AuthenticationQuery) Order(o ...OrderFunc) *AuthenticationQuery {
 	return aq
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (aq *AuthenticationQuery) QueryUser() *UserQuery {
-	query := &UserQuery{config: aq.config}
+// QueryAccount chains the current query on the "account" edge.
+func (aq *AuthenticationQuery) QueryAccount() *AccountQuery {
+	query := &AccountQuery{config: aq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -79,8 +79,8 @@ func (aq *AuthenticationQuery) QueryUser() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(authentication.Table, authentication.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, authentication.UserTable, authentication.UserColumn),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, authentication.AccountTable, authentication.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -264,12 +264,12 @@ func (aq *AuthenticationQuery) Clone() *AuthenticationQuery {
 		return nil
 	}
 	return &AuthenticationQuery{
-		config:     aq.config,
-		limit:      aq.limit,
-		offset:     aq.offset,
-		order:      append([]OrderFunc{}, aq.order...),
-		predicates: append([]predicate.Authentication{}, aq.predicates...),
-		withUser:   aq.withUser.Clone(),
+		config:      aq.config,
+		limit:       aq.limit,
+		offset:      aq.offset,
+		order:       append([]OrderFunc{}, aq.order...),
+		predicates:  append([]predicate.Authentication{}, aq.predicates...),
+		withAccount: aq.withAccount.Clone(),
 		// clone intermediate query.
 		sql:    aq.sql.Clone(),
 		path:   aq.path,
@@ -277,14 +277,14 @@ func (aq *AuthenticationQuery) Clone() *AuthenticationQuery {
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AuthenticationQuery) WithUser(opts ...func(*UserQuery)) *AuthenticationQuery {
-	query := &UserQuery{config: aq.config}
+// WithAccount tells the query-builder to eager-load the nodes that are connected to
+// the "account" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AuthenticationQuery) WithAccount(opts ...func(*AccountQuery)) *AuthenticationQuery {
+	query := &AccountQuery{config: aq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withUser = query
+	aq.withAccount = query
 	return aq
 }
 
@@ -355,10 +355,10 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context) ([]*Authentication, e
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
 		loadedTypes = [1]bool{
-			aq.withUser != nil,
+			aq.withAccount != nil,
 		}
 	)
-	if aq.withUser != nil {
+	if aq.withAccount != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -387,20 +387,20 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context) ([]*Authentication, e
 		return nodes, nil
 	}
 
-	if query := aq.withUser; query != nil {
+	if query := aq.withAccount; query != nil {
 		ids := make([]uuid.UUID, 0, len(nodes))
 		nodeids := make(map[uuid.UUID][]*Authentication)
 		for i := range nodes {
-			if nodes[i].user_authentication == nil {
+			if nodes[i].account_authentication == nil {
 				continue
 			}
-			fk := *nodes[i].user_authentication
+			fk := *nodes[i].account_authentication
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
 			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.Where(user.IDIn(ids...))
+		query.Where(account.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -408,10 +408,10 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context) ([]*Authentication, e
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "user_authentication" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "account_authentication" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.User = n
+				nodes[i].Edges.Account = n
 			}
 		}
 	}

@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Account is the predicate function for account builders.
+type Account func(*sql.Selector)
+
 // Authentication is the predicate function for authentication builders.
 type Authentication func(*sql.Selector)
 
@@ -26,6 +29,3 @@ type Subscription func(*sql.Selector)
 
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
-
-// User is the predicate function for user builders.
-type User func(*sql.Selector)

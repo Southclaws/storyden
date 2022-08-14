@@ -37,7 +37,7 @@ tasks:
 
   generate:db:
     cmds:
-      - go generate ./api/src/infra/db/...
+      - go generate ./backend/internal/infrastructure/db/...
 
   generate:openapi:
     cmds:

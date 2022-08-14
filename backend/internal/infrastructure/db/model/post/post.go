@@ -57,11 +57,11 @@ const (
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
 	AuthorTable = "posts"
-	// AuthorInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	AuthorInverseTable = "users"
+	// AuthorInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AuthorInverseTable = "accounts"
 	// AuthorColumn is the table column denoting the author relation/edge.
-	AuthorColumn = "user_posts"
+	AuthorColumn = "account_posts"
 	// CategoryTable is the table that holds the category relation/edge.
 	CategoryTable = "posts"
 	// CategoryInverseTable is the table name for the Category entity.
@@ -119,7 +119,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_posts",
+	"account_posts",
 }
 
 var (

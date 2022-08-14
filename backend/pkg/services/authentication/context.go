@@ -3,43 +3,24 @@ package authentication
 import (
 	"context"
 	"errors"
-	"net/http"
 
-	"github.com/Southclaws/storyden/backend/internal/web"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
+
+var ErrNoAccountInContext = errors.New("no account in context")
 
 var contextKey = struct{}{}
 
-func AddUserToContext(ctx context.Context, u user.UserID) context.Context {
+// WithAccountID stores the ID of the account making the request.
+func WithAccountID(ctx context.Context, u account.AccountID) context.Context {
 	return context.WithValue(ctx, contextKey, u)
 }
 
-// GetUser extracts auth info from a request context and, if not present, will
-// write a 500 error to the response and return not-ok. In this failure case,
-// the request should be immediately terminated.
-func GetUser(
-	w http.ResponseWriter,
-	r *http.Request,
-) (*user.User, bool) {
-	if auth, ok := GetUserFromContext(r.Context()); ok {
-		return auth, true
+// GetAccountID pulls out an account ID associated with the call.
+func GetAccountID(ctx context.Context) (account.AccountID, error) {
+	if auth, ok := ctx.Value(contextKey).(account.AccountID); ok {
+		return auth, nil
 	}
 
-	web.StatusUnauthorized(w, web.WithSuggestion(
-		errors.New("user not authenticated"),
-		"The request did not have any authentication information with it.",
-		"Ensure you are logged in, try logging out and back in again. If issues persist, please contact us.",
-	))
-
-	return nil, false
-}
-
-// GetUserFromContext pulls out auth data from a context.
-func GetUserFromContext(ctx context.Context) (*user.User, bool) {
-	if auth, ok := ctx.Value(contextKey).(user.User); ok {
-		return &auth, true
-	}
-
-	return nil, false
+	return account.AccountID{}, ErrNoAccountInContext
 }

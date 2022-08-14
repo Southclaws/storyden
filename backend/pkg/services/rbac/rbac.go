@@ -1,38 +1,51 @@
 package rbac
 
 import (
+	"errors"
+
 	"github.com/el-mike/restrict"
 	"github.com/el-mike/restrict/adapters"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/post"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
+
+type admin struct{}
+
+func (c admin) Type() string { return "ADMIN" }
+
+func (c admin) Check(request *restrict.AccessRequest) error {
+	sub := request.Subject.(*account.Account)
+	res := request.Resource.(*account.Account)
+
+	if sub.ID == res.ID {
+		return nil
+	}
+
+	if sub.Admin {
+		return nil
+	}
+
+	return restrict.NewConditionNotSatisfiedError(c, request, errors.New("not authorised"))
+}
 
 func NewPolicy() *restrict.PolicyDefinition {
 	return &restrict.PolicyDefinition{
 		Roles: restrict.Roles{
-			user.Role: {
+			account.Name: {
 				Grants: restrict.GrantsMap{
+					account.Name: {
+						&restrict.Permission{Action: "create", Conditions: restrict.Conditions{admin{}}},
+						&restrict.Permission{Action: "read", Conditions: restrict.Conditions{admin{}}},
+						&restrict.Permission{Action: "update", Conditions: restrict.Conditions{admin{}}},
+						&restrict.Permission{Action: "delete", Conditions: restrict.Conditions{admin{}}},
+					},
 					post.Role: {
-						&restrict.Permission{Action: "read"},
 						&restrict.Permission{Action: "create"},
-						&restrict.Permission{
-							Action: "update",
-							Conditions: restrict.Conditions{
-								&restrict.EqualCondition{
-									ID: "isOwner",
-									Left: &restrict.ValueDescriptor{
-										Source: restrict.ResourceField,
-										Field:  "Author.ID",
-									},
-									Right: &restrict.ValueDescriptor{
-										Source: restrict.SubjectField,
-										Field:  "ID",
-									},
-								},
-							},
-						},
+						&restrict.Permission{Action: "read"},
+						&restrict.Permission{Action: "update"}, // TODO: Ownership stuff
+						&restrict.Permission{Action: "delete"},
 					},
 				},
 			},
