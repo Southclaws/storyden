@@ -11,7 +11,7 @@ import (
 
 var contextKey = struct{}{}
 
-func AddUserToContext(ctx context.Context, u *user.User) context.Context {
+func AddUserToContext(ctx context.Context, u user.UserID) context.Context {
 	return context.WithValue(ctx, contextKey, u)
 }
 

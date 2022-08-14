@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -17,6 +18,10 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
+)
+
+const (
+	BrowserScopes = "browser.Scopes"
 )
 
 // APIError defines model for APIError.
@@ -55,6 +60,9 @@ type ServerInterface interface {
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
 
+	// (GET /v1/accounts/{id})
+	GetAccount(ctx echo.Context, id string) error
+
 	// (POST /v1/auth/password/signin)
 	Signin(ctx echo.Context) error
 
@@ -76,6 +84,24 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetSpec(ctx)
+	return err
+}
+
+// GetAccount converts echo context to params.
+func (w *ServerInterfaceWrapper) GetAccount(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetAccount(ctx, id)
 	return err
 }
 
@@ -135,6 +161,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
+	router.GET(baseURL+"/v1/accounts/:id", wrapper.GetAccount)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.Signin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.Signup)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
@@ -146,15 +173,44 @@ type GetSpecRequestObject struct {
 
 type GetSpec200TextResponse string
 
+type GetAccountRequestObject struct {
+	Id string `json:"id"`
+}
+
+type GetAccount200JSONResponse AuthenticationResponse
+
+func (t GetAccount200JSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((AuthenticationResponse)(t))
+}
+
+type GetAccount404Response struct {
+}
+
+type GetAccount500JSONResponse APIError
+
+func (t GetAccount500JSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((APIError)(t))
+}
+
 type SigninRequestObject struct {
 	JSONBody     *SigninJSONRequestBody
 	FormdataBody *SigninFormdataRequestBody
 }
 
-type Signin200JSONResponse AuthenticationResponse
+type Signin200ResponseHeaders struct {
+	SetCookie string
+}
+
+type Signin200JSONResponse struct {
+	Body    AuthenticationResponse
+	Headers Signin200ResponseHeaders
+}
 
 func (t Signin200JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((AuthenticationResponse)(t))
+	return json.Marshal(t.Body)
+}
+
+type Signin401Response struct {
 }
 
 type Signin404Response struct {
@@ -171,13 +227,17 @@ type SignupRequestObject struct {
 	FormdataBody *SignupFormdataRequestBody
 }
 
-type Signup200JSONResponse AuthenticationResponse
-
-func (t Signup200JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((AuthenticationResponse)(t))
+type Signup200ResponseHeaders struct {
+	SetCookie string
 }
 
-type Signup401Response struct {
+type Signup200JSONResponse struct {
+	Body    AuthenticationResponse
+	Headers Signup200ResponseHeaders
+}
+
+func (t Signup200JSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
 }
 
 type Signup500JSONResponse APIError
@@ -196,6 +256,9 @@ type StrictServerInterface interface {
 
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) interface{}
+
+	// (GET /v1/accounts/{id})
+	GetAccount(ctx context.Context, request GetAccountRequestObject) interface{}
 
 	// (POST /v1/auth/password/signin)
 	Signin(ctx context.Context, request SigninRequestObject) interface{}
@@ -245,6 +308,37 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 	return nil
 }
 
+// GetAccount operation middleware
+func (sh *strictHandler) GetAccount(ctx echo.Context, id string) error {
+	var request GetAccountRequestObject
+
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.GetAccount(ctx.Request().Context(), request.(GetAccountRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetAccount")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case GetAccount200JSONResponse:
+		return ctx.JSON(200, v)
+	case GetAccount404Response:
+		return ctx.NoContent(404)
+	case GetAccount500JSONResponse:
+		return ctx.JSON(500, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
 // Signin operation middleware
 func (sh *strictHandler) Signin(ctx echo.Context) error {
 	var request SigninRequestObject
@@ -279,7 +373,10 @@ func (sh *strictHandler) Signin(ctx echo.Context) error {
 
 	switch v := response.(type) {
 	case Signin200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
 		return ctx.JSON(200, v)
+	case Signin401Response:
+		return ctx.NoContent(401)
 	case Signin404Response:
 		return ctx.NoContent(404)
 	case Signin500JSONResponse:
@@ -327,9 +424,8 @@ func (sh *strictHandler) Signup(ctx echo.Context) error {
 
 	switch v := response.(type) {
 	case Signup200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
 		return ctx.JSON(200, v)
-	case Signup401Response:
-		return ctx.NoContent(401)
 	case Signup500JSONResponse:
 		return ctx.JSON(500, v)
 	case error:
@@ -369,16 +465,18 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xVwW7TQBD9lWjg6MQJlItPFAmhqgcQEVyqHBZ74mxr72x3ZpuEyv+Odm0rSeMEJIoQ",
-	"EjfLb3bmzZs3u4+QU23JoBGG7BE4X2Gt4uflp6v3zpEL39aRRScaI4L9b9lahAxYnDYlNAnUyKxKHMTY",
-	"lyWyYDGANgk4vPfaBfSmK7BI+jD6dou5hCSXXlZoROdKNJnPeO+R5ZihLkLQUmOkiRtV2yrWIy+rvFJr",
-	"fstCblugmZArITmmK3SH5vC0VcxrcsVx+BP+e+X7RL/SDFsyjEPd/FwyXQyUCKpj7p2W7TwMtk2XE91p",
-	"DMVjcgNZ9wsSMKpui7TijBmZNZldx8rqa9xCE3Jrs6TITEu1fwoSeEAXz2UwC52SRaOshgxeT6aTGSRg",
-	"lawim7TDJrdMUe8S40CDAFGXqwIy+IAyt5hDaLqVKR5+NZ22HRlBE48JbiS1ldJmZ+ch9ZoECuTcaSst",
-	"z4/XB3pBdhP0VCUHdWvNOSwCnj7MUuVllfZmSFmXpq1miQeoz1u8HReyvKNi+4S0srbqXJD2Muyov3S4",
-	"hAxepLtVTbs9TYf3IRDdz7kZr9fr8ZJcPfauQpNT0a7h7xVpPXh2HM/XWbccJyaXwMX0IqQ8hL4wupEh",
-	"GS3JmyKEvXlOiv0NOUDqygg6o6rRHN0DulEfeMphwVPnHObteYd5+99hf9xhswGHmTArcvo7/jP+6u/m",
-	"03ft1y7kL1+3hwGHL9fNolkEOHTPEfWuggzS8M40i+ZHAAAA///UbFXE2ggAAA==",
+	"H4sIAAAAAAAC/+xWTW/bMAz9KwG3oxMnW3fxad0HhqCHDQu2S5GDajO2WltSRappFvi/D5JixGnddMA2",
+	"rAV2ihFS5ON7z5S3kOvGaIWKCbItUF5hI8Lj6Zf5R2u19c/GaoOWJYYIdn/zxiBkQGylKqFNoEEiUeJg",
+	"jFxZIjEWA9E2AYvXTlofPd81WCZdmr64xJx9kVPHFSqWuWCp1Ve8dkh8H6EsfNJKYoCJt6IxdeinHVd5",
+	"Ldb0lljbTYFqom0JyX24rK9QHZ42gmitbXE//Q7+Xvuu0K8MQ0YrwqFpHqdMFgMtPOuYOyt5s/DCxnIX",
+	"Vq8pMiMVZJBrfSURElCiiR0iM2NCIqnVflxh5BluoPWFpVrpAEty3T8FCdygDecymPkxtUEljIQMXk+m",
+	"kxkkYARXAUq6i00uSQeySwxq+ukDKfMCMviEvDCYg584chQOv5pO/U+uFaMKxxhvOTW1kGrv5SHq2gQK",
+	"pNxKwxHn57MDsiA792SKkjy1jaQclj6e3sxSkefaKaZ0K4v2GOTTmBjGtaJBRuvLbe+03qWN5h8giXp4",
+	"dvZqyAL6SrN1mBwZbfkoScKYeme5tKN9X++lxRVk8CLd74V0txTSB/z6AJ8JnExPfMnD0DdCO1KaRyvt",
+	"VOHT3vxJiN3SGgA1V4xWiXq0QHuDdtQlHujeez3Ol23PBZ3uPSc4rtJuJ6QkSxV9ZzQNOGIR41FLJH6n",
+	"i81fUyauRQ+0X/N2vF6vxyttm7GzNapcF3Eb/16TuIqegucSqFAU4T3bwgJ5/D6utuPLIDh1NuBU5RXW",
+	"Vv7A4rnauW9gx9Ux8zpz3LzO/DfvkzTvczBc90Xw8HX5fZfyjy/5R24DCqPHe9zZGjJI/adNu2x/BgAA",
+	"///PzaDrSgsAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

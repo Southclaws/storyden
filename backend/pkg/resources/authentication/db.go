@@ -56,6 +56,7 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 			authentication.IdentifierEQ(identifier),
 			authentication.ServiceEQ(string(service)),
 		).
+		WithUser().
 		Only(ctx)
 	if err != nil {
 		return nil, err

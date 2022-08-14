@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/logger"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/securecookie"
 )
 
 func Build() fx.Option {
@@ -12,5 +13,6 @@ func Build() fx.Option {
 		logger.Build(),
 		// mailer.Build(),
 		db.Build(),
+		fx.Provide(securecookie.New),
 	)
 }

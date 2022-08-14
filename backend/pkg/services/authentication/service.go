@@ -14,7 +14,6 @@ type Service interface {
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(newCookie),
 		provider.Build(),
 	)
 }

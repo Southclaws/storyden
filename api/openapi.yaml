@@ -8,7 +8,7 @@ servers:
   - url: "/api"
 
 security:
-  - cookieAuth: []
+  - browser: []
 
 paths:
   /version:
@@ -52,12 +52,14 @@ paths:
       responses:
         200:
           description: OK
+          headers:
+            "Set-Cookie":
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationResponse"
-        401:
-          description: Unauthorized
         500:
           description: Internal Server Error
           content:
@@ -78,6 +80,41 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/AuthenticationRequest"
+      responses:
+        200:
+          description: OK
+          headers:
+            "Set-Cookie":
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationResponse"
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APIError"
+
+  /v1/accounts/{id}:
+    get:
+      operationId: getAccount
+      tags: [accounts]
+      security:
+        - browser: []
+      parameters:
+        - name: id
+          in: path
+          description: Account ID
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: OK
@@ -121,7 +158,7 @@ paths:
 
 components:
   securitySchemes:
-    cookieAuth:
+    browser:
       type: apiKey
       in: cookie
       name: storyden-session

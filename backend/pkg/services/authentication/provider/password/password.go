@@ -14,6 +14,8 @@ import (
 
 const AuthServiceName = `password`
 
+var ErrPasswordMismatch = errors.New("password mismatch")
+
 type Password struct {
 	auth authentication.Repository
 	user user.Repository
@@ -73,7 +75,7 @@ func (b *Password) Login(ctx context.Context, identifier string, password string
 	}
 
 	if !match {
-		return nil, nil
+		return nil, ErrPasswordMismatch
 	}
 
 	return &a.User, nil
