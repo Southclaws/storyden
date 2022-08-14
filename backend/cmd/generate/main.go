@@ -17,7 +17,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
-	"github.com/Southclaws/storyden/pkg/infra/db/model"
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 )
 
 var dburl = "postgres://default:default@localhost:5432/postgres?sslmode=disable"
