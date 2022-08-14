@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/backend/internal/config"
 	"github.com/Southclaws/storyden/backend/pkg/resources/account"
+	"github.com/Southclaws/storyden/backend/pkg/services/authentication"
 	"github.com/Southclaws/storyden/backend/pkg/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/backend/pkg/transports/http/openapi"
 )
@@ -88,13 +89,13 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	echo := ctx.Value(middleware.EchoContextKey).(echo.Context)
 	req := echo.Request()
 
-	_, ok := i.decodeSession(req)
+	session, ok := i.decodeSession(req)
 	if !ok {
 		return errors.New("no cookie found in request")
 	}
 
 	// TODO: Move this to middleware
-	// req.WithContext(authentication.WithAccountID(req.Context(), session.UserID))
+	*req = *req.WithContext(authentication.WithAccountID(req.Context(), session.UserID))
 
 	return nil
 }
