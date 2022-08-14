@@ -34,10 +34,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/deepmap/oapi-codegen/pkg/middleware"
+	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/go-chi/cors"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -150,18 +150,16 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, a Authen
 		cfg.PublicWebAddress,    // Live public website
 	}
 
-	router.Use(
-		echo.WrapMiddleware(cors.Handler(cors.Options{
-			AllowedOrigins:   origins,
-			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Content-Length", "X-CSRF-Token"},
-			ExposedHeaders:   []string{"Link", "Content-Length", "X-Ratelimit-Limit", "X-Ratelimit-Reset"},
-			AllowCredentials: true,
-			MaxAge:           300,
-		})),
-	)
+	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     origins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "Content-Length", "X-CSRF-Token"},
+		ExposeHeaders:    []string{"Link", "Content-Length", "X-Ratelimit-Limit", "X-Ratelimit-Reset"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 
-	router.Use(middleware.OapiRequestValidatorWithOptions(spec, &middleware.Options{
+	router.Use(oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
 		Skipper: openApiSkipper,
 		Options: openapi3filter.Options{
 			IncludeResponseStatus: true,
