@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
@@ -98,7 +99,8 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
-	_, err := authentication.GetAccountID(ctx)
+	c := ctx.Value(middleware.EchoContextKey).(echo.Context)
+	_, err := authentication.GetAccountID(c.Request().Context())
 	return err
 }
 
