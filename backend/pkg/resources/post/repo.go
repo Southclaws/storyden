@@ -5,14 +5,14 @@ import (
 
 	"4d63.com/optional"
 
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 type Repository interface {
 	CreatePost(
 		ctx context.Context,
 		body string,
-		authorID user.UserID,
+		authorID account.AccountID,
 		parentID PostID,
 		replyToID optional.Optional[PostID],
 	) (*Post, error)

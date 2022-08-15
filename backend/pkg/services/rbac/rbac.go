@@ -8,7 +8,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/backend/pkg/resources/account"
-	"github.com/Southclaws/storyden/backend/pkg/resources/post"
 )
 
 type admin struct{}
@@ -41,12 +40,12 @@ func NewPolicy() *restrict.PolicyDefinition {
 						&restrict.Permission{Action: "update", Conditions: restrict.Conditions{admin{}}},
 						&restrict.Permission{Action: "delete", Conditions: restrict.Conditions{admin{}}},
 					},
-					post.Role: {
-						&restrict.Permission{Action: "create"},
-						&restrict.Permission{Action: "read"},
-						&restrict.Permission{Action: "update"}, // TODO: Ownership stuff
-						&restrict.Permission{Action: "delete"},
-					},
+					// post.Role: {
+					// 	&restrict.Permission{Action: "create"},
+					// 	&restrict.Permission{Action: "read"},
+					// 	&restrict.Permission{Action: "update"}, // TODO: Ownership stuff
+					// 	&restrict.Permission{Action: "delete"},
+					// },
 				},
 			},
 		},

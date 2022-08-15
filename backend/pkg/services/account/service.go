@@ -25,6 +25,15 @@ type service struct {
 	account_repo account.Repository
 }
 
-func New() Service {
-	return &service{}
+func New(
+	l *zap.Logger,
+	rbac *restrict.AccessManager,
+
+	account_repo account.Repository,
+) Service {
+	return &service{
+		l:            l.With(zap.String("service", "account")),
+		rbac:         rbac,
+		account_repo: account_repo,
+	}
 }

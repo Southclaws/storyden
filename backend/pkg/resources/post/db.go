@@ -8,7 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 )
 
 type database struct {
@@ -22,7 +22,7 @@ func New(db *model.Client) Repository {
 func (d *database) CreatePost(
 	ctx context.Context,
 	body string,
-	authorID user.UserID,
+	authorID account.AccountID,
 	parentID PostID,
 	replyToID optional.Optional[PostID],
 ) (*Post, error) {
