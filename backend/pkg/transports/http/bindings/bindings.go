@@ -122,7 +122,7 @@ func mount(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictS
 	})
 }
 
-func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, a Authentication) error {
+func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Authentication) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
 		return err
@@ -159,11 +159,13 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, a Authen
 		MaxAge:           300,
 	}))
 
+	router.Use(auth.middleware)
+
 	router.Use(oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
 		Skipper: openApiSkipper,
 		Options: openapi3filter.Options{
 			IncludeResponseStatus: true,
-			AuthenticationFunc:    a.validator,
+			AuthenticationFunc:    auth.validator,
 		},
 		// Handles validation errors that occur BEFORE the handler is called.
 		ErrorHandler: func(c echo.Context, err *echo.HTTPError) error {

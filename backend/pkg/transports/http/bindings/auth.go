@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
@@ -85,19 +84,22 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 	}
 }
 
-func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
-	echo := ctx.Value(middleware.EchoContextKey).(echo.Context)
-	req := echo.Request()
+func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		r := c.Request()
 
-	session, ok := i.decodeSession(req)
-	if !ok {
-		return errors.New("no cookie found in request")
+		session, ok := i.decodeSession(r)
+		if ok {
+			c.SetRequest(r.WithContext(authentication.WithAccountID(r.Context(), session.UserID)))
+		}
+
+		return next(c)
 	}
+}
 
-	// TODO: Move this to middleware
-	*req = *req.WithContext(authentication.WithAccountID(req.Context(), session.UserID))
-
-	return nil
+func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
+	_, err := authentication.GetAccountID(ctx)
+	return err
 }
 
 const secureCookieName = "storyden-session"
