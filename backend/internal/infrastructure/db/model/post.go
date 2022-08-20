@@ -40,7 +40,7 @@ type Post struct {
 	// UpdatedAt holds the value of the "updatedAt" field.
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// DeletedAt holds the value of the "deletedAt" field.
-	DeletedAt time.Time `json:"deletedAt,omitempty"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID uuid.UUID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -264,7 +264,8 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
 			} else if value.Valid {
-				po.DeletedAt = value.Time
+				po.DeletedAt = new(time.Time)
+				*po.DeletedAt = value.Time
 			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -367,8 +368,10 @@ func (po *Post) String() string {
 	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updatedAt=")
 	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", deletedAt=")
-	builder.WriteString(po.DeletedAt.Format(time.ANSIC))
+	if v := po.DeletedAt; v != nil {
+		builder.WriteString(", deletedAt=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
 	builder.WriteByte(')')

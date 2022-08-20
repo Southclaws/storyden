@@ -101,6 +101,7 @@ func templateFormatter(templates ...string) migrate.Formatter {
 	if err != nil {
 		panic(err)
 	}
+
 	return fmt
 }
 
@@ -108,6 +109,7 @@ func templateFormatter(templates ...string) migrate.Formatter {
 func reverse(changes []*migrate.Change) []*migrate.Change {
 	n := len(changes)
 	rev := make([]*migrate.Change, n)
+
 	if n%2 == 1 {
 		rev[n/2] = changes[n/2]
 	}
@@ -115,5 +117,6 @@ func reverse(changes []*migrate.Change) []*migrate.Change {
 	for i, j := 0, n-1; i < j; i, j = i+1, j-1 {
 		rev[i], rev[j] = changes[j], changes[i]
 	}
+
 	return rev
 }

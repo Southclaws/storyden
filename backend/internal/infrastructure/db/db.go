@@ -20,13 +20,13 @@ func Build() fx.Option {
 	return fx.Provide(newDB)
 }
 
-func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, error) {
+func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, _, err := connect(wctx, cfg.DatabaseURL, true)
+	client, db, err := connect(wctx, cfg.DatabaseURL, true)
 	if err != nil {
 		cancel()
-		return nil, err
+		return nil, nil, err
 	}
 
 	lc.Append(fx.Hook{
@@ -36,7 +36,7 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, error) {
 		},
 	})
 
-	return client, nil
+	return client, db, nil
 }
 
 func connect(ctx context.Context, url string, prod bool) (*model.Client, *sql.DB, error) {

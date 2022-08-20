@@ -22,6 +22,7 @@ type Error struct {
 // StatusNotFound writes a pretty error
 func StatusNotFound(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusNotFound)
+
 	if err == nil {
 		errToWriter(w, errors.New("not found"))
 	} else {
@@ -34,6 +35,7 @@ func StatusInternalServerError(w http.ResponseWriter, err error) {
 	if errors.Is(err, context.Canceled) {
 		return
 	}
+
 	zap.L().Error("internal error", zap.Error(err))
 	w.WriteHeader(http.StatusInternalServerError)
 	errToWriter(w, errors.New("something went wrong but the details have been omitted from this error for security reasons"))
@@ -85,8 +87,11 @@ func errToWriter(w http.ResponseWriter, err error) {
 		err = errors.New("Unknown or unspecified error")
 	}
 
-	var message string
-	var suggest string
+	var (
+		message string
+		suggest string
+	)
+
 	herr, ok := err.(*HumanReadable)
 	if ok {
 		message = herr.desc

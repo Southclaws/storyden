@@ -38,6 +38,7 @@ func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, err
 		if model.IsNotFound(err) {
 			return nil, nil
 		}
+
 		return nil, err
 	}
 

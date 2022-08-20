@@ -45,6 +45,7 @@ func (d *database) CreatePost(
 		if model.IsNotFound(err) {
 			return nil, nil
 		}
+
 		return nil, err
 	}
 
@@ -55,6 +56,9 @@ func (d *database) CreatePost(
 			pq.WithAuthor()
 		}).
 		Only(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	return FromModel(p), nil
 }

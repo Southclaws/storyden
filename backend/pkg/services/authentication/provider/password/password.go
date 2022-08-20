@@ -43,6 +43,7 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 	if err != nil {
 		return nil, err
 	}
+
 	if exists {
 		return nil, errExists(identifier)
 	}

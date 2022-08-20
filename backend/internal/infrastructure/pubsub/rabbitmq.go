@@ -27,6 +27,7 @@ func NewRabbit(cfg config.Config) (Bus, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	sub, err := conn.Channel()
 	if err != nil {
 		return nil, err
@@ -56,6 +57,7 @@ func (r *Rabbit) Declare(t string) Topic {
 	if err != nil {
 		panic(err)
 	}
+
 	return Topic(t)
 }
 

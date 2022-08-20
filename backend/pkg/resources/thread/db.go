@@ -10,9 +10,9 @@ import (
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 	post_model "github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/post"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/category"
 	"github.com/Southclaws/storyden/backend/pkg/resources/post"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
 var (
@@ -33,7 +33,7 @@ func (d *database) CreateThread(
 	ctx context.Context,
 	title string,
 	body string,
-	authorID user.UserID,
+	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
 ) (*Thread, error) {
@@ -82,6 +82,9 @@ func (d *database) CreateThread(
 		WithCategory().
 		WithTags().
 		Only(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	return FromModel(p), nil
 }

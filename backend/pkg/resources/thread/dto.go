@@ -34,7 +34,7 @@ func FromModel(m *model.Post) *Thread {
 		Pinned:    m.Pinned,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: optional.Of(m.DeletedAt),
+		DeletedAt: optional.OfPtr(m.DeletedAt),
 		Category:  utils.Deref(category.FromModel(m.Edges.Category), 0),
 
 		Posts: lo.Map(m.Edges.Posts, func(t *model.Post, i int) post.Post {

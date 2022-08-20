@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
+	model_account "github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/subscription"
-	model_user "github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/user"
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/post"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
-	"github.com/google/uuid"
 )
 
 type database struct {
@@ -21,24 +22,25 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Subscribe(ctx context.Context, userID user.UserID, refersType NotificationType, refersTo string) (*Subscription, error) {
+func (d *database) Subscribe(ctx context.Context, accountID account.AccountID, refersType NotificationType, refersTo string) (*Subscription, error) {
 	sub, err := d.db.Subscription.Create().
-		SetUserID(uuid.UUID(userID)).
+		SetAccountID(uuid.UUID(accountID)).
 		SetRefersType(string(refersType)).
 		SetRefersTo(refersTo).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	return SubFromModel(sub), nil
 }
 
-func (d *database) Unsubscribe(ctx context.Context, userID user.UserID, subID SubscriptionID) (int, error) {
+func (d *database) Unsubscribe(ctx context.Context, accountID account.AccountID, subID SubscriptionID) (int, error) {
 	i, err := d.db.Subscription.Delete().
 		Where(
 			subscription.IDEQ(uuid.UUID(subID)),
-			subscription.HasUserWith(
-				model_user.IDEQ(uuid.UUID(userID)),
+			subscription.HasAccountWith(
+				model_account.IDEQ(uuid.UUID(accountID)),
 			),
 		).Exec(ctx)
 	if err != nil {
@@ -48,11 +50,11 @@ func (d *database) Unsubscribe(ctx context.Context, userID user.UserID, subID Su
 	return i, nil
 }
 
-func (d *database) GetSubscriptionsForUser(ctx context.Context, userID user.UserID) ([]Subscription, error) {
+func (d *database) GetSubscriptionsForUser(ctx context.Context, accountID account.AccountID) ([]Subscription, error) {
 	subs, err := d.db.Subscription.Query().
 		Where(
-			subscription.HasUserWith(
-				model_user.IDEQ(uuid.UUID(userID)),
+			subscription.HasAccountWith(
+				model_account.IDEQ(uuid.UUID(accountID)),
 			),
 		).
 		All(ctx)
@@ -78,12 +80,12 @@ func (d *database) GetSubscriptionsForItem(ctx context.Context, refersType Notif
 	return SubFromModelMany(subs), nil
 }
 
-func (d *database) GetNotifications(ctx context.Context, userID user.UserID, read bool, after time.Time) ([]Notification, error) {
+func (d *database) GetNotifications(ctx context.Context, accountID account.AccountID, read bool, after time.Time) ([]Notification, error) {
 	q := d.db.Notification.Query().
 		Where(
 			notification.HasSubscriptionWith(
-				subscription.HasUserWith(
-					model_user.IDEQ(uuid.UUID(userID)),
+				subscription.HasAccountWith(
+					model_account.IDEQ(uuid.UUID(accountID)),
 				),
 			),
 		).
@@ -137,11 +139,12 @@ func (d *database) Notify(ctx context.Context, refersType NotificationType, refe
 	return len(subs), nil
 }
 
-func (d *database) SetReadState(ctx context.Context, userID user.UserID, notificationID NotificationID, read bool) (*Notification, error) {
-	ok, err := d.userHasRightsForNotification(ctx, userID, notificationID)
+func (d *database) SetReadState(ctx context.Context, accountID account.AccountID, notificationID NotificationID, read bool) (*Notification, error) {
+	ok, err := d.userHasRightsForNotification(ctx, accountID, notificationID)
 	if err != nil {
 		return nil, err
 	}
+
 	if !ok {
 		return nil, post.ErrUnauthorised
 	}
@@ -158,24 +161,26 @@ func (d *database) SetReadState(ctx context.Context, userID user.UserID, notific
 }
 
 // TODO: Cache these. Or do more clever queries.
-func (d *database) userHasRightsForNotification(ctx context.Context, userID user.UserID, notificationID NotificationID) (bool, error) {
+func (d *database) userHasRightsForNotification(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (bool, error) {
 	n, err := d.db.Notification.Query().
 		Where(notification.IDEQ(uuid.UUID(notificationID))).
 		WithSubscription(func(sq *model.SubscriptionQuery) {
-			sq.WithUser()
+			sq.WithAccount()
 		}).
 		Only(ctx)
 	if err != nil {
 		return false, err
 	}
-	return user.UserID(n.Edges.Subscription.Edges.User.ID) == userID, nil
+
+	return account.AccountID(n.Edges.Subscription.Edges.Account.ID) == accountID, nil
 }
 
-func (d *database) Delete(ctx context.Context, userID user.UserID, notificationID NotificationID) (*Notification, error) {
-	ok, err := d.userHasRightsForNotification(ctx, userID, notificationID)
+func (d *database) Delete(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (*Notification, error) {
+	ok, err := d.userHasRightsForNotification(ctx, accountID, notificationID)
 	if err != nil {
 		return nil, err
 	}
+
 	if !ok {
 		return nil, post.ErrUnauthorised
 	}

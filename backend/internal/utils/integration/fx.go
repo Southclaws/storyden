@@ -1,4 +1,4 @@
-package bdd
+package integration
 
 import (
 	"context"
@@ -11,18 +11,16 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/config"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/backend/pkg/resources"
 	"github.com/Southclaws/storyden/backend/pkg/resources/seed"
 	"github.com/Southclaws/storyden/backend/pkg/services"
 )
 
-// Test provides a BDD style setup for testing service behaviour. It returns a
+// Test provides a full app setup for testing service behaviour. It returns a
 // context cancellation function for immediate shutdown once all test functions
 // have finished. Usage is a simple call and defer:
 //
 // func TestMyThing(t *testing.T) {
-//     ctx := context.Background()
 //     defer bdd.Test(t, nil, fx.Invoke(func(test dependencies...) {
 //         r := require.New(t)
 //         a := assert.New(t)
@@ -32,9 +30,12 @@ import (
 //     }))
 // }
 //
+//
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	defaultConfig := config.Config{}
 	defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
+
+	ctx, cf := context.WithCancel(context.Background())
 
 	o = append(o,
 		// main application dependencies
@@ -43,8 +44,11 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 		// seeded database
 		seed.Create(),
 
-		// database client
-		fx.Invoke(func() *model.Client { return db.TestDB(t) }),
+		// sql client and ent client
+		fx.Invoke(func() { db.TestDB(t) }),
+
+		// provide a global context
+		fx.Provide(func() context.Context { return ctx }),
 	)
 
 	// if this test has a custom config, merge+overwrite with the defaults.
@@ -54,12 +58,10 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 
 	o = append(o, fx.Provide(func() config.Config { return defaultConfig }))
 
-	ctx, cf := context.WithCancel(context.Background())
-
 	err := fx.New(o...).Start(ctx)
 	if err != nil {
 		fmt.Println(err)
-		t.Fail()
+		t.Error()
 	}
 
 	return cf

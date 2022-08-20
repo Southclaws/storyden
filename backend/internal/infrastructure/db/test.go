@@ -2,12 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/notification"
@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model/tag"
 )
 
-func TestDB(t *testing.T) *model.Client {
+func TestDB(t *testing.T) {
 	url := os.Getenv("DATABASE_URL")
 	if url == "" {
 		url = "postgresql://default:default@localhost:5432/postgres"
@@ -28,32 +28,28 @@ func TestDB(t *testing.T) *model.Client {
 		t.Fatal(err)
 	}
 
-	truncate := func() {
-		tables := []string{
-			notification.Table,
-			subscription.Table,
-			react.Table,
-			account.Table,
-			category.Table,
-			tag.Table,
-			post.Table,
-		}
+	t.Cleanup(func() {
+		Truncate(d)
+		c.Close()
+	})
+}
 
-		q := fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))
-
-		if _, err := d.Exec(q); err != nil {
-			t.Fatal(err)
-		}
+func Truncate(db *sql.DB) error {
+	tables := []string{
+		notification.Table,
+		subscription.Table,
+		react.Table,
+		account.Table,
+		category.Table,
+		tag.Table,
+		post.Table,
 	}
 
-	// truncate the database before tests and after.
-	truncate()
-	t.Cleanup(func() {
-		truncate()
-		c.Close()
+	if _, err := db.Exec(fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))); err != nil {
+		return err
+	}
 
-		fmt.Println("--- Cleaned database after test")
-	})
+	fmt.Println("--- Cleaned database")
 
-	return c
+	return nil
 }

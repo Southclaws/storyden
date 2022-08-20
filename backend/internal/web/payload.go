@@ -20,7 +20,9 @@ func DecodeBody(r *http.Request, v interface{}) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to parse form")
 		}
+
 		return decoder.Decode(v, r.PostForm)
 	}
+
 	return errors.Errorf("cannot decode content type %s", r.Header.Get("Content-Type"))
 }

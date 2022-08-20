@@ -42,8 +42,9 @@ func replaceGlobals(c config.Config, l *zap.Logger) {
 	// dependents most of the time using DI, the global logger is used
 	// in a couple of places during startup/shutdown.
 	zap.ReplaceGlobals(l)
+
 	if !c.Production {
-		l.Info("logger configured in development mode")
+		l.Debug("logger configured in development mode")
 	}
 }
 

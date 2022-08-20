@@ -19,6 +19,7 @@ func MakeShortBody(long string) string {
 	textonly := strings.Builder{}
 	p := parser.New()
 	tree := p.Parse([]byte(long))
+
 	var walk func(n ast.Node)
 	walk = func(n ast.Node) {
 		para, ok := n.(*ast.Paragraph)
@@ -45,6 +46,7 @@ func MakeShortBody(long string) string {
 
 	paragraphs := []rune(strings.TrimSpace(textonly.String()))
 	end := int(math.Min(float64(len(paragraphs)-1), MaxShortBodyLength))
+
 	if len(paragraphs) > MaxShortBodyLength {
 		for ; end > MaxShortBodyLength/2; end-- {
 			if unicode.IsPunct(paragraphs[end]) || unicode.IsSpace(paragraphs[end]) {
@@ -66,6 +68,7 @@ func MakeShortBody(long string) string {
 				}
 			}
 		}
+
 		return fmt.Sprint(string(paragraphs[:end]), "...")
 	}
 

@@ -1,4 +1,4 @@
-package category
+package seed
 
 import (
 	"context"
@@ -6,44 +6,44 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/backend/pkg/resources/category"
 )
 
 var (
-	SeedCategory_01_General = Category{
-		ID:          CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000000")),
+	SeedCategory_01_General = category.Category{
+		ID:          category.CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000000")),
 		Name:        "General",
 		Description: "General stuff",
 		Colour:      "#ffffff",
 		Sort:        0,
 	}
 
-	SeedCategory_02_Photos = Category{
-		ID:          CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000001")),
+	SeedCategory_02_Photos = category.Category{
+		ID:          category.CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000001")),
 		Name:        "Media",
 		Description: "Movies and tv shows",
 		Colour:      "#ffffff",
 		Sort:        1,
 	}
 
-	SeedCategory_03_Movies = Category{
-		ID:          CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000002")),
+	SeedCategory_03_Movies = category.Category{
+		ID:          category.CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000002")),
 		Name:        "Movies",
 		Description: "Movies discussion",
 		Colour:      "#ffffff",
 		Sort:        2,
 	}
 
-	SeedCategory_04_Music = Category{
-		ID:          CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000003")),
+	SeedCategory_04_Music = category.Category{
+		ID:          category.CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000003")),
 		Name:        "Music",
 		Description: "Music discussion",
 		Colour:      "#ffffff",
 		Sort:        3,
 	}
 
-	SeedCategory_05_Admin = Category{
-		ID:          CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000004")),
+	SeedCategory_05_Admin = category.Category{
+		ID:          category.CategoryID(uuid.MustParse("00000000-0000-0000-0000-000000000004")),
 		Name:        "Admin",
 		Description: "Admin area",
 		Colour:      "#ffffff",
@@ -52,26 +52,15 @@ var (
 	}
 )
 
-// func NewLocalWithSeed() Repository {
-// 	m := NewLocal()
-// 	Seed(m)
-// 	return m
-// }
-
-func NewWithSeed(db *model.Client) Repository {
-	m := New(db)
-	Seed(m)
-	return m
-}
-
-func Seed(r Repository) {
+func categories(r category.Repository) {
 	ctx := context.Background()
 
-	create := func(c *Category) CategoryID {
+	create := func(c *category.Category) category.CategoryID {
 		c, err := r.CreateCategory(ctx, c.Name, c.Description, c.Colour, c.Sort, c.Admin)
 		if err != nil {
 			panic(err)
 		}
+
 		return c.ID
 	}
 

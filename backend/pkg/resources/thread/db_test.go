@@ -1,42 +1,46 @@
-package thread
+package thread_test
 
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db"
-	"github.com/Southclaws/storyden/backend/internal/utils"
-	"github.com/Southclaws/storyden/backend/pkg/resources/category"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
+	"github.com/Southclaws/storyden/backend/internal/utils/integration"
+	"github.com/Southclaws/storyden/backend/pkg/resources/seed"
+	"github.com/Southclaws/storyden/backend/pkg/resources/thread"
 )
 
-func implementations(t *testing.T, seed bool) []utils.ImplConstructor[Repository] {
-	if seed {
-		return []utils.ImplConstructor[Repository]{
-			func() Repository { return NewWithSeed(db.TestDB(t)) },
-			func() Repository { return NewLocalWithSeed() },
-		}
-	} else {
-		return []utils.ImplConstructor[Repository]{
-			func() Repository { return New(db.TestDB(t)) },
-			func() Repository { return NewLocal() },
-		}
-	}
-}
-
 func TestCreatePost(t *testing.T) {
-	utils.TestAll(t, implementations(t, false), func(t1 *testing.T, repo Repository) {
-		r := require.New(t)
-		ctx := context.Background()
+	defer integration.Test(t, nil, fx.Invoke(
+		func(
+			_ seed.Ready,
+			ctx context.Context,
+			repo thread.Repository,
+		) {
+			r := require.New(t)
+			a := assert.New(t)
 
-		d := db.TestDB(t)
-		category.Seed(category.New(d))
-		user.Seed(user.New(d))
+			p, err := repo.CreateThread(ctx,
+				"A Super Nice Thread",
+				"Lorem ipsum",
+				seed.SeedUser_02_User.ID,
+				seed.SeedCategory_01_General.ID,
+				[]string{})
+			r.NoError(err)
+			r.NotNil(p)
 
-		p, err := repo.CreateThread(ctx, "title", "body", user.SeedUser_02_User.ID, category.SeedCategory_01_General.ID, []string{})
-		r.NoError(err)
-		r.NotNil(p)
-	})
+			a.Equal("A Super Nice Thread", p.Title)
+			a.Contains(p.Slug, "a-super-nice-thread")
+			a.Equal(false, p.Pinned)
+			a.WithinDuration(p.CreatedAt, time.Now(), time.Second*5)
+			a.WithinDuration(p.UpdatedAt, time.Now(), time.Second*5)
+			a.False(p.DeletedAt.IsPresent())
+			a.Equal(seed.SeedCategory_01_General.ID, p.Category.ID)
+			a.Len(p.Posts, 0)
+		}),
+	)
 }

@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mjml": "^4.7.1"
+    "mjml": "^4.13.0"
   }
 }

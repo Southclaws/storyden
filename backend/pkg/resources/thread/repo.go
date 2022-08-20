@@ -3,8 +3,8 @@ package thread
 import (
 	"context"
 
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/category"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
 //go:generate mockery --inpackage --name=Repository --case=underscore
@@ -19,7 +19,7 @@ type Repository interface {
 		ctx context.Context,
 		title string,
 		body string,
-		authorID user.UserID,
+		authorID account.AccountID,
 		categoryID category.CategoryID,
 		tags []string,
 	) (*Thread, error)

@@ -8,7 +8,6 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/backend/internal/utils"
 	"github.com/Southclaws/storyden/backend/pkg/resources/react"
 )
 
@@ -75,6 +74,6 @@ func FromModel(m *model.Post) (w *Post) {
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: utils.OptionalZero(m.DeletedAt),
+		DeletedAt: optional.OfPtr(m.DeletedAt),
 	}
 }

@@ -5,9 +5,9 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/category"
 	"github.com/Southclaws/storyden/backend/pkg/resources/post"
-	"github.com/Southclaws/storyden/backend/pkg/resources/user"
 )
 
 type local struct {
@@ -22,7 +22,7 @@ func (l *local) CreateThread(
 	ctx context.Context,
 	title string,
 	body string,
-	authorID user.UserID,
+	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
 ) (*Thread, error) {

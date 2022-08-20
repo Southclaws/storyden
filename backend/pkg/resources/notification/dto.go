@@ -4,10 +4,11 @@ import (
 	"time"
 
 	"4d63.com/optional"
-	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/backend/internal/utils"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+
+	"github.com/Southclaws/storyden/backend/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/backend/internal/utils"
 )
 
 type (

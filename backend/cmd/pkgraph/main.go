@@ -16,8 +16,6 @@ func main() {
 }
 
 func run(d fx.DotGraph) error {
-	// fmt.Print(d)
-
 	graphast, err := gographviz.Parse([]byte(d))
 	if err != nil {
 		return err
@@ -45,6 +43,7 @@ func run(d fx.DotGraph) error {
 		for k, v := range a {
 			b[string(k)] = v
 		}
+
 		return b
 	}
 

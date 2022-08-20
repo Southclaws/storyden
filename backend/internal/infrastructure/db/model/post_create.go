@@ -519,7 +519,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: post.FieldDeletedAt,
 		})
-		_node.DeletedAt = value
+		_node.DeletedAt = &value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

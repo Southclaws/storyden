@@ -61,6 +61,7 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 	if err != nil {
 		return nil, err
 	}
+
 	return FromModel(r), nil
 }
 
@@ -72,6 +73,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 	if err != nil {
 		return nil, err
 	}
+
 	return FromModelMany(r), nil
 }
 

@@ -38,7 +38,7 @@ func (Post) Fields() []ent.Field {
 
 		field.Time("createdAt").Default(time.Now),
 		field.Time("updatedAt").Default(time.Now),
-		field.Time("deletedAt").Optional(),
+		field.Time("deletedAt").Optional().Nillable(),
 
 		// Edges
 		field.UUID("category_id", uuid.UUID{}).Optional(),

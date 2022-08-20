@@ -38,12 +38,14 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 		} else if request.FormdataBody != nil {
 			return i.p.Login(ctx, request.FormdataBody.Identifier, request.FormdataBody.Token)
 		}
+
 		return nil, errors.New("missing body")
 	}()
 	if err != nil {
 		if errors.Is(err, password.ErrPasswordMismatch) {
 			return openapi.Signin401Response{}
 		}
+
 		return openapi.Signin500JSONResponse{Error: err.Error()}
 	}
 
@@ -65,12 +67,14 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 		} else if request.FormdataBody != nil {
 			return i.p.Register(ctx, request.FormdataBody.Identifier, request.FormdataBody.Token)
 		}
+
 		return nil, errors.New("missing body")
 	}()
 	if err != nil {
 		if errors.Is(err, password.ErrExists) {
 			return openapi.Signup400Response{}
 		}
+
 		return openapi.Signup500JSONResponse{Error: err.Error()}
 	}
 
@@ -101,6 +105,7 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
 	c := ctx.Value(middleware.EchoContextKey).(echo.Context)
 	_, err := authentication.GetAccountID(c.Request().Context())
+
 	return err
 }
 

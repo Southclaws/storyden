@@ -9,15 +9,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/backend/internal/utils/bdd"
+	"github.com/Southclaws/storyden/backend/internal/utils/integration"
 	"github.com/Southclaws/storyden/backend/pkg/resources/account"
 	"github.com/Southclaws/storyden/backend/pkg/resources/seed"
 )
 
 func TestCreateUser(t *testing.T) {
-	ctx := context.Background()
-
-	bdd.Test(t, nil, fx.Invoke(func(repo account.Repository) {
+	defer integration.Test(t, nil, fx.Invoke(func(ctx context.Context, repo account.Repository) {
 		r := require.New(t)
 		a := assert.New(t)
 
@@ -43,13 +41,11 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetByID(t *testing.T) {
-	ctx := context.Background()
-
-	bdd.Test(t, nil, fx.Invoke(func(repo account.Repository) {
+	defer integration.Test(t, nil, fx.Invoke(func(ctx context.Context, repo account.Repository) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, err := repo.GetByID(ctx, seed.SeedUser_01_Admin.ID, false)
+		none, err := repo.GetByID(ctx, seed.SeedUser_01_Admin.ID)
 		r.NoError(err)
 		a.Nil(none)
 
@@ -63,13 +59,11 @@ func TestGetByID(t *testing.T) {
 }
 
 func TestGetByEmail(t *testing.T) {
-	ctx := context.Background()
-
-	bdd.Test(t, nil, fx.Invoke(func(repo account.Repository) {
+	defer integration.Test(t, nil, fx.Invoke(func(ctx context.Context, repo account.Repository) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, ok, err := repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email, false)
+		none, ok, err := repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email)
 		r.NoError(err)
 		r.False(ok)
 		a.Nil(none)
@@ -77,7 +71,7 @@ func TestGetByEmail(t *testing.T) {
 		u, err := repo.Create(ctx, seed.SeedUser_01_Admin.Email, seed.SeedUser_01_Admin.Name)
 		r.NoError(err)
 
-		u, ok, err = repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email, false)
+		u, ok, err = repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email)
 		r.NoError(err)
 		r.True(ok)
 		a.NotNil(u)
@@ -85,11 +79,10 @@ func TestGetByEmail(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	ctx := context.Background()
-
-	bdd.Test(t, nil, fx.Invoke(
+	defer integration.Test(t, nil, fx.Invoke(
 		func(
 			_ seed.Ready,
+			ctx context.Context,
 			repo account.Repository,
 		) {
 			r := require.New(t)

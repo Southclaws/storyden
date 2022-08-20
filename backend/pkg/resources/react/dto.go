@@ -20,7 +20,7 @@ func FromModel(model *model.React) *React {
 	return &React{
 		ID:     ReactID(model.ID),
 		Emoji:  model.Emoji,
-		UserID: model.Edges.User.ID.String(),
+		UserID: model.Edges.Account.ID.String(),
 		PostID: model.Edges.Post.ID.String(),
 	}
 }
@@ -29,8 +29,10 @@ func IsValidEmoji(e string) (string, bool) {
 	if len(e) == 0 {
 		return "", false
 	}
+
 	if e[1] == ':' {
 		return "", false
 	}
+
 	return e, gomoji.ContainsEmoji(e)
 }

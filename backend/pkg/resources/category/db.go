@@ -127,15 +127,19 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc
 	if name != nil {
 		u.SetName(*name)
 	}
+
 	if desc != nil {
 		u.SetDescription(*desc)
 	}
+
 	if colour != nil {
 		u.SetColour(*colour)
 	}
+
 	if sort != nil {
 		u.SetSort(*sort)
 	}
+
 	if admin != nil {
 		u.SetAdmin(*admin)
 	}
@@ -172,6 +176,7 @@ func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto Cat
 	}
 
 	tx.Commit()
+
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to perform move+delete transaction")
 	}

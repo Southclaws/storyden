@@ -43,6 +43,7 @@ func (m *local) GetByID(ctx context.Context, userId AccountID) (*Account, error)
 	if !ok {
 		return nil, nil
 	}
+
 	return utils.Ref(u), nil
 }
 
