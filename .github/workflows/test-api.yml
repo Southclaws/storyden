@@ -30,14 +30,6 @@ jobs:
         with:
           go-version: 1.19
 
-      - name: Build
-        run: task backend
-
-      - name: Test
-        run: task backend:test
-        env:
-          DATABASE_URL: "postgresql://default:default@postgres:5432/postgres"
-
       - name: Cache
         uses: actions/cache@v3
         with:
@@ -47,3 +39,11 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
+      - name: Build
+        run: task backend
+
+      - name: Test
+        run: task backend:test
+        env:
+          DATABASE_URL: "postgresql://default:default@postgres:5432/postgres"
