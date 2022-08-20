@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/imdario/mergo"
@@ -33,7 +34,12 @@ import (
 //
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	defaultConfig := config.Config{}
-	defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
+
+	if url := os.Getenv("DATABASE_URL"); url == "" {
+		defaultConfig.DatabaseURL = url
+	} else {
+		defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
+	}
 
 	ctx, cf := context.WithCancel(context.Background())
 
