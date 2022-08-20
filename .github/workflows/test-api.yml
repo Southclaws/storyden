@@ -19,9 +19,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    env:
-      DATABASE_URL: "postgresql://default:default@postgres:5432/postgres"
-
     steps:
       - uses: actions/checkout@v2
 
@@ -38,3 +35,5 @@ jobs:
 
       - name: Test
         run: task backend:test
+        env:
+          DATABASE_URL: "postgresql://default:default@postgres:5432/postgres"
