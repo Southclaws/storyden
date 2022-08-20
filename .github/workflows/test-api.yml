@@ -6,6 +6,22 @@ on:
 jobs:
   backend-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: default
+          POSTGRES_PASSWORD: default
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://default:default@postgres:5432/postgres"
+
     steps:
       - uses: actions/checkout@v2
 
