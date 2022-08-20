@@ -1,4 +1,4 @@
-name: Build API
+name: Build backend
 
 on:
   push:
@@ -8,7 +8,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  api-build:
+  backend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
