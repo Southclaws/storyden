@@ -35,7 +35,7 @@ import (
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	defaultConfig := config.Config{}
 
-	if url := os.Getenv("DATABASE_URL"); url == "" {
+	if url := os.Getenv("DATABASE_URL"); url != "" {
 		defaultConfig.DatabaseURL = url
 	} else {
 		defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
