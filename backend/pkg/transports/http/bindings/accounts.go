@@ -22,7 +22,7 @@ func (i *Accounts) GetAccount(ctx context.Context, request openapi.GetAccountReq
 		return err
 	}
 
-	return openapi.GetAccount200JSONResponse(openapi.Account{
+	return openapi.GetAccountSuccess{
 		Id:        openapi.UUID(acc.ID),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		Email:     utils.Ref(acc.Email),
@@ -30,5 +30,5 @@ func (i *Accounts) GetAccount(ctx context.Context, request openapi.GetAccountReq
 		CreatedAt: utils.Ref(acc.CreatedAt.Format(time.RFC3339)),
 		UpdatedAt: utils.Ref(acc.UpdatedAt.Format(time.RFC3339)),
 		DeletedAt: utils.OptionalElsePtr(acc.DeletedAt, utils.FormatISO),
-	})
+	}
 }

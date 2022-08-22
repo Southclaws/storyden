@@ -1,5 +1,20 @@
 openapi: 3.0.1
 
+#
+#            ╓███,
+#          ▄██▀"███▄
+#         ╚█▀    `▀██▄
+#     ,,     ╓███,  ▀██▌_
+#   ╓███   ▄██▀"███▄  ╙███_
+#  ▐██"  ▄██▀    `▀██▄  ╙██
+#  ▐██  ╙██▄       ╫██Γ  ██─
+#  ▐██    ▀██▄  ,▓██▀    ██─
+#  ▐██      ╙█████▀      ██─
+#  ▐██      ╓█████_      ██─
+#  ▐██    ▄██▀` ╙███╥    ██─
+#  └███████▀      `▀██   ██
+#
+
 info:
   title: storyden
   version: "1"
@@ -10,7 +25,29 @@ servers:
 security:
   - browser: []
 
+#
+# 8888888b.     d8888 88888888888 888    888  .d8888b.
+# 888   Y88b   d88888     888     888    888 d88P  Y88b
+# 888    888  d88P888     888     888    888 Y88b.
+# 888   d88P d88P 888     888     8888888888  "Y888b.
+# 8888888P" d88P  888     888     888    888     "Y88b.
+# 888      d88P   888     888     888    888       "888
+# 888     d8888888888     888     888    888 Y88b  d88P
+# 888    d88P     888     888     888    888  "Y8888P"
+#
+
 paths:
+  #
+  #                d8b
+  #                Y8P
+  #
+  #  88888b.d88b.  888 .d8888b   .d8888b
+  #  888 "888 "88b 888 88K      d88P"
+  #  888  888  888 888 "Y8888b. 888
+  #  888  888  888 888      X88 Y88b.
+  #  888  888  888 888  88888P'  "Y8888P
+  #
+
   /version:
     get:
       security: []
@@ -23,6 +60,7 @@ paths:
             text/plain:
               schema:
                 type: string
+
   /openapi.json:
     get:
       security: []
@@ -35,6 +73,17 @@ paths:
             text/plain:
               schema:
                 type: string
+
+  #
+  #                   888    888
+  #                   888    888
+  #                   888    888
+  #  8888b.  888  888 888888 88888b.
+  #     "88b 888  888 888    888 "88b
+  # .d888888 888  888 888    888  888
+  # 888  888 Y88b 888 Y88b.  888  888
+  # "Y888888  "Y88888  "Y888 888  888
+  #
 
   /v1/auth/password/signup:
     post:
@@ -50,24 +99,9 @@ paths:
             schema:
               $ref: "#/components/schemas/AuthenticationRequest"
       responses:
-        200:
-          description: OK
-          headers:
-            "Set-Cookie":
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationResponse"
-        400:
-          description: Email address already registered
-        500:
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/APIError"
+        default: { "$ref": "#/components/responses/InternalServerError" }
+        400: { "$ref": "#/components/responses/BadRequest" }
+        200: { "$ref": "#/components/responses/AuthenticationSuccess" }
 
   /v1/auth/password/signin:
     post:
@@ -83,26 +117,21 @@ paths:
             schema:
               $ref: "#/components/schemas/AuthenticationRequest"
       responses:
-        200:
-          description: OK
-          headers:
-            "Set-Cookie":
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationResponse"
-        401:
-          description: Unauthorized
-        404:
-          description: User not found
-        500:
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/APIError"
+        default: { "$ref": "#/components/responses/InternalServerError" }
+        404: { "$ref": "#/components/responses/NotFound" }
+        401: { "$ref": "#/components/responses/Unauthorised" }
+        200: { "$ref": "#/components/responses/AuthenticationSuccess" }
+
+  #
+  #                                                      888
+  #                                                      888
+  #                                                      888
+  #   8888b.   .d8888b .d8888b .d88b.  888  888 88888b.  888888 .d8888b
+  #      "88b d88P"   d88P"   d88""88b 888  888 888 "88b 888    88K
+  #  .d888888 888     888     888  888 888  888 888  888 888    "Y8888b.
+  #  888  888 Y88b.   Y88b.   Y88..88P Y88b 888 888  888 Y88b.       X88
+  #  "Y888888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888  88888P'
+  #
 
   /v1/accounts/{id}:
     get:
@@ -118,54 +147,108 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        401:
-          description: Unauthorized
-        404:
-          description: User not found
-        500:
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/APIError"
+        default: { "$ref": "#/components/responses/InternalServerError" }
+        404: { "$ref": "#/components/responses/NotFound" }
+        401: { "$ref": "#/components/responses/Unauthorised" }
+        200: { "$ref": "#/components/responses/GetAccountSuccess" }
 
-  # /v1/auth/oauth/{provider}/link:
-  #   get:
-  #     operationId: oauthLink
-  #     security: []
-  #     parameters:
-  #       - name: provider
-  #         in: path
-  #         schema:
-  #           type: string
-  #     responses:
-  #       200:
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/AuthenticationResponse"
-  #       404:
-  #         description: User not found
-  #       500:
-  #         description: Internal Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/APIError"
+  #
+  # 888    888                                    888
+  # 888    888                                    888
+  # 888    888                                    888
+  # 888888 88888b.  888d888 .d88b.   8888b.   .d88888 .d8888b
+  # 888    888 "88b 888P"  d8P  Y8b     "88b d88" 888 88K
+  # 888    888  888 888    88888888 .d888888 888  888 "Y8888b.
+  # Y88b.  888  888 888    Y8b.     888  888 Y88b 888      X88
+  #  "Y888 888  888 888     "Y8888  "Y888888  "Y88888  88888P'
+  #
+
+  /v1/threads:
+    post:
+      operationId: createThread
+      tags: [threads]
+      security:
+        - browser: []
+      responses:
+        default: { "$ref": "#/components/responses/InternalServerError" }
+        404: { "$ref": "#/components/responses/NotFound" }
+        401: { "$ref": "#/components/responses/Unauthorised" }
+        200: { "$ref": "#/components/responses/CreateThreadSuccess" }
+  #
+  #                             888
+  #                             888
+  #                             888
+  #  88888b.   .d88b.  .d8888b  888888 .d8888b
+  #  888 "88b d88""88b 88K      888    88K
+  #  888  888 888  888 "Y8888b. 888    "Y8888b.
+  #  888 d88P Y88..88P      X88 Y88b.       X88
+  #  88888P"   "Y88P"   88888P'  "Y888  88888P'
+  #  888
+  #  888
+  #  888
+  #
 
 components:
-  securitySchemes:
-    browser:
-      type: apiKey
-      in: cookie
-      name: storyden-session
+  #
+  # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
+  # 888   Y88b 888       d88P  Y88b 888   Y88b d88P" "Y88b 8888b   888 d88P  Y88b 888       d88P  Y88b
+  # 888    888 888       Y88b.      888    888 888     888 88888b  888 Y88b.      888       Y88b.
+  # 888   d88P 8888888    "Y888b.   888   d88P 888     888 888Y88b 888  "Y888b.   8888888    "Y888b.
+  # 8888888P"  888           "Y88b. 8888888P"  888     888 888 Y88b888     "Y88b. 888           "Y88b.
+  # 888 T88b   888             "888 888        888     888 888  Y88888       "888 888             "888
+  # 888  T88b  888       Y88b  d88P 888        Y88b. .d88P 888   Y8888 Y88b  d88P 888       Y88b  d88P
+  # 888   T88b 8888888888 "Y8888P"  888         "Y88888P"  888    Y888  "Y8888P"  8888888888 "Y8888P"
+  #
+
+  responses:
+    BadRequest:
+      description: Bad request
+    NotFound:
+      description: Not found
+    Unauthorised:
+      description: Unauthorized
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIError"
+
+    AuthenticationSuccess:
+      description: OK
+      headers:
+        "Set-Cookie":
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthenticationSuccess"
+
+    GetAccountSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Account"
+
+    CreateThreadSuccess:
+      description: OK
+      # content:
+      #   application/json:
+      #     schema:
+      #       $ref: "#/components/schemas/Thread"
+
+  #
+  #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
+  # d88P  Y88b d88P  Y88b 888    888 888        8888b   d8888       d88888 d88P  Y88b
+  # Y88b.      888    888 888    888 888        88888b.d88888      d88P888 Y88b.
+  #  "Y888b.   888        8888888888 8888888    888Y88888P888     d88P 888  "Y888b.
+  #     "Y88b. 888        888    888 888        888 Y888P 888    d88P  888     "Y88b.
+  #       "888 888    888 888    888 888        888  Y8P  888   d88P   888       "888
+  # Y88b  d88P Y88b  d88P 888    888 888        888   "   888  d8888888888 Y88b  d88P
+  #  "Y8888P"   "Y8888P"  888    888 8888888888 888       888 d88P     888  "Y8888P"
+  #
 
   schemas:
     UUID:
@@ -183,7 +266,7 @@ components:
           example: "password"
           type: string
 
-    AuthenticationResponse:
+    AuthenticationSuccess:
       type: object
       required: [id]
       properties:
@@ -219,3 +302,23 @@ components:
           type: string
         suggested:
           type: string
+
+  securitySchemes:
+    browser:
+      type: apiKey
+      in: cookie
+      name: storyden-session
+#
+#     ..:.                                                        .***=
+#  .+#%%%%%#+   ...                                               :%%%+
+#  #%%%+==+#.  =%%%.                                              :%%%+
+# :%%%%:      -*%%%=-.   :==+==:    ---: :== ----     .---- .-===-:%%%+   :==+=-:   .---..-==-.
+#  +%%%%%#*=. #%%%%%%-.+%%%%#%%%%+ .%%%##%%% -%%%#.  .#%%#=*%%%%%%%%%%+ =%%#+=+#%#- -%%%#%#%%%%*
+#   .-+#%%%%%- +%%%:..#%%%=   +%%%*.%%%#-. .  :#%%#..#%%#:#%%%=  .+%%%+-%%%*===+%%%:-%%%+  .#%%%.
+#        +%%%# =%%%. .%%%#    .%%%%.%%%+       .#%%##%%#:.%%%#    :%%%+=%%%*+++++++:-%%%:   +%%%.
+# .##*===#%%%= =%%%.  +%%%#=-=#%%%-.%%%+        .#%%%%*.  +%%%#=-=#%%%+.#%%+:..=++= -%%%:   +%%%.
+# -*%%%%%%%*-  =%%%.   :*%%%%%%#+: .%%%+         -%%%#.    -*%%%%%*%%%+ .+#%%%%%%+. -%%%:   +%%%.
+#    .:::.                .:::.                 -%%%*.        .:.          .:::.
+#                                              -%%%*
+#                                             -***+
+#

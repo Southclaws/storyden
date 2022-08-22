@@ -59,9 +59,10 @@ import (
 type Bindings struct {
 	fx.In
 	Version
+	Spec
 	Authentication
 	Accounts
-	Spec
+	Threads
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -70,9 +71,10 @@ type Bindings struct {
 func bindingsProviders() fx.Option {
 	return fx.Provide(
 		NewVersion,
+		NewSpec,
 		NewAuthentication,
 		NewAccounts,
-		NewSpec,
+		NewThreads,
 	)
 }
 

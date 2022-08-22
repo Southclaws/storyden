@@ -46,7 +46,7 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 			return openapi.Signin401Response{}
 		}
 
-		return openapi.Signin500JSONResponse{Error: err.Error()}
+		return openapi.InternalServerErrorJSONResponse{Error: err.Error()}
 	}
 
 	cookie, err := i.encodeSession(u.ID)
@@ -55,8 +55,8 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 	}
 
 	return openapi.Signin200JSONResponse{
-		Body:    openapi.AuthenticationResponse{Id: u.ID.String()},
-		Headers: openapi.Signin200ResponseHeaders{SetCookie: cookie},
+		Body:    openapi.AuthenticationSuccess{Id: u.ID.String()},
+		Headers: openapi.AuthenticationSuccessResponseHeaders{SetCookie: cookie},
 	}
 }
 
@@ -75,7 +75,7 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 			return openapi.Signup400Response{}
 		}
 
-		return openapi.Signup500JSONResponse{Error: err.Error()}
+		return openapi.InternalServerErrorJSONResponse{Error: err.Error()}
 	}
 
 	cookie, err := i.encodeSession(u.ID)
@@ -84,8 +84,8 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 	}
 
 	return openapi.Signup200JSONResponse{
-		Body:    openapi.AuthenticationResponse{Id: u.ID.String()},
-		Headers: openapi.Signup200ResponseHeaders{SetCookie: cookie},
+		Body:    openapi.AuthenticationSuccess{Id: u.ID.String()},
+		Headers: openapi.AuthenticationSuccessResponseHeaders{SetCookie: cookie},
 	}
 }
 

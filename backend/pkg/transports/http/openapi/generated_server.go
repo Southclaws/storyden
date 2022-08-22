@@ -49,13 +49,19 @@ type AuthenticationRequest struct {
 	Token      string `json:"token"`
 }
 
-// AuthenticationResponse defines model for AuthenticationResponse.
-type AuthenticationResponse struct {
+// AuthenticationSuccess defines model for AuthenticationSuccess.
+type AuthenticationSuccess struct {
 	Id string `json:"id"`
 }
 
 // UUID defines model for UUID.
 type UUID = openapi_types.UUID
+
+// GetAccountSuccess defines model for GetAccountSuccess.
+type GetAccountSuccess = Account
+
+// InternalServerError defines model for InternalServerError.
+type InternalServerError = APIError
 
 // SigninJSONRequestBody defines body for Signin for application/json ContentType.
 type SigninJSONRequestBody = AuthenticationRequest
@@ -83,6 +89,9 @@ type ServerInterface interface {
 
 	// (POST /v1/auth/password/signup)
 	Signup(ctx echo.Context) error
+
+	// (POST /v1/threads)
+	CreateThread(ctx echo.Context) error
 
 	// (GET /version)
 	GetVersion(ctx echo.Context) error
@@ -138,6 +147,17 @@ func (w *ServerInterfaceWrapper) Signup(ctx echo.Context) error {
 	return err
 }
 
+// CreateThread converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateThread(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CreateThread(ctx)
+	return err
+}
+
 // GetVersion converts echo context to params.
 func (w *ServerInterfaceWrapper) GetVersion(ctx echo.Context) error {
 	var err error
@@ -179,8 +199,46 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/accounts/:id", wrapper.GetAccount)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.Signin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.Signup)
+	router.POST(baseURL+"/v1/threads", wrapper.CreateThread)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
+}
+
+type AuthenticationSuccessResponseHeaders struct {
+	SetCookie string
+}
+type AuthenticationSuccessJSONResponse struct {
+	Body AuthenticationSuccess
+
+	Headers AuthenticationSuccessResponseHeaders
+}
+
+func (t AuthenticationSuccessJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+type BadRequestResponse struct {
+}
+
+type CreateThreadSuccessResponse struct {
+}
+
+type GetAccountSuccessJSONResponse Account
+
+func (t GetAccountSuccessJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((Account)(t))
+}
+
+type InternalServerErrorJSONResponse APIError
+
+func (t InternalServerErrorJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((APIError)(t))
+}
+
+type NotFoundResponse struct {
+}
+
+type UnauthorisedResponse struct {
 }
 
 type GetSpecRequestObject struct {
@@ -192,22 +250,19 @@ type GetAccountRequestObject struct {
 	Id UUID `json:"id"`
 }
 
-type GetAccount200JSONResponse Account
+type GetAccount200JSONResponse = GetAccountSuccessJSONResponse
 
-func (t GetAccount200JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((Account)(t))
+type GetAccount401Response = UnauthorisedResponse
+
+type GetAccount404Response = NotFoundResponse
+
+type GetAccountdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
 }
 
-type GetAccount401Response struct {
-}
-
-type GetAccount404Response struct {
-}
-
-type GetAccount500JSONResponse APIError
-
-func (t GetAccount500JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((APIError)(t))
+func (t GetAccountdefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
 }
 
 type SigninRequestObject struct {
@@ -215,29 +270,19 @@ type SigninRequestObject struct {
 	FormdataBody *SigninFormdataRequestBody
 }
 
-type Signin200ResponseHeaders struct {
-	SetCookie string
+type Signin200JSONResponse = AuthenticationSuccessJSONResponse
+
+type Signin401Response = UnauthorisedResponse
+
+type Signin404Response = NotFoundResponse
+
+type SignindefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
 }
 
-type Signin200JSONResponse struct {
-	Body    AuthenticationResponse
-	Headers Signin200ResponseHeaders
-}
-
-func (t Signin200JSONResponse) MarshalJSON() ([]byte, error) {
+func (t SignindefaultJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
-}
-
-type Signin401Response struct {
-}
-
-type Signin404Response struct {
-}
-
-type Signin500JSONResponse APIError
-
-func (t Signin500JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((APIError)(t))
 }
 
 type SignupRequestObject struct {
@@ -245,26 +290,35 @@ type SignupRequestObject struct {
 	FormdataBody *SignupFormdataRequestBody
 }
 
-type Signup200ResponseHeaders struct {
-	SetCookie string
+type Signup200JSONResponse = AuthenticationSuccessJSONResponse
+
+type Signup400Response = BadRequestResponse
+
+type SignupdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
 }
 
-type Signup200JSONResponse struct {
-	Body    AuthenticationResponse
-	Headers Signup200ResponseHeaders
-}
-
-func (t Signup200JSONResponse) MarshalJSON() ([]byte, error) {
+func (t SignupdefaultJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
 }
 
-type Signup400Response struct {
+type CreateThreadRequestObject struct {
 }
 
-type Signup500JSONResponse APIError
+type CreateThread200Response = CreateThreadSuccessResponse
 
-func (t Signup500JSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal((APIError)(t))
+type CreateThread401Response = UnauthorisedResponse
+
+type CreateThread404Response = NotFoundResponse
+
+type CreateThreaddefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t CreateThreaddefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
 }
 
 type GetVersionRequestObject struct {
@@ -286,6 +340,9 @@ type StrictServerInterface interface {
 
 	// (POST /v1/auth/password/signup)
 	Signup(ctx context.Context, request SignupRequestObject) interface{}
+
+	// (POST /v1/threads)
+	CreateThread(ctx context.Context, request CreateThreadRequestObject) interface{}
 
 	// (GET /version)
 	GetVersion(ctx context.Context, request GetVersionRequestObject) interface{}
@@ -351,8 +408,8 @@ func (sh *strictHandler) GetAccount(ctx echo.Context, id UUID) error {
 		return ctx.NoContent(401)
 	case GetAccount404Response:
 		return ctx.NoContent(404)
-	case GetAccount500JSONResponse:
-		return ctx.JSON(500, v)
+	case GetAccountdefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
 	case error:
 		return v
 	case nil:
@@ -402,8 +459,8 @@ func (sh *strictHandler) Signin(ctx echo.Context) error {
 		return ctx.NoContent(401)
 	case Signin404Response:
 		return ctx.NoContent(404)
-	case Signin500JSONResponse:
-		return ctx.JSON(500, v)
+	case SignindefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
 	case error:
 		return v
 	case nil:
@@ -451,8 +508,39 @@ func (sh *strictHandler) Signup(ctx echo.Context) error {
 		return ctx.JSON(200, v)
 	case Signup400Response:
 		return ctx.NoContent(400)
-	case Signup500JSONResponse:
-		return ctx.JSON(500, v)
+	case SignupdefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
+// CreateThread operation middleware
+func (sh *strictHandler) CreateThread(ctx echo.Context) error {
+	var request CreateThreadRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.CreateThread(ctx.Request().Context(), request.(CreateThreadRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateThread")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case CreateThread200Response:
+		return ctx.NoContent(200)
+	case CreateThread401Response:
+		return ctx.NoContent(401)
+	case CreateThread404Response:
+		return ctx.NoContent(404)
+	case CreateThreaddefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
 	case error:
 		return v
 	case nil:
@@ -490,19 +578,21 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"DSUU8YXTLtvfAwAA//8GvKfADQ8AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
