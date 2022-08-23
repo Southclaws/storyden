@@ -11,7 +11,9 @@ tasks:
     cmds:
       - ./backend.exe
     sources:
-      - backend/**/*.go
+      - cmd/**/*.go
+      - internal/**/*.go
+      - pkg/**/*.go
 
   production:
     cmds:
@@ -19,10 +21,10 @@ tasks:
 
   backend:
     cmds:
-      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/backend/internal/config.Version={{.VERSION}}'" ./backend/cmd/api
+      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/internal/config.Version={{.VERSION}}'" ./cmd/api
   backend:test:
     cmds:
-      - go test -p 1 -race ./backend/...
+      - go test -p 1 -race ./...
 
   backend:image:
     cmds:
@@ -37,7 +39,7 @@ tasks:
 
   generate:db:
     cmds:
-      - go generate ./backend/internal/infrastructure/db/...
+      - go generate ./internal/infrastructure/db/...
 
   generate:openapi:
     cmds:
