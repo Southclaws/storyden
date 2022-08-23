@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
@@ -25,7 +26,7 @@ const (
 	BrowserScopes = "browser.Scopes"
 )
 
-// APIError defines model for APIError.
+// APIError A description of an error including a human readable message.
 type APIError struct {
 	Error     string  `json:"error"`
 	Message   *string `json:"message,omitempty"`
@@ -38,9 +39,11 @@ type Account struct {
 	CreatedAt *string `json:"createdAt,omitempty"`
 	DeletedAt *string `json:"deletedAt,omitempty"`
 	Email     *string `json:"email,omitempty"`
-	Id        UUID    `json:"id"`
-	Name      *string `json:"name,omitempty"`
-	UpdatedAt *string `json:"updatedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id        Identifier `json:"id"`
+	Name      *string    `json:"name,omitempty"`
+	UpdatedAt *string    `json:"updatedAt,omitempty"`
 }
 
 // AuthenticationRequest defines model for AuthenticationRequest.
@@ -54,13 +57,115 @@ type AuthenticationSuccess struct {
 	Id string `json:"id"`
 }
 
-// UUID defines model for UUID.
-type UUID = openapi_types.UUID
+// Category defines model for Category.
+type Category struct {
+	Admin       *bool   `json:"admin,omitempty"`
+	Colour      *string `json:"colour,omitempty"`
+	Description *string `json:"description,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id        *Identifier `json:"id,omitempty"`
+	Name      *string     `json:"name,omitempty"`
+	PostCount *int        `json:"postCount,omitempty"`
+	Sort      *int        `json:"sort,omitempty"`
+}
+
+// CommonProperties defines model for CommonProperties.
+type CommonProperties struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// Identifier A unique identifier for this resource.
+type Identifier = openapi_types.UUID
+
+// ProfileReference A minimal reference to an account.
+type ProfileReference struct {
+	// Id A unique identifier for this resource.
+	Id   *Identifier `json:"id,omitempty"`
+	Name *string     `json:"name,omitempty"`
+}
+
+// React defines model for React.
+type React struct {
+	Emoji *string `json:"emoji,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id *Identifier `json:"id,omitempty"`
+}
+
+// Thread defines model for Thread.
+type Thread struct {
+	// Author A minimal reference to an account.
+	Author   *ProfileReference `json:"author,omitempty"`
+	Category *Category         `json:"category,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Pinned Whether the thread is pinned in this category.
+	Pinned *bool `json:"pinned,omitempty"`
+
+	// Posts The number of posts under this thread.
+	Posts *int `json:"posts,omitempty"`
+
+	// Reacts A list of reactions this post has had from people.
+	Reacts *[]React `json:"reacts,omitempty"`
+
+	// Short A short version of the thread's body text for use in previews.
+	Short *string `json:"short,omitempty"`
+
+	// Slug A URL friendly slug which is prepended with the post ID
+	// for uniqueness and sortability.
+	Slug *string `json:"slug,omitempty"`
+
+	// Tags A list of tags associated with the thread.
+	Tags *[]string `json:"tags,omitempty"`
+
+	// Title The title of the thread.
+	Title string `json:"title"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ThreadSubmission defines model for ThreadSubmission.
+type ThreadSubmission struct {
+	// Body The markdown body for the new thread.
+	Body string `json:"body"`
+
+	// Category A unique identifier for this resource.
+	Category Identifier `json:"category"`
+
+	// Tags A list of tags for the new thread.
+	Tags []string `json:"tags"`
+
+	// Title The title of the thread.
+	Title string `json:"title"`
+}
+
+// CreateThreadSuccess defines model for CreateThreadSuccess.
+type CreateThreadSuccess = Thread
 
 // GetAccountSuccess defines model for GetAccountSuccess.
 type GetAccountSuccess = Account
 
-// InternalServerError defines model for InternalServerError.
+// InternalServerError A description of an error including a human readable message.
 type InternalServerError = APIError
 
 // SigninJSONRequestBody defines body for Signin for application/json ContentType.
@@ -75,6 +180,12 @@ type SignupJSONRequestBody = AuthenticationRequest
 // SignupFormdataRequestBody defines body for Signup for application/x-www-form-urlencoded ContentType.
 type SignupFormdataRequestBody = AuthenticationRequest
 
+// CreateThreadJSONRequestBody defines body for CreateThread for application/json ContentType.
+type CreateThreadJSONRequestBody = ThreadSubmission
+
+// CreateThreadFormdataRequestBody defines body for CreateThread for application/x-www-form-urlencoded ContentType.
+type CreateThreadFormdataRequestBody = ThreadSubmission
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
@@ -82,7 +193,7 @@ type ServerInterface interface {
 	GetSpec(ctx echo.Context) error
 
 	// (GET /v1/accounts/{id})
-	GetAccount(ctx echo.Context, id UUID) error
+	GetAccount(ctx echo.Context, id Identifier) error
 
 	// (POST /v1/auth/password/signin)
 	Signin(ctx echo.Context) error
@@ -115,7 +226,7 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) GetAccount(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id UUID
+	var id Identifier
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -220,7 +331,10 @@ func (t AuthenticationSuccessJSONResponse) MarshalJSON() ([]byte, error) {
 type BadRequestResponse struct {
 }
 
-type CreateThreadSuccessResponse struct {
+type CreateThreadSuccessJSONResponse Thread
+
+func (t CreateThreadSuccessJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((Thread)(t))
 }
 
 type GetAccountSuccessJSONResponse Account
@@ -247,7 +361,7 @@ type GetSpecRequestObject struct {
 type GetSpec200TextResponse string
 
 type GetAccountRequestObject struct {
-	Id UUID `json:"id"`
+	Id Identifier `json:"id"`
 }
 
 type GetAccount200JSONResponse = GetAccountSuccessJSONResponse
@@ -304,9 +418,11 @@ func (t SignupdefaultJSONResponse) MarshalJSON() ([]byte, error) {
 }
 
 type CreateThreadRequestObject struct {
+	JSONBody     *CreateThreadJSONRequestBody
+	FormdataBody *CreateThreadFormdataRequestBody
 }
 
-type CreateThread200Response = CreateThreadSuccessResponse
+type CreateThread200JSONResponse = CreateThreadSuccessJSONResponse
 
 type CreateThread401Response = UnauthorisedResponse
 
@@ -387,7 +503,7 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 }
 
 // GetAccount operation middleware
-func (sh *strictHandler) GetAccount(ctx echo.Context, id UUID) error {
+func (sh *strictHandler) GetAccount(ctx echo.Context, id Identifier) error {
 	var request GetAccountRequestObject
 
 	request.Id = id
@@ -523,6 +639,25 @@ func (sh *strictHandler) Signup(ctx echo.Context) error {
 func (sh *strictHandler) CreateThread(ctx echo.Context) error {
 	var request CreateThreadRequestObject
 
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
+		var body CreateThreadJSONRequestBody
+		if err := ctx.Bind(&body); err != nil {
+			return err
+		}
+		request.JSONBody = &body
+	}
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		if form, err := ctx.FormParams(); err == nil {
+			var body CreateThreadFormdataRequestBody
+			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+				return err
+			}
+			request.FormdataBody = &body
+		} else {
+			return err
+		}
+	}
+
 	handler := func(ctx echo.Context, request interface{}) interface{} {
 		return sh.ssi.CreateThread(ctx.Request().Context(), request.(CreateThreadRequestObject))
 	}
@@ -533,8 +668,8 @@ func (sh *strictHandler) CreateThread(ctx echo.Context) error {
 	response := handler(ctx, request)
 
 	switch v := response.(type) {
-	case CreateThread200Response:
-		return ctx.NoContent(200)
+	case CreateThread200JSONResponse:
+		return ctx.JSON(200, v)
 	case CreateThread401Response:
 		return ctx.NoContent(401)
 	case CreateThread404Response:
@@ -578,21 +713,32 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xXUXPjNBD+K5mFR6Vu4Z78RHsHTOZmDoZQXjJ50EmbWHe2JKRV05Dxf2ck2amTOE05",
-	"DhgY3lLvanf1fd/uqjsQprFGoyYP5Q4cemu0x/THbaAKNSnBSRk9D0KgTwZhNKGm+JNbW3cOxQdvdPzm",
-	"RYUNj7++dLiCEr4onrIU2eqL8eht2zKQ6IVTNn6HEn54Cwwq5BJdyj5Hmr425qPCw2S0tQgleHJKr2Og",
-	"lsEdlz/hrwF9KvYw7h2XE9cZWwavHXLCnyuHXA7uelJLy+B7pFshTND02UHJYc/A0DKYaUKneT1H94Du",
-	"W+eM+3zJf5zlgCPZ+7yTnHjSOTJ4Z+g7E7Q8xeqdockqmVoG95oHqoxTHkdc99bfUEJM3pWUVNhXVe7A",
-	"OmPRkcr6xP7zEfMMGvSer3HU5sN6jZ5yGceaYRAVoVy0LroES9a7mfcfUCSx9Dyd1PRemdGsIqlL3tKo",
-	"VWKN563YcFWPWpS8xOn9/exN9NS8GYcjWHm2sCM4lBzH4qCRB+12iIyS0WmlMFGGj7yxdUpmAlWi5hv/",
-	"jSfjthL1lXFrYKe1kvmI+vC05d5vjJOn7ifF79P3gS5fZtDex5f5ZLgSI+UOVsY1nKCEENR4+R5FcIq2",
-	"88hlJy9nNj4jqGLjiDwHe36hR3Dq0fvYW/u43Kq3uM2trfQqq1RRPTwFDB7Q+dyTN7FYY1Fzq6CEr6+u",
-	"r26AgeVUpVKKznbVD5k1JtYjTAm8mYQyjsq5RQHscLV8dX19NLYIH6mwNVf6wlQfm4sDsKBcRNT52kcO",
-	"GuUFLKO9eLgpeO5aX+yUbJ8ruW/veF3HG6S0ehbHY6tzm8zeAMt8RHSe2Ei8PkmCXED2wlmc+7ZdjuM2",
-	"dnLvV5yup5bBq+ubyycPpnQ69Oryof0GSNSseKjp8qGxPXZE40Dti2U7ILWncUBsoKroR0Hh1VpnGVnj",
-	"RwieZ3umBj3dGbn9i541/TSMhQ5jPk43m800joBpcDVqYWReSH8uSR5Bf1QvZ15i/0bNDFUSqHpOIcE+",
-	"r5Bg/1fICxTygtODR/jfRTelZ7w/z/DwtQ+fAsnYvwv/rTHbY9iB2j8Mzm/NXzqXf3jXX7ieT1DkdR5c",
-	"DSUU8YXTLtvfAwAA//8GvKfADQ8AAA==",
+	"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",
+	"uMrIGgAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

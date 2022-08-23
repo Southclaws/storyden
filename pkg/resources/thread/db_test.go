@@ -24,7 +24,7 @@ func TestCreatePost(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			p, err := repo.CreateThread(ctx,
+			p, err := repo.Create(ctx,
 				"A Super Nice Thread",
 				"Lorem ipsum",
 				seed.SeedUser_02_User.ID,

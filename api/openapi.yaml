@@ -145,7 +145,7 @@ paths:
           description: Account ID
           required: true
           schema:
-            $ref: "#/components/schemas/UUID"
+            $ref: "#/components/schemas/Identifier"
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
         404: { "$ref": "#/components/responses/NotFound" }
@@ -169,6 +169,15 @@ paths:
       tags: [threads]
       security:
         - browser: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ThreadSubmission"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ThreadSubmission"
+
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
         404: { "$ref": "#/components/responses/NotFound" }
@@ -233,11 +242,11 @@ components:
             $ref: "#/components/schemas/Account"
 
     CreateThreadSuccess:
-      description: OK
-      # content:
-      #   application/json:
-      #     schema:
-      #       $ref: "#/components/schemas/Thread"
+      description: Thread created.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Thread"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -251,9 +260,45 @@ components:
   #
 
   schemas:
-    UUID:
+    Identifier:
       type: string
       format: uuid
+      example: "00000000-0000-4000-8000-000000000000"
+      description: A unique identifier for this resource.
+
+    CommonProperties:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        createdAt:
+          type: string
+          format: date-time
+          description: The time the resource was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The time the resource was updated.
+        deletedAt:
+          type: string
+          format: date-time
+          description: The time the resource was soft-deleted.
+
+    APIError:
+      type: object
+      description: A description of an error including a human readable message.
+      required: [error]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        suggested:
+          type: string
 
     AuthenticationRequest:
       type: object
@@ -278,7 +323,7 @@ components:
       required: [id]
       properties:
         id:
-          $ref: "#/components/schemas/UUID"
+          $ref: "#/components/schemas/Identifier"
         email:
           type: string
         name:
@@ -292,15 +337,112 @@ components:
         deletedAt:
           type: string
 
-    APIError:
+    ThreadSubmission:
       type: object
-      required: [error]
+      required:
+        - title
+        - body
+        - tags
+        - category
       properties:
-        error:
+        title:
           type: string
-        message:
+          example: Hello world!
+          description: The title of the thread.
+        body:
           type: string
-        suggested:
+          description: The markdown body for the new thread.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags for the new thread.
+        category:
+          $ref: "#/components/schemas/Identifier"
+
+    Thread:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - type: object
+          required:
+            - id
+            - createdAt
+            - updatedAt
+            - title
+            - slug
+            - short
+          properties:
+            title:
+              type: string
+              example: Hello world!
+              description: The title of the thread.
+            slug:
+              type: string
+              readOnly: true
+              description: |
+                A URL friendly slug which is prepended with the post ID
+                for uniqueness and sortability.
+            short:
+              type: string
+              readOnly: true
+              description: |
+                A short version of the thread's body text for use in previews.
+            pinned:
+              type: boolean
+              description: Whether the thread is pinned in this category.
+            author:
+              $ref: "#/components/schemas/ProfileReference"
+              readOnly: true
+            tags:
+              type: array
+              items:
+                type: string
+              description: A list of tags associated with the thread.
+            posts:
+              type: integer
+              readOnly: true
+              description: The number of posts under this thread.
+            category:
+              $ref: "#/components/schemas/Category"
+            reacts:
+              type: array
+              items:
+                $ref: "#/components/schemas/React"
+              description: A list of reactions this post has had from people.
+
+    ProfileReference:
+      type: object
+      description: A minimal reference to an account.
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        name:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        name:
+          type: string
+        description:
+          type: string
+        colour:
+          type: string
+        sort:
+          type: integer
+        admin:
+          type: boolean
+        postCount:
+          type: integer
+
+    React:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        emoji:
           type: string
 
   securitySchemes:

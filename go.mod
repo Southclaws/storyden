@@ -40,6 +40,7 @@ require (
 )
 
 require (
+	github.com/Southclaws/dt v1.0.1 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect

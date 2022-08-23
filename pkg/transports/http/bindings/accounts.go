@@ -23,7 +23,7 @@ func (i *Accounts) GetAccount(ctx context.Context, request openapi.GetAccountReq
 	}
 
 	return openapi.GetAccountSuccess{
-		Id:        openapi.UUID(acc.ID),
+		Id:        openapi.Identifier(acc.ID),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		Email:     utils.Ref(acc.Email),
 		Name:      utils.Ref(acc.Name),

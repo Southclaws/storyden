@@ -29,7 +29,7 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) CreateThread(
+func (d *database) Create(
 	ctx context.Context,
 	title string,
 	body string,

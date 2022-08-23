@@ -10,7 +10,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/backend/cmd/api"
+      "program": "${workspaceFolder}/cmd/api"
     }
   ]
 }

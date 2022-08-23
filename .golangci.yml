@@ -13,6 +13,7 @@ linters:
   enable:
     - gci
     - wsl
+    - wrapcheck
   presets:
     - bugs
     - unused

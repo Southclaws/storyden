@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/dt"
 	"github.com/google/uuid"
-	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -56,14 +56,18 @@ func FromModel(m *model.Notification) *Notification {
 		Link:         m.Link,
 		Read:         m.Read,
 		CreatedAt:    m.CreateTime,
-		Subscription: utils.Deref(SubFromModel(m.Edges.Subscription), 0),
+		Subscription: utils.Deref(SubFromModel(m.Edges.Subscription)),
 	}
 }
 
 func FromModelMany(m []*model.Notification) []Notification {
-	return lo.Map(m, func(t *model.Notification, i int) Notification { return utils.Deref(FromModel(t), 0) })
+	return dt.Map(m, func(t *model.Notification) Notification {
+		return utils.Deref(FromModel(t))
+	})
 }
 
 func SubFromModelMany(m []*model.Subscription) []Subscription {
-	return lo.Map(m, func(t *model.Subscription, i int) Subscription { return utils.Deref(SubFromModel(t), 0) })
+	return dt.Map(m, func(t *model.Subscription) Subscription {
+		return utils.Deref(SubFromModel(t))
+	})
 }

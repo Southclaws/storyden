@@ -3,8 +3,8 @@ package account
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/google/uuid"
-	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
@@ -110,8 +110,8 @@ func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]
 		return nil, err
 	}
 
-	return lo.Map(
-		lo.Map(users, utils.Deref[model.Account]),
+	return dt.Map(
+		dt.Map(users, utils.Deref[model.Account]),
 		utils.ToMap(FromModel),
 	), nil
 }

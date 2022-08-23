@@ -15,7 +15,7 @@ import (
 // the database and a `thread` item use the same underlying table.
 
 type Repository interface {
-	CreateThread(
+	Create(
 		ctx context.Context,
 		title string,
 		body string,
