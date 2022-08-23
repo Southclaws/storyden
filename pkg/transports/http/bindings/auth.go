@@ -32,15 +32,15 @@ func NewAuthentication(
 }
 
 func (i *Authentication) Signin(ctx context.Context, request openapi.SigninRequestObject) any {
-	u, err := func() (*account.Account, error) {
+	params := func() openapi.AuthenticationRequest {
 		if request.JSONBody != nil {
-			return i.p.Login(ctx, request.JSONBody.Identifier, request.JSONBody.Token)
-		} else if request.FormdataBody != nil {
-			return i.p.Login(ctx, request.FormdataBody.Identifier, request.FormdataBody.Token)
+			return *request.JSONBody
+		} else {
+			return *request.FormdataBody
 		}
-
-		return nil, errors.New("missing body")
 	}()
+
+	u, err := i.p.Login(ctx, params.Identifier, params.Token)
 	if err != nil {
 		if errors.Is(err, password.ErrPasswordMismatch) {
 			return openapi.Signin401Response{}
@@ -61,15 +61,15 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 }
 
 func (i *Authentication) Signup(ctx context.Context, request openapi.SignupRequestObject) any {
-	u, err := func() (*account.Account, error) {
+	params := func() openapi.AuthenticationRequest {
 		if request.JSONBody != nil {
-			return i.p.Register(ctx, request.JSONBody.Identifier, request.JSONBody.Token)
-		} else if request.FormdataBody != nil {
-			return i.p.Register(ctx, request.FormdataBody.Identifier, request.FormdataBody.Token)
+			return *request.JSONBody
+		} else {
+			return *request.FormdataBody
 		}
-
-		return nil, errors.New("missing body")
 	}()
+
+	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
 		if errors.Is(err, password.ErrExists) {
 			return openapi.Signup400Response{}
