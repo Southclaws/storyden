@@ -1,0 +1,24 @@
+-- create "accounts" table
+CREATE TABLE "accounts" ("id" uuid NOT NULL, "email" character varying NOT NULL, "name" character varying NOT NULL, "bio" character varying NULL, "admin" boolean NOT NULL DEFAULT false, "created_at" timestamptz NOT NULL, "updated_at" timestamptz NOT NULL, "deleted_at" timestamptz NULL, PRIMARY KEY ("id"));
+-- create index "accounts_email_key" to table: "accounts"
+CREATE UNIQUE INDEX "accounts_email_key" ON "accounts" ("email");
+-- create "categories" table
+CREATE TABLE "categories" ("id" uuid NOT NULL, "name" character varying NOT NULL, "description" character varying NOT NULL DEFAULT '(No description)', "colour" character varying NOT NULL DEFAULT '#8577ce', "sort" bigint NOT NULL DEFAULT -1, "admin" boolean NOT NULL DEFAULT false, PRIMARY KEY ("id"));
+-- create "posts" table
+CREATE TABLE "posts" ("id" uuid NOT NULL, "first" boolean NOT NULL, "title" character varying NULL, "slug" character varying NULL, "pinned" boolean NOT NULL DEFAULT false, "body" character varying NOT NULL, "short" character varying NOT NULL, "created_at" timestamptz NOT NULL, "updated_at" timestamptz NOT NULL, "deleted_at" timestamptz NULL, "account_posts" uuid NOT NULL, "category_id" uuid NULL, "root_post_id" uuid NULL, "reply_to_post_id" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "posts_accounts_posts" FOREIGN KEY ("account_posts") REFERENCES "accounts" ("id") ON DELETE NO ACTION, CONSTRAINT "posts_categories_posts" FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE SET NULL, CONSTRAINT "posts_posts_posts" FOREIGN KEY ("root_post_id") REFERENCES "posts" ("id") ON DELETE SET NULL, CONSTRAINT "posts_posts_replies" FOREIGN KEY ("reply_to_post_id") REFERENCES "posts" ("id") ON DELETE SET NULL);
+-- create "reacts" table
+CREATE TABLE "reacts" ("id" uuid NOT NULL, "emoji" character varying NOT NULL, "created_at" timestamptz NOT NULL, "account_reacts" uuid NULL, "post_reacts" uuid NULL, "react_account" uuid NULL, "react_post" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "reacts_accounts_reacts" FOREIGN KEY ("account_reacts") REFERENCES "accounts" ("id") ON DELETE SET NULL, CONSTRAINT "reacts_posts_reacts" FOREIGN KEY ("post_reacts") REFERENCES "posts" ("id") ON DELETE SET NULL, CONSTRAINT "reacts_accounts_account" FOREIGN KEY ("react_account") REFERENCES "accounts" ("id") ON DELETE SET NULL, CONSTRAINT "reacts_posts_Post" FOREIGN KEY ("react_post") REFERENCES "posts" ("id") ON DELETE SET NULL);
+-- create "subscriptions" table
+CREATE TABLE "subscriptions" ("id" uuid NOT NULL, "refers_type" character varying NOT NULL, "refers_to" character varying NOT NULL, "delete_time" timestamptz NULL, "create_time" timestamptz NOT NULL, "update_time" timestamptz NOT NULL, "account_subscriptions" uuid NULL, "subscription_account" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "subscriptions_accounts_subscriptions" FOREIGN KEY ("account_subscriptions") REFERENCES "accounts" ("id") ON DELETE SET NULL, CONSTRAINT "subscriptions_accounts_account" FOREIGN KEY ("subscription_account") REFERENCES "accounts" ("id") ON DELETE SET NULL);
+-- create "tags" table
+CREATE TABLE "tags" ("id" uuid NOT NULL, "name" character varying NOT NULL, PRIMARY KEY ("id"));
+-- create index "tags_name_key" to table: "tags"
+CREATE UNIQUE INDEX "tags_name_key" ON "tags" ("name");
+-- create "tag_posts" table
+CREATE TABLE "tag_posts" ("tag_id" uuid NOT NULL, "post_id" uuid NOT NULL, PRIMARY KEY ("tag_id", "post_id"), CONSTRAINT "tag_posts_tag_id" FOREIGN KEY ("tag_id") REFERENCES "tags" ("id") ON DELETE CASCADE, CONSTRAINT "tag_posts_post_id" FOREIGN KEY ("post_id") REFERENCES "posts" ("id") ON DELETE CASCADE);
+-- create "authentications" table
+CREATE TABLE "authentications" ("id" uuid NOT NULL, "create_time" timestamptz NOT NULL, "service" character varying NOT NULL, "identifier" character varying NOT NULL, "token" character varying NOT NULL, "metadata" jsonb NULL, "account_authentication" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "authentications_accounts_authentication" FOREIGN KEY ("account_authentication") REFERENCES "accounts" ("id") ON DELETE SET NULL);
+-- create index "authentication_service_identifier" to table: "authentications"
+CREATE UNIQUE INDEX "authentication_service_identifier" ON "authentications" ("service", "identifier");
+-- create "notifications" table
+CREATE TABLE "notifications" ("id" uuid NOT NULL, "title" character varying NOT NULL, "description" character varying NOT NULL, "link" character varying NOT NULL, "read" boolean NOT NULL, "create_time" timestamptz NOT NULL, "notification_subscription" uuid NULL, "subscription_notifications" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "notifications_subscriptions_subscription" FOREIGN KEY ("notification_subscription") REFERENCES "subscriptions" ("id") ON DELETE SET NULL, CONSTRAINT "notifications_subscriptions_notifications" FOREIGN KEY ("subscription_notifications") REFERENCES "subscriptions" ("id") ON DELETE CASCADE);
