@@ -27,7 +27,7 @@ func main() {
 		}
 
 		if len(os.Args) != 2 {
-			log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
+			log.Fatalln("migration name is required")
 		}
 
 		err = migrate.NamedDiff(ctx, cfg.DatabaseURL, os.Args[1],

@@ -21,7 +21,7 @@ tasks:
 
   backend:
     cmds:
-      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/internal/config.Version={{.VERSION}}'" ./cmd/api
+      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/internal/config.Version={{.VERSION}}'" ./cmd/backend
   backend:test:
     cmds:
       - go test -p 1 -race ./...
@@ -50,17 +50,8 @@ tasks:
   # -
 
   db:migrate:
-    deps: [db:migrate:generate, db:migrate:run]
-
-  db:migrate:generate:
-    desc: Generate migrations from schema changes.
     cmds:
-      - go run ./cmd/generate/main.go
-
-  db:migrate:run:
-    desc: Execute migrations against database.
-    cmds:
-      - go run ./cmd/migrate/main.go
+      - go run ./tools/migrate {{.CLI_ARGS}}
 
   db:ui:
     cmds:
