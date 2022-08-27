@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
@@ -12,6 +13,8 @@ import (
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 )
+
+var id = uuid.MustParse
 
 // Ready is a type you can depend on during integration tests which, when used
 // will ensure the database is seeded with data before your tests run.
@@ -60,7 +63,7 @@ func New(
 
 	fmt.Println("seeding database")
 
-	users(account_repo)
+	accounts(account_repo)
 	categories(category_repo)
 
 	return Ready{}, err

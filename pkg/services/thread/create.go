@@ -3,6 +3,7 @@ package thread
 import (
 	"context"
 
+	"github.com/Southclaws/fault"
 	"github.com/el-mike/restrict"
 
 	"github.com/Southclaws/storyden/pkg/resources/account"
@@ -19,7 +20,7 @@ func (s *service) Create(ctx context.Context,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
-		return nil, err
+		return nil, fault.WithValue(err, "failed to get account", "authorID", authorID.String())
 	}
 
 	if err := s.rbac.Authorize(&restrict.AccessRequest{

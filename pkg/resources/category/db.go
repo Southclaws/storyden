@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
+	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type database struct {
@@ -21,14 +22,27 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool) (*Category, error) {
+func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool, opts ...option) (*Category, error) {
+	insert := Category{
+		Name:        name,
+		Description: desc,
+		Colour:      colour,
+		Sort:        sort,
+		Admin:       admin,
+	}
+
+	for _, v := range opts {
+		v(&insert)
+	}
+
 	id, err := d.db.Category.
 		Create().
-		SetName(name).
-		SetDescription(desc).
-		SetColour(colour).
-		SetSort(sort).
-		SetAdmin(admin).
+		SetName(insert.Name).
+		SetDescription(insert.Description).
+		SetColour(insert.Colour).
+		SetSort(insert.Sort).
+		SetAdmin(insert.Admin).
+		SetNillableID(utils.OptionalUUID(uuid.UUID(insert.ID))).
 		OnConflictColumns(category.FieldID).
 		UpdateNewValues().
 		ID(ctx)

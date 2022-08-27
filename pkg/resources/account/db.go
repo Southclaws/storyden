@@ -19,11 +19,22 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Create(ctx context.Context, email string, username string) (*Account, error) {
+func (d *database) Create(ctx context.Context, email string, username string, opts ...option) (*Account, error) {
+	withrequired := Account{
+		Email: email,
+		Name:  username,
+	}
+
+	for _, v := range opts {
+		v(&withrequired)
+	}
+
 	u, err := d.db.Account.
 		Create().
-		SetEmail(email).
-		SetName(username).
+		SetEmail(withrequired.Email).
+		SetName(withrequired.Name).
+		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
+		SetNillableID(utils.OptionalUUID(uuid.UUID(withrequired.ID))).
 		Save(ctx)
 	if err != nil {
 		return nil, err

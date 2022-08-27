@@ -117,6 +117,8 @@ github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMz
 github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d/go.mod h1:HI8ITrYtUY+O+ZhtlqUnD8+KwNPOyugEhfP9fdUIaEQ=
 github.com/Southclaws/dt v1.0.1 h1:9sof6hS2yLgrXoaxmBzlZNIyDRDKh/qLgDhUAlY/AF4=
 github.com/Southclaws/dt v1.0.1/go.mod h1:8EZr10LTV9E/hR5PdNFUbGHSoLo7//+EhDcxf0t1WNQ=
+github.com/Southclaws/fault v0.1.0 h1:YxNiq248wGT27WJonAFZIjlKc51YMVRZjfh+dMTCbXU=
+github.com/Southclaws/fault v0.1.0/go.mod h1:TSLTH9HUDtbO57GIaVE7Bym5wqNGlWWlTBSYxvac1vo=
 github.com/Southclaws/qstring v1.1.0 h1:6Gj//09Tue8+0HtX0IAgVNAau4XZ+6TQOH7koWjdNKI=
 github.com/Southclaws/qstring v1.1.0/go.mod h1:3KvScfejPnEaP1scQndt0CXDTfQKDdUqbRSJxSAPZu4=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=

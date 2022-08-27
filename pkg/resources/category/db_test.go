@@ -72,7 +72,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -82,7 +82,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -92,7 +92,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 				SetCategory(c2).
 				Save(ctx)
 			r.NoError(err)
@@ -110,8 +110,8 @@ func TestGetCategories(t *testing.T) {
 			cat5 := categories[4]
 			cat6 := categories[5]
 
-			a.Equal(seed.SeedCategory_01_General.Name, cat1.Name)
-			a.Equal(seed.SeedCategory_02_Photos.Name, cat2.Name)
+			a.Equal(seed.Category_01_General.Name, cat1.Name)
+			a.Equal(seed.Category_02_Photos.Name, cat2.Name)
 			a.Equal("cat5", cat5.Name)
 			a.Equal("cat6", cat6.Name)
 

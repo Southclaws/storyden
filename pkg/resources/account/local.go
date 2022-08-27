@@ -20,7 +20,7 @@ func NewLocal() Repository {
 
 func (m *local) GetResourceName() string { return "account" }
 
-func (m *local) Create(ctx context.Context, email string, username string) (*Account, error) {
+func (m *local) Create(ctx context.Context, email string, username string, opts ...option) (*Account, error) {
 	id := uuid.New()
 
 	if _, ok := lo.Find(lo.Values(m.m), func(t Account) bool { return email == t.Email }); ok {

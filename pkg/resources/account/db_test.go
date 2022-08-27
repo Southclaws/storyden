@@ -19,22 +19,22 @@ func TestCreateUser(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		u, err := repo.Create(ctx, seed.SeedUser_01_Admin.Email, seed.SeedUser_01_Admin.Name)
+		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
 		r.NoError(err)
 		r.NotNil(u)
 
-		a.Equal(seed.SeedUser_01_Admin.Email, u.Email)
-		a.Equal(seed.SeedUser_01_Admin.Name, u.Name)
+		a.Equal(seed.Account_000.Email, u.Email)
+		a.Equal(seed.Account_000.Name, u.Name)
 
 		u1, err := repo.GetByID(ctx, u.ID)
 		r.NoError(err)
 		a.NotNil(u1)
 
-		a.Equal(seed.SeedUser_01_Admin.Email, u1.Email)
-		a.Equal(seed.SeedUser_01_Admin.Name, u1.Name)
+		a.Equal(seed.Account_000.Email, u1.Email)
+		a.Equal(seed.Account_000.Name, u1.Name)
 
 		// Duplicate email address should fail.
-		u2, err := repo.Create(ctx, seed.SeedUser_01_Admin.Email, seed.SeedUser_01_Admin.Name)
+		u2, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
 		r.Error(err)
 		a.Nil(u2)
 	}))
@@ -45,11 +45,11 @@ func TestGetByID(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, err := repo.GetByID(ctx, seed.SeedUser_01_Admin.ID)
+		none, err := repo.GetByID(ctx, seed.Account_000.ID)
 		r.NoError(err)
 		a.Nil(none)
 
-		u, err := repo.Create(ctx, seed.SeedUser_01_Admin.Email, seed.SeedUser_01_Admin.Name)
+		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
 		r.NoError(err)
 
 		u, err = repo.GetByID(ctx, u.ID)
@@ -63,15 +63,15 @@ func TestGetByEmail(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, ok, err := repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email)
+		none, ok, err := repo.LookupByEmail(ctx, seed.Account_000.Email)
 		r.NoError(err)
 		r.False(ok)
 		a.Nil(none)
 
-		u, err := repo.Create(ctx, seed.SeedUser_01_Admin.Email, seed.SeedUser_01_Admin.Name)
+		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
 		r.NoError(err)
 
-		u, ok, err = repo.LookupByEmail(ctx, seed.SeedUser_01_Admin.Email)
+		u, ok, err = repo.LookupByEmail(ctx, seed.Account_000.Email)
 		r.NoError(err)
 		r.True(ok)
 		a.NotNil(u)
@@ -94,7 +94,7 @@ func TestGetAll(t *testing.T) {
 
 			emails := lo.Map(u, func(t account.Account, i int) string { return t.Email })
 
-			a.Contains(emails, seed.SeedUser_01_Admin.Email)
-			a.Contains(emails, seed.SeedUser_02_User.Email)
+			a.Contains(emails, seed.Account_000.Email)
+			a.Contains(emails, seed.Account_001.Email)
 		}))
 }

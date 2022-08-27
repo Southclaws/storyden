@@ -40,7 +40,7 @@ func TestGetTags(t *testing.T) {
 			SetFirst(true).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now()).
-			SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+			SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 			AddTagIDs(t1.ID).Save(ctx)
 		r.NoError(err)
 		_, err = d.Post.Create().
@@ -49,7 +49,7 @@ func TestGetTags(t *testing.T) {
 			SetFirst(true).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now()).
-			SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+			SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 			AddTagIDs(t1.ID).Save(ctx)
 		r.NoError(err)
 		_, err = d.Post.Create().
@@ -58,7 +58,7 @@ func TestGetTags(t *testing.T) {
 			SetFirst(true).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now()).
-			SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+			SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 			AddTagIDs(t2.ID).Save(ctx)
 		r.NoError(err)
 		_, err = d.Post.Create().
@@ -67,7 +67,7 @@ func TestGetTags(t *testing.T) {
 			SetFirst(true).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now()).
-			SetAuthorID(uuid.UUID(seed.SeedUser_02_User.ID)).
+			SetAuthorID(uuid.UUID(seed.Account_002.ID)).
 			AddTagIDs(t2.ID, t1.ID).Save(ctx)
 		r.NoError(err)
 

@@ -27,8 +27,8 @@ func TestCreatePost(t *testing.T) {
 			p, err := repo.Create(ctx,
 				"A Super Nice Thread",
 				"Lorem ipsum",
-				seed.SeedUser_02_User.ID,
-				seed.SeedCategory_01_General.ID,
+				seed.Account_002.ID,
+				seed.Category_01_General.ID,
 				[]string{})
 			r.NoError(err)
 			r.NotNil(p)
@@ -39,7 +39,7 @@ func TestCreatePost(t *testing.T) {
 			a.WithinDuration(p.CreatedAt, time.Now(), time.Second*5)
 			a.WithinDuration(p.UpdatedAt, time.Now(), time.Second*5)
 			a.False(p.DeletedAt.IsPresent())
-			a.Equal(seed.SeedCategory_01_General.ID, p.Category.ID)
+			a.Equal(seed.Category_01_General.ID, p.Category.ID)
 			a.Len(p.Posts, 0)
 		}),
 	)
