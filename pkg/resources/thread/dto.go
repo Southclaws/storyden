@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"4d63.com/optional"
-
 	"github.com/Southclaws/dt"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -37,6 +36,12 @@ type AuthorRef struct {
 	Name string
 }
 
+const Name = "Thread"
+
+func (*Thread) GetRole() string { return Name }
+
+func (*Thread) GetResourceName() string { return Name }
+
 func FromModel(m *model.Post) *Thread {
 	return &Thread{
 		ID:        post.PostID(m.ID),
@@ -44,10 +49,14 @@ func FromModel(m *model.Post) *Thread {
 		UpdatedAt: m.UpdatedAt,
 		DeletedAt: optional.OfPtr(m.DeletedAt),
 
-		Title:    m.Title,
-		Slug:     m.Slug,
-		Short:    m.Short,
-		Pinned:   m.Pinned,
+		Title:  m.Title,
+		Slug:   m.Slug,
+		Short:  m.Short,
+		Pinned: m.Pinned,
+		Author: AuthorRef{
+			ID:   account.AccountID(m.Edges.Author.ID),
+			Name: m.Edges.Author.Name,
+		},
 		Tags:     dt.Map(m.Edges.Tags, func(t *model.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
 		Posts:    dt.Map(m.Edges.Posts, post.FromModel),

@@ -2,11 +2,9 @@ package script
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/fx"
@@ -24,14 +22,6 @@ func Run(opts ...fx.Option) {
 
 	all := append(opts, []fx.Option{
 		fx.NopLogger,
-
-		fx.Invoke(func(cfg config.Config) error {
-			if strings.Contains(cfg.DatabaseURL, "development") || strings.Contains(cfg.DatabaseURL, "production") {
-				return errors.New("refusing to run script on live database")
-			}
-			return nil
-		}),
-
 		config.Build(),
 		infrastructure.Build(),
 		services.Build(),

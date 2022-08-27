@@ -31,9 +31,9 @@ type Account struct {
 // Name is the role/resource name.
 const Name = "Account"
 
-func (u *Account) GetRole() string { return Name }
+func (*Account) GetRole() string { return Name }
 
-func (d *Account) GetResourceName() string { return Name }
+func (*Account) GetResourceName() string { return Name }
 
 func FromModel(u model.Account) (o Account) {
 	result := Account{

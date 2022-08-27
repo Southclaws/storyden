@@ -1,9 +1,11 @@
 version: 3
 
+dotenv:
+  - .env
+
 vars:
   VERSION:
     sh: git describe --always --dirty --tags
-  LOCAL_DB: postgres://default:default@localhost:5432/postgres?sslmode=disable
 
 tasks:
   default:
@@ -55,4 +57,4 @@ tasks:
 
   db:ui:
     cmds:
-      - atlas schema inspect -d {{.LOCAL_DB}} -w
+      - atlas schema inspect -d {{.DATABASE_URL}} -w
