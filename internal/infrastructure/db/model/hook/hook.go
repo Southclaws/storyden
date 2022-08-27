@@ -87,6 +87,19 @@ func (f ReactFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, e
 	return f(ctx, mv)
 }
 
+// The RoleFunc type is an adapter to allow the use of ordinary
+// function as Role mutator.
+type RoleFunc func(context.Context, *model.RoleMutation) (model.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RoleFunc) Mutate(ctx context.Context, m model.Mutation) (model.Value, error) {
+	mv, ok := m.(*model.RoleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *model.RoleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The SubscriptionFunc type is an adapter to allow the use of ordinary
 // function as Subscription mutator.
 type SubscriptionFunc func(context.Context, *model.SubscriptionMutation) (model.Value, error)

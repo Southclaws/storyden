@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/google/uuid"
 )
@@ -152,6 +153,21 @@ func (ac *AccountCreate) AddReacts(r ...*React) *AccountCreate {
 		ids[i] = r[i].ID
 	}
 	return ac.AddReactIDs(ids...)
+}
+
+// AddRoleIDs adds the "roles" edge to the Role entity by IDs.
+func (ac *AccountCreate) AddRoleIDs(ids ...uuid.UUID) *AccountCreate {
+	ac.mutation.AddRoleIDs(ids...)
+	return ac
+}
+
+// AddRoles adds the "roles" edges to the Role entity.
+func (ac *AccountCreate) AddRoles(r ...*Role) *AccountCreate {
+	ids := make([]uuid.UUID, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ac.AddRoleIDs(ids...)
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
@@ -424,6 +440,25 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUUID,
 					Column: react.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.RolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.RolesTable,
+			Columns: account.RolesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: role.FieldID,
 				},
 			},
 		}

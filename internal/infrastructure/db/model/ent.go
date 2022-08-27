@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
 )
@@ -44,6 +45,7 @@ func columnChecker(table string) func(string) error {
 		notification.Table:   notification.ValidColumn,
 		post.Table:           post.ValidColumn,
 		react.Table:          react.ValidColumn,
+		role.Table:           role.ValidColumn,
 		subscription.Table:   subscription.ValidColumn,
 		tag.Table:            tag.ValidColumn,
 	}

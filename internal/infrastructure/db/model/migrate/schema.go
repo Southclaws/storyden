@@ -193,6 +193,18 @@ var (
 			},
 		},
 	}
+	// RolesColumns holds the columns for the "roles" table.
+	RolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Unique: true},
+	}
+	// RolesTable holds the schema information for the "roles" table.
+	RolesTable = &schema.Table{
+		Name:       "roles",
+		Columns:    RolesColumns,
+		PrimaryKey: []*schema.Column{RolesColumns[0]},
+	}
 	// SubscriptionsColumns holds the columns for the "subscriptions" table.
 	SubscriptionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
@@ -235,6 +247,31 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// RoleAccountsColumns holds the columns for the "role_accounts" table.
+	RoleAccountsColumns = []*schema.Column{
+		{Name: "role_id", Type: field.TypeUUID},
+		{Name: "account_id", Type: field.TypeUUID},
+	}
+	// RoleAccountsTable holds the schema information for the "role_accounts" table.
+	RoleAccountsTable = &schema.Table{
+		Name:       "role_accounts",
+		Columns:    RoleAccountsColumns,
+		PrimaryKey: []*schema.Column{RoleAccountsColumns[0], RoleAccountsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "role_accounts_role_id",
+				Columns:    []*schema.Column{RoleAccountsColumns[0]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "role_accounts_account_id",
+				Columns:    []*schema.Column{RoleAccountsColumns[1]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
 		{Name: "tag_id", Type: field.TypeUUID},
@@ -268,8 +305,10 @@ var (
 		NotificationsTable,
 		PostsTable,
 		ReactsTable,
+		RolesTable,
 		SubscriptionsTable,
 		TagsTable,
+		RoleAccountsTable,
 		TagPostsTable,
 	}
 )
@@ -288,6 +327,8 @@ func init() {
 	ReactsTable.ForeignKeys[3].RefTable = PostsTable
 	SubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = AccountsTable
+	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
+	RoleAccountsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

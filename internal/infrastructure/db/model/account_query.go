@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/google/uuid"
 )
@@ -31,6 +32,7 @@ type AccountQuery struct {
 	predicates         []predicate.Account
 	withPosts          *PostQuery
 	withReacts         *ReactQuery
+	withRoles          *RoleQuery
 	withSubscriptions  *SubscriptionQuery
 	withAuthentication *AuthenticationQuery
 	modifiers          []func(*sql.Selector)
@@ -107,6 +109,28 @@ func (aq *AccountQuery) QueryReacts() *ReactQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(react.Table, react.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ReactsTable, account.ReactsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRoles chains the current query on the "roles" edge.
+func (aq *AccountQuery) QueryRoles() *RoleQuery {
+	query := &RoleQuery{config: aq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, account.RolesTable, account.RolesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -341,6 +365,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		predicates:         append([]predicate.Account{}, aq.predicates...),
 		withPosts:          aq.withPosts.Clone(),
 		withReacts:         aq.withReacts.Clone(),
+		withRoles:          aq.withRoles.Clone(),
 		withSubscriptions:  aq.withSubscriptions.Clone(),
 		withAuthentication: aq.withAuthentication.Clone(),
 		// clone intermediate query.
@@ -369,6 +394,17 @@ func (aq *AccountQuery) WithReacts(opts ...func(*ReactQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withReacts = query
+	return aq
+}
+
+// WithRoles tells the query-builder to eager-load the nodes that are connected to
+// the "roles" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithRoles(opts ...func(*RoleQuery)) *AccountQuery {
+	query := &RoleQuery{config: aq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withRoles = query
 	return aq
 }
 
@@ -464,9 +500,10 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			aq.withPosts != nil,
 			aq.withReacts != nil,
+			aq.withRoles != nil,
 			aq.withSubscriptions != nil,
 			aq.withAuthentication != nil,
 		}
@@ -503,6 +540,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadReacts(ctx, query, nodes,
 			func(n *Account) { n.Edges.Reacts = []*React{} },
 			func(n *Account, e *React) { n.Edges.Reacts = append(n.Edges.Reacts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withRoles; query != nil {
+		if err := aq.loadRoles(ctx, query, nodes,
+			func(n *Account) { n.Edges.Roles = []*Role{} },
+			func(n *Account, e *Role) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -582,6 +626,64 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 			return fmt.Errorf(`unexpected foreign-key "account_reacts" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*Account, init func(*Account), assign func(*Account, *Role)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uuid.UUID]*Account)
+	nids := make(map[uuid.UUID]map[*Account]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(account.RolesTable)
+		s.Join(joinT).On(s.C(role.FieldID), joinT.C(account.RolesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(account.RolesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(account.RolesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	neighbors, err := query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+		assign := spec.Assign
+		values := spec.ScanValues
+		spec.ScanValues = func(columns []string) ([]interface{}, error) {
+			values, err := values(columns[1:])
+			if err != nil {
+				return nil, err
+			}
+			return append([]interface{}{new(uuid.UUID)}, values...), nil
+		}
+		spec.Assign = func(columns []string, values []interface{}) error {
+			outValue := *values[0].(*uuid.UUID)
+			inValue := *values[1].(*uuid.UUID)
+			if nids[inValue] == nil {
+				nids[inValue] = map[*Account]struct{}{byID[outValue]: struct{}{}}
+				return assign(columns[1:], values[1:])
+			}
+			nids[inValue][byID[outValue]] = struct{}{}
+			return nil
+		}
+	})
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "roles" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

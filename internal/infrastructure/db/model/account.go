@@ -42,13 +42,15 @@ type AccountEdges struct {
 	Posts []*Post `json:"posts,omitempty"`
 	// Reacts holds the value of the reacts edge.
 	Reacts []*React `json:"reacts,omitempty"`
+	// Roles holds the value of the roles edge.
+	Roles []*Role `json:"roles,omitempty"`
 	// Subscriptions holds the value of the subscriptions edge.
 	Subscriptions []*Subscription `json:"subscriptions,omitempty"`
 	// Authentication holds the value of the authentication edge.
 	Authentication []*Authentication `json:"authentication,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -69,10 +71,19 @@ func (e AccountEdges) ReactsOrErr() ([]*React, error) {
 	return nil, &NotLoadedError{edge: "reacts"}
 }
 
+// RolesOrErr returns the Roles value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RolesOrErr() ([]*Role, error) {
+	if e.loadedTypes[2] {
+		return e.Roles, nil
+	}
+	return nil, &NotLoadedError{edge: "roles"}
+}
+
 // SubscriptionsOrErr returns the Subscriptions value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) SubscriptionsOrErr() ([]*Subscription, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Subscriptions, nil
 	}
 	return nil, &NotLoadedError{edge: "subscriptions"}
@@ -81,7 +92,7 @@ func (e AccountEdges) SubscriptionsOrErr() ([]*Subscription, error) {
 // AuthenticationOrErr returns the Authentication value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
@@ -176,6 +187,11 @@ func (a *Account) QueryPosts() *PostQuery {
 // QueryReacts queries the "reacts" edge of the Account entity.
 func (a *Account) QueryReacts() *ReactQuery {
 	return (&AccountClient{config: a.config}).QueryReacts(a)
+}
+
+// QueryRoles queries the "roles" edge of the Account entity.
+func (a *Account) QueryRoles() *RoleQuery {
+	return (&AccountClient{config: a.config}).QueryRoles(a)
 }
 
 // QuerySubscriptions queries the "subscriptions" edge of the Account entity.

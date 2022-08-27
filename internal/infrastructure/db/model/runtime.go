@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/schema"
@@ -124,6 +125,16 @@ func init() {
 	reactDescID := reactFields[0].Descriptor()
 	// react.DefaultID holds the default value on creation for the id field.
 	react.DefaultID = reactDescID.Default.(func() uuid.UUID)
+	roleFields := schema.Role{}.Fields()
+	_ = roleFields
+	// roleDescCreatedAt is the schema descriptor for createdAt field.
+	roleDescCreatedAt := roleFields[1].Descriptor()
+	// role.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	role.DefaultCreatedAt = roleDescCreatedAt.Default.(func() time.Time)
+	// roleDescID is the schema descriptor for id field.
+	roleDescID := roleFields[0].Descriptor()
+	// role.DefaultID holds the default value on creation for the id field.
+	role.DefaultID = roleDescID.Default.(func() uuid.UUID)
 	subscriptionFields := schema.Subscription{}.Fields()
 	_ = subscriptionFields
 	// subscriptionDescRefersType is the schema descriptor for refers_type field.

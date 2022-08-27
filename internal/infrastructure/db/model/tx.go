@@ -24,6 +24,8 @@ type Tx struct {
 	Post *PostClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
+	// Role is the client for interacting with the Role builders.
+	Role *RoleClient
 	// Subscription is the client for interacting with the Subscription builders.
 	Subscription *SubscriptionClient
 	// Tag is the client for interacting with the Tag builders.
@@ -169,6 +171,7 @@ func (tx *Tx) init() {
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.React = NewReactClient(tx.config)
+	tx.Role = NewRoleClient(tx.config)
 	tx.Subscription = NewSubscriptionClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 }
