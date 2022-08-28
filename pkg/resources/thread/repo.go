@@ -2,6 +2,7 @@ package thread
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
@@ -25,14 +26,11 @@ type Repository interface {
 		tags []string,
 	) (*Thread, error)
 
-	// GetThreads(
-	// 	ctx context.Context,
-	// 	tags []string, category string, query string,
-	// 	before time.Time, sort string, offset, max int,
-	// 	includePosts bool,
-	// 	includeDeleted bool,
-	// 	includeAdmin bool,
-	// ) ([]post.Post, error)
+	List(
+		ctx context.Context,
+		before time.Time,
+		max int,
+	) ([]*Thread, error)
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 

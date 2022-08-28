@@ -4,6 +4,7 @@ package thread
 
 import (
 	"context"
+	"time"
 
 	"github.com/el-mike/restrict"
 	"go.uber.org/fx"
@@ -24,6 +25,13 @@ type Service interface {
 		categoryID category.CategoryID,
 		tags []string,
 	) (*thread.Thread, error)
+
+	// ListAll returns all threads.
+	ListAll(
+		ctx context.Context,
+		before time.Time,
+		max int,
+	) ([]*thread.Thread, error)
 }
 
 func Build() fx.Option {

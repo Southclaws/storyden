@@ -3,13 +3,16 @@ package thread
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	post_model "github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 	"github.com/Southclaws/storyden/pkg/resources/post"
@@ -108,132 +111,44 @@ func (d *database) Create(
 // 	return setters, nil
 // }
 
-// func (d *database) GetThreads(
-// 	ctx context.Context,
-// 	tags []string,
-// 	category string,
-// 	query string,
-// 	before time.Time,
-// 	sort string,
-// 	offset int,
-// 	max int,
-// 	includePosts bool,
-// 	includeDeleted bool,
-// 	includeAdmin bool,
-// ) ([]post.Post, error) {
-// 	filters := []db.PostWhereParam{}
+func (d *database) List(
+	ctx context.Context,
+	before time.Time,
+	max int,
+) ([]*Thread, error) {
+	filters := []predicate.Post{
+		post_model.DeletedAtNotNil(),
+	}
 
-// 	if !before.IsZero() {
-// 		filters = append(filters, db.Post.CreatedAt.Before(before))
-// 	}
-// 	if category != "" {
-// 		filters = append(filters, db.Post.Category.Where(db.Category.Name.Equals(category)))
-// 	}
-// 	if query != "" {
-// 		filters = append(filters, db.Post.Title.Search(query), db.Post.Body.Search(query))
-// 	}
-// 	if len(tags) > 0 {
-// 		for _, v := range tags {
-// 			if len(v) > 0 {
-// 				filters = append(filters, db.Post.Tags.Some(db.Tag.Name.Equals(v)))
-// 			}
-// 		}
-// 	}
-// 	if max < 1 {
-// 		max = 1
-// 	}
-// 	if max > 100 {
-// 		max = 100
-// 	}
-// 	if !includePosts {
-// 		filters = append(filters, db.Post.First.Equals(true))
-// 	}
-// 	if !includeDeleted {
-// 		filters = append(filters, db.Post.DeletedAt.IsNull())
-// 	}
-// 	if !includeAdmin {
-// 		filters = append(filters, db.Post.Category.Where(
-// 			db.Category.Admin.Equals(false),
-// 		))
-// 	}
+	if !before.IsZero() {
+		filters = append(filters, post_model.CreatedAtLT(before))
+	}
 
-// 	var pinned []db.PostModel
-// 	var err error
-// 	if category != "" {
-// 		pinned, err = d.db.Post.
-// 			FindMany(append(filters, db.Post.Pinned.Equals(true))...).
-// 			With(
-// 				db.Post.Author.Fetch(),
-// 				db.Post.Tags.Fetch(),
-// 				db.Post.Category.Fetch(),
-// 			).
-// 			Skip(offset).
-// 			Take(max).
-// 			OrderBy(db.Post.CreatedAt.Order(db.Direction(sort))).
-// 			Exec(ctx)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-// 	posts, err := d.db.Post.
-// 		FindMany(filters...).
-// 		With(
-// 			db.Post.Author.Fetch(),
-// 			db.Post.Tags.Fetch(),
-// 			db.Post.Category.Fetch(),
-// 		).
-// 		Skip(offset).
-// 		Take(max).
-// 		OrderBy(db.Post.CreatedAt.Order(db.Direction(sort))).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if max < 1 {
+		max = 1
+	}
 
-// 	counts, err := d.GetPostCounts(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if max > 100 {
+		max = 100
+	}
 
-// 	//
-// 	// NOTE:
-// 	//
-// 	// This double query is a temporary solution for pinned posts. The reason
-// 	// for this is the multiple sort order query didn't work, details here:
-// 	// https://github.com/prisma/prisma-client-go/issues/681
-// 	//
-// 	// NOTE 2:
-// 	//
-// 	// This code was removed, but the removal was reverted because of this bug:
-// 	// https://github.com/prisma/prisma-client-go/issues/698
-// 	//
+	result, err := d.db.Post.Query().
+		Where(filters...).
+		Limit(max).
+		// WithPosts(func(pq *model.PostQuery) {
+		// }).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-// 	result := []post.Post{}
-// 	pinnedIDs := make(map[string]struct{})
-// 	// First, add the pinned posts to the start of the list.
-// 	for _, p := range pinned {
-// 		p.Body = ""
-// 		newpost := *post.FromModel(&p)
-// 		newpost.Posts = counts[p.ID]
-// 		result = append(result, newpost)
+	// counts, err := d.GetPostCounts(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-// 		// store the pinned post ID so we can filter it out below.
-// 		pinnedIDs[p.ID] = struct{}{}
-// 	}
-// 	// then add the rest of the posts, filtering out what's already there.
-// 	for _, p := range posts {
-// 		// don't duplicate pinned posts they are already at the top of the list.
-// 		if _, ok := pinnedIDs[p.ID]; ok {
-// 			continue
-// 		}
-// 		p.Body = ""
-// 		newpost := *post.FromModel(&p)
-// 		newpost.Posts = counts[p.ID]
-// 		result = append(result, newpost)
-// 	}
-
-// 	return result, nil
-// }
+	return dt.Map(result, FromModel), nil
+}
 
 // func (d *database) GetThread(ctx context.Context, slug string, max, skip int, deleted, admin bool) ([]Post, error) {
 // 	filters := []db.PostWhereParam{
