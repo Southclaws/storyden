@@ -63,6 +63,7 @@ type Bindings struct {
 	Authentication
 	Accounts
 	Threads
+	Posts
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -75,6 +76,7 @@ func bindingsProviders() fx.Option {
 		NewAuthentication,
 		NewAccounts,
 		NewThreads,
+		NewPosts,
 	)
 }
 

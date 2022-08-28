@@ -9,7 +9,7 @@ import (
 )
 
 type Repository interface {
-	CreatePost(
+	Create(
 		ctx context.Context,
 		body string,
 		authorID account.AccountID,

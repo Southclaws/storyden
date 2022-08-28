@@ -45,6 +45,9 @@ type Account struct {
 	UpdatedAt *string    `json:"updatedAt,omitempty"`
 }
 
+// AccountName The username of an account.
+type AccountName = string
+
 // AuthRequest defines model for AuthRequest.
 type AuthRequest struct {
 	Identifier string `json:"identifier"`
@@ -87,11 +90,48 @@ type CommonProperties struct {
 // Identifier A unique identifier for this resource.
 type Identifier string
 
+// Post defines model for Post.
+type Post struct {
+	// Body The body text of a post within a thread.
+	Body PostBodyMarkdown `json:"body"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// ReplyTo A unique identifier for this resource.
+	ReplyTo *Identifier `json:"reply_to,omitempty"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// PostBodyMarkdown The body text of a post within a thread.
+type PostBodyMarkdown = string
+
+// PostSubmission A new post within a thread of posts. A post may reply to another post in
+// the thread by specifying the `reply_to` property. The identifier in the
+// `reply_to` value must be post within the same thread.
+type PostSubmission struct {
+	// Body The body text of a post within a thread.
+	Body PostBodyMarkdown `json:"body"`
+
+	// ReplyTo A unique identifier for this resource.
+	ReplyTo *Identifier `json:"reply_to,omitempty"`
+}
+
 // ProfileReference A minimal reference to an account.
 type ProfileReference struct {
 	// Id A unique identifier for this resource.
-	Id   *Identifier `json:"id,omitempty"`
-	Name *string     `json:"name,omitempty"`
+	Id *Identifier `json:"id,omitempty"`
+
+	// Name The username of an account.
+	Name *AccountName `json:"name,omitempty"`
 }
 
 // React defines model for React.
@@ -145,18 +185,30 @@ type Thread struct {
 
 // ThreadSubmission defines model for ThreadSubmission.
 type ThreadSubmission struct {
-	// Body The markdown body for the new thread.
-	Body string `json:"body"`
+	// Body The body text of a post within a thread.
+	Body PostBodyMarkdown `json:"body"`
 
 	// Category A unique identifier for this resource.
 	Category Identifier `json:"category"`
 
-	// Tags A list of tags for the new thread.
-	Tags []string `json:"tags"`
+	// Tags A list of tags for a thread.
+	Tags ThreadTags `json:"tags"`
 
-	// Title The title of the thread.
-	Title string `json:"title"`
+	// Title The title of a thread.
+	Title ThreadTitle `json:"title"`
 }
+
+// ThreadTags A list of tags for a thread.
+type ThreadTags = []string
+
+// ThreadTitle The title of a thread.
+type ThreadTitle = string
+
+// AccountID A unique identifier for this resource.
+type AccountID = Identifier
+
+// ThreadID A unique identifier for this resource.
+type ThreadID = Identifier
 
 // AccountsGetSuccess defines model for AccountsGetSuccess.
 type AccountsGetSuccess = Account
@@ -164,11 +216,25 @@ type AccountsGetSuccess = Account
 // InternalServerError A description of an error including a human readable message.
 type InternalServerError = APIError
 
+// PostsCreateSuccess A post within a thread of posts.
+type PostsCreateSuccess = Post
+
 // ThreadsCreateSuccess defines model for ThreadsCreateSuccess.
 type ThreadsCreateSuccess = Thread
 
 // ThreadsList defines model for ThreadsList.
 type ThreadsList = []Thread
+
+// AuthPassword defines model for AuthPassword.
+type AuthPassword = AuthRequest
+
+// PostsCreate A new post within a thread of posts. A post may reply to another post in
+// the thread by specifying the `reply_to` property. The identifier in the
+// `reply_to` value must be post within the same thread.
+type PostsCreate = PostSubmission
+
+// ThreadsCreate defines model for ThreadsCreate.
+type ThreadsCreate = ThreadSubmission
 
 // AuthPasswordSigninJSONRequestBody defines body for AuthPasswordSignin for application/json ContentType.
 type AuthPasswordSigninJSONRequestBody = AuthRequest
@@ -188,6 +254,12 @@ type ThreadsCreateJSONRequestBody = ThreadSubmission
 // ThreadsCreateFormdataRequestBody defines body for ThreadsCreate for application/x-www-form-urlencoded ContentType.
 type ThreadsCreateFormdataRequestBody = ThreadSubmission
 
+// PostsCreateJSONRequestBody defines body for PostsCreate for application/json ContentType.
+type PostsCreateJSONRequestBody = PostSubmission
+
+// PostsCreateFormdataRequestBody defines body for PostsCreate for application/x-www-form-urlencoded ContentType.
+type PostsCreateFormdataRequestBody = PostSubmission
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
@@ -195,7 +267,7 @@ type ServerInterface interface {
 	GetSpec(ctx echo.Context) error
 
 	// (GET /v1/accounts/{id})
-	AccountsGet(ctx echo.Context, id Identifier) error
+	AccountsGet(ctx echo.Context, id AccountID) error
 
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx echo.Context) error
@@ -208,6 +280,9 @@ type ServerInterface interface {
 
 	// (POST /v1/threads)
 	ThreadsCreate(ctx echo.Context) error
+	// Create a new post within a thread.
+	// (POST /v1/threads/{id}/posts)
+	PostsCreate(ctx echo.Context, id ThreadID) error
 
 	// (GET /version)
 	GetVersion(ctx echo.Context) error
@@ -231,7 +306,7 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 func (w *ServerInterfaceWrapper) AccountsGet(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id Identifier
+	var id AccountID
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -285,6 +360,24 @@ func (w *ServerInterfaceWrapper) ThreadsCreate(ctx echo.Context) error {
 	return err
 }
 
+// PostsCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id ThreadID
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.PostsCreate(ctx, id)
+	return err
+}
+
 // GetVersion converts echo context to params.
 func (w *ServerInterfaceWrapper) GetVersion(ctx echo.Context) error {
 	var err error
@@ -328,6 +421,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
+	router.POST(baseURL+"/v1/threads/:id/posts", wrapper.PostsCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
@@ -363,6 +457,12 @@ func (t InternalServerErrorJSONResponse) MarshalJSON() ([]byte, error) {
 type NotFoundResponse struct {
 }
 
+type PostsCreateSuccessJSONResponse Post
+
+func (t PostsCreateSuccessJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((Post)(t))
+}
+
 type ThreadsCreateSuccessJSONResponse Thread
 
 func (t ThreadsCreateSuccessJSONResponse) MarshalJSON() ([]byte, error) {
@@ -384,7 +484,7 @@ type GetSpecRequestObject struct {
 type GetSpec200TextResponse string
 
 type AccountsGetRequestObject struct {
-	Id Identifier `json:"id"`
+	Id AccountID `json:"id"`
 }
 
 type AccountsGet200JSONResponse = AccountsGetSuccessJSONResponse
@@ -478,6 +578,27 @@ func (t ThreadsCreatedefaultJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
 }
 
+type PostsCreateRequestObject struct {
+	Id           ThreadID `json:"id"`
+	JSONBody     *PostsCreateJSONRequestBody
+	FormdataBody *PostsCreateFormdataRequestBody
+}
+
+type PostsCreate200JSONResponse = PostsCreateSuccessJSONResponse
+
+type PostsCreate401Response = UnauthorisedResponse
+
+type PostsCreate404Response = NotFoundResponse
+
+type PostsCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t PostsCreatedefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
 type GetVersionRequestObject struct {
 }
 
@@ -503,6 +624,9 @@ type StrictServerInterface interface {
 
 	// (POST /v1/threads)
 	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) interface{}
+	// Create a new post within a thread.
+	// (POST /v1/threads/{id}/posts)
+	PostsCreate(ctx context.Context, request PostsCreateRequestObject) interface{}
 
 	// (GET /version)
 	GetVersion(ctx context.Context, request GetVersionRequestObject) interface{}
@@ -547,7 +671,7 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 }
 
 // AccountsGet operation middleware
-func (sh *strictHandler) AccountsGet(ctx echo.Context, id Identifier) error {
+func (sh *strictHandler) AccountsGet(ctx echo.Context, id AccountID) error {
 	var request AccountsGetRequestObject
 
 	request.Id = id
@@ -760,6 +884,57 @@ func (sh *strictHandler) ThreadsCreate(ctx echo.Context) error {
 	return nil
 }
 
+// PostsCreate operation middleware
+func (sh *strictHandler) PostsCreate(ctx echo.Context, id ThreadID) error {
+	var request PostsCreateRequestObject
+
+	request.Id = id
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
+		var body PostsCreateJSONRequestBody
+		if err := ctx.Bind(&body); err != nil {
+			return err
+		}
+		request.JSONBody = &body
+	}
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		if form, err := ctx.FormParams(); err == nil {
+			var body PostsCreateFormdataRequestBody
+			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+				return err
+			}
+			request.FormdataBody = &body
+		} else {
+			return err
+		}
+	}
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.PostsCreate(ctx.Request().Context(), request.(PostsCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostsCreate")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case PostsCreate200JSONResponse:
+		return ctx.JSON(200, v)
+	case PostsCreate401Response:
+		return ctx.NoContent(401)
+	case PostsCreate404Response:
+		return ctx.NoContent(404)
+	case PostsCreatedefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
 // GetVersion operation middleware
 func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 	var request GetVersionRequestObject
@@ -788,33 +963,39 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"//9oSO/1eBwAAA==",
+	"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",
+	"ud38JwAA///rHtCbqyQAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

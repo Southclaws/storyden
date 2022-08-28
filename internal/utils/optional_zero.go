@@ -37,15 +37,6 @@ func OptionalToPointer[T any](o optional.Optional[T]) *T {
 	return nil
 }
 
-func OptionalElse[T, R any](o optional.Optional[T], fn func(T) R) R {
-	if v, ok := o.Get(); ok {
-		r := fn(v)
-		return r
-	}
-
-	return *new(R)
-}
-
 func OptionalElsePtr[T, R any](o optional.Optional[T], fn func(T) R) *R {
 	if v, ok := o.Get(); ok {
 		r := fn(v)

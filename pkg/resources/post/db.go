@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/pkg/resources/account"
+	"github.com/pkg/errors"
 	"github.com/rs/xid"
 )
 
@@ -19,7 +20,7 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) CreatePost(
+func (d *database) Create(
 	ctx context.Context,
 	body string,
 	authorID account.AccountID,
@@ -28,12 +29,21 @@ func (d *database) CreatePost(
 ) (*Post, error) {
 	short := MakeShortBody(body)
 
+	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get thread parent post ID")
+	}
+
+	if thread.First == false {
+		return nil, errors.New("attempt to create post under non-thread post")
+	}
+
 	q := d.db.Post.
 		Create().
 		SetBody(body).
 		SetShort(short).
 		SetFirst(false).
-		// SetRootID(xid.ID(parentID)).
+		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))
 
 	replyToID.If(func(value PostID) {
@@ -42,8 +52,8 @@ func (d *database) CreatePost(
 
 	p, err := q.Save(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
-			return nil, nil
+		if model.IsConstraintError(err) {
+			return nil, errors.Wrap(err, "constraint error: check parent ID or reply ID")
 		}
 
 		return nil, err

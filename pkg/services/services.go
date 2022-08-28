@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/pkg/services/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
+	"github.com/Southclaws/storyden/pkg/services/post"
 	"github.com/Southclaws/storyden/pkg/services/rbac"
 	"github.com/Southclaws/storyden/pkg/services/thread"
 )
@@ -15,5 +16,6 @@ func Build() fx.Option {
 		authentication.Build(),
 		rbac.Build(),
 		thread.Build(),
+		post.Build(),
 	)
 }

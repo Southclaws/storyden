@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/category"
+	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 	"github.com/Southclaws/storyden/pkg/resources/thread"
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
@@ -27,6 +28,17 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Posts:    utils.Ref(len(t.Posts)),
 		Reacts:   reacts(t.Reacts),
 		Tags:     t.Tags,
+	}
+}
+
+func serialisePost(p *post.Post) openapi.Post {
+	return openapi.Post{
+		Id:        openapi.Identifier(xid.ID(p.ID).String()),
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
+
+		//
 	}
 }
 

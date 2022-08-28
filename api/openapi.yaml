@@ -20,10 +20,23 @@ info:
   version: "1"
 
 servers:
-  - url: "/api"
+  - url: "http://localhost:8000/api"
+    description: "Localhost"
 
 security:
   - browser: []
+
+tags:
+  - name: misc
+    description: Non-business logic stuff.
+  - name: auth
+    description: Authentication resources.
+  - name: accounts
+    description: User accounts.
+  - name: threads
+    description: Forum threads.
+  - name: posts
+    description: Posts within a specific thread.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -50,8 +63,12 @@ paths:
 
   /version:
     get:
-      security: []
       operationId: GetVersion
+      summary: Get the software version string.
+      description: |
+        The version number includes the date and time of the release build as
+        well as a short representation of the Git commit hash.
+      security: []
       tags: [misc]
       responses:
         "200":
@@ -63,8 +80,13 @@ paths:
 
   /openapi.json:
     get:
-      security: []
       operationId: GetSpec
+      summary: Get the OpenAPI 3.0 specification as JSON.
+      description: |
+        Note: the generator creates a `map[string]interface{}` if this is set to
+        `application/json`... so I'm just using plain text for now.
+
+      security: []
       tags: [misc]
       responses:
         "200":
@@ -88,39 +110,27 @@ paths:
   /v1/auth/password/signup:
     post:
       operationId: AuthPasswordSignup
+      summary: Register a new account with a username and password.
       tags: [auth]
       security: []
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/AuthRequest"
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AuthRequest"
+      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
-        default: { "$ref": "#/components/responses/InternalServerError" }
-        "400": { "$ref": "#/components/responses/BadRequest" }
-        "200": { "$ref": "#/components/responses/AuthSuccess" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
 
   /v1/auth/password/signin:
     post:
       operationId: AuthPasswordSignin
+      summary: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/AuthRequest"
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AuthRequest"
+      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
-        default: { "$ref": "#/components/responses/InternalServerError" }
-        "404": { "$ref": "#/components/responses/NotFound" }
-        "401": { "$ref": "#/components/responses/Unauthorised" }
-        "200": { "$ref": "#/components/responses/AuthSuccess" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
 
   #
   #                                                      888
@@ -136,21 +146,14 @@ paths:
   /v1/accounts/{id}:
     get:
       operationId: AccountsGet
+      summary: Get an account by ID.
       tags: [accounts]
-      security:
-        - browser: []
-      parameters:
-        - name: id
-          in: path
-          description: Account ID
-          required: true
-          schema:
-            $ref: "#/components/schemas/Identifier"
+      parameters: [$ref: "#/components/parameters/AccountID"]
       responses:
-        default: { "$ref": "#/components/responses/InternalServerError" }
-        "404": { "$ref": "#/components/responses/NotFound" }
-        "401": { "$ref": "#/components/responses/Unauthorised" }
-        "200": { "$ref": "#/components/responses/AccountsGetSuccess" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountsGetSuccess" }
 
   #
   # 888    888                                    888
@@ -166,34 +169,24 @@ paths:
   /v1/threads:
     post:
       operationId: ThreadsCreate
+      summary: Create a new thread within the specified category.
       tags: [threads]
-      security:
-        - browser: []
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/ThreadSubmission"
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ThreadSubmission"
-
+      requestBody: { $ref: "#/components/requestBodies/ThreadsCreate" }
       responses:
-        default: { "$ref": "#/components/responses/InternalServerError" }
-        "404": { "$ref": "#/components/responses/NotFound" }
-        "401": { "$ref": "#/components/responses/Unauthorised" }
-        "200": { "$ref": "#/components/responses/ThreadsCreateSuccess" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ThreadsCreateSuccess" }
 
     get:
       operationId: ThreadsList
+      summary: Get a list of all threads.
       tags: [threads]
-      security:
-        - browser: []
       responses:
-        default: { "$ref": "#/components/responses/InternalServerError" }
-        "404": { "$ref": "#/components/responses/NotFound" }
-        "401": { "$ref": "#/components/responses/Unauthorised" }
-        "200": { "$ref": "#/components/responses/ThreadsList" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ThreadsList" }
 
   #
   #                             888
@@ -209,7 +202,83 @@ paths:
   #  888
   #
 
+  /v1/threads/{id}/posts:
+    post:
+      operationId: PostsCreate
+      summary: Create a new post within a thread.
+      tags: [posts]
+      parameters: [$ref: "#/components/parameters/ThreadID"]
+      requestBody: { $ref: "#/components/requestBodies/PostsCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PostsCreateSuccess" }
+
 components:
+  #
+  # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
+  # 888   Y88b   d88888 888   Y88b       d88888 8888b   d8888 888            888     888        888   Y88b d88P  Y88b
+  # 888    888  d88P888 888    888      d88P888 88888b.d88888 888            888     888        888    888 Y88b.
+  # 888   d88P d88P 888 888   d88P     d88P 888 888Y88888P888 8888888        888     8888888    888   d88P  "Y888b.
+  # 8888888P" d88P  888 8888888P"     d88P  888 888 Y888P 888 888            888     888        8888888P"      "Y88b.
+  # 888      d88P   888 888 T88b     d88P   888 888  Y8P  888 888            888     888        888 T88b         "888
+  # 888     d8888888888 888  T88b   d8888888888 888   "   888 888            888     888        888  T88b  Y88b  d88P
+  # 888    d88P     888 888   T88b d88P     888 888       888 8888888888     888     8888888888 888   T88b  "Y8888P"
+  #
+
+  parameters:
+    AccountID:
+      description: Account ID
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    ThreadID:
+      description: Thread ID
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+  #
+  # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
+  # 888   Y88b 888       d88P" "Y88b 888     888 888       d88P  Y88b    888    d88P  Y88b
+  # 888    888 888       888     888 888     888 888       Y88b.         888    Y88b.
+  # 888   d88P 8888888   888     888 888     888 8888888    "Y888b.      888     "Y888b.
+  # 8888888P"  888       888     888 888     888 888           "Y88b.    888        "Y88b.
+  # 888 T88b   888       888 Y8b 888 888     888 888             "888    888          "888
+  # 888  T88b  888       Y88b.Y8b88P Y88b. .d88P 888       Y88b  d88P    888    Y88b  d88P
+  # 888   T88b 8888888888 "Y888888"   "Y88888P"  8888888888 "Y8888P"     888     "Y8888P"
+  #                             Y8b
+  #
+
+  requestBodies:
+    AuthPassword:
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/AuthRequest" }
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthRequest" }
+
+    ThreadsCreate:
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/ThreadSubmission" }
+        application/json:
+          schema: { $ref: "#/components/schemas/ThreadSubmission" }
+
+    PostsCreate:
+      description: Create a post within a thread.
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/PostSubmission" }
+        application/json:
+          schema: { $ref: "#/components/schemas/PostSubmission" }
+
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
   # 888   Y88b 888       d88P  Y88b 888   Y88b d88P" "Y88b 8888b   888 d88P  Y88b 888       d88P  Y88b
@@ -269,6 +338,13 @@ components:
             items:
               $ref: "#/components/schemas/Thread"
 
+    PostsCreateSuccess:
+      description: Thread post created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Post"
+
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
   # d88P  Y88b d88P  Y88b 888    888 888        8888b   d8888       d88888 d88P  Y88b
@@ -301,8 +377,7 @@ components:
         - createdAt
         - updatedAt
       properties:
-        id:
-          $ref: "#/components/schemas/Identifier"
+        id: { $ref: "#/components/schemas/Identifier" }
         createdAt:
           type: string
           format: date-time
@@ -328,6 +403,10 @@ components:
         suggested:
           type: string
 
+    # -
+    # Auth
+    # -
+
     AuthRequest:
       type: object
       required: [identifier, token]
@@ -346,12 +425,15 @@ components:
         id:
           type: string
 
+    # -
+    # Account
+    # -
+
     Account:
       type: object
       required: [id]
       properties:
-        id:
-          $ref: "#/components/schemas/Identifier"
+        id: { $ref: "#/components/schemas/Identifier" }
         email:
           type: string
         name:
@@ -365,6 +447,10 @@ components:
         deletedAt:
           type: string
 
+    # -
+    # Threads
+    # -
+
     ThreadSubmission:
       type: object
       required:
@@ -373,18 +459,9 @@ components:
         - tags
         - category
       properties:
-        title:
-          type: string
-          example: Hello world!
-          description: The title of the thread.
-        body:
-          type: string
-          description: The markdown body for the new thread.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags for the new thread.
+        title: { $ref: "#/components/schemas/ThreadTitle" }
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        tags: { $ref: "#/components/schemas/ThreadTags" }
         category:
           $ref: "#/components/schemas/Identifier"
 
@@ -393,15 +470,7 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - type: object
           required:
-            - title
-            - slug
-            - short
-            - pinned
-            - author
-            - tags
-            - posts
-            - category
-            - reacts
+            [title, slug, short, pinned, author, tags, posts, category, reacts]
           properties:
             title:
               type: string
@@ -421,8 +490,7 @@ components:
             pinned:
               type: boolean
               description: Whether the thread is pinned in this category.
-            author:
-              $ref: "#/components/schemas/ProfileReference"
+            author: { $ref: "#/components/schemas/ProfileReference" }
             tags:
               type: array
               items:
@@ -432,28 +500,16 @@ components:
               type: integer
               readOnly: true
               description: The number of posts under this thread.
-            category:
-              $ref: "#/components/schemas/Category"
+            category: { $ref: "#/components/schemas/Category" }
             reacts:
               type: array
-              items:
-                $ref: "#/components/schemas/React"
+              items: { $ref: "#/components/schemas/React" }
               description: A list of reactions this post has had from people.
-
-    ProfileReference:
-      type: object
-      description: A minimal reference to an account.
-      properties:
-        id:
-          $ref: "#/components/schemas/Identifier"
-        name:
-          type: string
 
     Category:
       type: object
       properties:
-        id:
-          $ref: "#/components/schemas/Identifier"
+        id: { $ref: "#/components/schemas/Identifier" }
         name:
           type: string
         description:
@@ -467,13 +523,75 @@ components:
         postCount:
           type: integer
 
+    # -
+    # Posts
+    # -
+
+    PostSubmission:
+      type: object
+      description: |
+        A new post within a thread of posts. A post may reply to another post in
+        the thread by specifying the `reply_to` property. The identifier in the
+        `reply_to` value must be post within the same thread.
+      required: [body]
+      properties:
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        reply_to: { $ref: "#/components/schemas/Identifier" }
+
+    Post:
+      description: A post within a thread of posts.
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - type: object
+          required: [body]
+          properties:
+            body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+            reply_to:
+              description: |
+                If present, identifies the post that this post is replying to.
+              $ref: "#/components/schemas/Identifier"
+
     React:
       type: object
       properties:
-        id:
-          $ref: "#/components/schemas/Identifier"
+        id: { $ref: "#/components/schemas/Identifier" }
         emoji:
           type: string
+
+    # -
+    # Commonly used small/simple types.
+    # -
+
+    AccountName:
+      type: string
+      description: The username of an account.
+      example: Southclaws
+
+    ProfileReference:
+      type: object
+      description: A minimal reference to an account.
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name: { $ref: "#/components/schemas/AccountName" }
+
+    ThreadTitle:
+      type: string
+      description: The title of a thread.
+      example: Hello world!
+
+    ThreadTags:
+      type: array
+      description: A list of tags for a thread.
+      items:
+        type: string
+
+    PostBodyMarkdown:
+      type: string
+      description: The body text of a post within a thread.
+      example: |
+        # My post
+
+        This is a _post_ within a _thread_ formatted in *markdown*.
 
   securitySchemes:
     browser:
