@@ -51,10 +51,10 @@ paths:
   /version:
     get:
       security: []
-      operationId: getVersion
+      operationId: GetVersion
       tags: [misc]
       responses:
-        200:
+        "200":
           description: OK
           content:
             text/plain:
@@ -64,10 +64,10 @@ paths:
   /openapi.json:
     get:
       security: []
-      operationId: getSpec
+      operationId: GetSpec
       tags: [misc]
       responses:
-        200:
+        "200":
           description: OK
           content:
             text/plain:
@@ -87,40 +87,40 @@ paths:
 
   /v1/auth/password/signup:
     post:
-      operationId: signup
+      operationId: AuthPasswordSignup
       tags: [auth]
       security: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/AuthenticationRequest"
+              $ref: "#/components/schemas/AuthRequest"
           application/json:
             schema:
-              $ref: "#/components/schemas/AuthenticationRequest"
+              $ref: "#/components/schemas/AuthRequest"
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
-        400: { "$ref": "#/components/responses/BadRequest" }
-        200: { "$ref": "#/components/responses/AuthenticationSuccess" }
+        "400": { "$ref": "#/components/responses/BadRequest" }
+        "200": { "$ref": "#/components/responses/AuthSuccess" }
 
   /v1/auth/password/signin:
     post:
-      operationId: signin
+      operationId: AuthPasswordSignin
       tags: [auth]
       security: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/AuthenticationRequest"
+              $ref: "#/components/schemas/AuthRequest"
           application/json:
             schema:
-              $ref: "#/components/schemas/AuthenticationRequest"
+              $ref: "#/components/schemas/AuthRequest"
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
-        404: { "$ref": "#/components/responses/NotFound" }
-        401: { "$ref": "#/components/responses/Unauthorised" }
-        200: { "$ref": "#/components/responses/AuthenticationSuccess" }
+        "404": { "$ref": "#/components/responses/NotFound" }
+        "401": { "$ref": "#/components/responses/Unauthorised" }
+        "200": { "$ref": "#/components/responses/AuthSuccess" }
 
   #
   #                                                      888
@@ -135,7 +135,7 @@ paths:
 
   /v1/accounts/{id}:
     get:
-      operationId: getAccount
+      operationId: AccountsGet
       tags: [accounts]
       security:
         - browser: []
@@ -148,9 +148,9 @@ paths:
             $ref: "#/components/schemas/Identifier"
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
-        404: { "$ref": "#/components/responses/NotFound" }
-        401: { "$ref": "#/components/responses/Unauthorised" }
-        200: { "$ref": "#/components/responses/GetAccountSuccess" }
+        "404": { "$ref": "#/components/responses/NotFound" }
+        "401": { "$ref": "#/components/responses/Unauthorised" }
+        "200": { "$ref": "#/components/responses/AccountsGetSuccess" }
 
   #
   # 888    888                                    888
@@ -165,7 +165,7 @@ paths:
 
   /v1/threads:
     post:
-      operationId: createThread
+      operationId: ThreadsCreate
       tags: [threads]
       security:
         - browser: []
@@ -180,9 +180,20 @@ paths:
 
       responses:
         default: { "$ref": "#/components/responses/InternalServerError" }
-        404: { "$ref": "#/components/responses/NotFound" }
-        401: { "$ref": "#/components/responses/Unauthorised" }
-        200: { "$ref": "#/components/responses/CreateThreadSuccess" }
+        "404": { "$ref": "#/components/responses/NotFound" }
+        "401": { "$ref": "#/components/responses/Unauthorised" }
+        "200": { "$ref": "#/components/responses/ThreadsCreateSuccess" }
+
+    get:
+      operationId: ThreadsList
+      tags: [threads]
+      security:
+        - browser: []
+      responses:
+        default: { "$ref": "#/components/responses/InternalServerError" }
+        "404": { "$ref": "#/components/responses/NotFound" }
+        "401": { "$ref": "#/components/responses/Unauthorised" }
+        "200": { "$ref": "#/components/responses/ThreadsList" }
 
   #
   #                             888
@@ -224,7 +235,7 @@ components:
           schema:
             $ref: "#/components/schemas/APIError"
 
-    AuthenticationSuccess:
+    AuthSuccess:
       description: OK
       headers:
         "Set-Cookie":
@@ -233,21 +244,30 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AuthenticationSuccess"
+            $ref: "#/components/schemas/AuthSuccess"
 
-    GetAccountSuccess:
+    AccountsGetSuccess:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
 
-    CreateThreadSuccess:
+    ThreadsCreateSuccess:
       description: Thread created.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Thread"
+
+    ThreadsList:
+      description: List of all threads.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Thread"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -264,10 +284,13 @@ components:
     Identifier:
       type: string
       format: xid
-      x-go-type: xid.ID
-      x-go-type-import:
-        name: xid
-        path: github.com/rs/xid
+      # NOTE: Does not work currently with oapi-codegen because it generates a
+      # new type declaration instead of a type alias so the unmarshalling fails.
+      # To work around this, there are special conversion APIs in the oapi pkg.
+      x-go-type: string
+      # x-go-type-import:
+      #   name: xid
+      #   path: github.com/rs/xid
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
 
@@ -305,7 +328,7 @@ components:
         suggested:
           type: string
 
-    AuthenticationRequest:
+    AuthRequest:
       type: object
       required: [identifier, token]
       properties:
@@ -316,7 +339,7 @@ components:
           example: "password"
           type: string
 
-    AuthenticationSuccess:
+    AuthSuccess:
       type: object
       required: [id]
       properties:
@@ -370,12 +393,15 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - type: object
           required:
-            - id
-            - createdAt
-            - updatedAt
             - title
             - slug
             - short
+            - pinned
+            - author
+            - tags
+            - posts
+            - category
+            - reacts
           properties:
             title:
               type: string
@@ -397,7 +423,6 @@ components:
               description: Whether the thread is pinned in this category.
             author:
               $ref: "#/components/schemas/ProfileReference"
-              readOnly: true
             tags:
               type: array
               items:

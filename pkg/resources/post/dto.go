@@ -33,7 +33,7 @@ const Role = "Post"
 func (u *Post) GetRole() string { return Role }
 
 type Author struct {
-	ID        xid.ID `json:"id"`
+	ID        xid.ID    `json:"id"`
 	Name      string    `json:"name"`
 	Admin     bool      `json:"admin"`
 	CreatedAt time.Time `json:"createdAt"`

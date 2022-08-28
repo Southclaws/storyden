@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -47,7 +48,7 @@ func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, err
 	account, err := d.db.Account.Get(ctx, xid.ID(userId))
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, nil
+			return nil, fault.WithValue(err, "account not found", "account_id", userId.String())
 		}
 
 		return nil, err

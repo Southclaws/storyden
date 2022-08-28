@@ -12,5 +12,5 @@ func (s *service) ListAll(
 	before time.Time,
 	max int,
 ) ([]*thread.Thread, error) {
-	return nil, nil
+	return s.thread_repo.List(ctx, before, max)
 }

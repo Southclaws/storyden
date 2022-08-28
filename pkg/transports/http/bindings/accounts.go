@@ -16,14 +16,14 @@ type Accounts struct {
 
 func NewAccounts(as account.Service) Accounts { return Accounts{as} }
 
-func (i *Accounts) GetAccount(ctx context.Context, request openapi.GetAccountRequestObject) any {
-	acc, err := i.as.Get(ctx, account_resource.AccountID(request.Id))
+func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) any {
+	acc, err := i.as.Get(ctx, account_resource.AccountID(request.Id.XID()))
 	if err != nil {
 		return err
 	}
 
-	return openapi.GetAccountSuccess{
-		Id:        openapi.Identifier(acc.ID),
+	return openapi.AccountsGetSuccess{
+		Id:        openapi.Identifier(acc.ID.String()),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		Email:     utils.Ref(acc.Email),
 		Name:      utils.Ref(acc.Name),

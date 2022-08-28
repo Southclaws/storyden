@@ -21,19 +21,21 @@ import (
 type Authentication struct {
 	p      *password.Password
 	sc     *securecookie.SecureCookie
+	ar     account.Repository
 	domain string
 }
 
 func NewAuthentication(
 	cfg config.Config,
 	p *password.Password,
+	ar account.Repository,
 	sc *securecookie.SecureCookie,
 ) Authentication {
-	return Authentication{p, sc, cfg.CookieDomain}
+	return Authentication{p, sc, ar, cfg.CookieDomain}
 }
 
-func (i *Authentication) Signin(ctx context.Context, request openapi.SigninRequestObject) any {
-	params := func() openapi.AuthenticationRequest {
+func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) any {
+	params := func() openapi.AuthRequest {
 		if request.JSONBody != nil {
 			return *request.JSONBody
 		} else {
@@ -44,11 +46,11 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 	u, err := i.p.Login(ctx, params.Identifier, params.Token)
 	if err != nil {
 		if errors.Is(err, password.ErrPasswordMismatch) {
-			return openapi.Signin401Response{}
+			return openapi.AuthPasswordSignin401Response{}
 		}
 
 		if model.IsNotFound(err) {
-			return openapi.Signin404Response{}
+			return openapi.AuthPasswordSignin404Response{}
 		}
 
 		return err
@@ -59,14 +61,14 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 		return err
 	}
 
-	return openapi.Signin200JSONResponse{
-		Body:    openapi.AuthenticationSuccess{Id: u.ID.String()},
-		Headers: openapi.AuthenticationSuccessResponseHeaders{SetCookie: cookie},
+	return openapi.AuthPasswordSignin200JSONResponse{
+		Body:    openapi.AuthSuccess{Id: u.ID.String()},
+		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
 	}
 }
 
-func (i *Authentication) Signup(ctx context.Context, request openapi.SignupRequestObject) any {
-	params := func() openapi.AuthenticationRequest {
+func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) any {
+	params := func() openapi.AuthRequest {
 		if request.JSONBody != nil {
 			return *request.JSONBody
 		} else {
@@ -77,7 +79,7 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
 		if errors.Is(err, password.ErrExists) {
-			return openapi.Signup400Response{}
+			return openapi.AuthPasswordSignup400Response{}
 		}
 
 		return openapi.InternalServerErrorJSONResponse{Error: err.Error()}
@@ -88,9 +90,9 @@ func (i *Authentication) Signup(ctx context.Context, request openapi.SignupReque
 		return err
 	}
 
-	return openapi.Signup200JSONResponse{
-		Body:    openapi.AuthenticationSuccess{Id: u.ID.String()},
-		Headers: openapi.AuthenticationSuccessResponseHeaders{SetCookie: cookie},
+	return openapi.AuthPasswordSignup200JSONResponse{
+		Body:    openapi.AuthSuccess{Id: u.ID.String()},
+		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
 	}
 }
 
@@ -109,9 +111,21 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
 	c := ctx.Value(middleware.EchoContextKey).(echo.Context)
-	_, err := authentication.GetAccountID(c.Request().Context())
 
-	return err
+	// first check if the middleware injected an account ID, if not, fail.
+	aid, err := authentication.GetAccountID(c.Request().Context())
+	if err != nil {
+		return err
+	}
+
+	// Then look up the account.
+	// TODO: Cache this.
+	_, err = i.ar.GetByID(ctx, aid)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 const secureCookieName = "storyden-session"

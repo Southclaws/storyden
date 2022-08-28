@@ -11,22 +11,22 @@ type CategoryID xid.ID
 func (i CategoryID) String() string { return xid.ID(i).String() }
 
 type PostMeta struct {
-	Author string `json:"author"`
-	PostID xid.ID `json:"postId"`
-	Slug   string `json:"slug"`
-	Title  string `json:"title"`
-	Short  string `json:"short"`
+	Author string
+	PostID xid.ID
+	Slug   string
+	Title  string
+	Short  string
 }
 
 type Category struct {
-	ID          CategoryID `json:"id"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	Colour      string     `json:"colour"`
-	Sort        int        `json:"sort"`
-	Admin       bool       `json:"admin"`
-	Recent      []PostMeta `json:"recent,omitempty"`
-	PostCount   int        `json:"postCount"`
+	ID          CategoryID
+	Name        string
+	Description string
+	Colour      string
+	Sort        int
+	Admin       bool
+	Recent      []PostMeta
+	PostCount   int
 }
 
 func PostMetaFromModel(p *model.Post) *PostMeta {
