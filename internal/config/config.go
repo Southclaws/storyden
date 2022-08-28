@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
 	"go.uber.org/fx"
 	"go.uber.org/zap/zapcore"
 )
@@ -25,7 +26,7 @@ type Config struct {
 func Build() fx.Option {
 	return fx.Provide(func() (c Config, err error) {
 		if err = envconfig.Process("", &c); err != nil {
-			return c, err
+			return c, errors.Wrap(err, "failed to parse configuration from environment variables")
 		}
 
 		return

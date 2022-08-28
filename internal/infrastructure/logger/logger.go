@@ -3,6 +3,7 @@ package logger
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -31,7 +32,7 @@ func newLogger(cfg config.Config) (*zap.Logger, error) {
 
 	logger, err := zapconfig.Build()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to build zap config")
 	}
 
 	return logger, nil

@@ -1,8 +1,7 @@
 package pubsub
 
 import (
-	"errors"
-
+	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 	"go.uber.org/zap"
 
@@ -20,17 +19,17 @@ type Rabbit struct {
 func NewRabbit(cfg config.Config) (Bus, error) {
 	conn, err := amqp.Dial(cfg.AmqpAddress)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to connect to amqp server")
 	}
 
 	pub, err := conn.Channel()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create publish channel")
 	}
 
 	sub, err := conn.Channel()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create subscribe channel")
 	}
 
 	r := Rabbit{pub, sub, make(map[Topic]amqp.Queue)}
@@ -62,7 +61,7 @@ func (r *Rabbit) Declare(t string) Topic {
 }
 
 func (r *Rabbit) Publish(topic Topic, message []byte) error {
-	return r.pub.Publish(
+	err := r.pub.Publish(
 		"",            // exchange
 		string(topic), // key
 		true,          // mandatory
@@ -72,6 +71,11 @@ func (r *Rabbit) Publish(topic Topic, message []byte) error {
 			Body:        message,
 		},
 	)
+	if err != nil {
+		return errors.Wrap(err, "failed to publish to topic")
+	}
+
+	return nil
 }
 
 func (r *Rabbit) Subscribe(topic Topic, handler func([]byte) (bool, error)) error {

@@ -22,7 +22,7 @@ type Config struct {
 func NewSendGrid() (Mailer, error) {
 	var cfg Config
 	if err := envconfig.Process("", &cfg); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to load sendgrid configuration")
 	}
 
 	return &SendGrid{
