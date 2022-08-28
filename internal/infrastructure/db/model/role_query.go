@@ -476,7 +476,7 @@ func (rq *RoleQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   role.Table,
 			Columns: role.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: role.FieldID,
 			},
 		},

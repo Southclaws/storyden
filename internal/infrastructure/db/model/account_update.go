@@ -383,7 +383,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: account.FieldID,
 			},
 		},
@@ -458,7 +458,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -474,7 +474,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -493,7 +493,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -512,7 +512,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -528,7 +528,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -547,7 +547,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -566,7 +566,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -582,7 +582,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -601,7 +601,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -620,7 +620,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -636,7 +636,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -655,7 +655,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -674,7 +674,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},
@@ -690,7 +690,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},
@@ -709,7 +709,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1101,7 +1101,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: account.FieldID,
 			},
 		},
@@ -1193,7 +1193,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -1209,7 +1209,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -1228,7 +1228,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},
@@ -1247,7 +1247,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -1263,7 +1263,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -1282,7 +1282,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: react.FieldID,
 				},
 			},
@@ -1301,7 +1301,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -1317,7 +1317,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -1336,7 +1336,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: role.FieldID,
 				},
 			},
@@ -1355,7 +1355,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1371,7 +1371,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1390,7 +1390,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1409,7 +1409,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1425,7 +1425,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1444,7 +1444,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: authentication.FieldID,
 				},
 			},

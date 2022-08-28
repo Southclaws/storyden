@@ -8,11 +8,13 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
+	"github.com/Southclaws/storyden/pkg/resources/thread"
 )
 
 // NOTE: identifiers in the system use the xid format. This format has a couple
@@ -55,11 +57,12 @@ func New(
 	client *model.Client,
 	account_repo account.Repository,
 	category_repo category.Repository,
+	thread_repo thread.Repository,
 ) (r Ready, err error) {
 	defer func() {
 		// recover panics so that test cleanups can run.
 		if r := recover(); r != nil {
-			fmt.Println(r)
+			fmt.Println(fault.Context(r.(error)))
 
 			err = errors.New("failed to seed")
 		}
@@ -73,6 +76,7 @@ func New(
 
 	accounts(account_repo)
 	categories(category_repo)
+	threads(thread_repo)
 
 	return Ready{}, err
 }

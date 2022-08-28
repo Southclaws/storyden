@@ -208,7 +208,7 @@ func (ac *AuthenticationCreate) check() error {
 		}
 	}
 	if v, ok := ac.mutation.ID(); ok {
-		if err := authentication.IDValidator(v[:]); err != nil {
+		if err := authentication.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Authentication.id": %w`, err)}
 		}
 	}
@@ -239,7 +239,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec = &sqlgraph.CreateSpec{
 			Table: authentication.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: authentication.FieldID,
 			},
 		}
@@ -298,7 +298,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: account.FieldID,
 				},
 			},

@@ -23,13 +23,13 @@ func TestDB(t *testing.T) {
 		url = "postgresql://default:default@localhost:5432/postgres"
 	}
 
-	c, d, err := connect(context.Background(), url, false)
+	c, _, err := connect(context.Background(), url, false)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
-		Truncate(d)
+		// Truncate(d)
 		c.Close()
 	})
 }

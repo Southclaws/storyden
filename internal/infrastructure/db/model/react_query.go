@@ -525,7 +525,7 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: react.FieldID,
 			},
 		},

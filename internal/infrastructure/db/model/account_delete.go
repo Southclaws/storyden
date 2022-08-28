@@ -72,7 +72,7 @@ func (ad *AccountDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: account.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: account.FieldID,
 			},
 		},

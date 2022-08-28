@@ -10,7 +10,7 @@ import (
 var (
 	// AccountsColumns holds the columns for the "accounts" table.
 	AccountsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -27,13 +27,13 @@ var (
 	}
 	// AuthenticationsColumns holds the columns for the "authentications" table.
 	AuthenticationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "service", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
-		{Name: "account_authentication", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "account_authentication", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
 	AuthenticationsTable = &schema.Table{
@@ -58,7 +58,7 @@ var (
 	}
 	// CategoriesColumns holds the columns for the "categories" table.
 	CategoriesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
@@ -75,14 +75,14 @@ var (
 	}
 	// NotificationsColumns holds the columns for the "notifications" table.
 	NotificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
 		{Name: "link", Type: field.TypeString},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "notification_subscription", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "subscription_notifications", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "notification_subscription", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "subscription_notifications", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.
 	NotificationsTable = &schema.Table{
@@ -106,7 +106,7 @@ var (
 	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
@@ -116,10 +116,10 @@ var (
 		{Name: "pinned", Type: field.TypeBool, Default: false},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
-		{Name: "account_posts", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "category_id", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "root_post_id", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "reply_to_post_id", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "account_posts", Type: field.TypeString, Size: 20},
+		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "root_post_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "reply_to_post_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// PostsTable holds the schema information for the "posts" table.
 	PostsTable = &schema.Table{
@@ -155,13 +155,13 @@ var (
 	}
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "emoji", Type: field.TypeString},
-		{Name: "account_reacts", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "post_reacts", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "react_account", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "react_post", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "account_reacts", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "post_reacts", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "react_account", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "react_post", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// ReactsTable holds the schema information for the "reacts" table.
 	ReactsTable = &schema.Table{
@@ -197,7 +197,7 @@ var (
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Unique: true},
@@ -210,12 +210,12 @@ var (
 	}
 	// SubscriptionsColumns holds the columns for the "subscriptions" table.
 	SubscriptionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "refers_type", Type: field.TypeString},
 		{Name: "refers_to", Type: field.TypeString},
-		{Name: "account_subscriptions", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "subscription_account", Type: field.TypeBytes, Nullable: true, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "account_subscriptions", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "subscription_account", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// SubscriptionsTable holds the schema information for the "subscriptions" table.
 	SubscriptionsTable = &schema.Table{
@@ -239,7 +239,7 @@ var (
 	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Unique: true},
 	}
@@ -251,8 +251,8 @@ var (
 	}
 	// RoleAccountsColumns holds the columns for the "role_accounts" table.
 	RoleAccountsColumns = []*schema.Column{
-		{Name: "role_id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "account_id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "role_id", Type: field.TypeString, Size: 20},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
 	// RoleAccountsTable holds the schema information for the "role_accounts" table.
 	RoleAccountsTable = &schema.Table{
@@ -276,8 +276,8 @@ var (
 	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
-		{Name: "tag_id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
-		{Name: "post_id", Type: field.TypeBytes, Size: 20, SchemaType: map[string]string{"mysql": "binary(12)", "postgres": "bytea"}},
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
 	}
 	// TagPostsTable holds the schema information for the "tag_posts" table.
 	TagPostsTable = &schema.Table{

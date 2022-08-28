@@ -194,7 +194,7 @@ func (rc *ReactCreate) check() error {
 		return &ValidationError{Name: "emoji", err: errors.New(`model: missing required field "React.emoji"`)}
 	}
 	if v, ok := rc.mutation.ID(); ok {
-		if err := react.IDValidator(v[:]); err != nil {
+		if err := react.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "React.id": %w`, err)}
 		}
 	}
@@ -225,7 +225,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: react.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: react.FieldID,
 			},
 		}
@@ -260,7 +260,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: account.FieldID,
 				},
 			},
@@ -280,7 +280,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},

@@ -150,7 +150,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: notification.FieldID,
 			},
 		},
@@ -199,7 +199,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -215,7 +215,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -379,7 +379,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: notification.FieldID,
 			},
 		},
@@ -445,7 +445,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},
@@ -461,7 +461,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},

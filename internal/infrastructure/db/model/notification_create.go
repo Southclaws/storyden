@@ -201,7 +201,7 @@ func (nc *NotificationCreate) check() error {
 		return &ValidationError{Name: "read", err: errors.New(`model: missing required field "Notification.read"`)}
 	}
 	if v, ok := nc.mutation.ID(); ok {
-		if err := notification.IDValidator(v[:]); err != nil {
+		if err := notification.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Notification.id": %w`, err)}
 		}
 	}
@@ -232,7 +232,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec = &sqlgraph.CreateSpec{
 			Table: notification.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: notification.FieldID,
 			},
 		}
@@ -291,7 +291,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: subscription.FieldID,
 				},
 			},

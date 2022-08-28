@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"entgo.io/ent"
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 	"github.com/rs/xid"
@@ -14,15 +13,11 @@ type Identifier struct{ mixin.Schema }
 
 func (Identifier) Fields() []ent.Field {
 	return []ent.Field{
-		field.Bytes("id").
+		field.String("id").
 			MaxLen(20).
 			NotEmpty().
 			Immutable().
 			GoType(xid.ID{}).
-			SchemaType(map[string]string{
-				dialect.MySQL:    "binary(12)",
-				dialect.Postgres: "bytea",
-			}).
 			DefaultFunc(func() xid.ID { return xid.New() }),
 	}
 }

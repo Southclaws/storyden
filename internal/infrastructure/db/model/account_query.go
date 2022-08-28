@@ -776,7 +776,7 @@ func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: account.FieldID,
 			},
 		},

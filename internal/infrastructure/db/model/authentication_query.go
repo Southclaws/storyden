@@ -453,7 +453,7 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: authentication.FieldID,
 			},
 		},

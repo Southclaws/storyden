@@ -209,7 +209,7 @@ func (sc *SubscriptionCreate) check() error {
 		}
 	}
 	if v, ok := sc.mutation.ID(); ok {
-		if err := subscription.IDValidator(v[:]); err != nil {
+		if err := subscription.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Subscription.id": %w`, err)}
 		}
 	}
@@ -240,7 +240,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_spec = &sqlgraph.CreateSpec{
 			Table: subscription.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: subscription.FieldID,
 			},
 		}
@@ -283,7 +283,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: account.FieldID,
 				},
 			},
@@ -303,7 +303,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: notification.FieldID,
 				},
 			},

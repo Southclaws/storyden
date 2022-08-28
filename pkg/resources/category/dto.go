@@ -1,18 +1,21 @@
 package category
 
 import (
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 
 type CategoryID xid.ID
 
+func (i CategoryID) String() string { return xid.ID(i).String() }
+
 type PostMeta struct {
-	Author string    `json:"author"`
+	Author string `json:"author"`
 	PostID xid.ID `json:"postId"`
-	Slug   string    `json:"slug"`
-	Title  string    `json:"title"`
-	Short  string    `json:"short"`
+	Slug   string `json:"slug"`
+	Title  string `json:"title"`
+	Short  string `json:"short"`
 }
 
 type Category struct {

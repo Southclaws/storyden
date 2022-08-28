@@ -275,7 +275,7 @@ func (cc *CategoryCreate) check() error {
 		return &ValidationError{Name: "admin", err: errors.New(`model: missing required field "Category.admin"`)}
 	}
 	if v, ok := cc.mutation.ID(); ok {
-		if err := category.IDValidator(v[:]); err != nil {
+		if err := category.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Category.id": %w`, err)}
 		}
 	}
@@ -306,7 +306,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: category.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: category.FieldID,
 			},
 		}
@@ -381,7 +381,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},

@@ -19,22 +19,22 @@ func TestCreateUser(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
+		u, err := repo.Create(ctx, "south@cla.ws", "southclaws")
 		r.NoError(err)
 		r.NotNil(u)
 
-		a.Equal(seed.Account_000.Email, u.Email)
-		a.Equal(seed.Account_000.Name, u.Name)
+		a.Equal("south@cla.ws", u.Email)
+		a.Equal("southclaws", u.Name)
 
 		u1, err := repo.GetByID(ctx, u.ID)
 		r.NoError(err)
 		a.NotNil(u1)
 
-		a.Equal(seed.Account_000.Email, u1.Email)
-		a.Equal(seed.Account_000.Name, u1.Name)
+		a.Equal("south@cla.ws", u1.Email)
+		a.Equal("southclaws", u1.Name)
 
 		// Duplicate email address should fail.
-		u2, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
+		u2, err := repo.Create(ctx, "south@cla.ws", "southclaws")
 		r.Error(err)
 		a.Nil(u2)
 	}))
@@ -45,16 +45,11 @@ func TestGetByID(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, err := repo.GetByID(ctx, seed.Account_000.ID)
+		acc, err := repo.GetByID(ctx, seed.Account_000.ID)
 		r.NoError(err)
-		a.Nil(none)
+		r.NotNil(acc)
 
-		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
-		r.NoError(err)
-
-		u, err = repo.GetByID(ctx, u.ID)
-		r.NoError(err)
-		a.NotNil(u)
+		a.Equal(seed.Account_000.Name, acc.Name)
 	}))
 }
 
@@ -63,18 +58,12 @@ func TestGetByEmail(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		none, ok, err := repo.LookupByEmail(ctx, seed.Account_000.Email)
-		r.NoError(err)
-		r.False(ok)
-		a.Nil(none)
-
-		u, err := repo.Create(ctx, seed.Account_000.Email, seed.Account_000.Name)
-		r.NoError(err)
-
-		u, ok, err = repo.LookupByEmail(ctx, seed.Account_000.Email)
+		acc, ok, err := repo.LookupByEmail(ctx, seed.Account_000.Email)
 		r.NoError(err)
 		r.True(ok)
-		a.NotNil(u)
+		a.NotNil(acc)
+
+		a.Equal(seed.Account_000.Name, acc.Name)
 	}))
 }
 

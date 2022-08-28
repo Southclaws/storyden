@@ -978,7 +978,7 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   post.Table,
 			Columns: post.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: post.FieldID,
 			},
 		},

@@ -191,7 +191,7 @@ func (rc *RoleCreate) check() error {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Role.name"`)}
 	}
 	if v, ok := rc.mutation.ID(); ok {
-		if err := role.IDValidator(v[:]); err != nil {
+		if err := role.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Role.id": %w`, err)}
 		}
 	}
@@ -222,7 +222,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: role.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: role.FieldID,
 			},
 		}
@@ -265,7 +265,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: account.FieldID,
 				},
 			},

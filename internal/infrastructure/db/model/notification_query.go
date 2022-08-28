@@ -453,7 +453,7 @@ func (nq *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: notification.FieldID,
 			},
 		},

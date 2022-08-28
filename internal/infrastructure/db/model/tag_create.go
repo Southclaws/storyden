@@ -170,7 +170,7 @@ func (tc *TagCreate) check() error {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Tag.name"`)}
 	}
 	if v, ok := tc.mutation.ID(); ok {
-		if err := tag.IDValidator(v[:]); err != nil {
+		if err := tag.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Tag.id": %w`, err)}
 		}
 	}
@@ -201,7 +201,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: tag.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: tag.FieldID,
 			},
 		}
@@ -236,7 +236,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeBytes,
+					Type:   field.TypeString,
 					Column: post.FieldID,
 				},
 			},

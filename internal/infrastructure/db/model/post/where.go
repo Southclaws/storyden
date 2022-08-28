@@ -662,6 +662,58 @@ func RootPostIDNotIn(vs ...xid.ID) predicate.Post {
 	})
 }
 
+// RootPostIDGT applies the GT predicate on the "root_post_id" field.
+func RootPostIDGT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDGTE applies the GTE predicate on the "root_post_id" field.
+func RootPostIDGTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDLT applies the LT predicate on the "root_post_id" field.
+func RootPostIDLT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDLTE applies the LTE predicate on the "root_post_id" field.
+func RootPostIDLTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRootPostID), v))
+	})
+}
+
+// RootPostIDContains applies the Contains predicate on the "root_post_id" field.
+func RootPostIDContains(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldRootPostID), vc))
+	})
+}
+
+// RootPostIDHasPrefix applies the HasPrefix predicate on the "root_post_id" field.
+func RootPostIDHasPrefix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldRootPostID), vc))
+	})
+}
+
+// RootPostIDHasSuffix applies the HasSuffix predicate on the "root_post_id" field.
+func RootPostIDHasSuffix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldRootPostID), vc))
+	})
+}
+
 // RootPostIDIsNil applies the IsNil predicate on the "root_post_id" field.
 func RootPostIDIsNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -673,6 +725,22 @@ func RootPostIDIsNil() predicate.Post {
 func RootPostIDNotNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldRootPostID)))
+	})
+}
+
+// RootPostIDEqualFold applies the EqualFold predicate on the "root_post_id" field.
+func RootPostIDEqualFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldRootPostID), vc))
+	})
+}
+
+// RootPostIDContainsFold applies the ContainsFold predicate on the "root_post_id" field.
+func RootPostIDContainsFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldRootPostID), vc))
 	})
 }
 
@@ -712,6 +780,58 @@ func ReplyToPostIDNotIn(vs ...xid.ID) predicate.Post {
 	})
 }
 
+// ReplyToPostIDGT applies the GT predicate on the "reply_to_post_id" field.
+func ReplyToPostIDGT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDGTE applies the GTE predicate on the "reply_to_post_id" field.
+func ReplyToPostIDGTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDLT applies the LT predicate on the "reply_to_post_id" field.
+func ReplyToPostIDLT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDLTE applies the LTE predicate on the "reply_to_post_id" field.
+func ReplyToPostIDLTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldReplyToPostID), v))
+	})
+}
+
+// ReplyToPostIDContains applies the Contains predicate on the "reply_to_post_id" field.
+func ReplyToPostIDContains(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldReplyToPostID), vc))
+	})
+}
+
+// ReplyToPostIDHasPrefix applies the HasPrefix predicate on the "reply_to_post_id" field.
+func ReplyToPostIDHasPrefix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldReplyToPostID), vc))
+	})
+}
+
+// ReplyToPostIDHasSuffix applies the HasSuffix predicate on the "reply_to_post_id" field.
+func ReplyToPostIDHasSuffix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldReplyToPostID), vc))
+	})
+}
+
 // ReplyToPostIDIsNil applies the IsNil predicate on the "reply_to_post_id" field.
 func ReplyToPostIDIsNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -723,6 +843,22 @@ func ReplyToPostIDIsNil() predicate.Post {
 func ReplyToPostIDNotNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldReplyToPostID)))
+	})
+}
+
+// ReplyToPostIDEqualFold applies the EqualFold predicate on the "reply_to_post_id" field.
+func ReplyToPostIDEqualFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldReplyToPostID), vc))
+	})
+}
+
+// ReplyToPostIDContainsFold applies the ContainsFold predicate on the "reply_to_post_id" field.
+func ReplyToPostIDContainsFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldReplyToPostID), vc))
 	})
 }
 
@@ -960,6 +1096,58 @@ func CategoryIDNotIn(vs ...xid.ID) predicate.Post {
 	})
 }
 
+// CategoryIDGT applies the GT predicate on the "category_id" field.
+func CategoryIDGT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCategoryID), v))
+	})
+}
+
+// CategoryIDGTE applies the GTE predicate on the "category_id" field.
+func CategoryIDGTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCategoryID), v))
+	})
+}
+
+// CategoryIDLT applies the LT predicate on the "category_id" field.
+func CategoryIDLT(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCategoryID), v))
+	})
+}
+
+// CategoryIDLTE applies the LTE predicate on the "category_id" field.
+func CategoryIDLTE(v xid.ID) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCategoryID), v))
+	})
+}
+
+// CategoryIDContains applies the Contains predicate on the "category_id" field.
+func CategoryIDContains(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldCategoryID), vc))
+	})
+}
+
+// CategoryIDHasPrefix applies the HasPrefix predicate on the "category_id" field.
+func CategoryIDHasPrefix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldCategoryID), vc))
+	})
+}
+
+// CategoryIDHasSuffix applies the HasSuffix predicate on the "category_id" field.
+func CategoryIDHasSuffix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldCategoryID), vc))
+	})
+}
+
 // CategoryIDIsNil applies the IsNil predicate on the "category_id" field.
 func CategoryIDIsNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
@@ -971,6 +1159,22 @@ func CategoryIDIsNil() predicate.Post {
 func CategoryIDNotNil() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldCategoryID)))
+	})
+}
+
+// CategoryIDEqualFold applies the EqualFold predicate on the "category_id" field.
+func CategoryIDEqualFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldCategoryID), vc))
+	})
+}
+
+// CategoryIDContainsFold applies the ContainsFold predicate on the "category_id" field.
+func CategoryIDContainsFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldCategoryID), vc))
 	})
 }
 

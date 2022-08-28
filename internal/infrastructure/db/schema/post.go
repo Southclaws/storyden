@@ -25,15 +25,15 @@ func (Post) Fields() []ent.Field {
 		field.Bool("pinned").Default(false),
 
 		// child posts
-		field.Bytes("root_post_id").GoType(xid.ID{}).Optional(),
-		field.Bytes("reply_to_post_id").GoType(xid.ID{}).Optional(),
+		field.String("root_post_id").GoType(xid.ID{}).Optional(),
+		field.String("reply_to_post_id").GoType(xid.ID{}).Optional(),
 
 		// All posts
 		field.String("body"),
 		field.String("short"),
 
 		// Edges
-		field.Bytes("category_id").GoType(xid.ID{}).Optional(),
+		field.String("category_id").GoType(xid.ID{}).Optional(),
 	}
 }
 

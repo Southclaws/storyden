@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	post_model "github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
+	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 	"github.com/Southclaws/storyden/pkg/resources/post"
@@ -39,8 +41,16 @@ func (d *database) Create(
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
+	opts ...option,
 ) (*Thread, error) {
-	short := post.MakeShortBody(body)
+	insert := Thread{
+		Short: post.MakeShortBody(body),
+		Title: title,
+	}
+
+	for _, v := range opts {
+		v(&insert)
+	}
 
 	// tagset, err := d.createTags(ctx, tags)
 	// if err != nil {
@@ -49,13 +59,14 @@ func (d *database) Create(
 
 	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
-		return nil, err
+		return nil, fault.WithValue(err, "category not found", "category_id", categoryID.String())
 	}
 
 	p, err := d.db.Post.
 		Create().
+		SetNillableID(utils.OptionalID(xid.ID(insert.ID))).
 		SetFirst(true).
-		SetShort(short).
+		SetShort(insert.Short).
 		SetBody(body).
 		SetAuthorID(xid.ID(authorID)).
 		SetTitle(title).
@@ -117,7 +128,7 @@ func (d *database) List(
 	max int,
 ) ([]*Thread, error) {
 	filters := []predicate.Post{
-		post_model.DeletedAtNotNil(),
+		post_model.DeletedAtIsNil(),
 	}
 
 	if !before.IsZero() {
@@ -135,8 +146,8 @@ func (d *database) List(
 	result, err := d.db.Post.Query().
 		Where(filters...).
 		Limit(max).
-		// WithPosts(func(pq *model.PostQuery) {
-		// }).
+		WithCategory().
+		WithAuthor().
 		All(ctx)
 	if err != nil {
 		return nil, err

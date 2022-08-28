@@ -529,7 +529,7 @@ func (sq *SubscriptionQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   subscription.Table,
 			Columns: subscription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: subscription.FieldID,
 			},
 		},

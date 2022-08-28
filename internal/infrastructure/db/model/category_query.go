@@ -446,7 +446,7 @@ func (cq *CategoryQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   category.Table,
 			Columns: category.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeBytes,
+				Type:   field.TypeString,
 				Column: category.FieldID,
 			},
 		},

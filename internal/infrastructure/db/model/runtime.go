@@ -54,13 +54,13 @@ func init() {
 	// account.DefaultID holds the default value on creation for the id field.
 	account.DefaultID = accountDescID.Default.(func() xid.ID)
 	// account.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	account.IDValidator = func() func([]byte) error {
+	account.IDValidator = func() func(string) error {
 		validators := accountDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -93,13 +93,13 @@ func init() {
 	// authentication.DefaultID holds the default value on creation for the id field.
 	authentication.DefaultID = authenticationDescID.Default.(func() xid.ID)
 	// authentication.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	authentication.IDValidator = func() func([]byte) error {
+	authentication.IDValidator = func() func(string) error {
 		validators := authenticationDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -148,13 +148,13 @@ func init() {
 	// category.DefaultID holds the default value on creation for the id field.
 	category.DefaultID = categoryDescID.Default.(func() xid.ID)
 	// category.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	category.IDValidator = func() func([]byte) error {
+	category.IDValidator = func() func(string) error {
 		validators := categoryDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -179,13 +179,13 @@ func init() {
 	// notification.DefaultID holds the default value on creation for the id field.
 	notification.DefaultID = notificationDescID.Default.(func() xid.ID)
 	// notification.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	notification.IDValidator = func() func([]byte) error {
+	notification.IDValidator = func() func(string) error {
 		validators := notificationDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -222,13 +222,13 @@ func init() {
 	// post.DefaultID holds the default value on creation for the id field.
 	post.DefaultID = postDescID.Default.(func() xid.ID)
 	// post.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	post.IDValidator = func() func([]byte) error {
+	post.IDValidator = func() func(string) error {
 		validators := postDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -253,13 +253,13 @@ func init() {
 	// react.DefaultID holds the default value on creation for the id field.
 	react.DefaultID = reactDescID.Default.(func() xid.ID)
 	// react.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	react.IDValidator = func() func([]byte) error {
+	react.IDValidator = func() func(string) error {
 		validators := reactDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -292,13 +292,13 @@ func init() {
 	// role.DefaultID holds the default value on creation for the id field.
 	role.DefaultID = roleDescID.Default.(func() xid.ID)
 	// role.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	role.IDValidator = func() func([]byte) error {
+	role.IDValidator = func() func(string) error {
 		validators := roleDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -331,13 +331,13 @@ func init() {
 	// subscription.DefaultID holds the default value on creation for the id field.
 	subscription.DefaultID = subscriptionDescID.Default.(func() xid.ID)
 	// subscription.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	subscription.IDValidator = func() func([]byte) error {
+	subscription.IDValidator = func() func(string) error {
 		validators := subscriptionDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err
@@ -362,13 +362,13 @@ func init() {
 	// tag.DefaultID holds the default value on creation for the id field.
 	tag.DefaultID = tagDescID.Default.(func() xid.ID)
 	// tag.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	tag.IDValidator = func() func([]byte) error {
+	tag.IDValidator = func() func(string) error {
 		validators := tagDescID.Validators
-		fns := [...]func([]byte) error{
-			validators[0].(func([]byte) error),
-			validators[1].(func([]byte) error),
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
 		}
-		return func(id []byte) error {
+		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
 					return err

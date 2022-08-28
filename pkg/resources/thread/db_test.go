@@ -2,11 +2,9 @@ package thread_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -48,9 +46,6 @@ func TestCreate(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	fmt.Println(xid.New())
-	fmt.Println(xid.ID{})
-
 	defer integration.Test(t, nil, fx.Invoke(
 		func(
 			_ seed.Ready,
@@ -64,7 +59,7 @@ func TestList(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(threads)
 
-			a.Len(threads, 0)
+			a.Len(threads, 2)
 		}),
 	)
 }

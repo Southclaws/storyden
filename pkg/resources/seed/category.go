@@ -10,7 +10,7 @@ import (
 
 var (
 	Category_01_General = category.Category{
-		ID:          category.CategoryID(id("00000000000000000000")),
+		ID:          category.CategoryID(id("00000000000000000010")),
 		Name:        "General",
 		Description: "General stuff",
 		Colour:      "#ffffff",
@@ -18,7 +18,7 @@ var (
 	}
 
 	Category_02_Photos = category.Category{
-		ID:          category.CategoryID(id("00000000000000000010")),
+		ID:          category.CategoryID(id("00000000000000000020")),
 		Name:        "Media",
 		Description: "Movies and tv shows",
 		Colour:      "#ffffff",
@@ -26,7 +26,7 @@ var (
 	}
 
 	Category_03_Movies = category.Category{
-		ID:          category.CategoryID(id("00000000000000000020")),
+		ID:          category.CategoryID(id("00000000000000000030")),
 		Name:        "Movies",
 		Description: "Movies discussion",
 		Colour:      "#ffffff",
@@ -34,7 +34,7 @@ var (
 	}
 
 	Category_04_Music = category.Category{
-		ID:          category.CategoryID(id("00000000000000000030")),
+		ID:          category.CategoryID(id("00000000000000000040")),
 		Name:        "Music",
 		Description: "Music discussion",
 		Colour:      "#ffffff",
@@ -42,7 +42,7 @@ var (
 	}
 
 	Category_05_Admin = category.Category{
-		ID:          category.CategoryID(id("00000000000000000040")),
+		ID:          category.CategoryID(id("00000000000000000050")),
 		Name:        "Admin",
 		Description: "Admin area",
 		Colour:      "#ffffff",
