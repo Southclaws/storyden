@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/fault"
+	"github.com/Southclaws/storyden/internal/errmeta"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/pkg/resources/account"
-	"github.com/pkg/errors"
-	"github.com/rs/xid"
 )
 
 type database struct {
@@ -32,7 +32,7 @@ func (d *database) Create(
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
-		return nil, fault.Wrap(errors.Wrap(err, "failed to get parent thread"),
+		return nil, errmeta.Wrap(errors.Wrap(err, "failed to get parent thread"),
 			"authorID", authorID.String(),
 			"parentID", parentID.String())
 	}

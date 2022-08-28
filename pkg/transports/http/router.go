@@ -5,7 +5,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/fault"
+	"github.com/Southclaws/storyden/internal/errmeta"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
 )
@@ -16,8 +17,13 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	// TODO: Check errtags or fault context and react accordingly.
 	// With: ctx.Response().WriteHeader( derived... )
 	router.HTTPErrorHandler = func(err error, c echo.Context) {
-		errdata := fault.ErrorData(err)
-		l.Info("request error", zap.Any("meta", errdata))
+		em := errmeta.Metadata(err)
+
+		switch errtag.Tag(err) {
+		case errtag.RESOURCE_EXHAUSTED{}:
+		}
+
+		l.Info("request error", zap.Any("metadata", em))
 
 		// TODO: Settle on a nice way to do this.
 		// TODO: Handle error categories mapping to HTTP statuses too.
@@ -27,7 +33,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 				Message:   utils.Ref("An unhandled error occurred."),
 				Suggested: utils.Ref("Please try again later or contact the site team/administrator."),
 			},
-			"context": errdata,
+			"metadata": em,
 		})
 	}
 
