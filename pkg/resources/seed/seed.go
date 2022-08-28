@@ -15,6 +15,13 @@ import (
 	"github.com/Southclaws/storyden/pkg/resources/category"
 )
 
+// NOTE: identifiers in the system use the xid format. This format has a couple
+// of checks when reading from a string format. Because of this, the constant ID
+// string literals used in the seed data are written to work properly but also
+// be super simple and readable for debugging purposes when working with seed
+// data. The format is just avoiding setting the final character so the first 2
+// characters of the final section are used. In the documentation this is
+// referred to as: "3-byte counter, starting with a random value."
 var id = func(s string) xid.ID { return utils.Must(xid.FromString(s)) }
 
 // Ready is a type you can depend on during integration tests which, when used
