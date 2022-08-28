@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/fault"
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
 )
@@ -15,7 +16,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	// TODO: Check errtags or fault context and react accordingly.
 	// With: ctx.Response().WriteHeader( derived... )
 	router.HTTPErrorHandler = func(err error, c echo.Context) {
-		l.Info("request error", zap.Error(err))
+		l.Info("request error", zap.Any("meta", fault.ErrorData(err)))
 
 		c.JSON(500, openapi.APIError{
 			Error:     err.Error(),
