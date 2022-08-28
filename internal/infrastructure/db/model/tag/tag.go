@@ -3,7 +3,9 @@
 package tag
 
 import (
-	"github.com/google/uuid"
+	"time"
+
+	"github.com/rs/xid"
 )
 
 const (
@@ -11,6 +13,8 @@ const (
 	Label = "tag"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
@@ -27,6 +31,7 @@ const (
 // Columns holds all SQL columns for tag fields.
 var Columns = []string{
 	FieldID,
+	FieldCreatedAt,
 	FieldName,
 }
 
@@ -47,6 +52,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

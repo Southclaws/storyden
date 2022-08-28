@@ -2,12 +2,12 @@ package react
 
 import (
 	"github.com/forPelevin/gomoji"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 
-type ReactID uuid.UUID
+type ReactID xid.ID
 
 type React struct {
 	ID     ReactID `json:"id"`

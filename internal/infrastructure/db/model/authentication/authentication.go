@@ -5,7 +5,7 @@ package authentication
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 const (
@@ -13,8 +13,8 @@ const (
 	Label = "authentication"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreateTime holds the string denoting the create_time field in the database.
-	FieldCreateTime = "create_time"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldService holds the string denoting the service field in the database.
 	FieldService = "service"
 	// FieldIdentifier holds the string denoting the identifier field in the database.
@@ -39,7 +39,7 @@ const (
 // Columns holds all SQL columns for authentication fields.
 var Columns = []string{
 	FieldID,
-	FieldCreateTime,
+	FieldCreatedAt,
 	FieldService,
 	FieldIdentifier,
 	FieldToken,
@@ -68,12 +68,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() time.Time
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
 	// ServiceValidator is a validator for the "service" field. It is called by the builders before save.
 	ServiceValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

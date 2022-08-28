@@ -1,16 +1,15 @@
 package category
 
 import (
-	"github.com/google/uuid"
-
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/rs/xid"
 )
 
-type CategoryID uuid.UUID
+type CategoryID xid.ID
 
 type PostMeta struct {
 	Author string    `json:"author"`
-	PostID uuid.UUID `json:"postId"`
+	PostID xid.ID `json:"postId"`
 	Slug   string    `json:"slug"`
 	Title  string    `json:"title"`
 	Short  string    `json:"short"`

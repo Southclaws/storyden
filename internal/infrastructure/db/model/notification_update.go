@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -14,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // NotificationUpdate is the builder for updating Notification entities.
@@ -55,28 +54,14 @@ func (nu *NotificationUpdate) SetRead(b bool) *NotificationUpdate {
 	return nu
 }
 
-// SetCreateTime sets the "create_time" field.
-func (nu *NotificationUpdate) SetCreateTime(t time.Time) *NotificationUpdate {
-	nu.mutation.SetCreateTime(t)
-	return nu
-}
-
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableCreateTime(t *time.Time) *NotificationUpdate {
-	if t != nil {
-		nu.SetCreateTime(*t)
-	}
-	return nu
-}
-
 // SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nu *NotificationUpdate) SetSubscriptionID(id uuid.UUID) *NotificationUpdate {
+func (nu *NotificationUpdate) SetSubscriptionID(id xid.ID) *NotificationUpdate {
 	nu.mutation.SetSubscriptionID(id)
 	return nu
 }
 
 // SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableSubscriptionID(id *uuid.UUID) *NotificationUpdate {
+func (nu *NotificationUpdate) SetNillableSubscriptionID(id *xid.ID) *NotificationUpdate {
 	if id != nil {
 		nu = nu.SetSubscriptionID(*id)
 	}
@@ -165,7 +150,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: notification.FieldID,
 			},
 		},
@@ -205,13 +190,6 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: notification.FieldRead,
 		})
 	}
-	if value, ok := nu.mutation.CreateTime(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: notification.FieldCreateTime,
-		})
-	}
 	if nu.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -221,7 +199,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -237,7 +215,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -292,28 +270,14 @@ func (nuo *NotificationUpdateOne) SetRead(b bool) *NotificationUpdateOne {
 	return nuo
 }
 
-// SetCreateTime sets the "create_time" field.
-func (nuo *NotificationUpdateOne) SetCreateTime(t time.Time) *NotificationUpdateOne {
-	nuo.mutation.SetCreateTime(t)
-	return nuo
-}
-
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableCreateTime(t *time.Time) *NotificationUpdateOne {
-	if t != nil {
-		nuo.SetCreateTime(*t)
-	}
-	return nuo
-}
-
 // SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nuo *NotificationUpdateOne) SetSubscriptionID(id uuid.UUID) *NotificationUpdateOne {
+func (nuo *NotificationUpdateOne) SetSubscriptionID(id xid.ID) *NotificationUpdateOne {
 	nuo.mutation.SetSubscriptionID(id)
 	return nuo
 }
 
 // SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableSubscriptionID(id *uuid.UUID) *NotificationUpdateOne {
+func (nuo *NotificationUpdateOne) SetNillableSubscriptionID(id *xid.ID) *NotificationUpdateOne {
 	if id != nil {
 		nuo = nuo.SetSubscriptionID(*id)
 	}
@@ -415,7 +379,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: notification.FieldID,
 			},
 		},
@@ -472,13 +436,6 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Column: notification.FieldRead,
 		})
 	}
-	if value, ok := nuo.mutation.CreateTime(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: notification.FieldCreateTime,
-		})
-	}
 	if nuo.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -488,7 +445,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -504,7 +461,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},

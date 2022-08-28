@@ -7,14 +7,15 @@ import (
 	"github.com/Southclaws/storyden/pkg/resources/category"
 )
 
-//go:generate mockery --inpackage --name=Repository --case=underscore
-
 // Note: The resources thread and post both map to the same underlying database
 // schema model. The point of the resources being separate is to provide
 // separate intuitive APIs that abstract away the detail that a `post` item in
 // the database and a `thread` item use the same underlying table.
 
 type Repository interface {
+	// Create a new thread. A thread is just a "post" in the underlying data
+	// model. But a thread is marked as "first" and has a title, catgegory and
+	// tags, and no parent post.
 	Create(
 		ctx context.Context,
 		title string,

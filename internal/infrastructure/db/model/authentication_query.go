@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AuthenticationQuery is the builder for querying Authentication entities.
@@ -110,8 +110,8 @@ func (aq *AuthenticationQuery) FirstX(ctx context.Context) *Authentication {
 
 // FirstID returns the first Authentication ID from the query.
 // Returns a *NotFoundError when no Authentication ID was found.
-func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (aq *AuthenticationQuery) FirstID(ctx context.Context) (id uuid.UUID, err e
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AuthenticationQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (aq *AuthenticationQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +161,8 @@ func (aq *AuthenticationQuery) OnlyX(ctx context.Context) *Authentication {
 // OnlyID is like Only, but returns the only Authentication ID in the query.
 // Returns a *NotSingularError when more than one Authentication ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (aq *AuthenticationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err er
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AuthenticationQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (aq *AuthenticationQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +204,8 @@ func (aq *AuthenticationQuery) AllX(ctx context.Context) []*Authentication {
 }
 
 // IDs executes the query and returns a list of Authentication IDs.
-func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := aq.Select(authentication.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (aq *AuthenticationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AuthenticationQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (aq *AuthenticationQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -292,12 +292,12 @@ func (aq *AuthenticationQuery) WithAccount(opts ...func(*AccountQuery)) *Authent
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Authentication.Query().
-//		GroupBy(authentication.FieldCreateTime).
+//		GroupBy(authentication.FieldCreatedAt).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -321,11 +321,11 @@ func (aq *AuthenticationQuery) GroupBy(field string, fields ...string) *Authenti
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Authentication.Query().
-//		Select(authentication.FieldCreateTime).
+//		Select(authentication.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (aq *AuthenticationQuery) Select(fields ...string) *AuthenticationSelect {
@@ -398,8 +398,8 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 }
 
 func (aq *AuthenticationQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*Authentication, init func(*Authentication), assign func(*Authentication, *Account)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Authentication)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Authentication)
 	for i := range nodes {
 		if nodes[i].account_authentication == nil {
 			continue
@@ -453,7 +453,7 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: authentication.FieldID,
 			},
 		},

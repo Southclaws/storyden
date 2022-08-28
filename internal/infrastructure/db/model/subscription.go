@@ -10,29 +10,25 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // Subscription is the model entity for the Subscription schema.
 type Subscription struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// RefersType holds the value of the "refers_type" field.
 	RefersType string `json:"refers_type,omitempty"`
 	// RefersTo holds the value of the "refers_to" field.
 	RefersTo string `json:"refers_to,omitempty"`
-	// DeleteTime holds the value of the "delete_time" field.
-	DeleteTime time.Time `json:"delete_time,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
-	// UpdateTime holds the value of the "update_time" field.
-	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubscriptionQuery when eager-loading is set.
 	Edges                 SubscriptionEdges `json:"edges"`
-	account_subscriptions *uuid.UUID
-	subscription_account  *uuid.UUID
+	account_subscriptions *xid.ID
+	subscription_account  *xid.ID
 }
 
 // SubscriptionEdges holds the relations/edges for other nodes in the graph.
@@ -75,14 +71,14 @@ func (*Subscription) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case subscription.FieldRefersType, subscription.FieldRefersTo:
 			values[i] = new(sql.NullString)
-		case subscription.FieldDeleteTime, subscription.FieldCreateTime, subscription.FieldUpdateTime:
+		case subscription.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case subscription.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(xid.ID)
 		case subscription.ForeignKeys[0]: // account_subscriptions
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case subscription.ForeignKeys[1]: // subscription_account
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Subscription", columns[i])
 		}
@@ -99,10 +95,16 @@ func (s *Subscription) assignValues(columns []string, values []interface{}) erro
 	for i := range columns {
 		switch columns[i] {
 		case subscription.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				s.ID = *value
+			}
+		case subscription.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				s.CreatedAt = value.Time
 			}
 		case subscription.FieldRefersType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -116,37 +118,19 @@ func (s *Subscription) assignValues(columns []string, values []interface{}) erro
 			} else if value.Valid {
 				s.RefersTo = value.String
 			}
-		case subscription.FieldDeleteTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
-			} else if value.Valid {
-				s.DeleteTime = value.Time
-			}
-		case subscription.FieldCreateTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
-			} else if value.Valid {
-				s.CreateTime = value.Time
-			}
-		case subscription.FieldUpdateTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field update_time", values[i])
-			} else if value.Valid {
-				s.UpdateTime = value.Time
-			}
 		case subscription.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_subscriptions", values[i])
 			} else if value.Valid {
-				s.account_subscriptions = new(uuid.UUID)
-				*s.account_subscriptions = *value.S.(*uuid.UUID)
+				s.account_subscriptions = new(xid.ID)
+				*s.account_subscriptions = *value.S.(*xid.ID)
 			}
 		case subscription.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field subscription_account", values[i])
 			} else if value.Valid {
-				s.subscription_account = new(uuid.UUID)
-				*s.subscription_account = *value.S.(*uuid.UUID)
+				s.subscription_account = new(xid.ID)
+				*s.subscription_account = *value.S.(*xid.ID)
 			}
 		}
 	}
@@ -186,20 +170,14 @@ func (s *Subscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("Subscription(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(s.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("refers_type=")
 	builder.WriteString(s.RefersType)
 	builder.WriteString(", ")
 	builder.WriteString("refers_to=")
 	builder.WriteString(s.RefersTo)
-	builder.WriteString(", ")
-	builder.WriteString("delete_time=")
-	builder.WriteString(s.DeleteTime.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("create_time=")
-	builder.WriteString(s.CreateTime.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("update_time=")
-	builder.WriteString(s.UpdateTime.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

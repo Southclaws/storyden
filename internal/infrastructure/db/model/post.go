@@ -11,14 +11,20 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // Post is the model entity for the Post schema.
 type Post struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// First holds the value of the "first" field.
 	First bool `json:"first,omitempty"`
 	// Title holds the value of the "title" field.
@@ -28,25 +34,19 @@ type Post struct {
 	// Pinned holds the value of the "pinned" field.
 	Pinned bool `json:"pinned,omitempty"`
 	// RootPostID holds the value of the "root_post_id" field.
-	RootPostID uuid.UUID `json:"root_post_id,omitempty"`
+	RootPostID xid.ID `json:"root_post_id,omitempty"`
 	// ReplyToPostID holds the value of the "reply_to_post_id" field.
-	ReplyToPostID uuid.UUID `json:"reply_to_post_id,omitempty"`
+	ReplyToPostID xid.ID `json:"reply_to_post_id,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
 	// Short holds the value of the "short" field.
 	Short string `json:"short,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
-	// DeletedAt holds the value of the "deletedAt" field.
-	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
-	CategoryID uuid.UUID `json:"category_id,omitempty"`
+	CategoryID xid.ID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges         PostEdges `json:"edges"`
-	account_posts *uuid.UUID
+	account_posts *xid.ID
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
@@ -172,9 +172,9 @@ func (*Post) scanValues(columns []string) ([]interface{}, error) {
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(xid.ID)
 		case post.ForeignKeys[0]: // account_posts
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
 		}
@@ -191,10 +191,29 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case post.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				po.ID = *value
+			}
+		case post.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				po.CreatedAt = value.Time
+			}
+		case post.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				po.UpdatedAt = value.Time
+			}
+		case post.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				po.DeletedAt = new(time.Time)
+				*po.DeletedAt = value.Time
 			}
 		case post.FieldFirst:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -221,13 +240,13 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 				po.Pinned = value.Bool
 			}
 		case post.FieldRootPostID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field root_post_id", values[i])
 			} else if value != nil {
 				po.RootPostID = *value
 			}
 		case post.FieldReplyToPostID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field reply_to_post_id", values[i])
 			} else if value != nil {
 				po.ReplyToPostID = *value
@@ -244,27 +263,8 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				po.Short = value.String
 			}
-		case post.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
-			} else if value.Valid {
-				po.CreatedAt = value.Time
-			}
-		case post.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
-			} else if value.Valid {
-				po.UpdatedAt = value.Time
-			}
-		case post.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deletedAt", values[i])
-			} else if value.Valid {
-				po.DeletedAt = new(time.Time)
-				*po.DeletedAt = value.Time
-			}
 		case post.FieldCategoryID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
 			} else if value != nil {
 				po.CategoryID = *value
@@ -273,8 +273,8 @@ func (po *Post) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
 			} else if value.Valid {
-				po.account_posts = new(uuid.UUID)
-				*po.account_posts = *value.S.(*uuid.UUID)
+				po.account_posts = new(xid.ID)
+				*po.account_posts = *value.S.(*xid.ID)
 			}
 		}
 	}
@@ -344,6 +344,17 @@ func (po *Post) String() string {
 	var builder strings.Builder
 	builder.WriteString("Post(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", po.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := po.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("first=")
 	builder.WriteString(fmt.Sprintf("%v", po.First))
 	builder.WriteString(", ")
@@ -367,17 +378,6 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("short=")
 	builder.WriteString(po.Short)
-	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
-	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updatedAt=")
-	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := po.DeletedAt; v != nil {
-		builder.WriteString("deletedAt=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))

@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // PostCreate is the builder for creating a Post entity.
@@ -26,6 +26,48 @@ type PostCreate struct {
 	mutation *PostMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (pc *PostCreate) SetCreatedAt(t time.Time) *PostCreate {
+	pc.mutation.SetCreatedAt(t)
+	return pc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableCreatedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetCreatedAt(*t)
+	}
+	return pc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (pc *PostCreate) SetUpdatedAt(t time.Time) *PostCreate {
+	pc.mutation.SetUpdatedAt(t)
+	return pc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableUpdatedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetUpdatedAt(*t)
+	}
+	return pc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
+	pc.mutation.SetDeletedAt(t)
+	return pc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetDeletedAt(*t)
+	}
+	return pc
 }
 
 // SetFirst sets the "first" field.
@@ -77,29 +119,29 @@ func (pc *PostCreate) SetNillablePinned(b *bool) *PostCreate {
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (pc *PostCreate) SetRootPostID(u uuid.UUID) *PostCreate {
-	pc.mutation.SetRootPostID(u)
+func (pc *PostCreate) SetRootPostID(x xid.ID) *PostCreate {
+	pc.mutation.SetRootPostID(x)
 	return pc
 }
 
 // SetNillableRootPostID sets the "root_post_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableRootPostID(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetRootPostID(*u)
+func (pc *PostCreate) SetNillableRootPostID(x *xid.ID) *PostCreate {
+	if x != nil {
+		pc.SetRootPostID(*x)
 	}
 	return pc
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (pc *PostCreate) SetReplyToPostID(u uuid.UUID) *PostCreate {
-	pc.mutation.SetReplyToPostID(u)
+func (pc *PostCreate) SetReplyToPostID(x xid.ID) *PostCreate {
+	pc.mutation.SetReplyToPostID(x)
 	return pc
 }
 
 // SetNillableReplyToPostID sets the "reply_to_post_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyToPostID(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetReplyToPostID(*u)
+func (pc *PostCreate) SetNillableReplyToPostID(x *xid.ID) *PostCreate {
+	if x != nil {
+		pc.SetReplyToPostID(*x)
 	}
 	return pc
 }
@@ -116,78 +158,36 @@ func (pc *PostCreate) SetShort(s string) *PostCreate {
 	return pc
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (pc *PostCreate) SetCreatedAt(t time.Time) *PostCreate {
-	pc.mutation.SetCreatedAt(t)
-	return pc
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (pc *PostCreate) SetNillableCreatedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetCreatedAt(*t)
-	}
-	return pc
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (pc *PostCreate) SetUpdatedAt(t time.Time) *PostCreate {
-	pc.mutation.SetUpdatedAt(t)
-	return pc
-}
-
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
-func (pc *PostCreate) SetNillableUpdatedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetUpdatedAt(*t)
-	}
-	return pc
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
-	pc.mutation.SetDeletedAt(t)
-	return pc
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetDeletedAt(*t)
-	}
-	return pc
-}
-
 // SetCategoryID sets the "category_id" field.
-func (pc *PostCreate) SetCategoryID(u uuid.UUID) *PostCreate {
-	pc.mutation.SetCategoryID(u)
+func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
+	pc.mutation.SetCategoryID(x)
 	return pc
 }
 
 // SetNillableCategoryID sets the "category_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableCategoryID(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetCategoryID(*u)
+func (pc *PostCreate) SetNillableCategoryID(x *xid.ID) *PostCreate {
+	if x != nil {
+		pc.SetCategoryID(*x)
 	}
 	return pc
 }
 
 // SetID sets the "id" field.
-func (pc *PostCreate) SetID(u uuid.UUID) *PostCreate {
-	pc.mutation.SetID(u)
+func (pc *PostCreate) SetID(x xid.ID) *PostCreate {
+	pc.mutation.SetID(x)
 	return pc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableID(u *uuid.UUID) *PostCreate {
-	if u != nil {
-		pc.SetID(*u)
+func (pc *PostCreate) SetNillableID(x *xid.ID) *PostCreate {
+	if x != nil {
+		pc.SetID(*x)
 	}
 	return pc
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (pc *PostCreate) SetAuthorID(id uuid.UUID) *PostCreate {
+func (pc *PostCreate) SetAuthorID(id xid.ID) *PostCreate {
 	pc.mutation.SetAuthorID(id)
 	return pc
 }
@@ -203,14 +203,14 @@ func (pc *PostCreate) SetCategory(c *Category) *PostCreate {
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pc *PostCreate) AddTagIDs(ids ...uuid.UUID) *PostCreate {
+func (pc *PostCreate) AddTagIDs(ids ...xid.ID) *PostCreate {
 	pc.mutation.AddTagIDs(ids...)
 	return pc
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
 func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
-	ids := make([]uuid.UUID, len(t))
+	ids := make([]xid.ID, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -218,13 +218,13 @@ func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
 }
 
 // SetRootID sets the "root" edge to the Post entity by ID.
-func (pc *PostCreate) SetRootID(id uuid.UUID) *PostCreate {
+func (pc *PostCreate) SetRootID(id xid.ID) *PostCreate {
 	pc.mutation.SetRootID(id)
 	return pc
 }
 
 // SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (pc *PostCreate) SetNillableRootID(id *uuid.UUID) *PostCreate {
+func (pc *PostCreate) SetNillableRootID(id *xid.ID) *PostCreate {
 	if id != nil {
 		pc = pc.SetRootID(*id)
 	}
@@ -237,14 +237,14 @@ func (pc *PostCreate) SetRoot(p *Post) *PostCreate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (pc *PostCreate) AddPostIDs(ids ...uuid.UUID) *PostCreate {
+func (pc *PostCreate) AddPostIDs(ids ...xid.ID) *PostCreate {
 	pc.mutation.AddPostIDs(ids...)
 	return pc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -252,13 +252,13 @@ func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
 }
 
 // SetReplyToID sets the "replyTo" edge to the Post entity by ID.
-func (pc *PostCreate) SetReplyToID(id uuid.UUID) *PostCreate {
+func (pc *PostCreate) SetReplyToID(id xid.ID) *PostCreate {
 	pc.mutation.SetReplyToID(id)
 	return pc
 }
 
 // SetNillableReplyToID sets the "replyTo" edge to the Post entity by ID if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyToID(id *uuid.UUID) *PostCreate {
+func (pc *PostCreate) SetNillableReplyToID(id *xid.ID) *PostCreate {
 	if id != nil {
 		pc = pc.SetReplyToID(*id)
 	}
@@ -271,14 +271,14 @@ func (pc *PostCreate) SetReplyTo(p *Post) *PostCreate {
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyIDs(ids ...uuid.UUID) *PostCreate {
+func (pc *PostCreate) AddReplyIDs(ids ...xid.ID) *PostCreate {
 	pc.mutation.AddReplyIDs(ids...)
 	return pc
 }
 
 // AddReplies adds the "replies" edges to the Post entity.
 func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -286,14 +286,14 @@ func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (pc *PostCreate) AddReactIDs(ids ...uuid.UUID) *PostCreate {
+func (pc *PostCreate) AddReactIDs(ids ...xid.ID) *PostCreate {
 	pc.mutation.AddReactIDs(ids...)
 	return pc
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -377,10 +377,6 @@ func (pc *PostCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (pc *PostCreate) defaults() {
-	if _, ok := pc.mutation.Pinned(); !ok {
-		v := post.DefaultPinned
-		pc.mutation.SetPinned(v)
-	}
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		v := post.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
@@ -388,6 +384,10 @@ func (pc *PostCreate) defaults() {
 	if _, ok := pc.mutation.UpdatedAt(); !ok {
 		v := post.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := pc.mutation.Pinned(); !ok {
+		v := post.DefaultPinned
+		pc.mutation.SetPinned(v)
 	}
 	if _, ok := pc.mutation.ID(); !ok {
 		v := post.DefaultID()
@@ -397,6 +397,12 @@ func (pc *PostCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PostCreate) check() error {
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Post.created_at"`)}
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`model: missing required field "Post.updated_at"`)}
+	}
 	if _, ok := pc.mutation.First(); !ok {
 		return &ValidationError{Name: "first", err: errors.New(`model: missing required field "Post.first"`)}
 	}
@@ -409,11 +415,10 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.Short(); !ok {
 		return &ValidationError{Name: "short", err: errors.New(`model: missing required field "Post.short"`)}
 	}
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "Post.createdAt"`)}
-	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`model: missing required field "Post.updatedAt"`)}
+	if v, ok := pc.mutation.ID(); ok {
+		if err := post.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Post.id": %w`, err)}
+		}
 	}
 	if _, ok := pc.mutation.AuthorID(); !ok {
 		return &ValidationError{Name: "author", err: errors.New(`model: missing required edge "Post.author"`)}
@@ -430,7 +435,7 @@ func (pc *PostCreate) sqlSave(ctx context.Context) (*Post, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -445,7 +450,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: post.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: post.FieldID,
 			},
 		}
@@ -454,6 +459,30 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := pc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: post.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := pc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: post.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
+	}
+	if value, ok := pc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: post.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if value, ok := pc.mutation.First(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -503,30 +532,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		})
 		_node.Short = value
 	}
-	if value, ok := pc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldCreatedAt,
-		})
-		_node.CreatedAt = value
-	}
-	if value, ok := pc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldUpdatedAt,
-		})
-		_node.UpdatedAt = value
-	}
-	if value, ok := pc.mutation.DeletedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldDeletedAt,
-		})
-		_node.DeletedAt = &value
-	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -536,7 +541,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -556,7 +561,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: category.FieldID,
 				},
 			},
@@ -576,7 +581,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: tag.FieldID,
 				},
 			},
@@ -595,7 +600,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -615,7 +620,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -634,7 +639,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -654,7 +659,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -673,7 +678,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -690,7 +695,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Post.Create().
-//		SetFirst(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -699,7 +704,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PostUpsert) {
-//			SetFirst(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -736,6 +741,48 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreatedAt sets the "created_at" field.
+func (u *PostUpsert) SetCreatedAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateCreatedAt() *PostUpsert {
+	u.SetExcluded(post.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PostUpsert) SetUpdatedAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateUpdatedAt() *PostUpsert {
+	u.SetExcluded(post.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *PostUpsert) SetDeletedAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateDeletedAt() *PostUpsert {
+	u.SetExcluded(post.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
+	u.SetNull(post.FieldDeletedAt)
+	return u
+}
 
 // SetFirst sets the "first" field.
 func (u *PostUpsert) SetFirst(v bool) *PostUpsert {
@@ -798,7 +845,7 @@ func (u *PostUpsert) UpdatePinned() *PostUpsert {
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (u *PostUpsert) SetRootPostID(v uuid.UUID) *PostUpsert {
+func (u *PostUpsert) SetRootPostID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldRootPostID, v)
 	return u
 }
@@ -816,7 +863,7 @@ func (u *PostUpsert) ClearRootPostID() *PostUpsert {
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (u *PostUpsert) SetReplyToPostID(v uuid.UUID) *PostUpsert {
+func (u *PostUpsert) SetReplyToPostID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldReplyToPostID, v)
 	return u
 }
@@ -857,50 +904,8 @@ func (u *PostUpsert) UpdateShort() *PostUpsert {
 	return u
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (u *PostUpsert) SetCreatedAt(v time.Time) *PostUpsert {
-	u.Set(post.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *PostUpsert) UpdateCreatedAt() *PostUpsert {
-	u.SetExcluded(post.FieldCreatedAt)
-	return u
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *PostUpsert) SetUpdatedAt(v time.Time) *PostUpsert {
-	u.Set(post.FieldUpdatedAt, v)
-	return u
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *PostUpsert) UpdateUpdatedAt() *PostUpsert {
-	u.SetExcluded(post.FieldUpdatedAt)
-	return u
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *PostUpsert) SetDeletedAt(v time.Time) *PostUpsert {
-	u.Set(post.FieldDeletedAt, v)
-	return u
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *PostUpsert) UpdateDeletedAt() *PostUpsert {
-	u.SetExcluded(post.FieldDeletedAt)
-	return u
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
-	u.SetNull(post.FieldDeletedAt)
-	return u
-}
-
 // SetCategoryID sets the "category_id" field.
-func (u *PostUpsert) SetCategoryID(v uuid.UUID) *PostUpsert {
+func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
 	return u
 }
@@ -935,6 +940,9 @@ func (u *PostUpsertOne) UpdateNewValues() *PostUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(post.FieldID)
 		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(post.FieldCreatedAt)
+		}
 	}))
 	return u
 }
@@ -965,6 +973,55 @@ func (u *PostUpsertOne) Update(set func(*PostUpsert)) *PostUpsertOne {
 		set(&PostUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *PostUpsertOne) SetCreatedAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateCreatedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PostUpsertOne) SetUpdatedAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateUpdatedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *PostUpsertOne) SetDeletedAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateDeletedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearDeletedAt()
+	})
 }
 
 // SetFirst sets the "first" field.
@@ -1038,7 +1095,7 @@ func (u *PostUpsertOne) UpdatePinned() *PostUpsertOne {
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (u *PostUpsertOne) SetRootPostID(v uuid.UUID) *PostUpsertOne {
+func (u *PostUpsertOne) SetRootPostID(v xid.ID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetRootPostID(v)
 	})
@@ -1059,7 +1116,7 @@ func (u *PostUpsertOne) ClearRootPostID() *PostUpsertOne {
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (u *PostUpsertOne) SetReplyToPostID(v uuid.UUID) *PostUpsertOne {
+func (u *PostUpsertOne) SetReplyToPostID(v xid.ID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetReplyToPostID(v)
 	})
@@ -1107,57 +1164,8 @@ func (u *PostUpsertOne) UpdateShort() *PostUpsertOne {
 	})
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (u *PostUpsertOne) SetCreatedAt(v time.Time) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateCreatedAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *PostUpsertOne) SetUpdatedAt(v time.Time) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateUpdatedAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *PostUpsertOne) SetDeletedAt(v time.Time) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateDeletedAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearDeletedAt()
-	})
-}
-
 // SetCategoryID sets the "category_id" field.
-func (u *PostUpsertOne) SetCategoryID(v uuid.UUID) *PostUpsertOne {
+func (u *PostUpsertOne) SetCategoryID(v xid.ID) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetCategoryID(v)
 	})
@@ -1193,7 +1201,7 @@ func (u *PostUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *PostUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *PostUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -1207,7 +1215,7 @@ func (u *PostUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *PostUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *PostUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1309,7 +1317,7 @@ func (pcb *PostCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PostUpsert) {
-//			SetFirst(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -1360,6 +1368,9 @@ func (u *PostUpsertBulk) UpdateNewValues() *PostUpsertBulk {
 				s.SetIgnore(post.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(post.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -1391,6 +1402,55 @@ func (u *PostUpsertBulk) Update(set func(*PostUpsert)) *PostUpsertBulk {
 		set(&PostUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *PostUpsertBulk) SetCreatedAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateCreatedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PostUpsertBulk) SetUpdatedAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateUpdatedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *PostUpsertBulk) SetDeletedAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateDeletedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearDeletedAt()
+	})
 }
 
 // SetFirst sets the "first" field.
@@ -1464,7 +1524,7 @@ func (u *PostUpsertBulk) UpdatePinned() *PostUpsertBulk {
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (u *PostUpsertBulk) SetRootPostID(v uuid.UUID) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetRootPostID(v xid.ID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetRootPostID(v)
 	})
@@ -1485,7 +1545,7 @@ func (u *PostUpsertBulk) ClearRootPostID() *PostUpsertBulk {
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (u *PostUpsertBulk) SetReplyToPostID(v uuid.UUID) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetReplyToPostID(v xid.ID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetReplyToPostID(v)
 	})
@@ -1533,57 +1593,8 @@ func (u *PostUpsertBulk) UpdateShort() *PostUpsertBulk {
 	})
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (u *PostUpsertBulk) SetCreatedAt(v time.Time) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateCreatedAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *PostUpsertBulk) SetUpdatedAt(v time.Time) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateUpdatedAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *PostUpsertBulk) SetDeletedAt(v time.Time) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateDeletedAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearDeletedAt()
-	})
-}
-
 // SetCategoryID sets the "category_id" field.
-func (u *PostUpsertBulk) SetCategoryID(v uuid.UUID) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetCategoryID(v xid.ID) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetCategoryID(v)
 	})

@@ -4,14 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/post"
+	"github.com/rs/xid"
 )
 
 type database struct {
@@ -24,7 +23,7 @@ func New(db *model.Client) Repository {
 
 func (d *database) Subscribe(ctx context.Context, accountID account.AccountID, refersType NotificationType, refersTo string) (*Subscription, error) {
 	sub, err := d.db.Subscription.Create().
-		SetAccountID(uuid.UUID(accountID)).
+		SetAccountID(xid.ID(accountID)).
 		SetRefersType(string(refersType)).
 		SetRefersTo(refersTo).
 		Save(ctx)
@@ -38,9 +37,9 @@ func (d *database) Subscribe(ctx context.Context, accountID account.AccountID, r
 func (d *database) Unsubscribe(ctx context.Context, accountID account.AccountID, subID SubscriptionID) (int, error) {
 	i, err := d.db.Subscription.Delete().
 		Where(
-			subscription.IDEQ(uuid.UUID(subID)),
+			subscription.IDEQ(xid.ID(subID)),
 			subscription.HasAccountWith(
-				model_account.IDEQ(uuid.UUID(accountID)),
+				model_account.IDEQ(xid.ID(accountID)),
 			),
 		).Exec(ctx)
 	if err != nil {
@@ -54,7 +53,7 @@ func (d *database) GetSubscriptionsForUser(ctx context.Context, accountID accoun
 	subs, err := d.db.Subscription.Query().
 		Where(
 			subscription.HasAccountWith(
-				model_account.IDEQ(uuid.UUID(accountID)),
+				model_account.IDEQ(xid.ID(accountID)),
 			),
 		).
 		All(ctx)
@@ -70,7 +69,6 @@ func (d *database) GetSubscriptionsForItem(ctx context.Context, refersType Notif
 		Where(
 			subscription.RefersTypeEQ(string(refersType)),
 			subscription.RefersToEQ(refersTo),
-			subscription.DeleteTimeIsNil(),
 		).
 		All(ctx)
 	if err != nil {
@@ -85,7 +83,7 @@ func (d *database) GetNotifications(ctx context.Context, accountID account.Accou
 		Where(
 			notification.HasSubscriptionWith(
 				subscription.HasAccountWith(
-					model_account.IDEQ(uuid.UUID(accountID)),
+					model_account.IDEQ(xid.ID(accountID)),
 				),
 			),
 		).
@@ -97,7 +95,7 @@ func (d *database) GetNotifications(ctx context.Context, accountID account.Accou
 	}
 
 	if !after.IsZero() {
-		q.Where(notification.CreateTimeGT(after))
+		q.Where(notification.CreatedAtGT(after))
 	}
 
 	notifs, err := q.All(ctx)
@@ -129,7 +127,7 @@ func (d *database) Notify(ctx context.Context, refersType NotificationType, refe
 			SetDescription(desc).
 			SetLink(link).
 			SetRead(false).
-			SetSubscriptionID(uuid.UUID(sub.ID)).
+			SetSubscriptionID(xid.ID(sub.ID)).
 			Save(ctx)
 		if err != nil {
 			return 0, err
@@ -150,7 +148,7 @@ func (d *database) SetReadState(ctx context.Context, accountID account.AccountID
 	}
 
 	notif, err := d.db.Notification.
-		UpdateOneID(uuid.UUID(notificationID)).
+		UpdateOneID(xid.ID(notificationID)).
 		SetRead(read).
 		Save(ctx)
 	if err != nil {
@@ -163,7 +161,7 @@ func (d *database) SetReadState(ctx context.Context, accountID account.AccountID
 // TODO: Cache these. Or do more clever queries.
 func (d *database) userHasRightsForNotification(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (bool, error) {
 	n, err := d.db.Notification.Query().
-		Where(notification.IDEQ(uuid.UUID(notificationID))).
+		Where(notification.IDEQ(xid.ID(notificationID))).
 		WithSubscription(func(sq *model.SubscriptionQuery) {
 			sq.WithAccount()
 		}).
@@ -185,7 +183,7 @@ func (d *database) Delete(ctx context.Context, accountID account.AccountID, noti
 		return nil, post.ErrUnauthorised
 	}
 
-	n, err := d.db.Notification.Get(ctx, uuid.UUID(notificationID))
+	n, err := d.db.Notification.Get(ctx, xid.ID(notificationID))
 	if err != nil {
 		return nil, err
 	}

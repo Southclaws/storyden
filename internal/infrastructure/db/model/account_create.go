@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -27,6 +27,48 @@ type AccountCreate struct {
 	mutation *AccountMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (ac *AccountCreate) SetCreatedAt(t time.Time) *AccountCreate {
+	ac.mutation.SetCreatedAt(t)
+	return ac
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableCreatedAt(t *time.Time) *AccountCreate {
+	if t != nil {
+		ac.SetCreatedAt(*t)
+	}
+	return ac
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (ac *AccountCreate) SetUpdatedAt(t time.Time) *AccountCreate {
+	ac.mutation.SetUpdatedAt(t)
+	return ac
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableUpdatedAt(t *time.Time) *AccountCreate {
+	if t != nil {
+		ac.SetUpdatedAt(*t)
+	}
+	return ac
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (ac *AccountCreate) SetDeletedAt(t time.Time) *AccountCreate {
+	ac.mutation.SetDeletedAt(t)
+	return ac
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableDeletedAt(t *time.Time) *AccountCreate {
+	if t != nil {
+		ac.SetDeletedAt(*t)
+	}
+	return ac
 }
 
 // SetEmail sets the "email" field.
@@ -69,71 +111,29 @@ func (ac *AccountCreate) SetNillableAdmin(b *bool) *AccountCreate {
 	return ac
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ac *AccountCreate) SetCreatedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetCreatedAt(t)
-	return ac
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableCreatedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetCreatedAt(*t)
-	}
-	return ac
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (ac *AccountCreate) SetUpdatedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetUpdatedAt(t)
-	return ac
-}
-
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableUpdatedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetUpdatedAt(*t)
-	}
-	return ac
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (ac *AccountCreate) SetDeletedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetDeletedAt(t)
-	return ac
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableDeletedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetDeletedAt(*t)
-	}
-	return ac
-}
-
 // SetID sets the "id" field.
-func (ac *AccountCreate) SetID(u uuid.UUID) *AccountCreate {
-	ac.mutation.SetID(u)
+func (ac *AccountCreate) SetID(x xid.ID) *AccountCreate {
+	ac.mutation.SetID(x)
 	return ac
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableID(u *uuid.UUID) *AccountCreate {
-	if u != nil {
-		ac.SetID(*u)
+func (ac *AccountCreate) SetNillableID(x *xid.ID) *AccountCreate {
+	if x != nil {
+		ac.SetID(*x)
 	}
 	return ac
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (ac *AccountCreate) AddPostIDs(ids ...uuid.UUID) *AccountCreate {
+func (ac *AccountCreate) AddPostIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddPostIDs(ids...)
 	return ac
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (ac *AccountCreate) AddPosts(p ...*Post) *AccountCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -141,14 +141,14 @@ func (ac *AccountCreate) AddPosts(p ...*Post) *AccountCreate {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (ac *AccountCreate) AddReactIDs(ids ...uuid.UUID) *AccountCreate {
+func (ac *AccountCreate) AddReactIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddReactIDs(ids...)
 	return ac
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (ac *AccountCreate) AddReacts(r ...*React) *AccountCreate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -156,14 +156,14 @@ func (ac *AccountCreate) AddReacts(r ...*React) *AccountCreate {
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (ac *AccountCreate) AddRoleIDs(ids ...uuid.UUID) *AccountCreate {
+func (ac *AccountCreate) AddRoleIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddRoleIDs(ids...)
 	return ac
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
 func (ac *AccountCreate) AddRoles(r ...*Role) *AccountCreate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -171,14 +171,14 @@ func (ac *AccountCreate) AddRoles(r ...*Role) *AccountCreate {
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (ac *AccountCreate) AddSubscriptionIDs(ids ...uuid.UUID) *AccountCreate {
+func (ac *AccountCreate) AddSubscriptionIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddSubscriptionIDs(ids...)
 	return ac
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
 func (ac *AccountCreate) AddSubscriptions(s ...*Subscription) *AccountCreate {
-	ids := make([]uuid.UUID, len(s))
+	ids := make([]xid.ID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -186,14 +186,14 @@ func (ac *AccountCreate) AddSubscriptions(s ...*Subscription) *AccountCreate {
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (ac *AccountCreate) AddAuthenticationIDs(ids ...uuid.UUID) *AccountCreate {
+func (ac *AccountCreate) AddAuthenticationIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddAuthenticationIDs(ids...)
 	return ac
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (ac *AccountCreate) AddAuthentication(a ...*Authentication) *AccountCreate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -277,10 +277,6 @@ func (ac *AccountCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AccountCreate) defaults() {
-	if _, ok := ac.mutation.Admin(); !ok {
-		v := account.DefaultAdmin
-		ac.mutation.SetAdmin(v)
-	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		v := account.DefaultCreatedAt()
 		ac.mutation.SetCreatedAt(v)
@@ -288,6 +284,10 @@ func (ac *AccountCreate) defaults() {
 	if _, ok := ac.mutation.UpdatedAt(); !ok {
 		v := account.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := ac.mutation.Admin(); !ok {
+		v := account.DefaultAdmin
+		ac.mutation.SetAdmin(v)
 	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := account.DefaultID()
@@ -297,6 +297,12 @@ func (ac *AccountCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AccountCreate) check() error {
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Account.created_at"`)}
+	}
+	if _, ok := ac.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`model: missing required field "Account.updated_at"`)}
+	}
 	if _, ok := ac.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`model: missing required field "Account.email"`)}
 	}
@@ -311,11 +317,10 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`model: missing required field "Account.admin"`)}
 	}
-	if _, ok := ac.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "Account.createdAt"`)}
-	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`model: missing required field "Account.updatedAt"`)}
+	if v, ok := ac.mutation.ID(); ok {
+		if err := account.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Account.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -329,7 +334,7 @@ func (ac *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -344,7 +349,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: account.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: account.FieldID,
 			},
 		}
@@ -353,6 +358,30 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := ac.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := ac.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
+	}
+	if value, ok := ac.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if value, ok := ac.mutation.Email(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -386,30 +415,6 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		})
 		_node.Admin = value
 	}
-	if value, ok := ac.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldCreatedAt,
-		})
-		_node.CreatedAt = value
-	}
-	if value, ok := ac.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldUpdatedAt,
-		})
-		_node.UpdatedAt = value
-	}
-	if value, ok := ac.mutation.DeletedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldDeletedAt,
-		})
-		_node.DeletedAt = value
-	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -419,7 +424,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -438,7 +443,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -457,7 +462,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -476,7 +481,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -495,7 +500,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -512,7 +517,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Account.Create().
-//		SetEmail(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -521,7 +526,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.AccountUpsert) {
-//			SetEmail(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -558,6 +563,48 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AccountUpsert) SetCreatedAt(v time.Time) *AccountUpsert {
+	u.Set(account.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateCreatedAt() *AccountUpsert {
+	u.SetExcluded(account.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AccountUpsert) SetUpdatedAt(v time.Time) *AccountUpsert {
+	u.Set(account.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateUpdatedAt() *AccountUpsert {
+	u.SetExcluded(account.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AccountUpsert) SetDeletedAt(v time.Time) *AccountUpsert {
+	u.Set(account.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateDeletedAt() *AccountUpsert {
+	u.SetExcluded(account.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AccountUpsert) ClearDeletedAt() *AccountUpsert {
+	u.SetNull(account.FieldDeletedAt)
+	return u
+}
 
 // SetEmail sets the "email" field.
 func (u *AccountUpsert) SetEmail(v string) *AccountUpsert {
@@ -613,48 +660,6 @@ func (u *AccountUpsert) UpdateAdmin() *AccountUpsert {
 	return u
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (u *AccountUpsert) SetCreatedAt(v time.Time) *AccountUpsert {
-	u.Set(account.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateCreatedAt() *AccountUpsert {
-	u.SetExcluded(account.FieldCreatedAt)
-	return u
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *AccountUpsert) SetUpdatedAt(v time.Time) *AccountUpsert {
-	u.Set(account.FieldUpdatedAt, v)
-	return u
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateUpdatedAt() *AccountUpsert {
-	u.SetExcluded(account.FieldUpdatedAt)
-	return u
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *AccountUpsert) SetDeletedAt(v time.Time) *AccountUpsert {
-	u.Set(account.FieldDeletedAt, v)
-	return u
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateDeletedAt() *AccountUpsert {
-	u.SetExcluded(account.FieldDeletedAt)
-	return u
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *AccountUpsert) ClearDeletedAt() *AccountUpsert {
-	u.SetNull(account.FieldDeletedAt)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -672,6 +677,9 @@ func (u *AccountUpsertOne) UpdateNewValues() *AccountUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(account.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(account.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -703,6 +711,55 @@ func (u *AccountUpsertOne) Update(set func(*AccountUpsert)) *AccountUpsertOne {
 		set(&AccountUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AccountUpsertOne) SetCreatedAt(v time.Time) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateCreatedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AccountUpsertOne) SetUpdatedAt(v time.Time) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateUpdatedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AccountUpsertOne) SetDeletedAt(v time.Time) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateDeletedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AccountUpsertOne) ClearDeletedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearDeletedAt()
+	})
 }
 
 // SetEmail sets the "email" field.
@@ -768,55 +825,6 @@ func (u *AccountUpsertOne) UpdateAdmin() *AccountUpsertOne {
 	})
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (u *AccountUpsertOne) SetCreatedAt(v time.Time) *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateCreatedAt() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *AccountUpsertOne) SetUpdatedAt(v time.Time) *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateUpdatedAt() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *AccountUpsertOne) SetDeletedAt(v time.Time) *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateDeletedAt() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *AccountUpsertOne) ClearDeletedAt() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.ClearDeletedAt()
-	})
-}
-
 // Exec executes the query.
 func (u *AccountUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -833,7 +841,7 @@ func (u *AccountUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AccountUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *AccountUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -847,7 +855,7 @@ func (u *AccountUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AccountUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *AccountUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -949,7 +957,7 @@ func (acb *AccountCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.AccountUpsert) {
-//			SetEmail(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -1000,6 +1008,9 @@ func (u *AccountUpsertBulk) UpdateNewValues() *AccountUpsertBulk {
 				s.SetIgnore(account.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(account.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -1031,6 +1042,55 @@ func (u *AccountUpsertBulk) Update(set func(*AccountUpsert)) *AccountUpsertBulk 
 		set(&AccountUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *AccountUpsertBulk) SetCreatedAt(v time.Time) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateCreatedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AccountUpsertBulk) SetUpdatedAt(v time.Time) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateUpdatedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *AccountUpsertBulk) SetDeletedAt(v time.Time) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateDeletedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *AccountUpsertBulk) ClearDeletedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearDeletedAt()
+	})
 }
 
 // SetEmail sets the "email" field.
@@ -1093,55 +1153,6 @@ func (u *AccountUpsertBulk) SetAdmin(v bool) *AccountUpsertBulk {
 func (u *AccountUpsertBulk) UpdateAdmin() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateAdmin()
-	})
-}
-
-// SetCreatedAt sets the "createdAt" field.
-func (u *AccountUpsertBulk) SetCreatedAt(v time.Time) *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateCreatedAt() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (u *AccountUpsertBulk) SetUpdatedAt(v time.Time) *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetUpdatedAt(v)
-	})
-}
-
-// UpdateUpdatedAt sets the "updatedAt" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateUpdatedAt() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (u *AccountUpsertBulk) SetDeletedAt(v time.Time) *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deletedAt" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateDeletedAt() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (u *AccountUpsertBulk) ClearDeletedAt() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.ClearDeletedAt()
 	})
 }
 

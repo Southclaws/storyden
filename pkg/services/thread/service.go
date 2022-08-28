@@ -1,3 +1,5 @@
+// Package thread provides APIs for working with threads which are sequences of
+// posts. Threads can be created with one post, listed, searched and updated.
 package thread
 
 import (
@@ -13,6 +15,7 @@ import (
 )
 
 type Service interface {
+	// Create a new thread in the specified category.
 	Create(
 		ctx context.Context,
 		title string,

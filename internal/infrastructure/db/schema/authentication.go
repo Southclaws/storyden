@@ -5,20 +5,18 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"entgo.io/ent/schema/mixin"
-	"github.com/google/uuid"
 )
 
 type Authentication struct {
 	ent.Schema
 }
 
+func (Authentication) Mixin() []ent.Mixin {
+	return []ent.Mixin{Identifier{}, CreatedAt{}}
+}
+
 func (Authentication) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Immutable().
-			Default(uuid.New),
-
 		field.String("service").
 			NotEmpty().
 			Comment("The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth"),
@@ -50,11 +48,5 @@ func (Authentication) Indexes() []ent.Index {
 		// a given identifier should be unique within the context of a service.
 		index.Fields("service", "identifier").
 			Unique(),
-	}
-}
-
-func (Authentication) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		mixin.CreateTime{},
 	}
 }

@@ -5,7 +5,7 @@ package subscription
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 const (
@@ -13,16 +13,12 @@ const (
 	Label = "subscription"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldRefersType holds the string denoting the refers_type field in the database.
 	FieldRefersType = "refers_type"
 	// FieldRefersTo holds the string denoting the refers_to field in the database.
 	FieldRefersTo = "refers_to"
-	// FieldDeleteTime holds the string denoting the delete_time field in the database.
-	FieldDeleteTime = "delete_time"
-	// FieldCreateTime holds the string denoting the create_time field in the database.
-	FieldCreateTime = "create_time"
-	// FieldUpdateTime holds the string denoting the update_time field in the database.
-	FieldUpdateTime = "update_time"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
@@ -48,11 +44,9 @@ const (
 // Columns holds all SQL columns for subscription fields.
 var Columns = []string{
 	FieldID,
+	FieldCreatedAt,
 	FieldRefersType,
 	FieldRefersTo,
-	FieldDeleteTime,
-	FieldCreateTime,
-	FieldUpdateTime,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subscriptions"
@@ -78,16 +72,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
 	// RefersTypeValidator is a validator for the "refers_type" field. It is called by the builders before save.
 	RefersTypeValidator func(string) error
 	// RefersToValidator is a validator for the "refers_to" field. It is called by the builders before save.
 	RefersToValidator func(string) error
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() time.Time
-	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
-	DefaultUpdateTime func() time.Time
-	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
-	UpdateDefaultUpdateTime func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

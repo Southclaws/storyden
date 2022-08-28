@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // PostQuery is the builder for querying Post entities.
@@ -275,8 +275,8 @@ func (pq *PostQuery) FirstX(ctx context.Context) *Post {
 
 // FirstID returns the first Post ID from the query.
 // Returns a *NotFoundError when no Post ID was found.
-func (pq *PostQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (pq *PostQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = pq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -288,7 +288,7 @@ func (pq *PostQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *PostQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (pq *PostQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -326,8 +326,8 @@ func (pq *PostQuery) OnlyX(ctx context.Context) *Post {
 // OnlyID is like Only, but returns the only Post ID in the query.
 // Returns a *NotSingularError when more than one Post ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *PostQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (pq *PostQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = pq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -343,7 +343,7 @@ func (pq *PostQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *PostQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (pq *PostQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -369,8 +369,8 @@ func (pq *PostQuery) AllX(ctx context.Context) []*Post {
 }
 
 // IDs executes the query and returns a list of Post IDs.
-func (pq *PostQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (pq *PostQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := pq.Select(post.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -378,7 +378,7 @@ func (pq *PostQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *PostQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (pq *PostQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -541,12 +541,12 @@ func (pq *PostQuery) WithReacts(opts ...func(*ReactQuery)) *PostQuery {
 // Example:
 //
 //	var v []struct {
-//		First bool `json:"first,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Post.Query().
-//		GroupBy(post.FieldFirst).
+//		GroupBy(post.FieldCreatedAt).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -570,11 +570,11 @@ func (pq *PostQuery) GroupBy(field string, fields ...string) *PostGroupBy {
 // Example:
 //
 //	var v []struct {
-//		First bool `json:"first,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Post.Query().
-//		Select(post.FieldFirst).
+//		Select(post.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (pq *PostQuery) Select(fields ...string) *PostSelect {
@@ -700,8 +700,8 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 }
 
 func (pq *PostQuery) loadAuthor(ctx context.Context, query *AccountQuery, nodes []*Post, init func(*Post), assign func(*Post, *Account)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Post)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
 		if nodes[i].account_posts == nil {
 			continue
@@ -729,8 +729,8 @@ func (pq *PostQuery) loadAuthor(ctx context.Context, query *AccountQuery, nodes 
 	return nil
 }
 func (pq *PostQuery) loadCategory(ctx context.Context, query *CategoryQuery, nodes []*Post, init func(*Post), assign func(*Post, *Category)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Post)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
 		fk := nodes[i].CategoryID
 		if _, ok := nodeids[fk]; !ok {
@@ -756,8 +756,8 @@ func (pq *PostQuery) loadCategory(ctx context.Context, query *CategoryQuery, nod
 }
 func (pq *PostQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Post, init func(*Post), assign func(*Post, *Tag)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Post)
-	nids := make(map[uuid.UUID]map[*Post]struct{})
+	byID := make(map[xid.ID]*Post)
+	nids := make(map[xid.ID]map[*Post]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -785,11 +785,11 @@ func (pq *PostQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Pos
 			if err != nil {
 				return nil, err
 			}
-			return append([]interface{}{new(uuid.UUID)}, values...), nil
+			return append([]interface{}{new(xid.ID)}, values...), nil
 		}
 		spec.Assign = func(columns []string, values []interface{}) error {
-			outValue := *values[0].(*uuid.UUID)
-			inValue := *values[1].(*uuid.UUID)
+			outValue := *values[0].(*xid.ID)
+			inValue := *values[1].(*xid.ID)
 			if nids[inValue] == nil {
 				nids[inValue] = map[*Post]struct{}{byID[outValue]: struct{}{}}
 				return assign(columns[1:], values[1:])
@@ -813,8 +813,8 @@ func (pq *PostQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Pos
 	return nil
 }
 func (pq *PostQuery) loadRoot(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Post)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
 		fk := nodes[i].RootPostID
 		if _, ok := nodeids[fk]; !ok {
@@ -840,7 +840,7 @@ func (pq *PostQuery) loadRoot(ctx context.Context, query *PostQuery, nodes []*Po
 }
 func (pq *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Post)
+	nodeids := make(map[xid.ID]*Post)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -867,8 +867,8 @@ func (pq *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*P
 	return nil
 }
 func (pq *PostQuery) loadReplyTo(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Post)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
 		fk := nodes[i].ReplyToPostID
 		if _, ok := nodeids[fk]; !ok {
@@ -894,7 +894,7 @@ func (pq *PostQuery) loadReplyTo(ctx context.Context, query *PostQuery, nodes []
 }
 func (pq *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []*Post, init func(*Post), assign func(*Post, *Post)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Post)
+	nodeids := make(map[xid.ID]*Post)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -922,7 +922,7 @@ func (pq *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 }
 func (pq *PostQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []*Post, init func(*Post), assign func(*Post, *React)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Post)
+	nodeids := make(map[xid.ID]*Post)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -978,7 +978,7 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   post.Table,
 			Columns: post.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: post.FieldID,
 			},
 		},

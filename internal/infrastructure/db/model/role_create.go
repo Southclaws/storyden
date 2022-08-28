@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // RoleCreate is the builder for creating a Role entity.
@@ -25,16 +25,30 @@ type RoleCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (rc *RoleCreate) SetCreatedAt(t time.Time) *RoleCreate {
 	rc.mutation.SetCreatedAt(t)
 	return rc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (rc *RoleCreate) SetNillableCreatedAt(t *time.Time) *RoleCreate {
 	if t != nil {
 		rc.SetCreatedAt(*t)
+	}
+	return rc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (rc *RoleCreate) SetUpdatedAt(t time.Time) *RoleCreate {
+	rc.mutation.SetUpdatedAt(t)
+	return rc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableUpdatedAt(t *time.Time) *RoleCreate {
+	if t != nil {
+		rc.SetUpdatedAt(*t)
 	}
 	return rc
 }
@@ -46,28 +60,28 @@ func (rc *RoleCreate) SetName(s string) *RoleCreate {
 }
 
 // SetID sets the "id" field.
-func (rc *RoleCreate) SetID(u uuid.UUID) *RoleCreate {
-	rc.mutation.SetID(u)
+func (rc *RoleCreate) SetID(x xid.ID) *RoleCreate {
+	rc.mutation.SetID(x)
 	return rc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableID(u *uuid.UUID) *RoleCreate {
-	if u != nil {
-		rc.SetID(*u)
+func (rc *RoleCreate) SetNillableID(x *xid.ID) *RoleCreate {
+	if x != nil {
+		rc.SetID(*x)
 	}
 	return rc
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (rc *RoleCreate) AddAccountIDs(ids ...uuid.UUID) *RoleCreate {
+func (rc *RoleCreate) AddAccountIDs(ids ...xid.ID) *RoleCreate {
 	rc.mutation.AddAccountIDs(ids...)
 	return rc
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
 func (rc *RoleCreate) AddAccounts(a ...*Account) *RoleCreate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -155,6 +169,10 @@ func (rc *RoleCreate) defaults() {
 		v := role.DefaultCreatedAt()
 		rc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := rc.mutation.UpdatedAt(); !ok {
+		v := role.DefaultUpdatedAt()
+		rc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := rc.mutation.ID(); !ok {
 		v := role.DefaultID()
 		rc.mutation.SetID(v)
@@ -164,10 +182,18 @@ func (rc *RoleCreate) defaults() {
 // check runs all checks and user-defined validators on the builder.
 func (rc *RoleCreate) check() error {
 	if _, ok := rc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "Role.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Role.created_at"`)}
+	}
+	if _, ok := rc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`model: missing required field "Role.updated_at"`)}
 	}
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Role.name"`)}
+	}
+	if v, ok := rc.mutation.ID(); ok {
+		if err := role.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Role.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -181,7 +207,7 @@ func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -196,7 +222,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: role.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: role.FieldID,
 			},
 		}
@@ -213,6 +239,14 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Column: role.FieldCreatedAt,
 		})
 		_node.CreatedAt = value
+	}
+	if value, ok := rc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: role.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
 	}
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -231,7 +265,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -295,15 +329,27 @@ type (
 	}
 )
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (u *RoleUpsert) SetCreatedAt(v time.Time) *RoleUpsert {
 	u.Set(role.FieldCreatedAt, v)
 	return u
 }
 
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
 func (u *RoleUpsert) UpdateCreatedAt() *RoleUpsert {
 	u.SetExcluded(role.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *RoleUpsert) SetUpdatedAt(v time.Time) *RoleUpsert {
+	u.Set(role.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateUpdatedAt() *RoleUpsert {
+	u.SetExcluded(role.FieldUpdatedAt)
 	return u
 }
 
@@ -337,6 +383,9 @@ func (u *RoleUpsertOne) UpdateNewValues() *RoleUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(role.FieldID)
 		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(role.FieldCreatedAt)
+		}
 	}))
 	return u
 }
@@ -369,17 +418,31 @@ func (u *RoleUpsertOne) Update(set func(*RoleUpsert)) *RoleUpsertOne {
 	return u
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (u *RoleUpsertOne) SetCreatedAt(v time.Time) *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.SetCreatedAt(v)
 	})
 }
 
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
 func (u *RoleUpsertOne) UpdateCreatedAt() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *RoleUpsertOne) SetUpdatedAt(v time.Time) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateUpdatedAt() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateUpdatedAt()
 	})
 }
 
@@ -413,7 +476,7 @@ func (u *RoleUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *RoleUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *RoleUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -427,7 +490,7 @@ func (u *RoleUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *RoleUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *RoleUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -580,6 +643,9 @@ func (u *RoleUpsertBulk) UpdateNewValues() *RoleUpsertBulk {
 				s.SetIgnore(role.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(role.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -613,17 +679,31 @@ func (u *RoleUpsertBulk) Update(set func(*RoleUpsert)) *RoleUpsertBulk {
 	return u
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (u *RoleUpsertBulk) SetCreatedAt(v time.Time) *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.SetCreatedAt(v)
 	})
 }
 
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
 func (u *RoleUpsertBulk) UpdateCreatedAt() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *RoleUpsertBulk) SetUpdatedAt(v time.Time) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateUpdatedAt() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateUpdatedAt()
 	})
 }
 

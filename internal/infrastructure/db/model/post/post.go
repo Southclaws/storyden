@@ -5,7 +5,7 @@ package post
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 const (
@@ -13,6 +13,12 @@ const (
 	Label = "post"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// FieldFirst holds the string denoting the first field in the database.
 	FieldFirst = "first"
 	// FieldTitle holds the string denoting the title field in the database.
@@ -29,12 +35,6 @@ const (
 	FieldBody = "body"
 	// FieldShort holds the string denoting the short field in the database.
 	FieldShort = "short"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
-	FieldUpdatedAt = "updated_at"
-	// FieldDeletedAt holds the string denoting the deletedat field in the database.
-	FieldDeletedAt = "deleted_at"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -102,6 +102,9 @@ const (
 // Columns holds all SQL columns for post fields.
 var Columns = []string{
 	FieldID,
+	FieldCreatedAt,
+	FieldUpdatedAt,
+	FieldDeletedAt,
 	FieldFirst,
 	FieldTitle,
 	FieldSlug,
@@ -110,9 +113,6 @@ var Columns = []string{
 	FieldReplyToPostID,
 	FieldBody,
 	FieldShort,
-	FieldCreatedAt,
-	FieldUpdatedAt,
-	FieldDeletedAt,
 	FieldCategoryID,
 }
 
@@ -144,12 +144,16 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultPinned holds the default value on creation for the "pinned" field.
 	DefaultPinned bool
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
-	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
-	DefaultUpdatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

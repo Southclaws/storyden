@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -13,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // TagCreate is the builder for creating a Tag entity.
@@ -24,6 +25,20 @@ type TagCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (tc *TagCreate) SetCreatedAt(t time.Time) *TagCreate {
+	tc.mutation.SetCreatedAt(t)
+	return tc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tc *TagCreate) SetNillableCreatedAt(t *time.Time) *TagCreate {
+	if t != nil {
+		tc.SetCreatedAt(*t)
+	}
+	return tc
+}
+
 // SetName sets the "name" field.
 func (tc *TagCreate) SetName(s string) *TagCreate {
 	tc.mutation.SetName(s)
@@ -31,28 +46,28 @@ func (tc *TagCreate) SetName(s string) *TagCreate {
 }
 
 // SetID sets the "id" field.
-func (tc *TagCreate) SetID(u uuid.UUID) *TagCreate {
-	tc.mutation.SetID(u)
+func (tc *TagCreate) SetID(x xid.ID) *TagCreate {
+	tc.mutation.SetID(x)
 	return tc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (tc *TagCreate) SetNillableID(u *uuid.UUID) *TagCreate {
-	if u != nil {
-		tc.SetID(*u)
+func (tc *TagCreate) SetNillableID(x *xid.ID) *TagCreate {
+	if x != nil {
+		tc.SetID(*x)
 	}
 	return tc
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tc *TagCreate) AddPostIDs(ids ...uuid.UUID) *TagCreate {
+func (tc *TagCreate) AddPostIDs(ids ...xid.ID) *TagCreate {
 	tc.mutation.AddPostIDs(ids...)
 	return tc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (tc *TagCreate) AddPosts(p ...*Post) *TagCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -136,6 +151,10 @@ func (tc *TagCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *TagCreate) defaults() {
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		v := tag.DefaultCreatedAt()
+		tc.mutation.SetCreatedAt(v)
+	}
 	if _, ok := tc.mutation.ID(); !ok {
 		v := tag.DefaultID()
 		tc.mutation.SetID(v)
@@ -144,8 +163,16 @@ func (tc *TagCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TagCreate) check() error {
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Tag.created_at"`)}
+	}
 	if _, ok := tc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Tag.name"`)}
+	}
+	if v, ok := tc.mutation.ID(); ok {
+		if err := tag.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Tag.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -159,7 +186,7 @@ func (tc *TagCreate) sqlSave(ctx context.Context) (*Tag, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -174,7 +201,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: tag.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: tag.FieldID,
 			},
 		}
@@ -183,6 +210,14 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := tc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: tag.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
 	}
 	if value, ok := tc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -201,7 +236,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -218,7 +253,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Tag.Create().
-//		SetName(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -227,7 +262,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.TagUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -265,6 +300,18 @@ type (
 	}
 )
 
+// SetCreatedAt sets the "created_at" field.
+func (u *TagUpsert) SetCreatedAt(v time.Time) *TagUpsert {
+	u.Set(tag.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TagUpsert) UpdateCreatedAt() *TagUpsert {
+	u.SetExcluded(tag.FieldCreatedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *TagUpsert) SetName(v string) *TagUpsert {
 	u.Set(tag.FieldName, v)
@@ -294,6 +341,9 @@ func (u *TagUpsertOne) UpdateNewValues() *TagUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(tag.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(tag.FieldCreatedAt)
 		}
 		if _, exists := u.create.mutation.Name(); exists {
 			s.SetIgnore(tag.FieldName)
@@ -330,6 +380,20 @@ func (u *TagUpsertOne) Update(set func(*TagUpsert)) *TagUpsertOne {
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *TagUpsertOne) SetCreatedAt(v time.Time) *TagUpsertOne {
+	return u.Update(func(s *TagUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TagUpsertOne) UpdateCreatedAt() *TagUpsertOne {
+	return u.Update(func(s *TagUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *TagUpsertOne) SetName(v string) *TagUpsertOne {
 	return u.Update(func(s *TagUpsert) {
@@ -360,7 +424,7 @@ func (u *TagUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *TagUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *TagUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -374,7 +438,7 @@ func (u *TagUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *TagUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *TagUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -476,7 +540,7 @@ func (tcb *TagCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.TagUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -527,6 +591,9 @@ func (u *TagUpsertBulk) UpdateNewValues() *TagUpsertBulk {
 				s.SetIgnore(tag.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(tag.FieldCreatedAt)
+			}
 			if _, exists := b.mutation.Name(); exists {
 				s.SetIgnore(tag.FieldName)
 			}
@@ -561,6 +628,20 @@ func (u *TagUpsertBulk) Update(set func(*TagUpsert)) *TagUpsertBulk {
 		set(&TagUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TagUpsertBulk) SetCreatedAt(v time.Time) *TagUpsertBulk {
+	return u.Update(func(s *TagUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TagUpsertBulk) UpdateCreatedAt() *TagUpsertBulk {
+	return u.Update(func(s *TagUpsert) {
+		s.UpdateCreatedAt()
+	})
 }
 
 // SetName sets the "name" field.

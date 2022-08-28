@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"4d63.com/optional"
-	"github.com/google/uuid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/pkg/resources/account"
+	"github.com/rs/xid"
 )
 
 type database struct {
@@ -33,11 +33,11 @@ func (d *database) CreatePost(
 		SetBody(body).
 		SetShort(short).
 		SetFirst(false).
-		// SetRootID(uuid.UUID(parentID)).
-		SetAuthorID(uuid.UUID(authorID))
+		// SetRootID(xid.ID(parentID)).
+		SetAuthorID(xid.ID(authorID))
 
 	replyToID.If(func(value PostID) {
-		q.SetReplyToID(uuid.UUID(value))
+		q.SetReplyToID(xid.ID(value))
 	})
 
 	p, err := q.Save(ctx)

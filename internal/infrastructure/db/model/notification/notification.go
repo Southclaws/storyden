@@ -5,7 +5,7 @@ package notification
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 const (
@@ -13,6 +13,8 @@ const (
 	Label = "notification"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -21,8 +23,6 @@ const (
 	FieldLink = "link"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
-	// FieldCreateTime holds the string denoting the create_time field in the database.
-	FieldCreateTime = "create_time"
 	// EdgeSubscription holds the string denoting the subscription edge name in mutations.
 	EdgeSubscription = "subscription"
 	// Table holds the table name of the notification in the database.
@@ -39,11 +39,11 @@ const (
 // Columns holds all SQL columns for notification fields.
 var Columns = []string{
 	FieldID,
+	FieldCreatedAt,
 	FieldTitle,
 	FieldDescription,
 	FieldLink,
 	FieldRead,
-	FieldCreateTime,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
@@ -69,8 +69,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreateTime holds the default value on creation for the "create_time" field.
-	DefaultCreateTime func() time.Time
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

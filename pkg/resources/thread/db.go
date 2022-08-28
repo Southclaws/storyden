@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	post_model "github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
@@ -44,7 +44,7 @@ func (d *database) Create(
 	// 	return nil, errors.Wrap(err, "failed to upsert tags for linking to post")
 	// }
 
-	cat, err := d.db.Category.Get(ctx, uuid.UUID(categoryID))
+	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (d *database) Create(
 		SetFirst(true).
 		SetShort(short).
 		SetBody(body).
-		SetAuthorID(uuid.UUID(authorID)).
+		SetAuthorID(xid.ID(authorID)).
 		SetTitle(title).
 		SetCategory(cat).
 		// AddTagIDs(tagset).

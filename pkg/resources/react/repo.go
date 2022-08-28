@@ -3,10 +3,10 @@ package react
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 type Repository interface {
-	Add(ctx context.Context, userID uuid.UUID, postID uuid.UUID, emojiID string) (*React, error)
-	Remove(ctx context.Context, userID uuid.UUID, reactID ReactID) (*React, error)
+	Add(ctx context.Context, userID xid.ID, postID xid.ID, emojiID string) (*React, error)
+	Remove(ctx context.Context, userID xid.ID, reactID ReactID) (*React, error)
 }

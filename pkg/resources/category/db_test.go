@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,7 +72,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -82,7 +82,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -92,7 +92,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(uuid.UUID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002.ID)).
 				SetCategory(c2).
 				Save(ctx)
 			r.NoError(err)
@@ -135,6 +135,6 @@ func TestGetCategories(t *testing.T) {
 	)
 }
 
-func ids(c []category.PostMeta) []uuid.UUID {
-	return lo.Map(c, func(p category.PostMeta, _ int) uuid.UUID { return p.PostID })
+func ids(c []category.PostMeta) []xid.ID {
+	return lo.Map(c, func(p category.PostMeta, _ int) xid.ID { return p.PostID })
 }

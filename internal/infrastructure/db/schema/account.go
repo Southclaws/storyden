@@ -1,32 +1,25 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
 )
 
 type Account struct {
 	ent.Schema
 }
 
+func (Account) Mixin() []ent.Mixin {
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
+}
+
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Immutable().
-			Default(uuid.New),
-
 		field.String("email").Unique(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
 		field.Bool("admin").Default(false),
-
-		field.Time("createdAt").Default(time.Now),
-		field.Time("updatedAt").Default(time.Now),
-		field.Time("deletedAt").Optional(),
 	}
 }
 

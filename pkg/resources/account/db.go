@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
@@ -34,7 +34,7 @@ func (d *database) Create(ctx context.Context, email string, username string, op
 		SetEmail(withrequired.Email).
 		SetName(withrequired.Name).
 		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
-		SetNillableID(utils.OptionalUUID(uuid.UUID(withrequired.ID))).
+		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
 		Save(ctx)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (d *database) Create(ctx context.Context, email string, username string, op
 }
 
 func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, error) {
-	account, err := d.db.Account.Get(ctx, uuid.UUID(userId))
+	account, err := d.db.Account.Get(ctx, xid.ID(userId))
 	if err != nil {
 		if model.IsNotFound(err) {
 			return nil, nil

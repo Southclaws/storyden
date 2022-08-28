@@ -11,16 +11,16 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // Authentication is the model entity for the Authentication schema.
 type Authentication struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
-	// CreateTime holds the value of the "create_time" field.
-	CreateTime time.Time `json:"create_time,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth
 	Service string `json:"service,omitempty"`
 	// The identifier, usually a user/account ID on some OAuth service or API token name. If it's a password, this is blank.
@@ -32,7 +32,7 @@ type Authentication struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
 	Edges                  AuthenticationEdges `json:"edges"`
-	account_authentication *uuid.UUID
+	account_authentication *xid.ID
 }
 
 // AuthenticationEdges holds the relations/edges for other nodes in the graph.
@@ -66,12 +66,12 @@ func (*Authentication) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new([]byte)
 		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken:
 			values[i] = new(sql.NullString)
-		case authentication.FieldCreateTime:
+		case authentication.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case authentication.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(xid.ID)
 		case authentication.ForeignKeys[0]: // account_authentication
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Authentication", columns[i])
 		}
@@ -88,16 +88,16 @@ func (a *Authentication) assignValues(columns []string, values []interface{}) er
 	for i := range columns {
 		switch columns[i] {
 		case authentication.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				a.ID = *value
 			}
-		case authentication.FieldCreateTime:
+		case authentication.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field create_time", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreateTime = value.Time
+				a.CreatedAt = value.Time
 			}
 		case authentication.FieldService:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -129,8 +129,8 @@ func (a *Authentication) assignValues(columns []string, values []interface{}) er
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
 			} else if value.Valid {
-				a.account_authentication = new(uuid.UUID)
-				*a.account_authentication = *value.S.(*uuid.UUID)
+				a.account_authentication = new(xid.ID)
+				*a.account_authentication = *value.S.(*xid.ID)
 			}
 		}
 	}
@@ -165,8 +165,8 @@ func (a *Authentication) String() string {
 	var builder strings.Builder
 	builder.WriteString("Authentication(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("create_time=")
-	builder.WriteString(a.CreateTime.Format(time.ANSIC))
+	builder.WriteString("created_at=")
+	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("service=")
 	builder.WriteString(a.Service)

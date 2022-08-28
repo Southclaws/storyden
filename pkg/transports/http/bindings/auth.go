@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 	"github.com/Southclaws/storyden/pkg/services/authentication/provider/password"
@@ -46,7 +47,11 @@ func (i *Authentication) Signin(ctx context.Context, request openapi.SigninReque
 			return openapi.Signin401Response{}
 		}
 
-		return openapi.InternalServerErrorJSONResponse{Error: err.Error()}
+		if model.IsNotFound(err) {
+			return openapi.Signin404Response{}
+		}
+
+		return err
 	}
 
 	cookie, err := i.encodeSession(u.ID)

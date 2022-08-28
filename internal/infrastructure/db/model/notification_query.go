@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // NotificationQuery is the builder for querying Notification entities.
@@ -110,8 +110,8 @@ func (nq *NotificationQuery) FirstX(ctx context.Context) *Notification {
 
 // FirstID returns the first Notification ID from the query.
 // Returns a *NotFoundError when no Notification ID was found.
-func (nq *NotificationQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (nq *NotificationQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = nq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (nq *NotificationQuery) FirstID(ctx context.Context) (id uuid.UUID, err err
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (nq *NotificationQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (nq *NotificationQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := nq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +161,8 @@ func (nq *NotificationQuery) OnlyX(ctx context.Context) *Notification {
 // OnlyID is like Only, but returns the only Notification ID in the query.
 // Returns a *NotSingularError when more than one Notification ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (nq *NotificationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (nq *NotificationQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = nq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (nq *NotificationQuery) OnlyID(ctx context.Context) (id uuid.UUID, err erro
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (nq *NotificationQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (nq *NotificationQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := nq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +204,8 @@ func (nq *NotificationQuery) AllX(ctx context.Context) []*Notification {
 }
 
 // IDs executes the query and returns a list of Notification IDs.
-func (nq *NotificationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (nq *NotificationQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := nq.Select(notification.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (nq *NotificationQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (nq *NotificationQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (nq *NotificationQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := nq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -292,12 +292,12 @@ func (nq *NotificationQuery) WithSubscription(opts ...func(*SubscriptionQuery)) 
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Notification.Query().
-//		GroupBy(notification.FieldTitle).
+//		GroupBy(notification.FieldCreatedAt).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -321,11 +321,11 @@ func (nq *NotificationQuery) GroupBy(field string, fields ...string) *Notificati
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Notification.Query().
-//		Select(notification.FieldTitle).
+//		Select(notification.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (nq *NotificationQuery) Select(fields ...string) *NotificationSelect {
@@ -398,8 +398,8 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 }
 
 func (nq *NotificationQuery) loadSubscription(ctx context.Context, query *SubscriptionQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *Subscription)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*Notification)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Notification)
 	for i := range nodes {
 		if nodes[i].notification_subscription == nil {
 			continue
@@ -453,7 +453,7 @@ func (nq *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   notification.Table,
 			Columns: notification.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: notification.FieldID,
 			},
 		},

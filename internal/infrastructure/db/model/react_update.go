@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -15,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // ReactUpdate is the builder for updating React entities.
@@ -38,28 +37,14 @@ func (ru *ReactUpdate) SetEmoji(s string) *ReactUpdate {
 	return ru
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ru *ReactUpdate) SetCreatedAt(t time.Time) *ReactUpdate {
-	ru.mutation.SetCreatedAt(t)
-	return ru
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ru *ReactUpdate) SetNillableCreatedAt(t *time.Time) *ReactUpdate {
-	if t != nil {
-		ru.SetCreatedAt(*t)
-	}
-	return ru
-}
-
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (ru *ReactUpdate) SetAccountID(id uuid.UUID) *ReactUpdate {
+func (ru *ReactUpdate) SetAccountID(id xid.ID) *ReactUpdate {
 	ru.mutation.SetAccountID(id)
 	return ru
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ru *ReactUpdate) SetNillableAccountID(id *uuid.UUID) *ReactUpdate {
+func (ru *ReactUpdate) SetNillableAccountID(id *xid.ID) *ReactUpdate {
 	if id != nil {
 		ru = ru.SetAccountID(*id)
 	}
@@ -72,13 +57,13 @@ func (ru *ReactUpdate) SetAccount(a *Account) *ReactUpdate {
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
-func (ru *ReactUpdate) SetPostID(id uuid.UUID) *ReactUpdate {
+func (ru *ReactUpdate) SetPostID(id xid.ID) *ReactUpdate {
 	ru.mutation.SetPostID(id)
 	return ru
 }
 
 // SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (ru *ReactUpdate) SetNillablePostID(id *uuid.UUID) *ReactUpdate {
+func (ru *ReactUpdate) SetNillablePostID(id *xid.ID) *ReactUpdate {
 	if id != nil {
 		ru = ru.SetPostID(*id)
 	}
@@ -173,7 +158,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: react.FieldID,
 			},
 		},
@@ -192,13 +177,6 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: react.FieldEmoji,
 		})
 	}
-	if value, ok := ru.mutation.CreatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: react.FieldCreatedAt,
-		})
-	}
 	if ru.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -208,7 +186,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -224,7 +202,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -243,7 +221,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -259,7 +237,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -296,28 +274,14 @@ func (ruo *ReactUpdateOne) SetEmoji(s string) *ReactUpdateOne {
 	return ruo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ruo *ReactUpdateOne) SetCreatedAt(t time.Time) *ReactUpdateOne {
-	ruo.mutation.SetCreatedAt(t)
-	return ruo
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableCreatedAt(t *time.Time) *ReactUpdateOne {
-	if t != nil {
-		ruo.SetCreatedAt(*t)
-	}
-	return ruo
-}
-
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (ruo *ReactUpdateOne) SetAccountID(id uuid.UUID) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) SetAccountID(id xid.ID) *ReactUpdateOne {
 	ruo.mutation.SetAccountID(id)
 	return ruo
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableAccountID(id *uuid.UUID) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) SetNillableAccountID(id *xid.ID) *ReactUpdateOne {
 	if id != nil {
 		ruo = ruo.SetAccountID(*id)
 	}
@@ -330,13 +294,13 @@ func (ruo *ReactUpdateOne) SetAccount(a *Account) *ReactUpdateOne {
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
-func (ruo *ReactUpdateOne) SetPostID(id uuid.UUID) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) SetPostID(id xid.ID) *ReactUpdateOne {
 	ruo.mutation.SetPostID(id)
 	return ruo
 }
 
 // SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillablePostID(id *uuid.UUID) *ReactUpdateOne {
+func (ruo *ReactUpdateOne) SetNillablePostID(id *xid.ID) *ReactUpdateOne {
 	if id != nil {
 		ruo = ruo.SetPostID(*id)
 	}
@@ -444,7 +408,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: react.FieldID,
 			},
 		},
@@ -480,13 +444,6 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Column: react.FieldEmoji,
 		})
 	}
-	if value, ok := ruo.mutation.CreatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: react.FieldCreatedAt,
-		})
-	}
 	if ruo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -496,7 +453,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -512,7 +469,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -531,7 +488,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -547,7 +504,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},

@@ -5,7 +5,7 @@ package react
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 const (
@@ -13,10 +13,10 @@ const (
 	Label = "react"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
 	// FieldEmoji holds the string denoting the emoji field in the database.
 	FieldEmoji = "emoji"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
-	FieldCreatedAt = "created_at"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgePost holds the string denoting the post edge name in mutations.
@@ -42,8 +42,8 @@ const (
 // Columns holds all SQL columns for react fields.
 var Columns = []string{
 	FieldID,
-	FieldEmoji,
 	FieldCreatedAt,
+	FieldEmoji,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "reacts"
@@ -71,8 +71,10 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
+	DefaultID func() xid.ID
+	// IDValidator is a validator for the "id" field. It is called by the builders before save.
+	IDValidator func([]byte) error
 )

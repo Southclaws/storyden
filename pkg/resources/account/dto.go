@@ -4,15 +4,14 @@ import (
 	"time"
 
 	"4d63.com/optional"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
-type AccountID uuid.UUID
+type AccountID xid.ID
 
-func (u AccountID) String() string { return uuid.UUID(u).String() }
+func (u AccountID) String() string { return xid.ID(u).String() }
 
 type Account struct {
 	ID          AccountID                 `json:"id"`
@@ -44,7 +43,7 @@ func FromModel(u model.Account) (o Account) {
 		Admin:     u.Admin,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		DeletedAt: utils.OptionalZero(u.DeletedAt),
+		DeletedAt: optional.OfPtr(u.DeletedAt),
 	}
 
 	return result

@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AccountUpdate is the builder for updating Account entities.
@@ -32,6 +32,32 @@ type AccountUpdate struct {
 // Where appends a list predicates to the AccountUpdate builder.
 func (au *AccountUpdate) Where(ps ...predicate.Account) *AccountUpdate {
 	au.mutation.Where(ps...)
+	return au
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (au *AccountUpdate) SetUpdatedAt(t time.Time) *AccountUpdate {
+	au.mutation.SetUpdatedAt(t)
+	return au
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (au *AccountUpdate) SetDeletedAt(t time.Time) *AccountUpdate {
+	au.mutation.SetDeletedAt(t)
+	return au
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableDeletedAt(t *time.Time) *AccountUpdate {
+	if t != nil {
+		au.SetDeletedAt(*t)
+	}
+	return au
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (au *AccountUpdate) ClearDeletedAt() *AccountUpdate {
+	au.mutation.ClearDeletedAt()
 	return au
 }
 
@@ -81,63 +107,15 @@ func (au *AccountUpdate) SetNillableAdmin(b *bool) *AccountUpdate {
 	return au
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (au *AccountUpdate) SetCreatedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetCreatedAt(t)
-	return au
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableCreatedAt(t *time.Time) *AccountUpdate {
-	if t != nil {
-		au.SetCreatedAt(*t)
-	}
-	return au
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (au *AccountUpdate) SetUpdatedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetUpdatedAt(t)
-	return au
-}
-
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableUpdatedAt(t *time.Time) *AccountUpdate {
-	if t != nil {
-		au.SetUpdatedAt(*t)
-	}
-	return au
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (au *AccountUpdate) SetDeletedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetDeletedAt(t)
-	return au
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableDeletedAt(t *time.Time) *AccountUpdate {
-	if t != nil {
-		au.SetDeletedAt(*t)
-	}
-	return au
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (au *AccountUpdate) ClearDeletedAt() *AccountUpdate {
-	au.mutation.ClearDeletedAt()
-	return au
-}
-
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (au *AccountUpdate) AddPostIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddPostIDs(ids...)
 	return au
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (au *AccountUpdate) AddPosts(p ...*Post) *AccountUpdate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -145,14 +123,14 @@ func (au *AccountUpdate) AddPosts(p ...*Post) *AccountUpdate {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (au *AccountUpdate) AddReactIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) AddReactIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddReactIDs(ids...)
 	return au
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (au *AccountUpdate) AddReacts(r ...*React) *AccountUpdate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -160,14 +138,14 @@ func (au *AccountUpdate) AddReacts(r ...*React) *AccountUpdate {
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (au *AccountUpdate) AddRoleIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) AddRoleIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddRoleIDs(ids...)
 	return au
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
 func (au *AccountUpdate) AddRoles(r ...*Role) *AccountUpdate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -175,14 +153,14 @@ func (au *AccountUpdate) AddRoles(r ...*Role) *AccountUpdate {
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (au *AccountUpdate) AddSubscriptionIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) AddSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddSubscriptionIDs(ids...)
 	return au
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
 func (au *AccountUpdate) AddSubscriptions(s ...*Subscription) *AccountUpdate {
-	ids := make([]uuid.UUID, len(s))
+	ids := make([]xid.ID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -190,14 +168,14 @@ func (au *AccountUpdate) AddSubscriptions(s ...*Subscription) *AccountUpdate {
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (au *AccountUpdate) AddAuthenticationIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddAuthenticationIDs(ids...)
 	return au
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (au *AccountUpdate) AddAuthentication(a ...*Authentication) *AccountUpdate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -216,14 +194,14 @@ func (au *AccountUpdate) ClearPosts() *AccountUpdate {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (au *AccountUpdate) RemovePostIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) RemovePostIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemovePostIDs(ids...)
 	return au
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (au *AccountUpdate) RemovePosts(p ...*Post) *AccountUpdate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -237,14 +215,14 @@ func (au *AccountUpdate) ClearReacts() *AccountUpdate {
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (au *AccountUpdate) RemoveReactIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) RemoveReactIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemoveReactIDs(ids...)
 	return au
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
 func (au *AccountUpdate) RemoveReacts(r ...*React) *AccountUpdate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -258,14 +236,14 @@ func (au *AccountUpdate) ClearRoles() *AccountUpdate {
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (au *AccountUpdate) RemoveRoleIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) RemoveRoleIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemoveRoleIDs(ids...)
 	return au
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
 func (au *AccountUpdate) RemoveRoles(r ...*Role) *AccountUpdate {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -279,14 +257,14 @@ func (au *AccountUpdate) ClearSubscriptions() *AccountUpdate {
 }
 
 // RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (au *AccountUpdate) RemoveSubscriptionIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) RemoveSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemoveSubscriptionIDs(ids...)
 	return au
 }
 
 // RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
 func (au *AccountUpdate) RemoveSubscriptions(s ...*Subscription) *AccountUpdate {
-	ids := make([]uuid.UUID, len(s))
+	ids := make([]xid.ID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -300,14 +278,14 @@ func (au *AccountUpdate) ClearAuthentication() *AccountUpdate {
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (au *AccountUpdate) RemoveAuthenticationIDs(ids ...uuid.UUID) *AccountUpdate {
+func (au *AccountUpdate) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemoveAuthenticationIDs(ids...)
 	return au
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
 func (au *AccountUpdate) RemoveAuthentication(a ...*Authentication) *AccountUpdate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -320,6 +298,7 @@ func (au *AccountUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	au.defaults()
 	if len(au.hooks) == 0 {
 		if err = au.check(); err != nil {
 			return 0, err
@@ -374,6 +353,14 @@ func (au *AccountUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (au *AccountUpdate) defaults() {
+	if _, ok := au.mutation.UpdatedAt(); !ok {
+		v := account.UpdateDefaultUpdatedAt()
+		au.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (au *AccountUpdate) check() error {
 	if v, ok := au.mutation.Name(); ok {
@@ -396,7 +383,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: account.FieldID,
 			},
 		},
@@ -407,6 +394,26 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := au.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldUpdatedAt,
+		})
+	}
+	if value, ok := au.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldDeletedAt,
+		})
+	}
+	if au.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: account.FieldDeletedAt,
+		})
 	}
 	if value, ok := au.mutation.Email(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -442,33 +449,6 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: account.FieldAdmin,
 		})
 	}
-	if value, ok := au.mutation.CreatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldCreatedAt,
-		})
-	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldUpdatedAt,
-		})
-	}
-	if value, ok := au.mutation.DeletedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldDeletedAt,
-		})
-	}
-	if au.mutation.DeletedAtCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Column: account.FieldDeletedAt,
-		})
-	}
 	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -478,7 +458,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -494,7 +474,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -513,7 +493,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -532,7 +512,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -548,7 +528,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -567,7 +547,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -586,7 +566,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -602,7 +582,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -621,7 +601,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -640,7 +620,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -656,7 +636,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -675,7 +655,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -694,7 +674,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -710,7 +690,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -729,7 +709,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -758,6 +738,32 @@ type AccountUpdateOne struct {
 	hooks     []Hook
 	mutation  *AccountMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (auo *AccountUpdateOne) SetUpdatedAt(t time.Time) *AccountUpdateOne {
+	auo.mutation.SetUpdatedAt(t)
+	return auo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (auo *AccountUpdateOne) SetDeletedAt(t time.Time) *AccountUpdateOne {
+	auo.mutation.SetDeletedAt(t)
+	return auo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableDeletedAt(t *time.Time) *AccountUpdateOne {
+	if t != nil {
+		auo.SetDeletedAt(*t)
+	}
+	return auo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (auo *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
+	auo.mutation.ClearDeletedAt()
+	return auo
 }
 
 // SetEmail sets the "email" field.
@@ -806,63 +812,15 @@ func (auo *AccountUpdateOne) SetNillableAdmin(b *bool) *AccountUpdateOne {
 	return auo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (auo *AccountUpdateOne) SetCreatedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetCreatedAt(t)
-	return auo
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableCreatedAt(t *time.Time) *AccountUpdateOne {
-	if t != nil {
-		auo.SetCreatedAt(*t)
-	}
-	return auo
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
-func (auo *AccountUpdateOne) SetUpdatedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
-	return auo
-}
-
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableUpdatedAt(t *time.Time) *AccountUpdateOne {
-	if t != nil {
-		auo.SetUpdatedAt(*t)
-	}
-	return auo
-}
-
-// SetDeletedAt sets the "deletedAt" field.
-func (auo *AccountUpdateOne) SetDeletedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetDeletedAt(t)
-	return auo
-}
-
-// SetNillableDeletedAt sets the "deletedAt" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableDeletedAt(t *time.Time) *AccountUpdateOne {
-	if t != nil {
-		auo.SetDeletedAt(*t)
-	}
-	return auo
-}
-
-// ClearDeletedAt clears the value of the "deletedAt" field.
-func (auo *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
-	auo.mutation.ClearDeletedAt()
-	return auo
-}
-
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (auo *AccountUpdateOne) AddPostIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
 	return auo
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (auo *AccountUpdateOne) AddPosts(p ...*Post) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -870,14 +828,14 @@ func (auo *AccountUpdateOne) AddPosts(p ...*Post) *AccountUpdateOne {
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (auo *AccountUpdateOne) AddReactIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddReactIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddReactIDs(ids...)
 	return auo
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
 func (auo *AccountUpdateOne) AddReacts(r ...*React) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -885,14 +843,14 @@ func (auo *AccountUpdateOne) AddReacts(r ...*React) *AccountUpdateOne {
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (auo *AccountUpdateOne) AddRoleIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddRoleIDs(ids...)
 	return auo
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
 func (auo *AccountUpdateOne) AddRoles(r ...*Role) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -900,14 +858,14 @@ func (auo *AccountUpdateOne) AddRoles(r ...*Role) *AccountUpdateOne {
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (auo *AccountUpdateOne) AddSubscriptionIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddSubscriptionIDs(ids...)
 	return auo
 }
 
 // AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
 func (auo *AccountUpdateOne) AddSubscriptions(s ...*Subscription) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(s))
+	ids := make([]xid.ID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -915,14 +873,14 @@ func (auo *AccountUpdateOne) AddSubscriptions(s ...*Subscription) *AccountUpdate
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (auo *AccountUpdateOne) AddAuthenticationIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddAuthenticationIDs(ids...)
 	return auo
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
 func (auo *AccountUpdateOne) AddAuthentication(a ...*Authentication) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -941,14 +899,14 @@ func (auo *AccountUpdateOne) ClearPosts() *AccountUpdateOne {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (auo *AccountUpdateOne) RemovePostIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemovePostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemovePostIDs(ids...)
 	return auo
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (auo *AccountUpdateOne) RemovePosts(p ...*Post) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -962,14 +920,14 @@ func (auo *AccountUpdateOne) ClearReacts() *AccountUpdateOne {
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (auo *AccountUpdateOne) RemoveReactIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemoveReactIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemoveReactIDs(ids...)
 	return auo
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
 func (auo *AccountUpdateOne) RemoveReacts(r ...*React) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -983,14 +941,14 @@ func (auo *AccountUpdateOne) ClearRoles() *AccountUpdateOne {
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (auo *AccountUpdateOne) RemoveRoleIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemoveRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemoveRoleIDs(ids...)
 	return auo
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
 func (auo *AccountUpdateOne) RemoveRoles(r ...*Role) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(r))
+	ids := make([]xid.ID, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -1004,14 +962,14 @@ func (auo *AccountUpdateOne) ClearSubscriptions() *AccountUpdateOne {
 }
 
 // RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (auo *AccountUpdateOne) RemoveSubscriptionIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemoveSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemoveSubscriptionIDs(ids...)
 	return auo
 }
 
 // RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
 func (auo *AccountUpdateOne) RemoveSubscriptions(s ...*Subscription) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(s))
+	ids := make([]xid.ID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -1025,14 +983,14 @@ func (auo *AccountUpdateOne) ClearAuthentication() *AccountUpdateOne {
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (auo *AccountUpdateOne) RemoveAuthenticationIDs(ids ...uuid.UUID) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemoveAuthenticationIDs(ids...)
 	return auo
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
 func (auo *AccountUpdateOne) RemoveAuthentication(a ...*Authentication) *AccountUpdateOne {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1052,6 +1010,7 @@ func (auo *AccountUpdateOne) Save(ctx context.Context) (*Account, error) {
 		err  error
 		node *Account
 	)
+	auo.defaults()
 	if len(auo.hooks) == 0 {
 		if err = auo.check(); err != nil {
 			return nil, err
@@ -1112,6 +1071,14 @@ func (auo *AccountUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (auo *AccountUpdateOne) defaults() {
+	if _, ok := auo.mutation.UpdatedAt(); !ok {
+		v := account.UpdateDefaultUpdatedAt()
+		auo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (auo *AccountUpdateOne) check() error {
 	if v, ok := auo.mutation.Name(); ok {
@@ -1134,7 +1101,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: account.FieldID,
 			},
 		},
@@ -1162,6 +1129,26 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := auo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldUpdatedAt,
+		})
+	}
+	if value, ok := auo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: account.FieldDeletedAt,
+		})
+	}
+	if auo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: account.FieldDeletedAt,
+		})
 	}
 	if value, ok := auo.mutation.Email(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -1197,33 +1184,6 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Column: account.FieldAdmin,
 		})
 	}
-	if value, ok := auo.mutation.CreatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldCreatedAt,
-		})
-	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldUpdatedAt,
-		})
-	}
-	if value, ok := auo.mutation.DeletedAt(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldDeletedAt,
-		})
-	}
-	if auo.mutation.DeletedAtCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Column: account.FieldDeletedAt,
-		})
-	}
 	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1233,7 +1193,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -1249,7 +1209,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -1268,7 +1228,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -1287,7 +1247,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -1303,7 +1263,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -1322,7 +1282,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: react.FieldID,
 				},
 			},
@@ -1341,7 +1301,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -1357,7 +1317,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -1376,7 +1336,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: role.FieldID,
 				},
 			},
@@ -1395,7 +1355,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1411,7 +1371,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1430,7 +1390,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -1449,7 +1409,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1465,7 +1425,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},
@@ -1484,7 +1444,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: authentication.FieldID,
 				},
 			},

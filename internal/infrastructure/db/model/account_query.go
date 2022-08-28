@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AccountQuery is the builder for querying Account entities.
@@ -206,8 +206,8 @@ func (aq *AccountQuery) FirstX(ctx context.Context) *Account {
 
 // FirstID returns the first Account ID from the query.
 // Returns a *NotFoundError when no Account ID was found.
-func (aq *AccountQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AccountQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -219,7 +219,7 @@ func (aq *AccountQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AccountQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (aq *AccountQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -257,8 +257,8 @@ func (aq *AccountQuery) OnlyX(ctx context.Context) *Account {
 // OnlyID is like Only, but returns the only Account ID in the query.
 // Returns a *NotSingularError when more than one Account ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AccountQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (aq *AccountQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -274,7 +274,7 @@ func (aq *AccountQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AccountQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (aq *AccountQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -300,8 +300,8 @@ func (aq *AccountQuery) AllX(ctx context.Context) []*Account {
 }
 
 // IDs executes the query and returns a list of Account IDs.
-func (aq *AccountQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (aq *AccountQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := aq.Select(account.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (aq *AccountQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AccountQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (aq *AccountQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -436,12 +436,12 @@ func (aq *AccountQuery) WithAuthentication(opts ...func(*AuthenticationQuery)) *
 // Example:
 //
 //	var v []struct {
-//		Email string `json:"email,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Account.Query().
-//		GroupBy(account.FieldEmail).
+//		GroupBy(account.FieldCreatedAt).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -465,11 +465,11 @@ func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Email string `json:"email,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Account.Query().
-//		Select(account.FieldEmail).
+//		Select(account.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (aq *AccountQuery) Select(fields ...string) *AccountSelect {
@@ -569,7 +569,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 
 func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Account, init func(*Account), assign func(*Account, *Post)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Account)
+	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -600,7 +600,7 @@ func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes [
 }
 func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []*Account, init func(*Account), assign func(*Account, *React)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Account)
+	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -631,8 +631,8 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 }
 func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*Account, init func(*Account), assign func(*Account, *Role)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[uuid.UUID]*Account)
-	nids := make(map[uuid.UUID]map[*Account]struct{})
+	byID := make(map[xid.ID]*Account)
+	nids := make(map[xid.ID]map[*Account]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -660,11 +660,11 @@ func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes [
 			if err != nil {
 				return nil, err
 			}
-			return append([]interface{}{new(uuid.UUID)}, values...), nil
+			return append([]interface{}{new(xid.ID)}, values...), nil
 		}
 		spec.Assign = func(columns []string, values []interface{}) error {
-			outValue := *values[0].(*uuid.UUID)
-			inValue := *values[1].(*uuid.UUID)
+			outValue := *values[0].(*xid.ID)
+			inValue := *values[1].(*xid.ID)
 			if nids[inValue] == nil {
 				nids[inValue] = map[*Account]struct{}{byID[outValue]: struct{}{}}
 				return assign(columns[1:], values[1:])
@@ -689,7 +689,7 @@ func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes [
 }
 func (aq *AccountQuery) loadSubscriptions(ctx context.Context, query *SubscriptionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Subscription)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Account)
+	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -720,7 +720,7 @@ func (aq *AccountQuery) loadSubscriptions(ctx context.Context, query *Subscripti
 }
 func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *AuthenticationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Authentication)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uuid.UUID]*Account)
+	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -776,7 +776,7 @@ func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   account.Table,
 			Columns: account.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: account.FieldID,
 			},
 		},

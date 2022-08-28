@@ -1,26 +1,22 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
-// Post holds the schema definition for the Post entity.
 type Post struct {
 	ent.Schema
 }
 
-// Fields of Post.
+func (Post) Mixin() []ent.Mixin {
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
+}
+
 func (Post) Fields() []ent.Field {
 	return []ent.Field{
-		field.UUID("id", uuid.UUID{}).
-			Immutable().
-			Default(uuid.New),
-
 		field.Bool("first"),
 
 		// parent posts
@@ -29,19 +25,15 @@ func (Post) Fields() []ent.Field {
 		field.Bool("pinned").Default(false),
 
 		// child posts
-		field.UUID("root_post_id", uuid.UUID{}).Optional(),
-		field.UUID("reply_to_post_id", uuid.UUID{}).Optional(),
+		field.Bytes("root_post_id").GoType(xid.ID{}).Optional(),
+		field.Bytes("reply_to_post_id").GoType(xid.ID{}).Optional(),
 
 		// All posts
 		field.String("body"),
 		field.String("short"),
 
-		field.Time("createdAt").Default(time.Now),
-		field.Time("updatedAt").Default(time.Now),
-		field.Time("deletedAt").Optional().Nillable(),
-
 		// Edges
-		field.UUID("category_id", uuid.UUID{}).Optional(),
+		field.Bytes("category_id").GoType(xid.ID{}).Optional(),
 	}
 }
 

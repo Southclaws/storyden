@@ -5,16 +5,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 )
 
-var id = uuid.MustParse
+var id = func(s string) xid.ID { return utils.Must(xid.FromString(s)) }
 
 // Ready is a type you can depend on during integration tests which, when used
 // will ensure the database is seeded with data before your tests run.

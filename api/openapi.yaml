@@ -263,8 +263,12 @@ components:
   schemas:
     Identifier:
       type: string
-      format: uuid
-      example: "00000000-0000-4000-8000-000000000000"
+      format: xid
+      x-go-type: xid.ID
+      x-go-type-import:
+        name: xid
+        path: github.com/rs/xid
+      example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
 
     CommonProperties:

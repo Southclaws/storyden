@@ -4,14 +4,14 @@ import (
 	"time"
 
 	"4d63.com/optional"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 )
 
-type PostID uuid.UUID
+type PostID xid.ID
 
 type Post struct {
 	ID PostID `json:"id"`
@@ -33,7 +33,7 @@ const Role = "Post"
 func (u *Post) GetRole() string { return Role }
 
 type Author struct {
-	ID        uuid.UUID `json:"id"`
+	ID        xid.ID `json:"id"`
 	Name      string    `json:"name"`
 	Admin     bool      `json:"admin"`
 	CreatedAt time.Time `json:"createdAt"`
@@ -55,7 +55,7 @@ func FromModel(m *model.Post) (w *Post) {
 		return *r
 	})
 
-	// replyTo := utils.OptionalSlice[uuid.UUID](m.ReplyToPostID)
+	// replyTo := utils.OptionalSlice[xid.ID](m.ReplyToPostID)
 
 	return &Post{
 		ID: PostID(m.ID),

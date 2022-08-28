@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/migrate"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
@@ -221,7 +221,7 @@ func (c *AccountClient) UpdateOne(a *Account) *AccountUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AccountClient) UpdateOneID(id uuid.UUID) *AccountUpdateOne {
+func (c *AccountClient) UpdateOneID(id xid.ID) *AccountUpdateOne {
 	mutation := newAccountMutation(c.config, OpUpdateOne, withAccountID(id))
 	return &AccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -238,7 +238,7 @@ func (c *AccountClient) DeleteOne(a *Account) *AccountDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *AccountClient) DeleteOneID(id uuid.UUID) *AccountDeleteOne {
+func (c *AccountClient) DeleteOneID(id xid.ID) *AccountDeleteOne {
 	builder := c.Delete().Where(account.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -253,12 +253,12 @@ func (c *AccountClient) Query() *AccountQuery {
 }
 
 // Get returns a Account entity by its id.
-func (c *AccountClient) Get(ctx context.Context, id uuid.UUID) (*Account, error) {
+func (c *AccountClient) Get(ctx context.Context, id xid.ID) (*Account, error) {
 	return c.Query().Where(account.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AccountClient) GetX(ctx context.Context, id uuid.UUID) *Account {
+func (c *AccountClient) GetX(ctx context.Context, id xid.ID) *Account {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -391,7 +391,7 @@ func (c *AuthenticationClient) UpdateOne(a *Authentication) *AuthenticationUpdat
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AuthenticationClient) UpdateOneID(id uuid.UUID) *AuthenticationUpdateOne {
+func (c *AuthenticationClient) UpdateOneID(id xid.ID) *AuthenticationUpdateOne {
 	mutation := newAuthenticationMutation(c.config, OpUpdateOne, withAuthenticationID(id))
 	return &AuthenticationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -408,7 +408,7 @@ func (c *AuthenticationClient) DeleteOne(a *Authentication) *AuthenticationDelet
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *AuthenticationClient) DeleteOneID(id uuid.UUID) *AuthenticationDeleteOne {
+func (c *AuthenticationClient) DeleteOneID(id xid.ID) *AuthenticationDeleteOne {
 	builder := c.Delete().Where(authentication.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -423,12 +423,12 @@ func (c *AuthenticationClient) Query() *AuthenticationQuery {
 }
 
 // Get returns a Authentication entity by its id.
-func (c *AuthenticationClient) Get(ctx context.Context, id uuid.UUID) (*Authentication, error) {
+func (c *AuthenticationClient) Get(ctx context.Context, id xid.ID) (*Authentication, error) {
 	return c.Query().Where(authentication.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AuthenticationClient) GetX(ctx context.Context, id uuid.UUID) *Authentication {
+func (c *AuthenticationClient) GetX(ctx context.Context, id xid.ID) *Authentication {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -497,7 +497,7 @@ func (c *CategoryClient) UpdateOne(ca *Category) *CategoryUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CategoryClient) UpdateOneID(id uuid.UUID) *CategoryUpdateOne {
+func (c *CategoryClient) UpdateOneID(id xid.ID) *CategoryUpdateOne {
 	mutation := newCategoryMutation(c.config, OpUpdateOne, withCategoryID(id))
 	return &CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -514,7 +514,7 @@ func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CategoryClient) DeleteOneID(id uuid.UUID) *CategoryDeleteOne {
+func (c *CategoryClient) DeleteOneID(id xid.ID) *CategoryDeleteOne {
 	builder := c.Delete().Where(category.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -529,12 +529,12 @@ func (c *CategoryClient) Query() *CategoryQuery {
 }
 
 // Get returns a Category entity by its id.
-func (c *CategoryClient) Get(ctx context.Context, id uuid.UUID) (*Category, error) {
+func (c *CategoryClient) Get(ctx context.Context, id xid.ID) (*Category, error) {
 	return c.Query().Where(category.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CategoryClient) GetX(ctx context.Context, id uuid.UUID) *Category {
+func (c *CategoryClient) GetX(ctx context.Context, id xid.ID) *Category {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -603,7 +603,7 @@ func (c *NotificationClient) UpdateOne(n *Notification) *NotificationUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *NotificationClient) UpdateOneID(id uuid.UUID) *NotificationUpdateOne {
+func (c *NotificationClient) UpdateOneID(id xid.ID) *NotificationUpdateOne {
 	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotificationID(id))
 	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -620,7 +620,7 @@ func (c *NotificationClient) DeleteOne(n *Notification) *NotificationDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *NotificationClient) DeleteOneID(id uuid.UUID) *NotificationDeleteOne {
+func (c *NotificationClient) DeleteOneID(id xid.ID) *NotificationDeleteOne {
 	builder := c.Delete().Where(notification.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -635,12 +635,12 @@ func (c *NotificationClient) Query() *NotificationQuery {
 }
 
 // Get returns a Notification entity by its id.
-func (c *NotificationClient) Get(ctx context.Context, id uuid.UUID) (*Notification, error) {
+func (c *NotificationClient) Get(ctx context.Context, id xid.ID) (*Notification, error) {
 	return c.Query().Where(notification.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *NotificationClient) GetX(ctx context.Context, id uuid.UUID) *Notification {
+func (c *NotificationClient) GetX(ctx context.Context, id xid.ID) *Notification {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -709,7 +709,7 @@ func (c *PostClient) UpdateOne(po *Post) *PostUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *PostClient) UpdateOneID(id uuid.UUID) *PostUpdateOne {
+func (c *PostClient) UpdateOneID(id xid.ID) *PostUpdateOne {
 	mutation := newPostMutation(c.config, OpUpdateOne, withPostID(id))
 	return &PostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -726,7 +726,7 @@ func (c *PostClient) DeleteOne(po *Post) *PostDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *PostClient) DeleteOneID(id uuid.UUID) *PostDeleteOne {
+func (c *PostClient) DeleteOneID(id xid.ID) *PostDeleteOne {
 	builder := c.Delete().Where(post.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -741,12 +741,12 @@ func (c *PostClient) Query() *PostQuery {
 }
 
 // Get returns a Post entity by its id.
-func (c *PostClient) Get(ctx context.Context, id uuid.UUID) (*Post, error) {
+func (c *PostClient) Get(ctx context.Context, id xid.ID) (*Post, error) {
 	return c.Query().Where(post.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *PostClient) GetX(ctx context.Context, id uuid.UUID) *Post {
+func (c *PostClient) GetX(ctx context.Context, id xid.ID) *Post {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -927,7 +927,7 @@ func (c *ReactClient) UpdateOne(r *React) *ReactUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ReactClient) UpdateOneID(id uuid.UUID) *ReactUpdateOne {
+func (c *ReactClient) UpdateOneID(id xid.ID) *ReactUpdateOne {
 	mutation := newReactMutation(c.config, OpUpdateOne, withReactID(id))
 	return &ReactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -944,7 +944,7 @@ func (c *ReactClient) DeleteOne(r *React) *ReactDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *ReactClient) DeleteOneID(id uuid.UUID) *ReactDeleteOne {
+func (c *ReactClient) DeleteOneID(id xid.ID) *ReactDeleteOne {
 	builder := c.Delete().Where(react.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -959,12 +959,12 @@ func (c *ReactClient) Query() *ReactQuery {
 }
 
 // Get returns a React entity by its id.
-func (c *ReactClient) Get(ctx context.Context, id uuid.UUID) (*React, error) {
+func (c *ReactClient) Get(ctx context.Context, id xid.ID) (*React, error) {
 	return c.Query().Where(react.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ReactClient) GetX(ctx context.Context, id uuid.UUID) *React {
+func (c *ReactClient) GetX(ctx context.Context, id xid.ID) *React {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1049,7 +1049,7 @@ func (c *RoleClient) UpdateOne(r *Role) *RoleUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *RoleClient) UpdateOneID(id uuid.UUID) *RoleUpdateOne {
+func (c *RoleClient) UpdateOneID(id xid.ID) *RoleUpdateOne {
 	mutation := newRoleMutation(c.config, OpUpdateOne, withRoleID(id))
 	return &RoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1066,7 +1066,7 @@ func (c *RoleClient) DeleteOne(r *Role) *RoleDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *RoleClient) DeleteOneID(id uuid.UUID) *RoleDeleteOne {
+func (c *RoleClient) DeleteOneID(id xid.ID) *RoleDeleteOne {
 	builder := c.Delete().Where(role.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1081,12 +1081,12 @@ func (c *RoleClient) Query() *RoleQuery {
 }
 
 // Get returns a Role entity by its id.
-func (c *RoleClient) Get(ctx context.Context, id uuid.UUID) (*Role, error) {
+func (c *RoleClient) Get(ctx context.Context, id xid.ID) (*Role, error) {
 	return c.Query().Where(role.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *RoleClient) GetX(ctx context.Context, id uuid.UUID) *Role {
+func (c *RoleClient) GetX(ctx context.Context, id xid.ID) *Role {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1155,7 +1155,7 @@ func (c *SubscriptionClient) UpdateOne(s *Subscription) *SubscriptionUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SubscriptionClient) UpdateOneID(id uuid.UUID) *SubscriptionUpdateOne {
+func (c *SubscriptionClient) UpdateOneID(id xid.ID) *SubscriptionUpdateOne {
 	mutation := newSubscriptionMutation(c.config, OpUpdateOne, withSubscriptionID(id))
 	return &SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1172,7 +1172,7 @@ func (c *SubscriptionClient) DeleteOne(s *Subscription) *SubscriptionDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *SubscriptionClient) DeleteOneID(id uuid.UUID) *SubscriptionDeleteOne {
+func (c *SubscriptionClient) DeleteOneID(id xid.ID) *SubscriptionDeleteOne {
 	builder := c.Delete().Where(subscription.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1187,12 +1187,12 @@ func (c *SubscriptionClient) Query() *SubscriptionQuery {
 }
 
 // Get returns a Subscription entity by its id.
-func (c *SubscriptionClient) Get(ctx context.Context, id uuid.UUID) (*Subscription, error) {
+func (c *SubscriptionClient) Get(ctx context.Context, id xid.ID) (*Subscription, error) {
 	return c.Query().Where(subscription.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SubscriptionClient) GetX(ctx context.Context, id uuid.UUID) *Subscription {
+func (c *SubscriptionClient) GetX(ctx context.Context, id xid.ID) *Subscription {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1277,7 +1277,7 @@ func (c *TagClient) UpdateOne(t *Tag) *TagUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TagClient) UpdateOneID(id uuid.UUID) *TagUpdateOne {
+func (c *TagClient) UpdateOneID(id xid.ID) *TagUpdateOne {
 	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
 	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1294,7 +1294,7 @@ func (c *TagClient) DeleteOne(t *Tag) *TagDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *TagClient) DeleteOneID(id uuid.UUID) *TagDeleteOne {
+func (c *TagClient) DeleteOneID(id xid.ID) *TagDeleteOne {
 	builder := c.Delete().Where(tag.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1309,12 +1309,12 @@ func (c *TagClient) Query() *TagQuery {
 }
 
 // Get returns a Tag entity by its id.
-func (c *TagClient) Get(ctx context.Context, id uuid.UUID) (*Tag, error) {
+func (c *TagClient) Get(ctx context.Context, id xid.ID) (*Tag, error) {
 	return c.Query().Where(tag.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TagClient) GetX(ctx context.Context, id uuid.UUID) *Tag {
+func (c *TagClient) GetX(ctx context.Context, id xid.ID) *Tag {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

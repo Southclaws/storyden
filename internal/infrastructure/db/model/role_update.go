@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // RoleUpdate is the builder for updating Role entities.
@@ -31,17 +31,9 @@ func (ru *RoleUpdate) Where(ps ...predicate.Role) *RoleUpdate {
 	return ru
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ru *RoleUpdate) SetCreatedAt(t time.Time) *RoleUpdate {
-	ru.mutation.SetCreatedAt(t)
-	return ru
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableCreatedAt(t *time.Time) *RoleUpdate {
-	if t != nil {
-		ru.SetCreatedAt(*t)
-	}
+// SetUpdatedAt sets the "updated_at" field.
+func (ru *RoleUpdate) SetUpdatedAt(t time.Time) *RoleUpdate {
+	ru.mutation.SetUpdatedAt(t)
 	return ru
 }
 
@@ -52,14 +44,14 @@ func (ru *RoleUpdate) SetName(s string) *RoleUpdate {
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (ru *RoleUpdate) AddAccountIDs(ids ...uuid.UUID) *RoleUpdate {
+func (ru *RoleUpdate) AddAccountIDs(ids ...xid.ID) *RoleUpdate {
 	ru.mutation.AddAccountIDs(ids...)
 	return ru
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
 func (ru *RoleUpdate) AddAccounts(a ...*Account) *RoleUpdate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -78,14 +70,14 @@ func (ru *RoleUpdate) ClearAccounts() *RoleUpdate {
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (ru *RoleUpdate) RemoveAccountIDs(ids ...uuid.UUID) *RoleUpdate {
+func (ru *RoleUpdate) RemoveAccountIDs(ids ...xid.ID) *RoleUpdate {
 	ru.mutation.RemoveAccountIDs(ids...)
 	return ru
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
 func (ru *RoleUpdate) RemoveAccounts(a ...*Account) *RoleUpdate {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -98,6 +90,7 @@ func (ru *RoleUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	ru.defaults()
 	if len(ru.hooks) == 0 {
 		affected, err = ru.sqlSave(ctx)
 	} else {
@@ -146,6 +139,14 @@ func (ru *RoleUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ru *RoleUpdate) defaults() {
+	if _, ok := ru.mutation.UpdatedAt(); !ok {
+		v := role.UpdateDefaultUpdatedAt()
+		ru.mutation.SetUpdatedAt(v)
+	}
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ru *RoleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdate {
 	ru.modifiers = append(ru.modifiers, modifiers...)
@@ -158,7 +159,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   role.Table,
 			Columns: role.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: role.FieldID,
 			},
 		},
@@ -170,11 +171,11 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ru.mutation.CreatedAt(); ok {
+	if value, ok := ru.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: role.FieldCreatedAt,
+			Column: role.FieldUpdatedAt,
 		})
 	}
 	if value, ok := ru.mutation.Name(); ok {
@@ -193,7 +194,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -209,7 +210,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -228,7 +229,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -259,17 +260,9 @@ type RoleUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ruo *RoleUpdateOne) SetCreatedAt(t time.Time) *RoleUpdateOne {
-	ruo.mutation.SetCreatedAt(t)
-	return ruo
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableCreatedAt(t *time.Time) *RoleUpdateOne {
-	if t != nil {
-		ruo.SetCreatedAt(*t)
-	}
+// SetUpdatedAt sets the "updated_at" field.
+func (ruo *RoleUpdateOne) SetUpdatedAt(t time.Time) *RoleUpdateOne {
+	ruo.mutation.SetUpdatedAt(t)
 	return ruo
 }
 
@@ -280,14 +273,14 @@ func (ruo *RoleUpdateOne) SetName(s string) *RoleUpdateOne {
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (ruo *RoleUpdateOne) AddAccountIDs(ids ...uuid.UUID) *RoleUpdateOne {
+func (ruo *RoleUpdateOne) AddAccountIDs(ids ...xid.ID) *RoleUpdateOne {
 	ruo.mutation.AddAccountIDs(ids...)
 	return ruo
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
 func (ruo *RoleUpdateOne) AddAccounts(a ...*Account) *RoleUpdateOne {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -306,14 +299,14 @@ func (ruo *RoleUpdateOne) ClearAccounts() *RoleUpdateOne {
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (ruo *RoleUpdateOne) RemoveAccountIDs(ids ...uuid.UUID) *RoleUpdateOne {
+func (ruo *RoleUpdateOne) RemoveAccountIDs(ids ...xid.ID) *RoleUpdateOne {
 	ruo.mutation.RemoveAccountIDs(ids...)
 	return ruo
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
 func (ruo *RoleUpdateOne) RemoveAccounts(a ...*Account) *RoleUpdateOne {
-	ids := make([]uuid.UUID, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -333,6 +326,7 @@ func (ruo *RoleUpdateOne) Save(ctx context.Context) (*Role, error) {
 		err  error
 		node *Role
 	)
+	ruo.defaults()
 	if len(ruo.hooks) == 0 {
 		node, err = ruo.sqlSave(ctx)
 	} else {
@@ -387,6 +381,14 @@ func (ruo *RoleUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ruo *RoleUpdateOne) defaults() {
+	if _, ok := ruo.mutation.UpdatedAt(); !ok {
+		v := role.UpdateDefaultUpdatedAt()
+		ruo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ruo *RoleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdateOne {
 	ruo.modifiers = append(ruo.modifiers, modifiers...)
@@ -399,7 +401,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Table:   role.Table,
 			Columns: role.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: role.FieldID,
 			},
 		},
@@ -428,11 +430,11 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			}
 		}
 	}
-	if value, ok := ruo.mutation.CreatedAt(); ok {
+	if value, ok := ruo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: role.FieldCreatedAt,
+			Column: role.FieldUpdatedAt,
 		})
 	}
 	if value, ok := ruo.mutation.Name(); ok {
@@ -451,7 +453,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -467,7 +469,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -486,7 +488,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},

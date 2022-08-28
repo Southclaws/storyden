@@ -1,10 +1,10 @@
 package role
 
-import "github.com/google/uuid"
+import "github.com/rs/xid"
 
-type RoleID uuid.UUID
+type RoleID xid.ID
 
-func (u RoleID) String() string { return uuid.UUID(u).String() }
+func (u RoleID) String() string { return xid.ID(u).String() }
 
 type Role struct {
 	ID          RoleID

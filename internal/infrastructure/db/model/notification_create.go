@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // NotificationCreate is the builder for creating a Notification entity.
@@ -23,6 +23,20 @@ type NotificationCreate struct {
 	mutation *NotificationMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (nc *NotificationCreate) SetCreatedAt(t time.Time) *NotificationCreate {
+	nc.mutation.SetCreatedAt(t)
+	return nc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableCreatedAt(t *time.Time) *NotificationCreate {
+	if t != nil {
+		nc.SetCreatedAt(*t)
+	}
+	return nc
 }
 
 // SetTitle sets the "title" field.
@@ -49,42 +63,28 @@ func (nc *NotificationCreate) SetRead(b bool) *NotificationCreate {
 	return nc
 }
 
-// SetCreateTime sets the "create_time" field.
-func (nc *NotificationCreate) SetCreateTime(t time.Time) *NotificationCreate {
-	nc.mutation.SetCreateTime(t)
-	return nc
-}
-
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (nc *NotificationCreate) SetNillableCreateTime(t *time.Time) *NotificationCreate {
-	if t != nil {
-		nc.SetCreateTime(*t)
-	}
-	return nc
-}
-
 // SetID sets the "id" field.
-func (nc *NotificationCreate) SetID(u uuid.UUID) *NotificationCreate {
-	nc.mutation.SetID(u)
+func (nc *NotificationCreate) SetID(x xid.ID) *NotificationCreate {
+	nc.mutation.SetID(x)
 	return nc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (nc *NotificationCreate) SetNillableID(u *uuid.UUID) *NotificationCreate {
-	if u != nil {
-		nc.SetID(*u)
+func (nc *NotificationCreate) SetNillableID(x *xid.ID) *NotificationCreate {
+	if x != nil {
+		nc.SetID(*x)
 	}
 	return nc
 }
 
 // SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nc *NotificationCreate) SetSubscriptionID(id uuid.UUID) *NotificationCreate {
+func (nc *NotificationCreate) SetSubscriptionID(id xid.ID) *NotificationCreate {
 	nc.mutation.SetSubscriptionID(id)
 	return nc
 }
 
 // SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nc *NotificationCreate) SetNillableSubscriptionID(id *uuid.UUID) *NotificationCreate {
+func (nc *NotificationCreate) SetNillableSubscriptionID(id *xid.ID) *NotificationCreate {
 	if id != nil {
 		nc = nc.SetSubscriptionID(*id)
 	}
@@ -173,9 +173,9 @@ func (nc *NotificationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (nc *NotificationCreate) defaults() {
-	if _, ok := nc.mutation.CreateTime(); !ok {
-		v := notification.DefaultCreateTime()
-		nc.mutation.SetCreateTime(v)
+	if _, ok := nc.mutation.CreatedAt(); !ok {
+		v := notification.DefaultCreatedAt()
+		nc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := nc.mutation.ID(); !ok {
 		v := notification.DefaultID()
@@ -185,6 +185,9 @@ func (nc *NotificationCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (nc *NotificationCreate) check() error {
+	if _, ok := nc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Notification.created_at"`)}
+	}
 	if _, ok := nc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`model: missing required field "Notification.title"`)}
 	}
@@ -197,8 +200,10 @@ func (nc *NotificationCreate) check() error {
 	if _, ok := nc.mutation.Read(); !ok {
 		return &ValidationError{Name: "read", err: errors.New(`model: missing required field "Notification.read"`)}
 	}
-	if _, ok := nc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`model: missing required field "Notification.create_time"`)}
+	if v, ok := nc.mutation.ID(); ok {
+		if err := notification.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Notification.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -212,7 +217,7 @@ func (nc *NotificationCreate) sqlSave(ctx context.Context) (*Notification, error
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -227,7 +232,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec = &sqlgraph.CreateSpec{
 			Table: notification.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: notification.FieldID,
 			},
 		}
@@ -236,6 +241,14 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 	if id, ok := nc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := nc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: notification.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
 	}
 	if value, ok := nc.mutation.Title(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -269,14 +282,6 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		})
 		_node.Read = value
 	}
-	if value, ok := nc.mutation.CreateTime(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: notification.FieldCreateTime,
-		})
-		_node.CreateTime = value
-	}
 	if nodes := nc.mutation.SubscriptionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -286,7 +291,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: subscription.FieldID,
 				},
 			},
@@ -304,7 +309,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 // of the `INSERT` statement. For example:
 //
 //	client.Notification.Create().
-//		SetTitle(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -313,7 +318,7 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.NotificationUpsert) {
-//			SetTitle(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -350,6 +355,18 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreatedAt sets the "created_at" field.
+func (u *NotificationUpsert) SetCreatedAt(v time.Time) *NotificationUpsert {
+	u.Set(notification.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateCreatedAt() *NotificationUpsert {
+	u.SetExcluded(notification.FieldCreatedAt)
+	return u
+}
 
 // SetTitle sets the "title" field.
 func (u *NotificationUpsert) SetTitle(v string) *NotificationUpsert {
@@ -399,18 +416,6 @@ func (u *NotificationUpsert) UpdateRead() *NotificationUpsert {
 	return u
 }
 
-// SetCreateTime sets the "create_time" field.
-func (u *NotificationUpsert) SetCreateTime(v time.Time) *NotificationUpsert {
-	u.Set(notification.FieldCreateTime, v)
-	return u
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *NotificationUpsert) UpdateCreateTime() *NotificationUpsert {
-	u.SetExcluded(notification.FieldCreateTime)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -428,6 +433,9 @@ func (u *NotificationUpsertOne) UpdateNewValues() *NotificationUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(notification.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(notification.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -459,6 +467,20 @@ func (u *NotificationUpsertOne) Update(set func(*NotificationUpsert)) *Notificat
 		set(&NotificationUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *NotificationUpsertOne) SetCreatedAt(v time.Time) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateCreatedAt() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateCreatedAt()
+	})
 }
 
 // SetTitle sets the "title" field.
@@ -517,20 +539,6 @@ func (u *NotificationUpsertOne) UpdateRead() *NotificationUpsertOne {
 	})
 }
 
-// SetCreateTime sets the "create_time" field.
-func (u *NotificationUpsertOne) SetCreateTime(v time.Time) *NotificationUpsertOne {
-	return u.Update(func(s *NotificationUpsert) {
-		s.SetCreateTime(v)
-	})
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *NotificationUpsertOne) UpdateCreateTime() *NotificationUpsertOne {
-	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateCreateTime()
-	})
-}
-
 // Exec executes the query.
 func (u *NotificationUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -547,7 +555,7 @@ func (u *NotificationUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *NotificationUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *NotificationUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -561,7 +569,7 @@ func (u *NotificationUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *NotificationUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *NotificationUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -663,7 +671,7 @@ func (ncb *NotificationCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.NotificationUpsert) {
-//			SetTitle(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -714,6 +722,9 @@ func (u *NotificationUpsertBulk) UpdateNewValues() *NotificationUpsertBulk {
 				s.SetIgnore(notification.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(notification.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -745,6 +756,20 @@ func (u *NotificationUpsertBulk) Update(set func(*NotificationUpsert)) *Notifica
 		set(&NotificationUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *NotificationUpsertBulk) SetCreatedAt(v time.Time) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateCreatedAt() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateCreatedAt()
+	})
 }
 
 // SetTitle sets the "title" field.
@@ -800,20 +825,6 @@ func (u *NotificationUpsertBulk) SetRead(v bool) *NotificationUpsertBulk {
 func (u *NotificationUpsertBulk) UpdateRead() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
 		s.UpdateRead()
-	})
-}
-
-// SetCreateTime sets the "create_time" field.
-func (u *NotificationUpsertBulk) SetCreateTime(v time.Time) *NotificationUpsertBulk {
-	return u.Update(func(s *NotificationUpsert) {
-		s.SetCreateTime(v)
-	})
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *NotificationUpsertBulk) UpdateCreateTime() *NotificationUpsertBulk {
-	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateCreateTime()
 	})
 }
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -13,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // CategoryUpdate is the builder for updating Category entities.
@@ -27,6 +28,12 @@ type CategoryUpdate struct {
 // Where appends a list predicates to the CategoryUpdate builder.
 func (cu *CategoryUpdate) Where(ps ...predicate.Category) *CategoryUpdate {
 	cu.mutation.Where(ps...)
+	return cu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cu *CategoryUpdate) SetUpdatedAt(t time.Time) *CategoryUpdate {
+	cu.mutation.SetUpdatedAt(t)
 	return cu
 }
 
@@ -100,14 +107,14 @@ func (cu *CategoryUpdate) SetNillableAdmin(b *bool) *CategoryUpdate {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cu *CategoryUpdate) AddPostIDs(ids ...uuid.UUID) *CategoryUpdate {
+func (cu *CategoryUpdate) AddPostIDs(ids ...xid.ID) *CategoryUpdate {
 	cu.mutation.AddPostIDs(ids...)
 	return cu
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cu *CategoryUpdate) AddPosts(p ...*Post) *CategoryUpdate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -126,14 +133,14 @@ func (cu *CategoryUpdate) ClearPosts() *CategoryUpdate {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cu *CategoryUpdate) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdate {
+func (cu *CategoryUpdate) RemovePostIDs(ids ...xid.ID) *CategoryUpdate {
 	cu.mutation.RemovePostIDs(ids...)
 	return cu
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -146,6 +153,7 @@ func (cu *CategoryUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	cu.defaults()
 	if len(cu.hooks) == 0 {
 		affected, err = cu.sqlSave(ctx)
 	} else {
@@ -194,6 +202,14 @@ func (cu *CategoryUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cu *CategoryUpdate) defaults() {
+	if _, ok := cu.mutation.UpdatedAt(); !ok {
+		v := category.UpdateDefaultUpdatedAt()
+		cu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cu *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdate {
 	cu.modifiers = append(cu.modifiers, modifiers...)
@@ -206,7 +222,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   category.Table,
 			Columns: category.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: category.FieldID,
 			},
 		},
@@ -217,6 +233,13 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cu.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: category.FieldUpdatedAt,
+		})
 	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -269,7 +292,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -285,7 +308,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -304,7 +327,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -333,6 +356,12 @@ type CategoryUpdateOne struct {
 	hooks     []Hook
 	mutation  *CategoryMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cuo *CategoryUpdateOne) SetUpdatedAt(t time.Time) *CategoryUpdateOne {
+	cuo.mutation.SetUpdatedAt(t)
+	return cuo
 }
 
 // SetName sets the "name" field.
@@ -405,14 +434,14 @@ func (cuo *CategoryUpdateOne) SetNillableAdmin(b *bool) *CategoryUpdateOne {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cuo *CategoryUpdateOne) AddPostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
+func (cuo *CategoryUpdateOne) AddPostIDs(ids ...xid.ID) *CategoryUpdateOne {
 	cuo.mutation.AddPostIDs(ids...)
 	return cuo
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cuo *CategoryUpdateOne) AddPosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -431,14 +460,14 @@ func (cuo *CategoryUpdateOne) ClearPosts() *CategoryUpdateOne {
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
+func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...xid.ID) *CategoryUpdateOne {
 	cuo.mutation.RemovePostIDs(ids...)
 	return cuo
 }
 
 // RemovePosts removes "posts" edges to Post entities.
 func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -458,6 +487,7 @@ func (cuo *CategoryUpdateOne) Save(ctx context.Context) (*Category, error) {
 		err  error
 		node *Category
 	)
+	cuo.defaults()
 	if len(cuo.hooks) == 0 {
 		node, err = cuo.sqlSave(ctx)
 	} else {
@@ -512,6 +542,14 @@ func (cuo *CategoryUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cuo *CategoryUpdateOne) defaults() {
+	if _, ok := cuo.mutation.UpdatedAt(); !ok {
+		v := category.UpdateDefaultUpdatedAt()
+		cuo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cuo *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdateOne {
 	cuo.modifiers = append(cuo.modifiers, modifiers...)
@@ -524,7 +562,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Table:   category.Table,
 			Columns: category.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: category.FieldID,
 			},
 		},
@@ -552,6 +590,13 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cuo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: category.FieldUpdatedAt,
+		})
 	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -604,7 +649,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -620,7 +665,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -639,7 +684,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},

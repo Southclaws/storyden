@@ -3,17 +3,16 @@ package notification
 import (
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/dt"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type (
-	NotificationID uuid.UUID
-	SubscriptionID uuid.UUID
+	NotificationID xid.ID
+	SubscriptionID xid.ID
 )
 
 type NotificationType string
@@ -29,12 +28,10 @@ type Notification struct {
 }
 
 type Subscription struct {
-	ID         SubscriptionID               `json:"id"`
-	RefersType NotificationType             `json:"refersType"`
-	RefersTo   string                       `json:"refersTo"`
-	CreatedAt  time.Time                    `json:"createdAt"`
-	UpdatedAt  time.Time                    `json:"updatedAt"`
-	DeletedAt  optional.Optional[time.Time] `json:"deletedAt"`
+	ID         SubscriptionID   `json:"id"`
+	RefersType NotificationType `json:"refersType"`
+	RefersTo   string           `json:"refersTo"`
+	CreatedAt  time.Time        `json:"createdAt"`
 }
 
 func SubFromModel(m *model.Subscription) *Subscription {
@@ -42,9 +39,7 @@ func SubFromModel(m *model.Subscription) *Subscription {
 		ID:         SubscriptionID(m.ID),
 		RefersType: NotificationType(m.RefersType),
 		RefersTo:   m.RefersTo,
-		CreatedAt:  m.CreateTime,
-		UpdatedAt:  m.UpdateTime,
-		DeletedAt:  utils.OptionalZero(m.DeleteTime),
+		CreatedAt:  m.CreatedAt,
 	}
 }
 
@@ -55,7 +50,7 @@ func FromModel(m *model.Notification) *Notification {
 		Description:  m.Description,
 		Link:         m.Link,
 		Read:         m.Read,
-		CreatedAt:    m.CreateTime,
+		CreatedAt:    m.CreatedAt,
 		Subscription: utils.Deref(SubFromModel(m.Edges.Subscription)),
 	}
 }

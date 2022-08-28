@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -13,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // CategoryCreate is the builder for creating a Category entity.
@@ -22,6 +23,34 @@ type CategoryCreate struct {
 	mutation *CategoryMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (cc *CategoryCreate) SetCreatedAt(t time.Time) *CategoryCreate {
+	cc.mutation.SetCreatedAt(t)
+	return cc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cc *CategoryCreate) SetNillableCreatedAt(t *time.Time) *CategoryCreate {
+	if t != nil {
+		cc.SetCreatedAt(*t)
+	}
+	return cc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cc *CategoryCreate) SetUpdatedAt(t time.Time) *CategoryCreate {
+	cc.mutation.SetUpdatedAt(t)
+	return cc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (cc *CategoryCreate) SetNillableUpdatedAt(t *time.Time) *CategoryCreate {
+	if t != nil {
+		cc.SetUpdatedAt(*t)
+	}
+	return cc
 }
 
 // SetName sets the "name" field.
@@ -87,28 +116,28 @@ func (cc *CategoryCreate) SetNillableAdmin(b *bool) *CategoryCreate {
 }
 
 // SetID sets the "id" field.
-func (cc *CategoryCreate) SetID(u uuid.UUID) *CategoryCreate {
-	cc.mutation.SetID(u)
+func (cc *CategoryCreate) SetID(x xid.ID) *CategoryCreate {
+	cc.mutation.SetID(x)
 	return cc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableID(u *uuid.UUID) *CategoryCreate {
-	if u != nil {
-		cc.SetID(*u)
+func (cc *CategoryCreate) SetNillableID(x *xid.ID) *CategoryCreate {
+	if x != nil {
+		cc.SetID(*x)
 	}
 	return cc
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cc *CategoryCreate) AddPostIDs(ids ...uuid.UUID) *CategoryCreate {
+func (cc *CategoryCreate) AddPostIDs(ids ...xid.ID) *CategoryCreate {
 	cc.mutation.AddPostIDs(ids...)
 	return cc
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
 func (cc *CategoryCreate) AddPosts(p ...*Post) *CategoryCreate {
-	ids := make([]uuid.UUID, len(p))
+	ids := make([]xid.ID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -192,6 +221,14 @@ func (cc *CategoryCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *CategoryCreate) defaults() {
+	if _, ok := cc.mutation.CreatedAt(); !ok {
+		v := category.DefaultCreatedAt()
+		cc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := cc.mutation.UpdatedAt(); !ok {
+		v := category.DefaultUpdatedAt()
+		cc.mutation.SetUpdatedAt(v)
+	}
 	if _, ok := cc.mutation.Description(); !ok {
 		v := category.DefaultDescription
 		cc.mutation.SetDescription(v)
@@ -216,6 +253,12 @@ func (cc *CategoryCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CategoryCreate) check() error {
+	if _, ok := cc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Category.created_at"`)}
+	}
+	if _, ok := cc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`model: missing required field "Category.updated_at"`)}
+	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Category.name"`)}
 	}
@@ -231,6 +274,11 @@ func (cc *CategoryCreate) check() error {
 	if _, ok := cc.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`model: missing required field "Category.admin"`)}
 	}
+	if v, ok := cc.mutation.ID(); ok {
+		if err := category.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Category.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -243,7 +291,7 @@ func (cc *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -258,7 +306,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: category.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: category.FieldID,
 			},
 		}
@@ -267,6 +315,22 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := cc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: category.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := cc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: category.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -317,7 +381,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -334,7 +398,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Category.Create().
-//		SetName(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -343,7 +407,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CategoryUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -380,6 +444,30 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CategoryUpsert) SetCreatedAt(v time.Time) *CategoryUpsert {
+	u.Set(category.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateCreatedAt() *CategoryUpsert {
+	u.SetExcluded(category.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CategoryUpsert) SetUpdatedAt(v time.Time) *CategoryUpsert {
+	u.Set(category.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateUpdatedAt() *CategoryUpsert {
+	u.SetExcluded(category.FieldUpdatedAt)
+	return u
+}
 
 // SetName sets the "name" field.
 func (u *CategoryUpsert) SetName(v string) *CategoryUpsert {
@@ -465,6 +553,9 @@ func (u *CategoryUpsertOne) UpdateNewValues() *CategoryUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(category.FieldID)
 		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(category.FieldCreatedAt)
+		}
 	}))
 	return u
 }
@@ -495,6 +586,34 @@ func (u *CategoryUpsertOne) Update(set func(*CategoryUpsert)) *CategoryUpsertOne
 		set(&CategoryUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CategoryUpsertOne) SetCreatedAt(v time.Time) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateCreatedAt() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CategoryUpsertOne) SetUpdatedAt(v time.Time) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateUpdatedAt() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateUpdatedAt()
+	})
 }
 
 // SetName sets the "name" field.
@@ -590,7 +709,7 @@ func (u *CategoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CategoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *CategoryUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -604,7 +723,7 @@ func (u *CategoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CategoryUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *CategoryUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -706,7 +825,7 @@ func (ccb *CategoryCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.CategoryUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -757,6 +876,9 @@ func (u *CategoryUpsertBulk) UpdateNewValues() *CategoryUpsertBulk {
 				s.SetIgnore(category.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(category.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -788,6 +910,34 @@ func (u *CategoryUpsertBulk) Update(set func(*CategoryUpsert)) *CategoryUpsertBu
 		set(&CategoryUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CategoryUpsertBulk) SetCreatedAt(v time.Time) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateCreatedAt() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CategoryUpsertBulk) SetUpdatedAt(v time.Time) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateUpdatedAt() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateUpdatedAt()
+	})
 }
 
 // SetName sets the "name" field.

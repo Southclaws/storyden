@@ -3,12 +3,11 @@ package authentication
 import (
 	"context"
 
-	"github.com/google/uuid"
-
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/pkg/resources/account"
+	"github.com/rs/xid"
 )
 
 type database struct {
@@ -27,7 +26,7 @@ func (d *database) Create(ctx context.Context,
 	metadata map[string]any,
 ) (*Authentication, error) {
 	r, err := d.db.Authentication.Create().
-		SetAccountID(uuid.UUID(id)).
+		SetAccountID(xid.ID(id)).
 		SetService(string(service)).
 		SetIdentifier(identifier).
 		SetToken(token).
@@ -68,7 +67,7 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]Authentication, error) {
 	r, err := d.db.Authentication.
 		Query().
-		Where(authentication.HasAccountWith(model_account.IDEQ(uuid.UUID(id)))).
+		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -81,7 +80,7 @@ func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier
 	r, err := d.db.Authentication.
 		Query().
 		Where(
-			authentication.HasAccountWith(model_account.IDEQ(uuid.UUID(id))),
+			authentication.HasAccountWith(model_account.IDEQ(xid.ID(id))),
 			authentication.IdentifierEQ(identifier),
 		).
 		Only(ctx)

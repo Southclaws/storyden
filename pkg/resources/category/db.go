@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
@@ -42,7 +42,7 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 		SetColour(insert.Colour).
 		SetSort(insert.Sort).
 		SetAdmin(insert.Admin).
-		SetNillableID(utils.OptionalUUID(uuid.UUID(insert.ID))).
+		SetNillableID(utils.OptionalID(xid.ID(insert.ID))).
 		OnConflictColumns(category.FieldID).
 		UpdateNewValues().
 		ID(ctx)
@@ -96,8 +96,8 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 	// there won't be many categories anyway so it's not going to affect
 	// performance much.
 	type CategoryPostCount struct {
-		ID    uuid.UUID `json:"id"`
-		Posts int       `json:"posts"`
+		ID    xid.ID `json:"id"`
+		Posts int    `json:"posts"`
 	}
 
 	var categoryPostsList []CategoryPostCount
@@ -116,7 +116,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 		return nil, err
 	}
 
-	categoryPosts := make(map[uuid.UUID]int)
+	categoryPosts := make(map[xid.ID]int)
 	for _, c := range categoryPostsList {
 		categoryPosts[c.ID] = c.Posts
 	}
@@ -133,7 +133,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 }
 
 func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {
-	u := d.db.Category.UpdateOneID(uuid.UUID(id))
+	u := d.db.Category.UpdateOneID(xid.ID(id))
 
 	// TODO: Write a less explicit, more ergonomic way to do this:
 
@@ -174,17 +174,17 @@ func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto Cat
 
 	defer tx.Rollback()
 
-	c, err := tx.Category.Get(ctx, uuid.UUID(id))
+	c, err := tx.Category.Get(ctx, xid.ID(id))
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = tx.Post.Update().Where(post.CategoryID(uuid.UUID(id))).SetCategoryID(uuid.UUID(moveto)).Save(ctx)
+	_, err = tx.Post.Update().Where(post.CategoryID(xid.ID(id))).SetCategoryID(xid.ID(moveto)).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tx.Category.DeleteOneID(uuid.UUID(id)).Exec(ctx)
+	err = tx.Category.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
 		return nil, err
 	}

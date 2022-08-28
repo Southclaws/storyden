@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AuthenticationCreate is the builder for creating a Authentication entity.
@@ -25,16 +25,16 @@ type AuthenticationCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetCreateTime sets the "create_time" field.
-func (ac *AuthenticationCreate) SetCreateTime(t time.Time) *AuthenticationCreate {
-	ac.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (ac *AuthenticationCreate) SetCreatedAt(t time.Time) *AuthenticationCreate {
+	ac.mutation.SetCreatedAt(t)
 	return ac
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableCreateTime(t *time.Time) *AuthenticationCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableCreatedAt(t *time.Time) *AuthenticationCreate {
 	if t != nil {
-		ac.SetCreateTime(*t)
+		ac.SetCreatedAt(*t)
 	}
 	return ac
 }
@@ -64,27 +64,27 @@ func (ac *AuthenticationCreate) SetMetadata(m map[string]interface{}) *Authentic
 }
 
 // SetID sets the "id" field.
-func (ac *AuthenticationCreate) SetID(u uuid.UUID) *AuthenticationCreate {
-	ac.mutation.SetID(u)
+func (ac *AuthenticationCreate) SetID(x xid.ID) *AuthenticationCreate {
+	ac.mutation.SetID(x)
 	return ac
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableID(u *uuid.UUID) *AuthenticationCreate {
-	if u != nil {
-		ac.SetID(*u)
+func (ac *AuthenticationCreate) SetNillableID(x *xid.ID) *AuthenticationCreate {
+	if x != nil {
+		ac.SetID(*x)
 	}
 	return ac
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (ac *AuthenticationCreate) SetAccountID(id uuid.UUID) *AuthenticationCreate {
+func (ac *AuthenticationCreate) SetAccountID(id xid.ID) *AuthenticationCreate {
 	ac.mutation.SetAccountID(id)
 	return ac
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableAccountID(id *uuid.UUID) *AuthenticationCreate {
+func (ac *AuthenticationCreate) SetNillableAccountID(id *xid.ID) *AuthenticationCreate {
 	if id != nil {
 		ac = ac.SetAccountID(*id)
 	}
@@ -173,9 +173,9 @@ func (ac *AuthenticationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AuthenticationCreate) defaults() {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		v := authentication.DefaultCreateTime()
-		ac.mutation.SetCreateTime(v)
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		v := authentication.DefaultCreatedAt()
+		ac.mutation.SetCreatedAt(v)
 	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := authentication.DefaultID()
@@ -185,8 +185,8 @@ func (ac *AuthenticationCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AuthenticationCreate) check() error {
-	if _, ok := ac.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`model: missing required field "Authentication.create_time"`)}
+	if _, ok := ac.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Authentication.created_at"`)}
 	}
 	if _, ok := ac.mutation.Service(); !ok {
 		return &ValidationError{Name: "service", err: errors.New(`model: missing required field "Authentication.service"`)}
@@ -207,6 +207,11 @@ func (ac *AuthenticationCreate) check() error {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`model: validator failed for field "Authentication.token": %w`, err)}
 		}
 	}
+	if v, ok := ac.mutation.ID(); ok {
+		if err := authentication.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Authentication.id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -219,7 +224,7 @@ func (ac *AuthenticationCreate) sqlSave(ctx context.Context) (*Authentication, e
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -234,7 +239,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec = &sqlgraph.CreateSpec{
 			Table: authentication.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: authentication.FieldID,
 			},
 		}
@@ -244,13 +249,13 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := ac.mutation.CreateTime(); ok {
+	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
-			Column: authentication.FieldCreateTime,
+			Column: authentication.FieldCreatedAt,
 		})
-		_node.CreateTime = value
+		_node.CreatedAt = value
 	}
 	if value, ok := ac.mutation.Service(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -293,7 +298,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -311,7 +316,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 // of the `INSERT` statement. For example:
 //
 //	client.Authentication.Create().
-//		SetCreateTime(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -320,7 +325,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.AuthenticationUpsert) {
-//			SetCreateTime(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -358,15 +363,15 @@ type (
 	}
 )
 
-// SetCreateTime sets the "create_time" field.
-func (u *AuthenticationUpsert) SetCreateTime(v time.Time) *AuthenticationUpsert {
-	u.Set(authentication.FieldCreateTime, v)
+// SetCreatedAt sets the "created_at" field.
+func (u *AuthenticationUpsert) SetCreatedAt(v time.Time) *AuthenticationUpsert {
+	u.Set(authentication.FieldCreatedAt, v)
 	return u
 }
 
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *AuthenticationUpsert) UpdateCreateTime() *AuthenticationUpsert {
-	u.SetExcluded(authentication.FieldCreateTime)
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateCreatedAt() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldCreatedAt)
 	return u
 }
 
@@ -442,8 +447,8 @@ func (u *AuthenticationUpsertOne) UpdateNewValues() *AuthenticationUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(authentication.FieldID)
 		}
-		if _, exists := u.create.mutation.CreateTime(); exists {
-			s.SetIgnore(authentication.FieldCreateTime)
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(authentication.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -477,17 +482,17 @@ func (u *AuthenticationUpsertOne) Update(set func(*AuthenticationUpsert)) *Authe
 	return u
 }
 
-// SetCreateTime sets the "create_time" field.
-func (u *AuthenticationUpsertOne) SetCreateTime(v time.Time) *AuthenticationUpsertOne {
+// SetCreatedAt sets the "created_at" field.
+func (u *AuthenticationUpsertOne) SetCreatedAt(v time.Time) *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
-		s.SetCreateTime(v)
+		s.SetCreatedAt(v)
 	})
 }
 
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *AuthenticationUpsertOne) UpdateCreateTime() *AuthenticationUpsertOne {
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateCreatedAt() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
-		s.UpdateCreateTime()
+		s.UpdateCreatedAt()
 	})
 }
 
@@ -570,7 +575,7 @@ func (u *AuthenticationUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -584,7 +589,7 @@ func (u *AuthenticationUpsertOne) ID(ctx context.Context) (id uuid.UUID, err err
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AuthenticationUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *AuthenticationUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -686,7 +691,7 @@ func (acb *AuthenticationCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.AuthenticationUpsert) {
-//			SetCreateTime(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -737,8 +742,8 @@ func (u *AuthenticationUpsertBulk) UpdateNewValues() *AuthenticationUpsertBulk {
 				s.SetIgnore(authentication.FieldID)
 				return
 			}
-			if _, exists := b.mutation.CreateTime(); exists {
-				s.SetIgnore(authentication.FieldCreateTime)
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(authentication.FieldCreatedAt)
 			}
 		}
 	}))
@@ -773,17 +778,17 @@ func (u *AuthenticationUpsertBulk) Update(set func(*AuthenticationUpsert)) *Auth
 	return u
 }
 
-// SetCreateTime sets the "create_time" field.
-func (u *AuthenticationUpsertBulk) SetCreateTime(v time.Time) *AuthenticationUpsertBulk {
+// SetCreatedAt sets the "created_at" field.
+func (u *AuthenticationUpsertBulk) SetCreatedAt(v time.Time) *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
-		s.SetCreateTime(v)
+		s.SetCreatedAt(v)
 	})
 }
 
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *AuthenticationUpsertBulk) UpdateCreateTime() *AuthenticationUpsertBulk {
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateCreatedAt() *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
-		s.UpdateCreateTime()
+		s.UpdateCreatedAt()
 	})
 }
 

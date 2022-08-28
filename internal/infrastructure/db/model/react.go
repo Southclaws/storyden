@@ -11,25 +11,25 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // React is the model entity for the React schema.
 type React struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Emoji holds the value of the "emoji" field.
 	Emoji string `json:"emoji,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReactQuery when eager-loading is set.
 	Edges          ReactEdges `json:"edges"`
-	account_reacts *uuid.UUID
-	post_reacts    *uuid.UUID
-	react_account  *uuid.UUID
-	react_post     *uuid.UUID
+	account_reacts *xid.ID
+	post_reacts    *xid.ID
+	react_account  *xid.ID
+	react_post     *xid.ID
 }
 
 // ReactEdges holds the relations/edges for other nodes in the graph.
@@ -79,15 +79,15 @@ func (*React) scanValues(columns []string) ([]interface{}, error) {
 		case react.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case react.FieldID:
-			values[i] = new(uuid.UUID)
+			values[i] = new(xid.ID)
 		case react.ForeignKeys[0]: // account_reacts
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case react.ForeignKeys[1]: // post_reacts
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case react.ForeignKeys[2]: // react_account
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case react.ForeignKeys[3]: // react_post
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type React", columns[i])
 		}
@@ -104,10 +104,16 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case react.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				r.ID = *value
+			}
+		case react.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				r.CreatedAt = value.Time
 			}
 		case react.FieldEmoji:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -115,39 +121,33 @@ func (r *React) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				r.Emoji = value.String
 			}
-		case react.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
-			} else if value.Valid {
-				r.CreatedAt = value.Time
-			}
 		case react.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_reacts", values[i])
 			} else if value.Valid {
-				r.account_reacts = new(uuid.UUID)
-				*r.account_reacts = *value.S.(*uuid.UUID)
+				r.account_reacts = new(xid.ID)
+				*r.account_reacts = *value.S.(*xid.ID)
 			}
 		case react.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field post_reacts", values[i])
 			} else if value.Valid {
-				r.post_reacts = new(uuid.UUID)
-				*r.post_reacts = *value.S.(*uuid.UUID)
+				r.post_reacts = new(xid.ID)
+				*r.post_reacts = *value.S.(*xid.ID)
 			}
 		case react.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field react_account", values[i])
 			} else if value.Valid {
-				r.react_account = new(uuid.UUID)
-				*r.react_account = *value.S.(*uuid.UUID)
+				r.react_account = new(xid.ID)
+				*r.react_account = *value.S.(*xid.ID)
 			}
 		case react.ForeignKeys[3]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field react_post", values[i])
 			} else if value.Valid {
-				r.react_post = new(uuid.UUID)
-				*r.react_post = *value.S.(*uuid.UUID)
+				r.react_post = new(xid.ID)
+				*r.react_post = *value.S.(*xid.ID)
 			}
 		}
 	}
@@ -187,11 +187,11 @@ func (r *React) String() string {
 	var builder strings.Builder
 	builder.WriteString("React(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	builder.WriteString("created_at=")
+	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
 	builder.WriteString("emoji=")
 	builder.WriteString(r.Emoji)
-	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
-	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // AuthenticationUpdate is the builder for updating Authentication entities.
@@ -61,13 +61,13 @@ func (au *AuthenticationUpdate) ClearMetadata() *AuthenticationUpdate {
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (au *AuthenticationUpdate) SetAccountID(id uuid.UUID) *AuthenticationUpdate {
+func (au *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
 	au.mutation.SetAccountID(id)
 	return au
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableAccountID(id *uuid.UUID) *AuthenticationUpdate {
+func (au *AuthenticationUpdate) SetNillableAccountID(id *xid.ID) *AuthenticationUpdate {
 	if id != nil {
 		au = au.SetAccountID(*id)
 	}
@@ -177,7 +177,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: authentication.FieldID,
 			},
 		},
@@ -232,7 +232,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -248,7 +248,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -310,13 +310,13 @@ func (auo *AuthenticationUpdateOne) ClearMetadata() *AuthenticationUpdateOne {
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (auo *AuthenticationUpdateOne) SetAccountID(id uuid.UUID) *AuthenticationUpdateOne {
+func (auo *AuthenticationUpdateOne) SetAccountID(id xid.ID) *AuthenticationUpdateOne {
 	auo.mutation.SetAccountID(id)
 	return auo
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableAccountID(id *uuid.UUID) *AuthenticationUpdateOne {
+func (auo *AuthenticationUpdateOne) SetNillableAccountID(id *xid.ID) *AuthenticationUpdateOne {
 	if id != nil {
 		auo = auo.SetAccountID(*id)
 	}
@@ -439,7 +439,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Table:   authentication.Table,
 			Columns: authentication.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: authentication.FieldID,
 			},
 		},
@@ -511,7 +511,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -527,7 +527,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},

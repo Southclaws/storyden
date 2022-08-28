@@ -4,9 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/uuid"
-
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/rs/xid"
 )
 
 var (
@@ -23,7 +22,7 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Add(ctx context.Context, accountID uuid.UUID, postID uuid.UUID, emojiID string) (*React, error) {
+func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emojiID string) (*React, error) {
 	e, ok := IsValidEmoji(emojiID)
 	if !ok {
 		return nil, ErrInvalidEmoji
@@ -32,8 +31,8 @@ func (d *database) Add(ctx context.Context, accountID uuid.UUID, postID uuid.UUI
 	react, err := d.db.React.
 		Create().
 		SetEmoji(e).
-		SetAccountID(uuid.UUID(accountID)).
-		SetPostID(uuid.UUID(postID)).
+		SetAccountID(xid.ID(accountID)).
+		SetPostID(xid.ID(postID)).
 		Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
@@ -46,19 +45,19 @@ func (d *database) Add(ctx context.Context, accountID uuid.UUID, postID uuid.UUI
 	return FromModel(react), nil
 }
 
-func (d *database) Remove(ctx context.Context, accountID uuid.UUID, reactID ReactID) (*React, error) {
+func (d *database) Remove(ctx context.Context, accountID xid.ID, reactID ReactID) (*React, error) {
 	// First, look up the react to check if this account has permissions to remove.
-	p, err := d.db.React.Get(ctx, uuid.UUID(reactID))
+	p, err := d.db.React.Get(ctx, xid.ID(reactID))
 	if err != nil {
 		return nil, err
 	}
 
-	if !p.Edges.Account.Admin && p.Edges.Account.ID != uuid.UUID(accountID) {
+	if !p.Edges.Account.Admin && p.Edges.Account.ID != xid.ID(accountID) {
 		return nil, ErrUnauthorised
 	}
 
 	// the account has permission, remove it.
-	if err := d.db.React.DeleteOneID(uuid.UUID(reactID)).Exec(ctx); err != nil {
+	if err := d.db.React.DeleteOneID(xid.ID(reactID)).Exec(ctx); err != nil {
 		return nil, err
 	}
 

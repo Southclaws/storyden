@@ -13,7 +13,7 @@ func TestCreatePost(t *testing.T) {
 	// seed.Seed(account.New(d))
 	// repo := New(d)
 
-	// p, err := repo.CreatePost(ctx, "body", user.SeedUser_02_User.ID, PostID(uuid.New()), nil)
+	// p, err := repo.CreatePost(ctx, "body", user.SeedUser_02_User.ID, PostID(xid.New()), nil)
 	// r.NoError(err)
 	// r.NotNil(p)
 }

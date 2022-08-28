@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // SubscriptionCreate is the builder for creating a Subscription entity.
@@ -24,6 +24,20 @@ type SubscriptionCreate struct {
 	mutation *SubscriptionMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (sc *SubscriptionCreate) SetCreatedAt(t time.Time) *SubscriptionCreate {
+	sc.mutation.SetCreatedAt(t)
+	return sc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillableCreatedAt(t *time.Time) *SubscriptionCreate {
+	if t != nil {
+		sc.SetCreatedAt(*t)
+	}
+	return sc
 }
 
 // SetRefersType sets the "refers_type" field.
@@ -38,70 +52,28 @@ func (sc *SubscriptionCreate) SetRefersTo(s string) *SubscriptionCreate {
 	return sc
 }
 
-// SetDeleteTime sets the "delete_time" field.
-func (sc *SubscriptionCreate) SetDeleteTime(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetDeleteTime(t)
-	return sc
-}
-
-// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableDeleteTime(t *time.Time) *SubscriptionCreate {
-	if t != nil {
-		sc.SetDeleteTime(*t)
-	}
-	return sc
-}
-
-// SetCreateTime sets the "create_time" field.
-func (sc *SubscriptionCreate) SetCreateTime(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetCreateTime(t)
-	return sc
-}
-
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableCreateTime(t *time.Time) *SubscriptionCreate {
-	if t != nil {
-		sc.SetCreateTime(*t)
-	}
-	return sc
-}
-
-// SetUpdateTime sets the "update_time" field.
-func (sc *SubscriptionCreate) SetUpdateTime(t time.Time) *SubscriptionCreate {
-	sc.mutation.SetUpdateTime(t)
-	return sc
-}
-
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableUpdateTime(t *time.Time) *SubscriptionCreate {
-	if t != nil {
-		sc.SetUpdateTime(*t)
-	}
-	return sc
-}
-
 // SetID sets the "id" field.
-func (sc *SubscriptionCreate) SetID(u uuid.UUID) *SubscriptionCreate {
-	sc.mutation.SetID(u)
+func (sc *SubscriptionCreate) SetID(x xid.ID) *SubscriptionCreate {
+	sc.mutation.SetID(x)
 	return sc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableID(u *uuid.UUID) *SubscriptionCreate {
-	if u != nil {
-		sc.SetID(*u)
+func (sc *SubscriptionCreate) SetNillableID(x *xid.ID) *SubscriptionCreate {
+	if x != nil {
+		sc.SetID(*x)
 	}
 	return sc
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (sc *SubscriptionCreate) SetAccountID(id uuid.UUID) *SubscriptionCreate {
+func (sc *SubscriptionCreate) SetAccountID(id xid.ID) *SubscriptionCreate {
 	sc.mutation.SetAccountID(id)
 	return sc
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (sc *SubscriptionCreate) SetNillableAccountID(id *uuid.UUID) *SubscriptionCreate {
+func (sc *SubscriptionCreate) SetNillableAccountID(id *xid.ID) *SubscriptionCreate {
 	if id != nil {
 		sc = sc.SetAccountID(*id)
 	}
@@ -114,14 +86,14 @@ func (sc *SubscriptionCreate) SetAccount(a *Account) *SubscriptionCreate {
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (sc *SubscriptionCreate) AddNotificationIDs(ids ...uuid.UUID) *SubscriptionCreate {
+func (sc *SubscriptionCreate) AddNotificationIDs(ids ...xid.ID) *SubscriptionCreate {
 	sc.mutation.AddNotificationIDs(ids...)
 	return sc
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
 func (sc *SubscriptionCreate) AddNotifications(n ...*Notification) *SubscriptionCreate {
-	ids := make([]uuid.UUID, len(n))
+	ids := make([]xid.ID, len(n))
 	for i := range n {
 		ids[i] = n[i].ID
 	}
@@ -205,13 +177,9 @@ func (sc *SubscriptionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SubscriptionCreate) defaults() {
-	if _, ok := sc.mutation.CreateTime(); !ok {
-		v := subscription.DefaultCreateTime()
-		sc.mutation.SetCreateTime(v)
-	}
-	if _, ok := sc.mutation.UpdateTime(); !ok {
-		v := subscription.DefaultUpdateTime()
-		sc.mutation.SetUpdateTime(v)
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		v := subscription.DefaultCreatedAt()
+		sc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := subscription.DefaultID()
@@ -221,6 +189,9 @@ func (sc *SubscriptionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SubscriptionCreate) check() error {
+	if _, ok := sc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "Subscription.created_at"`)}
+	}
 	if _, ok := sc.mutation.RefersType(); !ok {
 		return &ValidationError{Name: "refers_type", err: errors.New(`model: missing required field "Subscription.refers_type"`)}
 	}
@@ -237,11 +208,10 @@ func (sc *SubscriptionCreate) check() error {
 			return &ValidationError{Name: "refers_to", err: fmt.Errorf(`model: validator failed for field "Subscription.refers_to": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`model: missing required field "Subscription.create_time"`)}
-	}
-	if _, ok := sc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`model: missing required field "Subscription.update_time"`)}
+	if v, ok := sc.mutation.ID(); ok {
+		if err := subscription.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Subscription.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -255,7 +225,7 @@ func (sc *SubscriptionCreate) sqlSave(ctx context.Context) (*Subscription, error
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -270,7 +240,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_spec = &sqlgraph.CreateSpec{
 			Table: subscription.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: subscription.FieldID,
 			},
 		}
@@ -279,6 +249,14 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 	if id, ok := sc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := sc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: subscription.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
 	}
 	if value, ok := sc.mutation.RefersType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -296,30 +274,6 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		})
 		_node.RefersTo = value
 	}
-	if value, ok := sc.mutation.DeleteTime(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldDeleteTime,
-		})
-		_node.DeleteTime = value
-	}
-	if value, ok := sc.mutation.CreateTime(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldCreateTime,
-		})
-		_node.CreateTime = value
-	}
-	if value, ok := sc.mutation.UpdateTime(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldUpdateTime,
-		})
-		_node.UpdateTime = value
-	}
 	if nodes := sc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -329,7 +283,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -349,7 +303,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: notification.FieldID,
 				},
 			},
@@ -366,7 +320,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 // of the `INSERT` statement. For example:
 //
 //	client.Subscription.Create().
-//		SetRefersType(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -375,7 +329,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.SubscriptionUpsert) {
-//			SetRefersType(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -413,6 +367,18 @@ type (
 	}
 )
 
+// SetCreatedAt sets the "created_at" field.
+func (u *SubscriptionUpsert) SetCreatedAt(v time.Time) *SubscriptionUpsert {
+	u.Set(subscription.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubscriptionUpsert) UpdateCreatedAt() *SubscriptionUpsert {
+	u.SetExcluded(subscription.FieldCreatedAt)
+	return u
+}
+
 // SetRefersType sets the "refers_type" field.
 func (u *SubscriptionUpsert) SetRefersType(v string) *SubscriptionUpsert {
 	u.Set(subscription.FieldRefersType, v)
@@ -437,48 +403,6 @@ func (u *SubscriptionUpsert) UpdateRefersTo() *SubscriptionUpsert {
 	return u
 }
 
-// SetDeleteTime sets the "delete_time" field.
-func (u *SubscriptionUpsert) SetDeleteTime(v time.Time) *SubscriptionUpsert {
-	u.Set(subscription.FieldDeleteTime, v)
-	return u
-}
-
-// UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
-func (u *SubscriptionUpsert) UpdateDeleteTime() *SubscriptionUpsert {
-	u.SetExcluded(subscription.FieldDeleteTime)
-	return u
-}
-
-// ClearDeleteTime clears the value of the "delete_time" field.
-func (u *SubscriptionUpsert) ClearDeleteTime() *SubscriptionUpsert {
-	u.SetNull(subscription.FieldDeleteTime)
-	return u
-}
-
-// SetCreateTime sets the "create_time" field.
-func (u *SubscriptionUpsert) SetCreateTime(v time.Time) *SubscriptionUpsert {
-	u.Set(subscription.FieldCreateTime, v)
-	return u
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *SubscriptionUpsert) UpdateCreateTime() *SubscriptionUpsert {
-	u.SetExcluded(subscription.FieldCreateTime)
-	return u
-}
-
-// SetUpdateTime sets the "update_time" field.
-func (u *SubscriptionUpsert) SetUpdateTime(v time.Time) *SubscriptionUpsert {
-	u.Set(subscription.FieldUpdateTime, v)
-	return u
-}
-
-// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
-func (u *SubscriptionUpsert) UpdateUpdateTime() *SubscriptionUpsert {
-	u.SetExcluded(subscription.FieldUpdateTime)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -496,6 +420,9 @@ func (u *SubscriptionUpsertOne) UpdateNewValues() *SubscriptionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(subscription.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(subscription.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -529,6 +456,20 @@ func (u *SubscriptionUpsertOne) Update(set func(*SubscriptionUpsert)) *Subscript
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *SubscriptionUpsertOne) SetCreatedAt(v time.Time) *SubscriptionUpsertOne {
+	return u.Update(func(s *SubscriptionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubscriptionUpsertOne) UpdateCreatedAt() *SubscriptionUpsertOne {
+	return u.Update(func(s *SubscriptionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
 // SetRefersType sets the "refers_type" field.
 func (u *SubscriptionUpsertOne) SetRefersType(v string) *SubscriptionUpsertOne {
 	return u.Update(func(s *SubscriptionUpsert) {
@@ -557,55 +498,6 @@ func (u *SubscriptionUpsertOne) UpdateRefersTo() *SubscriptionUpsertOne {
 	})
 }
 
-// SetDeleteTime sets the "delete_time" field.
-func (u *SubscriptionUpsertOne) SetDeleteTime(v time.Time) *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetDeleteTime(v)
-	})
-}
-
-// UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertOne) UpdateDeleteTime() *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateDeleteTime()
-	})
-}
-
-// ClearDeleteTime clears the value of the "delete_time" field.
-func (u *SubscriptionUpsertOne) ClearDeleteTime() *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.ClearDeleteTime()
-	})
-}
-
-// SetCreateTime sets the "create_time" field.
-func (u *SubscriptionUpsertOne) SetCreateTime(v time.Time) *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetCreateTime(v)
-	})
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertOne) UpdateCreateTime() *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateCreateTime()
-	})
-}
-
-// SetUpdateTime sets the "update_time" field.
-func (u *SubscriptionUpsertOne) SetUpdateTime(v time.Time) *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetUpdateTime(v)
-	})
-}
-
-// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertOne) UpdateUpdateTime() *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateUpdateTime()
-	})
-}
-
 // Exec executes the query.
 func (u *SubscriptionUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -622,7 +514,7 @@ func (u *SubscriptionUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *SubscriptionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *SubscriptionUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -636,7 +528,7 @@ func (u *SubscriptionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *SubscriptionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *SubscriptionUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -738,7 +630,7 @@ func (scb *SubscriptionCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.SubscriptionUpsert) {
-//			SetRefersType(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -789,6 +681,9 @@ func (u *SubscriptionUpsertBulk) UpdateNewValues() *SubscriptionUpsertBulk {
 				s.SetIgnore(subscription.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(subscription.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -822,6 +717,20 @@ func (u *SubscriptionUpsertBulk) Update(set func(*SubscriptionUpsert)) *Subscrip
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *SubscriptionUpsertBulk) SetCreatedAt(v time.Time) *SubscriptionUpsertBulk {
+	return u.Update(func(s *SubscriptionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *SubscriptionUpsertBulk) UpdateCreatedAt() *SubscriptionUpsertBulk {
+	return u.Update(func(s *SubscriptionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
 // SetRefersType sets the "refers_type" field.
 func (u *SubscriptionUpsertBulk) SetRefersType(v string) *SubscriptionUpsertBulk {
 	return u.Update(func(s *SubscriptionUpsert) {
@@ -847,55 +756,6 @@ func (u *SubscriptionUpsertBulk) SetRefersTo(v string) *SubscriptionUpsertBulk {
 func (u *SubscriptionUpsertBulk) UpdateRefersTo() *SubscriptionUpsertBulk {
 	return u.Update(func(s *SubscriptionUpsert) {
 		s.UpdateRefersTo()
-	})
-}
-
-// SetDeleteTime sets the "delete_time" field.
-func (u *SubscriptionUpsertBulk) SetDeleteTime(v time.Time) *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetDeleteTime(v)
-	})
-}
-
-// UpdateDeleteTime sets the "delete_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertBulk) UpdateDeleteTime() *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateDeleteTime()
-	})
-}
-
-// ClearDeleteTime clears the value of the "delete_time" field.
-func (u *SubscriptionUpsertBulk) ClearDeleteTime() *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.ClearDeleteTime()
-	})
-}
-
-// SetCreateTime sets the "create_time" field.
-func (u *SubscriptionUpsertBulk) SetCreateTime(v time.Time) *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetCreateTime(v)
-	})
-}
-
-// UpdateCreateTime sets the "create_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertBulk) UpdateCreateTime() *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateCreateTime()
-	})
-}
-
-// SetUpdateTime sets the "update_time" field.
-func (u *SubscriptionUpsertBulk) SetUpdateTime(v time.Time) *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetUpdateTime(v)
-	})
-}
-
-// UpdateUpdateTime sets the "update_time" field to the value that was provided on create.
-func (u *SubscriptionUpsertBulk) UpdateUpdateTime() *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateUpdateTime()
 	})
 }
 

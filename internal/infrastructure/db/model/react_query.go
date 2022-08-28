@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // ReactQuery is the builder for querying React entities.
@@ -134,8 +134,8 @@ func (rq *ReactQuery) FirstX(ctx context.Context) *React {
 
 // FirstID returns the first React ID from the query.
 // Returns a *NotFoundError when no React ID was found.
-func (rq *ReactQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (rq *ReactQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func (rq *ReactQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *ReactQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (rq *ReactQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +185,8 @@ func (rq *ReactQuery) OnlyX(ctx context.Context) *React {
 // OnlyID is like Only, but returns the only React ID in the query.
 // Returns a *NotSingularError when more than one React ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *ReactQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (rq *ReactQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = rq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (rq *ReactQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *ReactQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (rq *ReactQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +228,8 @@ func (rq *ReactQuery) AllX(ctx context.Context) []*React {
 }
 
 // IDs executes the query and returns a list of React IDs.
-func (rq *ReactQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (rq *ReactQuery) IDs(ctx context.Context) ([]xid.ID, error) {
+	var ids []xid.ID
 	if err := rq.Select(react.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (rq *ReactQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *ReactQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (rq *ReactQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -328,12 +328,12 @@ func (rq *ReactQuery) WithPost(opts ...func(*PostQuery)) *ReactQuery {
 // Example:
 //
 //	var v []struct {
-//		Emoji string `json:"emoji,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.React.Query().
-//		GroupBy(react.FieldEmoji).
+//		GroupBy(react.FieldCreatedAt).
 //		Aggregate(model.Count()).
 //		Scan(ctx, &v)
 //
@@ -357,11 +357,11 @@ func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Emoji string `json:"emoji,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.React.Query().
-//		Select(react.FieldEmoji).
+//		Select(react.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (rq *ReactQuery) Select(fields ...string) *ReactSelect {
@@ -441,8 +441,8 @@ func (rq *ReactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*React,
 }
 
 func (rq *ReactQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*React, init func(*React), assign func(*React, *Account)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*React)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*React)
 	for i := range nodes {
 		if nodes[i].react_account == nil {
 			continue
@@ -470,8 +470,8 @@ func (rq *ReactQuery) loadAccount(ctx context.Context, query *AccountQuery, node
 	return nil
 }
 func (rq *ReactQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*React, init func(*React), assign func(*React, *Post)) error {
-	ids := make([]uuid.UUID, 0, len(nodes))
-	nodeids := make(map[uuid.UUID][]*React)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*React)
 	for i := range nodes {
 		if nodes[i].react_post == nil {
 			continue
@@ -525,7 +525,7 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   react.Table,
 			Columns: react.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: react.FieldID,
 			},
 		},

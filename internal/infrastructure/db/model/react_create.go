@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
-	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
 
 // ReactCreate is the builder for creating a React entity.
@@ -26,19 +26,13 @@ type ReactCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetEmoji sets the "emoji" field.
-func (rc *ReactCreate) SetEmoji(s string) *ReactCreate {
-	rc.mutation.SetEmoji(s)
-	return rc
-}
-
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (rc *ReactCreate) SetCreatedAt(t time.Time) *ReactCreate {
 	rc.mutation.SetCreatedAt(t)
 	return rc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (rc *ReactCreate) SetNillableCreatedAt(t *time.Time) *ReactCreate {
 	if t != nil {
 		rc.SetCreatedAt(*t)
@@ -46,28 +40,34 @@ func (rc *ReactCreate) SetNillableCreatedAt(t *time.Time) *ReactCreate {
 	return rc
 }
 
+// SetEmoji sets the "emoji" field.
+func (rc *ReactCreate) SetEmoji(s string) *ReactCreate {
+	rc.mutation.SetEmoji(s)
+	return rc
+}
+
 // SetID sets the "id" field.
-func (rc *ReactCreate) SetID(u uuid.UUID) *ReactCreate {
-	rc.mutation.SetID(u)
+func (rc *ReactCreate) SetID(x xid.ID) *ReactCreate {
+	rc.mutation.SetID(x)
 	return rc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (rc *ReactCreate) SetNillableID(u *uuid.UUID) *ReactCreate {
-	if u != nil {
-		rc.SetID(*u)
+func (rc *ReactCreate) SetNillableID(x *xid.ID) *ReactCreate {
+	if x != nil {
+		rc.SetID(*x)
 	}
 	return rc
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (rc *ReactCreate) SetAccountID(id uuid.UUID) *ReactCreate {
+func (rc *ReactCreate) SetAccountID(id xid.ID) *ReactCreate {
 	rc.mutation.SetAccountID(id)
 	return rc
 }
 
 // SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (rc *ReactCreate) SetNillableAccountID(id *uuid.UUID) *ReactCreate {
+func (rc *ReactCreate) SetNillableAccountID(id *xid.ID) *ReactCreate {
 	if id != nil {
 		rc = rc.SetAccountID(*id)
 	}
@@ -80,13 +80,13 @@ func (rc *ReactCreate) SetAccount(a *Account) *ReactCreate {
 }
 
 // SetPostID sets the "Post" edge to the Post entity by ID.
-func (rc *ReactCreate) SetPostID(id uuid.UUID) *ReactCreate {
+func (rc *ReactCreate) SetPostID(id xid.ID) *ReactCreate {
 	rc.mutation.SetPostID(id)
 	return rc
 }
 
 // SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (rc *ReactCreate) SetNillablePostID(id *uuid.UUID) *ReactCreate {
+func (rc *ReactCreate) SetNillablePostID(id *xid.ID) *ReactCreate {
 	if id != nil {
 		rc = rc.SetPostID(*id)
 	}
@@ -187,11 +187,16 @@ func (rc *ReactCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *ReactCreate) check() error {
+	if _, ok := rc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`model: missing required field "React.created_at"`)}
+	}
 	if _, ok := rc.mutation.Emoji(); !ok {
 		return &ValidationError{Name: "emoji", err: errors.New(`model: missing required field "React.emoji"`)}
 	}
-	if _, ok := rc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`model: missing required field "React.createdAt"`)}
+	if v, ok := rc.mutation.ID(); ok {
+		if err := react.IDValidator(v[:]); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "React.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -205,7 +210,7 @@ func (rc *ReactCreate) sqlSave(ctx context.Context) (*React, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
 			_node.ID = *id
 		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
 			return nil, err
@@ -220,7 +225,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: react.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeBytes,
 				Column: react.FieldID,
 			},
 		}
@@ -230,14 +235,6 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := rc.mutation.Emoji(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldEmoji,
-		})
-		_node.Emoji = value
-	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -245,6 +242,14 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Column: react.FieldCreatedAt,
 		})
 		_node.CreatedAt = value
+	}
+	if value, ok := rc.mutation.Emoji(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: react.FieldEmoji,
+		})
+		_node.Emoji = value
 	}
 	if nodes := rc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -255,7 +260,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: account.FieldID,
 				},
 			},
@@ -275,7 +280,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
+					Type:   field.TypeBytes,
 					Column: post.FieldID,
 				},
 			},
@@ -293,7 +298,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.React.Create().
-//		SetEmoji(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -302,7 +307,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ReactUpsert) {
-//			SetEmoji(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -340,6 +345,18 @@ type (
 	}
 )
 
+// SetCreatedAt sets the "created_at" field.
+func (u *ReactUpsert) SetCreatedAt(v time.Time) *ReactUpsert {
+	u.Set(react.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ReactUpsert) UpdateCreatedAt() *ReactUpsert {
+	u.SetExcluded(react.FieldCreatedAt)
+	return u
+}
+
 // SetEmoji sets the "emoji" field.
 func (u *ReactUpsert) SetEmoji(v string) *ReactUpsert {
 	u.Set(react.FieldEmoji, v)
@@ -349,18 +366,6 @@ func (u *ReactUpsert) SetEmoji(v string) *ReactUpsert {
 // UpdateEmoji sets the "emoji" field to the value that was provided on create.
 func (u *ReactUpsert) UpdateEmoji() *ReactUpsert {
 	u.SetExcluded(react.FieldEmoji)
-	return u
-}
-
-// SetCreatedAt sets the "createdAt" field.
-func (u *ReactUpsert) SetCreatedAt(v time.Time) *ReactUpsert {
-	u.Set(react.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *ReactUpsert) UpdateCreatedAt() *ReactUpsert {
-	u.SetExcluded(react.FieldCreatedAt)
 	return u
 }
 
@@ -381,6 +386,9 @@ func (u *ReactUpsertOne) UpdateNewValues() *ReactUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(react.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(react.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -414,6 +422,20 @@ func (u *ReactUpsertOne) Update(set func(*ReactUpsert)) *ReactUpsertOne {
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *ReactUpsertOne) SetCreatedAt(v time.Time) *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ReactUpsertOne) UpdateCreatedAt() *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
 // SetEmoji sets the "emoji" field.
 func (u *ReactUpsertOne) SetEmoji(v string) *ReactUpsertOne {
 	return u.Update(func(s *ReactUpsert) {
@@ -425,20 +447,6 @@ func (u *ReactUpsertOne) SetEmoji(v string) *ReactUpsertOne {
 func (u *ReactUpsertOne) UpdateEmoji() *ReactUpsertOne {
 	return u.Update(func(s *ReactUpsert) {
 		s.UpdateEmoji()
-	})
-}
-
-// SetCreatedAt sets the "createdAt" field.
-func (u *ReactUpsertOne) SetCreatedAt(v time.Time) *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *ReactUpsertOne) UpdateCreatedAt() *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 
@@ -458,7 +466,7 @@ func (u *ReactUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ReactUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+func (u *ReactUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -472,7 +480,7 @@ func (u *ReactUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ReactUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *ReactUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -574,7 +582,7 @@ func (rcb *ReactCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.ReactUpsert) {
-//			SetEmoji(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -625,6 +633,9 @@ func (u *ReactUpsertBulk) UpdateNewValues() *ReactUpsertBulk {
 				s.SetIgnore(react.FieldID)
 				return
 			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(react.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -658,6 +669,20 @@ func (u *ReactUpsertBulk) Update(set func(*ReactUpsert)) *ReactUpsertBulk {
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *ReactUpsertBulk) SetCreatedAt(v time.Time) *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *ReactUpsertBulk) UpdateCreatedAt() *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
 // SetEmoji sets the "emoji" field.
 func (u *ReactUpsertBulk) SetEmoji(v string) *ReactUpsertBulk {
 	return u.Update(func(s *ReactUpsert) {
@@ -669,20 +694,6 @@ func (u *ReactUpsertBulk) SetEmoji(v string) *ReactUpsertBulk {
 func (u *ReactUpsertBulk) UpdateEmoji() *ReactUpsertBulk {
 	return u.Update(func(s *ReactUpsert) {
 		s.UpdateEmoji()
-	})
-}
-
-// SetCreatedAt sets the "createdAt" field.
-func (u *ReactUpsertBulk) SetCreatedAt(v time.Time) *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "createdAt" field to the value that was provided on create.
-func (u *ReactUpsertBulk) UpdateCreatedAt() *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 

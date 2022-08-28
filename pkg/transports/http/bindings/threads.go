@@ -3,8 +3,6 @@ package bindings
 import (
 	"context"
 
-	"github.com/google/uuid"
-
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/category"
@@ -48,7 +46,7 @@ func (i *Threads) CreateThread(ctx context.Context, request openapi.CreateThread
 
 		Title: thread.Title,
 		Author: &openapi.ProfileReference{
-			Id:   utils.Ref(uuid.UUID(thread.Author.ID)),
+			Id:   (*openapi.Identifier)(&thread.Author.ID),
 			Name: &thread.Author.Name,
 		},
 		Slug:  &thread.Slug,
@@ -63,7 +61,7 @@ func (i *Threads) CreateThread(ctx context.Context, request openapi.CreateThread
 		}, 0)),
 		Reacts: utils.Ref(dt.Map(thread.Reacts, func(r *react.React) openapi.React {
 			return openapi.React{
-				Id:    utils.Ref(uuid.UUID(r.ID)),
+				Id:    (*openapi.Identifier)(&r.ID),
 				Emoji: &r.Emoji,
 			}
 		})),
