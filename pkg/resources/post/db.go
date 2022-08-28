@@ -5,6 +5,7 @@ import (
 
 	"4d63.com/optional"
 
+	"github.com/Southclaws/storyden/internal/fault"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/pkg/resources/account"
@@ -31,7 +32,9 @@ func (d *database) Create(
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get thread parent post ID")
+		return nil, fault.Wrap(errors.Wrap(err, "failed to get parent thread"),
+			"authorID", authorID.String(),
+			"parentID", parentID.String())
 	}
 
 	if thread.First == false {

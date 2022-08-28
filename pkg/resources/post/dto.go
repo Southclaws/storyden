@@ -13,6 +13,8 @@ import (
 
 type PostID xid.ID
 
+func (u PostID) String() string { return xid.ID(u).String() }
+
 type Post struct {
 	ID PostID `json:"id"`
 

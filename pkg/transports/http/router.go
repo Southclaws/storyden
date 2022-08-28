@@ -16,12 +16,18 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	// TODO: Check errtags or fault context and react accordingly.
 	// With: ctx.Response().WriteHeader( derived... )
 	router.HTTPErrorHandler = func(err error, c echo.Context) {
-		l.Info("request error", zap.Any("meta", fault.ErrorData(err)))
+		errdata := fault.ErrorData(err)
+		l.Info("request error", zap.Any("meta", errdata))
 
-		c.JSON(500, openapi.APIError{
-			Error:     err.Error(),
-			Message:   utils.Ref("An unhandled error occurred."),
-			Suggested: utils.Ref("Please try again later or contact the site team/administrator."),
+		// TODO: Settle on a nice way to do this.
+		// TODO: Handle error categories mapping to HTTP statuses too.
+		c.JSON(500, map[string]any{
+			"details": openapi.APIError{
+				Error:     err.Error(),
+				Message:   utils.Ref("An unhandled error occurred."),
+				Suggested: utils.Ref("Please try again later or contact the site team/administrator."),
+			},
+			"context": errdata,
 		})
 	}
 
