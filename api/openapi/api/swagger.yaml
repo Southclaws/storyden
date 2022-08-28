@@ -1,0 +1,448 @@
+openapi: 3.0.1
+info:
+  title: storyden
+  version: "1"
+servers:
+- url: http://localhost:8000/api
+  description: Local instance
+- url: https://demo.storyden.org/api
+  description: Live demo
+security:
+- browser: []
+paths:
+  /version:
+    get:
+      tags:
+      - misc
+      operationId: GetVersion
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+      security: []
+  /openapi.json:
+    get:
+      tags:
+      - misc
+      operationId: GetSpec
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+      security: []
+  /v1/auth/password/signup:
+    post:
+      tags:
+      - auth
+      operationId: AuthPasswordSignup
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        default:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        "400":
+          description: Bad request
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccess'
+      security: []
+  /v1/auth/password/signin:
+    post:
+      tags:
+      - auth
+      operationId: AuthPasswordSignin
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        default:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        "404":
+          description: Not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccess'
+      security: []
+  /v1/accounts/{id}:
+    get:
+      tags:
+      - accounts
+      operationId: AccountsGet
+      parameters:
+      - name: id
+        in: path
+        description: Account ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: '#/components/schemas/Identifier'
+      responses:
+        default:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        "404":
+          description: Not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+      security:
+      - browser: []
+  /v1/threads:
+    get:
+      tags:
+      - threads
+      operationId: ThreadsList
+      responses:
+        default:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        "404":
+          description: Not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: List of all threads.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Thread'
+                x-content-type: application/json
+      security:
+      - browser: []
+    post:
+      tags:
+      - threads
+      operationId: ThreadsCreate
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ThreadSubmission'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadSubmission'
+      responses:
+        default:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        "404":
+          description: Not found
+        "401":
+          description: Unauthorized
+        "200":
+          description: Thread created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+      security:
+      - browser: []
+components:
+  schemas:
+    Identifier:
+      type: string
+      description: A unique identifier for this resource.
+      format: xid
+      example: cc5lnd2s1s4652adtu50
+      x-go-type: string
+    CommonProperties:
+      required:
+      - createdAt
+      - id
+      - updatedAt
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        createdAt:
+          type: string
+          description: The time the resource was created.
+          format: date-time
+        updatedAt:
+          type: string
+          description: The time the resource was updated.
+          format: date-time
+        deletedAt:
+          type: string
+          description: The time the resource was soft-deleted.
+          format: date-time
+    APIError:
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        suggested:
+          type: string
+      description: A description of an error including a human readable message.
+    AuthRequest:
+      required:
+      - identifier
+      - token
+      type: object
+      properties:
+        identifier:
+          type: string
+          example: southclaws@storyden.org
+        token:
+          type: string
+          example: password
+    AuthSuccess:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+      example:
+        id: id
+    Account:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        email:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        deletedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        deletedAt: deletedAt
+        name: name
+        bio: bio
+        id: cc5lnd2s1s4652adtu50
+        email: email
+        updatedAt: updatedAt
+    ThreadSubmission:
+      required:
+      - body
+      - category
+      - tags
+      - title
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the thread.
+          example: Hello world!
+        body:
+          type: string
+          description: The markdown body for the new thread.
+        tags:
+          type: array
+          description: A list of tags for the new thread.
+          items:
+            type: string
+        category:
+          $ref: '#/components/schemas/Identifier'
+    Thread:
+      allOf:
+      - $ref: '#/components/schemas/CommonProperties'
+      - required:
+        - author
+        - category
+        - pinned
+        - posts
+        - reacts
+        - short
+        - slug
+        - tags
+        - title
+        type: object
+        properties:
+          title:
+            type: string
+            description: The title of the thread.
+            example: Hello world!
+          slug:
+            type: string
+            description: |
+              A URL friendly slug which is prepended with the post ID
+              for uniqueness and sortability.
+            readOnly: true
+          short:
+            type: string
+            description: |
+              A short version of the thread's body text for use in previews.
+            readOnly: true
+          pinned:
+            type: boolean
+            description: Whether the thread is pinned in this category.
+          author:
+            $ref: '#/components/schemas/ProfileReference'
+          tags:
+            type: array
+            description: A list of tags associated with the thread.
+            items:
+              type: string
+          posts:
+            type: integer
+            description: The number of posts under this thread.
+            readOnly: true
+          category:
+            $ref: '#/components/schemas/Category'
+          reacts:
+            type: array
+            description: A list of reactions this post has had from people.
+            items:
+              $ref: '#/components/schemas/React'
+    ProfileReference:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        name:
+          type: string
+      description: A minimal reference to an account.
+    Category:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        name:
+          type: string
+        description:
+          type: string
+        colour:
+          type: string
+        sort:
+          type: integer
+        admin:
+          type: boolean
+        postCount:
+          type: integer
+    React:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Identifier'
+        emoji:
+          type: string
+  responses:
+    BadRequest:
+      description: Bad request
+    NotFound:
+      description: Not found
+    Unauthorised:
+      description: Unauthorized
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/APIError'
+    AuthSuccess:
+      description: OK
+      headers:
+        Set-Cookie:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthSuccess'
+    AccountsGetSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
+    ThreadsCreateSuccess:
+      description: Thread created.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Thread'
+    ThreadsList:
+      description: List of all threads.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Thread'
+            x-content-type: application/json
+  securitySchemes:
+    browser:
+      type: apiKey
+      name: storyden-session
+      in: cookie
