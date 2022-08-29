@@ -1,13 +1,15 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/errmeta"
+	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/internal/errtag"
-	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
 )
 
@@ -17,23 +19,36 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	// TODO: Check errtags or fault context and react accordingly.
 	// With: ctx.Response().WriteHeader( derived... )
 	router.HTTPErrorHandler = func(err error, c echo.Context) {
-		em := errmeta.Metadata(err)
+		status := 500
 
-		switch errtag.Tag(err) {
-		case errtag.RESOURCE_EXHAUSTED{}:
+		switch errtag.Tag(err).(type) {
+		case errtag.Cancelled:
+			// Do nothing
+		case errtag.InvalidArgument:
+			status = http.StatusBadRequest
+		case errtag.NotFound:
+			status = http.StatusNotFound
+		case errtag.AlreadyExists:
+			status = http.StatusConflict
+		case errtag.PermissionDenied:
+			status = http.StatusForbidden
+		case errtag.Unauthenticated:
+			status = http.StatusForbidden
 		}
 
-		l.Info("request error", zap.Any("metadata", em))
+		ec := errctx.Unwrap(err)
+
+		l.Info("request error",
+			zap.String("error", err.Error()),
+			zap.Any("metadata", ec),
+		)
 
 		// TODO: Settle on a nice way to do this.
-		// TODO: Handle error categories mapping to HTTP statuses too.
-		c.JSON(500, map[string]any{
-			"details": openapi.APIError{
-				Error:     err.Error(),
-				Message:   utils.Ref("An unhandled error occurred."),
-				Suggested: utils.Ref("Please try again later or contact the site team/administrator."),
-			},
-			"metadata": em,
+		c.JSON(status, openapi.APIError{
+			Error: err.Error(),
+			// Message:              utils.Ref("An unhandled error occurred."),
+			// Suggested:            utils.Ref("Please try again later or contact the site team/administrator."),
+			AdditionalProperties: lo.MapValues(ec, func(k, v string) any { return v }),
 		})
 	}
 

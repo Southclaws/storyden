@@ -17,7 +17,7 @@ type Accounts struct {
 func NewAccounts(as account.Service) Accounts { return Accounts{as} }
 
 func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) any {
-	acc, err := i.as.Get(ctx, account_resource.AccountID(request.Id.XID()))
+	acc, err := i.as.Get(ctx, account_resource.AccountID(request.AccountId.XID()))
 	if err != nil {
 		return err
 	}

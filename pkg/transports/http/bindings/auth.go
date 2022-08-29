@@ -11,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
@@ -99,13 +101,26 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		r := c.Request()
+		ctx := r.Context()
+
+		// gather request metadata for context injection.
+		meta := []string{}
+		for _, k := range c.ParamNames() {
+			meta = append(meta, k, c.Param(k))
+		}
+
+		ctx = errctx.WithMeta(ctx, meta...)
 
 		session, ok := i.decodeSession(r)
 		if ok {
-			c.SetRequest(r.WithContext(authentication.WithAccountID(r.Context(), session.UserID)))
+			ctx = authentication.WithAccountID(ctx, session.UserID)
 		}
 
-		return next(c)
+		c.SetRequest(r.WithContext(ctx))
+
+		err := next(c)
+
+		return err
 	}
 }
 
@@ -115,14 +130,14 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	// first check if the middleware injected an account ID, if not, fail.
 	aid, err := authentication.GetAccountID(c.Request().Context())
 	if err != nil {
-		return err
+		return errtag.Wrap(err, errtag.Unauthenticated{})
 	}
 
 	// Then look up the account.
 	// TODO: Cache this.
 	_, err = i.ar.GetByID(ctx, aid)
 	if err != nil {
-		return err
+		return errctx.Wrap(err, ctx)
 	}
 
 	return nil

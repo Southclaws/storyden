@@ -40,7 +40,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 	post, err := p.post_svc.Create(ctx,
 		params.Body,
 		accountID,
-		post.PostID(request.Id.XID()),
+		post.PostID(request.ThreadId.XID()),
 		reply,
 	)
 	if err != nil {

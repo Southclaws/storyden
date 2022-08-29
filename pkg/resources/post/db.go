@@ -7,7 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/errmeta"
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/pkg/resources/account"
@@ -32,9 +33,11 @@ func (d *database) Create(
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
-		return nil, errmeta.Wrap(errors.Wrap(err, "failed to get parent thread"),
-			"authorID", authorID.String(),
-			"parentID", parentID.String())
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(errors.Wrap(err, "failed to get parent thread"), ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(errors.Wrap(err, "failed to get parent thread"), ctx), errtag.Internal{})
 	}
 
 	if thread.First == false {
@@ -56,10 +59,10 @@ func (d *database) Create(
 	p, err := q.Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errors.Wrap(err, "constraint error: check parent ID or reply ID")
+			return nil, errtag.Wrap(err, errtag.InvalidArgument{})
 		}
 
-		return nil, err
+		return nil, errtag.Wrap(err, errtag.Internal{})
 	}
 
 	p, err = d.db.Post.Query().

@@ -27,9 +27,10 @@ const (
 
 // APIError A description of an error including a human readable message.
 type APIError struct {
-	Error     string  `json:"error"`
-	Message   *string `json:"message,omitempty"`
-	Suggested *string `json:"suggested,omitempty"`
+	Error                string                 `json:"error"`
+	Message              *string                `json:"message,omitempty"`
+	Suggested            *string                `json:"suggested,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // Account defines model for Account.
@@ -260,30 +261,126 @@ type PostsCreateJSONRequestBody = PostSubmission
 // PostsCreateFormdataRequestBody defines body for PostsCreate for application/x-www-form-urlencoded ContentType.
 type PostsCreateFormdataRequestBody = PostSubmission
 
+// Getter for additional properties for APIError. Returns the specified
+// element and whether it was found
+func (a APIError) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for APIError
+func (a *APIError) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for APIError to handle AdditionalProperties
+func (a *APIError) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["error"]; found {
+		err = json.Unmarshal(raw, &a.Error)
+		if err != nil {
+			return fmt.Errorf("error reading 'error': %w", err)
+		}
+		delete(object, "error")
+	}
+
+	if raw, found := object["message"]; found {
+		err = json.Unmarshal(raw, &a.Message)
+		if err != nil {
+			return fmt.Errorf("error reading 'message': %w", err)
+		}
+		delete(object, "message")
+	}
+
+	if raw, found := object["suggested"]; found {
+		err = json.Unmarshal(raw, &a.Suggested)
+		if err != nil {
+			return fmt.Errorf("error reading 'suggested': %w", err)
+		}
+		delete(object, "suggested")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for APIError to handle AdditionalProperties
+func (a APIError) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	object["error"], err = json.Marshal(a.Error)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'error': %w", err)
+	}
+
+	if a.Message != nil {
+		object["message"], err = json.Marshal(a.Message)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'message': %w", err)
+		}
+	}
+
+	if a.Suggested != nil {
+		object["suggested"], err = json.Marshal(a.Suggested)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'suggested': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
+	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
-
-	// (GET /v1/accounts/{id})
-	AccountsGet(ctx echo.Context, id AccountID) error
-
+	// Get an account by ID.
+	// (GET /v1/accounts/{account_id})
+	AccountsGet(ctx echo.Context, accountId AccountID) error
+	// Sign in to an existing account with a username and password.
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx echo.Context) error
-
+	// Register a new account with a username and password.
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx echo.Context) error
-
+	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx echo.Context) error
-
+	// Create a new thread within the specified category.
 	// (POST /v1/threads)
 	ThreadsCreate(ctx echo.Context) error
 	// Create a new post within a thread.
-	// (POST /v1/threads/{id}/posts)
-	PostsCreate(ctx echo.Context, id ThreadID) error
-
+	// (POST /v1/threads/{thread_id}/posts)
+	PostsCreate(ctx echo.Context, threadId ThreadID) error
+	// Get the software version string.
 	// (GET /version)
 	GetVersion(ctx echo.Context) error
 }
@@ -305,18 +402,18 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 // AccountsGet converts echo context to params.
 func (w *ServerInterfaceWrapper) AccountsGet(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "id" -------------
-	var id AccountID
+	// ------------- Path parameter "account_id" -------------
+	var accountId AccountID
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "account_id", runtime.ParamLocationPath, ctx.Param("account_id"), &accountId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_id: %s", err))
 	}
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsGet(ctx, id)
+	err = w.Handler.AccountsGet(ctx, accountId)
 	return err
 }
 
@@ -363,18 +460,18 @@ func (w *ServerInterfaceWrapper) ThreadsCreate(ctx echo.Context) error {
 // PostsCreate converts echo context to params.
 func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "id" -------------
-	var id ThreadID
+	// ------------- Path parameter "thread_id" -------------
+	var threadId ThreadID
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, ctx.Param("thread_id"), &threadId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_id: %s", err))
 	}
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PostsCreate(ctx, id)
+	err = w.Handler.PostsCreate(ctx, threadId)
 	return err
 }
 
@@ -416,12 +513,12 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
-	router.GET(baseURL+"/v1/accounts/:id", wrapper.AccountsGet)
+	router.GET(baseURL+"/v1/accounts/:account_id", wrapper.AccountsGet)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
-	router.POST(baseURL+"/v1/threads/:id/posts", wrapper.PostsCreate)
+	router.POST(baseURL+"/v1/threads/:thread_id/posts", wrapper.PostsCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
@@ -484,7 +581,7 @@ type GetSpecRequestObject struct {
 type GetSpec200TextResponse string
 
 type AccountsGetRequestObject struct {
-	Id AccountID `json:"id"`
+	AccountId AccountID `json:"account_id"`
 }
 
 type AccountsGet200JSONResponse = AccountsGetSuccessJSONResponse
@@ -579,7 +676,7 @@ func (t ThreadsCreatedefaultJSONResponse) MarshalJSON() ([]byte, error) {
 }
 
 type PostsCreateRequestObject struct {
-	Id           ThreadID `json:"id"`
+	ThreadId     ThreadID `json:"thread_id"`
 	JSONBody     *PostsCreateJSONRequestBody
 	FormdataBody *PostsCreateFormdataRequestBody
 }
@@ -606,28 +703,28 @@ type GetVersion200TextResponse string
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-
+	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) interface{}
-
-	// (GET /v1/accounts/{id})
+	// Get an account by ID.
+	// (GET /v1/accounts/{account_id})
 	AccountsGet(ctx context.Context, request AccountsGetRequestObject) interface{}
-
+	// Sign in to an existing account with a username and password.
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx context.Context, request AuthPasswordSigninRequestObject) interface{}
-
+	// Register a new account with a username and password.
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) interface{}
-
+	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx context.Context, request ThreadsListRequestObject) interface{}
-
+	// Create a new thread within the specified category.
 	// (POST /v1/threads)
 	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) interface{}
 	// Create a new post within a thread.
-	// (POST /v1/threads/{id}/posts)
+	// (POST /v1/threads/{thread_id}/posts)
 	PostsCreate(ctx context.Context, request PostsCreateRequestObject) interface{}
-
+	// Get the software version string.
 	// (GET /version)
 	GetVersion(ctx context.Context, request GetVersionRequestObject) interface{}
 }
@@ -671,10 +768,10 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 }
 
 // AccountsGet operation middleware
-func (sh *strictHandler) AccountsGet(ctx echo.Context, id AccountID) error {
+func (sh *strictHandler) AccountsGet(ctx echo.Context, accountId AccountID) error {
 	var request AccountsGetRequestObject
 
-	request.Id = id
+	request.AccountId = accountId
 
 	handler := func(ctx echo.Context, request interface{}) interface{} {
 		return sh.ssi.AccountsGet(ctx.Request().Context(), request.(AccountsGetRequestObject))
@@ -885,10 +982,10 @@ func (sh *strictHandler) ThreadsCreate(ctx echo.Context) error {
 }
 
 // PostsCreate operation middleware
-func (sh *strictHandler) PostsCreate(ctx echo.Context, id ThreadID) error {
+func (sh *strictHandler) PostsCreate(ctx echo.Context, threadId ThreadID) error {
 	var request PostsCreateRequestObject
 
-	request.Id = id
+	request.ThreadId = threadId
 	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
 		var body PostsCreateJSONRequestBody
 		if err := ctx.Bind(&body); err != nil {
@@ -963,39 +1060,45 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"ud38JwAA///rHtCbqyQAAA==",
+	"H4sIAAAAAAAC/9RabXPbNvL/Kvij/5nOdGjJaZObG726PFxzuraJJ07uXtieGCKXIhIQYLFgZJ1H3/0G",
+	"D6RAEbJlV5lrXiUygN3F/vYZvKW5qhslQRqks1vaMM1qMKDdr+d5rlpp5q/sjwIw17wxXEk665bI/BXN",
+	"KLd/aZipaEYlq4HOKPPrH3lBM6rh95ZrKOjM6BYyinkFNbNE/19DSWf0u+lWjKlfxem8AGl4yUHTzSaj",
+	"7ysNrEjJ4lf2imLc8tEk2XgqgOaFKjh4RbWmOmOIK6UL+ztX0oA09r+saQTPmRV1+gmtvLcHcrVE33lO",
+	"TgExpZuT1Wp1Uipdn7RagMxVAcVjSVviZwoNvtTADBztApbmebuoOaIF6sh3GFHfZDt24a9DGGkUGrLi",
+	"puKSMOLtYUJ7mzr2vT3Vr3fzBP1gltgoiRD7Lr4Gc97mOSAezzA96ZTK3/5i1WrN6+hMI5ppxhmtgBUh",
+	"dJ2DOXmp1GcOQxZm3diYgEZzuQy2/4IVnTOMYssLVhDdeUpG59KAlkycg/4C+u9aK328G57NPcHE9Tq+",
+	"xDMmYWNG3yjzs2plMZb8jTKkdEtD9z42MJZ0SuQQlZ3v5Y5zQdDzLlsh1mMHPLZknvgdsgWxYkl+5d4K",
+	"DhaAG6jxUEmyzv6Y1mydkszyJ6okTIgQqNCJ90Gy1lRKc4QE1v3qf6Bw0SYwdoGgMyt7laLg9ggTZ1o1",
+	"oI3LXz4V7uR3Ev12AkkClgzhMhdtweWSMFK1NZPESskWAkgNiGwJE5rRJqJ/S6ETYMf9MhqOJNewXS4B",
+	"jb/wruPGufwiMLjq9asWnyB3HtsFK1vcDGRacJXkGoziuUmuFiBg/yrUjIvkCi8eUmR0tUuCUNsUe8Xb",
+	"UQov7tLIm8Bh1zOAtGhjTQ0B9lDKWVThhtWNsOTOVWuqXLAV0mwsZFxfjBTPtxe1ptGTxJ7k39AovS5A",
+	"TpRepugb9Rnk8HTTlV/ZvVrp2XeEkloa5rDdKzxa+y+ZgaXS6zFRVtRcRnQXSglg0tmkEqrVewwygu9r",
+	"Gp4N5C87VwqrXBpY+nOodHJlk9KBqmslzwa3H+pi4IRjCzW8BmIqIBpQtToHsmK4DecZtbUVM3RGrbOc",
+	"2O0pMxo486FcUJXmJJw8nNVDYRi4+aGihUOHSjU22Dj6xTKkDHk+cOPd7NFK/nsLZOtspFSamIpjL/Iw",
+	"oOT5MyGLH/EJPv3Lsx9ZYdpnp/E9bvjYtTN6c7JUJyNlu5LEepQQb0s6u7hb8SNr3GSjXKGK9SF10AtV",
+	"rH9j+nOhVs5vNTRi/dGoB7a6MSqO9Vj/V+OEnepybAi3f/dFxEjEpG1ZjsTAja9D9jRPMXTfkd/Wbtul",
+	"vJTvLcQcCSMf7Z8+bo9+DI048ZjaepBL8kMdhPlhcilTnrPT5yVsTcLqnsuToJ2arYnDhBhFmFSmAu1X",
+	"uLyU1p/CycWaYAM5L9e20LEL1x2W1yTYxnpCrLoiE+fSbr2U0d4vTLRA6hYNWcBASksUWd2x9Lf/s5td",
+	"Rs+0KrmAd1CCBplDCpCaS14zQXS3yas7riRS+fThSeqALtWVOcks9A5YnihPoFaf+BFSaYpl6AOOGZp8",
+	"4X+vleyiZouKqBK5U4huny0CuJSpBuTfFThfilyII/G7vVtwJB3DydbNoxrHeWo6Ism2XoDu3Zm0soCQ",
+	"TLbxyP77Vop118+MSxRtAceUwYrQdbkdXEn0xJ27VgxJxQpSalWTBlQjXOY6qO/zJjZq+zKKVSiXdiVx",
+	"C+QLaAx911aj32MUmm02bRGsbhsNXzis0EeQPWqIuirRLlOcP7z7lZSagyzEmthNZFXxvHI4amhAFlC4",
+	"2OVEcqqZv7qUThCX7CUgEiYLYktBtuCCm/WBMhm2vBMXu04Yosq5myP0Ymzh7/EYE9/RveFGwL6yyggY",
+	"an2Y6v4BQiiyUloU/3dvQeUZBY13mPc+lHWuG67feUDkmL3JJvJ/H02GufE4CeTQ0DCMyh2K909C3tud",
+	"MRQHHHFb96nYXbRXZC/+1d4Y/P4Qi7O2zR5lY7HMd1sae5ydIeSt5mZ9bpUUwNZqhb4ad68guR9/9u8g",
+	"XVN9guDNZSt2w3+BMI7isvRzES97f4pmNEQlOqNP7B1VA5I1nM7oT5PTyRNrwMxUTpRpWJt087IlmOSE",
+	"EmbO1ZYgQTOjdOjhbPl4XbPmwt/4ygZxXbIcbjfXhJc+OnMkCIYYdSmvd2d015PJhKAi8+9r8skWXy3a",
+	"Qq4RzCajLoBKtfIByvqMOzwv6Iy+BnPeQE53Juo/np7uTAYtoamjec+QOTUmj0Cks4urjGJb18z6nBXA",
+	"qeVtA/L52Zz8NDkN5Wi4I2FI/nn+9s2ks/nZBa055vTKkp1+eTINpRZOb7cvcZsIieGNo8cCB+P2EXBP",
+	"gbLdMt0+EtqmJKWxFIF+3zTxULHJ6NPTJ/cfHQxF3aGn9x/qJ+YOlZK1wtx/KDX3dwgOMNuWuLaBmL+K",
+	"4ekAiSBqTTXtxlZT5Evp7agJ3esORNET47nfGz9ErvffIXqrnA4eKjePgit+h/l2cNrjaVaTrj51/Qnc",
+	"cDRush1QdHUG2w5EbXXTITYAtzXVXcC2zeHAts2fBNgDzkQvZ18TpXew5GjAJmPb6/8xdMKryt5YGD8E",
+	"PUaP8flvNpD1ddDgHWqr0k6JV6Fx26vG8LT+CIseEtj8ASiGr4vfIib9lwzW/EN/HY+RfG0AxbDFHmE1",
+	"9IDpbf9lzGbad99pNOPPQx5aIPQf7vj64IFmEHN+lBEknr6/eRPYN5PtIPdoBsC7qn1PFW67kW7eEAYt",
+	"/okX0BlX4djKwr85hN5YgwCGQBYtFwVheClXIIQtS1kYYWhoNCBIw0w0yXjNDclVXXM3V6n2VN//CiL/",
+	"zwtwVKVZMb1VkKeYKruH1KJu7OLK2j06YL2/7Lz4q5yJSrls02pBZ7QypplNp6JbmP319PR0alstSykw",
+	"HjdT8mRhuxxAJEIteU7QtGU52TaATtRNNmp6W1PZNj60Ft3zDEYnXQYdn/yANieHwnYy+vgPE0d+Vrqt",
+	"44wy+EgvdcL579bYuz4osvpAwhv95mrz3wAAAP//2Di0itUoAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

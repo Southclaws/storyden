@@ -143,7 +143,7 @@ paths:
   #  "Y888888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888  88888P'
   #
 
-  /v1/accounts/{id}:
+  /v1/accounts/{account_id}:
     get:
       operationId: AccountsGet
       summary: Get an account by ID.
@@ -202,7 +202,7 @@ paths:
   #  888
   #
 
-  /v1/threads/{id}/posts:
+  /v1/threads/{thread_id}/posts:
     post:
       operationId: PostsCreate
       summary: Create a new post within a thread.
@@ -230,7 +230,7 @@ components:
   parameters:
     AccountID:
       description: Account ID
-      name: id
+      name: account_id
       in: path
       required: true
       schema:
@@ -238,7 +238,7 @@ components:
 
     ThreadID:
       description: Thread ID
-      name: id
+      name: thread_id
       in: path
       required: true
       schema:
@@ -402,6 +402,7 @@ components:
           type: string
         suggested:
           type: string
+      additionalProperties: true
 
     # -
     # Auth
