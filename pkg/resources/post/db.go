@@ -73,7 +73,11 @@ func (d *database) Create(
 		}).
 		Only(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(p), nil

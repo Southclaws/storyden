@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 )
 
@@ -22,5 +23,5 @@ func GetAccountID(ctx context.Context) (account.AccountID, error) {
 		return auth, nil
 	}
 
-	return account.AccountID{}, ErrNoAccountInContext
+	return account.AccountID{}, errtag.Wrap(ErrNoAccountInContext, errtag.Unauthenticated{})
 }

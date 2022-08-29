@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -38,7 +39,11 @@ func (d *database) Create(ctx context.Context, email string, username string, op
 		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsConstraintError(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return utils.Ref(FromModel(*u)), nil
@@ -48,10 +53,10 @@ func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, err
 	account, err := d.db.Account.Get(ctx, xid.ID(userId))
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, fault.WithValue(err, "account not found", "account_id", userId.String())
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
 		}
 
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	// threads, posts, err := d.getPostCounts(ctx, account.ID)
@@ -105,7 +110,7 @@ func (d *database) LookupByEmail(ctx context.Context, email string) (*Account, b
 			return nil, false, nil
 		}
 
-		return nil, false, err
+		return nil, false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return utils.Ref(FromModel(*account)), true, nil
@@ -119,7 +124,7 @@ func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]
 		Order(model.Asc(account.FieldCreatedAt)).
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return dt.Map(

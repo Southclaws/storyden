@@ -4,13 +4,16 @@ import (
 	"context"
 	"time"
 
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/post"
-	"github.com/rs/xid"
 )
 
 type database struct {
@@ -28,7 +31,7 @@ func (d *database) Subscribe(ctx context.Context, accountID account.AccountID, r
 		SetRefersTo(refersTo).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return SubFromModel(sub), nil
@@ -43,7 +46,7 @@ func (d *database) Unsubscribe(ctx context.Context, accountID account.AccountID,
 			),
 		).Exec(ctx)
 	if err != nil {
-		return 0, err
+		return 0, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return i, nil
@@ -58,7 +61,7 @@ func (d *database) GetSubscriptionsForUser(ctx context.Context, accountID accoun
 		).
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return SubFromModelMany(subs), nil
@@ -72,7 +75,7 @@ func (d *database) GetSubscriptionsForItem(ctx context.Context, refersType Notif
 		).
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return SubFromModelMany(subs), nil
@@ -100,7 +103,11 @@ func (d *database) GetNotifications(ctx context.Context, accountID account.Accou
 
 	notifs, err := q.All(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModelMany(notifs), nil
@@ -130,7 +137,7 @@ func (d *database) Notify(ctx context.Context, refersType NotificationType, refe
 			SetSubscriptionID(xid.ID(sub.ID)).
 			Save(ctx)
 		if err != nil {
-			return 0, err
+			return 0, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 		}
 	}
 
@@ -152,7 +159,7 @@ func (d *database) SetReadState(ctx context.Context, accountID account.AccountID
 		SetRead(read).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(notif), nil
@@ -167,7 +174,7 @@ func (d *database) userHasRightsForNotification(ctx context.Context, accountID a
 		}).
 		Only(ctx)
 	if err != nil {
-		return false, err
+		return false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return account.AccountID(n.Edges.Subscription.Edges.Account.ID) == accountID, nil
@@ -185,12 +192,12 @@ func (d *database) Delete(ctx context.Context, accountID account.AccountID, noti
 
 	n, err := d.db.Notification.Get(ctx, xid.ID(notificationID))
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	err = d.db.Notification.DeleteOne(n).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(n), nil

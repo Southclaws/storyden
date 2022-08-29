@@ -3,8 +3,8 @@ package thread
 import (
 	"context"
 
-	"github.com/Southclaws/fault"
 	"github.com/el-mike/restrict"
+	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
@@ -20,7 +20,7 @@ func (s *service) Create(ctx context.Context,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
-		return nil, fault.WithValue(err, "failed to get account", "authorID", authorID.String())
+		return nil, errors.Wrap(err, "failed to get account")
 	}
 
 	if err := s.rbac.Authorize(&restrict.AccessRequest{
@@ -28,12 +28,12 @@ func (s *service) Create(ctx context.Context,
 		Resource: &thread.Thread{},
 		Actions:  []string{"create"},
 	}); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to authorize")
 	}
 
 	thr, err := s.thread_repo.Create(ctx, title, body, authorID, categoryID, tags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create thread")
 	}
 
 	return thr, nil

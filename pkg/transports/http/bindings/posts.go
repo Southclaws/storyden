@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/pkg/errors"
 
+	"github.com/Southclaws/storyden/internal/errmeta"
 	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 	post_service "github.com/Southclaws/storyden/pkg/services/post"
@@ -20,7 +22,7 @@ func NewPosts(post_svc post_service.Service) Posts { return Posts{post_svc} }
 func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequestObject) any {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get requester")
 	}
 
 	params := func() openapi.PostsCreate {
@@ -44,7 +46,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		reply,
 	)
 	if err != nil {
-		return err
+		return errmeta.Wrap(err, "reply_to", reply.String())
 	}
 
 	return openapi.PostsCreate200JSONResponse(serialisePost(post))

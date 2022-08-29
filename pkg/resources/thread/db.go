@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	post_model "github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
@@ -59,7 +60,11 @@ func (d *database) Create(
 
 	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
-		return nil, fault.WithValue(err, "category not found", "category_id", categoryID.String())
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	p, err := d.db.Post.
@@ -74,7 +79,11 @@ func (d *database) Create(
 		// AddTagIDs(tagset).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsConstraintError(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	// Update the slug so it includes the ID for uniqueness.
@@ -84,7 +93,7 @@ func (d *database) Create(
 		SetSlug(fmt.Sprintf("%s-%s", p.ID, slug.Make(title))).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	// Finally, query the created thread with related entities.
@@ -97,7 +106,7 @@ func (d *database) Create(
 		WithTags().
 		Only(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(p), nil
@@ -150,7 +159,7 @@ func (d *database) List(
 		WithAuthor().
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	// counts, err := d.GetPostCounts(ctx)

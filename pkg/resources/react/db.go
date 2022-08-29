@@ -2,17 +2,16 @@ package react
 
 import (
 	"context"
-	"errors"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/pkg/errors"
 	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 
-var (
-	ErrInvalidEmoji   = errors.New("invalid emoji codepoint")
-	ErrAlreadyReacted = errors.New("account already reacted emoji to post")
-	ErrUnauthorised   = errors.New("not allowed to remove another account's react")
-)
+var ErrInvalidEmoji = errors.New("invalid emoji codepoint")
 
 type database struct {
 	db *model.Client
@@ -25,7 +24,7 @@ func New(db *model.Client) Repository {
 func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emojiID string) (*React, error) {
 	e, ok := IsValidEmoji(emojiID)
 	if !ok {
-		return nil, ErrInvalidEmoji
+		return nil, errtag.Wrap(errctx.Wrap(ErrInvalidEmoji, ctx), errtag.InvalidArgument{})
 	}
 
 	react, err := d.db.React.
@@ -36,10 +35,12 @@ func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emo
 		Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, ErrAlreadyReacted
+			return nil, errtag.Wrap(
+				errctx.Wrap(errors.Wrap(err, "already reacted to post"), ctx),
+				errtag.AlreadyExists{})
 		}
 
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(react), nil
@@ -49,16 +50,16 @@ func (d *database) Remove(ctx context.Context, accountID xid.ID, reactID ReactID
 	// First, look up the react to check if this account has permissions to remove.
 	p, err := d.db.React.Get(ctx, xid.ID(reactID))
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	if !p.Edges.Account.Admin && p.Edges.Account.ID != xid.ID(accountID) {
-		return nil, ErrUnauthorised
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.PermissionDenied{})
 	}
 
 	// the account has permission, remove it.
 	if err := d.db.React.DeleteOneID(xid.ID(reactID)).Exec(ctx); err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(p), nil

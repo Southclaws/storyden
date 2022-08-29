@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Southclaws/storyden/internal/utils"
 	account_resource "github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/account"
@@ -19,7 +21,7 @@ func NewAccounts(as account.Service) Accounts { return Accounts{as} }
 func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) any {
 	acc, err := i.as.Get(ctx, account_resource.AccountID(request.AccountId.XID()))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get account")
 	}
 
 	return openapi.AccountsGetSuccess{

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/Southclaws/storyden/pkg/resources/thread"
 )
 
@@ -12,5 +14,10 @@ func (s *service) ListAll(
 	before time.Time,
 	max int,
 ) ([]*thread.Thread, error) {
-	return s.thread_repo.List(ctx, before, max)
+	thr, err := s.thread_repo.List(ctx, before, max)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list threads")
+	}
+
+	return thr, nil
 }

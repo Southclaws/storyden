@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/dt"
 
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
@@ -30,7 +31,7 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return err
+		return errtag.Wrap(err, errtag.Unauthenticated{})
 	}
 
 	thread, err := i.thread_svc.Create(ctx, params.Title, params.Body, accountID, category.CategoryID(params.Category.XID()), params.Tags)

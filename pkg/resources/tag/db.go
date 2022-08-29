@@ -5,6 +5,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
@@ -36,7 +38,11 @@ func (d *database) GetTags(ctx context.Context, query string) ([]Tag, error) {
 			OrderBy(sql.Desc("posts"))
 	}).Scan(ctx, &tags)
 	if err != nil {
-		return nil, err
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return tags, nil

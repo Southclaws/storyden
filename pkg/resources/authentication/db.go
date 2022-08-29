@@ -5,6 +5,8 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
@@ -34,7 +36,11 @@ func (d *database) Create(ctx context.Context,
 		SetMetadata(metadata).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsConstraintError(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	r, err = d.db.Authentication.
@@ -43,7 +49,11 @@ func (d *database) Create(ctx context.Context,
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(r), nil
@@ -59,7 +69,11 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(r), nil
@@ -71,7 +85,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModelMany(r), nil
@@ -86,7 +100,11 @@ func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier
 		).
 		Only(ctx)
 	if err != nil {
-		return false, err
+		if model.IsNotFound(err) {
+			return false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return r.Token == token, nil

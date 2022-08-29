@@ -2,23 +2,28 @@ package account
 
 import (
 	"context"
-	"errors"
 
+	"github.com/pkg/errors"
+
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 )
 
-var ErrNotAuthorised = errors.New("not authorised")
-
 func (s *service) Get(ctx context.Context, id account.AccountID) (*account.Account, error) {
 	subject, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get account")
 	}
 
 	if subject != id {
-		return nil, ErrNotAuthorised
+		return nil, errtag.Wrap(errors.New("not owner"), errtag.PermissionDenied{})
 	}
 
-	return s.account_repo.GetByID(ctx, id)
+	acc, err := s.account_repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get account by ID")
+	}
+
+	return acc, nil
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
@@ -47,12 +49,16 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
-		return nil, err
+		if model.IsConstraintError(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	c, err := d.db.Category.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(c), nil
@@ -81,7 +87,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 		Order(model.Asc(category.FieldSort)).
 		All(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	if len(categories) == 0 {
@@ -113,7 +119,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 			OrderBy(sql.Desc("posts"))
 	}).Scan(ctx, &categoryPostsList)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	categoryPosts := make(map[xid.ID]int)
@@ -160,7 +166,7 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc
 
 	c, err := u.Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	return FromModel(c), nil
@@ -169,24 +175,27 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc
 func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto CategoryID) (*Category, error) {
 	tx, err := d.db.Tx(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	defer tx.Rollback()
 
 	c, err := tx.Category.Get(ctx, xid.ID(id))
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
-	_, err = tx.Post.Update().Where(post.CategoryID(xid.ID(id))).SetCategoryID(xid.ID(moveto)).Save(ctx)
+	_, err = tx.Post.Update().
+		Where(post.CategoryID(xid.ID(id))).
+		SetCategoryID(xid.ID(moveto)).
+		Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	err = tx.Category.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
 	tx.Commit()

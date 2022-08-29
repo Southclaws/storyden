@@ -8,7 +8,6 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -62,8 +61,6 @@ func New(
 	defer func() {
 		// recover panics so that test cleanups can run.
 		if r := recover(); r != nil {
-			fmt.Println(fault.Context(r.(error)))
-
 			err = errors.New("failed to seed")
 		}
 	}()

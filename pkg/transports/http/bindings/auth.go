@@ -2,18 +2,18 @@ package bindings
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errmeta"
 	"github.com/Southclaws/storyden/internal/errtag"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 	"github.com/Southclaws/storyden/pkg/services/authentication/provider/password"
@@ -47,15 +47,7 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 
 	u, err := i.p.Login(ctx, params.Identifier, params.Token)
 	if err != nil {
-		if errors.Is(err, password.ErrPasswordMismatch) {
-			return openapi.AuthPasswordSignin401Response{}
-		}
-
-		if model.IsNotFound(err) {
-			return openapi.AuthPasswordSignin404Response{}
-		}
-
-		return err
+		return errors.Wrap(err, "login failed")
 	}
 
 	cookie, err := i.encodeSession(u.ID)
@@ -80,11 +72,7 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 
 	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
-		if errors.Is(err, password.ErrExists) {
-			return openapi.AuthPasswordSignup400Response{}
-		}
-
-		return openapi.InternalServerErrorJSONResponse{Error: err.Error()}
+		return errmeta.Wrap(err, "identifier", params.Identifier)
 	}
 
 	cookie, err := i.encodeSession(u.ID)
@@ -140,7 +128,7 @@ type session struct {
 func (i *Authentication) encodeSession(userID account.AccountID) (string, error) {
 	encoded, err := i.sc.Encode(secureCookieName, session{userID})
 	if err != nil {
-		return "", err
+		return "", errtag.Wrap(err, errtag.Internal{})
 	}
 
 	cookie := &http.Cookie{
