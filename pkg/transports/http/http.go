@@ -15,6 +15,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/pkg/transports/http/bindings"
+	"github.com/Southclaws/storyden/pkg/transports/http/proxy"
 )
 
 //go:generate go run -mod=mod github.com/deepmap/oapi-codegen/cmd/oapi-codegen@master --config ./api/config.yaml ./api/openapi.yaml
@@ -22,6 +23,7 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		bindings.Build(),
+		proxy.Build(),
 		fx.Provide(newRouter),
 		fx.Invoke(newServer),
 	)
