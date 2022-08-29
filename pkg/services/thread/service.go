@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
+	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/resources/thread"
 )
 
@@ -32,6 +33,12 @@ type Service interface {
 		before time.Time,
 		max int,
 	) ([]*thread.Thread, error)
+
+	// Get one thread and the posts within it.
+	Get(
+		ctx context.Context,
+		threadID post.PostID,
+	) (*thread.Thread, error)
 }
 
 func Build() fx.Option {

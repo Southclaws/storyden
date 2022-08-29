@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/pkg/resources/category"
+	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 	thread_service "github.com/Southclaws/storyden/pkg/services/thread"
@@ -52,5 +53,14 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 		return errctx.Wrap(err, ctx)
 	}
 
-	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThread))
+	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThreadReference))
+}
+
+func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) any {
+	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadId.XID()))
+	if err != nil {
+		return errctx.Wrap(err, ctx)
+	}
+
+	return openapi.ThreadsGet200JSONResponse(serialiseThread(thread))
 }

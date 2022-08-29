@@ -138,6 +138,7 @@ func (d *database) List(
 ) ([]*Thread, error) {
 	filters := []predicate.Post{
 		post_model.DeletedAtIsNil(),
+		post_model.First(true),
 	}
 
 	if !before.IsZero() {
@@ -170,83 +171,37 @@ func (d *database) List(
 	return dt.Map(result, FromModel), nil
 }
 
-// func (d *database) GetThread(ctx context.Context, slug string, max, skip int, deleted, admin bool) ([]Post, error) {
-// 	filters := []db.PostWhereParam{
-// 		db.Post.Or(
-// 			db.Post.And(
-// 				db.Post.First.Equals(true),
-// 				db.Post.Slug.Equals(slug),
-// 			),
-// 			db.Post.And(
-// 				db.Post.First.Equals(false),
-// 				db.Post.Root.Where(db.Post.Slug.Equals(slug)),
-// 			),
-// 		),
-// 	}
+func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, error) {
+	post, err := d.db.Post.
+		Query().
+		Where(
+			post_model.First(true),
+			post_model.ID(xid.ID(threadID)),
+		).
+		WithPosts(func(pq *model.PostQuery) {
+			pq.
+				WithReplyTo(func(pq *model.PostQuery) {
+					pq.WithAuthor()
+				}).
+				WithReacts().
+				WithAuthor().
+				Order(model.Asc(post_model.FieldCreatedAt))
+		}).
+		WithAuthor().
+		WithCategory().
+		WithTags().
+		WithReacts().
+		Only(ctx)
+	if err != nil {
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
 
-// 	if !admin {
-// 		filters = append(filters,
-// 			db.Post.Or(
-// 				// Root posts (first=true) have categories set, so simply check
-// 				// the linked category for admin status.
-// 				db.Post.And(
-// 					db.Post.First.Equals(true),
-// 					db.Post.Category.Where(
-// 						db.Category.Admin.Equals(false),
-// 					),
-// 				),
-// 				// Child posts (first=false) do not have categories, so it needs
-// 				// to check the root post category for admin status.
-// 				db.Post.And(
-// 					db.Post.First.Equals(false),
-// 					db.Post.Root.Where(db.Post.Category.Where(
-// 						db.Category.Admin.Equals(false),
-// 					)),
-// 				),
-// 			),
-// 		)
-// 	}
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+	}
 
-// 	posts, err := d.db.Post.
-// 		FindMany(filters...).
-// 		With(
-// 			db.Post.Author.Fetch(),
-// 			db.Post.Category.Fetch(),
-// 			db.Post.Tags.Fetch(),
-// 			db.Post.ReplyTo.Fetch().With(
-// 				db.Post.Author.Fetch(),
-// 			),
-// 			db.Post.Reacts.Fetch().With(
-// 				db.React.User.Fetch(),
-// 			),
-// 			db.Post.Root.Fetch().With(
-// 				db.Post.Author.Fetch(),
-// 			),
-// 		).
-// 		Take(max).
-// 		Skip(skip).
-// 		OrderBy(db.Post.CreatedAt.Order(db.ASC)).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	if len(posts) == 0 {
-// 		return nil, nil
-// 	}
-
-// 	result := []Post{}
-// 	for _, p := range posts {
-// 		// if "show deleted" is false, then filter out posts with a deleted date
-// 		if deleted == false && p.InnerPost.DeletedAt != nil {
-// 			continue
-// 		}
-
-// 		result = append(result, *FromModel(&p))
-// 	}
-
-// 	return result, nil
-// }
+	return FromModel(post), nil
+}
 
 // func (d *database) GetPostCounts(ctx context.Context) (map[string]int, error) {
 // 	type PostCount struct {

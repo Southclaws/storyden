@@ -45,8 +45,11 @@ func PostMetaFromModel(p *model.Post) *PostMeta {
 
 func FromModel(c *model.Category) *Category {
 	recent := []PostMeta{}
-	for _, p := range c.Edges.Posts {
-		recent = append(recent, *PostMetaFromModel(p))
+
+	if c.Edges.Posts != nil {
+		for _, p := range c.Edges.Posts {
+			recent = append(recent, *PostMetaFromModel(p))
+		}
 	}
 
 	return &Category{

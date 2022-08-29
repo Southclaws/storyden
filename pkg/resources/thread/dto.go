@@ -43,6 +43,12 @@ func (*Thread) GetRole() string { return Name }
 func (*Thread) GetResourceName() string { return Name }
 
 func FromModel(m *model.Post) *Thread {
+	var posts []*post.Post
+
+	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
+		posts = dt.Map(p, post.FromModel)
+	}
+
 	return &Thread{
 		ID:        post.PostID(m.ID),
 		CreatedAt: m.CreatedAt,
@@ -59,7 +65,7 @@ func FromModel(m *model.Post) *Thread {
 		},
 		Tags:     dt.Map(m.Edges.Tags, func(t *model.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
-		Posts:    dt.Map(m.Edges.Posts, post.FromModel),
+		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
 	}
 }

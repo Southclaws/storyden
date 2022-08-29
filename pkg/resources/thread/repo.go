@@ -38,7 +38,7 @@ type Repository interface {
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	// GetThread(ctx context.Context, slug string, max, skip int, deleted, admin bool) (Thread, error)
+	Get(ctx context.Context, threadID post.PostID) (*Thread, error)
 
 	// Update(ctx context.Context, userID user.UserID, id string, title, category *string, pinned *bool) (*post.Post, error)
 

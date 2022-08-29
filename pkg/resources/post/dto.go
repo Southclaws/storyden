@@ -8,6 +8,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 )
 
@@ -35,10 +36,10 @@ const Role = "Post"
 func (u *Post) GetRole() string { return Role }
 
 type Author struct {
-	ID        xid.ID    `json:"id"`
-	Name      string    `json:"name"`
-	Admin     bool      `json:"admin"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        account.AccountID `json:"id"`
+	Name      string            `json:"name"`
+	Admin     bool              `json:"admin"`
+	CreatedAt time.Time         `json:"createdAt"`
 }
 
 func replyTo(m *model.Post) optional.Optional[PostID] {
@@ -65,7 +66,7 @@ func FromModel(m *model.Post) (w *Post) {
 		Body:  m.Body,
 		Short: m.Short,
 		Author: Author{
-			ID:        m.Edges.Author.ID,
+			ID:        account.AccountID(m.Edges.Author.ID),
 			Name:      m.Edges.Author.Name,
 			Admin:     m.Edges.Author.Admin,
 			CreatedAt: m.Edges.Author.CreatedAt,

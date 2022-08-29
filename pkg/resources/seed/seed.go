@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/resources/category"
+	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/resources/thread"
 )
 
@@ -57,6 +58,7 @@ func New(
 	account_repo account.Repository,
 	category_repo category.Repository,
 	thread_repo thread.Repository,
+	post_repo post.Repository,
 ) (r Ready, err error) {
 	defer func() {
 		// recover panics so that test cleanups can run.
@@ -73,7 +75,7 @@ func New(
 
 	accounts(account_repo)
 	categories(category_repo)
-	threads(thread_repo)
+	threads(thread_repo, post_repo)
 
 	return Ready{}, err
 }

@@ -115,16 +115,8 @@ type Post struct {
 // PostBodyMarkdown The body text of a post within a thread.
 type PostBodyMarkdown = string
 
-// PostSubmission A new post within a thread of posts. A post may reply to another post in
-// the thread by specifying the `reply_to` property. The identifier in the
-// `reply_to` value must be post within the same thread.
-type PostSubmission struct {
-	// Body The body text of a post within a thread.
-	Body PostBodyMarkdown `json:"body"`
-
-	// ReplyTo A unique identifier for this resource.
-	ReplyTo *Identifier `json:"reply_to,omitempty"`
-}
+// PostSubmission A post within a thread of posts.
+type PostSubmission = Post
 
 // ProfileReference A minimal reference to an account.
 type ProfileReference struct {
@@ -145,6 +137,45 @@ type React struct {
 
 // Thread defines model for Thread.
 type Thread struct {
+	// Author A minimal reference to an account.
+	Author   ProfileReference `json:"author"`
+	Category Category         `json:"category"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Pinned Whether the thread is pinned in this category.
+	Pinned bool   `json:"pinned"`
+	Posts  []Post `json:"posts"`
+
+	// Reacts A list of reactions this post has had from people.
+	Reacts []React `json:"reacts"`
+
+	// Short A short version of the thread's body text for use in previews.
+	Short *string `json:"short,omitempty"`
+
+	// Slug A URL friendly slug which is prepended with the post ID
+	// for uniqueness and sortability.
+	Slug *string `json:"slug,omitempty"`
+
+	// Tags A list of tags associated with the thread.
+	Tags []string `json:"tags"`
+
+	// Title The title of the thread.
+	Title string `json:"title"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ThreadReference defines model for ThreadReference.
+type ThreadReference struct {
 	// Author A minimal reference to an account.
 	Author   ProfileReference `json:"author"`
 	Category Category         `json:"category"`
@@ -223,15 +254,16 @@ type PostsCreateSuccess = Post
 // ThreadsCreateSuccess defines model for ThreadsCreateSuccess.
 type ThreadsCreateSuccess = Thread
 
+// ThreadsGet defines model for ThreadsGet.
+type ThreadsGet = Thread
+
 // ThreadsList defines model for ThreadsList.
-type ThreadsList = []Thread
+type ThreadsList = []ThreadReference
 
 // AuthPassword defines model for AuthPassword.
 type AuthPassword = AuthRequest
 
-// PostsCreate A new post within a thread of posts. A post may reply to another post in
-// the thread by specifying the `reply_to` property. The identifier in the
-// `reply_to` value must be post within the same thread.
+// PostsCreate A post within a thread of posts.
 type PostsCreate = PostSubmission
 
 // ThreadsCreate defines model for ThreadsCreate.
@@ -377,6 +409,9 @@ type ServerInterface interface {
 	// Create a new thread within the specified category.
 	// (POST /v1/threads)
 	ThreadsCreate(ctx echo.Context) error
+	// Get information about a thread and the posts within the thread.
+	// (GET /v1/threads/{thread_id})
+	ThreadsGet(ctx echo.Context, threadId ThreadID) error
 	// Create a new post within a thread.
 	// (POST /v1/threads/{thread_id}/posts)
 	PostsCreate(ctx echo.Context, threadId ThreadID) error
@@ -457,6 +492,24 @@ func (w *ServerInterfaceWrapper) ThreadsCreate(ctx echo.Context) error {
 	return err
 }
 
+// ThreadsGet converts echo context to params.
+func (w *ServerInterfaceWrapper) ThreadsGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "thread_id" -------------
+	var threadId ThreadID
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, ctx.Param("thread_id"), &threadId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ThreadsGet(ctx, threadId)
+	return err
+}
+
 // PostsCreate converts echo context to params.
 func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
 	var err error
@@ -518,6 +571,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
+	router.GET(baseURL+"/v1/threads/:thread_id", wrapper.ThreadsGet)
 	router.POST(baseURL+"/v1/threads/:thread_id/posts", wrapper.PostsCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
@@ -566,10 +620,16 @@ func (t ThreadsCreateSuccessJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal((Thread)(t))
 }
 
-type ThreadsListJSONResponse []Thread
+type ThreadsGetJSONResponse Thread
+
+func (t ThreadsGetJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal((Thread)(t))
+}
+
+type ThreadsListJSONResponse []ThreadReference
 
 func (t ThreadsListJSONResponse) MarshalJSON() ([]byte, error) {
-	return json.Marshal(([]Thread)(t))
+	return json.Marshal(([]ThreadReference)(t))
 }
 
 type UnauthorisedResponse struct {
@@ -675,6 +735,25 @@ func (t ThreadsCreatedefaultJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
 }
 
+type ThreadsGetRequestObject struct {
+	ThreadId ThreadID `json:"thread_id"`
+}
+
+type ThreadsGet200JSONResponse = ThreadsGetJSONResponse
+
+type ThreadsGet401Response = UnauthorisedResponse
+
+type ThreadsGet404Response = NotFoundResponse
+
+type ThreadsGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t ThreadsGetdefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
 type PostsCreateRequestObject struct {
 	ThreadId     ThreadID `json:"thread_id"`
 	JSONBody     *PostsCreateJSONRequestBody
@@ -721,6 +800,9 @@ type StrictServerInterface interface {
 	// Create a new thread within the specified category.
 	// (POST /v1/threads)
 	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) interface{}
+	// Get information about a thread and the posts within the thread.
+	// (GET /v1/threads/{thread_id})
+	ThreadsGet(ctx context.Context, request ThreadsGetRequestObject) interface{}
 	// Create a new post within a thread.
 	// (POST /v1/threads/{thread_id}/posts)
 	PostsCreate(ctx context.Context, request PostsCreateRequestObject) interface{}
@@ -981,6 +1063,39 @@ func (sh *strictHandler) ThreadsCreate(ctx echo.Context) error {
 	return nil
 }
 
+// ThreadsGet operation middleware
+func (sh *strictHandler) ThreadsGet(ctx echo.Context, threadId ThreadID) error {
+	var request ThreadsGetRequestObject
+
+	request.ThreadId = threadId
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.ThreadsGet(ctx.Request().Context(), request.(ThreadsGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ThreadsGet")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case ThreadsGet200JSONResponse:
+		return ctx.JSON(200, v)
+	case ThreadsGet401Response:
+		return ctx.NoContent(401)
+	case ThreadsGet404Response:
+		return ctx.NoContent(404)
+	case ThreadsGetdefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
 // PostsCreate operation middleware
 func (sh *strictHandler) PostsCreate(ctx echo.Context, threadId ThreadID) error {
 	var request PostsCreateRequestObject
@@ -1060,45 +1175,48 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"AAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

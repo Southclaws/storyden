@@ -11,8 +11,8 @@ import (
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
 )
 
-func serialiseThread(t *thread.Thread) openapi.Thread {
-	return openapi.Thread{
+func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
+	return openapi.ThreadReference{
 		Id:        openapi.Identifier(xid.ID(t.ID).String()),
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
@@ -29,6 +29,10 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Reacts:   reacts(t.Reacts),
 		Tags:     t.Tags,
 	}
+}
+
+func serialiseThread(t *thread.Thread) openapi.Thread {
+	return openapi.Thread{}
 }
 
 func serialisePost(p *post.Post) openapi.Post {

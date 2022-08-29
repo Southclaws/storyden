@@ -63,3 +63,36 @@ func TestList(t *testing.T) {
 		}),
 	)
 }
+
+func TestGet(t *testing.T) {
+	defer integration.Test(t, nil, fx.Invoke(
+		func(
+			_ seed.Ready,
+			ctx context.Context,
+			repo thread.Repository,
+		) {
+			r := require.New(t)
+			a := assert.New(t)
+
+			threads, err := repo.Get(ctx, seed.Post_01.ID)
+			r.NoError(err)
+			r.NotNil(threads)
+
+			a.Equal("Hello world!", threads.Title)
+			a.Contains(threads.Slug, "hello-world")
+			a.Equal(false, threads.Pinned)
+			a.False(threads.DeletedAt.IsPresent())
+			a.Equal(seed.Category_01_General.ID, threads.Category.ID)
+
+			r.Len(threads.Posts, 2)
+
+			p0 := threads.Posts[0]
+			a.Equal("First reply", p0.Body)
+			a.Equal(seed.Account_003.ID, p0.Author.ID)
+
+			p1 := threads.Posts[1]
+			a.Equal("Second reply", p1.Body)
+			a.Equal(seed.Account_004.ID, p1.Author.ID)
+		}),
+	)
+}
