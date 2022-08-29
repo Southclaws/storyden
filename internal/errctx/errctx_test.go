@@ -18,6 +18,19 @@ func TestWithMeta(t *testing.T) {
 	assert.Equal(t, map[string]string{"key": "value"}, data)
 }
 
+func TestWithMetaAdditional(t *testing.T) {
+	ctx := context.Background()
+	ctx = WithMeta(ctx, "key", "value")
+
+	err := Wrap(errors.New("a problem"), ctx, "additional", "value")
+	data := Unwrap(err)
+
+	assert.Equal(t, map[string]string{
+		"key":        "value",
+		"additional": "value",
+	}, data)
+}
+
 func TestWithMetaOverwrite(t *testing.T) {
 	ctx := context.Background()
 	ctx = WithMeta(ctx, "key", "value")
