@@ -10,6 +10,7 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
@@ -42,7 +43,7 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 func connect(ctx context.Context, url string, prod bool) (*model.Client, *sql.DB, error) {
 	driver, err := sql.Open("pgx", url)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "failed to connect to database")
 	}
 
 	client := model.NewClient(model.Driver(entsql.OpenDB(dialect.Postgres, driver)))

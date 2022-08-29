@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
@@ -29,7 +31,6 @@ func TestDB(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		// Truncate(d)
 		c.Close()
 	})
 }
@@ -46,7 +47,7 @@ func Truncate(db *sql.DB) error {
 	}
 
 	if _, err := db.Exec(fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))); err != nil {
-		return err
+		return errors.Wrap(err, "failed to clean database")
 	}
 
 	fmt.Println("--- Cleaned database")
