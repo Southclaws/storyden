@@ -12,7 +12,6 @@ import (
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errmeta"
 	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/pkg/resources/account"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
@@ -72,7 +71,7 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 
 	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
-		return errmeta.Wrap(err, "identifier", params.Identifier)
+		return errctx.Wrap(err, ctx, "identifier", params.Identifier)
 	}
 
 	cookie, err := i.encodeSession(u.ID)

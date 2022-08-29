@@ -43,10 +43,25 @@ func WithMeta(ctx context.Context, kv ...string) context.Context {
 }
 
 // Wrap wraps an error with the metadata stored in the context using `WithMeta`.
-func Wrap(err error, ctx context.Context) error {
+// You can also pass in additional key-value strings for some extra information.
+func Wrap(err error, ctx context.Context, kv ...string) error {
 	meta, ok := ctx.Value(contextKey{}).(map[string]string)
 	if !ok {
 		return err
+	}
+
+	l := len(kv)
+	if l >= 2 {
+		if l%2 != 0 {
+			l -= 1
+		}
+
+		for i := 0; i < l; i += 2 {
+			k := kv[i]
+			v := kv[i+1]
+
+			meta[k] = v
+		}
 	}
 
 	return &withContext{err, meta}

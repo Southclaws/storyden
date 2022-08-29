@@ -6,7 +6,7 @@ import (
 
 	"github.com/Southclaws/dt"
 
-	"github.com/Southclaws/storyden/internal/errtag"
+	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/pkg/resources/category"
 	"github.com/Southclaws/storyden/pkg/resources/react"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
@@ -31,12 +31,12 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return errtag.Wrap(err, errtag.Unauthenticated{})
+		return err
 	}
 
 	thread, err := i.thread_svc.Create(ctx, params.Title, params.Body, accountID, category.CategoryID(params.Category.XID()), params.Tags)
 	if err != nil {
-		return err
+		return errctx.Wrap(err, ctx)
 	}
 
 	return openapi.ThreadsCreate200JSONResponse(serialiseThread(thread))
@@ -49,7 +49,7 @@ func reacts(reacts []*react.React) []openapi.React {
 func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) any {
 	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000)
 	if err != nil {
-		return err
+		return errctx.Wrap(err, ctx)
 	}
 
 	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThread))

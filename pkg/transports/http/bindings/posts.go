@@ -6,7 +6,7 @@ import (
 	"4d63.com/optional"
 	"github.com/pkg/errors"
 
-	"github.com/Southclaws/storyden/internal/errmeta"
+	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/pkg/resources/post"
 	"github.com/Southclaws/storyden/pkg/services/authentication"
 	post_service "github.com/Southclaws/storyden/pkg/services/post"
@@ -46,7 +46,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		reply,
 	)
 	if err != nil {
-		return errmeta.Wrap(err, "reply_to", reply.String())
+		return errctx.Wrap(err, ctx, "reply_to", reply.String())
 	}
 
 	return openapi.PostsCreate200JSONResponse(serialisePost(post))
