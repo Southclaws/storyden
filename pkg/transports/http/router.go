@@ -48,7 +48,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 			Error: err.Error(),
 			// Message:              utils.Ref("An unhandled error occurred."),
 			// Suggested:            utils.Ref("Please try again later or contact the site team/administrator."),
-			AdditionalProperties: lo.MapValues(ec, func(k, v string) any { return v }),
+			AdditionalProperties: lo.MapValues(ec, func(v, k string) any { return v }),
 		})
 	}
 

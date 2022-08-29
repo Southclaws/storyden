@@ -103,24 +103,12 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 		r := c.Request()
 		ctx := r.Context()
 
-		// gather request metadata for context injection.
-		meta := []string{}
-		for _, k := range c.ParamNames() {
-			meta = append(meta, k, c.Param(k))
-		}
-
-		ctx = errctx.WithMeta(ctx, meta...)
-
 		session, ok := i.decodeSession(r)
 		if ok {
-			ctx = authentication.WithAccountID(ctx, session.UserID)
+			c.SetRequest(r.WithContext(authentication.WithAccountID(ctx, session.UserID)))
 		}
 
-		c.SetRequest(r.WithContext(ctx))
-
-		err := next(c)
-
-		return err
+		return next(c)
 	}
 }
 

@@ -38,11 +38,13 @@ import (
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/pkg/transports/http/openapi"
 )
 
@@ -129,8 +131,24 @@ func mount(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictS
 func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Authentication) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get openapi specification")
 	}
+
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			r := c.Request()
+			ctx := r.Context()
+
+			meta := []string{}
+			for _, k := range c.ParamNames() {
+				meta = append(meta, k, c.Param(k))
+			}
+
+			c.SetRequest(r.WithContext(errctx.WithMeta(ctx, meta...)))
+
+			return next(c)
+		}
+	})
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

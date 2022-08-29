@@ -3,11 +3,12 @@ package authentication
 import (
 	"context"
 
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
 	"github.com/Southclaws/storyden/pkg/resources/account"
-	"github.com/rs/xid"
 )
 
 type database struct {
