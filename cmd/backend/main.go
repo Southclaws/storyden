@@ -13,11 +13,11 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources"
+	"github.com/Southclaws/storyden/app/services"
+	transport "github.com/Southclaws/storyden/app/transports"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
-	"github.com/Southclaws/storyden/pkg/resources"
-	"github.com/Southclaws/storyden/pkg/services"
-	transport "github.com/Southclaws/storyden/pkg/transports"
 )
 
 // Start starts the application and blocks until fatal error

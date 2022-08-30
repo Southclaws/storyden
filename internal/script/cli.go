@@ -9,10 +9,10 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources"
+	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
-	"github.com/Southclaws/storyden/pkg/resources"
-	"github.com/Southclaws/storyden/pkg/services"
 )
 
 // Run is a quick helper for writing scripts that use services.

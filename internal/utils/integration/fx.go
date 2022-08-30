@@ -9,12 +9,12 @@ import (
 	"github.com/imdario/mergo"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources"
+	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
-	"github.com/Southclaws/storyden/pkg/resources"
-	"github.com/Southclaws/storyden/pkg/resources/seed"
-	"github.com/Southclaws/storyden/pkg/services"
 )
 
 // Test provides a full app setup for testing service behaviour. It returns a
