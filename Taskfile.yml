@@ -15,7 +15,7 @@ tasks:
     sources:
       - cmd/**/*.go
       - internal/**/*.go
-      - pkg/**/*.go
+      - app/**/*.go
 
   production:
     cmds:
