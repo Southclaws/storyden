@@ -24,6 +24,18 @@ export interface paths {
   "/v1/auth/password/signin": {
     post: operations["AuthPasswordSignin"];
   };
+  "/v1/auth/webauthn/make/{account_handle}": {
+    post: operations["WebAuthnRequestCredential"];
+  };
+  "/v1/auth/webauthn/make": {
+    get: operations["WebAuthnMakeCredential"];
+  };
+  "/v1/auth/webauthn/assert/{account_handle}": {
+    post: operations["WebAuthnGetAssertion"];
+  };
+  "/v1/auth/webauthn/assert": {
+    get: operations["WebAuthnMakeAssertion"];
+  };
   "/v1/accounts/{account_id}": {
     get: operations["AccountsGet"];
   };
@@ -214,6 +226,15 @@ export interface components {
       };
     };
     /** OK */
+    WebAuthnPublicKeyCreationOptions: {
+      headers: {
+        "Set-Cookie"?: string;
+      };
+      content: {
+        "application/json": { [key: string]: unknown };
+      };
+    };
+    /** OK */
     AccountsGetSuccess: {
       content: {
         "application/json": components["schemas"]["Account"];
@@ -245,6 +266,11 @@ export interface components {
     };
   };
   parameters: {
+    /**
+     * @description Account handle.
+     * @example southclaws
+     */
+    AccountHandle: string;
     /** @description Account ID */
     AccountID: components["schemas"]["Identifier"];
     /** @description Thread ID */
@@ -311,6 +337,55 @@ export interface operations {
     requestBody: components["requestBodies"]["AuthPassword"];
   };
   AuthPasswordSignin: {
+    responses: {
+      200: components["responses"]["AuthSuccess"];
+      401: components["responses"]["Unauthorised"];
+      404: components["responses"]["NotFound"];
+      default: components["responses"]["InternalServerError"];
+    };
+    requestBody: components["requestBodies"]["AuthPassword"];
+  };
+  WebAuthnRequestCredential: {
+    parameters: {
+      path: {
+        /** Account handle. */
+        account_handle: components["parameters"]["AccountHandle"];
+      };
+    };
+    responses: {
+      200: components["responses"]["WebAuthnPublicKeyCreationOptions"];
+      400: components["responses"]["BadRequest"];
+      default: components["responses"]["InternalServerError"];
+    };
+  };
+  WebAuthnMakeCredential: {
+    responses: {
+      200: components["responses"]["AuthSuccess"];
+      400: components["responses"]["BadRequest"];
+      default: components["responses"]["InternalServerError"];
+    };
+    requestBody: {
+      content: {
+        "application/json": { [key: string]: unknown };
+      };
+    };
+  };
+  WebAuthnGetAssertion: {
+    parameters: {
+      path: {
+        /** Account handle. */
+        account_handle: components["parameters"]["AccountHandle"];
+      };
+    };
+    responses: {
+      200: components["responses"]["AuthSuccess"];
+      401: components["responses"]["Unauthorised"];
+      404: components["responses"]["NotFound"];
+      default: components["responses"]["InternalServerError"];
+    };
+    requestBody: components["requestBodies"]["AuthPassword"];
+  };
+  WebAuthnMakeAssertion: {
     responses: {
       200: components["responses"]["AuthSuccess"];
       401: components["responses"]["Unauthorised"];

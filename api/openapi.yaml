@@ -19,9 +19,13 @@ info:
   title: storyden
   version: "1"
 
-servers:
-  - url: "http://localhost:8000/api"
-    description: "Localhost"
+# servers:
+#   - url: "http://localhost:8000/api"
+#     description: "Localhost"
+#   - url: "https://1f91-212-82-91-46.ngrok.io/api"
+#     description: "ngrok"
+#   - url: "https://1f91-212-82-91-46.ngrok.io"
+#     description: "ngrok"
 
 security:
   - browser: []
@@ -125,6 +129,63 @@ paths:
       summary: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
+
+  /v1/auth/webauthn/make/{account_handle}:
+    post:
+      operationId: WebAuthnRequestCredential
+      summary: |
+        Start the WebAuthn registration process by requesting a credential.
+      tags: [auth]
+      security: []
+      parameters: [$ref: "#/components/parameters/AccountHandle"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200":
+          { $ref: "#/components/responses/WebAuthnPublicKeyCreationOptions" }
+
+  /v1/auth/webauthn/make:
+    get:
+      operationId: WebAuthnMakeCredential
+      summary: Complete WebAuthn registration by creating a new credential.
+      security: [webauthn: []]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
+
+  /v1/auth/webauthn/assert/{account_handle}:
+    post:
+      operationId: WebAuthnGetAssertion
+      summary: Start the WebAuthn assertion for an existing account.
+      tags: [auth]
+      security: []
+      parameters: [$ref: "#/components/parameters/AccountHandle"]
+      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
+
+  /v1/auth/webauthn/assert:
+    get:
+      operationId: WebAuthnMakeAssertion
+      summary: Complete the credential assertion and sign in to an account.
+      tags: [auth]
+      security: [webauthn: []]
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -253,6 +314,15 @@ components:
   #
 
   parameters:
+    AccountHandle:
+      description: Account handle.
+      example: southclaws
+      name: account_handle
+      in: path
+      required: true
+      schema:
+        type: string
+
     AccountID:
       description: Account ID
       name: account_id
@@ -339,6 +409,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuthSuccess"
+
+    WebAuthnPublicKeyCreationOptions:
+      description: OK
+      headers:
+        "Set-Cookie":
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            x-go-type: any
 
     AccountsGetSuccess:
       description: OK
@@ -642,6 +724,10 @@ components:
       type: apiKey
       in: cookie
       name: storyden-session
+    webauthn:
+      type: apiKey
+      in: cookie
+      name: "storyden-webauthn-session"
 #
 #     ..:.                                                        .***=
 #  .+#%%%%%#+   ...                                               :%%%+

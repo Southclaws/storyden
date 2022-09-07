@@ -5,4 +5,4 @@ generate:
   strict-server: true
   models: true
   embedded-spec: true
-output: ./pkg/transports/http/openapi/generated_server.go
+output: ./openapi/generated_server.go

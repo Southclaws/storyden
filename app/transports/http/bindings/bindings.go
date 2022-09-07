@@ -40,6 +40,7 @@ import (
 
 	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/kr/pretty"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -68,6 +69,7 @@ type Bindings struct {
 	Version
 	Spec
 	Authentication
+	WebAuthn
 	Accounts
 	Threads
 	Posts
@@ -81,6 +83,7 @@ func bindingsProviders() fx.Option {
 		NewVersion,
 		NewSpec,
 		NewAuthentication,
+		NewWebAuthn,
 		NewAccounts,
 		NewThreads,
 		NewPosts,
@@ -214,6 +217,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 		ErrorHandler: func(c echo.Context, err *echo.HTTPError) error {
 			// TODO: Only log internal server errors.
 			l.Info("validation error", zap.Error(err.Internal))
+			pretty.Println(c, err)
 
 			// TODO: Derive an APIError from the above error and write as JSON.
 			c.Response().WriteHeader(err.Code)
@@ -228,7 +232,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 }
 
 func openApiSkipper(c echo.Context) bool {
-	return !strings.HasPrefix(c.Path(), "/api")
+	return true //!strings.HasPrefix(c.Path(), "/api")
 }
 
 func Build() fx.Option {

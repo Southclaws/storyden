@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
+	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
@@ -23,6 +24,7 @@ type Authentication struct {
 	p      *password.Password
 	sc     *securecookie.SecureCookie
 	ar     account.Repository
+	wa     *webauthn.WebAuthn
 	domain string
 }
 
@@ -31,8 +33,9 @@ func NewAuthentication(
 	p *password.Password,
 	ar account.Repository,
 	sc *securecookie.SecureCookie,
+	wa *webauthn.WebAuthn,
 ) Authentication {
-	return Authentication{p, sc, ar, cfg.CookieDomain}
+	return Authentication{p, sc, ar, wa, cfg.CookieDomain}
 }
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) any {

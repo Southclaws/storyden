@@ -44,8 +44,12 @@ tasks:
       - go generate ./internal/infrastructure/db/...
 
   generate:openapi:
-    cmds:
-      - oapi-codegen --config ./api/config.yaml ./api/openapi.yaml
+    deps: [generate:openapi:backend, generate:openapi:frontend]
+  generate:openapi:backend:
+    cmds: [go generate ./app/transports/http]
+  generate:openapi:frontend:
+    dir: web
+    cmds: [yarn openapi]
 
   # -
   # Database

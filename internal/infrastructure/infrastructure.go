@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/infrastructure/logger"
 	"github.com/Southclaws/storyden/internal/infrastructure/securecookie"
+	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
 )
 
 func Build() fx.Option {
@@ -14,5 +15,6 @@ func Build() fx.Option {
 		// mailer.Build(),
 		db.Build(),
 		fx.Provide(securecookie.New),
+		fx.Provide(webauthn.New),
 	)
 }

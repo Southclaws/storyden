@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	BrowserScopes = "browser.Scopes"
+	BrowserScopes  = "browser.Scopes"
+	WebauthnScopes = "webauthn.Scopes"
 )
 
 // APIError A description of an error including a human readable message.
@@ -236,6 +237,9 @@ type ThreadTags = []string
 // ThreadTitle The title of a thread.
 type ThreadTitle = string
 
+// AccountHandle defines model for AccountHandle.
+type AccountHandle = string
+
 // AccountID A unique identifier for this resource.
 type AccountID = Identifier
 
@@ -260,6 +264,9 @@ type ThreadsGet = Thread
 // ThreadsList defines model for ThreadsList.
 type ThreadsList = []ThreadReference
 
+// WebAuthnPublicKeyCreationOptions defines model for WebAuthnPublicKeyCreationOptions.
+type WebAuthnPublicKeyCreationOptions any
+
 // AuthPassword defines model for AuthPassword.
 type AuthPassword = AuthRequest
 
@@ -268,6 +275,9 @@ type PostsCreate = PostSubmission
 
 // ThreadsCreate defines model for ThreadsCreate.
 type ThreadsCreate = ThreadSubmission
+
+// WebAuthnMakeCredentialJSONBody defines parameters for WebAuthnMakeCredential.
+type WebAuthnMakeCredentialJSONBody = map[string]interface{}
 
 // AuthPasswordSigninJSONRequestBody defines body for AuthPasswordSignin for application/json ContentType.
 type AuthPasswordSigninJSONRequestBody = AuthRequest
@@ -280,6 +290,21 @@ type AuthPasswordSignupJSONRequestBody = AuthRequest
 
 // AuthPasswordSignupFormdataRequestBody defines body for AuthPasswordSignup for application/x-www-form-urlencoded ContentType.
 type AuthPasswordSignupFormdataRequestBody = AuthRequest
+
+// WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
+type WebAuthnMakeAssertionJSONRequestBody = AuthRequest
+
+// WebAuthnMakeAssertionFormdataRequestBody defines body for WebAuthnMakeAssertion for application/x-www-form-urlencoded ContentType.
+type WebAuthnMakeAssertionFormdataRequestBody = AuthRequest
+
+// WebAuthnGetAssertionJSONRequestBody defines body for WebAuthnGetAssertion for application/json ContentType.
+type WebAuthnGetAssertionJSONRequestBody = AuthRequest
+
+// WebAuthnGetAssertionFormdataRequestBody defines body for WebAuthnGetAssertion for application/x-www-form-urlencoded ContentType.
+type WebAuthnGetAssertionFormdataRequestBody = AuthRequest
+
+// WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
+type WebAuthnMakeCredentialJSONRequestBody = WebAuthnMakeCredentialJSONBody
 
 // ThreadsCreateJSONRequestBody defines body for ThreadsCreate for application/json ContentType.
 type ThreadsCreateJSONRequestBody = ThreadSubmission
@@ -403,6 +428,18 @@ type ServerInterface interface {
 	// Register a new account with a username and password.
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx echo.Context) error
+	// Complete the credential assertion and sign in to an account.
+	// (GET /v1/auth/webauthn/assert)
+	WebAuthnMakeAssertion(ctx echo.Context) error
+	// Start the WebAuthn assertion for an existing account.
+	// (POST /v1/auth/webauthn/assert/{account_handle})
+	WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandle) error
+	// Complete WebAuthn registration by creating a new credential.
+	// (GET /v1/auth/webauthn/make)
+	WebAuthnMakeCredential(ctx echo.Context) error
+	// Start the WebAuthn registration process by requesting a credential.
+	// (POST /v1/auth/webauthn/make/{account_handle})
+	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandle) error
 	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx echo.Context) error
@@ -467,6 +504,60 @@ func (w *ServerInterfaceWrapper) AuthPasswordSignup(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.AuthPasswordSignup(ctx)
+	return err
+}
+
+// WebAuthnMakeAssertion converts echo context to params.
+func (w *ServerInterfaceWrapper) WebAuthnMakeAssertion(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(WebauthnScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.WebAuthnMakeAssertion(ctx)
+	return err
+}
+
+// WebAuthnGetAssertion converts echo context to params.
+func (w *ServerInterfaceWrapper) WebAuthnGetAssertion(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_handle" -------------
+	var accountHandle AccountHandle
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, ctx.Param("account_handle"), &accountHandle)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_handle: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.WebAuthnGetAssertion(ctx, accountHandle)
+	return err
+}
+
+// WebAuthnMakeCredential converts echo context to params.
+func (w *ServerInterfaceWrapper) WebAuthnMakeCredential(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(WebauthnScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.WebAuthnMakeCredential(ctx)
+	return err
+}
+
+// WebAuthnRequestCredential converts echo context to params.
+func (w *ServerInterfaceWrapper) WebAuthnRequestCredential(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_handle" -------------
+	var accountHandle AccountHandle
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, ctx.Param("account_handle"), &accountHandle)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_handle: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.WebAuthnRequestCredential(ctx, accountHandle)
 	return err
 }
 
@@ -569,6 +660,10 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/accounts/:account_id", wrapper.AccountsGet)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
+	router.GET(baseURL+"/v1/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
+	router.POST(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
+	router.GET(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
+	router.POST(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
 	router.GET(baseURL+"/v1/threads/:thread_id", wrapper.ThreadsGet)
@@ -635,6 +730,19 @@ func (t ThreadsListJSONResponse) MarshalJSON() ([]byte, error) {
 type UnauthorisedResponse struct {
 }
 
+type WebAuthnPublicKeyCreationOptionsResponseHeaders struct {
+	SetCookie string
+}
+type WebAuthnPublicKeyCreationOptionsJSONResponse struct {
+	Body any
+
+	Headers WebAuthnPublicKeyCreationOptionsResponseHeaders
+}
+
+func (t WebAuthnPublicKeyCreationOptionsJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
 type GetSpecRequestObject struct {
 }
 
@@ -694,6 +802,81 @@ type AuthPasswordSignupdefaultJSONResponse struct {
 }
 
 func (t AuthPasswordSignupdefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+type WebAuthnMakeAssertionRequestObject struct {
+	JSONBody     *WebAuthnMakeAssertionJSONRequestBody
+	FormdataBody *WebAuthnMakeAssertionFormdataRequestBody
+}
+
+type WebAuthnMakeAssertion200JSONResponse = AuthSuccessJSONResponse
+
+type WebAuthnMakeAssertion401Response = UnauthorisedResponse
+
+type WebAuthnMakeAssertion404Response = NotFoundResponse
+
+type WebAuthnMakeAssertiondefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t WebAuthnMakeAssertiondefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+type WebAuthnGetAssertionRequestObject struct {
+	AccountHandle AccountHandle `json:"account_handle"`
+	JSONBody      *WebAuthnGetAssertionJSONRequestBody
+	FormdataBody  *WebAuthnGetAssertionFormdataRequestBody
+}
+
+type WebAuthnGetAssertion200JSONResponse = AuthSuccessJSONResponse
+
+type WebAuthnGetAssertion401Response = UnauthorisedResponse
+
+type WebAuthnGetAssertion404Response = NotFoundResponse
+
+type WebAuthnGetAssertiondefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t WebAuthnGetAssertiondefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+type WebAuthnMakeCredentialRequestObject struct {
+	Body *WebAuthnMakeCredentialJSONRequestBody
+}
+
+type WebAuthnMakeCredential200JSONResponse = AuthSuccessJSONResponse
+
+type WebAuthnMakeCredential400Response = BadRequestResponse
+
+type WebAuthnMakeCredentialdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t WebAuthnMakeCredentialdefaultJSONResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+type WebAuthnRequestCredentialRequestObject struct {
+	AccountHandle AccountHandle `json:"account_handle"`
+}
+
+type WebAuthnRequestCredential200JSONResponse = WebAuthnPublicKeyCreationOptionsJSONResponse
+
+type WebAuthnRequestCredential400Response = BadRequestResponse
+
+type WebAuthnRequestCredentialdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (t WebAuthnRequestCredentialdefaultJSONResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Body)
 }
 
@@ -794,6 +977,18 @@ type StrictServerInterface interface {
 	// Register a new account with a username and password.
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) interface{}
+	// Complete the credential assertion and sign in to an account.
+	// (GET /v1/auth/webauthn/assert)
+	WebAuthnMakeAssertion(ctx context.Context, request WebAuthnMakeAssertionRequestObject) interface{}
+	// Start the WebAuthn assertion for an existing account.
+	// (POST /v1/auth/webauthn/assert/{account_handle})
+	WebAuthnGetAssertion(ctx context.Context, request WebAuthnGetAssertionRequestObject) interface{}
+	// Complete WebAuthn registration by creating a new credential.
+	// (GET /v1/auth/webauthn/make)
+	WebAuthnMakeCredential(ctx context.Context, request WebAuthnMakeCredentialRequestObject) interface{}
+	// Start the WebAuthn registration process by requesting a credential.
+	// (POST /v1/auth/webauthn/make/{account_handle})
+	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) interface{}
 	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx context.Context, request ThreadsListRequestObject) interface{}
@@ -972,6 +1167,177 @@ func (sh *strictHandler) AuthPasswordSignup(ctx echo.Context) error {
 	case AuthPasswordSignup400Response:
 		return ctx.NoContent(400)
 	case AuthPasswordSignupdefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
+// WebAuthnMakeAssertion operation middleware
+func (sh *strictHandler) WebAuthnMakeAssertion(ctx echo.Context) error {
+	var request WebAuthnMakeAssertionRequestObject
+
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
+		var body WebAuthnMakeAssertionJSONRequestBody
+		if err := ctx.Bind(&body); err != nil {
+			return err
+		}
+		request.JSONBody = &body
+	}
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		if form, err := ctx.FormParams(); err == nil {
+			var body WebAuthnMakeAssertionFormdataRequestBody
+			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+				return err
+			}
+			request.FormdataBody = &body
+		} else {
+			return err
+		}
+	}
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.WebAuthnMakeAssertion(ctx.Request().Context(), request.(WebAuthnMakeAssertionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "WebAuthnMakeAssertion")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case WebAuthnMakeAssertion200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
+		return ctx.JSON(200, v)
+	case WebAuthnMakeAssertion401Response:
+		return ctx.NoContent(401)
+	case WebAuthnMakeAssertion404Response:
+		return ctx.NoContent(404)
+	case WebAuthnMakeAssertiondefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
+// WebAuthnGetAssertion operation middleware
+func (sh *strictHandler) WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandle) error {
+	var request WebAuthnGetAssertionRequestObject
+
+	request.AccountHandle = accountHandle
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
+		var body WebAuthnGetAssertionJSONRequestBody
+		if err := ctx.Bind(&body); err != nil {
+			return err
+		}
+		request.JSONBody = &body
+	}
+	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		if form, err := ctx.FormParams(); err == nil {
+			var body WebAuthnGetAssertionFormdataRequestBody
+			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+				return err
+			}
+			request.FormdataBody = &body
+		} else {
+			return err
+		}
+	}
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.WebAuthnGetAssertion(ctx.Request().Context(), request.(WebAuthnGetAssertionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "WebAuthnGetAssertion")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case WebAuthnGetAssertion200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
+		return ctx.JSON(200, v)
+	case WebAuthnGetAssertion401Response:
+		return ctx.NoContent(401)
+	case WebAuthnGetAssertion404Response:
+		return ctx.NoContent(404)
+	case WebAuthnGetAssertiondefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
+// WebAuthnMakeCredential operation middleware
+func (sh *strictHandler) WebAuthnMakeCredential(ctx echo.Context) error {
+	var request WebAuthnMakeCredentialRequestObject
+
+	var body WebAuthnMakeCredentialJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.WebAuthnMakeCredential(ctx.Request().Context(), request.(WebAuthnMakeCredentialRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "WebAuthnMakeCredential")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case WebAuthnMakeCredential200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
+		return ctx.JSON(200, v)
+	case WebAuthnMakeCredential400Response:
+		return ctx.NoContent(400)
+	case WebAuthnMakeCredentialdefaultJSONResponse:
+		return ctx.JSON(v.StatusCode, v)
+	case error:
+		return v
+	case nil:
+	default:
+		return fmt.Errorf("Unexpected response type: %T", v)
+	}
+	return nil
+}
+
+// WebAuthnRequestCredential operation middleware
+func (sh *strictHandler) WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandle) error {
+	var request WebAuthnRequestCredentialRequestObject
+
+	request.AccountHandle = accountHandle
+
+	handler := func(ctx echo.Context, request interface{}) interface{} {
+		return sh.ssi.WebAuthnRequestCredential(ctx.Request().Context(), request.(WebAuthnRequestCredentialRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "WebAuthnRequestCredential")
+	}
+
+	response := handler(ctx, request)
+
+	switch v := response.(type) {
+	case WebAuthnRequestCredential200JSONResponse:
+		ctx.Response().Header().Set("Set-Cookie", fmt.Sprint(v.Headers.SetCookie))
+		return ctx.JSON(200, v)
+	case WebAuthnRequestCredential400Response:
+		return ctx.NoContent(400)
+	case WebAuthnRequestCredentialdefaultJSONResponse:
 		return ctx.JSON(v.StatusCode, v)
 	case error:
 		return v
@@ -1175,48 +1541,51 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"AAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
