@@ -38,7 +38,7 @@ func NewAuthentication(
 	return Authentication{p, sc, ar, wa, cfg.CookieDomain}
 }
 
-func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) any {
+func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
 	params := func() openapi.AuthRequest {
 		if request.JSONBody != nil {
 			return *request.JSONBody
@@ -49,21 +49,21 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 
 	u, err := i.p.Login(ctx, params.Identifier, params.Token)
 	if err != nil {
-		return errors.Wrap(err, "login failed")
+		return nil, errors.Wrap(err, "login failed")
 	}
 
 	cookie, err := i.encodeSession(u.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return openapi.AuthPasswordSignin200JSONResponse{
 		Body:    openapi.AuthSuccess{Id: u.ID.String()},
 		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
-	}
+	}, nil
 }
 
-func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) any {
+func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) (openapi.AuthPasswordSignupResponseObject, error) {
 	params := func() openapi.AuthRequest {
 		if request.JSONBody != nil {
 			return *request.JSONBody
@@ -74,18 +74,18 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 
 	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
-		return errctx.Wrap(err, ctx, "identifier", params.Identifier)
+		return nil, errctx.Wrap(err, ctx, "identifier", params.Identifier)
 	}
 
 	cookie, err := i.encodeSession(u.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return openapi.AuthPasswordSignup200JSONResponse{
 		Body:    openapi.AuthSuccess{Id: u.ID.String()},
 		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
-	}
+	}, nil
 }
 
 func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {

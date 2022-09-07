@@ -21,7 +21,7 @@ type Threads struct {
 
 func NewThreads(thread_svc thread_service.Service) Threads { return Threads{thread_svc} }
 
-func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) any {
+func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
 	params := func() openapi.ThreadSubmission {
 		if request.FormdataBody != nil {
 			return *request.FormdataBody
@@ -32,35 +32,35 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	thread, err := i.thread_svc.Create(ctx, params.Title, params.Body, accountID, category.CategoryID(params.Category.XID()), params.Tags)
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return nil, errctx.Wrap(err, ctx)
 	}
 
-	return openapi.ThreadsCreate200JSONResponse(serialiseThread(thread))
+	return openapi.ThreadsCreate200JSONResponse(serialiseThread(thread)), nil
 }
 
 func reacts(reacts []*react.React) []openapi.React {
 	return (dt.Map(reacts, serialiseReact))
 }
 
-func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) any {
+func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) (openapi.ThreadsListResponseObject, error) {
 	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000)
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return nil, errctx.Wrap(err, ctx)
 	}
 
-	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThreadReference))
+	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThreadReference)), nil
 }
 
-func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) any {
+func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
 	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadId.XID()))
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return nil, errctx.Wrap(err, ctx)
 	}
 
-	return openapi.ThreadsGet200JSONResponse(serialiseThread(thread))
+	return openapi.ThreadsGet200JSONResponse(serialiseThread(thread)), nil
 }

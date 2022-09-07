@@ -5,7 +5,8 @@ dotenv:
 
 vars:
   VERSION:
-    sh: git describe --always --dirty --tags
+    sh: git describe --always --tags
+  DOCKER_IMAGE_TAG: "storyden:{{.VERSION}}"
 
 tasks:
   default:
@@ -28,9 +29,17 @@ tasks:
     cmds:
       - go test -p 1 -race ./...
 
-  backend:image:
+  # -
+  # Docker
+  # -
+
+  backend:image:build:
     cmds:
       - docker build -t {{.DOCKER_IMAGE_TAG}} .
+
+  backend:image:run:
+    cmds:
+      - docker run {{.DOCKER_IMAGE_TAG}}
 
   # -
   # Code generation

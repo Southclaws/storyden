@@ -19,10 +19,10 @@ type Posts struct {
 
 func NewPosts(post_svc post_service.Service) Posts { return Posts{post_svc} }
 
-func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequestObject) any {
+func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequestObject) (openapi.PostsCreateResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return errors.Wrap(err, "failed to get requester")
+		return nil, errors.Wrap(err, "failed to get requester")
 	}
 
 	params := func() openapi.PostsCreate {
@@ -46,8 +46,8 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		reply,
 	)
 	if err != nil {
-		return errctx.Wrap(err, ctx, "reply_to", reply.String())
+		return nil, errctx.Wrap(err, ctx, "reply_to", reply.String())
 	}
 
-	return openapi.PostsCreate200JSONResponse(serialisePost(post))
+	return openapi.PostsCreate200JSONResponse(serialisePost(post)), nil
 }

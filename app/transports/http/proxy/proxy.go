@@ -2,8 +2,6 @@ package proxy
 
 import (
 	"context"
-	"os"
-	"os/exec"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
@@ -28,15 +26,17 @@ func mount(lc fx.Lifecycle, cfg config.Config, router *echo.Echo) {
 }
 
 func run(ctx context.Context) {
-	// TODO: format logs properly
-	cmd := exec.CommandContext(ctx, "yarn", "dev")
+	// TODO: Implement standalone mode which means also setting up a separate
+	// Docker image which contains the frontend dependencies too.
 
-	cmd.Dir = "./web"
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	// cmd := exec.CommandContext(ctx, "yarn", "dev")
 
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
-	}
+	// cmd.Dir = "./web"
+	// cmd.Stdout = os.Stdout
+	// cmd.Stderr = os.Stderr
+
+	// err := cmd.Run()
+	// if err != nil {
+	// 	panic(err)
+	// }
 }

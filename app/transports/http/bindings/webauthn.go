@@ -58,7 +58,7 @@ func (t *temporary) WebAuthnDisplayName() string                { return t.handl
 func (t *temporary) WebAuthnIcon() string                       { return "" }
 func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return nil }
 
-func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) any {
+func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) (openapi.WebAuthnRequestCredentialResponseObject, error) {
 	t := temporary{request.AccountHandle}
 
 	credentialOptions, sessionData, err := a.wa.BeginRegistration(&t,
@@ -71,12 +71,12 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		// webauthn.WithConveyancePreference(protocol.ConveyancePreference(attType)),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to start registration")
+		return nil, errors.Wrap(err, "failed to start registration")
 	}
 
 	cookie, err := json.Marshal(sessionData)
 	if err != nil {
-		return errors.Wrap(err, "failed to encode session data")
+		return nil, errors.Wrap(err, "failed to encode session data")
 	}
 
 	return openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
@@ -84,13 +84,13 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 			SetCookie: string(cookie),
 		},
 		Body: credentialOptions,
-	}
+	}, nil
 }
 
-func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.WebAuthnMakeCredentialRequestObject) any {
+func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.WebAuthnMakeCredentialRequestObject) (openapi.WebAuthnMakeCredentialResponseObject, error) {
 	session, ok := ctx.Value("webauthn").(*webauthn.SessionData)
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
 	pretty.Println(request.Body)
@@ -103,13 +103,13 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 
 	// a.wa.ParseCredentialCreationResponseBody(&t, *session, request)
 
-	return nil
+	return nil, nil
 }
 
-func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.WebAuthnGetAssertionRequestObject) any {
-	return nil
+func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.WebAuthnGetAssertionRequestObject) (openapi.WebAuthnGetAssertionResponseObject, error) {
+	return nil, nil
 }
 
-func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.WebAuthnMakeAssertionRequestObject) any {
-	return nil
+func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.WebAuthnMakeAssertionRequestObject) (openapi.WebAuthnMakeAssertionResponseObject, error) {
+	return nil, nil
 }

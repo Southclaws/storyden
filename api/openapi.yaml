@@ -19,13 +19,12 @@ info:
   title: storyden
   version: "1"
 
-# servers:
-#   - url: "http://localhost:8000/api"
-#     description: "Localhost"
-#   - url: "https://1f91-212-82-91-46.ngrok.io/api"
-#     description: "ngrok"
-#   - url: "https://1f91-212-82-91-46.ngrok.io"
-#     description: "ngrok"
+servers:
+  - url: "/api"
+    description: |
+      The HTTP interface that this document describes is mounted on the `/api` 
+      path and any requests outside of this base path will be proxied to the
+      frontend if Storyden is running in standalone mode.
 
 security:
   - browser: []
