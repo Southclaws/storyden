@@ -1,22 +1,43 @@
+import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { authPasswordSignin } from "src/api/openapi/auth";
 
-import { api } from "src/api";
 import { Form, FormSchema } from "./common";
 
 export default function useSignIn() {
-  const { register, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
 
-  const onSubmit = (payload: Form) => {
-    api("/v1/auth/password/signin");
+  const toast = useToast();
+
+  const { push } = useRouter();
+
+  const onSubmit = async (payload: Form) => {
+    await authPasswordSignin(payload)
+      .then(() => {
+        push("/");
+      })
+      .catch((e) =>
+        toast({
+          title: "Failed!",
+          description: `Failed to sign up: ${e}`,
+          status: "error",
+        })
+      );
   };
 
   return {
     form: {
       register,
-      handleSubmit: handleSubmit(onSubmit),
+      onSubmit: handleSubmit(onSubmit),
+      errors,
     },
   };
 }

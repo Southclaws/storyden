@@ -1,6 +1,7 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
+import { ReactNode } from "react";
 
-export function AuthBox({ children }) {
+export function AuthBox({ children }: { children: ReactNode }) {
   return (
     <Box
       p={12}

@@ -1,4 +1,4 @@
-export function Patterns(props) {
+export function Patterns(props: any) {
   return (
     <svg
       viewBox="0 0 1329 1115"
@@ -60,7 +60,7 @@ export function Patterns(props) {
   );
 }
 
-export function Blue(props) {
+export function Blue(props: any) {
   return (
     <svg
       viewBox="0 0 928 1004"
@@ -103,7 +103,7 @@ export function Blue(props) {
   );
 }
 
-export function Green(props) {
+export function Green(props: any) {
   return (
     <svg
       viewBox="0 0 1040 973"

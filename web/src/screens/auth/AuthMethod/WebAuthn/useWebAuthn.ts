@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 export function useAuthScreen() {
   const { register, handleSubmit } = useForm({});
 
-  const onSubmit = async (form) => {
-    console.log("SUBMIT FORM", form);
-
+  const onSubmit = async () => {
     const response = await fetch(
       `https://1f91-212-82-91-46.ngrok.io/api/v1/auth/webauthn/make/southclaws`,
       {

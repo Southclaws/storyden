@@ -2,7 +2,7 @@ import { Spinner } from "@chakra-ui/react";
 import { SignUp } from "./Password/SignUp";
 
 interface Props {
-  method?: string;
+  method: string | undefined;
 }
 export function AuthMethod({ method }: Props) {
   if (!method) {
