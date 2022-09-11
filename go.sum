@@ -216,6 +216,8 @@ github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d/go.
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1/go.mod h1:hyedUtir6IdtD/7lIxGeCxkaw7y45JueMRL4DIyJDKs=
 github.com/deepmap/oapi-codegen v1.11.1-0.20220728213615-b9782fb00949 h1:Hgi24CiG7PI6hnPojEbEJSy+CUO7z30mrx0G2CC2TOs=
 github.com/deepmap/oapi-codegen v1.11.1-0.20220728213615-b9782fb00949/go.mod h1:ZEkp6OmGXKgASQRLO7V3N9dXcVsgl5e5hl9X0aShDJE=
+github.com/deepmap/oapi-codegen v1.11.1-0.20220908201945-d1a63c702fd0 h1:uAdIP5ua7EzrcF98JnnSMXWS7G7Nf28vZXd5kwPuYpE=
+github.com/deepmap/oapi-codegen v1.11.1-0.20220908201945-d1a63c702fd0/go.mod h1:ZEkp6OmGXKgASQRLO7V3N9dXcVsgl5e5hl9X0aShDJE=
 github.com/devigned/tab v0.1.1/go.mod h1:XG9mPq0dFghrYvoBF3xdRrJzSTX1b7IQrvaL9mzjeJY=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=

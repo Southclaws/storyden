@@ -10,7 +10,7 @@ require (
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/cskr/pubsub v1.0.2
-	github.com/deepmap/oapi-codegen v1.11.1-0.20220728213615-b9782fb00949
+	github.com/deepmap/oapi-codegen v1.11.1-0.20220908201945-d1a63c702fd0
 	github.com/el-mike/restrict v1.0.0
 	github.com/forPelevin/gomoji v1.1.6
 	github.com/getkin/kin-openapi v0.98.0

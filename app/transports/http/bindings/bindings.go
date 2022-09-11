@@ -232,7 +232,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 }
 
 func openApiSkipper(c echo.Context) bool {
-	return true //!strings.HasPrefix(c.Path(), "/api")
+	return !strings.HasPrefix(c.Path(), "/api")
 }
 
 func Build() fx.Option {

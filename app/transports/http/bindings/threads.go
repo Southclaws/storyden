@@ -22,7 +22,7 @@ type Threads struct {
 func NewThreads(thread_svc thread_service.Service) Threads { return Threads{thread_svc} }
 
 func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
-	params := func() openapi.ThreadSubmission {
+	params := func() openapi.ThreadsCreateBody {
 		if request.FormdataBody != nil {
 			return *request.FormdataBody
 		} else {

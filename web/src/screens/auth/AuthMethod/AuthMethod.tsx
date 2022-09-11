@@ -1,5 +1,5 @@
-import { Box, Spinner } from "@chakra-ui/react";
-import { Password } from "./Password/Password";
+import { Spinner } from "@chakra-ui/react";
+import { SignUp } from "./Password/SignUp";
 
 interface Props {
   method?: string;
@@ -11,7 +11,7 @@ export function AuthMethod({ method }: Props) {
 
   switch (method) {
     case "password":
-      return <Password />;
+      return <SignUp />;
   }
 
   // TODO: Status/error component.

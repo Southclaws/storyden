@@ -1,24 +1,13 @@
-import {
-  Box,
-  Grid,
-  GridItem,
-  Heading,
-  Image,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Grid, GridItem, Image, VStack } from "@chakra-ui/react";
 import { AuthMethod } from "./AuthMethod/AuthMethod";
 import { AuthSelection } from "./AuthSelection/AuthSelection";
 import { AuthBox } from "./components/AuthBox";
-import { Blue, Green, Patterns } from "./components/Patterns";
-
-import { useAuthScreen } from "./useAuthScreen";
+import { Blue, Green } from "./components/Patterns";
 
 type Props = {
   method?: string | undefined | null;
 };
 export function AuthScreen({ method }: Props) {
-  console.log({ method });
   return (
     <Grid
       templateRows="4fr 3fr 2fr auto 2fr 3fr 4fr"

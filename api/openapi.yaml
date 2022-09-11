@@ -353,24 +353,24 @@ components:
   requestBodies:
     AuthPassword:
       content:
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/AuthRequest" }
         application/json:
-          schema: { $ref: "#/components/schemas/AuthRequest" }
+          schema: { $ref: "#/components/schemas/AuthPasswordBody" }
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/AuthPasswordBody" }
 
     ThreadsCreate:
       content:
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/ThreadSubmission" }
         application/json:
-          schema: { $ref: "#/components/schemas/ThreadSubmission" }
+          schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
 
     PostsCreate:
       description: Create a post within a thread.
       content:
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/PostSubmission" }
         application/json:
+          schema: { $ref: "#/components/schemas/PostSubmission" }
+        application/x-www-form-urlencoded:
           schema: { $ref: "#/components/schemas/PostSubmission" }
 
   #
@@ -520,7 +520,7 @@ components:
     # Auth
     # -
 
-    AuthRequest:
+    AuthPasswordBody:
       type: object
       required: [identifier, token]
       properties:
@@ -564,7 +564,7 @@ components:
     # Threads
     # -
 
-    ThreadSubmission:
+    ThreadsCreateBody:
       type: object
       required:
         - title

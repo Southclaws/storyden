@@ -39,7 +39,7 @@ func NewAuthentication(
 }
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
-	params := func() openapi.AuthRequest {
+	params := func() openapi.AuthPassword {
 		if request.JSONBody != nil {
 			return *request.JSONBody
 		} else {
@@ -64,7 +64,7 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 }
 
 func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) (openapi.AuthPasswordSignupResponseObject, error) {
-	params := func() openapi.AuthRequest {
+	params := func() openapi.AuthPassword {
 		if request.JSONBody != nil {
 			return *request.JSONBody
 		} else {
