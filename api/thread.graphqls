@@ -1,0 +1,14 @@
+type Thread {
+  id: ID!
+}
+
+input NewThread {
+  title: String!
+  body: String!
+  tags: String!
+  category: String!
+}
+
+type Mutation {
+  createThread(input: NewThread!): Thread!
+}

@@ -32,10 +32,6 @@ package bindings
 
 import (
 	"context"
-	"fmt"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"strings"
 
 	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
@@ -51,7 +47,6 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
@@ -191,21 +186,21 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 
 	router.Use(auth.middleware)
 
-	router.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler {
-		proxy := httputil.NewSingleHostReverseProxy(utils.Must(url.Parse("http://localhost:3000")))
+	// router.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler {
+	// 	proxy := httputil.NewSingleHostReverseProxy(utils.Must(url.Parse("http://localhost:3000")))
 
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if !strings.HasPrefix(r.URL.Path, "/api") {
-				fmt.Println("PROXY 2 FRONT END PLS")
+	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 		if !strings.HasPrefix(r.URL.Path, "/api") {
+	// 			fmt.Println("PROXY 2 FRONT END PLS")
 
-				proxy.ServeHTTP(w, r)
+	// 			proxy.ServeHTTP(w, r)
 
-				return
-			}
+	// 			return
+	// 		}
 
-			h.ServeHTTP(w, r)
-		})
-	}))
+	// 		h.ServeHTTP(w, r)
+	// 	})
+	// }))
 
 	router.Use(oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
 		Skipper: openApiSkipper,

@@ -6,11 +6,13 @@ package transport
 import (
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/transports/graphql"
 	"github.com/Southclaws/storyden/app/transports/http"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		http.Build(),
+		graphql.Build(),
 	)
 }

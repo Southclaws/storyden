@@ -6,11 +6,13 @@ require (
 	4d63.com/optional v0.2.0
 	ariga.io/atlas v0.6.3
 	entgo.io/ent v0.11.2
+	github.com/99designs/gqlgen v0.17.16
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.1-0.20220908201945-d1a63c702fd0
+	github.com/duo-labs/webauthn v0.0.0-20220815211337-00c9fb5711f5
 	github.com/el-mike/restrict v1.0.0
 	github.com/forPelevin/gomoji v1.1.6
 	github.com/getkin/kin-openapi v0.98.0
@@ -30,6 +32,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.8.0
+	github.com/vektah/gqlparser/v2 v2.5.0
 	go.uber.org/dig v1.15.0
 	go.uber.org/fx v1.18.1
 	go.uber.org/zap v1.23.0
@@ -38,6 +41,7 @@ require (
 require (
 	cloud.google.com/go v0.81.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
+	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -51,7 +55,6 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/duo-labs/webauthn v0.0.0-20220815211337-00c9fb5711f5 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.9.9-0.20210217033140-668b12f5399d // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.1 // indirect
@@ -77,6 +80,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
