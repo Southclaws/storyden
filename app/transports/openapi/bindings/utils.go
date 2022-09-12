@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

@@ -3,7 +3,7 @@ package bindings
 import (
 	"context"
 
-	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
 

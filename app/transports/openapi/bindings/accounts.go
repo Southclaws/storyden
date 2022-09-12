@@ -8,7 +8,7 @@ import (
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
-	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

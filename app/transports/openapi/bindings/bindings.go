@@ -32,6 +32,7 @@ package bindings
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
 	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
@@ -44,9 +45,10 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/errctx"
+	"github.com/Southclaws/storyden/internal/errtag"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
@@ -115,7 +117,7 @@ func bindings(s Bindings) openapi.StrictServerInterface {
 // mounts the OpenAPI routes and middleware onto the /api path. Everything that
 // is outside of the `/api` path is considered part of the proxied frontend app.
 // Note: routes are mounted with the `OnStart` hook so that middleware is first.
-func mount(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictServerInterface) {
+func mount(lc fx.Lifecycle, l *zap.Logger, mux *http.ServeMux, router *echo.Echo, si openapi.StrictServerInterface) {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), "/api")
@@ -125,6 +127,9 @@ func mount(lc fx.Lifecycle, l *zap.Logger, router *echo.Echo, si openapi.StrictS
 					return r.Path
 				})),
 			)
+
+			// mount onto / because this router already only cares about /api
+			mux.Handle("/", router)
 
 			return nil
 		},
@@ -230,12 +235,59 @@ func openApiSkipper(c echo.Context) bool {
 	return !strings.HasPrefix(c.Path(), "/api")
 }
 
+func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
+	router := echo.New()
+
+	router.HTTPErrorHandler = func(err error, c echo.Context) {
+		status := 500
+
+		switch errtag.Tag(err).(type) {
+		case errtag.Cancelled:
+			// Do nothing
+		case errtag.InvalidArgument:
+			status = http.StatusBadRequest
+		case errtag.NotFound:
+			status = http.StatusNotFound
+		case errtag.AlreadyExists:
+			status = http.StatusConflict
+		case errtag.PermissionDenied:
+			status = http.StatusForbidden
+		case errtag.Unauthenticated:
+			status = http.StatusForbidden
+		}
+
+		ec := errctx.Unwrap(err)
+
+		l.Info("request error",
+			zap.String("error", err.Error()),
+			zap.Any("metadata", ec),
+		)
+
+		// TODO: Settle on a nice way to do this.
+		c.JSON(status, openapi.APIError{
+			Error: err.Error(),
+			// Message:              utils.Ref("An unhandled error occurred."),
+			// Suggested:            utils.Ref("Please try again later or contact the site team/administrator."),
+			AdditionalProperties: lo.MapValues(ec, func(v, k string) any { return v }),
+		})
+	}
+
+	// Router must add all middleware before mounting routes. To add middleware,
+	// simply depend on the router in a provider or invoker and do `router.Use`.
+	// To mount routes use the lifecycle `OnStart` hook and mount them normally.
+
+	return router
+}
+
 func Build() fx.Option {
 	return fx.Options(
 		// Provide the bindings struct which implements the generated OpenAPI
 		// interface by composing together all of the service bindings into a
 		// single struct.
 		fx.Provide(bindings),
+
+		// Provide the Echo router.
+		fx.Provide(newRouter),
 
 		// Add the middleware bindings.
 		fx.Invoke(addMiddleware),
