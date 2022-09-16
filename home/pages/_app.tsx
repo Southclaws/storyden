@@ -33,8 +33,8 @@ function MyApp({ Component, pageProps }) {
       <ChakraProvider
         theme={extendTheme({
           fonts: {
-            heading: "P22 Mackinac Pro",
-            body: "Halyard Display",
+            heading: "p22-mackinac-pro",
+            body: "halyard-display",
           },
         })}
       >
