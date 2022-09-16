@@ -1,0 +1,14 @@
+{
+    "name": "Storyden",
+    "short_name": "Storyden",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#27b981",
+    "background_color": "#27b981",
+    "display": "standalone"
+}
