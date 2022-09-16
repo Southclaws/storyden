@@ -19,7 +19,12 @@ export default function Home() {
         gap={2}
         w="full"
       >
-        <Image src="/logo_200x200.png" width={50} height={50} />
+        <Image
+          src="/logo_200x200.png"
+          width={50}
+          height={50}
+          alt="The Storyden logo, a Norse 'homestead' rune indicating a cosy place to talk."
+        />
         <Heading as="h1" fontWeight="bold" fontSize="lg">
           A forum for the modern age
         </Heading>
@@ -34,7 +39,13 @@ export default function Home() {
           Empower your community with a modern discussion platform
         </Heading>
         <Box bgColor="white">
-          <Image src="/graphic.png" width={323} height={297} />
+          <Image
+            src="/graphic.png"
+            width={323}
+            height={297}
+            priority
+            alt="A graphic of friends sat on the floor chatting casually in a living room."
+          />
         </Box>
       </VStack>
 
@@ -129,7 +140,11 @@ export default function Home() {
         p={4}
       >
         <HStack>
-          <Link href="https://github.com/Southclaws/storyden" isExternal>
+          <Link
+            href="https://github.com/Southclaws/storyden"
+            isExternal
+            aria-label="The Storyden GitHub repository"
+          >
             <svg
               width="33"
               height="32"
@@ -143,7 +158,11 @@ export default function Home() {
               />
             </svg>
           </Link>
-          <Link href="https://twitter.com/Southclaws" isExternal>
+          <Link
+            href="https://twitter.com/Southclaws"
+            isExternal
+            aria-label="The Twitter account of Storyden developer, Barnaby 'Southclaws' Keene"
+          >
             <svg
               width="33"
               height="27"
