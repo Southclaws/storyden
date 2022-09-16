@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import "../fonts.css";
 
 function MyApp({ Component, pageProps }) {
   return (
