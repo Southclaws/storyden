@@ -6,12 +6,12 @@ require (
 	4d63.com/optional v0.2.0
 	ariga.io/atlas v0.6.3
 	entgo.io/ent v0.11.2
-	github.com/99designs/gqlgen v0.17.16
+	github.com/99designs/gqlgen v0.17.20
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/cskr/pubsub v1.0.2
-	github.com/deepmap/oapi-codegen v1.11.1-0.20220908201945-d1a63c702fd0
+	github.com/deepmap/oapi-codegen v1.11.1-0.20220906181851-9c600dddea33
 	github.com/duo-labs/webauthn v0.0.0-20220815211337-00c9fb5711f5
 	github.com/el-mike/restrict v1.0.0
 	github.com/forPelevin/gomoji v1.1.6
@@ -32,7 +32,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.8.0
-	github.com/vektah/gqlparser/v2 v2.5.0
+	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/dig v1.15.0
 	go.uber.org/fx v1.18.1
 	go.uber.org/zap v1.23.0
@@ -123,10 +123,12 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802 // indirect
 	github.com/urfave/cli v1.22.5 // indirect
+	github.com/urfave/cli/v2 v2.8.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/zclconf/go-cty v1.11.0 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.0-alpha.0 // indirect

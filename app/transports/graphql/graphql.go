@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/graphql/server"
 )
 
-//go:generate go run github.com/99designs/gqlgen@latest
+//go:generate go run github.com/99designs/gqlgen@v0.17.20
 
 func Build() fx.Option {
 	return fx.Options(
