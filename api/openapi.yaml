@@ -505,16 +505,24 @@ components:
 
     APIError:
       type: object
-      description: A description of an error including a human readable message.
+      description: |
+        A description of an error including a human readable message and any
+        related metadata from the request and associated services.
       required: [error]
       properties:
         error:
+          description: The internal error, not intended for end-user display.
           type: string
         message:
+          description: A human-readable message intended for end-user display.
           type: string
         suggested:
+          description: A suggested action for the user.
           type: string
-      additionalProperties: true
+        metadata:
+          description: Any additional metadata related to the error.
+          type: object
+          additionalProperties: true
 
     # -
     # Auth

@@ -37,7 +37,6 @@ import (
 
 	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/kr/pretty"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -47,8 +46,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
+	"github.com/Southclaws/storyden/internal/glue"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
@@ -145,22 +143,6 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			r := c.Request()
-			ctx := r.Context()
-
-			meta := []string{}
-			for _, k := range c.ParamNames() {
-				meta = append(meta, k, c.Param(k))
-			}
-
-			c.SetRequest(r.WithContext(errctx.WithMeta(ctx, meta...)))
-
-			return next(c)
-		}
-	})
-
-	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			r := c.Request()
 
 			l.Info(
 				"request",
@@ -173,23 +155,6 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 			return next(c)
 		}
 	})
-
-	origins := []string{
-		"http://localhost:3000", // Local development
-		"http://localhost:8001", // Swagger UI
-		cfg.PublicWebAddress,    // Live public website
-	}
-
-	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     origins,
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "Content-Length", "X-CSRF-Token"},
-		ExposeHeaders:    []string{"Link", "Content-Length", "X-Ratelimit-Limit", "X-Ratelimit-Reset"},
-		AllowCredentials: true,
-		MaxAge:           300,
-	}))
-
-	router.Use(auth.middleware)
 
 	// router.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler {
 	// 	proxy := httputil.NewSingleHostReverseProxy(utils.Must(url.Parse("http://localhost:3000")))
@@ -207,6 +172,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 	// 	})
 	// }))
 
+	router.Use(auth.middleware)
 	router.Use(oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
 		Skipper: openApiSkipper,
 		Options: openapi3filter.Options{
@@ -214,19 +180,8 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 			AuthenticationFunc:    auth.validator,
 		},
 		// Handles validation errors that occur BEFORE the handler is called.
-		ErrorHandler: func(c echo.Context, err *echo.HTTPError) error {
-			// TODO: Only log internal server errors.
-			l.Info("validation error", zap.Error(err.Internal))
-			pretty.Println(c, err)
-
-			// TODO: Derive an APIError from the above error and write as JSON.
-			c.Response().WriteHeader(err.Code)
-
-			return err
-		},
+		ErrorHandler: glue.ValidatorErrorHandler(),
 	}))
-
-	l.Info("added router middleware", zap.Strings("origins", origins))
 
 	return nil
 }
@@ -238,43 +193,29 @@ func openApiSkipper(c echo.Context) bool {
 func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	router := echo.New()
 
-	router.HTTPErrorHandler = func(err error, c echo.Context) {
-		status := 500
-
-		switch errtag.Tag(err).(type) {
-		case errtag.Cancelled:
-			// Do nothing
-		case errtag.InvalidArgument:
-			status = http.StatusBadRequest
-		case errtag.NotFound:
-			status = http.StatusNotFound
-		case errtag.AlreadyExists:
-			status = http.StatusConflict
-		case errtag.PermissionDenied:
-			status = http.StatusForbidden
-		case errtag.Unauthenticated:
-			status = http.StatusForbidden
-		}
-
-		ec := errctx.Unwrap(err)
-
-		l.Info("request error",
-			zap.String("error", err.Error()),
-			zap.Any("metadata", ec),
-		)
-
-		// TODO: Settle on a nice way to do this.
-		c.JSON(status, openapi.APIError{
-			Error: err.Error(),
-			// Message:              utils.Ref("An unhandled error occurred."),
-			// Suggested:            utils.Ref("Please try again later or contact the site team/administrator."),
-			AdditionalProperties: lo.MapValues(ec, func(v, k string) any { return v }),
-		})
+	origins := []string{
+		"http://localhost:3000", // Local development
+		"http://localhost:8001", // Swagger UI
+		cfg.PublicWebAddress,    // Live public website
 	}
+
+	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     origins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "Content-Length", "X-CSRF-Token"},
+		ExposeHeaders:    []string{"Link", "Content-Length", "X-Ratelimit-Limit", "X-Ratelimit-Reset"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
+
+	router.Use(glue.ParameterContext)
+	router.HTTPErrorHandler = glue.HTTPErrorHandler(l)
 
 	// Router must add all middleware before mounting routes. To add middleware,
 	// simply depend on the router in a provider or invoker and do `router.Use`.
 	// To mount routes use the lifecycle `OnStart` hook and mount them normally.
+
+	l.Info("created router", zap.Strings("origins", origins))
 
 	return router
 }
