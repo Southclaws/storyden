@@ -8,10 +8,13 @@ import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
   AuthSuccessResponse,
+  BadRequestResponse,
   InternalServerErrorResponse,
   AuthPasswordBody,
   UnauthorisedResponse,
   NotFoundResponse,
+  AuthOAuthProviderListResponse,
+  AuthOAuthProviderCallbackBody,
   WebAuthnPublicKeyCreationOptionsResponse,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -37,6 +40,68 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
     method: "post",
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
+  });
+};
+
+/**
+ * @summary Retrieve a list of OAuth2 providers and their links.
+ */
+export const authOAuthProviderList = () => {
+  return fetcher<AuthOAuthProviderListResponse>({
+    url: `/v1/auth/oauth`,
+    method: "get",
+  });
+};
+
+export const getAuthOAuthProviderListKey = () => [`/v1/auth/oauth`];
+
+export type AuthOAuthProviderListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof authOAuthProviderList>>
+>;
+export type AuthOAuthProviderListQueryError =
+  | BadRequestResponse
+  | InternalServerErrorResponse;
+
+export const useAuthOAuthProviderList = <
+  TError = BadRequestResponse | InternalServerErrorResponse
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof authOAuthProviderList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAuthOAuthProviderListKey() : null));
+  const swrFn = () => authOAuthProviderList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+
+/**
+ * @summary Sign in to an existing account with a username and password.
+ */
+export const authOAuthProviderCallback = (
+  oauthProvider: string,
+  authOAuthProviderCallbackBody: AuthOAuthProviderCallbackBody
+) => {
+  return fetcher<AuthSuccessResponse>({
+    url: `/v1/auth/oauth/${oauthProvider}/callback`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: authOAuthProviderCallbackBody,
   });
 };
 

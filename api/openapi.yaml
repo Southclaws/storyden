@@ -135,6 +135,32 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccess" }
 
+  /v1/auth/oauth:
+    get:
+      operationId: AuthOAuthProviderList
+      summary: Retrieve a list of OAuth2 providers and their links.
+      tags: [auth]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthOAuthProviderList" }
+
+  /v1/auth/oauth/{oauth_provider}/callback:
+    post:
+      operationId: AuthOAuthProviderCallback
+      summary: Sign in to an existing account with a username and password.
+      tags: [auth]
+      security: []
+      parameters: [$ref: "#/components/parameters/OAuthProvider"]
+      requestBody:
+        { $ref: "#/components/requestBodies/AuthOAuthProviderCallback" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AuthSuccess" }
+
   /v1/auth/webauthn/make/{account_handle}:
     post:
       operationId: WebAuthnRequestCredential
@@ -338,6 +364,15 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    OAuthProvider:
+      description: The identifier for an OAuth2 provider such as "twitter".
+      name: oauth_provider
+      in: path
+      required: true
+      example: twitter
+      schema:
+        type: string
+
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
   # 888   Y88b 888       d88P" "Y88b 888     888 888       d88P  Y88b    888    d88P  Y88b
@@ -357,6 +392,11 @@ components:
           schema: { $ref: "#/components/schemas/AuthPasswordBody" }
         application/x-www-form-urlencoded:
           schema: { $ref: "#/components/schemas/AuthPasswordBody" }
+
+    AuthOAuthProviderCallback:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthOAuthProviderCallbackBody" }
 
     ThreadsCreate:
       content:
@@ -408,6 +448,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuthSuccess"
+
+    AuthOAuthProviderList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthOAuthProviderListBody"
 
     WebAuthnPublicKeyCreationOptions:
       description: OK
@@ -546,6 +593,44 @@ components:
         id:
           type: string
 
+    AuthOAuthProviderListBody:
+      type: array
+      items:
+        properties:
+          provider:
+            description: The slug name of the provider.
+            type: string
+          name:
+            description: The human-readable name of the provider.
+            type: string
+          logo_url:
+            description: The logo to display for the provider.
+            type: string
+          link:
+            description: The hyperlink to render for the user.
+            type: string
+
+    AuthOAuthProviderCallbackSuccess:
+      type: object
+      properties:
+        state:
+          type: string
+
+    AuthOAuthProviderCallbackError:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+
+    AuthOAuthProviderCallbackBody:
+      type: object
+      required:
+        - state
+      oneOf:
+        - $ref: "#/components/schemas/AuthOAuthProviderCallbackSuccess"
+        - $ref: "#/components/schemas/AuthOAuthProviderCallbackError"
     # -
     # Account
     # -
