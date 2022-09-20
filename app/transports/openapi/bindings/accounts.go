@@ -27,7 +27,7 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 
 	acc, err := i.as.Get(ctx, accountID)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get account")
+		return nil, errctx.Wrap(errors.Wrap(err, "failed to get account"), ctx)
 	}
 
 	return openapi.AccountsGet200JSONResponse{
