@@ -36,6 +36,7 @@ require (
 	go.uber.org/dig v1.15.0
 	go.uber.org/fx v1.18.1
 	go.uber.org/zap v1.23.0
+	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 )
 
 require (
@@ -146,7 +147,6 @@ require (
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c // indirect
 	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
