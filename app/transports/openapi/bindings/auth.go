@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Southclaws/dt"
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/getkin/kin-openapi/openapi3filter"
@@ -11,7 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
