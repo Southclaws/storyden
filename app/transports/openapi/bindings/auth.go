@@ -11,8 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -24,6 +26,7 @@ type Authentication struct {
 	p      *password.Password
 	sc     *securecookie.SecureCookie
 	ar     account.Repository
+	oa     *oauth.OAuth
 	wa     *webauthn.WebAuthn
 	domain string
 }
@@ -33,9 +36,10 @@ func NewAuthentication(
 	p *password.Password,
 	ar account.Repository,
 	sc *securecookie.SecureCookie,
+	oa *oauth.OAuth,
 	wa *webauthn.WebAuthn,
 ) Authentication {
-	return Authentication{p, sc, ar, wa, cfg.CookieDomain}
+	return Authentication{p, sc, ar, oa, wa, cfg.CookieDomain}
 }
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
@@ -84,6 +88,43 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 
 	return openapi.AuthPasswordSignup200JSONResponse{
 		Body:    openapi.AuthSuccess{Id: u.ID.String()},
+		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+	}, nil
+}
+
+func (o *Authentication) AuthOAuthProviderList(ctx context.Context, request openapi.AuthOAuthProviderListRequestObject) (openapi.AuthOAuthProviderListResponseObject, error) {
+	list := dt.Map(o.oa.Providers(),
+		func(p oauth.Provider) openapi.AuthOAuthProvider {
+			return openapi.AuthOAuthProvider{
+				Provider: "p.ID()",
+				Name:     "p.Name()",
+				LogoUrl:  "p.LogoURL()",
+				Link:     p.Link(),
+			}
+		},
+	)
+
+	return openapi.AuthOAuthProviderListJSONResponse(list), nil
+}
+
+func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request openapi.AuthOAuthProviderCallbackRequestObject) (openapi.AuthOAuthProviderCallbackResponseObject, error) {
+	provider, err := o.oa.Provider(string(request.OauthProvider))
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	account, err := provider.Login(ctx, request.Body.State, request.Body.Code)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	cookie, err := o.encodeSession(account.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return openapi.AuthPasswordSignin200JSONResponse{
+		Body:    openapi.AuthSuccess{Id: account.ID.String()},
 		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
 	}, nil
 }

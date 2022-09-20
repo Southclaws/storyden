@@ -4,9 +4,8 @@
  * storyden
  * OpenAPI spec version: 1
  */
-import type { AuthOAuthProviderCallbackSuccess } from "./authOAuthProviderCallbackSuccess";
-import type { AuthOAuthProviderCallbackError } from "./authOAuthProviderCallbackError";
 
-export type AuthOAuthProviderCallbackBody =
-  | AuthOAuthProviderCallbackSuccess
-  | AuthOAuthProviderCallbackError;
+export interface AuthOAuthProviderCallbackBody {
+  state: string;
+  code: string;
+}

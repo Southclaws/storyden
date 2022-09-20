@@ -596,41 +596,35 @@ components:
     AuthOAuthProviderListBody:
       type: array
       items:
-        properties:
-          provider:
-            description: The slug name of the provider.
-            type: string
-          name:
-            description: The human-readable name of the provider.
-            type: string
-          logo_url:
-            description: The logo to display for the provider.
-            type: string
-          link:
-            description: The hyperlink to render for the user.
-            type: string
+        $ref: "#/components/schemas/AuthOAuthProvider"
 
-    AuthOAuthProviderCallbackSuccess:
-      type: object
+    AuthOAuthProvider:
+      required: [provider, name, logo_url, link]
       properties:
-        state:
+        provider:
+          description: The slug name of the provider.
           type: string
-
-    AuthOAuthProviderCallbackError:
-      type: object
-      properties:
-        error:
+        name:
+          description: The human-readable name of the provider.
           type: string
-        error_description:
+        logo_url:
+          description: The logo to display for the provider.
+          type: string
+        link:
+          description: The hyperlink to render for the user.
           type: string
 
     AuthOAuthProviderCallbackBody:
       type: object
       required:
         - state
-      oneOf:
-        - $ref: "#/components/schemas/AuthOAuthProviderCallbackSuccess"
-        - $ref: "#/components/schemas/AuthOAuthProviderCallbackError"
+        - code
+      properties:
+        state:
+          type: string
+        code:
+          type: string
+
     # -
     # Account
     # -

@@ -4,6 +4,6 @@
  * storyden
  * OpenAPI spec version: 1
  */
-import type { AuthOAuthProviderListBodyItem } from "./authOAuthProviderListBodyItem";
+import type { AuthOAuthProvider } from "./authOAuthProvider";
 
-export type AuthOAuthProviderListBody = AuthOAuthProviderListBodyItem[];
+export type AuthOAuthProviderListBody = AuthOAuthProvider[];

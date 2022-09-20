@@ -5,13 +5,13 @@
  * OpenAPI spec version: 1
  */
 
-export type AuthOAuthProviderListBodyItem = {
+export interface AuthOAuthProvider {
   /** The slug name of the provider. */
-  provider?: string;
+  provider: string;
   /** The human-readable name of the provider. */
-  name?: string;
+  name: string;
   /** The logo to display for the provider. */
-  logo_url?: string;
+  logo_url: string;
   /** The hyperlink to render for the user. */
-  link?: string;
-};
+  link: string;
+}

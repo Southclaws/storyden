@@ -64,7 +64,6 @@ type Bindings struct {
 	Version
 	Spec
 	Authentication
-	OAuth
 	WebAuthn
 	Accounts
 	Threads
@@ -79,7 +78,6 @@ func bindingsProviders() fx.Option {
 		NewVersion,
 		NewSpec,
 		NewAuthentication,
-		NewOAuth,
 		NewWebAuthn,
 		NewAccounts,
 		NewThreads,
