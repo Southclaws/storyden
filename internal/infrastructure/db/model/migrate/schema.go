@@ -249,6 +249,31 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// AccountTagsColumns holds the columns for the "account_tags" table.
+	AccountTagsColumns = []*schema.Column{
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+	}
+	// AccountTagsTable holds the schema information for the "account_tags" table.
+	AccountTagsTable = &schema.Table{
+		Name:       "account_tags",
+		Columns:    AccountTagsColumns,
+		PrimaryKey: []*schema.Column{AccountTagsColumns[0], AccountTagsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "account_tags_account_id",
+				Columns:    []*schema.Column{AccountTagsColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "account_tags_tag_id",
+				Columns:    []*schema.Column{AccountTagsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// RoleAccountsColumns holds the columns for the "role_accounts" table.
 	RoleAccountsColumns = []*schema.Column{
 		{Name: "role_id", Type: field.TypeString, Size: 20},
@@ -310,6 +335,7 @@ var (
 		RolesTable,
 		SubscriptionsTable,
 		TagsTable,
+		AccountTagsTable,
 		RoleAccountsTable,
 		TagPostsTable,
 	}
@@ -329,6 +355,8 @@ func init() {
 	ReactsTable.ForeignKeys[3].RefTable = PostsTable
 	SubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = AccountsTable
+	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
 	RoleAccountsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable

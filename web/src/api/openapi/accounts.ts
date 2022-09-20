@@ -15,18 +15,16 @@ import type {
 import { fetcher } from "../client";
 
 /**
- * @summary Get an account by ID.
+ * @summary Get the information for the currently authenticated account.
  */
-export const accountsGet = (accountId: string) => {
+export const accountsGet = () => {
   return fetcher<AccountsGetSuccessResponse>({
-    url: `/v1/accounts/${accountId}`,
+    url: `/v1/accounts`,
     method: "get",
   });
 };
 
-export const getAccountsGetKey = (accountId: string) => [
-  `/v1/accounts/${accountId}`,
-];
+export const getAccountsGetKey = () => [`/v1/accounts`];
 
 export type AccountsGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountsGet>>
@@ -38,22 +36,18 @@ export type AccountsGetQueryError =
 
 export const useAccountsGet = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
->(
-  accountId: string,
-  options?: {
-    swr?: SWRConfiguration<Awaited<ReturnType<typeof accountsGet>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-  }
-) => {
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof accountsGet>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false && !!accountId;
+  const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccountsGetKey(accountId) : null));
-  const swrFn = () => accountsGet(accountId);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAccountsGetKey() : null));
+  const swrFn = () => accountsGet();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

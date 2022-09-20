@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
 	"github.com/rs/xid"
 )
 
@@ -198,6 +199,21 @@ func (ac *AccountCreate) AddAuthentication(a ...*Authentication) *AccountCreate 
 		ids[i] = a[i].ID
 	}
 	return ac.AddAuthenticationIDs(ids...)
+}
+
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (ac *AccountCreate) AddTagIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddTagIDs(ids...)
+	return ac
+}
+
+// AddTags adds the "tags" edges to the Tag entity.
+func (ac *AccountCreate) AddTags(t ...*Tag) *AccountCreate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ac.AddTagIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -502,6 +518,25 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: authentication.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.TagsTable,
+			Columns: account.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: tag.FieldID,
 				},
 			},
 		}

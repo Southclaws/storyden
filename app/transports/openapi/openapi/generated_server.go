@@ -160,6 +160,19 @@ type ProfileReference struct {
 	Name *AccountName `json:"name,omitempty"`
 }
 
+// PublicProfile defines model for PublicProfile.
+type PublicProfile struct {
+	Bio       *string `json:"bio,omitempty"`
+	CreatedAt string  `json:"createdAt"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Interests A list of tags.
+	Interests TagList `json:"interests"`
+	Name      string  `json:"name"`
+}
+
 // React defines model for React.
 type React struct {
 	Emoji *string `json:"emoji,omitempty"`
@@ -167,6 +180,12 @@ type React struct {
 	// Id A unique identifier for this resource.
 	Id *Identifier `json:"id,omitempty"`
 }
+
+// TagList A list of tags.
+type TagList = []TagName
+
+// TagName A tag.
+type TagName = string
 
 // Thread defines model for Thread.
 type Thread struct {
@@ -248,9 +267,6 @@ type ThreadReference struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// ThreadTags A list of tags for a thread.
-type ThreadTags = []string
-
 // ThreadTitle The title of a thread.
 type ThreadTitle = string
 
@@ -262,8 +278,8 @@ type ThreadsCreateBody struct {
 	// Category A unique identifier for this resource.
 	Category Identifier `json:"category"`
 
-	// Tags A list of tags for a thread.
-	Tags ThreadTags `json:"tags"`
+	// Tags A list of tags.
+	Tags TagList `json:"tags"`
 
 	// Title The title of a thread.
 	Title ThreadTitle `json:"title"`
@@ -293,6 +309,9 @@ type InternalServerError = APIError
 
 // PostsCreateSuccess A post within a thread of posts.
 type PostsCreateSuccess = Post
+
+// ProfilesGetSuccess defines model for ProfilesGetSuccess.
+type ProfilesGetSuccess = PublicProfile
 
 // ThreadsCreateSuccess defines model for ThreadsCreateSuccess.
 type ThreadsCreateSuccess = Thread
@@ -368,9 +387,9 @@ type ServerInterface interface {
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
-	// Get an account by ID.
-	// (GET /v1/accounts/{account_id})
-	AccountsGet(ctx echo.Context, accountId AccountID) error
+	// Get the information for the currently authenticated account.
+	// (GET /v1/accounts)
+	AccountsGet(ctx echo.Context) error
 	// Retrieve a list of OAuth2 providers and their links.
 	// (GET /v1/auth/oauth)
 	AuthOAuthProviderList(ctx echo.Context) error
@@ -395,6 +414,9 @@ type ServerInterface interface {
 	// Start the WebAuthn registration process by requesting a credential.
 	// (POST /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandle) error
+	// Get a public profile by ID.
+	// (GET /v1/profiles/{account_id})
+	ProfilesGet(ctx echo.Context, accountId AccountID) error
 	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx echo.Context) error
@@ -429,18 +451,11 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 // AccountsGet converts echo context to params.
 func (w *ServerInterfaceWrapper) AccountsGet(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "account_id" -------------
-	var accountId AccountID
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "account_id", runtime.ParamLocationPath, ctx.Param("account_id"), &accountId)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_id: %s", err))
-	}
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsGet(ctx, accountId)
+	err = w.Handler.AccountsGet(ctx)
 	return err
 }
 
@@ -541,6 +556,24 @@ func (w *ServerInterfaceWrapper) WebAuthnRequestCredential(ctx echo.Context) err
 	return err
 }
 
+// ProfilesGet converts echo context to params.
+func (w *ServerInterfaceWrapper) ProfilesGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_id" -------------
+	var accountId AccountID
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "account_id", runtime.ParamLocationPath, ctx.Param("account_id"), &accountId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ProfilesGet(ctx, accountId)
+	return err
+}
+
 // ThreadsList converts echo context to params.
 func (w *ServerInterfaceWrapper) ThreadsList(ctx echo.Context) error {
 	var err error
@@ -637,7 +670,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
-	router.GET(baseURL+"/v1/accounts/:account_id", wrapper.AccountsGet)
+	router.GET(baseURL+"/v1/accounts", wrapper.AccountsGet)
 	router.GET(baseURL+"/v1/auth/oauth", wrapper.AuthOAuthProviderList)
 	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.AuthOAuthProviderCallback)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
@@ -646,6 +679,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
 	router.GET(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
 	router.POST(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
+	router.GET(baseURL+"/v1/profiles/:account_id", wrapper.ProfilesGet)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
 	router.GET(baseURL+"/v1/threads/:thread_id", wrapper.ThreadsGet)
@@ -676,6 +710,8 @@ type NotFoundResponse struct {
 }
 
 type PostsCreateSuccessJSONResponse Post
+
+type ProfilesGetSuccessJSONResponse PublicProfile
 
 type ThreadsCreateSuccessJSONResponse Thread
 
@@ -713,7 +749,6 @@ func (response GetSpec200TextResponse) VisitGetSpecResponse(w http.ResponseWrite
 }
 
 type AccountsGetRequestObject struct {
-	AccountId AccountID `json:"account_id"`
 }
 
 type AccountsGetResponseObject interface {
@@ -1083,6 +1118,49 @@ func (response WebAuthnRequestCredentialdefaultJSONResponse) VisitWebAuthnReques
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type ProfilesGetRequestObject struct {
+	AccountId AccountID `json:"account_id"`
+}
+
+type ProfilesGetResponseObject interface {
+	VisitProfilesGetResponse(w http.ResponseWriter) error
+}
+
+type ProfilesGet200JSONResponse = ProfilesGetSuccessJSONResponse
+
+func (response ProfilesGet200JSONResponse) VisitProfilesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ProfilesGet401Response = UnauthorisedResponse
+
+func (response ProfilesGet401Response) VisitProfilesGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ProfilesGet404Response = NotFoundResponse
+
+func (response ProfilesGet404Response) VisitProfilesGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ProfilesGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ProfilesGetdefaultJSONResponse) VisitProfilesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type ThreadsListRequestObject struct {
 }
 
@@ -1279,8 +1357,8 @@ type StrictServerInterface interface {
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) (GetSpecResponseObject, error)
-	// Get an account by ID.
-	// (GET /v1/accounts/{account_id})
+	// Get the information for the currently authenticated account.
+	// (GET /v1/accounts)
 	AccountsGet(ctx context.Context, request AccountsGetRequestObject) (AccountsGetResponseObject, error)
 	// Retrieve a list of OAuth2 providers and their links.
 	// (GET /v1/auth/oauth)
@@ -1306,6 +1384,9 @@ type StrictServerInterface interface {
 	// Start the WebAuthn registration process by requesting a credential.
 	// (POST /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
+	// Get a public profile by ID.
+	// (GET /v1/profiles/{account_id})
+	ProfilesGet(ctx context.Context, request ProfilesGetRequestObject) (ProfilesGetResponseObject, error)
 	// Get a list of all threads.
 	// (GET /v1/threads)
 	ThreadsList(ctx context.Context, request ThreadsListRequestObject) (ThreadsListResponseObject, error)
@@ -1360,10 +1441,8 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 }
 
 // AccountsGet operation middleware
-func (sh *strictHandler) AccountsGet(ctx echo.Context, accountId AccountID) error {
+func (sh *strictHandler) AccountsGet(ctx echo.Context) error {
 	var request AccountsGetRequestObject
-
-	request.AccountId = accountId
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.AccountsGet(ctx.Request().Context(), request.(AccountsGetRequestObject))
@@ -1661,6 +1740,31 @@ func (sh *strictHandler) WebAuthnRequestCredential(ctx echo.Context, accountHand
 	return nil
 }
 
+// ProfilesGet operation middleware
+func (sh *strictHandler) ProfilesGet(ctx echo.Context, accountId AccountID) error {
+	var request ProfilesGetRequestObject
+
+	request.AccountId = accountId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ProfilesGet(ctx.Request().Context(), request.(ProfilesGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ProfilesGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ProfilesGetResponseObject); ok {
+		return validResponse.VisitProfilesGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // ThreadsList operation middleware
 func (sh *strictHandler) ThreadsList(ctx echo.Context) error {
 	var request ThreadsListRequestObject
@@ -1820,60 +1924,62 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"CQAA//+0y+MIxz8AAA==",
+	"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",
+	"sRtDAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

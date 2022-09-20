@@ -19,6 +19,8 @@ const (
 	FieldName = "name"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
+	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
+	EdgeAccounts = "accounts"
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
 	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
@@ -26,6 +28,11 @@ const (
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
+	// AccountsTable is the table that holds the accounts relation/edge. The primary key declared below.
+	AccountsTable = "account_tags"
+	// AccountsInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	AccountsInverseTable = "accounts"
 )
 
 // Columns holds all SQL columns for tag fields.
@@ -39,6 +46,9 @@ var (
 	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
 	// primary key for the posts relation (M2M).
 	PostsPrimaryKey = []string{"tag_id", "post_id"}
+	// AccountsPrimaryKey and AccountsColumn2 are the table columns denoting the
+	// primary key for the accounts relation (M2M).
+	AccountsPrimaryKey = []string{"account_id", "tag_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

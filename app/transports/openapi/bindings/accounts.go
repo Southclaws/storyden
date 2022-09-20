@@ -6,9 +6,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
+	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -19,7 +20,12 @@ type Accounts struct {
 func NewAccounts(as account.Service) Accounts { return Accounts{as} }
 
 func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) (openapi.AccountsGetResponseObject, error) {
-	acc, err := i.as.Get(ctx, account_resource.AccountID(request.AccountId.XID()))
+	accountID, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	acc, err := i.as.Get(ctx, accountID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get account")
 	}

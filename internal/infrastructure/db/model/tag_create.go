@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
 	"github.com/rs/xid"
@@ -72,6 +73,21 @@ func (tc *TagCreate) AddPosts(p ...*Post) *TagCreate {
 		ids[i] = p[i].ID
 	}
 	return tc.AddPostIDs(ids...)
+}
+
+// AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
+func (tc *TagCreate) AddAccountIDs(ids ...xid.ID) *TagCreate {
+	tc.mutation.AddAccountIDs(ids...)
+	return tc
+}
+
+// AddAccounts adds the "accounts" edges to the Account entity.
+func (tc *TagCreate) AddAccounts(a ...*Account) *TagCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return tc.AddAccountIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -238,6 +254,25 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.AccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
 				},
 			},
 		}

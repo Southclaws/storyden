@@ -37,6 +37,8 @@ const (
 	EdgeSubscriptions = "subscriptions"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
 	EdgeAuthentication = "authentication"
+	// EdgeTags holds the string denoting the tags edge name in mutations.
+	EdgeTags = "tags"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// PostsTable is the table that holds the posts relation/edge.
@@ -72,6 +74,11 @@ const (
 	AuthenticationInverseTable = "authentications"
 	// AuthenticationColumn is the table column denoting the authentication relation/edge.
 	AuthenticationColumn = "account_authentication"
+	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
+	TagsTable = "account_tags"
+	// TagsInverseTable is the table name for the Tag entity.
+	// It exists in this package in order to avoid circular dependency with the "tag" package.
+	TagsInverseTable = "tags"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -90,6 +97,9 @@ var (
 	// RolesPrimaryKey and RolesColumn2 are the table columns denoting the
 	// primary key for the roles relation (M2M).
 	RolesPrimaryKey = []string{"role_id", "account_id"}
+	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
+	// primary key for the tags relation (M2M).
+	TagsPrimaryKey = []string{"account_id", "tag_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
@@ -45,6 +46,21 @@ func (tu *TagUpdate) AddPosts(p ...*Post) *TagUpdate {
 	return tu.AddPostIDs(ids...)
 }
 
+// AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
+func (tu *TagUpdate) AddAccountIDs(ids ...xid.ID) *TagUpdate {
+	tu.mutation.AddAccountIDs(ids...)
+	return tu
+}
+
+// AddAccounts adds the "accounts" edges to the Account entity.
+func (tu *TagUpdate) AddAccounts(a ...*Account) *TagUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return tu.AddAccountIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
@@ -69,6 +85,27 @@ func (tu *TagUpdate) RemovePosts(p ...*Post) *TagUpdate {
 		ids[i] = p[i].ID
 	}
 	return tu.RemovePostIDs(ids...)
+}
+
+// ClearAccounts clears all "accounts" edges to the Account entity.
+func (tu *TagUpdate) ClearAccounts() *TagUpdate {
+	tu.mutation.ClearAccounts()
+	return tu
+}
+
+// RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
+func (tu *TagUpdate) RemoveAccountIDs(ids ...xid.ID) *TagUpdate {
+	tu.mutation.RemoveAccountIDs(ids...)
+	return tu
+}
+
+// RemoveAccounts removes "accounts" edges to Account entities.
+func (tu *TagUpdate) RemoveAccounts(a ...*Account) *TagUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return tu.RemoveAccountIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -203,6 +240,60 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.AccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !tu.mutation.AccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.AccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.Modifiers = tu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -239,6 +330,21 @@ func (tuo *TagUpdateOne) AddPosts(p ...*Post) *TagUpdateOne {
 	return tuo.AddPostIDs(ids...)
 }
 
+// AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
+func (tuo *TagUpdateOne) AddAccountIDs(ids ...xid.ID) *TagUpdateOne {
+	tuo.mutation.AddAccountIDs(ids...)
+	return tuo
+}
+
+// AddAccounts adds the "accounts" edges to the Account entity.
+func (tuo *TagUpdateOne) AddAccounts(a ...*Account) *TagUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return tuo.AddAccountIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tuo *TagUpdateOne) Mutation() *TagMutation {
 	return tuo.mutation
@@ -263,6 +369,27 @@ func (tuo *TagUpdateOne) RemovePosts(p ...*Post) *TagUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return tuo.RemovePostIDs(ids...)
+}
+
+// ClearAccounts clears all "accounts" edges to the Account entity.
+func (tuo *TagUpdateOne) ClearAccounts() *TagUpdateOne {
+	tuo.mutation.ClearAccounts()
+	return tuo
+}
+
+// RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
+func (tuo *TagUpdateOne) RemoveAccountIDs(ids ...xid.ID) *TagUpdateOne {
+	tuo.mutation.RemoveAccountIDs(ids...)
+	return tuo
+}
+
+// RemoveAccounts removes "accounts" edges to Account entities.
+func (tuo *TagUpdateOne) RemoveAccounts(a ...*Account) *TagUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return tuo.RemoveAccountIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -419,6 +546,60 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: post.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.AccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !tuo.mutation.AccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.AccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.AccountsTable,
+			Columns: tag.AccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: account.FieldID,
 				},
 			},
 		}

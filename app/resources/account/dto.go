@@ -4,8 +4,10 @@ import (
 	"time"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 
@@ -14,17 +16,18 @@ type AccountID xid.ID
 func (u AccountID) String() string { return xid.ID(u).String() }
 
 type Account struct {
-	ID          AccountID                 `json:"id"`
-	Email       string                    `json:"email"`
-	Name        string                    `json:"name"`
-	Bio         optional.Optional[string] `json:"bio"`
-	Admin       bool                      `json:"admin"`
-	ThreadCount int                       `json:"threadCount"`
-	PostCount   int                       `json:"postCount"`
+	ID          AccountID
+	Email       string
+	Name        string
+	Bio         optional.Optional[string]
+	Admin       bool
+	ThreadCount int
+	PostCount   int
+	Interests   []tag.Tag
 
-	CreatedAt time.Time                    `json:"createdAt"`
-	UpdatedAt time.Time                    `json:"updatedAt"`
-	DeletedAt optional.Optional[time.Time] `json:"deletedAt"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt optional.Optional[time.Time]
 }
 
 // Name is the role/resource name.
@@ -36,11 +39,17 @@ func (*Account) GetResourceName() string { return Name }
 
 func FromModel(u model.Account) (o Account) {
 	result := Account{
-		ID:        AccountID(u.ID),
-		Email:     u.Email,
-		Name:      u.Name,
-		Bio:       optional.Of(u.Bio),
-		Admin:     u.Admin,
+		ID:    AccountID(u.ID),
+		Email: u.Email,
+		Name:  u.Name,
+		Bio:   optional.Of(u.Bio),
+		Admin: u.Admin,
+		Interests: dt.Map(u.Edges.Tags, func(t *model.Tag) tag.Tag {
+			return tag.Tag{
+				ID:   t.ID.String(),
+				Name: t.Name,
+			}
+		}),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		DeletedAt: optional.OfPtr(u.DeletedAt),

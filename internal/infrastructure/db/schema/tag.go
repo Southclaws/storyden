@@ -25,5 +25,7 @@ func (Tag) Fields() []ent.Field {
 func (Tag) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("posts", Post.Type),
+		edge.From("accounts", Account.Type).
+			Ref("tags"),
 	}
 }

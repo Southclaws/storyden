@@ -73,6 +73,9 @@ type AccountMutation struct {
 	authentication        map[xid.ID]struct{}
 	removedauthentication map[xid.ID]struct{}
 	clearedauthentication bool
+	tags                  map[xid.ID]struct{}
+	removedtags           map[xid.ID]struct{}
+	clearedtags           bool
 	done                  bool
 	oldValue              func(context.Context) (*Account, error)
 	predicates            []predicate.Account
@@ -730,6 +733,60 @@ func (m *AccountMutation) ResetAuthentication() {
 	m.removedauthentication = nil
 }
 
+// AddTagIDs adds the "tags" edge to the Tag entity by ids.
+func (m *AccountMutation) AddTagIDs(ids ...xid.ID) {
+	if m.tags == nil {
+		m.tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTags clears the "tags" edge to the Tag entity.
+func (m *AccountMutation) ClearTags() {
+	m.clearedtags = true
+}
+
+// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
+func (m *AccountMutation) TagsCleared() bool {
+	return m.clearedtags
+}
+
+// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
+func (m *AccountMutation) RemoveTagIDs(ids ...xid.ID) {
+	if m.removedtags == nil {
+		m.removedtags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.tags, ids[i])
+		m.removedtags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
+func (m *AccountMutation) RemovedTagsIDs() (ids []xid.ID) {
+	for id := range m.removedtags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TagsIDs returns the "tags" edge IDs in the mutation.
+func (m *AccountMutation) TagsIDs() (ids []xid.ID) {
+	for id := range m.tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTags resets all changes to the "tags" edge.
+func (m *AccountMutation) ResetTags() {
+	m.tags = nil
+	m.clearedtags = false
+	m.removedtags = nil
+}
+
 // Where appends a list predicates to the AccountMutation builder.
 func (m *AccountMutation) Where(ps ...predicate.Account) {
 	m.predicates = append(m.predicates, ps...)
@@ -965,7 +1022,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -980,6 +1037,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.authentication != nil {
 		edges = append(edges, account.EdgeAuthentication)
+	}
+	if m.tags != nil {
+		edges = append(edges, account.EdgeTags)
 	}
 	return edges
 }
@@ -1018,13 +1078,19 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.tags))
+		for id := range m.tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1039,6 +1105,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedauthentication != nil {
 		edges = append(edges, account.EdgeAuthentication)
+	}
+	if m.removedtags != nil {
+		edges = append(edges, account.EdgeTags)
 	}
 	return edges
 }
@@ -1077,13 +1146,19 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.removedtags))
+		for id := range m.removedtags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1098,6 +1173,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedauthentication {
 		edges = append(edges, account.EdgeAuthentication)
+	}
+	if m.clearedtags {
+		edges = append(edges, account.EdgeTags)
 	}
 	return edges
 }
@@ -1116,6 +1194,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedsubscriptions
 	case account.EdgeAuthentication:
 		return m.clearedauthentication
+	case account.EdgeTags:
+		return m.clearedtags
 	}
 	return false
 }
@@ -1146,6 +1226,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeAuthentication:
 		m.ResetAuthentication()
+		return nil
+	case account.EdgeTags:
+		m.ResetTags()
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
@@ -6334,18 +6417,21 @@ func (m *SubscriptionMutation) ResetEdge(name string) error {
 // TagMutation represents an operation that mutates the Tag nodes in the graph.
 type TagMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	name          *string
-	clearedFields map[string]struct{}
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	done          bool
-	oldValue      func(context.Context) (*Tag, error)
-	predicates    []predicate.Tag
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	name            *string
+	clearedFields   map[string]struct{}
+	posts           map[xid.ID]struct{}
+	removedposts    map[xid.ID]struct{}
+	clearedposts    bool
+	accounts        map[xid.ID]struct{}
+	removedaccounts map[xid.ID]struct{}
+	clearedaccounts bool
+	done            bool
+	oldValue        func(context.Context) (*Tag, error)
+	predicates      []predicate.Tag
 }
 
 var _ ent.Mutation = (*TagMutation)(nil)
@@ -6578,6 +6664,60 @@ func (m *TagMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddAccountIDs adds the "accounts" edge to the Account entity by ids.
+func (m *TagMutation) AddAccountIDs(ids ...xid.ID) {
+	if m.accounts == nil {
+		m.accounts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.accounts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAccounts clears the "accounts" edge to the Account entity.
+func (m *TagMutation) ClearAccounts() {
+	m.clearedaccounts = true
+}
+
+// AccountsCleared reports if the "accounts" edge to the Account entity was cleared.
+func (m *TagMutation) AccountsCleared() bool {
+	return m.clearedaccounts
+}
+
+// RemoveAccountIDs removes the "accounts" edge to the Account entity by IDs.
+func (m *TagMutation) RemoveAccountIDs(ids ...xid.ID) {
+	if m.removedaccounts == nil {
+		m.removedaccounts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.accounts, ids[i])
+		m.removedaccounts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAccounts returns the removed IDs of the "accounts" edge to the Account entity.
+func (m *TagMutation) RemovedAccountsIDs() (ids []xid.ID) {
+	for id := range m.removedaccounts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AccountsIDs returns the "accounts" edge IDs in the mutation.
+func (m *TagMutation) AccountsIDs() (ids []xid.ID) {
+	for id := range m.accounts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAccounts resets all changes to the "accounts" edge.
+func (m *TagMutation) ResetAccounts() {
+	m.accounts = nil
+	m.clearedaccounts = false
+	m.removedaccounts = nil
+}
+
 // Where appends a list predicates to the TagMutation builder.
 func (m *TagMutation) Where(ps ...predicate.Tag) {
 	m.predicates = append(m.predicates, ps...)
@@ -6713,9 +6853,12 @@ func (m *TagMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TagMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.posts != nil {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.accounts != nil {
+		edges = append(edges, tag.EdgeAccounts)
 	}
 	return edges
 }
@@ -6730,15 +6873,24 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgeAccounts:
+		ids := make([]ent.Value, 0, len(m.accounts))
+		for id := range m.accounts {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TagMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedposts != nil {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.removedaccounts != nil {
+		edges = append(edges, tag.EdgeAccounts)
 	}
 	return edges
 }
@@ -6753,15 +6905,24 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgeAccounts:
+		ids := make([]ent.Value, 0, len(m.removedaccounts))
+		for id := range m.removedaccounts {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TagMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedposts {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.clearedaccounts {
+		edges = append(edges, tag.EdgeAccounts)
 	}
 	return edges
 }
@@ -6772,6 +6933,8 @@ func (m *TagMutation) EdgeCleared(name string) bool {
 	switch name {
 	case tag.EdgePosts:
 		return m.clearedposts
+	case tag.EdgeAccounts:
+		return m.clearedaccounts
 	}
 	return false
 }
@@ -6790,6 +6953,9 @@ func (m *TagMutation) ResetEdge(name string) error {
 	switch name {
 	case tag.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case tag.EdgeAccounts:
+		m.ResetAccounts()
 		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)

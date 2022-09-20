@@ -229,17 +229,42 @@ paths:
   #  "Y888888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888  88888P'
   #
 
-  /v1/accounts/{account_id}:
+  /v1/accounts:
     get:
       operationId: AccountsGet
-      summary: Get an account by ID.
+      summary: Get the information for the currently authenticated account.
       tags: [accounts]
-      parameters: [$ref: "#/components/parameters/AccountID"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountsGetSuccess" }
+
+  #
+  #                           .d888 d8b 888
+  #                          d88P"  Y8P 888
+  #                          888        888
+  # 88888b.  888d888 .d88b.  888888 888 888  .d88b.  .d8888b
+  # 888 "88b 888P"  d88""88b 888    888 888 d8P  Y8b 88K
+  # 888  888 888    888  888 888    888 888 88888888 "Y8888b.
+  # 888 d88P 888    Y88..88P 888    888 888 Y8b.          X88
+  # 88888P"  888     "Y88P"  888    888 888  "Y8888   88888P'
+  # 888
+  # 888
+  # 888
+  #
+
+  /v1/profiles/{account_id}:
+    get:
+      operationId: ProfilesGet
+      summary: Get a public profile by ID.
+      tags: [profiles]
+      parameters: [$ref: "#/components/parameters/AccountID"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ProfilesGetSuccess" }
 
   #
   # 888    888                                    888
@@ -475,6 +500,13 @@ components:
           schema:
             $ref: "#/components/schemas/Account"
 
+    ProfilesGetSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PublicProfile"
+
     ThreadsCreateSuccess:
       description: Thread created.
       content:
@@ -648,6 +680,24 @@ components:
           type: string
 
     # -
+    # PublicProfile
+    # -
+
+    PublicProfile:
+      type: object
+      required: [id, name, createdAt, interests]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+        interests:
+          $ref: "#/components/schemas/TagList"
+
+    # -
     # Threads
     # -
 
@@ -661,7 +711,7 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
-        tags: { $ref: "#/components/schemas/ThreadTags" }
+        tags: { $ref: "#/components/schemas/TagList" }
         category:
           $ref: "#/components/schemas/Identifier"
 
@@ -791,11 +841,14 @@ components:
       description: The title of a thread.
       example: Hello world!
 
-    ThreadTags:
+    TagName:
+      type: string
+      description: A tag.
+
+    TagList:
       type: array
-      description: A list of tags for a thread.
-      items:
-        type: string
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/TagName" }
 
     PostBodyMarkdown:
       type: string

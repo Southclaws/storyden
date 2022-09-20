@@ -30,9 +30,11 @@ type Tag struct {
 type TagEdges struct {
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Accounts holds the value of the accounts edge.
+	Accounts []*Account `json:"accounts,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -42,6 +44,15 @@ func (e TagEdges) PostsOrErr() ([]*Post, error) {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
+}
+
+// AccountsOrErr returns the Accounts value or an error if the edge
+// was not loaded in eager-loading.
+func (e TagEdges) AccountsOrErr() ([]*Account, error) {
+	if e.loadedTypes[1] {
+		return e.Accounts, nil
+	}
+	return nil, &NotLoadedError{edge: "accounts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -96,6 +107,11 @@ func (t *Tag) assignValues(columns []string, values []interface{}) error {
 // QueryPosts queries the "posts" edge of the Tag entity.
 func (t *Tag) QueryPosts() *PostQuery {
 	return (&TagClient{config: t.config}).QueryPosts(t)
+}
+
+// QueryAccounts queries the "accounts" edge of the Tag entity.
+func (t *Tag) QueryAccounts() *AccountQuery {
+	return (&TagClient{config: t.config}).QueryAccounts(t)
 }
 
 // Update returns a builder for updating this Tag.

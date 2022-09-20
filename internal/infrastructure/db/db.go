@@ -24,7 +24,7 @@ func Build() fx.Option {
 func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, db, err := connect(wctx, cfg.DatabaseURL, true)
+	client, db, err := connect(wctx, cfg.DatabaseURL)
 	if err != nil {
 		cancel()
 		return nil, nil, err
@@ -40,7 +40,7 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 	return client, db, nil
 }
 
-func connect(ctx context.Context, url string, prod bool) (*model.Client, *sql.DB, error) {
+func connect(ctx context.Context, url string) (*model.Client, *sql.DB, error) {
 	driver, err := sql.Open("pgx", url)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to connect to database")
@@ -52,10 +52,9 @@ func connect(ctx context.Context, url string, prod bool) (*model.Client, *sql.DB
 		schema.WithAtlas(true),
 	}
 
-	if !prod {
-		opts = append(opts, schema.WithDropColumn(true))
-		opts = append(opts, schema.WithDropIndex(true))
-	}
+	// We don't do versioned migrations currently.
+	opts = append(opts, schema.WithDropColumn(true))
+	opts = append(opts, schema.WithDropIndex(true))
 
 	// Run only additive migrations
 	if err := client.Schema.Create(ctx, opts...); err != nil {

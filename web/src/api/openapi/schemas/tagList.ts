@@ -4,8 +4,9 @@
  * storyden
  * OpenAPI spec version: 1
  */
+import type { TagName } from "./tagName";
 
 /**
- * A list of tags for a thread.
+ * A list of tags.
  */
-export type ThreadTags = string[];
+export type TagList = TagName[];

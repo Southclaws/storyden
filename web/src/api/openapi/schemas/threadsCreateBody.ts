@@ -6,12 +6,12 @@
  */
 import type { ThreadTitle } from "./threadTitle";
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
-import type { ThreadTags } from "./threadTags";
+import type { TagList } from "./tagList";
 import type { Identifier } from "./identifier";
 
 export interface ThreadsCreateBody {
   title: ThreadTitle;
   body: PostBodyMarkdown;
-  tags: ThreadTags;
+  tags: TagList;
   category: Identifier;
 }

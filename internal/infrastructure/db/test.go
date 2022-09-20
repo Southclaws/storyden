@@ -25,7 +25,7 @@ func TestDB(t *testing.T) {
 		url = "postgresql://default:default@localhost:5432/postgres"
 	}
 
-	c, _, err := connect(context.Background(), url, false)
+	c, _, err := connect(context.Background(), url)
 	if err != nil {
 		t.Fatal(err)
 	}

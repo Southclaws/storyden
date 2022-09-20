@@ -48,9 +48,11 @@ type AccountEdges struct {
 	Subscriptions []*Subscription `json:"subscriptions,omitempty"`
 	// Authentication holds the value of the authentication edge.
 	Authentication []*Authentication `json:"authentication,omitempty"`
+	// Tags holds the value of the tags edge.
+	Tags []*Tag `json:"tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -96,6 +98,15 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
+}
+
+// TagsOrErr returns the Tags value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
+	if e.loadedTypes[5] {
+		return e.Tags, nil
+	}
+	return nil, &NotLoadedError{edge: "tags"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -203,6 +214,11 @@ func (a *Account) QuerySubscriptions() *SubscriptionQuery {
 // QueryAuthentication queries the "authentication" edge of the Account entity.
 func (a *Account) QueryAuthentication() *AuthenticationQuery {
 	return (&AccountClient{config: a.config}).QueryAuthentication(a)
+}
+
+// QueryTags queries the "tags" edge of the Account entity.
+func (a *Account) QueryTags() *TagQuery {
+	return (&AccountClient{config: a.config}).QueryTags(a)
 }
 
 // Update returns a builder for updating this Account.
