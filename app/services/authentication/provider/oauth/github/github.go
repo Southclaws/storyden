@@ -26,9 +26,14 @@ type GitHubProvider struct {
 }
 
 func New(cfg config.Config, auth_repo authentication.Repository) (*GitHubProvider, error) {
+	config, err := all.LoadProvider(id)
+	if err != nil {
+		return nil, err
+	}
+
 	return &GitHubProvider{
 		auth_repo: auth_repo,
-		config:    all.LoadProvider(id),
+		config:    config,
 	}, nil
 }
 

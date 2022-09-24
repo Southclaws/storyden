@@ -26,9 +26,14 @@ type LinkedInProvider struct {
 }
 
 func New(cfg config.Config, auth_repo authentication.Repository) (*LinkedInProvider, error) {
+	config, err := all.LoadProvider(id)
+	if err != nil {
+		return nil, err
+	}
+
 	return &LinkedInProvider{
 		auth_repo: auth_repo,
-		config:    all.LoadProvider(id),
+		config:    config,
 	}, nil
 }
 
