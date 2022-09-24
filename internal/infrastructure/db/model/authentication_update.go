@@ -66,14 +66,6 @@ func (au *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
 	return au
 }
 
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableAccountID(id *xid.ID) *AuthenticationUpdate {
-	if id != nil {
-		au = au.SetAccountID(*id)
-	}
-	return au
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (au *AuthenticationUpdate) SetAccount(a *Account) *AuthenticationUpdate {
 	return au.SetAccountID(a.ID)
@@ -161,6 +153,9 @@ func (au *AuthenticationUpdate) check() error {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`model: validator failed for field "Authentication.token": %w`, err)}
 		}
+	}
+	if _, ok := au.mutation.AccountID(); au.mutation.AccountCleared() && !ok {
+		return errors.New(`model: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil
 }
@@ -315,14 +310,6 @@ func (auo *AuthenticationUpdateOne) SetAccountID(id xid.ID) *AuthenticationUpdat
 	return auo
 }
 
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableAccountID(id *xid.ID) *AuthenticationUpdateOne {
-	if id != nil {
-		auo = auo.SetAccountID(*id)
-	}
-	return auo
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (auo *AuthenticationUpdateOne) SetAccount(a *Account) *AuthenticationUpdateOne {
 	return auo.SetAccountID(a.ID)
@@ -423,6 +410,9 @@ func (auo *AuthenticationUpdateOne) check() error {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`model: validator failed for field "Authentication.token": %w`, err)}
 		}
+	}
+	if _, ok := auo.mutation.AccountID(); auo.mutation.AccountCleared() && !ok {
+		return errors.New(`model: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil
 }

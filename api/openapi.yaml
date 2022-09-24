@@ -179,6 +179,7 @@ paths:
     get:
       operationId: WebAuthnMakeCredential
       summary: Complete WebAuthn registration by creating a new credential.
+      tags: [auth]
       security: [webauthn: []]
       requestBody:
         content:
@@ -798,15 +799,14 @@ components:
     # -
 
     PostSubmission:
+      $ref: "#/components/schemas/Post"
+
+    Post:
       type: object
       description: |
         A new post within a thread of posts. A post may reply to another post in
         the thread by specifying the `reply_to` property. The identifier in the
         `reply_to` value must be post within the same thread.
-      $ref: "#/components/schemas/Post"
-
-    Post:
-      description: A post within a thread of posts.
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - type: object

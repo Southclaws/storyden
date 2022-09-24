@@ -39,6 +39,7 @@ func (Authentication) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("account", Account.Type).
 			Ref("authentication").
+			Required().
 			Unique(),
 	}
 }

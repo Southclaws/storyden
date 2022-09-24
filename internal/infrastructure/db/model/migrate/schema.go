@@ -34,7 +34,7 @@ var (
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
-		{Name: "account_authentication", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "account_authentication", Type: field.TypeString, Size: 20},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
 	AuthenticationsTable = &schema.Table{
@@ -46,7 +46,7 @@ var (
 				Symbol:     "authentications_accounts_authentication",
 				Columns:    []*schema.Column{AuthenticationsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 		Indexes: []*schema.Index{

@@ -83,14 +83,6 @@ func (ac *AuthenticationCreate) SetAccountID(id xid.ID) *AuthenticationCreate {
 	return ac
 }
 
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ac *AuthenticationCreate) SetNillableAccountID(id *xid.ID) *AuthenticationCreate {
-	if id != nil {
-		ac = ac.SetAccountID(*id)
-	}
-	return ac
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (ac *AuthenticationCreate) SetAccount(a *Account) *AuthenticationCreate {
 	return ac.SetAccountID(a.ID)
@@ -211,6 +203,9 @@ func (ac *AuthenticationCreate) check() error {
 		if err := authentication.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`model: validator failed for field "Authentication.id": %w`, err)}
 		}
+	}
+	if _, ok := ac.mutation.AccountID(); !ok {
+		return &ValidationError{Name: "account", err: errors.New(`model: missing required edge "Authentication.account"`)}
 	}
 	return nil
 }
