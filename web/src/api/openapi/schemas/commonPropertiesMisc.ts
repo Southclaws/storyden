@@ -6,6 +6,6 @@
  */
 
 /**
- * The account owners display name.
+ * Arbitrary extra data stored with the resource.
  */
-export type AccountName = string;
+export type CommonPropertiesMisc = { [key: string]: any };

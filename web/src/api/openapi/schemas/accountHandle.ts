@@ -6,6 +6,6 @@
  */
 
 /**
- * The account owners display name.
+ * The unique @ handle of an account.
  */
-export type AccountName = string;
+export type AccountHandle = string;

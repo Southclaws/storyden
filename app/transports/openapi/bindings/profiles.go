@@ -28,13 +28,16 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 		return nil, errctx.Wrap(err, ctx)
 	}
 
+	interests := dt.Map(acc.Interests, func(t tag.Tag) string {
+		return t.Name
+	})
+
 	return openapi.ProfilesGet200JSONResponse{
-		Id:   openapi.Identifier(acc.ID.String()),
-		Bio:  utils.Ref(acc.Bio.ElseZero()),
-		Name: acc.Name,
-		Interests: dt.Map(acc.Interests, func(t tag.Tag) string {
-			return t.Name
-		}),
+		Id:        openapi.Identifier(acc.ID.String()),
+		Bio:       utils.Ref(acc.Bio.ElseZero()),
+		Handle:    &acc.Handle,
+		Name:      &acc.Name,
+		Interests: &interests,
 		CreatedAt: acc.CreatedAt.Format(time.RFC3339),
 	}, nil
 }

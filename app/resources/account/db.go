@@ -23,8 +23,9 @@ func New(db *model.Client) Repository {
 
 func (d *database) Create(ctx context.Context, email string, username string, opts ...option) (*Account, error) {
 	withrequired := Account{
-		Email: email,
-		Name:  username,
+		Email:  email,
+		Handle: username,
+		Name:   username, // default display name is just the handle
 	}
 
 	for _, v := range opts {
@@ -34,6 +35,7 @@ func (d *database) Create(ctx context.Context, email string, username string, op
 	u, err := d.db.Account.
 		Create().
 		SetEmail(withrequired.Email).
+		SetHandle(withrequired.Handle).
 		SetName(withrequired.Name).
 		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
 		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).

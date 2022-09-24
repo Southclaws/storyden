@@ -581,6 +581,9 @@ components:
           type: string
           format: date-time
           description: The time the resource was soft-deleted.
+        misc:
+          type: object
+          description: Arbitrary extra data stored with the resource.
 
     APIError:
       type: object
@@ -664,20 +667,17 @@ components:
     Account:
       type: object
       required: [id]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        email:
-          type: string
-        name:
-          type: string
-        bio:
-          type: string
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-        deletedAt:
-          type: string
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - properties:
+            handle:
+              $ref: "#/components/schemas/AccountHandle"
+            name:
+              $ref: "#/components/schemas/AccountName"
+            email:
+              type: string
+            bio:
+              type: string
 
     # -
     # PublicProfile
@@ -685,17 +685,22 @@ components:
 
     PublicProfile:
       type: object
-      required: [id, name, createdAt, interests]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        name:
-          type: string
-        bio:
-          type: string
-        createdAt:
-          type: string
-        interests:
-          $ref: "#/components/schemas/TagList"
+      required: [id, handle, name, createdAt, interests]
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - properties:
+            handle:
+              $ref: "#/components/schemas/AccountHandle"
+            name:
+              $ref: "#/components/schemas/AccountName"
+            bio:
+              type: string
+            image:
+              type: string
+            createdAt:
+              type: string
+            interests:
+              $ref: "#/components/schemas/TagList"
 
     # -
     # Threads
@@ -826,7 +831,12 @@ components:
 
     AccountName:
       type: string
-      description: The username of an account.
+      description: The account owners display name.
+      example: Barnaby Keene
+
+    AccountHandle:
+      type: string
+      description: The unique @ handle of an account.
       example: Southclaws
 
     ProfileReference:

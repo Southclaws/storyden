@@ -4,14 +4,7 @@
  * storyden
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
+import type { CommonProperties } from "./commonProperties";
+import type { AccountAllOf } from "./accountAllOf";
 
-export interface Account {
-  id: Identifier;
-  email?: string;
-  name?: string;
-  bio?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
+export type Account = CommonProperties & AccountAllOf;

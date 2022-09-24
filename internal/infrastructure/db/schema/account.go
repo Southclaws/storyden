@@ -17,6 +17,7 @@ func (Account) Mixin() []ent.Mixin {
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("email").Unique(),
+		field.String("handle").Unique().NotEmpty(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
 		field.Bool("admin").Default(false),

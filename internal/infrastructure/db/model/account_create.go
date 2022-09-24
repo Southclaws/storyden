@@ -78,6 +78,12 @@ func (ac *AccountCreate) SetEmail(s string) *AccountCreate {
 	return ac
 }
 
+// SetHandle sets the "handle" field.
+func (ac *AccountCreate) SetHandle(s string) *AccountCreate {
+	ac.mutation.SetHandle(s)
+	return ac
+}
+
 // SetName sets the "name" field.
 func (ac *AccountCreate) SetName(s string) *AccountCreate {
 	ac.mutation.SetName(s)
@@ -322,6 +328,14 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`model: missing required field "Account.email"`)}
 	}
+	if _, ok := ac.mutation.Handle(); !ok {
+		return &ValidationError{Name: "handle", err: errors.New(`model: missing required field "Account.handle"`)}
+	}
+	if v, ok := ac.mutation.Handle(); ok {
+		if err := account.HandleValidator(v); err != nil {
+			return &ValidationError{Name: "handle", err: fmt.Errorf(`model: validator failed for field "Account.handle": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`model: missing required field "Account.name"`)}
 	}
@@ -406,6 +420,14 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Column: account.FieldEmail,
 		})
 		_node.Email = value
+	}
+	if value, ok := ac.mutation.Handle(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldHandle,
+		})
+		_node.Handle = value
 	}
 	if value, ok := ac.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -653,6 +675,18 @@ func (u *AccountUpsert) UpdateEmail() *AccountUpsert {
 	return u
 }
 
+// SetHandle sets the "handle" field.
+func (u *AccountUpsert) SetHandle(v string) *AccountUpsert {
+	u.Set(account.FieldHandle, v)
+	return u
+}
+
+// UpdateHandle sets the "handle" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateHandle() *AccountUpsert {
+	u.SetExcluded(account.FieldHandle)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *AccountUpsert) SetName(v string) *AccountUpsert {
 	u.Set(account.FieldName, v)
@@ -808,6 +842,20 @@ func (u *AccountUpsertOne) SetEmail(v string) *AccountUpsertOne {
 func (u *AccountUpsertOne) UpdateEmail() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateEmail()
+	})
+}
+
+// SetHandle sets the "handle" field.
+func (u *AccountUpsertOne) SetHandle(v string) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetHandle(v)
+	})
+}
+
+// UpdateHandle sets the "handle" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateHandle() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateHandle()
 	})
 }
 
@@ -1139,6 +1187,20 @@ func (u *AccountUpsertBulk) SetEmail(v string) *AccountUpsertBulk {
 func (u *AccountUpsertBulk) UpdateEmail() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateEmail()
+	})
+}
+
+// SetHandle sets the "handle" field.
+func (u *AccountUpsertBulk) SetHandle(v string) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetHandle(v)
+	})
+}
+
+// UpdateHandle sets the "handle" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateHandle() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateHandle()
 	})
 }
 

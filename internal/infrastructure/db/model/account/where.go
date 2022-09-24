@@ -110,6 +110,13 @@ func Email(v string) predicate.Account {
 	})
 }
 
+// Handle applies equality check predicate on the "handle" field. It's identical to HandleEQ.
+func Handle(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHandle), v))
+	})
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
@@ -433,6 +440,105 @@ func EmailEqualFold(v string) predicate.Account {
 func EmailContainsFold(v string) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldEmail), v))
+	})
+}
+
+// HandleEQ applies the EQ predicate on the "handle" field.
+func HandleEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHandle), v))
+	})
+}
+
+// HandleNEQ applies the NEQ predicate on the "handle" field.
+func HandleNEQ(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldHandle), v))
+	})
+}
+
+// HandleIn applies the In predicate on the "handle" field.
+func HandleIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldHandle), v...))
+	})
+}
+
+// HandleNotIn applies the NotIn predicate on the "handle" field.
+func HandleNotIn(vs ...string) predicate.Account {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldHandle), v...))
+	})
+}
+
+// HandleGT applies the GT predicate on the "handle" field.
+func HandleGT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldHandle), v))
+	})
+}
+
+// HandleGTE applies the GTE predicate on the "handle" field.
+func HandleGTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldHandle), v))
+	})
+}
+
+// HandleLT applies the LT predicate on the "handle" field.
+func HandleLT(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldHandle), v))
+	})
+}
+
+// HandleLTE applies the LTE predicate on the "handle" field.
+func HandleLTE(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldHandle), v))
+	})
+}
+
+// HandleContains applies the Contains predicate on the "handle" field.
+func HandleContains(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldHandle), v))
+	})
+}
+
+// HandleHasPrefix applies the HasPrefix predicate on the "handle" field.
+func HandleHasPrefix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldHandle), v))
+	})
+}
+
+// HandleHasSuffix applies the HasSuffix predicate on the "handle" field.
+func HandleHasSuffix(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldHandle), v))
+	})
+}
+
+// HandleEqualFold applies the EqualFold predicate on the "handle" field.
+func HandleEqualFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldHandle), v))
+	})
+}
+
+// HandleContainsFold applies the ContainsFold predicate on the "handle" field.
+func HandleContainsFold(v string) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldHandle), v))
 	})
 }
 

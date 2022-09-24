@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1
  */
 import type { Identifier } from "./identifier";
+import type { CommonPropertiesMisc } from "./commonPropertiesMisc";
 
 export interface CommonProperties {
   id: Identifier;
@@ -14,4 +15,6 @@ export interface CommonProperties {
   updatedAt: string;
   /** The time the resource was soft-deleted. */
   deletedAt?: string;
+  /** Arbitrary extra data stored with the resource. */
+  misc?: CommonPropertiesMisc;
 }

@@ -68,6 +68,12 @@ func (au *AccountUpdate) SetEmail(s string) *AccountUpdate {
 	return au
 }
 
+// SetHandle sets the "handle" field.
+func (au *AccountUpdate) SetHandle(s string) *AccountUpdate {
+	au.mutation.SetHandle(s)
+	return au
+}
+
 // SetName sets the "name" field.
 func (au *AccountUpdate) SetName(s string) *AccountUpdate {
 	au.mutation.SetName(s)
@@ -400,6 +406,11 @@ func (au *AccountUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (au *AccountUpdate) check() error {
+	if v, ok := au.mutation.Handle(); ok {
+		if err := account.HandleValidator(v); err != nil {
+			return &ValidationError{Name: "handle", err: fmt.Errorf(`model: validator failed for field "Account.handle": %w`, err)}
+		}
+	}
 	if v, ok := au.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`model: validator failed for field "Account.name": %w`, err)}
@@ -457,6 +468,13 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: account.FieldEmail,
+		})
+	}
+	if value, ok := au.mutation.Handle(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldHandle,
 		})
 	}
 	if value, ok := au.mutation.Name(); ok {
@@ -863,6 +881,12 @@ func (auo *AccountUpdateOne) SetEmail(s string) *AccountUpdateOne {
 	return auo
 }
 
+// SetHandle sets the "handle" field.
+func (auo *AccountUpdateOne) SetHandle(s string) *AccountUpdateOne {
+	auo.mutation.SetHandle(s)
+	return auo
+}
+
 // SetName sets the "name" field.
 func (auo *AccountUpdateOne) SetName(s string) *AccountUpdateOne {
 	auo.mutation.SetName(s)
@@ -1208,6 +1232,11 @@ func (auo *AccountUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *AccountUpdateOne) check() error {
+	if v, ok := auo.mutation.Handle(); ok {
+		if err := account.HandleValidator(v); err != nil {
+			return &ValidationError{Name: "handle", err: fmt.Errorf(`model: validator failed for field "Account.handle": %w`, err)}
+		}
+	}
 	if v, ok := auo.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`model: validator failed for field "Account.name": %w`, err)}
@@ -1282,6 +1311,13 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: account.FieldEmail,
+		})
+	}
+	if value, ok := auo.mutation.Handle(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: account.FieldHandle,
 		})
 	}
 	if value, ok := auo.mutation.Name(); ok {

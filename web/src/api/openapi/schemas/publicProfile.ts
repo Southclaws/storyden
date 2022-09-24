@@ -4,13 +4,7 @@
  * storyden
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
-import type { TagList } from "./tagList";
+import type { CommonProperties } from "./commonProperties";
+import type { PublicProfileAllOf } from "./publicProfileAllOf";
 
-export interface PublicProfile {
-  id: Identifier;
-  name?: string;
-  bio?: string;
-  createdAt?: string;
-  interests?: TagList;
-}
+export type PublicProfile = CommonProperties & PublicProfileAllOf;

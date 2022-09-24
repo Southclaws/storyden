@@ -22,6 +22,12 @@ func WithID(id AccountID) option {
 	}
 }
 
+func WithName(name string) option {
+	return func(a *Account) {
+		a.Name = name
+	}
+}
+
 func WithBio(bio string) option {
 	return func(a *Account) {
 		a.Bio = optional.Of(bio)

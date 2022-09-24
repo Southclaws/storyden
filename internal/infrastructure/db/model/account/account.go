@@ -21,6 +21,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
+	// FieldHandle holds the string denoting the handle field in the database.
+	FieldHandle = "handle"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldBio holds the string denoting the bio field in the database.
@@ -88,6 +90,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldEmail,
+	FieldHandle,
 	FieldName,
 	FieldBio,
 	FieldAdmin,
@@ -119,6 +122,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// HandleValidator is a validator for the "handle" field. It is called by the builders before save.
+	HandleValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// DefaultAdmin holds the default value on creation for the "admin" field.

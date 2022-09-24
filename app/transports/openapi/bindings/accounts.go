@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -32,11 +31,12 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 
 	return openapi.AccountsGet200JSONResponse{
 		Id:        openapi.Identifier(acc.ID.String()),
-		Bio:       utils.Ref(acc.Bio.ElseZero()),
-		Email:     utils.Ref(acc.Email),
+		Handle:    &acc.Handle,
 		Name:      utils.Ref(acc.Name),
-		CreatedAt: utils.Ref(acc.CreatedAt.Format(time.RFC3339)),
-		UpdatedAt: utils.Ref(acc.UpdatedAt.Format(time.RFC3339)),
-		DeletedAt: utils.OptionalElsePtr(acc.DeletedAt, utils.FormatISO),
+		Email:     utils.Ref(acc.Email),
+		Bio:       utils.Ref(acc.Bio.ElseZero()),
+		CreatedAt: acc.CreatedAt,
+		UpdatedAt: acc.UpdatedAt,
+		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
 	}, nil
 }
