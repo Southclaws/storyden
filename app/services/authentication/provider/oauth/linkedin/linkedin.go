@@ -3,6 +3,7 @@ package linkedin
 import (
 	"context"
 
+	"github.com/go-resty/resty/v2"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/linkedin"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/errctx"
 )
 
 const (
@@ -59,5 +61,27 @@ func (p *LinkedInProvider) Link() string {
 }
 
 func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {
+	var auth struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   string `json:"expires_in"`
+	}
+
+	_, err := resty.New().R().SetFormData(map[string]string{
+		"grant_type":    "authorization_code",
+		"code":          code,
+		"client_id":     p.config.ClientID,
+		"client_secret": p.config.ClientSecret,
+		"redirect_uri":  p.callback,
+	}).SetResult(auth).Post("https://www.linkedin.com/oauth/v2/accessToken")
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	// TODO:
+	// - get linkedin account ID
+	// - p.auth_repo.GetByIdentifier(linkedin account ID)
+	// - create if doesn't exist
+	// - return account
+
 	return nil, nil
 }
