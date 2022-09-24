@@ -34,6 +34,7 @@ func New(cfg config.Config, auth_repo authentication.Repository) (*LinkedInProvi
 	return &LinkedInProvider{
 		auth_repo: auth_repo,
 		config:    config,
+		callback:  all.Redirect(cfg, id),
 	}, nil
 }
 
@@ -48,10 +49,13 @@ func (p *LinkedInProvider) Link() string {
 		ClientSecret: p.config.ClientSecret,
 		Endpoint:     linkedin.Endpoint,
 		RedirectURL:  p.callback,
-		Scopes:       []string{},
+		Scopes: []string{
+			"r_emailaddress",
+			"r_liteprofile",
+		},
 	}
 
-	return c.AuthCodeURL("", oauth2.AccessTypeOffline)
+	return c.AuthCodeURL("state", oauth2.AccessTypeOffline)
 }
 
 func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {

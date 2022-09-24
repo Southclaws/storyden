@@ -16,8 +16,8 @@ type Config struct {
 	MailTemplatesDirectory string `envconfig:"MAIL_TEMPLATES_DIRECTORY" default:"email"`
 	ListenAddr             string `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
 	CookieDomain           string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
-	PublicWebAddress       string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"localhost:3000"`
-	PublicApiAddress       string `envconfig:"PUBLIC_API_ADDRESS"     default:"localhost:8000"`
+	PublicWebAddress       string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
+	PublicApiAddress       string `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
 	AmqpAddress            string `envconfig:"AMQP_ADDRESS"           default:"amqp://rabbit:5672"`
 	HashKey                []byte `envconfig:"HASH_KEY"               required:"true"`
 	BlockKey               []byte `envconfig:"BLOCK_KEY"              required:"true"`

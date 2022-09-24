@@ -2,8 +2,10 @@
 package all
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
 )
@@ -30,4 +32,8 @@ func LoadProvider(name string) (Configuration, error) {
 	}
 
 	return pc, nil
+}
+
+func Redirect(cfg config.Config, name string) string {
+	return fmt.Sprintf("%s/auth/%s/callback", cfg.PublicWebAddress, name)
 }

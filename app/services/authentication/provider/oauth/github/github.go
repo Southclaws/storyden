@@ -34,6 +34,7 @@ func New(cfg config.Config, auth_repo authentication.Repository) (*GitHubProvide
 	return &GitHubProvider{
 		auth_repo: auth_repo,
 		config:    config,
+		callback:  all.Redirect(cfg, id),
 	}, nil
 }
 
