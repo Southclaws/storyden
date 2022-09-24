@@ -5,7 +5,7 @@ export default defineConfig({
     input: {
       target: "../api/openapi.yaml",
 
-      validation: true,
+      validation: false,
     },
     output: {
       target: "./src/api/openapi",
