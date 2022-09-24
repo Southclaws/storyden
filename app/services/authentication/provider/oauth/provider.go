@@ -3,10 +3,7 @@ package oauth
 import (
 	"context"
 
-	"go.uber.org/fx"
-
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 )
 
 // Provider describes a type that can provide an OAuth2 authentication
@@ -32,11 +29,4 @@ type Provider interface {
 
 	// Login is the callback function.
 	Login(ctx context.Context, state, code string) (*account.Account, error)
-}
-
-func Build() fx.Option {
-	return fx.Provide(
-		New,
-		github.New,
-	)
 }

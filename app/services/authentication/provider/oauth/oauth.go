@@ -5,9 +5,11 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/samber/lo"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 )
 
 var ErrInvalidProvider = errors.New("invalid provider")
@@ -16,14 +18,34 @@ type OAuth struct {
 	providers map[string]Provider
 }
 
+// Adding a new OAuth2 provider?
+//
+// 1. Add the constructor to the `fx.Provide` call in the builder.
+// 2. Add the instance to `allProviders` in the OAuth constructor.
+//
+// See lines annotated with (1) and (2) below...
+//
+func Build() fx.Option {
+	return fx.Provide(
+		New,
+		// (1)
+		// All OAuth2 providers are initialised, those that fail are disabled.
+		github.New,
+		linkedin.New,
+	)
+}
+
 func New(
 	l *zap.Logger,
 	gh *github.GitHubProvider,
+	li *linkedin.LinkedInProvider,
 ) *OAuth {
 	allProviders := []Provider{
+		// (2)
 		// All OAuth2 providers are statically added to this list regardless of
 		// whether they are enabled or not. Disabled providers are filtered out.
 		gh,
+		li,
 	}
 
 	// Filter out disabled providers.
