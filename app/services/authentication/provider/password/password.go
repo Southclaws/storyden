@@ -15,7 +15,10 @@ import (
 
 const AuthServiceName = `password`
 
-var ErrPasswordMismatch = errors.New("password mismatch")
+var (
+	ErrPasswordMismatch = errors.New("password mismatch")
+	ErrNotFound         = errors.New("account not found")
+)
 
 type Password struct {
 	auth    authentication.Repository
@@ -62,9 +65,12 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 }
 
 func (b *Password) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	a, err := b.auth.GetByIdentifier(ctx, AuthServiceName, identifier)
+	a, exists, err := b.auth.LookupByIdentifier(ctx, AuthServiceName, identifier)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get account")
+	}
+	if !exists {
+		return nil, errtag.Wrap(ErrNotFound, errtag.NotFound{})
 	}
 
 	match, _, err := argon2id.CheckHash(password, a.Token)

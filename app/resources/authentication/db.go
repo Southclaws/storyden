@@ -59,7 +59,7 @@ func (d *database) Create(ctx context.Context,
 	return FromModel(r), nil
 }
 
-func (d *database) GetByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, error) {
+func (d *database) LookupByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, bool, error) {
 	r, err := d.db.Authentication.
 		Query().
 		Where(
@@ -70,13 +70,13 @@ func (d *database) GetByIdentifier(ctx context.Context, service Service, identif
 		Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, false, nil
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
-	return FromModel(r), nil
+	return FromModel(r), true, nil
 }
 
 func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]Authentication, error) {
