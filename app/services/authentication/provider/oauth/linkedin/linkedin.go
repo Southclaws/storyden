@@ -3,6 +3,7 @@ package linkedin
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
@@ -125,7 +126,10 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 		return &authmethod.Account, nil
 	}
 
-	acc, err := p.account_repo.Create(ctx, "temp@temp.com", "temp",
+	// TODO: Invent a better handle generator
+	handle := fmt.Sprintf("%s-%s-%d", profile.FirstName, profile.LastName, time.Now().Day())
+
+	acc, err := p.account_repo.Create(ctx, handle,
 		account.WithName(fmt.Sprint(profile.FirstName, " ", profile.LastName)))
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)

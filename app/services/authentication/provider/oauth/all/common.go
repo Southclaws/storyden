@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Southclaws/storyden/internal/config"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
+
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 // Configuration is the standard config required by all OAuth2 providers.

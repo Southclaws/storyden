@@ -21,11 +21,10 @@ func New(db *model.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Create(ctx context.Context, email string, username string, opts ...option) (*Account, error) {
+func (d *database) Create(ctx context.Context, handle string, opts ...option) (*Account, error) {
 	withrequired := Account{
-		Email:  email,
-		Handle: username,
-		Name:   username, // default display name is just the handle
+		Handle: handle,
+		Name:   handle, // default display name is just the handle
 	}
 
 	for _, v := range opts {
@@ -34,7 +33,6 @@ func (d *database) Create(ctx context.Context, email string, username string, op
 
 	u, err := d.db.Account.
 		Create().
-		SetEmail(withrequired.Email).
 		SetHandle(withrequired.Handle).
 		SetName(withrequired.Name).
 		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
@@ -101,22 +99,6 @@ func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, err
 
 // 	return count[0].Threads, count[0].Posts, nil
 // }
-
-func (d *database) LookupByEmail(ctx context.Context, email string) (*Account, bool, error) {
-	account, err := d.db.Account.
-		Query().
-		Where(account.Email(email)).
-		Only(ctx)
-	if err != nil {
-		if model.IsNotFound(err) {
-			return nil, false, nil
-		}
-
-		return nil, false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
-	}
-
-	return utils.Ref(FromModel(*account)), true, nil
-}
 
 func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]Account, error) {
 	users, err := d.db.Account.

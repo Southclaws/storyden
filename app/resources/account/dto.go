@@ -17,7 +17,6 @@ func (u AccountID) String() string { return xid.ID(u).String() }
 
 type Account struct {
 	ID          AccountID
-	Email       string
 	Handle      string
 	Name        string
 	Bio         optional.Optional[string]
@@ -41,7 +40,6 @@ func (*Account) GetResourceName() string { return Name }
 func FromModel(u model.Account) (o Account) {
 	result := Account{
 		ID:     AccountID(u.ID),
-		Email:  u.Email,
 		Handle: u.Handle,
 		Name:   u.Name,
 		Bio:    optional.Of(u.Bio),

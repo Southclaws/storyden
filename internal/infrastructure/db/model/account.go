@@ -23,8 +23,6 @@ type Account struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
 	// Handle holds the value of the "handle" field.
 	Handle string `json:"handle,omitempty"`
 	// Name holds the value of the "name" field.
@@ -118,7 +116,7 @@ func (*Account) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case account.FieldAdmin:
 			values[i] = new(sql.NullBool)
-		case account.FieldEmail, account.FieldHandle, account.FieldName, account.FieldBio:
+		case account.FieldHandle, account.FieldName, account.FieldBio:
 			values[i] = new(sql.NullString)
 		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -163,12 +161,6 @@ func (a *Account) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				a.DeletedAt = new(time.Time)
 				*a.DeletedAt = value.Time
-			}
-		case account.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				a.Email = value.String
 			}
 		case account.FieldHandle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -262,9 +254,6 @@ func (a *Account) String() string {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
-	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(a.Email)
 	builder.WriteString(", ")
 	builder.WriteString("handle=")
 	builder.WriteString(a.Handle)

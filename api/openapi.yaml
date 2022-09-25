@@ -675,8 +675,6 @@ components:
               $ref: "#/components/schemas/AccountHandle"
             name:
               $ref: "#/components/schemas/AccountName"
-            email:
-              type: string
             bio:
               type: string
 

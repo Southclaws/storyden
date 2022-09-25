@@ -72,12 +72,6 @@ func (ac *AccountCreate) SetNillableDeletedAt(t *time.Time) *AccountCreate {
 	return ac
 }
 
-// SetEmail sets the "email" field.
-func (ac *AccountCreate) SetEmail(s string) *AccountCreate {
-	ac.mutation.SetEmail(s)
-	return ac
-}
-
 // SetHandle sets the "handle" field.
 func (ac *AccountCreate) SetHandle(s string) *AccountCreate {
 	ac.mutation.SetHandle(s)
@@ -325,9 +319,6 @@ func (ac *AccountCreate) check() error {
 	if _, ok := ac.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`model: missing required field "Account.updated_at"`)}
 	}
-	if _, ok := ac.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`model: missing required field "Account.email"`)}
-	}
 	if _, ok := ac.mutation.Handle(); !ok {
 		return &ValidationError{Name: "handle", err: errors.New(`model: missing required field "Account.handle"`)}
 	}
@@ -412,14 +403,6 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Column: account.FieldDeletedAt,
 		})
 		_node.DeletedAt = &value
-	}
-	if value, ok := ac.mutation.Email(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldEmail,
-		})
-		_node.Email = value
 	}
 	if value, ok := ac.mutation.Handle(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -663,18 +646,6 @@ func (u *AccountUpsert) ClearDeletedAt() *AccountUpsert {
 	return u
 }
 
-// SetEmail sets the "email" field.
-func (u *AccountUpsert) SetEmail(v string) *AccountUpsert {
-	u.Set(account.FieldEmail, v)
-	return u
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateEmail() *AccountUpsert {
-	u.SetExcluded(account.FieldEmail)
-	return u
-}
-
 // SetHandle sets the "handle" field.
 func (u *AccountUpsert) SetHandle(v string) *AccountUpsert {
 	u.Set(account.FieldHandle, v)
@@ -828,20 +799,6 @@ func (u *AccountUpsertOne) UpdateDeletedAt() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearDeletedAt() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearDeletedAt()
-	})
-}
-
-// SetEmail sets the "email" field.
-func (u *AccountUpsertOne) SetEmail(v string) *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetEmail(v)
-	})
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateEmail() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateEmail()
 	})
 }
 
@@ -1173,20 +1130,6 @@ func (u *AccountUpsertBulk) UpdateDeletedAt() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearDeletedAt() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearDeletedAt()
-	})
-}
-
-// SetEmail sets the "email" field.
-func (u *AccountUpsertBulk) SetEmail(v string) *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetEmail(v)
-	})
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateEmail() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateEmail()
 	})
 }
 

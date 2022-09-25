@@ -35,18 +35,18 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 		return nil, errtag.Wrap(err, errtag.InvalidArgument{})
 	}
 
-	username := strings.Split(addr.Address, "@")[0]
+	handle := strings.Split(addr.Address, "@")[0]
 
-	u, exists, err := b.account.LookupByEmail(ctx, identifier)
+	_, exists, err := b.auth.LookupByIdentifier(ctx, AuthServiceName, identifier)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get account")
 	}
 
 	if exists {
-		return nil, errtag.Wrap(errors.New("exists"), errtag.AlreadyExists{})
+		return nil, errtag.Wrap(errors.New("account already exists"), errtag.AlreadyExists{})
 	}
 
-	u, err = b.account.Create(ctx, identifier, username)
+	account, err := b.account.Create(ctx, handle)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create account")
 	}
@@ -56,12 +56,12 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 		return nil, errors.Wrap(err, "failed to create secure password hash")
 	}
 
-	_, err = b.auth.Create(ctx, u.ID, AuthServiceName, identifier, string(hashed), nil)
+	_, err = b.auth.Create(ctx, account.ID, AuthServiceName, identifier, string(hashed), nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create account authentication instance")
 	}
 
-	return u, nil
+	return account, nil
 }
 
 func (b *Password) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
@@ -69,6 +69,7 @@ func (b *Password) Login(ctx context.Context, identifier string, password string
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get account")
 	}
+
 	if !exists {
 		return nil, errtag.Wrap(ErrNotFound, errtag.NotFound{})
 	}

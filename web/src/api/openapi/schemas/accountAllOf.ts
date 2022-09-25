@@ -10,6 +10,5 @@ import type { AccountName } from "./accountName";
 export type AccountAllOf = {
   handle?: AccountHandle;
   name?: AccountName;
-  email?: string;
   bio?: string;
 };

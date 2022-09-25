@@ -42,15 +42,15 @@ func init() {
 	// account.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	account.UpdateDefaultUpdatedAt = accountDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// accountDescHandle is the schema descriptor for handle field.
-	accountDescHandle := accountFields[1].Descriptor()
+	accountDescHandle := accountFields[0].Descriptor()
 	// account.HandleValidator is a validator for the "handle" field. It is called by the builders before save.
 	account.HandleValidator = accountDescHandle.Validators[0].(func(string) error)
 	// accountDescName is the schema descriptor for name field.
-	accountDescName := accountFields[2].Descriptor()
+	accountDescName := accountFields[1].Descriptor()
 	// account.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	account.NameValidator = accountDescName.Validators[0].(func(string) error)
 	// accountDescAdmin is the schema descriptor for admin field.
-	accountDescAdmin := accountFields[4].Descriptor()
+	accountDescAdmin := accountFields[3].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
 	// accountDescID is the schema descriptor for id field.

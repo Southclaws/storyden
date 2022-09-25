@@ -19,22 +19,20 @@ func TestCreateUser(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		u, err := repo.Create(ctx, "south@cla.ws", "southclaws")
+		u, err := repo.Create(ctx, "southclaws")
 		r.NoError(err)
 		r.NotNil(u)
 
-		a.Equal("south@cla.ws", u.Email)
 		a.Equal("southclaws", u.Name)
 
 		u1, err := repo.GetByID(ctx, u.ID)
 		r.NoError(err)
 		a.NotNil(u1)
 
-		a.Equal("south@cla.ws", u1.Email)
 		a.Equal("southclaws", u1.Name)
 
 		// Duplicate email address should fail.
-		u2, err := repo.Create(ctx, "south@cla.ws", "southclaws")
+		u2, err := repo.Create(ctx, "southclaws")
 		r.Error(err)
 		a.Nil(u2)
 	}))
@@ -48,20 +46,6 @@ func TestGetByID(t *testing.T) {
 		acc, err := repo.GetByID(ctx, seed.Account_000.ID)
 		r.NoError(err)
 		r.NotNil(acc)
-
-		a.Equal(seed.Account_000.Name, acc.Name)
-	}))
-}
-
-func TestGetByEmail(t *testing.T) {
-	defer integration.Test(t, nil, fx.Invoke(func(ctx context.Context, repo account.Repository) {
-		r := require.New(t)
-		a := assert.New(t)
-
-		acc, ok, err := repo.LookupByEmail(ctx, seed.Account_000.Email)
-		r.NoError(err)
-		r.True(ok)
-		a.NotNil(acc)
 
 		a.Equal(seed.Account_000.Name, acc.Name)
 	}))
@@ -81,9 +65,9 @@ func TestGetAll(t *testing.T) {
 			r.NoError(err)
 			a.NotNil(u)
 
-			emails := lo.Map(u, func(t account.Account, i int) string { return t.Email })
+			handles := lo.Map(u, func(t account.Account, i int) string { return t.Handle })
 
-			a.Contains(emails, seed.Account_000.Email)
-			a.Contains(emails, seed.Account_001.Email)
+			a.Contains(handles, seed.Account_000.Handle)
+			a.Contains(handles, seed.Account_001.Handle)
 		}))
 }

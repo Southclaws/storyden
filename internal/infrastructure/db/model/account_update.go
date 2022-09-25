@@ -62,12 +62,6 @@ func (au *AccountUpdate) ClearDeletedAt() *AccountUpdate {
 	return au
 }
 
-// SetEmail sets the "email" field.
-func (au *AccountUpdate) SetEmail(s string) *AccountUpdate {
-	au.mutation.SetEmail(s)
-	return au
-}
-
 // SetHandle sets the "handle" field.
 func (au *AccountUpdate) SetHandle(s string) *AccountUpdate {
 	au.mutation.SetHandle(s)
@@ -461,13 +455,6 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Column: account.FieldDeletedAt,
-		})
-	}
-	if value, ok := au.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldEmail,
 		})
 	}
 	if value, ok := au.mutation.Handle(); ok {
@@ -872,12 +859,6 @@ func (auo *AccountUpdateOne) SetNillableDeletedAt(t *time.Time) *AccountUpdateOn
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (auo *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
 	auo.mutation.ClearDeletedAt()
-	return auo
-}
-
-// SetEmail sets the "email" field.
-func (auo *AccountUpdateOne) SetEmail(s string) *AccountUpdateOne {
-	auo.mutation.SetEmail(s)
 	return auo
 }
 
@@ -1304,13 +1285,6 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Column: account.FieldDeletedAt,
-		})
-	}
-	if value, ok := auo.mutation.Email(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldEmail,
 		})
 	}
 	if value, ok := auo.mutation.Handle(); ok {

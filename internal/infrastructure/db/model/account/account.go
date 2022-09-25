@@ -19,8 +19,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
 	// FieldHandle holds the string denoting the handle field in the database.
 	FieldHandle = "handle"
 	// FieldName holds the string denoting the name field in the database.
@@ -89,7 +87,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldEmail,
 	FieldHandle,
 	FieldName,
 	FieldBio,

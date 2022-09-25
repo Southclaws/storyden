@@ -33,7 +33,6 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 		Id:        openapi.Identifier(acc.ID.String()),
 		Handle:    &acc.Handle,
 		Name:      utils.Ref(acc.Name),
-		Email:     utils.Ref(acc.Email),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
