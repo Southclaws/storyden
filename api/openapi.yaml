@@ -241,6 +241,31 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountsGetSuccess" }
 
+  /v1/accounts/self/avatar:
+    post:
+      operationId: AccountsSetAvatar
+      summary: Upload an avatar for the authenticated account.
+      tags: [accounts]
+      requestBody: { $ref: "#/components/requestBodies/AccountsSetAvatar" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: "OK" }
+
+  /v1/accounts/{account_id}/avatar:
+    get:
+      operationId: AccountsGetAvatar
+      summary: Get an avatar for the specified account.
+      tags: [accounts]
+      security: []
+      parameters: [{ $ref: "#/components/parameters/AccountID" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountsGetAvatar" }
+
   #
   #                           .d888 d8b 888
   #                          d88P"  Y8P 888
@@ -424,6 +449,13 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthOAuthProviderCallbackBody" }
 
+    AccountsSetAvatar:
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+
     ThreadsCreate:
       content:
         application/json:
@@ -500,6 +532,14 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
+
+    AccountsGetAvatar:
+      description: OK
+      content:
+        image/png:
+          schema:
+            type: string
+            format: binary
 
     ProfilesGetSuccess:
       description: OK

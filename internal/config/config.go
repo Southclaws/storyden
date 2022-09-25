@@ -21,6 +21,12 @@ type Config struct {
 	AmqpAddress            string `envconfig:"AMQP_ADDRESS"           default:"amqp://rabbit:5672"`
 	HashKey                []byte `envconfig:"HASH_KEY"               required:"true"`
 	BlockKey               []byte `envconfig:"BLOCK_KEY"              required:"true"`
+
+	S3Endpoint  string `envconfig:"S3_ENDPOINT"   required:"true"`
+	S3Bucket    string `envconfig:"S3_BUCKET"     required:"true"`
+	S3Region    string `envconfig:"S3_REGION"     required:"true"`
+	S3AccessKey string `envconfig:"S3_ACCESS_KEY" required:"true"`
+	S3SecretKey string `envconfig:"S3_SECRET_KEY" required:"true"`
 }
 
 func Build() fx.Option {
