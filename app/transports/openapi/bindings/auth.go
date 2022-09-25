@@ -96,9 +96,9 @@ func (o *Authentication) AuthOAuthProviderList(ctx context.Context, request open
 	list := dt.Map(o.oa.Providers(),
 		func(p oauth.Provider) openapi.AuthOAuthProvider {
 			return openapi.AuthOAuthProvider{
-				Provider: "p.ID()",
-				Name:     "p.Name()",
-				LogoUrl:  "p.LogoURL()",
+				Provider: p.ID(),
+				Name:     p.Name(),
+				LogoUrl:  p.LogoURL(),
 				Link:     p.Link(),
 			}
 		},
