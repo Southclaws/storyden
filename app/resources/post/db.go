@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 )

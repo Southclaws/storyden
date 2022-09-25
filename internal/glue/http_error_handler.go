@@ -3,13 +3,13 @@ package glue
 import (
 	"net/http"
 
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
 )
 
 // HTTPErrorHandler provides an error handler function for use with the Echo
@@ -39,6 +39,7 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 		l.Info("request error",
 			zap.String("error", err.Error()),
 			zap.Any("metadata", ec),
+			zap.String("path", c.Path()),
 		)
 
 		meta := lo.MapValues(ec, func(v, k string) any {

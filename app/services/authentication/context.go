@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/Southclaws/fault/errtag"
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/errtag"
 )
 
 var ErrNoAccountInContext = errors.New("no account in context")

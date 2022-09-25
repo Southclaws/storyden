@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Southclaws/fault/errctx"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -14,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/errctx"
 )
 
 const (

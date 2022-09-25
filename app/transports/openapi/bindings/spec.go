@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
-	"github.com/Southclaws/storyden/internal/errtag"
+
+	"github.com/Southclaws/fault/errtag"
 )
 
 type Spec struct{}

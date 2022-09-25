@@ -9,8 +9,8 @@ import (
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 )
 
 // ValidatorErrorHandler is an OpenAPI validator function for structured errors.
@@ -43,6 +43,10 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 		// These occur when calling the wrong endpoint.
 		re := &openapi3filter.RequestError{}
 		if errors.As(err, &re) {
+			if re.Err == nil {
+				return err
+			}
+
 			return fn(ctx, errctx.Wrap(re.Err, ctx,
 				"reason", re.Reason,
 			))

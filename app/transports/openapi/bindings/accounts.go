@@ -3,12 +3,12 @@ package bindings
 import (
 	"context"
 
+	"github.com/Southclaws/fault/errctx"
 	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
-	"github.com/Southclaws/storyden/internal/errctx"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

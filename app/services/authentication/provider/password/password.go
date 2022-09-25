@@ -8,9 +8,9 @@ import (
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
 
+	"github.com/Southclaws/fault/errtag"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
-	"github.com/Southclaws/storyden/internal/errtag"
 )
 
 const AuthServiceName = `password`

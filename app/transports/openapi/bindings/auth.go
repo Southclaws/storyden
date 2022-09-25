@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/getkin/kin-openapi/openapi3filter"
@@ -18,8 +20,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
 )
 
 type Authentication struct {

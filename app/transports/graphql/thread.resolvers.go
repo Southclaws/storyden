@@ -6,11 +6,11 @@ package graphql
 import (
 	"context"
 
+	"github.com/Southclaws/fault/errctx"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/transports/graphql/models"
 	"github.com/Southclaws/storyden/app/transports/graphql/server"
-	"github.com/Southclaws/storyden/internal/errctx"
 )
 
 // CreateThread is the resolver for the createThread field.

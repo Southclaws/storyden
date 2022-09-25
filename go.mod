@@ -39,6 +39,8 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 )
 
+require github.com/Southclaws/fault v0.2.1 // indirect
+
 require (
 	cloud.google.com/go v0.81.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect

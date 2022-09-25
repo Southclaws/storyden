@@ -5,9 +5,10 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
+
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/errctx"
-	"github.com/Southclaws/storyden/internal/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"

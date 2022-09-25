@@ -90,6 +90,8 @@ github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWX
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/Southclaws/dt v1.0.1 h1:9sof6hS2yLgrXoaxmBzlZNIyDRDKh/qLgDhUAlY/AF4=
 github.com/Southclaws/dt v1.0.1/go.mod h1:8EZr10LTV9E/hR5PdNFUbGHSoLo7//+EhDcxf0t1WNQ=
+github.com/Southclaws/fault v0.2.1 h1:M86TcsrvS1VKDPUZW3rl8EugEcsocte1h9Sww5TYjF4=
+github.com/Southclaws/fault v0.2.1/go.mod h1:TSLTH9HUDtbO57GIaVE7Bym5wqNGlWWlTBSYxvac1vo=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/agext/levenshtein v1.2.3 h1:YB2fHEn0UJagG8T1rrWknE3ZQzWM06O8AMAatNn7lmo=
