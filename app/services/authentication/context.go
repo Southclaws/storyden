@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/Southclaws/fault/errtag"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 )
 

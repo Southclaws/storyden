@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/fault/errctx"
 	"github.com/pkg/errors"
 
-	"github.com/Southclaws/fault/errctx"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	post_service "github.com/Southclaws/storyden/app/services/post"

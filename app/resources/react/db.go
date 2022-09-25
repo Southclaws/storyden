@@ -3,11 +3,11 @@ package react
 import (
 	"context"
 
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 

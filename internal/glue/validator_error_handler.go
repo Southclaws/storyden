@@ -5,12 +5,11 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault/errtag"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
-
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
 )
 
 // ValidatorErrorHandler is an OpenAPI validator function for structured errors.

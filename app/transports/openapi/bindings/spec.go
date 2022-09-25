@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
-
 	"github.com/Southclaws/fault/errtag"
+
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 )
 
 type Spec struct{}

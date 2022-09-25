@@ -1,9 +1,8 @@
 package glue
 
 import (
-	"github.com/labstack/echo/v4"
-
 	"github.com/Southclaws/fault/errctx"
+	"github.com/labstack/echo/v4"
 )
 
 // ParameterContext is a simple middleware for injecting request metadata into a

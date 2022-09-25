@@ -5,10 +5,10 @@ import (
 	"net/mail"
 	"strings"
 
+	"github.com/Southclaws/fault/errtag"
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
 
-	"github.com/Southclaws/fault/errtag"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 )

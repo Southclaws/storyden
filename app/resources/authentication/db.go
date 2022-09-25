@@ -3,10 +3,9 @@ package authentication
 import (
 	"context"
 
-	"github.com/rs/xid"
-
 	"github.com/Southclaws/fault/errctx"
 	"github.com/Southclaws/fault/errtag"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"

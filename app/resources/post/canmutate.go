@@ -3,10 +3,10 @@ package post
 import (
 	"context"
 
-	"github.com/rs/xid"
-
 	"github.com/Southclaws/fault/errctx"
 	"github.com/Southclaws/fault/errtag"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
 )
