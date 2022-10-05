@@ -177,6 +177,7 @@ func (i *Authentication) encodeSession(userID account.AccountID) (string, error)
 	cookie := &http.Cookie{
 		Name:     secureCookieName,
 		Value:    encoded,
+		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 		Domain:   i.domain,
 		Secure:   true,
