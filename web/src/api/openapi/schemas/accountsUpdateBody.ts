@@ -8,9 +8,9 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { TagList } from "./tagList";
 
-export type AccountAllOf = {
+export interface AccountsUpdateBody {
   handle?: AccountHandle;
   name?: AccountName;
   bio?: string;
   interests?: TagList;
-};
+}

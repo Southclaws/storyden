@@ -11,6 +11,8 @@ import type {
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
+  AccountsUpdateSuccessResponse,
+  AccountsUpdateBody,
   AccountsSetAvatarBody,
   AccountsGetAvatarResponse,
 } from "./schemas";
@@ -61,6 +63,18 @@ export const useAccountsGet = <
     swrKey,
     ...query,
   };
+};
+
+/**
+ * @summary Update the information for the currently authenticated account.
+ */
+export const accountsUpdate = (accountsUpdateBody: AccountsUpdateBody) => {
+  return fetcher<AccountsUpdateSuccessResponse>({
+    url: `/v1/accounts`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: accountsUpdateBody,
+  });
 };
 
 /**

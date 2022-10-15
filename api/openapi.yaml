@@ -241,6 +241,17 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountsGetSuccess" }
 
+    patch:
+      operationId: AccountsUpdate
+      summary: Update the information for the currently authenticated account.
+      tags: [accounts]
+      requestBody: { $ref: "#/components/requestBodies/AccountsUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountsUpdateSuccess" }
+
   /v1/accounts/self/avatar:
     post:
       operationId: AccountsSetAvatar
@@ -441,6 +452,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthOAuthProviderCallbackBody" }
 
+    AccountsUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AccountsUpdateBody" }
+
     AccountsSetAvatar:
       content:
         application/octet-stream:
@@ -519,6 +535,13 @@ components:
             x-go-type: any
 
     AccountsGetSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Account"
+
+    AccountsUpdateSuccess:
       description: OK
       content:
         application/json:
@@ -699,7 +722,7 @@ components:
 
     Account:
       type: object
-      required: [id]
+      required: [handle, id]
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - properties:
@@ -709,6 +732,20 @@ components:
               $ref: "#/components/schemas/AccountName"
             bio:
               type: string
+            interests:
+              $ref: "#/components/schemas/TagList"
+
+    AccountsUpdateBody:
+      type: object
+      properties:
+        handle:
+          $ref: "#/components/schemas/AccountHandle"
+        name:
+          $ref: "#/components/schemas/AccountName"
+        bio:
+          type: string
+        interests:
+          $ref: "#/components/schemas/TagList"
 
     # -
     # PublicProfile
@@ -882,14 +919,23 @@ components:
       description: The title of a thread.
       example: Hello world!
 
+    Tag:
+      type: object
+      description: A tag which can link profiles or threads via interests.
+      required: [id, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name: { $ref: "#/components/schemas/TagName" }
+        colour: { type: string }
+
     TagName:
       type: string
-      description: A tag.
+      description: The name of a tag.
 
     TagList:
       type: array
       description: A list of tags.
-      items: { $ref: "#/components/schemas/TagName" }
+      items: { $ref: "#/components/schemas/Tag" }
 
     PostBodyMarkdown:
       type: string

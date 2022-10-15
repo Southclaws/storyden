@@ -1,15 +1,30 @@
 package bindings
 
 import (
+	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
+
+func serialiseAccount(acc *account.Account) openapi.Account {
+	return openapi.Account{
+		Id:        openapi.Identifier(acc.ID.String()),
+		Handle:    (*openapi.AccountHandle)(&acc.Handle),
+		Name:      utils.Ref(acc.Name),
+		Bio:       utils.Ref(acc.Bio.ElseZero()),
+		CreatedAt: acc.CreatedAt,
+		UpdatedAt: acc.UpdatedAt,
+		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
+	}
+}
 
 func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 	return openapi.ThreadReference{
@@ -64,4 +79,20 @@ func serialiseReact(r *react.React) openapi.React {
 		Id:    openapi.IdentifierFrom(xid.ID(r.ID)),
 		Emoji: &r.Emoji,
 	}
+}
+
+func serialiseTag(t tag.Tag) openapi.Tag {
+	return openapi.Tag{
+		Id:   openapi.Identifier(t.ID),
+		Name: t.Name,
+	}
+}
+
+func tagID(t openapi.Tag) xid.ID {
+	return t.Id.XID()
+}
+
+// tagsIDs just applies tagID to a slice so we get a slice of IDs back.
+func tagsIDs(i []openapi.Tag) []xid.ID {
+	return dt.Map(i, tagID)
 }

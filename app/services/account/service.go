@@ -12,6 +12,7 @@ import (
 
 type Service interface {
 	Get(ctx context.Context, id account.AccountID) (*account.Account, error)
+	Update(ctx context.Context, id account.AccountID, params Partial) (*account.Account, error)
 }
 
 func Build() fx.Option {

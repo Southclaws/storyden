@@ -65,7 +65,7 @@ func TestGetAll(t *testing.T) {
 			r.NoError(err)
 			a.NotNil(u)
 
-			handles := lo.Map(u, func(t account.Account, i int) string { return t.Handle })
+			handles := lo.Map(u, func(t *account.Account, i int) string { return t.Handle })
 
 			a.Contains(handles, seed.Account_000.Handle)
 			a.Contains(handles, seed.Account_001.Handle)

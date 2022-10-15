@@ -35,7 +35,13 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 		return nil, err
 	}
 
-	thread, err := i.thread_svc.Create(ctx, params.Title, params.Body, accountID, category.CategoryID(params.Category.XID()), params.Tags)
+	thread, err := i.thread_svc.Create(ctx,
+		params.Title,
+		params.Body,
+		accountID,
+		category.CategoryID(params.Category.XID()),
+		dt.Map(params.Tags, func(t openapi.Tag) string { return string(t.Id) }),
+	)
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)
 	}

@@ -4,9 +4,9 @@
  * storyden
  * OpenAPI spec version: 1
  */
-import type { Tag } from "./tag";
+import type { Account } from "./account";
 
 /**
- * A list of tags.
+ * OK
  */
-export type TagList = Tag[];
+export type AccountsUpdateSuccessResponse = Account;
