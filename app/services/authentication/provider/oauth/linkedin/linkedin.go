@@ -189,6 +189,13 @@ func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, ac
 		return nil
 	}
 
+	// don't want to waste time with an existing account with an existing avatar
+	// however, if the user is logging in (not registering) and they don't have
+	// an avatar already somehow, we may as well set one while the data is here.
+	if p.avatar_svc.Exists(ctx, acc.ID) {
+		return nil
+	}
+
 	avatarBinary, err := rest.R().
 		SetDoNotParseResponse(true).
 		Get(url)
