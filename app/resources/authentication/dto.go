@@ -19,7 +19,7 @@ type Authentication struct {
 
 func FromModel(m *model.Authentication) *Authentication {
 	return &Authentication{
-		Account:    account.FromModel(*m.Edges.Account),
+		Account:    *account.FromModel(*m.Edges.Account),
 		Service:    Service(m.Service),
 		Identifier: m.Identifier,
 		Token:      m.Token,

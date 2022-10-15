@@ -41,6 +41,8 @@ require (
 
 require github.com/Southclaws/fault v0.2.1
 
+require github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
+
 require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect

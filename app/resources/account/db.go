@@ -46,7 +46,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}
 
-	return utils.Ref(FromModel(*u)), nil
+	return FromModel(*u), nil
 }
 
 func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) {
@@ -68,7 +68,7 @@ func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) 
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
-	return &acc, nil
+	return acc, nil
 }
 
 func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, error) {
@@ -92,7 +92,7 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
-	return &acc, nil
+	return acc, nil
 }
 
 // func (d *database) getPostCounts(ctx context.Context, id string) (int, int, error) {
@@ -124,7 +124,7 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 // 	return count[0].Threads, count[0].Posts, nil
 // }
 
-func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]Account, error) {
+func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]*Account, error) {
 	users, err := d.db.Account.
 		Query().
 		Limit(limit).
@@ -139,4 +139,19 @@ func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]
 		dt.Map(users, utils.Deref[model.Account]),
 		utils.ToMap(FromModel),
 	), nil
+}
+
+func (d *database) Update(ctx context.Context, id AccountID, opts ...Mutation) (*Account, error) {
+	update := d.db.Account.UpdateOneID(xid.ID(id))
+
+	for _, fn := range opts {
+		fn(update)
+	}
+
+	acc, err := update.Save(ctx)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	return FromModel(*acc), nil
 }

@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
 
 type option func(*Account)
@@ -14,7 +17,9 @@ type Repository interface {
 	GetByID(ctx context.Context, id AccountID) (*Account, error)
 	GetByHandle(ctx context.Context, handle string) (*Account, error)
 
-	List(ctx context.Context, sort string, max, skip int) ([]Account, error)
+	List(ctx context.Context, sort string, max, skip int) ([]*Account, error)
+
+	Update(ctx context.Context, id AccountID, opts ...Mutation) (*Account, error)
 }
 
 func WithID(id AccountID) option {
@@ -32,5 +37,37 @@ func WithName(name string) option {
 func WithBio(bio string) option {
 	return func(a *Account) {
 		a.Bio = optional.Of(bio)
+	}
+}
+
+type Mutation func(u *model.AccountUpdateOne)
+
+func SetHandle(handle string) Mutation {
+	return func(u *model.AccountUpdateOne) {
+		u.SetHandle(handle)
+	}
+}
+
+func SetName(name string) Mutation {
+	return func(u *model.AccountUpdateOne) {
+		u.SetName(name)
+	}
+}
+
+func SetBio(bio string) Mutation {
+	return func(u *model.AccountUpdateOne) {
+		u.SetBio(bio)
+	}
+}
+
+func SetAdmin(status bool) Mutation {
+	return func(u *model.AccountUpdateOne) {
+		u.SetAdmin(status)
+	}
+}
+
+func SetInterests(interests []xid.ID) Mutation {
+	return func(u *model.AccountUpdateOne) {
+		u.ClearTags().AddTagIDs(interests...)
 	}
 }

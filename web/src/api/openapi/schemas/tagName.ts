@@ -6,6 +6,6 @@
  */
 
 /**
- * A tag.
+ * The name of a tag.
  */
 export type TagName = string;

@@ -12,7 +12,6 @@ linters:
   fast: true
   enable:
     - gci
-    - wsl
     - wrapcheck
   presets:
     - bugs

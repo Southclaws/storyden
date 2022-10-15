@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/errctx"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -34,9 +33,7 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 		return nil, errctx.Wrap(err, ctx)
 	}
 
-	interests := dt.Map(acc.Interests, func(t tag.Tag) string {
-		return t.Name
-	})
+	interests := dt.Map(acc.Interests, serialiseTag)
 
 	return openapi.ProfilesGet200JSONResponse{
 		Id:        openapi.Identifier(acc.ID.String()),

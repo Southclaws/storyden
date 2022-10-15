@@ -37,7 +37,7 @@ func (*Account) GetRole() string { return Name }
 
 func (*Account) GetResourceName() string { return Name }
 
-func FromModel(u model.Account) (o Account) {
+func FromModel(u model.Account) (o *Account) {
 	result := Account{
 		ID:     AccountID(u.ID),
 		Handle: u.Handle,
@@ -55,5 +55,5 @@ func FromModel(u model.Account) (o Account) {
 		DeletedAt: optional.OfPtr(u.DeletedAt),
 	}
 
-	return result
+	return &result
 }
