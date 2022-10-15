@@ -49,8 +49,8 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 	return utils.Ref(FromModel(*u)), nil
 }
 
-func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, error) {
-	account, err := d.db.Account.Get(ctx, xid.ID(userId))
+func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) {
+	account, err := d.db.Account.Get(ctx, xid.ID(id))
 	if err != nil {
 		if model.IsNotFound(err) {
 			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
@@ -63,12 +63,36 @@ func (d *database) GetByID(ctx context.Context, userId AccountID) (*Account, err
 	// if err != nil {
 	// 	return nil, err
 	// }
-	u := FromModel(*account)
+	acc := FromModel(*account)
 
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
-	return &u, nil
+	return &acc, nil
+}
+
+func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, error) {
+	account, err := d.db.Account.Query().Where(
+		account.Handle(handle),
+	).Only(ctx)
+	if err != nil {
+		if model.IsNotFound(err) {
+			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+		}
+
+		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+	}
+
+	// threads, posts, err := d.getPostCounts(ctx, account.ID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	acc := FromModel(*account)
+
+	// u.ThreadCount = threads
+	// u.PostCount = posts
+
+	return &acc, nil
 }
 
 // func (d *database) getPostCounts(ctx context.Context, id string) (int, int, error) {

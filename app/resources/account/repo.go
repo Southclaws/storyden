@@ -12,6 +12,8 @@ type Repository interface {
 	Create(ctx context.Context, handle string, opts ...option) (*Account, error)
 
 	GetByID(ctx context.Context, id AccountID) (*Account, error)
+	GetByHandle(ctx context.Context, handle string) (*Account, error)
+
 	List(ctx context.Context, sort string, max, skip int) ([]Account, error)
 }
 

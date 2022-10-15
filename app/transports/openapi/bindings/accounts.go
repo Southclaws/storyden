@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/fault/errctx"
 	"github.com/pkg/errors"
 
-	account_resource "github.com/Southclaws/storyden/app/resources/account"
+	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
@@ -17,9 +17,12 @@ import (
 type Accounts struct {
 	as account.Service
 	av avatar.Service
+	ar account_repo.Repository
 }
 
-func NewAccounts(as account.Service, av avatar.Service) Accounts { return Accounts{as, av} }
+func NewAccounts(as account.Service, av avatar.Service, ar account_repo.Repository) Accounts {
+	return Accounts{as, av, ar}
+}
 
 func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) (openapi.AccountsGetResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
@@ -34,7 +37,7 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 
 	return openapi.AccountsGet200JSONResponse{
 		Id:        openapi.Identifier(acc.ID.String()),
-		Handle:    &acc.Handle,
+		Handle:    (*openapi.AccountHandle)(&acc.Handle),
 		Name:      utils.Ref(acc.Name),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		CreatedAt: acc.CreatedAt,
@@ -44,7 +47,12 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 }
 
 func (i *Accounts) AccountsGetAvatar(ctx context.Context, request openapi.AccountsGetAvatarRequestObject) (openapi.AccountsGetAvatarResponseObject, error) {
-	r, err := i.av.Get(ctx, account_resource.AccountID(request.AccountId.XID()))
+	id, err := request.AccountHandle.ID(ctx, i.ar)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	r, err := i.av.Get(ctx, id)
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)
 	}
