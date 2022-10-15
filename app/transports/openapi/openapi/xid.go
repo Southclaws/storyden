@@ -8,7 +8,7 @@ import "github.com/rs/xid"
 func (i Identifier) XID() xid.ID {
 	v, err := xid.FromString(string(i))
 	if err != nil {
-		panic(err)
+		return xid.NilID()
 	}
 
 	return v
