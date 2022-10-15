@@ -12,6 +12,7 @@ import (
 )
 
 type Service interface {
+	Exists(ctx context.Context, accountID account.AccountID) bool
 	Set(ctx context.Context, accountID account.AccountID, stream io.Reader) error
 	Get(ctx context.Context, accountID account.AccountID) (io.Reader, error)
 }
