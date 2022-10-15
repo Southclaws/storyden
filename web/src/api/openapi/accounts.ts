@@ -78,17 +78,17 @@ export const accountsSetAvatar = (
 };
 
 /**
- * @summary Get an avatar for the authenticated account.
+ * @summary Get an avatar for the specified account.
  */
-export const accountsGetAvatar = (accountId: string) => {
+export const accountsGetAvatar = (accountHandle: string) => {
   return fetcher<AccountsGetAvatarResponse>({
-    url: `/v1/accounts/${accountId}/avatar`,
+    url: `/v1/accounts/${accountHandle}/avatar`,
     method: "get",
   });
 };
 
-export const getAccountsGetAvatarKey = (accountId: string) => [
-  `/v1/accounts/${accountId}/avatar`,
+export const getAccountsGetAvatarKey = (accountHandle: string) => [
+  `/v1/accounts/${accountHandle}/avatar`,
 ];
 
 export type AccountsGetAvatarQueryResult = NonNullable<
@@ -102,7 +102,7 @@ export type AccountsGetAvatarQueryError =
 export const useAccountsGetAvatar = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
-  accountId: string,
+  accountHandle: string,
   options?: {
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof accountsGetAvatar>>,
@@ -112,11 +112,11 @@ export const useAccountsGetAvatar = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false && !!accountId;
+  const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccountsGetAvatarKey(accountId) : null));
-  const swrFn = () => accountsGetAvatar(accountId);
+    (() => (isEnabled ? getAccountsGetAvatarKey(accountHandle) : null));
+  const swrFn = () => accountsGetAvatar(accountHandle);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

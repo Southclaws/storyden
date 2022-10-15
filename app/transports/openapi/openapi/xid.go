@@ -1,6 +1,15 @@
 package openapi
 
-import "github.com/rs/xid"
+import (
+	"context"
+	"errors"
+
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/fault/errtag"
+	account_repo "github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+)
 
 // XID converts an openapi identifier to an xid. This is to work around an issue
 // with the oapi-codegen generated code which generates the identifier as a new
@@ -18,4 +27,35 @@ func (i Identifier) XID() xid.ID {
 func IdentifierFrom(id xid.ID) *Identifier {
 	oid := Identifier(id.String())
 	return &oid
+}
+
+// ID will resolve the Unique value to an account's ID using a repository. Since
+// this is used a lot as most of the system supports using IDs and handles
+// interchangably, the repository this uses should make heavy use of caching.
+func (u AccountHandle) ID(ctx context.Context, r account_repo.Repository) (account_repo.AccountID, error) {
+	if id, err := xid.FromString(string(u)); err == nil {
+		a, err := r.GetByID(ctx, account_repo.AccountID(id))
+		if err != nil {
+			if model.IsNotFound(err) {
+				// NOTE: In the unlikely chance that a user sets their handle to
+				// a valid XID string, this will produce a confusing result.
+				return account_repo.AccountID(xid.NilID()), errtag.Wrap(errors.New("an account does not exist with the specified ID"), errtag.NotFound{})
+			}
+
+			return account_repo.AccountID(xid.NilID()), err
+		}
+
+		return account_repo.AccountID(a.ID), nil
+	}
+
+	a, err := r.GetByHandle(ctx, string(u))
+	if err != nil {
+		if model.IsNotFound(err) {
+			return account_repo.AccountID(xid.NilID()), errtag.Wrap(errors.New("an account does not exist with the specified handle"), errtag.NotFound{})
+		}
+
+		return account_repo.AccountID(xid.NilID()), err
+	}
+
+	return account_repo.AccountID(a.ID), nil
 }

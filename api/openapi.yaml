@@ -253,13 +253,13 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: "OK" }
 
-  /v1/accounts/{account_id}/avatar:
+  /v1/accounts/{account_handle}/avatar:
     get:
       operationId: AccountsGetAvatar
       summary: Get an avatar for the specified account.
       tags: [accounts]
       security: []
-      parameters: [{ $ref: "#/components/parameters/AccountID" }]
+      parameters: [$ref: "#/components/parameters/AccountHandle"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -280,12 +280,12 @@ paths:
   # 888
   #
 
-  /v1/profiles/{account_id}:
+  /v1/profiles/{account_handle}:
     get:
       operationId: ProfilesGet
       summary: Get a public profile by ID.
       tags: [profiles]
-      parameters: [$ref: "#/components/parameters/AccountID"]
+      parameters: [$ref: "#/components/parameters/AccountHandle"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -398,14 +398,6 @@ components:
       required: true
       schema:
         type: string
-
-    AccountID:
-      description: Account ID
-      name: account_id
-      in: path
-      required: true
-      schema:
-        $ref: "#/components/schemas/Identifier"
 
     ThreadID:
       description: Thread ID
@@ -874,6 +866,7 @@ components:
 
     AccountHandle:
       type: string
+      x-go-type: string
       description: The unique @ handle of an account.
       example: Southclaws
 

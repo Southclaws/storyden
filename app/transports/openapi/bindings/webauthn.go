@@ -59,7 +59,7 @@ func (t *temporary) WebAuthnIcon() string                       { return "" }
 func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return nil }
 
 func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) (openapi.WebAuthnRequestCredentialResponseObject, error) {
-	t := temporary{request.AccountHandle}
+	t := temporary{string(request.AccountHandle)}
 
 	credentialOptions, sessionData, err := a.wa.BeginRegistration(&t,
 		webauthn.WithAuthenticatorSelection(

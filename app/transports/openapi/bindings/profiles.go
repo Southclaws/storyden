@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault/errctx"
 
-	account_resource "github.com/Southclaws/storyden/app/resources/account"
+	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
@@ -16,14 +16,20 @@ import (
 
 type Profiles struct {
 	as account.Service
+	ar account_repo.Repository
 }
 
-func NewProfiles(as account.Service) Profiles {
-	return Profiles{as}
+func NewProfiles(as account.Service, ar account_repo.Repository) Profiles {
+	return Profiles{as, ar}
 }
 
 func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetRequestObject) (openapi.ProfilesGetResponseObject, error) {
-	acc, err := p.as.Get(ctx, account_resource.AccountID(request.AccountId.XID()))
+	id, err := request.AccountHandle.ID(ctx, p.ar)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	acc, err := p.as.Get(ctx, id)
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)
 	}
@@ -35,7 +41,7 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 	return openapi.ProfilesGet200JSONResponse{
 		Id:        openapi.Identifier(acc.ID.String()),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
-		Handle:    &acc.Handle,
+		Handle:    (*openapi.AccountHandle)(&acc.Handle),
 		Name:      &acc.Name,
 		Interests: &interests,
 		CreatedAt: acc.CreatedAt.Format(time.RFC3339),
