@@ -19,6 +19,7 @@ func (s *service) Exists(ctx context.Context, accountID account.AccountID) bool 
 	if err != nil {
 		return false // errors are ignored for now 🤠
 	}
+
 	return exists
 }
 
