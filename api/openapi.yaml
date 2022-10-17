@@ -296,6 +296,7 @@ paths:
       operationId: ProfilesGet
       summary: Get a public profile by ID.
       tags: [profiles]
+      security: []
       parameters: [$ref: "#/components/parameters/AccountHandle"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -330,6 +331,7 @@ paths:
       operationId: ThreadsList
       summary: Get a list of all threads.
       tags: [threads]
+      security: []
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -343,6 +345,7 @@ paths:
       description: |
         Get information about a thread such as its title, author, when it was
         created as well as a list of the posts within the thread.
+      security: []
       tags: [threads]
       parameters: [$ref: "#/components/parameters/ThreadID"]
       responses:
