@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/storyden/app/resources/account"
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
@@ -58,4 +60,17 @@ func (u AccountHandle) ID(ctx context.Context, r account_repo.Repository) (accou
 	}
 
 	return account_repo.AccountID(a.ID), nil
+}
+
+func (u *AccountHandle) OptionalID(ctx context.Context, r account_repo.Repository) (opt.Optional[account.AccountID], error) {
+	if u == nil {
+		return opt.NewEmpty[account.AccountID](), nil
+	}
+
+	id, err := u.ID(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt.New(id), nil
 }

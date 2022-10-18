@@ -60,6 +60,12 @@ func TestList(t *testing.T) {
 			r.NotNil(threads)
 
 			a.Len(threads, 2)
+
+			threads, err = repo.List(ctx, time.Now(), 10, thread.WithAuthor(seed.Account_000.ID))
+			r.NoError(err)
+			r.NotNil(threads)
+
+			a.Len(threads, 1)
 		}),
 	)
 }

@@ -135,6 +135,7 @@ func (d *database) List(
 	ctx context.Context,
 	before time.Time,
 	max int,
+	opts ...Query,
 ) ([]*Thread, error) {
 	filters := []predicate.Post{
 		post_model.DeletedAtIsNil(),
@@ -153,12 +154,17 @@ func (d *database) List(
 		max = 100
 	}
 
-	result, err := d.db.Post.Query().
+	query := d.db.Post.Query().
 		Where(filters...).
 		Limit(max).
 		WithCategory().
-		WithAuthor().
-		All(ctx)
+		WithAuthor()
+
+	for _, fn := range opts {
+		fn(query)
+	}
+
+	result, err := query.All(ctx)
 	if err != nil {
 		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
 	}

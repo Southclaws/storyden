@@ -32,6 +32,7 @@ type Service interface {
 		ctx context.Context,
 		before time.Time,
 		max int,
+		query Params,
 	) ([]*thread.Thread, error)
 
 	// Get one thread and the posts within it.
