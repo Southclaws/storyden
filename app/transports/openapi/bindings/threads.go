@@ -6,7 +6,10 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
+	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -16,10 +19,16 @@ import (
 )
 
 type Threads struct {
-	thread_svc thread_service.Service
+	thread_svc   thread_service.Service
+	account_repo account_resource.Repository
 }
 
-func NewThreads(thread_svc thread_service.Service) Threads { return Threads{thread_svc} }
+func NewThreads(
+	thread_svc thread_service.Service,
+	account_repo account_resource.Repository,
+) Threads {
+	return Threads{thread_svc, account_repo}
+}
 
 func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
 	params := func() openapi.ThreadsCreateBody {
@@ -54,7 +63,23 @@ func reacts(reacts []*react.React) []openapi.React {
 }
 
 func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) (openapi.ThreadsListResponseObject, error) {
-	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000)
+	// optionally map from OpenAPI account handle type to AccountID type.
+	author, err := request.Params.Author.OptionalID(ctx, i.account_repo)
+	if err != nil {
+		return nil, errctx.Wrap(err, ctx)
+	}
+
+	// optionally map from OpenAPI identifier type to xid.ID type.
+	tags := opt.NewPtrMap(request.Params.Tags, func(t []openapi.Identifier) []xid.ID {
+		return dt.Map(t, func(i openapi.Identifier) xid.ID {
+			return i.XID()
+		})
+	})
+
+	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000, thread_service.Params{
+		AccountID: author,
+		Tags:      tags,
+	})
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)
 	}

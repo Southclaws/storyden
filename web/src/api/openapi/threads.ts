@@ -13,6 +13,7 @@ import type {
   InternalServerErrorResponse,
   ThreadsCreateBody,
   ThreadsListResponse,
+  ThreadsListParams,
   ThreadsGetResponse,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -32,11 +33,18 @@ export const threadsCreate = (threadsCreateBody: ThreadsCreateBody) => {
 /**
  * @summary Get a list of all threads.
  */
-export const threadsList = () => {
-  return fetcher<ThreadsListResponse>({ url: `/v1/threads`, method: "get" });
+export const threadsList = (params?: ThreadsListParams) => {
+  return fetcher<ThreadsListResponse>({
+    url: `/v1/threads`,
+    method: "get",
+    params,
+  });
 };
 
-export const getThreadsListKey = () => [`/v1/threads`];
+export const getThreadsListKey = (params?: ThreadsListParams) => [
+  `/v1/threads`,
+  ...(params ? [params] : []),
+];
 
 export type ThreadsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadsList>>
@@ -48,18 +56,22 @@ export type ThreadsListQueryError =
 
 export const useThreadsList = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
->(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof threadsList>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-}) => {
+>(
+  params?: ThreadsListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof threadsList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  }
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getThreadsListKey() : null));
-  const swrFn = () => threadsList();
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getThreadsListKey(params) : null));
+  const swrFn = () => threadsList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

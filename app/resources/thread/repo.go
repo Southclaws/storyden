@@ -4,9 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/rs/xid"
+
+	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
-	"github.com/Southclaws/storyden/app/resources/post"
+	post_resource "github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
 )
 
 // Note: The resources thread and post both map to the same underlying database
@@ -24,7 +30,7 @@ type Repository interface {
 		ctx context.Context,
 		title string,
 		body string,
-		authorID account.AccountID,
+		authorID account_resource.AccountID,
 		categoryID category.CategoryID,
 		tags []string,
 		opts ...option,
@@ -34,19 +40,34 @@ type Repository interface {
 		ctx context.Context,
 		before time.Time,
 		max int,
+		opts ...Query,
 	) ([]*Thread, error)
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	Get(ctx context.Context, threadID post.PostID) (*Thread, error)
+	Get(ctx context.Context, threadID post_resource.PostID) (*Thread, error)
 
 	// Update(ctx context.Context, userID user.UserID, id string, title, category *string, pinned *bool) (*post.Post, error)
 
 	// Delete(ctx context.Context, id, authorID user.UserID) (int, error)
 }
 
-func WithID(id post.PostID) option {
+func WithID(id post_resource.PostID) option {
 	return func(c *Thread) {
 		c.ID = id
+	}
+}
+
+type Query func(q *model.PostQuery)
+
+func WithAuthor(id account_resource.AccountID) Query {
+	return func(q *model.PostQuery) {
+		q.Where(post.HasAuthorWith(account.ID(xid.ID(id))))
+	}
+}
+
+func WithTags(ids []xid.ID) Query {
+	return func(q *model.PostQuery) {
+		q.Where(post.HasTagsWith(tag.IDIn(ids...)))
 	}
 }

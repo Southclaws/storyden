@@ -332,6 +332,17 @@ paths:
       summary: Get a list of all threads.
       tags: [threads]
       security: []
+      parameters:
+        - name: author
+          description: Show only results creeated by this user.
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/AccountHandle" }
+        - name: tags
+          description: Show only results with these tags
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/TagListIDs" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -939,6 +950,16 @@ components:
       type: array
       description: A list of tags.
       items: { $ref: "#/components/schemas/Tag" }
+
+    TagListIDs:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/Identifier" }
+
+    TagListNames:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/TagName" }
 
     PostBodyMarkdown:
       type: string
