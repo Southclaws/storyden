@@ -16,8 +16,9 @@ func (s *service) Create(
 	authorID account.AccountID,
 	parentID post.PostID,
 	replyToID optional.Optional[post.PostID],
+	meta map[string]any,
 ) (*post.Post, error) {
-	p, err := s.post_repo.Create(ctx, body, authorID, parentID, replyToID)
+	p, err := s.post_repo.Create(ctx, body, authorID, parentID, replyToID, meta)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create post in thread")
 	}

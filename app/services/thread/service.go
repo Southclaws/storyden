@@ -25,6 +25,7 @@ type Service interface {
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		tags []string,
+		meta map[string]any,
 	) (*thread.Thread, error)
 
 	// ListAll returns all threads.

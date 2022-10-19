@@ -76,6 +76,7 @@ func (d *database) Create(
 		SetAuthorID(xid.ID(authorID)).
 		SetTitle(title).
 		SetCategory(cat).
+		SetMetadata(insert.Meta).
 		// AddTagIDs(tagset).
 		Save(ctx)
 	if err != nil {

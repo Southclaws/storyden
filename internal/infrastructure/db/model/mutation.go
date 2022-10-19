@@ -3245,6 +3245,7 @@ type PostMutation struct {
 	pinned          *bool
 	body            *string
 	short           *string
+	metadata        *map[string]interface{}
 	clearedFields   map[string]struct{}
 	author          *xid.ID
 	clearedauthor   bool
@@ -3836,6 +3837,55 @@ func (m *PostMutation) ResetShort() {
 	m.short = nil
 }
 
+// SetMetadata sets the "metadata" field.
+func (m *PostMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *PostMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *PostMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[post.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *PostMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[post.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *PostMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, post.FieldMetadata)
+}
+
 // SetCategoryID sets the "category_id" field.
 func (m *PostMutation) SetCategoryID(x xid.ID) {
 	m.category = &x
@@ -4263,7 +4313,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -4296,6 +4346,9 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.short != nil {
 		fields = append(fields, post.FieldShort)
+	}
+	if m.metadata != nil {
+		fields = append(fields, post.FieldMetadata)
 	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
@@ -4330,6 +4383,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Body()
 	case post.FieldShort:
 		return m.Short()
+	case post.FieldMetadata:
+		return m.Metadata()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -4363,6 +4418,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldBody(ctx)
 	case post.FieldShort:
 		return m.OldShort(ctx)
+	case post.FieldMetadata:
+		return m.OldMetadata(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -4451,6 +4508,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetShort(v)
 		return nil
+	case post.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -4503,6 +4567,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldReplyToPostID) {
 		fields = append(fields, post.FieldReplyToPostID)
 	}
+	if m.FieldCleared(post.FieldMetadata) {
+		fields = append(fields, post.FieldMetadata)
+	}
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -4534,6 +4601,9 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldReplyToPostID:
 		m.ClearReplyToPostID()
+		return nil
+	case post.FieldMetadata:
+		m.ClearMetadata()
 		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
@@ -4578,6 +4648,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldShort:
 		m.ResetShort()
+		return nil
+	case post.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()

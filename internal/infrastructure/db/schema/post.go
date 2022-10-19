@@ -31,6 +31,9 @@ func (Post) Fields() []ent.Field {
 		// All posts
 		field.String("body"),
 		field.String("short"),
+		field.JSON("metadata", map[string]any{}).
+			Optional().
+			Comment("Arbitrary metadata used by clients to store domain specific information."),
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),

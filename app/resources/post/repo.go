@@ -15,6 +15,7 @@ type Repository interface {
 		authorID account.AccountID,
 		parentID PostID,
 		replyToID optional.Optional[PostID],
+		meta map[string]any,
 	) (*Post, error)
 
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)

@@ -17,6 +17,7 @@ func (s *service) Create(ctx context.Context,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
+	meta map[string]any,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
@@ -31,7 +32,7 @@ func (s *service) Create(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to authorize")
 	}
 
-	thr, err := s.thread_repo.Create(ctx, title, body, authorID, categoryID, tags)
+	thr, err := s.thread_repo.Create(ctx, title, body, authorID, categoryID, tags, thread.WithMeta(meta))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create thread")
 	}

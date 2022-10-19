@@ -1060,6 +1060,20 @@ func ShortContainsFold(v string) predicate.Post {
 	})
 }
 
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldMetadata)))
+	})
+}
+
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldMetadata)))
+	})
+}
+
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.
 func CategoryIDEQ(v xid.ID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {

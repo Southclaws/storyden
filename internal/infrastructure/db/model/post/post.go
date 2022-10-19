@@ -35,6 +35,8 @@ const (
 	FieldBody = "body"
 	// FieldShort holds the string denoting the short field in the database.
 	FieldShort = "short"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -113,6 +115,7 @@ var Columns = []string{
 	FieldReplyToPostID,
 	FieldBody,
 	FieldShort,
+	FieldMetadata,
 	FieldCategoryID,
 }
 

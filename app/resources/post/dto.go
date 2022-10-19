@@ -25,6 +25,7 @@ type Post struct {
 	RootPostID PostID                    `json:"rootPostId"`
 	ReplyTo    optional.Optional[PostID] `json:"replyTo"`
 	Reacts     []react.React             `json:"reacts"`
+	Meta       map[string]any
 
 	CreatedAt time.Time                    `json:"createdAt"`
 	UpdatedAt time.Time                    `json:"updatedAt"`
@@ -74,6 +75,7 @@ func FromModel(m *model.Post) (w *Post) {
 		RootPostID: PostID(m.RootPostID),
 		ReplyTo:    replyTo,
 		Reacts:     reacts,
+		Meta:       m.Metadata,
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

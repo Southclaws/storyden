@@ -58,6 +58,12 @@ func WithID(id post_resource.PostID) option {
 	}
 }
 
+func WithMeta(meta map[string]any) option {
+	return func(t *Thread) {
+		t.Meta = meta
+	}
+}
+
 type Query func(q *model.PostQuery)
 
 func WithAuthor(id account_resource.AccountID) Query {
