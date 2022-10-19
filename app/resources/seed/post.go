@@ -66,7 +66,7 @@ func threads(tr thread.Repository, pr post.Repository) {
 		th := utils.Must(tr.Create(ctx, t.Title, t.Short, t.Author.ID, t.Category.ID, t.Tags, thread.WithID(t.ID)))
 
 		for _, p := range t.Posts {
-			utils.Must(pr.Create(ctx, p.Body, p.Author.ID, th.ID, nil))
+			utils.Must(pr.Create(ctx, p.Body, p.Author.ID, th.ID, nil, nil))
 		}
 	}
 

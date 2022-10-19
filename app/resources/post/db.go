@@ -28,6 +28,7 @@ func (d *database) Create(
 	authorID account.AccountID,
 	parentID PostID,
 	replyToID optional.Optional[PostID],
+	meta map[string]any,
 ) (*Post, error) {
 	short := MakeShortBody(body)
 

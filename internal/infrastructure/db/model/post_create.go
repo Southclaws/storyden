@@ -158,6 +158,12 @@ func (pc *PostCreate) SetShort(s string) *PostCreate {
 	return pc
 }
 
+// SetMetadata sets the "metadata" field.
+func (pc *PostCreate) SetMetadata(m map[string]interface{}) *PostCreate {
+	pc.mutation.SetMetadata(m)
+	return pc
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
 	pc.mutation.SetCategoryID(x)
@@ -532,6 +538,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		})
 		_node.Short = value
 	}
+	if value, ok := pc.mutation.Metadata(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: post.FieldMetadata,
+		})
+		_node.Metadata = value
+	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -904,6 +918,24 @@ func (u *PostUpsert) UpdateShort() *PostUpsert {
 	return u
 }
 
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsert) SetMetadata(v map[string]interface{}) *PostUpsert {
+	u.Set(post.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsert) UpdateMetadata() *PostUpsert {
+	u.SetExcluded(post.FieldMetadata)
+	return u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsert) ClearMetadata() *PostUpsert {
+	u.SetNull(post.FieldMetadata)
+	return u
+}
+
 // SetCategoryID sets the "category_id" field.
 func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
@@ -1161,6 +1193,27 @@ func (u *PostUpsertOne) SetShort(v string) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateShort() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateShort()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsertOne) SetMetadata(v map[string]interface{}) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateMetadata() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsertOne) ClearMetadata() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearMetadata()
 	})
 }
 
@@ -1590,6 +1643,27 @@ func (u *PostUpsertBulk) SetShort(v string) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateShort() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateShort()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *PostUpsertBulk) SetMetadata(v map[string]interface{}) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateMetadata() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *PostUpsertBulk) ClearMetadata() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearMetadata()
 	})
 }
 

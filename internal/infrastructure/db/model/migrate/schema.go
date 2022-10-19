@@ -116,6 +116,7 @@ var (
 		{Name: "pinned", Type: field.TypeBool, Default: false},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_posts", Type: field.TypeString, Size: 20},
 		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "root_post_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -129,25 +130,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_accounts_posts",
-				Columns:    []*schema.Column{PostsColumns[10]},
+				Columns:    []*schema.Column{PostsColumns[11]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[11]},
+				Columns:    []*schema.Column{PostsColumns[12]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[12]},
+				Columns:    []*schema.Column{PostsColumns[13]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_replies",
-				Columns:    []*schema.Column{PostsColumns[13]},
+				Columns:    []*schema.Column{PostsColumns[14]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

@@ -39,11 +39,17 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		reply = optional.Of(post.PostID(params.ReplyTo.XID()))
 	}
 
+	var meta map[string]any
+	if params.Meta != nil {
+		meta = *params.Meta
+	}
+
 	post, err := p.post_svc.Create(ctx,
 		params.Body,
 		accountID,
 		post.PostID(request.ThreadId.XID()),
 		reply,
+		meta,
 	)
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx, "reply_to", reply.String())

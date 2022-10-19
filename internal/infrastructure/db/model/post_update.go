@@ -172,6 +172,18 @@ func (pu *PostUpdate) SetShort(s string) *PostUpdate {
 	return pu
 }
 
+// SetMetadata sets the "metadata" field.
+func (pu *PostUpdate) SetMetadata(m map[string]interface{}) *PostUpdate {
+	pu.mutation.SetMetadata(m)
+	return pu
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (pu *PostUpdate) ClearMetadata() *PostUpdate {
+	pu.mutation.ClearMetadata()
+	return pu
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
 	pu.mutation.SetCategoryID(x)
@@ -592,6 +604,19 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: post.FieldShort,
+		})
+	}
+	if value, ok := pu.mutation.Metadata(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: post.FieldMetadata,
+		})
+	}
+	if pu.mutation.MetadataCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: post.FieldMetadata,
 		})
 	}
 	if pu.mutation.AuthorCleared() {
@@ -1109,6 +1134,18 @@ func (puo *PostUpdateOne) SetShort(s string) *PostUpdateOne {
 	return puo
 }
 
+// SetMetadata sets the "metadata" field.
+func (puo *PostUpdateOne) SetMetadata(m map[string]interface{}) *PostUpdateOne {
+	puo.mutation.SetMetadata(m)
+	return puo
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (puo *PostUpdateOne) ClearMetadata() *PostUpdateOne {
+	puo.mutation.ClearMetadata()
+	return puo
+}
+
 // SetCategoryID sets the "category_id" field.
 func (puo *PostUpdateOne) SetCategoryID(x xid.ID) *PostUpdateOne {
 	puo.mutation.SetCategoryID(x)
@@ -1559,6 +1596,19 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: post.FieldShort,
+		})
+	}
+	if value, ok := puo.mutation.Metadata(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: post.FieldMetadata,
+		})
+	}
+	if puo.mutation.MetadataCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: post.FieldMetadata,
 		})
 	}
 	if puo.mutation.AuthorCleared() {

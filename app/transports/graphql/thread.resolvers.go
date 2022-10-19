@@ -20,7 +20,7 @@ func (r *mutationResolver) CreateThread(ctx context.Context, input models.NewThr
 		return nil, err
 	}
 
-	thread, err := r.thread_service.Create(ctx, input.Title, input.Body, acc, category.CategoryID{}, nil)
+	thread, err := r.thread_service.Create(ctx, input.Title, input.Body, acc, category.CategoryID{}, nil, nil)
 	if err != nil {
 		return nil, errctx.Wrap(err, ctx)
 	}

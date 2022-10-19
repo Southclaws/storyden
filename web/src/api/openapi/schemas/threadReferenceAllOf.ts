@@ -7,6 +7,7 @@
 import type { ProfileReference } from "./profileReference";
 import type { Category } from "./category";
 import type { React } from "./react";
+import type { Metadata } from "./metadata";
 
 export type ThreadReferenceAllOf = {
   /** The title of the thread. */
@@ -28,4 +29,5 @@ for uniqueness and sortability.
   category: Category;
   /** A list of reactions this post has had from people. */
   reacts: React[];
+  meta: Metadata;
 };

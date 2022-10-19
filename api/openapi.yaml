@@ -676,6 +676,11 @@ components:
           type: object
           additionalProperties: true
 
+    Metadata:
+      type: object
+      additionalProperties: true
+      description: Arbitrary metadata for the resource.
+
     # -
     # Auth
     # -
@@ -799,6 +804,7 @@ components:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
         tags: { $ref: "#/components/schemas/TagList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
         category:
           $ref: "#/components/schemas/Identifier"
 
@@ -811,7 +817,16 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - type: object
           required:
-            [title, slug, short, pinned, author, tags, posts, category, reacts]
+            - title
+            - slug
+            - short
+            - pinned
+            - author
+            - tags
+            - posts
+            - category
+            - reacts
+            - meta
           properties:
             title:
               type: string
@@ -846,6 +861,7 @@ components:
               type: array
               items: { $ref: "#/components/schemas/React" }
               description: A list of reactions this post has had from people.
+            meta: { $ref: "#/components/schemas/Metadata" }
 
     Thread:
       allOf:
@@ -894,6 +910,7 @@ components:
           required: [body]
           properties:
             body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+            meta: { $ref: "#/components/schemas/Metadata" }
             reply_to:
               description: |
                 If present, identifies the post that this post is replying to.

@@ -21,6 +21,7 @@ type Service interface {
 		authorID account.AccountID,
 		parentID post.PostID,
 		replyToID optional.Optional[post.PostID],
+		meta map[string]any,
 	) (*post.Post, error)
 }
 

@@ -7,11 +7,13 @@
 import type { ThreadTitle } from "./threadTitle";
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
 import type { TagList } from "./tagList";
+import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
 
 export interface ThreadsCreateBody {
   title: ThreadTitle;
   body: PostBodyMarkdown;
   tags: TagList;
+  meta?: Metadata;
   category: Identifier;
 }

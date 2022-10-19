@@ -5,10 +5,12 @@
  * OpenAPI spec version: 1
  */
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
 
 export type PostAllOf = {
   body: PostBodyMarkdown;
+  meta?: Metadata;
   /** If present, identifies the post that this post is replying to.
    */
   reply_to?: Identifier;

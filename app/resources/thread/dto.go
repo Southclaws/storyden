@@ -29,6 +29,7 @@ type Thread struct {
 	Category category.Category
 	Posts    []*post.Post
 	Reacts   []*react.React
+	Meta     map[string]any
 }
 
 type AuthorRef struct {
@@ -67,5 +68,6 @@ func FromModel(m *model.Post) *Thread {
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
 		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
+		Meta:     m.Metadata,
 	}
 }

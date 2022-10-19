@@ -28,7 +28,7 @@ func TestCreate(t *testing.T) {
 				"My cool post in reply to your thread",
 				seed.Account_002.ID,
 				seed.Post_01.ID,
-				nil)
+				nil, nil)
 			r.NoError(err)
 			r.NotNil(p)
 

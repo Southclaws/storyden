@@ -22,7 +22,7 @@ func TestThreadCreate(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		t, err := thread_svc.Create(ctx, "New thread", "hi there", seed.Account_002.ID, seed.Category_01_General.ID, []string{"hello"})
+		t, err := thread_svc.Create(ctx, "New thread", "hi there", seed.Account_002.ID, seed.Category_01_General.ID, []string{"hello"}, nil)
 		r.NoError(err)
 		r.NotNil(t)
 
