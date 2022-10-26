@@ -1,6 +1,7 @@
 package: openapi
 generate:
   server: true
+  client: true
   echo-server: true
   strict-server: true
   models: true
