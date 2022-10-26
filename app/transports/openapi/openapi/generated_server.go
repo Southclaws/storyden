@@ -490,6 +490,2790 @@ type PostsCreateJSONRequestBody = PostSubmission
 // PostsCreateFormdataRequestBody defines body for PostsCreate for application/x-www-form-urlencoded ContentType.
 type PostsCreateFormdataRequestBody = PostSubmission
 
+// RequestEditorFn  is the function signature for the RequestEditor callback function
+type RequestEditorFn func(ctx context.Context, req *http.Request) error
+
+// Doer performs HTTP requests.
+//
+// The standard http.Client implements this interface.
+type HttpRequestDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+// Client which conforms to the OpenAPI3 specification for this service.
+type Client struct {
+	// The endpoint of the server conforming to this interface, with scheme,
+	// https://api.deepmap.com for example. This can contain a path relative
+	// to the server, such as https://api.deepmap.com/dev-test, and all the
+	// paths in the swagger spec will be appended to the server.
+	Server string
+
+	// Doer for performing requests, typically a *http.Client with any
+	// customized settings, such as certificate chains.
+	Client HttpRequestDoer
+
+	// A list of callbacks for modifying requests which are generated before sending over
+	// the network.
+	RequestEditors []RequestEditorFn
+}
+
+// ClientOption allows setting custom parameters during construction
+type ClientOption func(*Client) error
+
+// Creates a new Client, with reasonable defaults
+func NewClient(server string, opts ...ClientOption) (*Client, error) {
+	// create a client with sane default values
+	client := Client{
+		Server: server,
+	}
+	// mutate client and add all optional params
+	for _, o := range opts {
+		if err := o(&client); err != nil {
+			return nil, err
+		}
+	}
+	// ensure the server URL always has a trailing slash
+	if !strings.HasSuffix(client.Server, "/") {
+		client.Server += "/"
+	}
+	// create httpClient, if not already present
+	if client.Client == nil {
+		client.Client = &http.Client{}
+	}
+	return &client, nil
+}
+
+// WithHTTPClient allows overriding the default Doer, which is
+// automatically created using http.Client. This is useful for tests.
+func WithHTTPClient(doer HttpRequestDoer) ClientOption {
+	return func(c *Client) error {
+		c.Client = doer
+		return nil
+	}
+}
+
+// WithRequestEditorFn allows setting up a callback function, which will be
+// called right before sending the request. This can be used to mutate the request.
+func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
+	return func(c *Client) error {
+		c.RequestEditors = append(c.RequestEditors, fn)
+		return nil
+	}
+}
+
+// The interface specification for the client above.
+type ClientInterface interface {
+	// GetSpec request
+	GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AccountsGet request
+	AccountsGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AccountsUpdate request with any body
+	AccountsUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AccountsUpdate(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AccountsSetAvatar request with any body
+	AccountsSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AccountsGetAvatar request
+	AccountsGetAvatar(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthOAuthProviderList request
+	AuthOAuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthOAuthProviderCallback request with any body
+	AuthOAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthOAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthPasswordSignin request with any body
+	AuthPasswordSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthPasswordSignin(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthPasswordSigninWithFormdataBody(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthPasswordSignup request with any body
+	AuthPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthPasswordSignupWithFormdataBody(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// WebAuthnMakeAssertion request with any body
+	WebAuthnMakeAssertionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	WebAuthnMakeAssertion(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	WebAuthnMakeAssertionWithFormdataBody(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// WebAuthnGetAssertion request with any body
+	WebAuthnGetAssertionWithBody(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	WebAuthnGetAssertion(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	WebAuthnGetAssertionWithFormdataBody(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// WebAuthnMakeCredential request with any body
+	WebAuthnMakeCredentialWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	WebAuthnMakeCredential(ctx context.Context, body WebAuthnMakeCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// WebAuthnRequestCredential request
+	WebAuthnRequestCredential(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ProfilesGet request
+	ProfilesGet(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ThreadsList request
+	ThreadsList(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ThreadsCreate request with any body
+	ThreadsCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ThreadsCreate(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ThreadsCreateWithFormdataBody(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ThreadsGet request
+	ThreadsGet(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostsCreate request with any body
+	PostsCreateWithBody(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostsCreate(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostsCreateWithFormdataBody(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetVersion request
+	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSpecRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountsGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsGetRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountsUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsUpdateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountsUpdate(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsUpdateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountsSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsSetAvatarRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountsGetAvatar(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsGetAvatarRequest(c.Server, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthOAuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthOAuthProviderListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthOAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthOAuthProviderCallbackRequestWithBody(c.Server, oauthProvider, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthOAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthOAuthProviderCallbackRequest(c.Server, oauthProvider, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSigninRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSignin(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSigninRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSigninWithFormdataBody(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSigninRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSignupRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSignupRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthPasswordSignupWithFormdataBody(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthPasswordSignupRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnMakeAssertionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnMakeAssertionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnMakeAssertion(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnMakeAssertionRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnMakeAssertionWithFormdataBody(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnMakeAssertionRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnGetAssertionWithBody(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnGetAssertionRequestWithBody(c.Server, accountHandle, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnGetAssertion(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnGetAssertionRequest(c.Server, accountHandle, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnGetAssertionWithFormdataBody(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnGetAssertionRequestWithFormdataBody(c.Server, accountHandle, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnMakeCredentialWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnMakeCredentialRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnMakeCredential(ctx context.Context, body WebAuthnMakeCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnMakeCredentialRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) WebAuthnRequestCredential(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewWebAuthnRequestCredentialRequest(c.Server, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ProfilesGet(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProfilesGetRequest(c.Server, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadsList(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadsCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadsCreate(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadsCreateWithFormdataBody(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsCreateRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadsGet(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsGetRequest(c.Server, threadId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostsCreateWithBody(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequestWithBody(c.Server, threadId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostsCreate(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequest(c.Server, threadId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostsCreateWithFormdataBody(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequestWithFormdataBody(c.Server, threadId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVersionRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewGetSpecRequest generates requests for GetSpec
+func NewGetSpecRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/openapi.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAccountsGetRequest generates requests for AccountsGet
+func NewAccountsGetRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/accounts")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAccountsUpdateRequest calls the generic AccountsUpdate builder with application/json body
+func NewAccountsUpdateRequest(server string, body AccountsUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAccountsUpdateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAccountsUpdateRequestWithBody generates requests for AccountsUpdate with any type of body
+func NewAccountsUpdateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/accounts")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAccountsSetAvatarRequestWithBody generates requests for AccountsSetAvatar with any type of body
+func NewAccountsSetAvatarRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/accounts/self/avatar")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAccountsGetAvatarRequest generates requests for AccountsGetAvatar
+func NewAccountsGetAvatarRequest(server string, accountHandle AccountHandle) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/accounts/%s/avatar", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAuthOAuthProviderListRequest generates requests for AuthOAuthProviderList
+func NewAuthOAuthProviderListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/oauth")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAuthOAuthProviderCallbackRequest calls the generic AuthOAuthProviderCallback builder with application/json body
+func NewAuthOAuthProviderCallbackRequest(server string, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthOAuthProviderCallbackRequestWithBody(server, oauthProvider, "application/json", bodyReader)
+}
+
+// NewAuthOAuthProviderCallbackRequestWithBody generates requests for AuthOAuthProviderCallback with any type of body
+func NewAuthOAuthProviderCallbackRequestWithBody(server string, oauthProvider OAuthProvider, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_provider", runtime.ParamLocationPath, oauthProvider)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/oauth/%s/callback", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthPasswordSigninRequest calls the generic AuthPasswordSignin builder with application/json body
+func NewAuthPasswordSigninRequest(server string, body AuthPasswordSigninJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthPasswordSigninRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthPasswordSigninRequestWithFormdataBody calls the generic AuthPasswordSignin builder with application/x-www-form-urlencoded body
+func NewAuthPasswordSigninRequestWithFormdataBody(server string, body AuthPasswordSigninFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewAuthPasswordSigninRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewAuthPasswordSigninRequestWithBody generates requests for AuthPasswordSignin with any type of body
+func NewAuthPasswordSigninRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/password/signin")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthPasswordSignupRequest calls the generic AuthPasswordSignup builder with application/json body
+func NewAuthPasswordSignupRequest(server string, body AuthPasswordSignupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthPasswordSignupRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthPasswordSignupRequestWithFormdataBody calls the generic AuthPasswordSignup builder with application/x-www-form-urlencoded body
+func NewAuthPasswordSignupRequestWithFormdataBody(server string, body AuthPasswordSignupFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewAuthPasswordSignupRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewAuthPasswordSignupRequestWithBody generates requests for AuthPasswordSignup with any type of body
+func NewAuthPasswordSignupRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/password/signup")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewWebAuthnMakeAssertionRequest calls the generic WebAuthnMakeAssertion builder with application/json body
+func NewWebAuthnMakeAssertionRequest(server string, body WebAuthnMakeAssertionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewWebAuthnMakeAssertionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewWebAuthnMakeAssertionRequestWithFormdataBody calls the generic WebAuthnMakeAssertion builder with application/x-www-form-urlencoded body
+func NewWebAuthnMakeAssertionRequestWithFormdataBody(server string, body WebAuthnMakeAssertionFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewWebAuthnMakeAssertionRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewWebAuthnMakeAssertionRequestWithBody generates requests for WebAuthnMakeAssertion with any type of body
+func NewWebAuthnMakeAssertionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/webauthn/assert")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewWebAuthnGetAssertionRequest calls the generic WebAuthnGetAssertion builder with application/json body
+func NewWebAuthnGetAssertionRequest(server string, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewWebAuthnGetAssertionRequestWithBody(server, accountHandle, "application/json", bodyReader)
+}
+
+// NewWebAuthnGetAssertionRequestWithFormdataBody calls the generic WebAuthnGetAssertion builder with application/x-www-form-urlencoded body
+func NewWebAuthnGetAssertionRequestWithFormdataBody(server string, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewWebAuthnGetAssertionRequestWithBody(server, accountHandle, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewWebAuthnGetAssertionRequestWithBody generates requests for WebAuthnGetAssertion with any type of body
+func NewWebAuthnGetAssertionRequestWithBody(server string, accountHandle AccountHandle, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/webauthn/assert/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewWebAuthnMakeCredentialRequest calls the generic WebAuthnMakeCredential builder with application/json body
+func NewWebAuthnMakeCredentialRequest(server string, body WebAuthnMakeCredentialJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewWebAuthnMakeCredentialRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewWebAuthnMakeCredentialRequestWithBody generates requests for WebAuthnMakeCredential with any type of body
+func NewWebAuthnMakeCredentialRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/webauthn/make")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewWebAuthnRequestCredentialRequest generates requests for WebAuthnRequestCredential
+func NewWebAuthnRequestCredentialRequest(server string, accountHandle AccountHandle) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/webauthn/make/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewProfilesGetRequest generates requests for ProfilesGet
+func NewProfilesGetRequest(server string, accountHandle AccountHandle) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/profiles/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewThreadsListRequest generates requests for ThreadsList
+func NewThreadsListRequest(server string, params *ThreadsListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/threads")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	queryValues := queryURL.Query()
+
+	if params.Author != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "author", runtime.ParamLocationQuery, *params.Author); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.Tags != nil {
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tags", runtime.ParamLocationQuery, *params.Tags); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	queryURL.RawQuery = queryValues.Encode()
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewThreadsCreateRequest calls the generic ThreadsCreate builder with application/json body
+func NewThreadsCreateRequest(server string, body ThreadsCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewThreadsCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewThreadsCreateRequestWithFormdataBody calls the generic ThreadsCreate builder with application/x-www-form-urlencoded body
+func NewThreadsCreateRequestWithFormdataBody(server string, body ThreadsCreateFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewThreadsCreateRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewThreadsCreateRequestWithBody generates requests for ThreadsCreate with any type of body
+func NewThreadsCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/threads")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewThreadsGetRequest generates requests for ThreadsGet
+func NewThreadsGetRequest(server string, threadId ThreadID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, threadId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/threads/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPostsCreateRequest calls the generic PostsCreate builder with application/json body
+func NewPostsCreateRequest(server string, threadId ThreadID, body PostsCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostsCreateRequestWithBody(server, threadId, "application/json", bodyReader)
+}
+
+// NewPostsCreateRequestWithFormdataBody calls the generic PostsCreate builder with application/x-www-form-urlencoded body
+func NewPostsCreateRequestWithFormdataBody(server string, threadId ThreadID, body PostsCreateFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewPostsCreateRequestWithBody(server, threadId, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewPostsCreateRequestWithBody generates requests for PostsCreate with any type of body
+func NewPostsCreateRequestWithBody(server string, threadId ThreadID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, threadId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/threads/%s/posts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetVersionRequest generates requests for GetVersion
+func NewGetVersionRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/version")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+	for _, r := range c.RequestEditors {
+		if err := r(ctx, req); err != nil {
+			return err
+		}
+	}
+	for _, r := range additionalEditors {
+		if err := r(ctx, req); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ClientWithResponses builds on ClientInterface to offer response payloads
+type ClientWithResponses struct {
+	ClientInterface
+}
+
+// NewClientWithResponses creates a new ClientWithResponses, which wraps
+// Client with return type handling
+func NewClientWithResponses(server string, opts ...ClientOption) (*ClientWithResponses, error) {
+	client, err := NewClient(server, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &ClientWithResponses{client}, nil
+}
+
+// WithBaseURL overrides the baseURL.
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
+		newBaseURL, err := url.Parse(baseURL)
+		if err != nil {
+			return err
+		}
+		c.Server = newBaseURL.String()
+		return nil
+	}
+}
+
+// ClientWithResponsesInterface is the interface specification for the client with responses above.
+type ClientWithResponsesInterface interface {
+	// GetSpec request
+	GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error)
+
+	// AccountsGet request
+	AccountsGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountsGetResponse, error)
+
+	// AccountsUpdate request with any body
+	AccountsUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error)
+
+	AccountsUpdateWithResponse(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error)
+
+	// AccountsSetAvatar request with any body
+	AccountsSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsSetAvatarResponse, error)
+
+	// AccountsGetAvatar request
+	AccountsGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*AccountsGetAvatarResponse, error)
+
+	// AuthOAuthProviderList request
+	AuthOAuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthOAuthProviderListResponse, error)
+
+	// AuthOAuthProviderCallback request with any body
+	AuthOAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error)
+
+	AuthOAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error)
+
+	// AuthPasswordSignin request with any body
+	AuthPasswordSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
+
+	AuthPasswordSigninWithResponse(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
+
+	AuthPasswordSigninWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
+
+	// AuthPasswordSignup request with any body
+	AuthPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
+
+	AuthPasswordSignupWithResponse(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
+
+	AuthPasswordSignupWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
+
+	// WebAuthnMakeAssertion request with any body
+	WebAuthnMakeAssertionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
+
+	WebAuthnMakeAssertionWithResponse(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
+
+	WebAuthnMakeAssertionWithFormdataBodyWithResponse(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
+
+	// WebAuthnGetAssertion request with any body
+	WebAuthnGetAssertionWithBodyWithResponse(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
+
+	WebAuthnGetAssertionWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
+
+	WebAuthnGetAssertionWithFormdataBodyWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
+
+	// WebAuthnMakeCredential request with any body
+	WebAuthnMakeCredentialWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeCredentialResponse, error)
+
+	WebAuthnMakeCredentialWithResponse(ctx context.Context, body WebAuthnMakeCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeCredentialResponse, error)
+
+	// WebAuthnRequestCredential request
+	WebAuthnRequestCredentialWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*WebAuthnRequestCredentialResponse, error)
+
+	// ProfilesGet request
+	ProfilesGetWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*ProfilesGetResponse, error)
+
+	// ThreadsList request
+	ThreadsListWithResponse(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*ThreadsListResponse, error)
+
+	// ThreadsCreate request with any body
+	ThreadsCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+
+	ThreadsCreateWithResponse(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+
+	ThreadsCreateWithFormdataBodyWithResponse(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+
+	// ThreadsGet request
+	ThreadsGetWithResponse(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error)
+
+	// PostsCreate request with any body
+	PostsCreateWithBodyWithResponse(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+
+	PostsCreateWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+
+	PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+
+	// GetVersion request
+	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
+}
+
+type GetSpecResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSpecResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSpecResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Account
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountsUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Account
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountsUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountsUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountsSetAvatarResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountsSetAvatarResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountsSetAvatarResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountsGetAvatarResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountsGetAvatarResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountsGetAvatarResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthOAuthProviderListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthOAuthProviderListBody
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthOAuthProviderListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthOAuthProviderListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthOAuthProviderCallbackResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthOAuthProviderCallbackResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthOAuthProviderCallbackResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthPasswordSigninResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthPasswordSigninResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthPasswordSigninResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthPasswordSignupResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthPasswordSignupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthPasswordSignupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type WebAuthnMakeAssertionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r WebAuthnMakeAssertionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r WebAuthnMakeAssertionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type WebAuthnGetAssertionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r WebAuthnGetAssertionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r WebAuthnGetAssertionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type WebAuthnMakeCredentialResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r WebAuthnMakeCredentialResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r WebAuthnMakeCredentialResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type WebAuthnRequestCredentialResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *any
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r WebAuthnRequestCredentialResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r WebAuthnRequestCredentialResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ProfilesGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PublicProfile
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r ProfilesGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ProfilesGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ThreadsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]ThreadReference
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r ThreadsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ThreadsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ThreadsCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Thread
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r ThreadsCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ThreadsCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ThreadsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Thread
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r ThreadsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ThreadsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostsCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Post
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostsCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostsCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetVersionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GetVersionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetVersionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// GetSpecWithResponse request returning *GetSpecResponse
+func (c *ClientWithResponses) GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error) {
+	rsp, err := c.GetSpec(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSpecResponse(rsp)
+}
+
+// AccountsGetWithResponse request returning *AccountsGetResponse
+func (c *ClientWithResponses) AccountsGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountsGetResponse, error) {
+	rsp, err := c.AccountsGet(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountsGetResponse(rsp)
+}
+
+// AccountsUpdateWithBodyWithResponse request with arbitrary body returning *AccountsUpdateResponse
+func (c *ClientWithResponses) AccountsUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error) {
+	rsp, err := c.AccountsUpdateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountsUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) AccountsUpdateWithResponse(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error) {
+	rsp, err := c.AccountsUpdate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountsUpdateResponse(rsp)
+}
+
+// AccountsSetAvatarWithBodyWithResponse request with arbitrary body returning *AccountsSetAvatarResponse
+func (c *ClientWithResponses) AccountsSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsSetAvatarResponse, error) {
+	rsp, err := c.AccountsSetAvatarWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountsSetAvatarResponse(rsp)
+}
+
+// AccountsGetAvatarWithResponse request returning *AccountsGetAvatarResponse
+func (c *ClientWithResponses) AccountsGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*AccountsGetAvatarResponse, error) {
+	rsp, err := c.AccountsGetAvatar(ctx, accountHandle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountsGetAvatarResponse(rsp)
+}
+
+// AuthOAuthProviderListWithResponse request returning *AuthOAuthProviderListResponse
+func (c *ClientWithResponses) AuthOAuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthOAuthProviderListResponse, error) {
+	rsp, err := c.AuthOAuthProviderList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthOAuthProviderListResponse(rsp)
+}
+
+// AuthOAuthProviderCallbackWithBodyWithResponse request with arbitrary body returning *AuthOAuthProviderCallbackResponse
+func (c *ClientWithResponses) AuthOAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error) {
+	rsp, err := c.AuthOAuthProviderCallbackWithBody(ctx, oauthProvider, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthOAuthProviderCallbackResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthOAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error) {
+	rsp, err := c.AuthOAuthProviderCallback(ctx, oauthProvider, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthOAuthProviderCallbackResponse(rsp)
+}
+
+// AuthPasswordSigninWithBodyWithResponse request with arbitrary body returning *AuthPasswordSigninResponse
+func (c *ClientWithResponses) AuthPasswordSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error) {
+	rsp, err := c.AuthPasswordSigninWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSigninResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthPasswordSigninWithResponse(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error) {
+	rsp, err := c.AuthPasswordSignin(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSigninResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthPasswordSigninWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error) {
+	rsp, err := c.AuthPasswordSigninWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSigninResponse(rsp)
+}
+
+// AuthPasswordSignupWithBodyWithResponse request with arbitrary body returning *AuthPasswordSignupResponse
+func (c *ClientWithResponses) AuthPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
+	rsp, err := c.AuthPasswordSignupWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSignupResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthPasswordSignupWithResponse(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
+	rsp, err := c.AuthPasswordSignup(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSignupResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthPasswordSignupWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
+	rsp, err := c.AuthPasswordSignupWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthPasswordSignupResponse(rsp)
+}
+
+// WebAuthnMakeAssertionWithBodyWithResponse request with arbitrary body returning *WebAuthnMakeAssertionResponse
+func (c *ClientWithResponses) WebAuthnMakeAssertionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error) {
+	rsp, err := c.WebAuthnMakeAssertionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnMakeAssertionResponse(rsp)
+}
+
+func (c *ClientWithResponses) WebAuthnMakeAssertionWithResponse(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error) {
+	rsp, err := c.WebAuthnMakeAssertion(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnMakeAssertionResponse(rsp)
+}
+
+func (c *ClientWithResponses) WebAuthnMakeAssertionWithFormdataBodyWithResponse(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error) {
+	rsp, err := c.WebAuthnMakeAssertionWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnMakeAssertionResponse(rsp)
+}
+
+// WebAuthnGetAssertionWithBodyWithResponse request with arbitrary body returning *WebAuthnGetAssertionResponse
+func (c *ClientWithResponses) WebAuthnGetAssertionWithBodyWithResponse(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
+	rsp, err := c.WebAuthnGetAssertionWithBody(ctx, accountHandle, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnGetAssertionResponse(rsp)
+}
+
+func (c *ClientWithResponses) WebAuthnGetAssertionWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
+	rsp, err := c.WebAuthnGetAssertion(ctx, accountHandle, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnGetAssertionResponse(rsp)
+}
+
+func (c *ClientWithResponses) WebAuthnGetAssertionWithFormdataBodyWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
+	rsp, err := c.WebAuthnGetAssertionWithFormdataBody(ctx, accountHandle, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnGetAssertionResponse(rsp)
+}
+
+// WebAuthnMakeCredentialWithBodyWithResponse request with arbitrary body returning *WebAuthnMakeCredentialResponse
+func (c *ClientWithResponses) WebAuthnMakeCredentialWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeCredentialResponse, error) {
+	rsp, err := c.WebAuthnMakeCredentialWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnMakeCredentialResponse(rsp)
+}
+
+func (c *ClientWithResponses) WebAuthnMakeCredentialWithResponse(ctx context.Context, body WebAuthnMakeCredentialJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeCredentialResponse, error) {
+	rsp, err := c.WebAuthnMakeCredential(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnMakeCredentialResponse(rsp)
+}
+
+// WebAuthnRequestCredentialWithResponse request returning *WebAuthnRequestCredentialResponse
+func (c *ClientWithResponses) WebAuthnRequestCredentialWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*WebAuthnRequestCredentialResponse, error) {
+	rsp, err := c.WebAuthnRequestCredential(ctx, accountHandle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseWebAuthnRequestCredentialResponse(rsp)
+}
+
+// ProfilesGetWithResponse request returning *ProfilesGetResponse
+func (c *ClientWithResponses) ProfilesGetWithResponse(ctx context.Context, accountHandle AccountHandle, reqEditors ...RequestEditorFn) (*ProfilesGetResponse, error) {
+	rsp, err := c.ProfilesGet(ctx, accountHandle, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseProfilesGetResponse(rsp)
+}
+
+// ThreadsListWithResponse request returning *ThreadsListResponse
+func (c *ClientWithResponses) ThreadsListWithResponse(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*ThreadsListResponse, error) {
+	rsp, err := c.ThreadsList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadsListResponse(rsp)
+}
+
+// ThreadsCreateWithBodyWithResponse request with arbitrary body returning *ThreadsCreateResponse
+func (c *ClientWithResponses) ThreadsCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
+	rsp, err := c.ThreadsCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadsCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) ThreadsCreateWithResponse(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
+	rsp, err := c.ThreadsCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadsCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) ThreadsCreateWithFormdataBodyWithResponse(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
+	rsp, err := c.ThreadsCreateWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadsCreateResponse(rsp)
+}
+
+// ThreadsGetWithResponse request returning *ThreadsGetResponse
+func (c *ClientWithResponses) ThreadsGetWithResponse(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error) {
+	rsp, err := c.ThreadsGet(ctx, threadId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadsGetResponse(rsp)
+}
+
+// PostsCreateWithBodyWithResponse request with arbitrary body returning *PostsCreateResponse
+func (c *ClientWithResponses) PostsCreateWithBodyWithResponse(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreateWithBody(ctx, threadId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostsCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostsCreateWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreate(ctx, threadId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostsCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreateWithFormdataBody(ctx, threadId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostsCreateResponse(rsp)
+}
+
+// GetVersionWithResponse request returning *GetVersionResponse
+func (c *ClientWithResponses) GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error) {
+	rsp, err := c.GetVersion(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetVersionResponse(rsp)
+}
+
+// ParseGetSpecResponse parses an HTTP response from a GetSpecWithResponse call
+func ParseGetSpecResponse(rsp *http.Response) (*GetSpecResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSpecResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseAccountsGetResponse parses an HTTP response from a AccountsGetWithResponse call
+func ParseAccountsGetResponse(rsp *http.Response) (*AccountsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Account
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAccountsUpdateResponse parses an HTTP response from a AccountsUpdateWithResponse call
+func ParseAccountsUpdateResponse(rsp *http.Response) (*AccountsUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountsUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Account
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAccountsSetAvatarResponse parses an HTTP response from a AccountsSetAvatarWithResponse call
+func ParseAccountsSetAvatarResponse(rsp *http.Response) (*AccountsSetAvatarResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountsSetAvatarResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAccountsGetAvatarResponse parses an HTTP response from a AccountsGetAvatarWithResponse call
+func ParseAccountsGetAvatarResponse(rsp *http.Response) (*AccountsGetAvatarResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountsGetAvatarResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthOAuthProviderListResponse parses an HTTP response from a AuthOAuthProviderListWithResponse call
+func ParseAuthOAuthProviderListResponse(rsp *http.Response) (*AuthOAuthProviderListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthOAuthProviderListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthOAuthProviderListBody
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthOAuthProviderCallbackResponse parses an HTTP response from a AuthOAuthProviderCallbackWithResponse call
+func ParseAuthOAuthProviderCallbackResponse(rsp *http.Response) (*AuthOAuthProviderCallbackResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthOAuthProviderCallbackResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthPasswordSigninResponse parses an HTTP response from a AuthPasswordSigninWithResponse call
+func ParseAuthPasswordSigninResponse(rsp *http.Response) (*AuthPasswordSigninResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthPasswordSigninResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthPasswordSignupResponse parses an HTTP response from a AuthPasswordSignupWithResponse call
+func ParseAuthPasswordSignupResponse(rsp *http.Response) (*AuthPasswordSignupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthPasswordSignupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseWebAuthnMakeAssertionResponse parses an HTTP response from a WebAuthnMakeAssertionWithResponse call
+func ParseWebAuthnMakeAssertionResponse(rsp *http.Response) (*WebAuthnMakeAssertionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &WebAuthnMakeAssertionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseWebAuthnGetAssertionResponse parses an HTTP response from a WebAuthnGetAssertionWithResponse call
+func ParseWebAuthnGetAssertionResponse(rsp *http.Response) (*WebAuthnGetAssertionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &WebAuthnGetAssertionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseWebAuthnMakeCredentialResponse parses an HTTP response from a WebAuthnMakeCredentialWithResponse call
+func ParseWebAuthnMakeCredentialResponse(rsp *http.Response) (*WebAuthnMakeCredentialResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &WebAuthnMakeCredentialResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseWebAuthnRequestCredentialResponse parses an HTTP response from a WebAuthnRequestCredentialWithResponse call
+func ParseWebAuthnRequestCredentialResponse(rsp *http.Response) (*WebAuthnRequestCredentialResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &WebAuthnRequestCredentialResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest any
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseProfilesGetResponse parses an HTTP response from a ProfilesGetWithResponse call
+func ParseProfilesGetResponse(rsp *http.Response) (*ProfilesGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ProfilesGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PublicProfile
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseThreadsListResponse parses an HTTP response from a ThreadsListWithResponse call
+func ParseThreadsListResponse(rsp *http.Response) (*ThreadsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ThreadsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []ThreadReference
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseThreadsCreateResponse parses an HTTP response from a ThreadsCreateWithResponse call
+func ParseThreadsCreateResponse(rsp *http.Response) (*ThreadsCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ThreadsCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Thread
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseThreadsGetResponse parses an HTTP response from a ThreadsGetWithResponse call
+func ParseThreadsGetResponse(rsp *http.Response) (*ThreadsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ThreadsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Thread
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostsCreateResponse parses an HTTP response from a PostsCreateWithResponse call
+func ParsePostsCreateResponse(rsp *http.Response) (*PostsCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostsCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Post
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetVersionResponse parses an HTTP response from a GetVersionWithResponse call
+func ParseGetVersionResponse(rsp *http.Response) (*GetVersionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetVersionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get the OpenAPI 3.0 specification as JSON.
