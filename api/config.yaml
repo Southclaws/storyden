@@ -6,4 +6,4 @@ generate:
   strict-server: true
   models: true
   embedded-spec: true
-output: ./openapi/generated_server.go
+output: ./openapi/generated.go
