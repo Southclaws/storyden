@@ -1,8 +1,9 @@
 package mailer
 
 import (
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
@@ -22,7 +23,7 @@ type Config struct {
 func NewSendGrid() (Mailer, error) {
 	var cfg Config
 	if err := envconfig.Process("", &cfg); err != nil {
-		return nil, errors.Wrap(err, "failed to load sendgrid configuration")
+		return nil, fault.Wrap(err, fmsg.With("failed to load sendgrid configuration"))
 	}
 
 	return &SendGrid{
@@ -40,7 +41,7 @@ func (m *SendGrid) Mail(toname, toaddr, subj, rich, text string) error {
 
 	_, err := m.client.Send(message)
 	if err != nil {
-		return errors.Wrap(err, "failed to send email via sendgrid")
+		return fault.Wrap(err, fmsg.With("failed to send email via sendgrid"))
 	}
 
 	return nil

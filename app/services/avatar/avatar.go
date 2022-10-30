@@ -5,8 +5,8 @@ import (
 	"io"
 	"path"
 
-	"github.com/Southclaws/fault/errctx"
-
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 )
 
@@ -25,7 +25,7 @@ func (s *service) Exists(ctx context.Context, accountID account.AccountID) bool 
 
 func (s *service) Set(ctx context.Context, accountID account.AccountID, stream io.Reader) error {
 	if err := s.storage.Write(ctx, avatarPath(accountID), stream); err != nil {
-		return errctx.Wrap(err, ctx)
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
@@ -34,7 +34,7 @@ func (s *service) Set(ctx context.Context, accountID account.AccountID, stream i
 func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Reader, error) {
 	stream, err := s.storage.Read(ctx, avatarPath(accountID))
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return stream, nil

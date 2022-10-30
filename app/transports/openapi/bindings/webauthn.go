@@ -9,8 +9,9 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/kr/pretty"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -71,12 +72,12 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		// webauthn.WithConveyancePreference(protocol.ConveyancePreference(attType)),
 	)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to start registration")
+		return nil, fault.Wrap(err, fmsg.With("failed to start registration"))
 	}
 
 	cookie, err := json.Marshal(sessionData)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to encode session data")
+		return nil, fault.Wrap(err, fmsg.With("failed to encode session data"))
 	}
 
 	return openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{

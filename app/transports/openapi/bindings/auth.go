@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -53,12 +53,12 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 
 	u, err := i.p.Login(ctx, params.Identifier, params.Token)
 	if err != nil {
-		return nil, errors.Wrap(err, "login failed")
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	cookie, err := i.encodeSession(u.ID)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AuthPasswordSignin200JSONResponse{
@@ -78,12 +78,12 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 
 	u, err := i.p.Register(ctx, params.Identifier, params.Token)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx, "identifier", params.Identifier)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	cookie, err := i.encodeSession(u.ID)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AuthPasswordSignup200JSONResponse{
@@ -110,17 +110,17 @@ func (o *Authentication) AuthOAuthProviderList(ctx context.Context, request open
 func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request openapi.AuthOAuthProviderCallbackRequestObject) (openapi.AuthOAuthProviderCallbackResponseObject, error) {
 	provider, err := o.oa.Provider(string(request.OauthProvider))
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	account, err := provider.Login(ctx, request.Body.State, request.Body.Code)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	cookie, err := o.encodeSession(account.ID)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AuthPasswordSignin200JSONResponse{
@@ -149,14 +149,14 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	// first check if the middleware injected an account ID, if not, fail.
 	aid, err := authentication.GetAccountID(c.Request().Context())
 	if err != nil {
-		return errtag.Wrap(err, errtag.Unauthenticated{})
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 	}
 
 	// Then look up the account.
 	// TODO: Cache this.
 	_, err = i.ar.GetByID(ctx, aid)
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
@@ -171,7 +171,7 @@ type session struct {
 func (i *Authentication) encodeSession(userID account.AccountID) (string, error) {
 	encoded, err := i.sc.Encode(secureCookieName, session{userID})
 	if err != nil {
-		return "", errtag.Wrap(err, errtag.Internal{})
+		return "", fault.Wrap(err)
 	}
 
 	cookie := &http.Cookie{

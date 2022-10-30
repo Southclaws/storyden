@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
@@ -25,12 +26,12 @@ func NewProfiles(as account.Service, ar account_repo.Repository) Profiles {
 func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetRequestObject) (openapi.ProfilesGetResponseObject, error) {
 	id, err := request.AccountHandle.ID(ctx, p.ar)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	acc, err := p.as.Get(ctx, id)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	interests := dt.Map(acc.Interests, serialiseTag)

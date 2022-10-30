@@ -3,8 +3,9 @@ package authentication
 import (
 	"context"
 
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -37,10 +38,10 @@ func (d *database) Create(ctx context.Context,
 		Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	r, err = d.db.Authentication.
@@ -50,10 +51,10 @@ func (d *database) Create(ctx context.Context,
 		Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(r), nil
@@ -73,7 +74,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 			return nil, false, nil
 		}
 
-		return nil, false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(r), true, nil
@@ -85,7 +86,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
 		All(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModelMany(r), nil
@@ -101,10 +102,10 @@ func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier
 		Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return false, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return r.Token == token, nil

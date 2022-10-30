@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	"github.com/kelseyhightower/envconfig"
-	"github.com/pkg/errors"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -29,7 +30,7 @@ func LoadProvider(name string) (Configuration, error) {
 
 	pc := Configuration{}
 	if err := envconfig.Process(strings.ToUpper(name), &pc); err != nil {
-		return Configuration{}, errors.Wrapf(err, "oauth provider '%s' is enabled but configuration failed to load", name)
+		return Configuration{}, fault.Wrap(err, fmsg.With(fmt.Sprintf("oauth provider '%s' is enabled but configuration failed to load", name)))
 	}
 
 	return pc, nil

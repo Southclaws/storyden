@@ -5,6 +5,8 @@ import (
 	"github.com/streadway/amqp"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -19,17 +21,17 @@ type Rabbit struct {
 func NewRabbit(cfg config.Config) (Bus, error) {
 	conn, err := amqp.Dial(cfg.AmqpAddress)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to amqp server")
+		return nil, fault.Wrap(err, fmsg.With("failed to connect to amqp server"))
 	}
 
 	pub, err := conn.Channel()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create publish channel")
+		return nil, fault.Wrap(err, fmsg.With("failed to create publish channel"))
 	}
 
 	sub, err := conn.Channel()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create subscribe channel")
+		return nil, fault.Wrap(err, fmsg.With("failed to create subscribe channel"))
 	}
 
 	r := Rabbit{pub, sub, make(map[Topic]amqp.Queue)}
@@ -72,7 +74,7 @@ func (r *Rabbit) Publish(topic Topic, message []byte) error {
 		},
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to publish to topic")
+		return fault.Wrap(err, fmsg.With("failed to publish to topic"))
 	}
 
 	return nil

@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"4d63.com/optional"
-	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -94,15 +96,15 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 		SetError(&authError).
 		Post("https://www.linkedin.com/oauth/v2/accessToken")
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if authError.Error != "" {
-		return nil, errctx.Wrap(errors.New(authError.ErrorDescription), ctx)
+		return nil, fault.Wrap(errors.New(authError.ErrorDescription), fctx.With(ctx))
 	}
 
 	if auth.AccessToken == "" {
-		return nil, errctx.Wrap(errors.New("no access token in response"), ctx)
+		return nil, fault.Wrap(errors.New("no access token in response"), fctx.With(ctx))
 	}
 
 	// Use the auth token for all future requests
@@ -127,7 +129,7 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 		SetResult(&profile).
 		Get("https://api.linkedin.com/v2/me?projection=(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))")
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	// TODO: Iterate "elements" and search for the largest avatar instead of
@@ -148,11 +150,11 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 
 	acc, err := p.getOrCreateAccount(ctx, "linkedin", profile.ID, auth.AccessToken, handle, name)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if err := p.setAvatar(ctx, rest, acc, avatarURL); err != nil {
-		// failing to set the avatar is not a big issue.
+		// failing to set the avatar is not a big fmsg.
 		fmt.Println(err)
 	}
 
@@ -162,7 +164,7 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
 	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, provider, identifier)
 	if err != nil {
-		return nil, errctx.Wrap(errors.Wrap(err, "failed to lookup existing account"), ctx)
+		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
 
 	if exists {
@@ -172,12 +174,12 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 	acc, err := p.account_repo.Create(ctx, handle,
 		account.WithName(name))
 	if err != nil {
-		return nil, errctx.Wrap(errors.Wrap(err, "failed to create new account"), ctx)
+		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}
 
 	_, err = p.auth_repo.Create(ctx, acc.ID, provider, identifier, token, nil)
 	if err != nil {
-		return nil, errctx.Wrap(errors.Wrap(err, "failed to create new auth method for account"), ctx)
+		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
 	}
 
 	return acc, nil
@@ -200,7 +202,7 @@ func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, ac
 		SetDoNotParseResponse(true).
 		Get(url)
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if avatarBinary == nil {
@@ -208,7 +210,7 @@ func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, ac
 	}
 
 	if err := p.avatar_svc.Set(ctx, acc.ID, avatarBinary.RawBody()); err != nil {
-		return errctx.Wrap(err, ctx)
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil

@@ -3,8 +3,10 @@ package thread
 import (
 	"context"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
-	"github.com/pkg/errors"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -21,7 +23,7 @@ func (s *service) Create(ctx context.Context,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get account")
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
 
 	if err := s.rbac.Authorize(&restrict.AccessRequest{
@@ -29,12 +31,12 @@ func (s *service) Create(ctx context.Context,
 		Resource: &thread.Thread{},
 		Actions:  []string{"create"},
 	}); err != nil {
-		return nil, errors.Wrap(err, "failed to authorize")
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
 	}
 
 	thr, err := s.thread_repo.Create(ctx, title, body, authorID, categoryID, tags, thread.WithMeta(meta))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create thread")
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
 	return thr, nil

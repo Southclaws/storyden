@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
-	"github.com/pkg/errors"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -50,15 +51,15 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 		ID(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	c, err := d.db.Category.Get(ctx, id)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(c), nil
@@ -87,7 +88,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 		Order(model.Asc(category.FieldSort)).
 		All(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	if len(categories) == 0 {
@@ -119,7 +120,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 			OrderBy(sql.Desc("posts"))
 	}).Scan(ctx, &categoryPostsList)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	categoryPosts := make(map[xid.ID]int)
@@ -166,7 +167,7 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc
 
 	c, err := u.Save(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(c), nil
@@ -175,14 +176,14 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc
 func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto CategoryID) (*Category, error) {
 	tx, err := d.db.Tx(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	defer tx.Rollback()
 
 	c, err := tx.Category.Get(ctx, xid.ID(id))
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	_, err = tx.Post.Update().
@@ -190,18 +191,18 @@ func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto Cat
 		SetCategoryID(xid.ID(moveto)).
 		Save(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	err = tx.Category.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	tx.Commit()
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to perform move+delete transaction")
+		return nil, fault.Wrap(err, fmsg.With("failed to perform move+delete transaction"))
 	}
 
 	return FromModel(c), nil

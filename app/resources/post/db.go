@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"4d63.com/optional"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
-	"github.com/pkg/errors"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -35,14 +36,14 @@ func (d *database) Create(
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(errors.Wrap(err, "failed to get parent thread"), ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(errors.Wrap(err, "failed to get parent thread"), ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	if thread.First == false {
-		return nil, errors.New("attempt to create post under non-thread post")
+		return nil, fault.New("attempt to create post under non-thread post")
 	}
 
 	q := d.db.Post.
@@ -60,10 +61,10 @@ func (d *database) Create(
 	p, err := q.Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errtag.Wrap(err, errtag.InvalidArgument{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 
-		return nil, errtag.Wrap(err, errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	p, err = d.db.Post.Query().
@@ -75,10 +76,10 @@ func (d *database) Create(
 		Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(p), nil

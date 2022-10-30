@@ -1,9 +1,10 @@
 package rbac
 
 import (
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
 	"github.com/el-mike/restrict/adapters"
-	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -40,7 +41,7 @@ func NewAdapter(policy *restrict.PolicyDefinition) restrict.StorageAdapter {
 func NewPolicyManager(storage restrict.StorageAdapter) (*restrict.PolicyManager, error) {
 	pm, err := restrict.NewPolicyManager(storage, true)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create new policy manager")
+		return nil, fault.Wrap(err, fmsg.With("failed to create new policy manager"))
 	}
 
 	return pm, nil
