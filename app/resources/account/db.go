@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -40,10 +41,10 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(*u), nil
@@ -53,10 +54,10 @@ func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) 
 	account, err := d.db.Account.Get(ctx, xid.ID(id))
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// threads, posts, err := d.getPostCounts(ctx, account.ID)
@@ -77,10 +78,10 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 	).Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// threads, posts, err := d.getPostCounts(ctx, account.ID)
@@ -132,7 +133,7 @@ func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]
 		Order(model.Asc(account.FieldCreatedAt)).
 		All(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return dt.Map(
@@ -150,7 +151,7 @@ func (d *database) Update(ctx context.Context, id AccountID, opts ...Mutation) (
 
 	acc, err := update.Save(ctx)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return FromModel(*acc), nil

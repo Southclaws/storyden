@@ -6,9 +6,9 @@ import (
 
 	"github.com/awalterschulze/gographviz"
 	"github.com/kr/pretty"
-	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/internal/script"
 )
 
@@ -19,7 +19,7 @@ func main() {
 func run(d fx.DotGraph) error {
 	graphast, err := gographviz.Parse([]byte(d))
 	if err != nil {
-		return errors.Wrap(err, "failed to parse fx graph")
+		return fault.Wrap(err)
 	}
 
 	fxgraph := gographviz.NewGraph()
@@ -53,7 +53,7 @@ func run(d fx.DotGraph) error {
 
 		if strings.Contains(pkg, "services") {
 			if err := graph.AddSubGraph("cluster_services", v.Name, convattr(v.Attrs)); err != nil {
-				return errors.Wrap(err, "failed to add subgraph")
+				return fault.Wrap(err)
 			}
 
 			pretty.Println(pkg, fxgraph.Relations.ParentToChildren[v.Name])

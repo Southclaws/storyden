@@ -3,7 +3,8 @@ package account
 import (
 	"context"
 
-	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -35,7 +36,7 @@ func (s *service) Update(ctx context.Context, id account.AccountID, params Parti
 
 	acc, err := s.account_repo.Update(ctx, id, opts...)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return acc, nil

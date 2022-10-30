@@ -4,10 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
@@ -30,7 +32,7 @@ func (s *service) ListAll(
 
 	thr, err := s.thread_repo.List(ctx, before, max, q...)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to list threads")
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to list threads"))
 	}
 
 	return thr, nil

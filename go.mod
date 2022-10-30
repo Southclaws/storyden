@@ -23,7 +23,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.1
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/kr/pretty v0.3.0
+	github.com/kr/pretty v0.3.1
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/lib/pq v1.10.6
 	github.com/pkg/errors v0.9.1
@@ -39,7 +39,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 )
 
-require github.com/Southclaws/fault v0.2.1
+require github.com/Southclaws/fault v0.4.1
 
 require github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
 

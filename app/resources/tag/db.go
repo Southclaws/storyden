@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
@@ -39,10 +40,10 @@ func (d *database) GetTags(ctx context.Context, query string) ([]Tag, error) {
 	}).Scan(ctx, &tags)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return tags, nil

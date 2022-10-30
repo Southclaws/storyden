@@ -1,8 +1,9 @@
 package webauthn
 
 import (
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/duo-labs/webauthn/webauthn"
-	"github.com/pkg/errors"
 )
 
 func New() (*webauthn.WebAuthn, error) {
@@ -12,7 +13,7 @@ func New() (*webauthn.WebAuthn, error) {
 		RPOrigin:      "localhost",
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to init webauthn")
+		return nil, fault.Wrap(err, fmsg.With("failed to init webauthn"))
 	}
 
 	return wa, nil

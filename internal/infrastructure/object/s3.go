@@ -5,7 +5,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
@@ -39,7 +40,7 @@ func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {
 		// TODO: figure out if there's a way to differentiate between an error
 		// and an item just not existing. Ideally we want to treat actual
 		// transport errors and such as actual errors and non-existence as nil.
-		return false, errctx.Wrap(err, ctx)
+		return false, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return true, nil
@@ -48,7 +49,7 @@ func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {
 func (s *s3Storer) Read(ctx context.Context, path string) (io.Reader, error) {
 	obj, err := s.minioClient.GetObject(ctx, s.bucket, path, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return obj, nil
@@ -59,7 +60,7 @@ func (s *s3Storer) Write(ctx context.Context, path string, stream io.Reader) err
 		SendContentMd5: true,
 	})
 	if err != nil {
-		return errctx.Wrap(err, ctx)
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil

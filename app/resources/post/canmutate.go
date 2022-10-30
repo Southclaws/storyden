@@ -3,8 +3,9 @@ package post
 import (
 	"context"
 
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -15,7 +16,7 @@ func CanUserMutatePost(ctx context.Context, d *model.Client, authorID, postID Po
 	// First, check if this user is the author of the post.
 	post, err := d.Post.Query().Where(post.IDEQ(xid.ID(postID))).WithAuthor().Only(ctx)
 	if err != nil {
-		return errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	user := post.Edges.Author
@@ -28,5 +29,5 @@ func CanUserMutatePost(ctx context.Context, d *model.Client, authorID, postID Po
 	}
 
 	// Not either? Not authorised to edit.
-	return errtag.Wrap(errctx.Wrap(ErrUnauthorised, ctx), errtag.PermissionDenied{})
+	return fault.Wrap(ErrUnauthorised, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 }

@@ -48,7 +48,21 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 }
 
 func serialiseThread(t *thread.Thread) openapi.Thread {
-	return openapi.Thread{}
+	return openapi.Thread{
+		Author:    serialiseProfileReference(t.Author),
+		Category:  serialiseCategory(&t.Category),
+		CreatedAt: t.CreatedAt,
+		// DeletedAt: t.DeletedAt,
+		Id:        openapi.Identifier(t.ID.String()),
+		Meta:      t.Meta,
+		Pinned:    t.Pinned,
+		Reacts:    dt.Map(t.Reacts, serialiseReact),
+		Short:     &t.Short,
+		Slug:      &t.Slug,
+		Tags:      t.Tags,
+		Title:     t.Title,
+		UpdatedAt: t.UpdatedAt,
+	}
 }
 
 func serialisePost(p *post.Post) openapi.Post {

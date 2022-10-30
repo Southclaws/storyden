@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 )
@@ -24,5 +26,5 @@ func GetAccountID(ctx context.Context) (account.AccountID, error) {
 		return auth, nil
 	}
 
-	return account.AccountID{}, errtag.Wrap(ErrNoAccountInContext, errtag.Unauthenticated{})
+	return account.AccountID{}, fault.Wrap(ErrNoAccountInContext, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 }

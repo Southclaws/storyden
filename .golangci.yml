@@ -25,5 +25,7 @@ linters-settings:
       - default
       - prefix(github.com/Southclaws/storyden)
   wrapcheck:
-    ignorePackageGlobs:
-      - github.com/Southclaws/storyden/*
+    ignoreSigs:
+      - fault.New(
+      - fault.Newf(
+      - fault.Wrap(

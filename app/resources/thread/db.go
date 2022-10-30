@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault/errctx"
-	"github.com/Southclaws/fault/errtag"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
@@ -55,16 +57,20 @@ func (d *database) Create(
 
 	// tagset, err := d.createTags(ctx, tags)
 	// if err != nil {
-	// 	return nil, errors.Wrap(err, "failed to upsert tags for linking to post")
+	// 	return nil, fault.Wrap(err, "failed to upsert tags for linking to post")
 	// }
 
 	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err,
+				fctx.With(ctx),
+				ftag.With(ftag.NotFound),
+				fmsg.WithDesc("category not found",
+					"The specified category was not found while creating the thread."))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	p, err := d.db.Post.
@@ -81,10 +87,10 @@ func (d *database) Create(
 		Save(ctx)
 	if err != nil {
 		if model.IsConstraintError(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.AlreadyExists{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// Update the slug so it includes the ID for uniqueness.
@@ -94,7 +100,7 @@ func (d *database) Create(
 		SetSlug(fmt.Sprintf("%s-%s", p.ID, slug.Make(title))).
 		Save(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// Finally, query the created thread with related entities.
@@ -107,7 +113,7 @@ func (d *database) Create(
 		WithTags().
 		Only(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(p), nil
@@ -125,7 +131,7 @@ func (d *database) Create(
 // 			Create(db.Tag.Name.Set(tag)).
 // 			Exec(ctx)
 // 		if err != nil {
-// 			return nil, errors.Wrap(err, "failed to upsert tag")
+// 			return nil, fault.Wrap(err, "failed to upsert tag")
 // 		}
 // 		setters = append(setters, db.Tag.Name.Equals(tag))
 // 	}
@@ -167,7 +173,7 @@ func (d *database) List(
 
 	result, err := query.All(ctx)
 	if err != nil {
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// counts, err := d.GetPostCounts(ctx)
@@ -201,10 +207,10 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 		Only(ctx)
 	if err != nil {
 		if model.IsNotFound(err) {
-			return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.NotFound{})
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, errtag.Wrap(errctx.Wrap(err, ctx), errtag.Internal{})
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(post), nil
@@ -280,7 +286,7 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 // 	// a different abstraction layer. Lower than the HTTP API but higher than
 // 	// the database implementation.
 // 	if err := post.CanUserMutatePost(ctx, d.db, authorID, id); err != nil {
-// 		return 0, errors.Wrap(err, "failed to check user permissions")
+// 		return 0, fault.Wrap(err, "failed to check user permissions")
 // 	}
 
 // 	result, err := d.db.Post.FindMany(
@@ -301,7 +307,7 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 // 		if errors.Is(err, db.ErrNotFound) {
 // 			return 0, nil
 // 		}
-// 		return 0, errors.Wrap(err, "failed to set deletedAt for posts")
+// 		return 0, fault.Wrap(err, "failed to set deletedAt for posts")
 // 	}
 
 // 	return result.Count, nil

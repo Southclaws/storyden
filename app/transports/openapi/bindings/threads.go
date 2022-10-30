@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault/errctx"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -41,7 +42,7 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	var meta map[string]any
@@ -58,7 +59,7 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 		meta,
 	)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.ThreadsCreate200JSONResponse(serialiseThread(thread)), nil
@@ -72,7 +73,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 	// optionally map from OpenAPI account handle type to AccountID type.
 	author, err := request.Params.Author.OptionalID(ctx, i.account_repo)
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	// optionally map from OpenAPI identifier type to xid.ID type.
@@ -87,7 +88,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 		Tags:      tags,
 	})
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThreadReference)), nil
@@ -96,7 +97,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
 	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadId.XID()))
 	if err != nil {
-		return nil, errctx.Wrap(err, ctx)
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.ThreadsGet200JSONResponse(serialiseThread(thread)), nil
