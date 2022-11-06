@@ -44,10 +44,13 @@ func (*Thread) GetRole() string { return Name }
 func (*Thread) GetResourceName() string { return Name }
 
 func FromModel(m *model.Post) *Thread {
-	var posts []*post.Post
+	// Thread data structure will always contain one post: itself in post form.
+	posts := []*post.Post{
+		post.FromModel(m),
+	}
 
 	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
-		posts = dt.Map(p, post.FromModel)
+		posts = append(posts, dt.Map(p, post.FromModel)...)
 	}
 
 	return &Thread{

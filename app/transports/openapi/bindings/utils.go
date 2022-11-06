@@ -60,6 +60,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Short:     &t.Short,
 		Slug:      &t.Slug,
 		Tags:      t.Tags,
+		Posts:     dt.Map(t.Posts, serialisePost),
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
 	}
@@ -71,8 +72,7 @@ func serialisePost(p *post.Post) openapi.Post {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
-
-		//
+		Body:      p.Body,
 	}
 }
 
