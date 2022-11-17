@@ -209,18 +209,10 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := su.mutation.RefersType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersType,
-		})
+		_spec.SetField(subscription.FieldRefersType, field.TypeString, value)
 	}
 	if value, ok := su.mutation.RefersTo(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersTo,
-		})
+		_spec.SetField(subscription.FieldRefersTo, field.TypeString, value)
 	}
 	if su.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -311,7 +303,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = su.modifiers
+	_spec.AddModifiers(su.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subscription.Label}
@@ -540,18 +532,10 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 	}
 	if value, ok := suo.mutation.RefersType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersType,
-		})
+		_spec.SetField(subscription.FieldRefersType, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.RefersTo(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersTo,
-		})
+		_spec.SetField(subscription.FieldRefersTo, field.TypeString, value)
 	}
 	if suo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -642,7 +626,7 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = suo.modifiers
+	_spec.AddModifiers(suo.modifiers...)
 	_node = &Subscription{config: suo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

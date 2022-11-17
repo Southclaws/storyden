@@ -237,7 +237,7 @@ func (c *AccountClient) DeleteOne(a *Account) *AccountDeleteOne {
 	return c.DeleteOneID(a.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *AccountClient) DeleteOneID(id xid.ID) *AccountDeleteOne {
 	builder := c.Delete().Where(account.ID(id))
 	builder.mutation.id = &id
@@ -269,7 +269,7 @@ func (c *AccountClient) GetX(ctx context.Context, id xid.ID) *Account {
 // QueryPosts queries the posts edge of a Account.
 func (c *AccountClient) QueryPosts(a *Account) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -285,7 +285,7 @@ func (c *AccountClient) QueryPosts(a *Account) *PostQuery {
 // QueryReacts queries the reacts edge of a Account.
 func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
 	query := &ReactQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -301,7 +301,7 @@ func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
 // QueryRoles queries the roles edge of a Account.
 func (c *AccountClient) QueryRoles(a *Account) *RoleQuery {
 	query := &RoleQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -317,7 +317,7 @@ func (c *AccountClient) QueryRoles(a *Account) *RoleQuery {
 // QuerySubscriptions queries the subscriptions edge of a Account.
 func (c *AccountClient) QuerySubscriptions(a *Account) *SubscriptionQuery {
 	query := &SubscriptionQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -333,7 +333,7 @@ func (c *AccountClient) QuerySubscriptions(a *Account) *SubscriptionQuery {
 // QueryAuthentication queries the authentication edge of a Account.
 func (c *AccountClient) QueryAuthentication(a *Account) *AuthenticationQuery {
 	query := &AuthenticationQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -349,7 +349,7 @@ func (c *AccountClient) QueryAuthentication(a *Account) *AuthenticationQuery {
 // QueryTags queries the tags edge of a Account.
 func (c *AccountClient) QueryTags(a *Account) *TagQuery {
 	query := &TagQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
@@ -423,7 +423,7 @@ func (c *AuthenticationClient) DeleteOne(a *Authentication) *AuthenticationDelet
 	return c.DeleteOneID(a.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *AuthenticationClient) DeleteOneID(id xid.ID) *AuthenticationDeleteOne {
 	builder := c.Delete().Where(authentication.ID(id))
 	builder.mutation.id = &id
@@ -455,7 +455,7 @@ func (c *AuthenticationClient) GetX(ctx context.Context, id xid.ID) *Authenticat
 // QueryAccount queries the account edge of a Authentication.
 func (c *AuthenticationClient) QueryAccount(a *Authentication) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(authentication.Table, authentication.FieldID, id),
@@ -529,7 +529,7 @@ func (c *CategoryClient) DeleteOne(ca *Category) *CategoryDeleteOne {
 	return c.DeleteOneID(ca.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *CategoryClient) DeleteOneID(id xid.ID) *CategoryDeleteOne {
 	builder := c.Delete().Where(category.ID(id))
 	builder.mutation.id = &id
@@ -561,7 +561,7 @@ func (c *CategoryClient) GetX(ctx context.Context, id xid.ID) *Category {
 // QueryPosts queries the posts edge of a Category.
 func (c *CategoryClient) QueryPosts(ca *Category) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(category.Table, category.FieldID, id),
@@ -635,7 +635,7 @@ func (c *NotificationClient) DeleteOne(n *Notification) *NotificationDeleteOne {
 	return c.DeleteOneID(n.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *NotificationClient) DeleteOneID(id xid.ID) *NotificationDeleteOne {
 	builder := c.Delete().Where(notification.ID(id))
 	builder.mutation.id = &id
@@ -667,7 +667,7 @@ func (c *NotificationClient) GetX(ctx context.Context, id xid.ID) *Notification 
 // QuerySubscription queries the subscription edge of a Notification.
 func (c *NotificationClient) QuerySubscription(n *Notification) *SubscriptionQuery {
 	query := &SubscriptionQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(notification.Table, notification.FieldID, id),
@@ -741,7 +741,7 @@ func (c *PostClient) DeleteOne(po *Post) *PostDeleteOne {
 	return c.DeleteOneID(po.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *PostClient) DeleteOneID(id xid.ID) *PostDeleteOne {
 	builder := c.Delete().Where(post.ID(id))
 	builder.mutation.id = &id
@@ -773,7 +773,7 @@ func (c *PostClient) GetX(ctx context.Context, id xid.ID) *Post {
 // QueryAuthor queries the author edge of a Post.
 func (c *PostClient) QueryAuthor(po *Post) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -789,7 +789,7 @@ func (c *PostClient) QueryAuthor(po *Post) *AccountQuery {
 // QueryCategory queries the category edge of a Post.
 func (c *PostClient) QueryCategory(po *Post) *CategoryQuery {
 	query := &CategoryQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -805,7 +805,7 @@ func (c *PostClient) QueryCategory(po *Post) *CategoryQuery {
 // QueryTags queries the tags edge of a Post.
 func (c *PostClient) QueryTags(po *Post) *TagQuery {
 	query := &TagQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -821,7 +821,7 @@ func (c *PostClient) QueryTags(po *Post) *TagQuery {
 // QueryRoot queries the root edge of a Post.
 func (c *PostClient) QueryRoot(po *Post) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -837,7 +837,7 @@ func (c *PostClient) QueryRoot(po *Post) *PostQuery {
 // QueryPosts queries the posts edge of a Post.
 func (c *PostClient) QueryPosts(po *Post) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -853,7 +853,7 @@ func (c *PostClient) QueryPosts(po *Post) *PostQuery {
 // QueryReplyTo queries the replyTo edge of a Post.
 func (c *PostClient) QueryReplyTo(po *Post) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -869,7 +869,7 @@ func (c *PostClient) QueryReplyTo(po *Post) *PostQuery {
 // QueryReplies queries the replies edge of a Post.
 func (c *PostClient) QueryReplies(po *Post) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -885,7 +885,7 @@ func (c *PostClient) QueryReplies(po *Post) *PostQuery {
 // QueryReacts queries the reacts edge of a Post.
 func (c *PostClient) QueryReacts(po *Post) *ReactQuery {
 	query := &ReactQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
@@ -959,7 +959,7 @@ func (c *ReactClient) DeleteOne(r *React) *ReactDeleteOne {
 	return c.DeleteOneID(r.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *ReactClient) DeleteOneID(id xid.ID) *ReactDeleteOne {
 	builder := c.Delete().Where(react.ID(id))
 	builder.mutation.id = &id
@@ -991,7 +991,7 @@ func (c *ReactClient) GetX(ctx context.Context, id xid.ID) *React {
 // QueryAccount queries the account edge of a React.
 func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
@@ -1007,7 +1007,7 @@ func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
 // QueryPost queries the Post edge of a React.
 func (c *ReactClient) QueryPost(r *React) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
@@ -1081,7 +1081,7 @@ func (c *RoleClient) DeleteOne(r *Role) *RoleDeleteOne {
 	return c.DeleteOneID(r.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *RoleClient) DeleteOneID(id xid.ID) *RoleDeleteOne {
 	builder := c.Delete().Where(role.ID(id))
 	builder.mutation.id = &id
@@ -1113,7 +1113,7 @@ func (c *RoleClient) GetX(ctx context.Context, id xid.ID) *Role {
 // QueryAccounts queries the accounts edge of a Role.
 func (c *RoleClient) QueryAccounts(r *Role) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
@@ -1187,7 +1187,7 @@ func (c *SubscriptionClient) DeleteOne(s *Subscription) *SubscriptionDeleteOne {
 	return c.DeleteOneID(s.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *SubscriptionClient) DeleteOneID(id xid.ID) *SubscriptionDeleteOne {
 	builder := c.Delete().Where(subscription.ID(id))
 	builder.mutation.id = &id
@@ -1219,7 +1219,7 @@ func (c *SubscriptionClient) GetX(ctx context.Context, id xid.ID) *Subscription 
 // QueryAccount queries the account edge of a Subscription.
 func (c *SubscriptionClient) QueryAccount(s *Subscription) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, id),
@@ -1235,7 +1235,7 @@ func (c *SubscriptionClient) QueryAccount(s *Subscription) *AccountQuery {
 // QueryNotifications queries the notifications edge of a Subscription.
 func (c *SubscriptionClient) QueryNotifications(s *Subscription) *NotificationQuery {
 	query := &NotificationQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subscription.Table, subscription.FieldID, id),
@@ -1309,7 +1309,7 @@ func (c *TagClient) DeleteOne(t *Tag) *TagDeleteOne {
 	return c.DeleteOneID(t.ID)
 }
 
-// DeleteOne returns a builder for deleting the given entity by its id.
+// DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *TagClient) DeleteOneID(id xid.ID) *TagDeleteOne {
 	builder := c.Delete().Where(tag.ID(id))
 	builder.mutation.id = &id
@@ -1341,7 +1341,7 @@ func (c *TagClient) GetX(ctx context.Context, id xid.ID) *Tag {
 // QueryPosts queries the posts edge of a Tag.
 func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
 	query := &PostQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),
@@ -1357,7 +1357,7 @@ func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
 // QueryAccounts queries the accounts edge of a Tag.
 func (c *TagClient) QueryAccounts(t *Tag) *AccountQuery {
 	query := &AccountQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),

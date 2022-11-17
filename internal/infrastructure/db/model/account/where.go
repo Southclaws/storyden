@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.Account {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.Account {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -147,7 +147,7 @@ func CreatedAtNEQ(v time.Time) predicate.Account {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -158,7 +158,7 @@ func CreatedAtIn(vs ...time.Time) predicate.Account {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -211,7 +211,7 @@ func UpdatedAtNEQ(v time.Time) predicate.Account {
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -222,7 +222,7 @@ func UpdatedAtIn(vs ...time.Time) predicate.Account {
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -275,7 +275,7 @@ func DeletedAtNEQ(v time.Time) predicate.Account {
 
 // DeletedAtIn applies the In predicate on the "deleted_at" field.
 func DeletedAtIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -286,7 +286,7 @@ func DeletedAtIn(vs ...time.Time) predicate.Account {
 
 // DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
 func DeletedAtNotIn(vs ...time.Time) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -353,7 +353,7 @@ func HandleNEQ(v string) predicate.Account {
 
 // HandleIn applies the In predicate on the "handle" field.
 func HandleIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -364,7 +364,7 @@ func HandleIn(vs ...string) predicate.Account {
 
 // HandleNotIn applies the NotIn predicate on the "handle" field.
 func HandleNotIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -452,7 +452,7 @@ func NameNEQ(v string) predicate.Account {
 
 // NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -463,7 +463,7 @@ func NameIn(vs ...string) predicate.Account {
 
 // NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -551,7 +551,7 @@ func BioNEQ(v string) predicate.Account {
 
 // BioIn applies the In predicate on the "bio" field.
 func BioIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -562,7 +562,7 @@ func BioIn(vs ...string) predicate.Account {
 
 // BioNotIn applies the NotIn predicate on the "bio" field.
 func BioNotIn(vs ...string) predicate.Account {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

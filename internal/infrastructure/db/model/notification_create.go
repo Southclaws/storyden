@@ -243,43 +243,23 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.ID.Value = &id
 	}
 	if value, ok := nc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: notification.FieldCreatedAt,
-		})
+		_spec.SetField(notification.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := nc.mutation.Title(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldTitle,
-		})
+		_spec.SetField(notification.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
 	if value, ok := nc.mutation.Description(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldDescription,
-		})
+		_spec.SetField(notification.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
 	if value, ok := nc.mutation.Link(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldLink,
-		})
+		_spec.SetField(notification.FieldLink, field.TypeString, value)
 		_node.Link = value
 	}
 	if value, ok := nc.mutation.Read(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: notification.FieldRead,
-		})
+		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 		_node.Read = value
 	}
 	if nodes := nc.mutation.SubscriptionIDs(); len(nodes) > 0 {
@@ -355,18 +335,6 @@ type (
 		*sql.UpdateSet
 	}
 )
-
-// SetCreatedAt sets the "created_at" field.
-func (u *NotificationUpsert) SetCreatedAt(v time.Time) *NotificationUpsert {
-	u.Set(notification.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *NotificationUpsert) UpdateCreatedAt() *NotificationUpsert {
-	u.SetExcluded(notification.FieldCreatedAt)
-	return u
-}
 
 // SetTitle sets the "title" field.
 func (u *NotificationUpsert) SetTitle(v string) *NotificationUpsert {
@@ -467,20 +435,6 @@ func (u *NotificationUpsertOne) Update(set func(*NotificationUpsert)) *Notificat
 		set(&NotificationUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *NotificationUpsertOne) SetCreatedAt(v time.Time) *NotificationUpsertOne {
-	return u.Update(func(s *NotificationUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *NotificationUpsertOne) UpdateCreatedAt() *NotificationUpsertOne {
-	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetTitle sets the "title" field.
@@ -720,7 +674,6 @@ func (u *NotificationUpsertBulk) UpdateNewValues() *NotificationUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(notification.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(notification.FieldCreatedAt)
@@ -756,20 +709,6 @@ func (u *NotificationUpsertBulk) Update(set func(*NotificationUpsert)) *Notifica
 		set(&NotificationUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *NotificationUpsertBulk) SetCreatedAt(v time.Time) *NotificationUpsertBulk {
-	return u.Update(func(s *NotificationUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *NotificationUpsertBulk) UpdateCreatedAt() *NotificationUpsertBulk {
-	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetTitle sets the "title" field.

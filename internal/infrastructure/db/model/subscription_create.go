@@ -251,27 +251,15 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_spec.ID.Value = &id
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: subscription.FieldCreatedAt,
-		})
+		_spec.SetField(subscription.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := sc.mutation.RefersType(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersType,
-		})
+		_spec.SetField(subscription.FieldRefersType, field.TypeString, value)
 		_node.RefersType = value
 	}
 	if value, ok := sc.mutation.RefersTo(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: subscription.FieldRefersTo,
-		})
+		_spec.SetField(subscription.FieldRefersTo, field.TypeString, value)
 		_node.RefersTo = value
 	}
 	if nodes := sc.mutation.AccountIDs(); len(nodes) > 0 {
@@ -367,18 +355,6 @@ type (
 	}
 )
 
-// SetCreatedAt sets the "created_at" field.
-func (u *SubscriptionUpsert) SetCreatedAt(v time.Time) *SubscriptionUpsert {
-	u.Set(subscription.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *SubscriptionUpsert) UpdateCreatedAt() *SubscriptionUpsert {
-	u.SetExcluded(subscription.FieldCreatedAt)
-	return u
-}
-
 // SetRefersType sets the "refers_type" field.
 func (u *SubscriptionUpsert) SetRefersType(v string) *SubscriptionUpsert {
 	u.Set(subscription.FieldRefersType, v)
@@ -454,20 +430,6 @@ func (u *SubscriptionUpsertOne) Update(set func(*SubscriptionUpsert)) *Subscript
 		set(&SubscriptionUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *SubscriptionUpsertOne) SetCreatedAt(v time.Time) *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *SubscriptionUpsertOne) UpdateCreatedAt() *SubscriptionUpsertOne {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetRefersType sets the "refers_type" field.
@@ -679,7 +641,6 @@ func (u *SubscriptionUpsertBulk) UpdateNewValues() *SubscriptionUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(subscription.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(subscription.FieldCreatedAt)
@@ -715,20 +676,6 @@ func (u *SubscriptionUpsertBulk) Update(set func(*SubscriptionUpsert)) *Subscrip
 		set(&SubscriptionUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *SubscriptionUpsertBulk) SetCreatedAt(v time.Time) *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *SubscriptionUpsertBulk) UpdateCreatedAt() *SubscriptionUpsertBulk {
-	return u.Update(func(s *SubscriptionUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetRefersType sets the "refers_type" field.

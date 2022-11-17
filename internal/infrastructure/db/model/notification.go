@@ -58,8 +58,8 @@ func (e NotificationEdges) SubscriptionOrErr() (*Subscription, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Notification) scanValues(columns []string) ([]interface{}, error) {
-	values := make([]interface{}, len(columns))
+func (*Notification) scanValues(columns []string) ([]any, error) {
+	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
 		case notification.FieldRead:
@@ -83,7 +83,7 @@ func (*Notification) scanValues(columns []string) ([]interface{}, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Notification fields.
-func (n *Notification) assignValues(columns []string, values []interface{}) error {
+func (n *Notification) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}

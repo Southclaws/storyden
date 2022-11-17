@@ -585,6 +585,11 @@ func (pq *PostQuery) Select(fields ...string) *PostSelect {
 	return selbuild
 }
 
+// Aggregate returns a PostSelect configured with the given aggregations.
+func (pq *PostQuery) Aggregate(fns ...AggregateFunc) *PostSelect {
+	return pq.Select().Aggregate(fns...)
+}
+
 func (pq *PostQuery) prepareQuery(ctx context.Context) error {
 	for _, f := range pq.fields {
 		if !post.ValidColumn(f) {
@@ -623,10 +628,10 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, post.ForeignKeys...)
 	}
-	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
+	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Post).scanValues(nil, columns)
 	}
-	_spec.Assign = func(columns []string, values []interface{}) error {
+	_spec.Assign = func(columns []string, values []any) error {
 		node := &Post{config: pq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
@@ -780,18 +785,18 @@ func (pq *PostQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Pos
 	neighbors, err := query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
 		assign := spec.Assign
 		values := spec.ScanValues
-		spec.ScanValues = func(columns []string) ([]interface{}, error) {
+		spec.ScanValues = func(columns []string) ([]any, error) {
 			values, err := values(columns[1:])
 			if err != nil {
 				return nil, err
 			}
-			return append([]interface{}{new(xid.ID)}, values...), nil
+			return append([]any{new(xid.ID)}, values...), nil
 		}
-		spec.Assign = func(columns []string, values []interface{}) error {
+		spec.Assign = func(columns []string, values []any) error {
 			outValue := *values[0].(*xid.ID)
 			inValue := *values[1].(*xid.ID)
 			if nids[inValue] == nil {
-				nids[inValue] = map[*Post]struct{}{byID[outValue]: struct{}{}}
+				nids[inValue] = map[*Post]struct{}{byID[outValue]: {}}
 				return assign(columns[1:], values[1:])
 			}
 			nids[inValue][byID[outValue]] = struct{}{}
@@ -965,11 +970,14 @@ func (pq *PostQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (pq *PostQuery) sqlExist(ctx context.Context) (bool, error) {
-	n, err := pq.sqlCount(ctx)
-	if err != nil {
+	switch _, err := pq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
 		return false, fmt.Errorf("model: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return n > 0, nil
 }
 
 func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
@@ -1079,7 +1087,7 @@ func (pgb *PostGroupBy) Aggregate(fns ...AggregateFunc) *PostGroupBy {
 }
 
 // Scan applies the group-by query and scans the result into the given value.
-func (pgb *PostGroupBy) Scan(ctx context.Context, v interface{}) error {
+func (pgb *PostGroupBy) Scan(ctx context.Context, v any) error {
 	query, err := pgb.path(ctx)
 	if err != nil {
 		return err
@@ -1088,7 +1096,7 @@ func (pgb *PostGroupBy) Scan(ctx context.Context, v interface{}) error {
 	return pgb.sqlScan(ctx, v)
 }
 
-func (pgb *PostGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+func (pgb *PostGroupBy) sqlScan(ctx context.Context, v any) error {
 	for _, f := range pgb.fields {
 		if !post.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
@@ -1113,8 +1121,6 @@ func (pgb *PostGroupBy) sqlQuery() *sql.Selector {
 	for _, fn := range pgb.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
 	if len(selector.SelectedColumns()) == 0 {
 		columns := make([]string, 0, len(pgb.fields)+len(pgb.fns))
 		for _, f := range pgb.fields {
@@ -1134,8 +1140,14 @@ type PostSelect struct {
 	sql *sql.Selector
 }
 
+// Aggregate adds the given aggregation functions to the selector query.
+func (ps *PostSelect) Aggregate(fns ...AggregateFunc) *PostSelect {
+	ps.fns = append(ps.fns, fns...)
+	return ps
+}
+
 // Scan applies the selector query and scans the result into the given value.
-func (ps *PostSelect) Scan(ctx context.Context, v interface{}) error {
+func (ps *PostSelect) Scan(ctx context.Context, v any) error {
 	if err := ps.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -1143,7 +1155,17 @@ func (ps *PostSelect) Scan(ctx context.Context, v interface{}) error {
 	return ps.sqlScan(ctx, v)
 }
 
-func (ps *PostSelect) sqlScan(ctx context.Context, v interface{}) error {
+func (ps *PostSelect) sqlScan(ctx context.Context, v any) error {
+	aggregation := make([]string, 0, len(ps.fns))
+	for _, fn := range ps.fns {
+		aggregation = append(aggregation, fn(ps.sql))
+	}
+	switch n := len(*ps.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		ps.sql.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		ps.sql.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
 	query, args := ps.sql.Query()
 	if err := ps.driver.Query(ctx, query, args, rows); err != nil {

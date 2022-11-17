@@ -236,19 +236,11 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: react.FieldCreatedAt,
-		})
+		_spec.SetField(react.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := rc.mutation.Emoji(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldEmoji,
-		})
+		_spec.SetField(react.FieldEmoji, field.TypeString, value)
 		_node.Emoji = value
 	}
 	if nodes := rc.mutation.AccountIDs(); len(nodes) > 0 {
@@ -345,18 +337,6 @@ type (
 	}
 )
 
-// SetCreatedAt sets the "created_at" field.
-func (u *ReactUpsert) SetCreatedAt(v time.Time) *ReactUpsert {
-	u.Set(react.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *ReactUpsert) UpdateCreatedAt() *ReactUpsert {
-	u.SetExcluded(react.FieldCreatedAt)
-	return u
-}
-
 // SetEmoji sets the "emoji" field.
 func (u *ReactUpsert) SetEmoji(v string) *ReactUpsert {
 	u.Set(react.FieldEmoji, v)
@@ -420,20 +400,6 @@ func (u *ReactUpsertOne) Update(set func(*ReactUpsert)) *ReactUpsertOne {
 		set(&ReactUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *ReactUpsertOne) SetCreatedAt(v time.Time) *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *ReactUpsertOne) UpdateCreatedAt() *ReactUpsertOne {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetEmoji sets the "emoji" field.
@@ -631,7 +597,6 @@ func (u *ReactUpsertBulk) UpdateNewValues() *ReactUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(react.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(react.FieldCreatedAt)
@@ -667,20 +632,6 @@ func (u *ReactUpsertBulk) Update(set func(*ReactUpsert)) *ReactUpsertBulk {
 		set(&ReactUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *ReactUpsertBulk) SetCreatedAt(v time.Time) *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *ReactUpsertBulk) UpdateCreatedAt() *ReactUpsertBulk {
-	return u.Update(func(s *ReactUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetEmoji sets the "emoji" field.

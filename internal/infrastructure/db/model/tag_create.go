@@ -228,19 +228,11 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: tag.FieldCreatedAt,
-		})
+		_spec.SetField(tag.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := tc.mutation.Name(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: tag.FieldName,
-		})
+		_spec.SetField(tag.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if nodes := tc.mutation.PostsIDs(); len(nodes) > 0 {
@@ -335,30 +327,6 @@ type (
 	}
 )
 
-// SetCreatedAt sets the "created_at" field.
-func (u *TagUpsert) SetCreatedAt(v time.Time) *TagUpsert {
-	u.Set(tag.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *TagUpsert) UpdateCreatedAt() *TagUpsert {
-	u.SetExcluded(tag.FieldCreatedAt)
-	return u
-}
-
-// SetName sets the "name" field.
-func (u *TagUpsert) SetName(v string) *TagUpsert {
-	u.Set(tag.FieldName, v)
-	return u
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *TagUpsert) UpdateName() *TagUpsert {
-	u.SetExcluded(tag.FieldName)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -413,34 +381,6 @@ func (u *TagUpsertOne) Update(set func(*TagUpsert)) *TagUpsertOne {
 		set(&TagUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *TagUpsertOne) SetCreatedAt(v time.Time) *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *TagUpsertOne) UpdateCreatedAt() *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetName sets the "name" field.
-func (u *TagUpsertOne) SetName(v string) *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *TagUpsertOne) UpdateName() *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateName()
-	})
 }
 
 // Exec executes the query.
@@ -624,7 +564,6 @@ func (u *TagUpsertBulk) UpdateNewValues() *TagUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(tag.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(tag.FieldCreatedAt)
@@ -663,34 +602,6 @@ func (u *TagUpsertBulk) Update(set func(*TagUpsert)) *TagUpsertBulk {
 		set(&TagUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *TagUpsertBulk) SetCreatedAt(v time.Time) *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *TagUpsertBulk) UpdateCreatedAt() *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateCreatedAt()
-	})
-}
-
-// SetName sets the "name" field.
-func (u *TagUpsertBulk) SetName(v string) *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *TagUpsertBulk) UpdateName() *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateName()
-	})
 }
 
 // Exec executes the query.

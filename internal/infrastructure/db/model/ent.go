@@ -170,7 +170,7 @@ func (e *ValidationError) Error() string {
 	return e.err.Error()
 }
 
-// Unwrap implements the fault.Wrapper interface.
+// Unwrap implements the errors.Wrapper interface.
 func (e *ValidationError) Unwrap() error {
 	return e.err
 }
@@ -262,7 +262,7 @@ func (e ConstraintError) Error() string {
 	return "model: constraint failed: " + e.msg
 }
 
-// Unwrap implements the fault.Wrapper interface.
+// Unwrap implements the errors.Wrapper interface.
 func (e *ConstraintError) Unwrap() error {
 	return e.wrap
 }
@@ -280,11 +280,12 @@ func IsConstraintError(err error) bool {
 type selector struct {
 	label string
 	flds  *[]string
-	scan  func(context.Context, interface{}) error
+	fns   []AggregateFunc
+	scan  func(context.Context, any) error
 }
 
 // ScanX is like Scan, but panics if an error occurs.
-func (s *selector) ScanX(ctx context.Context, v interface{}) {
+func (s *selector) ScanX(ctx context.Context, v any) {
 	if err := s.scan(ctx, v); err != nil {
 		panic(err)
 	}

@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.Subscription {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.Subscription {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Subscription {
 	return predicate.Subscription(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -119,7 +119,7 @@ func CreatedAtNEQ(v time.Time) predicate.Subscription {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -130,7 +130,7 @@ func CreatedAtIn(vs ...time.Time) predicate.Subscription {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -183,7 +183,7 @@ func RefersTypeNEQ(v string) predicate.Subscription {
 
 // RefersTypeIn applies the In predicate on the "refers_type" field.
 func RefersTypeIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -194,7 +194,7 @@ func RefersTypeIn(vs ...string) predicate.Subscription {
 
 // RefersTypeNotIn applies the NotIn predicate on the "refers_type" field.
 func RefersTypeNotIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -282,7 +282,7 @@ func RefersToNEQ(v string) predicate.Subscription {
 
 // RefersToIn applies the In predicate on the "refers_to" field.
 func RefersToIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -293,7 +293,7 @@ func RefersToIn(vs ...string) predicate.Subscription {
 
 // RefersToNotIn applies the NotIn predicate on the "refers_to" field.
 func RefersToNotIn(vs ...string) predicate.Subscription {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

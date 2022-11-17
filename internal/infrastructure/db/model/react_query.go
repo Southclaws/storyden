@@ -372,6 +372,11 @@ func (rq *ReactQuery) Select(fields ...string) *ReactSelect {
 	return selbuild
 }
 
+// Aggregate returns a ReactSelect configured with the given aggregations.
+func (rq *ReactQuery) Aggregate(fns ...AggregateFunc) *ReactSelect {
+	return rq.Select().Aggregate(fns...)
+}
+
 func (rq *ReactQuery) prepareQuery(ctx context.Context) error {
 	for _, f := range rq.fields {
 		if !react.ValidColumn(f) {
@@ -404,10 +409,10 @@ func (rq *ReactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*React,
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, react.ForeignKeys...)
 	}
-	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
+	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*React).scanValues(nil, columns)
 	}
-	_spec.Assign = func(columns []string, values []interface{}) error {
+	_spec.Assign = func(columns []string, values []any) error {
 		node := &React{config: rq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
@@ -512,11 +517,14 @@ func (rq *ReactQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (rq *ReactQuery) sqlExist(ctx context.Context) (bool, error) {
-	n, err := rq.sqlCount(ctx)
-	if err != nil {
+	switch _, err := rq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
 		return false, fmt.Errorf("model: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return n > 0, nil
 }
 
 func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
@@ -626,7 +634,7 @@ func (rgb *ReactGroupBy) Aggregate(fns ...AggregateFunc) *ReactGroupBy {
 }
 
 // Scan applies the group-by query and scans the result into the given value.
-func (rgb *ReactGroupBy) Scan(ctx context.Context, v interface{}) error {
+func (rgb *ReactGroupBy) Scan(ctx context.Context, v any) error {
 	query, err := rgb.path(ctx)
 	if err != nil {
 		return err
@@ -635,7 +643,7 @@ func (rgb *ReactGroupBy) Scan(ctx context.Context, v interface{}) error {
 	return rgb.sqlScan(ctx, v)
 }
 
-func (rgb *ReactGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+func (rgb *ReactGroupBy) sqlScan(ctx context.Context, v any) error {
 	for _, f := range rgb.fields {
 		if !react.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
@@ -660,8 +668,6 @@ func (rgb *ReactGroupBy) sqlQuery() *sql.Selector {
 	for _, fn := range rgb.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
 	if len(selector.SelectedColumns()) == 0 {
 		columns := make([]string, 0, len(rgb.fields)+len(rgb.fns))
 		for _, f := range rgb.fields {
@@ -681,8 +687,14 @@ type ReactSelect struct {
 	sql *sql.Selector
 }
 
+// Aggregate adds the given aggregation functions to the selector query.
+func (rs *ReactSelect) Aggregate(fns ...AggregateFunc) *ReactSelect {
+	rs.fns = append(rs.fns, fns...)
+	return rs
+}
+
 // Scan applies the selector query and scans the result into the given value.
-func (rs *ReactSelect) Scan(ctx context.Context, v interface{}) error {
+func (rs *ReactSelect) Scan(ctx context.Context, v any) error {
 	if err := rs.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -690,7 +702,17 @@ func (rs *ReactSelect) Scan(ctx context.Context, v interface{}) error {
 	return rs.sqlScan(ctx, v)
 }
 
-func (rs *ReactSelect) sqlScan(ctx context.Context, v interface{}) error {
+func (rs *ReactSelect) sqlScan(ctx context.Context, v any) error {
+	aggregation := make([]string, 0, len(rs.fns))
+	for _, fn := range rs.fns {
+		aggregation = append(aggregation, fn(rs.sql))
+	}
+	switch n := len(*rs.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		rs.sql.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		rs.sql.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
 	query, args := rs.sql.Query()
 	if err := rs.driver.Query(ctx, query, args, rows); err != nil {

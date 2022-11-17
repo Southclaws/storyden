@@ -317,59 +317,31 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: category.FieldCreatedAt,
-		})
+		_spec.SetField(category.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := cc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: category.FieldUpdatedAt,
-		})
+		_spec.SetField(category.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := cc.mutation.Name(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: category.FieldName,
-		})
+		_spec.SetField(category.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if value, ok := cc.mutation.Description(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: category.FieldDescription,
-		})
+		_spec.SetField(category.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
 	if value, ok := cc.mutation.Colour(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: category.FieldColour,
-		})
+		_spec.SetField(category.FieldColour, field.TypeString, value)
 		_node.Colour = value
 	}
 	if value, ok := cc.mutation.Sort(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Value:  value,
-			Column: category.FieldSort,
-		})
+		_spec.SetField(category.FieldSort, field.TypeInt, value)
 		_node.Sort = value
 	}
 	if value, ok := cc.mutation.Admin(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: category.FieldAdmin,
-		})
+		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
 	}
 	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
@@ -444,18 +416,6 @@ type (
 		*sql.UpdateSet
 	}
 )
-
-// SetCreatedAt sets the "created_at" field.
-func (u *CategoryUpsert) SetCreatedAt(v time.Time) *CategoryUpsert {
-	u.Set(category.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *CategoryUpsert) UpdateCreatedAt() *CategoryUpsert {
-	u.SetExcluded(category.FieldCreatedAt)
-	return u
-}
 
 // SetUpdatedAt sets the "updated_at" field.
 func (u *CategoryUpsert) SetUpdatedAt(v time.Time) *CategoryUpsert {
@@ -586,20 +546,6 @@ func (u *CategoryUpsertOne) Update(set func(*CategoryUpsert)) *CategoryUpsertOne
 		set(&CategoryUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *CategoryUpsertOne) SetCreatedAt(v time.Time) *CategoryUpsertOne {
-	return u.Update(func(s *CategoryUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *CategoryUpsertOne) UpdateCreatedAt() *CategoryUpsertOne {
-	return u.Update(func(s *CategoryUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -874,7 +820,6 @@ func (u *CategoryUpsertBulk) UpdateNewValues() *CategoryUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(category.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(category.FieldCreatedAt)
@@ -910,20 +855,6 @@ func (u *CategoryUpsertBulk) Update(set func(*CategoryUpsert)) *CategoryUpsertBu
 		set(&CategoryUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *CategoryUpsertBulk) SetCreatedAt(v time.Time) *CategoryUpsertBulk {
-	return u.Update(func(s *CategoryUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *CategoryUpsertBulk) UpdateCreatedAt() *CategoryUpsertBulk {
-	return u.Update(func(s *CategoryUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.

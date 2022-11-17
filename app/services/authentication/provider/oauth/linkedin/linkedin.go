@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/go-resty/resty/v2"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/linkedin"
 
@@ -19,6 +18,11 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
+)
+
+var (
+	ErrAccessToken  = fault.New("failed to get access token")
+	ErrMissingToken = fault.New("no access token in response")
 )
 
 const (
@@ -39,7 +43,7 @@ type LinkedInProvider struct {
 func New(cfg config.Config, auth_repo authentication.Repository, account_repo account.Repository, avatar_svc avatar.Service) (*LinkedInProvider, error) {
 	config, err := all.LoadProvider(id)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err)
 	}
 
 	return &LinkedInProvider{
@@ -72,6 +76,13 @@ func (p *LinkedInProvider) Link() string {
 }
 
 func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {
+	ctx = fctx.WithMeta(ctx,
+		"state", state,
+		"code", code,
+		"callback", p.callback,
+		"client_id", p.config.ClientID,
+	)
+
 	var auth struct {
 		AccessToken string `json:"access_token"`
 		ExpiresIn   int    `json:"expires_in"`
@@ -100,11 +111,13 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 	}
 
 	if authError.Error != "" {
-		return nil, fault.Wrap(errors.New(authError.ErrorDescription), fctx.With(ctx))
+		return nil, fault.Wrap(ErrAccessToken,
+			fctx.With(ctx),
+			fmsg.WithDesc("oauth provider rejected token exchange", authError.ErrorDescription))
 	}
 
 	if auth.AccessToken == "" {
-		return nil, fault.Wrap(errors.New("no access token in response"), fctx.With(ctx))
+		return nil, fault.Wrap(ErrMissingToken, fctx.With(ctx))
 	}
 
 	// Use the auth token for all future requests

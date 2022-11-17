@@ -1,9 +1,8 @@
 package oauth
 
 import (
-	"errors"
-
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -12,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 )
 
-var ErrInvalidProvider = errors.New("invalid provider")
+var ErrInvalidProvider = fault.New("invalid provider")
 
 type OAuth struct {
 	providers map[string]Provider
@@ -72,7 +71,7 @@ func (oa *OAuth) Providers() []Provider {
 func (oa *OAuth) Provider(id string) (Provider, error) {
 	p, ok := oa.providers[id]
 	if !ok {
-		return nil, ErrInvalidProvider
+		return nil, fault.Wrap(ErrInvalidProvider)
 	}
 
 	return p, nil
