@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.React {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.React {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.React {
 	return predicate.React(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -112,7 +112,7 @@ func CreatedAtNEQ(v time.Time) predicate.React {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.React {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -123,7 +123,7 @@ func CreatedAtIn(vs ...time.Time) predicate.React {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.React {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -176,7 +176,7 @@ func EmojiNEQ(v string) predicate.React {
 
 // EmojiIn applies the In predicate on the "emoji" field.
 func EmojiIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -187,7 +187,7 @@ func EmojiIn(vs ...string) predicate.React {
 
 // EmojiNotIn applies the NotIn predicate on the "emoji" field.
 func EmojiNotIn(vs ...string) predicate.React {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

@@ -245,43 +245,23 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec.ID.Value = &id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: authentication.FieldCreatedAt,
-		})
+		_spec.SetField(authentication.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := ac.mutation.Service(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldService,
-		})
+		_spec.SetField(authentication.FieldService, field.TypeString, value)
 		_node.Service = value
 	}
 	if value, ok := ac.mutation.Identifier(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldIdentifier,
-		})
+		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 		_node.Identifier = value
 	}
 	if value, ok := ac.mutation.Token(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldToken,
-		})
+		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 		_node.Token = value
 	}
 	if value, ok := ac.mutation.Metadata(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Value:  value,
-			Column: authentication.FieldMetadata,
-		})
+		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
 	if nodes := ac.mutation.AccountIDs(); len(nodes) > 0 {
@@ -357,18 +337,6 @@ type (
 		*sql.UpdateSet
 	}
 )
-
-// SetCreatedAt sets the "created_at" field.
-func (u *AuthenticationUpsert) SetCreatedAt(v time.Time) *AuthenticationUpsert {
-	u.Set(authentication.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AuthenticationUpsert) UpdateCreatedAt() *AuthenticationUpsert {
-	u.SetExcluded(authentication.FieldCreatedAt)
-	return u
-}
 
 // SetService sets the "service" field.
 func (u *AuthenticationUpsert) SetService(v string) *AuthenticationUpsert {
@@ -475,20 +443,6 @@ func (u *AuthenticationUpsertOne) Update(set func(*AuthenticationUpsert)) *Authe
 		set(&AuthenticationUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *AuthenticationUpsertOne) SetCreatedAt(v time.Time) *AuthenticationUpsertOne {
-	return u.Update(func(s *AuthenticationUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AuthenticationUpsertOne) UpdateCreatedAt() *AuthenticationUpsertOne {
-	return u.Update(func(s *AuthenticationUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetService sets the "service" field.
@@ -735,7 +689,6 @@ func (u *AuthenticationUpsertBulk) UpdateNewValues() *AuthenticationUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(authentication.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(authentication.FieldCreatedAt)
@@ -771,20 +724,6 @@ func (u *AuthenticationUpsertBulk) Update(set func(*AuthenticationUpsert)) *Auth
 		set(&AuthenticationUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *AuthenticationUpsertBulk) SetCreatedAt(v time.Time) *AuthenticationUpsertBulk {
-	return u.Update(func(s *AuthenticationUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AuthenticationUpsertBulk) UpdateCreatedAt() *AuthenticationUpsertBulk {
-	return u.Update(func(s *AuthenticationUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetService sets the "service" field.

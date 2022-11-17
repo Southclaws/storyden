@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.Authentication {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.Authentication {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -126,7 +126,7 @@ func CreatedAtNEQ(v time.Time) predicate.Authentication {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -137,7 +137,7 @@ func CreatedAtIn(vs ...time.Time) predicate.Authentication {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -190,7 +190,7 @@ func ServiceNEQ(v string) predicate.Authentication {
 
 // ServiceIn applies the In predicate on the "service" field.
 func ServiceIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -201,7 +201,7 @@ func ServiceIn(vs ...string) predicate.Authentication {
 
 // ServiceNotIn applies the NotIn predicate on the "service" field.
 func ServiceNotIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -289,7 +289,7 @@ func IdentifierNEQ(v string) predicate.Authentication {
 
 // IdentifierIn applies the In predicate on the "identifier" field.
 func IdentifierIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -300,7 +300,7 @@ func IdentifierIn(vs ...string) predicate.Authentication {
 
 // IdentifierNotIn applies the NotIn predicate on the "identifier" field.
 func IdentifierNotIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -388,7 +388,7 @@ func TokenNEQ(v string) predicate.Authentication {
 
 // TokenIn applies the In predicate on the "token" field.
 func TokenIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -399,7 +399,7 @@ func TokenIn(vs ...string) predicate.Authentication {
 
 // TokenNotIn applies the NotIn predicate on the "token" field.
 func TokenNotIn(vs ...string) predicate.Authentication {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

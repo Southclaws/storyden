@@ -381,59 +381,31 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldCreatedAt,
-		})
+		_spec.SetField(account.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := ac.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldUpdatedAt,
-		})
+		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := ac.mutation.DeletedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: account.FieldDeletedAt,
-		})
+		_spec.SetField(account.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
 	if value, ok := ac.mutation.Handle(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldHandle,
-		})
+		_spec.SetField(account.FieldHandle, field.TypeString, value)
 		_node.Handle = value
 	}
 	if value, ok := ac.mutation.Name(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldName,
-		})
+		_spec.SetField(account.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if value, ok := ac.mutation.Bio(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: account.FieldBio,
-		})
+		_spec.SetField(account.FieldBio, field.TypeString, value)
 		_node.Bio = value
 	}
 	if value, ok := ac.mutation.Admin(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: account.FieldAdmin,
-		})
+		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
 	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
@@ -604,18 +576,6 @@ type (
 	}
 )
 
-// SetCreatedAt sets the "created_at" field.
-func (u *AccountUpsert) SetCreatedAt(v time.Time) *AccountUpsert {
-	u.Set(account.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AccountUpsert) UpdateCreatedAt() *AccountUpsert {
-	u.SetExcluded(account.FieldCreatedAt)
-	return u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (u *AccountUpsert) SetUpdatedAt(v time.Time) *AccountUpsert {
 	u.Set(account.FieldUpdatedAt, v)
@@ -751,20 +711,6 @@ func (u *AccountUpsertOne) Update(set func(*AccountUpsert)) *AccountUpsertOne {
 		set(&AccountUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *AccountUpsertOne) SetCreatedAt(v time.Time) *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AccountUpsertOne) UpdateCreatedAt() *AccountUpsertOne {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -1046,7 +992,6 @@ func (u *AccountUpsertBulk) UpdateNewValues() *AccountUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(account.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(account.FieldCreatedAt)
@@ -1082,20 +1027,6 @@ func (u *AccountUpsertBulk) Update(set func(*AccountUpsert)) *AccountUpsertBulk 
 		set(&AccountUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *AccountUpsertBulk) SetCreatedAt(v time.Time) *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *AccountUpsertBulk) UpdateCreatedAt() *AccountUpsertBulk {
-	return u.Update(func(s *AccountUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.

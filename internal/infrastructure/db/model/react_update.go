@@ -171,11 +171,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := ru.mutation.Emoji(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldEmoji,
-		})
+		_spec.SetField(react.FieldEmoji, field.TypeString, value)
 	}
 	if ru.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -247,7 +243,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = ru.modifiers
+	_spec.AddModifiers(ru.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{react.Label}
@@ -438,11 +434,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 	}
 	if value, ok := ruo.mutation.Emoji(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: react.FieldEmoji,
-		})
+		_spec.SetField(react.FieldEmoji, field.TypeString, value)
 	}
 	if ruo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -514,7 +506,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = ruo.modifiers
+	_spec.AddModifiers(ruo.modifiers...)
 	_node = &React{config: ruo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

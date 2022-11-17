@@ -163,32 +163,16 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := nu.mutation.Title(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldTitle,
-		})
+		_spec.SetField(notification.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Description(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldDescription,
-		})
+		_spec.SetField(notification.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Link(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldLink,
-		})
+		_spec.SetField(notification.FieldLink, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Read(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: notification.FieldRead,
-		})
+		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 	}
 	if nu.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -225,7 +209,7 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = nu.modifiers
+	_spec.AddModifiers(nu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{notification.Label}
@@ -409,32 +393,16 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 		}
 	}
 	if value, ok := nuo.mutation.Title(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldTitle,
-		})
+		_spec.SetField(notification.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Description(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldDescription,
-		})
+		_spec.SetField(notification.FieldDescription, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Link(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: notification.FieldLink,
-		})
+		_spec.SetField(notification.FieldLink, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Read(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: notification.FieldRead,
-		})
+		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 	}
 	if nuo.mutation.SubscriptionCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -471,7 +439,7 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = nuo.modifiers
+	_spec.AddModifiers(nuo.modifiers...)
 	_node = &Notification{config: nuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

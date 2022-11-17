@@ -233,27 +233,15 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: role.FieldCreatedAt,
-		})
+		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := rc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: role.FieldUpdatedAt,
-		})
+		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := rc.mutation.Name(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: role.FieldName,
-		})
+		_spec.SetField(role.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	if nodes := rc.mutation.AccountsIDs(); len(nodes) > 0 {
@@ -328,18 +316,6 @@ type (
 		*sql.UpdateSet
 	}
 )
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsert) SetCreatedAt(v time.Time) *RoleUpsert {
-	u.Set(role.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateCreatedAt() *RoleUpsert {
-	u.SetExcluded(role.FieldCreatedAt)
-	return u
-}
 
 // SetUpdatedAt sets the "updated_at" field.
 func (u *RoleUpsert) SetUpdatedAt(v time.Time) *RoleUpsert {
@@ -416,20 +392,6 @@ func (u *RoleUpsertOne) Update(set func(*RoleUpsert)) *RoleUpsertOne {
 		set(&RoleUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsertOne) SetCreatedAt(v time.Time) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateCreatedAt() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -641,7 +603,6 @@ func (u *RoleUpsertBulk) UpdateNewValues() *RoleUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(role.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(role.FieldCreatedAt)
@@ -677,20 +638,6 @@ func (u *RoleUpsertBulk) Update(set func(*RoleUpsert)) *RoleUpsertBulk {
 		set(&RoleUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsertBulk) SetCreatedAt(v time.Time) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateCreatedAt() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.

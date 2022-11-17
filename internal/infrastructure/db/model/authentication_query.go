@@ -336,6 +336,11 @@ func (aq *AuthenticationQuery) Select(fields ...string) *AuthenticationSelect {
 	return selbuild
 }
 
+// Aggregate returns a AuthenticationSelect configured with the given aggregations.
+func (aq *AuthenticationQuery) Aggregate(fns ...AggregateFunc) *AuthenticationSelect {
+	return aq.Select().Aggregate(fns...)
+}
+
 func (aq *AuthenticationQuery) prepareQuery(ctx context.Context) error {
 	for _, f := range aq.fields {
 		if !authentication.ValidColumn(f) {
@@ -367,10 +372,10 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, authentication.ForeignKeys...)
 	}
-	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
+	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Authentication).scanValues(nil, columns)
 	}
-	_spec.Assign = func(columns []string, values []interface{}) error {
+	_spec.Assign = func(columns []string, values []any) error {
 		node := &Authentication{config: aq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
@@ -440,11 +445,14 @@ func (aq *AuthenticationQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (aq *AuthenticationQuery) sqlExist(ctx context.Context) (bool, error) {
-	n, err := aq.sqlCount(ctx)
-	if err != nil {
+	switch _, err := aq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
 		return false, fmt.Errorf("model: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return n > 0, nil
 }
 
 func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
@@ -554,7 +562,7 @@ func (agb *AuthenticationGroupBy) Aggregate(fns ...AggregateFunc) *Authenticatio
 }
 
 // Scan applies the group-by query and scans the result into the given value.
-func (agb *AuthenticationGroupBy) Scan(ctx context.Context, v interface{}) error {
+func (agb *AuthenticationGroupBy) Scan(ctx context.Context, v any) error {
 	query, err := agb.path(ctx)
 	if err != nil {
 		return err
@@ -563,7 +571,7 @@ func (agb *AuthenticationGroupBy) Scan(ctx context.Context, v interface{}) error
 	return agb.sqlScan(ctx, v)
 }
 
-func (agb *AuthenticationGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+func (agb *AuthenticationGroupBy) sqlScan(ctx context.Context, v any) error {
 	for _, f := range agb.fields {
 		if !authentication.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
@@ -588,8 +596,6 @@ func (agb *AuthenticationGroupBy) sqlQuery() *sql.Selector {
 	for _, fn := range agb.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	// If no columns were selected in a custom aggregation function, the default
-	// selection is the fields used for "group-by", and the aggregation functions.
 	if len(selector.SelectedColumns()) == 0 {
 		columns := make([]string, 0, len(agb.fields)+len(agb.fns))
 		for _, f := range agb.fields {
@@ -609,8 +615,14 @@ type AuthenticationSelect struct {
 	sql *sql.Selector
 }
 
+// Aggregate adds the given aggregation functions to the selector query.
+func (as *AuthenticationSelect) Aggregate(fns ...AggregateFunc) *AuthenticationSelect {
+	as.fns = append(as.fns, fns...)
+	return as
+}
+
 // Scan applies the selector query and scans the result into the given value.
-func (as *AuthenticationSelect) Scan(ctx context.Context, v interface{}) error {
+func (as *AuthenticationSelect) Scan(ctx context.Context, v any) error {
 	if err := as.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -618,7 +630,17 @@ func (as *AuthenticationSelect) Scan(ctx context.Context, v interface{}) error {
 	return as.sqlScan(ctx, v)
 }
 
-func (as *AuthenticationSelect) sqlScan(ctx context.Context, v interface{}) error {
+func (as *AuthenticationSelect) sqlScan(ctx context.Context, v any) error {
+	aggregation := make([]string, 0, len(as.fns))
+	for _, fn := range as.fns {
+		aggregation = append(aggregation, fn(as.sql))
+	}
+	switch n := len(*as.selector.flds); {
+	case n == 0 && len(aggregation) > 0:
+		as.sql.Select(aggregation...)
+	case n != 0 && len(aggregation) > 0:
+		as.sql.AppendSelect(aggregation...)
+	}
 	rows := &sql.Rows{}
 	query, args := as.sql.Query()
 	if err := as.driver.Query(ctx, query, args, rows); err != nil {

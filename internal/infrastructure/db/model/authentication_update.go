@@ -185,38 +185,19 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 	}
 	if value, ok := au.mutation.Service(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldService,
-		})
+		_spec.SetField(authentication.FieldService, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Identifier(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldIdentifier,
-		})
+		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Token(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldToken,
-		})
+		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Metadata(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Value:  value,
-			Column: authentication.FieldMetadata,
-		})
+		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 	}
 	if au.mutation.MetadataCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Column: authentication.FieldMetadata,
-		})
+		_spec.ClearField(authentication.FieldMetadata, field.TypeJSON)
 	}
 	if au.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -253,7 +234,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = au.modifiers
+	_spec.AddModifiers(au.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{authentication.Label}
@@ -459,38 +440,19 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 		}
 	}
 	if value, ok := auo.mutation.Service(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldService,
-		})
+		_spec.SetField(authentication.FieldService, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Identifier(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldIdentifier,
-		})
+		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Token(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: authentication.FieldToken,
-		})
+		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Value:  value,
-			Column: authentication.FieldMetadata,
-		})
+		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 	}
 	if auo.mutation.MetadataCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Column: authentication.FieldMetadata,
-		})
+		_spec.ClearField(authentication.FieldMetadata, field.TypeJSON)
 	}
 	if auo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -527,7 +489,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Modifiers = auo.modifiers
+	_spec.AddModifiers(auo.modifiers...)
 	_node = &Authentication{config: auo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

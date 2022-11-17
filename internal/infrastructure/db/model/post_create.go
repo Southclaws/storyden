@@ -467,83 +467,43 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldCreatedAt,
-		})
+		_spec.SetField(post.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := pc.mutation.UpdatedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldUpdatedAt,
-		})
+		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := pc.mutation.DeletedAt(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeTime,
-			Value:  value,
-			Column: post.FieldDeletedAt,
-		})
+		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
 	if value, ok := pc.mutation.First(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: post.FieldFirst,
-		})
+		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 		_node.First = value
 	}
 	if value, ok := pc.mutation.Title(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldTitle,
-		})
+		_spec.SetField(post.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
 	if value, ok := pc.mutation.Slug(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldSlug,
-		})
+		_spec.SetField(post.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
 	if value, ok := pc.mutation.Pinned(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: post.FieldPinned,
-		})
+		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 		_node.Pinned = value
 	}
 	if value, ok := pc.mutation.Body(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldBody,
-		})
+		_spec.SetField(post.FieldBody, field.TypeString, value)
 		_node.Body = value
 	}
 	if value, ok := pc.mutation.Short(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: post.FieldShort,
-		})
+		_spec.SetField(post.FieldShort, field.TypeString, value)
 		_node.Short = value
 	}
 	if value, ok := pc.mutation.Metadata(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeJSON,
-			Value:  value,
-			Column: post.FieldMetadata,
-		})
+		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
@@ -755,18 +715,6 @@ type (
 		*sql.UpdateSet
 	}
 )
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PostUpsert) SetCreatedAt(v time.Time) *PostUpsert {
-	u.Set(post.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PostUpsert) UpdateCreatedAt() *PostUpsert {
-	u.SetExcluded(post.FieldCreatedAt)
-	return u
-}
 
 // SetUpdatedAt sets the "updated_at" field.
 func (u *PostUpsert) SetUpdatedAt(v time.Time) *PostUpsert {
@@ -1005,20 +953,6 @@ func (u *PostUpsertOne) Update(set func(*PostUpsert)) *PostUpsertOne {
 		set(&PostUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PostUpsertOne) SetCreatedAt(v time.Time) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateCreatedAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -1419,7 +1353,6 @@ func (u *PostUpsertBulk) UpdateNewValues() *PostUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(post.FieldID)
-				return
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(post.FieldCreatedAt)
@@ -1455,20 +1388,6 @@ func (u *PostUpsertBulk) Update(set func(*PostUpsert)) *PostUpsertBulk {
 		set(&PostUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PostUpsertBulk) SetCreatedAt(v time.Time) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateCreatedAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateCreatedAt()
-	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.

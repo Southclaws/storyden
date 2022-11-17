@@ -6,13 +6,14 @@ import (
 	"context"
 	"database/sql"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/schema"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	"go.uber.org/fx"
+	"entgo.io/ent/dialect"             // nolint:gci
+	entsql "entgo.io/ent/dialect/sql"  // nolint:gci
+	"entgo.io/ent/dialect/sql/schema"  // nolint:gci
+	_ "github.com/jackc/pgx/v4/stdlib" // nolint:gci
+	"go.uber.org/fx"                   // nolint:gci
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
@@ -32,9 +33,15 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 	}
 
 	lc.Append(fx.Hook{
-		OnStop: func(_ context.Context) error {
+		OnStop: func(ctx context.Context) error {
 			defer cancel()
-			return client.Close()
+
+			err := client.Close()
+			if err != nil {
+				return fault.Wrap(err, fctx.With(ctx))
+			}
+
+			return nil
 		},
 	})
 
@@ -54,8 +61,8 @@ func connect(ctx context.Context, url string) (*model.Client, *sql.DB, error) {
 	}
 
 	// We don't do versioned migrations currently.
-	opts = append(opts, schema.WithDropColumn(true))
-	opts = append(opts, schema.WithDropIndex(true))
+	// opts = append(opts, schema.WithDropColumn(true))
+	// opts = append(opts, schema.WithDropIndex(true))
 
 	// Run only additive migrations
 	if err := client.Schema.Create(ctx, opts...); err != nil {

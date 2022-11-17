@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.Post {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.Post {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -182,7 +182,7 @@ func CreatedAtNEQ(v time.Time) predicate.Post {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -193,7 +193,7 @@ func CreatedAtIn(vs ...time.Time) predicate.Post {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -246,7 +246,7 @@ func UpdatedAtNEQ(v time.Time) predicate.Post {
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -257,7 +257,7 @@ func UpdatedAtIn(vs ...time.Time) predicate.Post {
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -310,7 +310,7 @@ func DeletedAtNEQ(v time.Time) predicate.Post {
 
 // DeletedAtIn applies the In predicate on the "deleted_at" field.
 func DeletedAtIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -321,7 +321,7 @@ func DeletedAtIn(vs ...time.Time) predicate.Post {
 
 // DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
 func DeletedAtNotIn(vs ...time.Time) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -402,7 +402,7 @@ func TitleNEQ(v string) predicate.Post {
 
 // TitleIn applies the In predicate on the "title" field.
 func TitleIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -413,7 +413,7 @@ func TitleIn(vs ...string) predicate.Post {
 
 // TitleNotIn applies the NotIn predicate on the "title" field.
 func TitleNotIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -515,7 +515,7 @@ func SlugNEQ(v string) predicate.Post {
 
 // SlugIn applies the In predicate on the "slug" field.
 func SlugIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -526,7 +526,7 @@ func SlugIn(vs ...string) predicate.Post {
 
 // SlugNotIn applies the NotIn predicate on the "slug" field.
 func SlugNotIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -642,7 +642,7 @@ func RootPostIDNEQ(v xid.ID) predicate.Post {
 
 // RootPostIDIn applies the In predicate on the "root_post_id" field.
 func RootPostIDIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -653,7 +653,7 @@ func RootPostIDIn(vs ...xid.ID) predicate.Post {
 
 // RootPostIDNotIn applies the NotIn predicate on the "root_post_id" field.
 func RootPostIDNotIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -760,7 +760,7 @@ func ReplyToPostIDNEQ(v xid.ID) predicate.Post {
 
 // ReplyToPostIDIn applies the In predicate on the "reply_to_post_id" field.
 func ReplyToPostIDIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -771,7 +771,7 @@ func ReplyToPostIDIn(vs ...xid.ID) predicate.Post {
 
 // ReplyToPostIDNotIn applies the NotIn predicate on the "reply_to_post_id" field.
 func ReplyToPostIDNotIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -878,7 +878,7 @@ func BodyNEQ(v string) predicate.Post {
 
 // BodyIn applies the In predicate on the "body" field.
 func BodyIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -889,7 +889,7 @@ func BodyIn(vs ...string) predicate.Post {
 
 // BodyNotIn applies the NotIn predicate on the "body" field.
 func BodyNotIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -977,7 +977,7 @@ func ShortNEQ(v string) predicate.Post {
 
 // ShortIn applies the In predicate on the "short" field.
 func ShortIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -988,7 +988,7 @@ func ShortIn(vs ...string) predicate.Post {
 
 // ShortNotIn applies the NotIn predicate on the "short" field.
 func ShortNotIn(vs ...string) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -1090,7 +1090,7 @@ func CategoryIDNEQ(v xid.ID) predicate.Post {
 
 // CategoryIDIn applies the In predicate on the "category_id" field.
 func CategoryIDIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -1101,7 +1101,7 @@ func CategoryIDIn(vs ...xid.ID) predicate.Post {
 
 // CategoryIDNotIn applies the NotIn predicate on the "category_id" field.
 func CategoryIDNotIn(vs ...xid.ID) predicate.Post {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}

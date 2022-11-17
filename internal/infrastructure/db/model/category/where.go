@@ -35,7 +35,7 @@ func IDNEQ(id xid.ID) predicate.Category {
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -46,7 +46,7 @@ func IDIn(ids ...xid.ID) predicate.Category {
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
-		v := make([]interface{}, len(ids))
+		v := make([]any, len(ids))
 		for i := range v {
 			v[i] = ids[i]
 		}
@@ -147,7 +147,7 @@ func CreatedAtNEQ(v time.Time) predicate.Category {
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -158,7 +158,7 @@ func CreatedAtIn(vs ...time.Time) predicate.Category {
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -211,7 +211,7 @@ func UpdatedAtNEQ(v time.Time) predicate.Category {
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -222,7 +222,7 @@ func UpdatedAtIn(vs ...time.Time) predicate.Category {
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -275,7 +275,7 @@ func NameNEQ(v string) predicate.Category {
 
 // NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -286,7 +286,7 @@ func NameIn(vs ...string) predicate.Category {
 
 // NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -374,7 +374,7 @@ func DescriptionNEQ(v string) predicate.Category {
 
 // DescriptionIn applies the In predicate on the "description" field.
 func DescriptionIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -385,7 +385,7 @@ func DescriptionIn(vs ...string) predicate.Category {
 
 // DescriptionNotIn applies the NotIn predicate on the "description" field.
 func DescriptionNotIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -473,7 +473,7 @@ func ColourNEQ(v string) predicate.Category {
 
 // ColourIn applies the In predicate on the "colour" field.
 func ColourIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -484,7 +484,7 @@ func ColourIn(vs ...string) predicate.Category {
 
 // ColourNotIn applies the NotIn predicate on the "colour" field.
 func ColourNotIn(vs ...string) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -572,7 +572,7 @@ func SortNEQ(v int) predicate.Category {
 
 // SortIn applies the In predicate on the "sort" field.
 func SortIn(vs ...int) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
@@ -583,7 +583,7 @@ func SortIn(vs ...int) predicate.Category {
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
 func SortNotIn(vs ...int) predicate.Category {
-	v := make([]interface{}, len(vs))
+	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
