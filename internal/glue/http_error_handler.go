@@ -8,10 +8,11 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
+
+	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 )
 
 // HTTPErrorHandler provides an error handler function for use with the Echo
@@ -20,6 +21,22 @@ import (
 // called "ftag" which enables the decoration of error chains with a basic kind
 // of category which helps organise the kind of errors that occur within an app.
 func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
+	getLoggerForTag := func(tag ftag.Kind) func(msg string, fields ...zap.Field) {
+		switch tag {
+		case ftag.Internal:
+			return l.Error
+
+		// We don't need to log these in prod.
+		case ftag.PermissionDenied:
+			return l.Debug
+		case ftag.Unauthenticated:
+			return l.Debug
+
+		default:
+			return l.Info
+		}
+	}
+
 	return func(err error, c echo.Context) {
 		errmsg := err.Error()
 		errtag := ftag.Get(err)
@@ -28,17 +45,13 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 		message := fmsg.GetIssue(err)
 		chain := fault.Flatten(err)
 
-		fn := l.Info
+		fn := getLoggerForTag(errtag)
 
-		// use log level error for internal server errors
-		if status == http.StatusInternalServerError {
-			fn = l.Error
-		}
-
-		fn("request error",
-			zap.String("error", errmsg),
+		fn(errmsg,
+			zap.String("package", "http"),
 			zap.String("message", message),
 			zap.String("path", c.Path()),
+			zap.String("tag", string(errtag)),
 			zap.Any("metadata", errctx),
 			zap.Any("trace", chain.Errors),
 		)
@@ -48,7 +61,7 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 		errormetadata := opt.NewIf(meta, func(m map[string]any) bool { return len(m) > 0 }).Ptr()
 
 		c.JSON(status, openapi.APIError{
-			Error:    string(errtag),
+			Error:    errmsg,
 			Message:  errormessage,
 			Metadata: errormetadata,
 		})
