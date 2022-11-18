@@ -27,7 +27,6 @@
 //
 // Updating a route is as simple as just modifying the OpenAPI specification
 // and making the necessary changes to the bindings to get the code compiling.
-//
 package bindings
 
 import (
@@ -35,6 +34,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	oapi_middleware "github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
@@ -43,11 +44,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/storyden/app/transports/openapi/glue"
 	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/glue"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
@@ -59,7 +58,6 @@ import (
 // REST collections instead of bundling everything into one huge struct with
 // loads of dependencies. This is just how the oapi-codegen tool works, by
 // generating one big interface which the bindings layer must satisfy.
-//
 type Bindings struct {
 	fx.In
 	Version
@@ -91,9 +89,7 @@ func bindingsProviders() fx.Option {
 // bindings provides to the application the above struct which binds the service
 // layer to the transport layer. This uses `Bindings` as an fx parameter struct.
 //
-//
 // ## WHY AM I GETTING AN ERROR HERE?
-//
 //
 // When you edit `openapi.yaml` and re-run the code generation task, this will
 // most likely change the declaration of `StrictServerInterface` inside the
@@ -101,7 +97,7 @@ func bindingsProviders() fx.Option {
 //
 // The error you will see is most likely something along the lines of:
 //
-//   *Bindings does not implement openapi.StrictServerInterface
+//	*Bindings does not implement openapi.StrictServerInterface
 //
 // and the underlying problem is either missing methods or methods that have
 // changed signature due to changes to the parameters or request or response.
@@ -110,7 +106,6 @@ func bindingsProviders() fx.Option {
 // (such as `/v1/accounts`) will map to a file, struct and constructor here
 // (such as `accounts.go`, `Accounts` and `NewAccounts`) and everything is glued
 // together in this file.
-//
 func bindings(s Bindings) openapi.StrictServerInterface {
 	return &s
 }
