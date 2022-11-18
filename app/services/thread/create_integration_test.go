@@ -34,7 +34,7 @@ func TestThreadCreate(t *testing.T) {
 		a.Equal(seed.Account_002.Name, t.Author.Name)
 		// a.Equal([]string{"hello"}, t.Tags) // TODO: upsert tags in resource
 		a.Equal(seed.Category_01_General.Name, t.Category.Name)
-		a.Len(t.Posts, 0)
+		a.Len(t.Posts, 1)
 		a.Len(t.Reacts, 0)
 	}))
 }
