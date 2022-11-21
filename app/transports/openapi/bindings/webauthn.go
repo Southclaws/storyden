@@ -13,8 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type WebAuthn struct {

@@ -18,8 +18,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Authentication struct {

@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Accounts struct {

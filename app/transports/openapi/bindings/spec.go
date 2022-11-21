@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Spec struct{}

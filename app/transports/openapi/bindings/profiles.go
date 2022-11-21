@@ -10,7 +10,7 @@ import (
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

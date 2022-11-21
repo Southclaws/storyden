@@ -45,8 +45,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/openapi/glue"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
