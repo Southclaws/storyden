@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/thread"
-	"github.com/Southclaws/storyden/internal/utils/integration"
+	"github.com/Southclaws/storyden/internal/integration"
 )
 
 func TestThreadCreate(t *testing.T) {

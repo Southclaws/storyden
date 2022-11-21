@@ -3,7 +3,6 @@ package provider
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/services/authentication/provider/magiclink"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 )
@@ -15,7 +14,7 @@ func Build() fx.Option {
 
 		// Magic links are passwordless and use a provided communication method
 		// to send the user a link that logs them in.
-		magiclink.Build(),
+		// magiclink.Build(), // TODO
 
 		// OAuth is for integration with other services like login with twitter.
 		oauth.Build(),

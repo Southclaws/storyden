@@ -11,7 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/internal/utils/integration"
+	"github.com/Southclaws/storyden/internal/integration"
 )
 
 func TestCreateUser(t *testing.T) {

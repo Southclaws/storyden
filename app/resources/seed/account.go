@@ -84,7 +84,11 @@ func accounts(r account.Repository) {
 		Account_032,
 		Account_033,
 	} {
-		utils.Must(r.Create(ctx, v.Name, account.WithID(v.ID)))
+		utils.Must(r.Create(ctx, v.Handle,
+			account.WithID(v.ID),
+			account.WithName(v.Name),
+			account.WithBio(v.Bio.ElseZero()),
+		))
 	}
 
 	fmt.Println("created seed users")

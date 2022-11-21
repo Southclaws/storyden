@@ -8,10 +8,13 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/graphql"
 	"github.com/Southclaws/storyden/app/transports/openapi"
+	"github.com/Southclaws/storyden/internal/http"
 )
 
 func Build() fx.Option {
 	return fx.Options(
+		http.Build(),
+
 		openapi.Build(),
 		graphql.Build(),
 	)

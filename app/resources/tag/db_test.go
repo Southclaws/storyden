@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/utils/integration"
+	"github.com/Southclaws/storyden/internal/integration"
 )
 
 func TestGetTags(t *testing.T) {

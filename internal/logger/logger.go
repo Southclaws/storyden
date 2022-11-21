@@ -54,9 +54,8 @@ func replaceGlobals(c config.Config, l *zap.Logger) {
 func WithLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		zap.L().Info(
-			"request",
+			r.URL.Path,
 			zap.String("method", r.Method),
-			zap.String("path", r.URL.Path),
 			zap.Any("query", r.URL.Query()),
 			zap.Any("headers", r.Header),
 			zap.Int64("body", r.ContentLength),

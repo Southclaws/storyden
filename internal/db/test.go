@@ -1,12 +1,9 @@
 package db
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"strings"
-	"testing"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
@@ -19,22 +16,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
-
-func TestDB(t *testing.T) {
-	url := os.Getenv("DATABASE_URL")
-	if url == "" {
-		url = "postgresql://default:default@localhost:5432/postgres"
-	}
-
-	c, _, err := connect(context.Background(), url)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Cleanup(func() {
-		c.Close()
-	})
-}
 
 func Truncate(db *sql.DB) error {
 	tables := []string{

@@ -1,9 +1,0 @@
-version: "3"
-
-services:
-  storyden:
-    image: storyden:latest
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-    ports:
-      - 8000:8000

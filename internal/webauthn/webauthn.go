@@ -7,6 +7,7 @@ import (
 )
 
 func New() (*webauthn.WebAuthn, error) {
+	// TODO: Read this from config.
 	wa, err := webauthn.New(&webauthn.Config{
 		RPID:          "storyden.org",
 		RPDisplayName: "Storyden",
