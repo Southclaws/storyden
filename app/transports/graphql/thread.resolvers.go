@@ -1,3 +1,4 @@
+//nolint:gci
 package graphql
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
@@ -18,7 +19,7 @@ import (
 func (r *mutationResolver) CreateThread(ctx context.Context, input models.NewThread) (*models.Thread, error) {
 	acc, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	thread, err := r.thread_service.Create(ctx, input.Title, input.Body, acc, category.CategoryID{}, nil, nil)

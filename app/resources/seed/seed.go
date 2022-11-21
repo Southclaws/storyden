@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
@@ -77,5 +78,5 @@ func New(
 	categories(category_repo)
 	threads(thread_repo, post_repo)
 
-	return Ready{}, err
+	return Ready{}, fault.Wrap(err)
 }

@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 
+	"github.com/Southclaws/fault"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 
@@ -28,7 +29,7 @@ type GitHubProvider struct {
 func New(cfg config.Config, auth_repo authentication.Repository) (*GitHubProvider, error) {
 	config, err := all.LoadProvider(id)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err)
 	}
 
 	return &GitHubProvider{

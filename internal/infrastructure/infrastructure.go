@@ -14,7 +14,6 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		logger.Build(),
-		// mailer.Build(),
 		db.Build(),
 		http.Build(),
 		fx.Provide(securecookie.New),

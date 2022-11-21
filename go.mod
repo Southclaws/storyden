@@ -10,7 +10,6 @@ require (
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
-	github.com/cskr/pubsub v1.0.2
 	github.com/deepmap/oapi-codegen v1.11.1-0.20220906181851-9c600dddea33
 	github.com/duo-labs/webauthn v0.0.0-20220815211337-00c9fb5711f5
 	github.com/el-mike/restrict v1.0.0
@@ -30,7 +29,6 @@ require (
 	github.com/rs/xid v1.4.0
 	github.com/samber/lo v1.27.1
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
-	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.8.1
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/dig v1.15.0

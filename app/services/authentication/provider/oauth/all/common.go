@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kelseyhightower/envconfig"
-
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/kelseyhightower/envconfig"
+
 	"github.com/Southclaws/storyden/internal/config"
 )
 
