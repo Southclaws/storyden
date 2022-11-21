@@ -2,10 +2,8 @@ package seed
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
-	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
@@ -13,8 +11,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/internal/db"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -60,14 +58,7 @@ func New(
 	category_repo category.Repository,
 	thread_repo thread.Repository,
 	post_repo post.Repository,
-) (r Ready, err error) {
-	defer func() {
-		// recover panics so that test cleanups can run.
-		if r := recover(); r != nil {
-			err = errors.New("failed to seed")
-		}
-	}()
-
+) (r Ready) {
 	if err := db.Truncate(database); err != nil {
 		panic(err)
 	}
@@ -78,5 +69,5 @@ func New(
 	categories(category_repo)
 	threads(thread_repo, post_repo)
 
-	return Ready{}, fault.Wrap(err)
+	return Ready{}
 }

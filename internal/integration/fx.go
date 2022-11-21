@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
-	"github.com/Southclaws/storyden/internal/infrastructure/db"
 )
 
 // Test provides a full app setup for testing service behaviour. It returns a
@@ -49,9 +48,6 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 
 		// seeded database
 		seed.Create(),
-
-		// sql client and ent client
-		fx.Invoke(func() { db.TestDB(t) }),
 
 		// provide a global context
 		fx.Provide(func() context.Context { return ctx }),

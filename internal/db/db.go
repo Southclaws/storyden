@@ -18,16 +18,31 @@ import (
 )
 
 func Build() fx.Option {
-	return fx.Provide(newDB)
+	return fx.Options(
+		// provide the underlying *sql.DB to the system
+		fx.Provide(newSQL),
+
+		// construct a new ent client using the *sql.DB provided above
+		fx.Provide(newEntClient),
+	)
 }
 
-func newDB(lc fx.Lifecycle, cfg config.Config) (*ent.Client, *sql.DB, error) {
+func newSQL(cfg config.Config) (*sql.DB, error) {
+	driver, err := sql.Open("pgx", cfg.DatabaseURL)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
+	}
+
+	return driver, nil
+}
+
+func newEntClient(lc fx.Lifecycle, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, db, err := connect(wctx, cfg.DatabaseURL)
+	client, err := connect(wctx, db)
 	if err != nil {
 		cancel()
-		return nil, nil, err
+		return nil, err
 	}
 
 	lc.Append(fx.Hook{
@@ -43,15 +58,10 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*ent.Client, *sql.DB, error) {
 		},
 	})
 
-	return client, db, nil
+	return client, nil
 }
 
-func connect(ctx context.Context, url string) (*ent.Client, *sql.DB, error) {
-	driver, err := sql.Open("pgx", url)
-	if err != nil {
-		return nil, nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
-	}
-
+func connect(ctx context.Context, driver *sql.DB) (*ent.Client, error) {
 	client := ent.NewClient(ent.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
 	opts := []schema.MigrateOption{
@@ -64,8 +74,8 @@ func connect(ctx context.Context, url string) (*ent.Client, *sql.DB, error) {
 
 	// Run only additive migrations
 	if err := client.Schema.Create(ctx, opts...); err != nil {
-		return nil, nil, fault.Wrap(err)
+		return nil, fault.Wrap(err)
 	}
 
-	return client, driver, nil
+	return client, nil
 }

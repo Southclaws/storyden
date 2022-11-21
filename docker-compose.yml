@@ -12,13 +12,6 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
-  rabbit:
-    image: rabbitmq:3-management
-    restart: always
-    ports:
-      - 5672:5672
-      - 8080:15672
-
   swaggerui:
     image: swaggerapi/swagger-ui
     ports:

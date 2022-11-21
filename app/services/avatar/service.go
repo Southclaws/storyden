@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/object"
+	"github.com/Southclaws/storyden/internal/object"
 )
 
 type Service interface {
