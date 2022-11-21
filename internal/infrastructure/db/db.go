@@ -9,12 +9,12 @@ import (
 	"entgo.io/ent/dialect"             // nolint:gci
 	entsql "entgo.io/ent/dialect/sql"  // nolint:gci
 	"entgo.io/ent/dialect/sql/schema"  // nolint:gci
+	"github.com/Southclaws/fault"      // nolint:gci
+	"github.com/Southclaws/fault/fctx" // nolint:gci
+	"github.com/Southclaws/fault/fmsg" // nolint:gci
 	_ "github.com/jackc/pgx/v4/stdlib" // nolint:gci
 	"go.uber.org/fx"                   // nolint:gci
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 )
@@ -66,7 +66,7 @@ func connect(ctx context.Context, url string) (*model.Client, *sql.DB, error) {
 
 	// Run only additive migrations
 	if err := client.Schema.Create(ctx, opts...); err != nil {
-		return nil, nil, err
+		return nil, nil, fault.Wrap(err)
 	}
 
 	return client, driver, nil

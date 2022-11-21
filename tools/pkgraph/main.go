@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Southclaws/fault"
 	"github.com/awalterschulze/gographviz"
 	"github.com/kr/pretty"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/internal/script"
 )
 

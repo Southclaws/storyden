@@ -3279,55 +3279,55 @@ type ServerInterface interface {
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
-	// Get the information for the currently authenticated account.
+
 	// (GET /v1/accounts)
 	AccountsGet(ctx echo.Context) error
-	// Update the information for the currently authenticated account.
+
 	// (PATCH /v1/accounts)
 	AccountsUpdate(ctx echo.Context) error
-	// Upload an avatar for the authenticated account.
+
 	// (POST /v1/accounts/self/avatar)
 	AccountsSetAvatar(ctx echo.Context) error
-	// Get an avatar for the specified account.
+
 	// (GET /v1/accounts/{account_handle}/avatar)
 	AccountsGetAvatar(ctx echo.Context, accountHandle AccountHandle) error
-	// Retrieve a list of OAuth2 providers and their links.
+
 	// (GET /v1/auth/oauth)
 	AuthOAuthProviderList(ctx echo.Context) error
-	// Sign in to an existing account with a username and password.
+
 	// (POST /v1/auth/oauth/{oauth_provider}/callback)
 	AuthOAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
-	// Sign in to an existing account with a username and password.
+
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx echo.Context) error
-	// Register a new account with a username and password.
+
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx echo.Context) error
-	// Complete the credential assertion and sign in to an account.
+
 	// (GET /v1/auth/webauthn/assert)
 	WebAuthnMakeAssertion(ctx echo.Context) error
-	// Start the WebAuthn assertion for an existing account.
+
 	// (POST /v1/auth/webauthn/assert/{account_handle})
 	WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandle) error
-	// Complete WebAuthn registration by creating a new credential.
+
 	// (GET /v1/auth/webauthn/make)
 	WebAuthnMakeCredential(ctx echo.Context) error
-	// Start the WebAuthn registration process by requesting a credential.
+
 	// (POST /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandle) error
-	// Get a public profile by ID.
+
 	// (GET /v1/profiles/{account_handle})
 	ProfilesGet(ctx echo.Context, accountHandle AccountHandle) error
-	// Get a list of all threads.
+
 	// (GET /v1/threads)
 	ThreadsList(ctx echo.Context, params ThreadsListParams) error
-	// Create a new thread within the specified category.
+
 	// (POST /v1/threads)
 	ThreadsCreate(ctx echo.Context) error
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_id})
 	ThreadsGet(ctx echo.Context, threadId ThreadID) error
-	// Create a new post within a thread.
+
 	// (POST /v1/threads/{thread_id}/posts)
 	PostsCreate(ctx echo.Context, threadId ThreadID) error
 	// Get the software version string.
@@ -4453,55 +4453,55 @@ type StrictServerInterface interface {
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) (GetSpecResponseObject, error)
-	// Get the information for the currently authenticated account.
+
 	// (GET /v1/accounts)
 	AccountsGet(ctx context.Context, request AccountsGetRequestObject) (AccountsGetResponseObject, error)
-	// Update the information for the currently authenticated account.
+
 	// (PATCH /v1/accounts)
 	AccountsUpdate(ctx context.Context, request AccountsUpdateRequestObject) (AccountsUpdateResponseObject, error)
-	// Upload an avatar for the authenticated account.
+
 	// (POST /v1/accounts/self/avatar)
 	AccountsSetAvatar(ctx context.Context, request AccountsSetAvatarRequestObject) (AccountsSetAvatarResponseObject, error)
-	// Get an avatar for the specified account.
+
 	// (GET /v1/accounts/{account_handle}/avatar)
 	AccountsGetAvatar(ctx context.Context, request AccountsGetAvatarRequestObject) (AccountsGetAvatarResponseObject, error)
-	// Retrieve a list of OAuth2 providers and their links.
+
 	// (GET /v1/auth/oauth)
 	AuthOAuthProviderList(ctx context.Context, request AuthOAuthProviderListRequestObject) (AuthOAuthProviderListResponseObject, error)
-	// Sign in to an existing account with a username and password.
+
 	// (POST /v1/auth/oauth/{oauth_provider}/callback)
 	AuthOAuthProviderCallback(ctx context.Context, request AuthOAuthProviderCallbackRequestObject) (AuthOAuthProviderCallbackResponseObject, error)
-	// Sign in to an existing account with a username and password.
+
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx context.Context, request AuthPasswordSigninRequestObject) (AuthPasswordSigninResponseObject, error)
-	// Register a new account with a username and password.
+
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) (AuthPasswordSignupResponseObject, error)
-	// Complete the credential assertion and sign in to an account.
+
 	// (GET /v1/auth/webauthn/assert)
 	WebAuthnMakeAssertion(ctx context.Context, request WebAuthnMakeAssertionRequestObject) (WebAuthnMakeAssertionResponseObject, error)
-	// Start the WebAuthn assertion for an existing account.
+
 	// (POST /v1/auth/webauthn/assert/{account_handle})
 	WebAuthnGetAssertion(ctx context.Context, request WebAuthnGetAssertionRequestObject) (WebAuthnGetAssertionResponseObject, error)
-	// Complete WebAuthn registration by creating a new credential.
+
 	// (GET /v1/auth/webauthn/make)
 	WebAuthnMakeCredential(ctx context.Context, request WebAuthnMakeCredentialRequestObject) (WebAuthnMakeCredentialResponseObject, error)
-	// Start the WebAuthn registration process by requesting a credential.
+
 	// (POST /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
-	// Get a public profile by ID.
+
 	// (GET /v1/profiles/{account_handle})
 	ProfilesGet(ctx context.Context, request ProfilesGetRequestObject) (ProfilesGetResponseObject, error)
-	// Get a list of all threads.
+
 	// (GET /v1/threads)
 	ThreadsList(ctx context.Context, request ThreadsListRequestObject) (ThreadsListResponseObject, error)
-	// Create a new thread within the specified category.
+
 	// (POST /v1/threads)
 	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) (ThreadsCreateResponseObject, error)
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_id})
 	ThreadsGet(ctx context.Context, request ThreadsGetRequestObject) (ThreadsGetResponseObject, error)
-	// Create a new post within a thread.
+
 	// (POST /v1/threads/{thread_id}/posts)
 	PostsCreate(ctx context.Context, request PostsCreateRequestObject) (PostsCreateResponseObject, error)
 	// Get the software version string.
@@ -5110,69 +5110,70 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -16,6 +16,9 @@ openapi: 3.0.1
 #
 
 info:
+  contact:
+    name: Barnaby Keene
+  description: Storyden social API for building community driven platforms.
   title: storyden
   version: "1"
 
@@ -36,6 +39,8 @@ tags:
     description: Authentication resources.
   - name: accounts
     description: User accounts.
+  - name: profiles
+    description: Public profiles.
   - name: threads
     description: Forum threads.
   - name: posts
@@ -113,7 +118,7 @@ paths:
   /v1/auth/password/signup:
     post:
       operationId: AuthPasswordSignup
-      summary: Register a new account with a username and password.
+      description: Register a new account with a username and password.
       tags: [auth]
       security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
@@ -125,7 +130,7 @@ paths:
   /v1/auth/password/signin:
     post:
       operationId: AuthPasswordSignin
-      summary: Sign in to an existing account with a username and password.
+      description: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
@@ -138,7 +143,7 @@ paths:
   /v1/auth/oauth:
     get:
       operationId: AuthOAuthProviderList
-      summary: Retrieve a list of OAuth2 providers and their links.
+      description: Retrieve a list of OAuth2 providers and their links.
       tags: [auth]
       security: []
       responses:
@@ -149,7 +154,7 @@ paths:
   /v1/auth/oauth/{oauth_provider}/callback:
     post:
       operationId: AuthOAuthProviderCallback
-      summary: Sign in to an existing account with a username and password.
+      description: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/OAuthProvider"]
@@ -164,7 +169,7 @@ paths:
   /v1/auth/webauthn/make/{account_handle}:
     post:
       operationId: WebAuthnRequestCredential
-      summary: |
+      description: |
         Start the WebAuthn registration process by requesting a credential.
       tags: [auth]
       security: []
@@ -178,7 +183,7 @@ paths:
   /v1/auth/webauthn/make:
     get:
       operationId: WebAuthnMakeCredential
-      summary: Complete WebAuthn registration by creating a new credential.
+      description: Complete WebAuthn registration by creating a new credential.
       tags: [auth]
       security: [webauthn: []]
       requestBody:
@@ -195,7 +200,7 @@ paths:
   /v1/auth/webauthn/assert/{account_handle}:
     post:
       operationId: WebAuthnGetAssertion
-      summary: Start the WebAuthn assertion for an existing account.
+      description: Start the WebAuthn assertion for an existing account.
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandle"]
@@ -209,7 +214,7 @@ paths:
   /v1/auth/webauthn/assert:
     get:
       operationId: WebAuthnMakeAssertion
-      summary: Complete the credential assertion and sign in to an account.
+      description: Complete the credential assertion and sign in to an account.
       tags: [auth]
       security: [webauthn: []]
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
@@ -233,7 +238,7 @@ paths:
   /v1/accounts:
     get:
       operationId: AccountsGet
-      summary: Get the information for the currently authenticated account.
+      description: Get the information for the currently authenticated account.
       tags: [accounts]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -243,7 +248,7 @@ paths:
 
     patch:
       operationId: AccountsUpdate
-      summary: Update the information for the currently authenticated account.
+      description: Update the information for the currently authenticated account.
       tags: [accounts]
       requestBody: { $ref: "#/components/requestBodies/AccountsUpdate" }
       responses:
@@ -255,7 +260,7 @@ paths:
   /v1/accounts/self/avatar:
     post:
       operationId: AccountsSetAvatar
-      summary: Upload an avatar for the authenticated account.
+      description: Upload an avatar for the authenticated account.
       tags: [accounts]
       requestBody: { $ref: "#/components/requestBodies/AccountsSetAvatar" }
       responses:
@@ -267,7 +272,7 @@ paths:
   /v1/accounts/{account_handle}/avatar:
     get:
       operationId: AccountsGetAvatar
-      summary: Get an avatar for the specified account.
+      description: Get an avatar for the specified account.
       tags: [accounts]
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandle"]
@@ -294,7 +299,7 @@ paths:
   /v1/profiles/{account_handle}:
     get:
       operationId: ProfilesGet
-      summary: Get a public profile by ID.
+      description: Get a public profile by ID.
       tags: [profiles]
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandle"]
@@ -318,7 +323,7 @@ paths:
   /v1/threads:
     post:
       operationId: ThreadsCreate
-      summary: Create a new thread within the specified category.
+      description: Create a new thread within the specified category.
       tags: [threads]
       requestBody: { $ref: "#/components/requestBodies/ThreadsCreate" }
       responses:
@@ -329,7 +334,7 @@ paths:
 
     get:
       operationId: ThreadsList
-      summary: Get a list of all threads.
+      description: Get a list of all threads.
       tags: [threads]
       security: []
       parameters:
@@ -382,7 +387,7 @@ paths:
   /v1/threads/{thread_id}/posts:
     post:
       operationId: PostsCreate
-      summary: Create a new post within a thread.
+      description: Create a new post within a thread.
       tags: [posts]
       parameters: [$ref: "#/components/parameters/ThreadID"]
       requestBody: { $ref: "#/components/requestBodies/PostsCreate" }
@@ -395,7 +400,7 @@ paths:
   # /v1/threads/{thread_id}/posts/{post_id}:
   #   get:
   #     operationId: PostsGet
-  #     summary: Get the data for a single post.
+  #     description: Get the data for a single post.
   #     tags: [posts]
   #     responses:
   #       default: { $ref: "#/components/responses/InternalServerError" }
@@ -912,8 +917,6 @@ components:
             body: { $ref: "#/components/schemas/PostBodyMarkdown" }
             meta: { $ref: "#/components/schemas/Metadata" }
             reply_to:
-              description: |
-                If present, identifies the post that this post is replying to.
               $ref: "#/components/schemas/Identifier"
 
     React:
@@ -972,11 +975,6 @@ components:
       type: array
       description: A list of tags.
       items: { $ref: "#/components/schemas/Identifier" }
-
-    TagListNames:
-      type: array
-      description: A list of tags.
-      items: { $ref: "#/components/schemas/TagName" }
 
     PostBodyMarkdown:
       type: string
