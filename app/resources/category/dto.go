@@ -3,7 +3,7 @@ package category
 import (
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type CategoryID xid.ID
@@ -29,7 +29,7 @@ type Category struct {
 	PostCount   int
 }
 
-func PostMetaFromModel(p *model.Post) *PostMeta {
+func PostMetaFromModel(p *ent.Post) *PostMeta {
 	slug := p.Slug
 
 	title := p.Title
@@ -43,7 +43,7 @@ func PostMetaFromModel(p *model.Post) *PostMeta {
 	}
 }
 
-func FromModel(c *model.Category) *Category {
+func FromModel(c *ent.Category) *Category {
 	recent := []PostMeta{}
 
 	if c.Edges.Posts != nil {

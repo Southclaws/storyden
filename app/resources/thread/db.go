@@ -17,9 +17,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	post_model "github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
+	"github.com/Southclaws/storyden/internal/ent"
+	post_model "github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -30,10 +30,10 @@ var (
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -62,7 +62,7 @@ func (d *database) Create(
 
 	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err,
 				fctx.With(ctx),
 				ftag.With(ftag.NotFound),
@@ -86,7 +86,7 @@ func (d *database) Create(
 		// AddTagIDs(tagset).
 		Save(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
@@ -191,14 +191,14 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 			post_model.First(true),
 			post_model.ID(xid.ID(threadID)),
 		).
-		WithPosts(func(pq *model.PostQuery) {
+		WithPosts(func(pq *ent.PostQuery) {
 			pq.
-				WithReplyTo(func(pq *model.PostQuery) {
+				WithReplyTo(func(pq *ent.PostQuery) {
 					pq.WithAuthor()
 				}).
 				WithReacts().
 				WithAuthor().
-				Order(model.Asc(post_model.FieldCreatedAt))
+				Order(ent.Asc(post_model.FieldCreatedAt))
 		}).
 		WithAuthor().
 		WithCategory().
@@ -206,7 +206,7 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 		WithReacts().
 		Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 

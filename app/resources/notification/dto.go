@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -34,7 +34,7 @@ type Subscription struct {
 	CreatedAt  time.Time        `json:"createdAt"`
 }
 
-func SubFromModel(m *model.Subscription) *Subscription {
+func SubFromModel(m *ent.Subscription) *Subscription {
 	return &Subscription{
 		ID:         SubscriptionID(m.ID),
 		RefersType: NotificationType(m.RefersType),
@@ -43,7 +43,7 @@ func SubFromModel(m *model.Subscription) *Subscription {
 	}
 }
 
-func FromModel(m *model.Notification) *Notification {
+func FromModel(m *ent.Notification) *Notification {
 	return &Notification{
 		ID:           NotificationID(m.ID),
 		Title:        m.Title,
@@ -55,14 +55,14 @@ func FromModel(m *model.Notification) *Notification {
 	}
 }
 
-func FromModelMany(m []*model.Notification) []Notification {
-	return dt.Map(m, func(t *model.Notification) Notification {
+func FromModelMany(m []*ent.Notification) []Notification {
+	return dt.Map(m, func(t *ent.Notification) Notification {
 		return utils.Deref(FromModel(t))
 	})
 }
 
-func SubFromModelMany(m []*model.Subscription) []Subscription {
-	return dt.Map(m, func(t *model.Subscription) Subscription {
+func SubFromModelMany(m []*ent.Subscription) []Subscription {
+	return dt.Map(m, func(t *ent.Subscription) Subscription {
 		return utils.Deref(SubFromModel(t))
 	})
 }

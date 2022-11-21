@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -43,7 +43,7 @@ func (*Thread) GetRole() string { return Name }
 
 func (*Thread) GetResourceName() string { return Name }
 
-func FromModel(m *model.Post) *Thread {
+func FromModel(m *ent.Post) *Thread {
 	// Thread data structure will always contain one post: itself in post form.
 	posts := []*post.Post{
 		post.FromModel(m),
@@ -67,7 +67,7 @@ func FromModel(m *model.Post) *Thread {
 			ID:   account.AccountID(m.Edges.Author.ID),
 			Name: m.Edges.Author.Name,
 		},
-		Tags:     dt.Map(m.Edges.Tags, func(t *model.Tag) string { return t.Name }),
+		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
 		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),

@@ -11,13 +11,13 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/react"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
+	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/react"
+	"github.com/Southclaws/storyden/internal/ent/subscription"
+	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 func TestDB(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type PostID xid.ID
@@ -43,7 +43,7 @@ type Author struct {
 	CreatedAt time.Time         `json:"createdAt"`
 }
 
-func replyTo(m *model.Post) optional.Optional[PostID] {
+func replyTo(m *ent.Post) optional.Optional[PostID] {
 	if m.Edges.ReplyTo != nil {
 		return optional.Of(PostID(m.Edges.ReplyTo.ID))
 	}
@@ -51,10 +51,10 @@ func replyTo(m *model.Post) optional.Optional[PostID] {
 	return optional.Empty[PostID]()
 }
 
-func FromModel(m *model.Post) (w *Post) {
+func FromModel(m *ent.Post) (w *Post) {
 	replyTo := replyTo(m)
 
-	reacts := lo.Map(m.Edges.Reacts, func(t *model.React, i int) react.React {
+	reacts := lo.Map(m.Edges.Reacts, func(t *ent.React, i int) react.React {
 		r := react.FromModel(t)
 		return *r
 	})

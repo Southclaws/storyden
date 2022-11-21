@@ -11,15 +11,15 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/post"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -35,7 +35,7 @@ func (d *database) Create(
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
@@ -60,7 +60,7 @@ func (d *database) Create(
 
 	p, err := q.Save(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 
@@ -70,12 +70,12 @@ func (d *database) Create(
 	p, err = d.db.Post.Query().
 		Where(post.IDEQ(p.ID)).
 		WithAuthor().
-		WithRoot(func(pq *model.PostQuery) {
+		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
 		}).
 		Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 

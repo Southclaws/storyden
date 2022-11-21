@@ -1,6 +1,6 @@
 package db
 
-//go:generate go run -mod=mod entgo.io/ent/cmd/ent generate --feature sql/upsert --feature sql/modifier --feature sql/upsert --feature sql/versioned-migration ./schema --target ./model
+//go:generate go run -mod=mod entgo.io/ent/cmd/ent generate --feature sql/upsert --feature sql/modifier --feature sql/upsert --feature sql/versioned-migration ./schema --target ./ent
 
 import (
 	"context"
@@ -16,14 +16,14 @@ import (
 	"go.uber.org/fx"                   // nolint:gci
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 func Build() fx.Option {
 	return fx.Provide(newDB)
 }
 
-func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
+func newDB(lc fx.Lifecycle, cfg config.Config) (*ent.Client, *sql.DB, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
 	client, db, err := connect(wctx, cfg.DatabaseURL)
@@ -48,13 +48,13 @@ func newDB(lc fx.Lifecycle, cfg config.Config) (*model.Client, *sql.DB, error) {
 	return client, db, nil
 }
 
-func connect(ctx context.Context, url string) (*model.Client, *sql.DB, error) {
+func connect(ctx context.Context, url string) (*ent.Client, *sql.DB, error) {
 	driver, err := sql.Open("pgx", url)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
 	}
 
-	client := model.NewClient(model.Driver(entsql.OpenDB(dialect.Postgres, driver)))
+	client := ent.NewClient(ent.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
 	opts := []schema.MigrateOption{
 		schema.WithAtlas(true),

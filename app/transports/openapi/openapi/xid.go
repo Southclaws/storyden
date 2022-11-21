@@ -11,7 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	model "github.com/Southclaws/storyden/internal/ent"
 )
 
 var (

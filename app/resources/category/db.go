@@ -10,18 +10,18 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/category"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/predicate"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -50,7 +50,7 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
@@ -75,7 +75,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 	categories, err := d.db.Category.
 		Query().
 		Where(filters...).
-		WithPosts(func(pq *model.PostQuery) {
+		WithPosts(func(pq *ent.PostQuery) {
 			pq.
 				Where(
 					post.FirstEQ(true),
@@ -83,9 +83,9 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 				).
 				WithAuthor().
 				Limit(5).
-				Order(model.Desc(post.FieldUpdatedAt))
+				Order(ent.Desc(post.FieldUpdatedAt))
 		}).
-		Order(model.Asc(category.FieldSort)).
+		Order(ent.Asc(category.FieldSort)).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

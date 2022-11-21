@@ -12,7 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/tag"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils/integration"
 )
 
@@ -20,7 +20,7 @@ func TestGetTags(t *testing.T) {
 	defer integration.Test(t, nil, fx.Invoke(func(
 		_ seed.Ready,
 		ctx context.Context,
-		d *model.Client,
+		d *ent.Client,
 		repo tag.Repository,
 	) {
 		a := assert.New(t)

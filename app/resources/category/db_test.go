@@ -13,7 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils/integration"
 )
 
@@ -48,7 +48,7 @@ func TestGetCategories(t *testing.T) {
 			_ seed.Ready,
 			ctx context.Context,
 			repo category.Repository,
-			d *model.Client,
+			d *ent.Client,
 		) {
 			a := assert.New(t)
 			r := require.New(t)
