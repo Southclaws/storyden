@@ -487,15 +487,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
 
     PostsCreate:
       description: Create a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostSubmission" }
-        application/x-www-form-urlencoded:
           schema: { $ref: "#/components/schemas/PostSubmission" }
 
   #
@@ -714,6 +710,7 @@ components:
         $ref: "#/components/schemas/AuthOAuthProvider"
 
     AuthOAuthProvider:
+      type: object
       required: [provider, name, logo_url, link]
       properties:
         provider:
@@ -814,6 +811,7 @@ components:
           $ref: "#/components/schemas/Identifier"
 
     ThreadReference:
+      type: object
       description: |
         A thread reference includes most of the information about a thread but
         does not include the posts within the thread. Useful for rendering large
@@ -857,7 +855,7 @@ components:
               items:
                 type: string
               description: A list of tags associated with the thread.
-            posts:
+            post_count:
               type: integer
               readOnly: true
               description: The number of posts under this thread.
@@ -869,6 +867,7 @@ components:
             meta: { $ref: "#/components/schemas/Metadata" }
 
     Thread:
+      type: object
       allOf:
         - $ref: "#/components/schemas/ThreadReference"
         - type: object

@@ -32,30 +32,22 @@ func NewThreads(
 }
 
 func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
-	params := func() openapi.ThreadsCreateBody {
-		if request.FormdataBody != nil {
-			return *request.FormdataBody
-		} else {
-			return *request.JSONBody
-		}
-	}()
-
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	var meta map[string]any
-	if params.Meta != nil {
-		meta = *params.Meta
+	if request.Body.Meta != nil {
+		meta = *request.Body.Meta
 	}
 
 	thread, err := i.thread_svc.Create(ctx,
-		params.Title,
-		params.Body,
+		request.Body.Title,
+		request.Body.Body,
 		accountID,
-		category.CategoryID(params.Category.XID()),
-		dt.Map(params.Tags, func(t openapi.Tag) string { return string(t.Id) }),
+		category.CategoryID(request.Body.Category.XID()),
+		dt.Map(request.Body.Tags, func(t openapi.Tag) string { return string(t.Id) }),
 		meta,
 	)
 	if err != nil {

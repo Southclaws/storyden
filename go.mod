@@ -37,9 +37,29 @@ require (
 
 require github.com/Southclaws/fault v0.4.3
 
-require github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
+require (
+	github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
+	github.com/go-faster/errors v0.6.1
+	github.com/go-faster/jx v0.40.0
+	github.com/ogen-go/ogen v0.54.1
+	go.opentelemetry.io/otel v1.11.1
+	go.opentelemetry.io/otel/metric v0.33.0
+	go.opentelemetry.io/otel/trace v1.11.1
+)
 
-require github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
+require (
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/fatih/color v1.13.0 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/go-faster/yamlx v0.3.8 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+)
 
 require (
 	github.com/klauspost/compress v1.15.9 // indirect
@@ -54,7 +74,6 @@ require (
 	cloud.google.com/go v0.81.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
@@ -85,7 +104,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/certificate-transparency-go v1.1.2-0.20210511102531-373a877eec92 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -150,9 +169,9 @@ require (
 	go.etcd.io/etcd/tests/v3 v3.5.0-alpha.0 // indirect
 	go.etcd.io/etcd/v3 v3.5.0-alpha.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
+	go.uber.org/multierr v1.8.0
 	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
+	golang.org/x/exp v0.0.0-20221006183845-316c7553db56 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect

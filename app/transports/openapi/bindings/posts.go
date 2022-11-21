@@ -25,27 +25,19 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	params := func() openapi.PostsCreate {
-		if request.FormdataBody != nil {
-			return *request.FormdataBody
-		} else {
-			return *request.JSONBody
-		}
-	}()
-
 	var reply optional.Optional[post.PostID]
 
-	if params.ReplyTo != nil {
-		reply = optional.Of(post.PostID(params.ReplyTo.XID()))
+	if request.Body.ReplyTo != nil {
+		reply = optional.Of(post.PostID(request.Body.ReplyTo.XID()))
 	}
 
 	var meta map[string]any
-	if params.Meta != nil {
-		meta = *params.Meta
+	if request.Body.Meta != nil {
+		meta = *request.Body.Meta
 	}
 
 	post, err := p.post_svc.Create(ctx,
-		params.Body,
+		request.Body.Body,
 		accountID,
 		post.PostID(request.ThreadId.XID()),
 		reply,
