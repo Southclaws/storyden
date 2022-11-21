@@ -9,14 +9,14 @@ import (
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	post_resource "github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 // Note: The resources thread and post both map to the same underlying database
-// schema model. The point of the resources being separate is to provide
+// schema ent. The point of the resources being separate is to provide
 // separate intuitive APIs that abstract away the detail that a `post` item in
 // the database and a `thread` item use the same underlying table.
 
@@ -24,7 +24,7 @@ type option func(*Thread)
 
 type Repository interface {
 	// Create a new thread. A thread is just a "post" in the underlying data
-	// model. But a thread is marked as "first" and has a title, catgegory and
+	// ent. But a thread is marked as "first" and has a title, catgegory and
 	// tags, and no parent post.
 	Create(
 		ctx context.Context,
@@ -64,16 +64,16 @@ func WithMeta(meta map[string]any) option {
 	}
 }
 
-type Query func(q *model.PostQuery)
+type Query func(q *ent.PostQuery)
 
 func WithAuthor(id account_resource.AccountID) Query {
-	return func(q *model.PostQuery) {
+	return func(q *ent.PostQuery) {
 		q.Where(post.HasAuthorWith(account.ID(xid.ID(id))))
 	}
 }
 
 func WithTags(ids []xid.ID) Query {
-	return func(q *model.PostQuery) {
+	return func(q *ent.PostQuery) {
 		q.Where(post.HasTagsWith(tag.IDIn(ids...)))
 	}
 }

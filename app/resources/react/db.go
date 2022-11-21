@@ -10,16 +10,16 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 var ErrInvalidEmoji = errors.New("invalid emoji codepoint")
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -36,7 +36,7 @@ func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emo
 		SetPostID(xid.ID(postID)).
 		Save(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err,
 				fctx.With(ctx),
 				ftag.With(ftag.AlreadyExists),

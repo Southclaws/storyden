@@ -4,7 +4,7 @@ import (
 	"github.com/forPelevin/gomoji"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type ReactID xid.ID
@@ -16,12 +16,12 @@ type React struct {
 	PostID string  `json:"post"`
 }
 
-func FromModel(model *model.React) *React {
+func FromModel(ent *ent.React) *React {
 	return &React{
-		ID:     ReactID(model.ID),
-		Emoji:  model.Emoji,
-		UserID: model.Edges.Account.ID.String(),
-		PostID: model.Edges.Post.ID.String(),
+		ID:     ReactID(ent.ID),
+		Emoji:  ent.Emoji,
+		UserID: ent.Edges.Account.ID.String(),
+		PostID: ent.Edges.Post.ID.String(),
 	}
 }
 

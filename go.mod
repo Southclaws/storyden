@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	4d63.com/optional v0.2.0
-	ariga.io/atlas v0.8.3-0.20221116191127-d3f03357cf03
+	ariga.io/atlas v0.8.3-0.20221116191127-d3f03357cf03 // indirect
 	entgo.io/ent v0.11.5-0.20221117090453-a5aadd7737a5
 	github.com/99designs/gqlgen v0.17.20
 	github.com/Southclaws/dt v1.0.1
@@ -24,7 +24,6 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.3.1
 	github.com/labstack/echo/v4 v4.9.1
-	github.com/lib/pq v1.10.7
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.4.0
 	github.com/samber/lo v1.27.1

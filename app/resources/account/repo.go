@@ -6,7 +6,7 @@ import (
 	"4d63.com/optional"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type option func(*Account)
@@ -40,34 +40,34 @@ func WithBio(bio string) option {
 	}
 }
 
-type Mutation func(u *model.AccountUpdateOne)
+type Mutation func(u *ent.AccountUpdateOne)
 
 func SetHandle(handle string) Mutation {
-	return func(u *model.AccountUpdateOne) {
+	return func(u *ent.AccountUpdateOne) {
 		u.SetHandle(handle)
 	}
 }
 
 func SetName(name string) Mutation {
-	return func(u *model.AccountUpdateOne) {
+	return func(u *ent.AccountUpdateOne) {
 		u.SetName(name)
 	}
 }
 
 func SetBio(bio string) Mutation {
-	return func(u *model.AccountUpdateOne) {
+	return func(u *ent.AccountUpdateOne) {
 		u.SetBio(bio)
 	}
 }
 
 func SetAdmin(status bool) Mutation {
-	return func(u *model.AccountUpdateOne) {
+	return func(u *ent.AccountUpdateOne) {
 		u.SetAdmin(status)
 	}
 }
 
 func SetInterests(interests []xid.ID) Mutation {
-	return func(u *model.AccountUpdateOne) {
+	return func(u *ent.AccountUpdateOne) {
 		u.ClearTags().AddTagIDs(interests...)
 	}
 }

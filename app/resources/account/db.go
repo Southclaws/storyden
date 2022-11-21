@@ -9,16 +9,16 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -40,7 +40,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
 		Save(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
@@ -53,7 +53,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) {
 	account, err := d.db.Account.Get(ctx, xid.ID(id))
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
@@ -77,7 +77,7 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 		account.Handle(handle),
 	).Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
@@ -130,14 +130,14 @@ func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]
 		Query().
 		Limit(limit).
 		Offset(offset).
-		Order(model.Asc(account.FieldCreatedAt)).
+		Order(ent.Asc(account.FieldCreatedAt)).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return dt.Map(
-		dt.Map(users, utils.Deref[model.Account]),
+		dt.Map(users, utils.Deref[ent.Account]),
 		utils.ToMap(FromModel),
 	), nil
 }

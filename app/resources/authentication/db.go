@@ -9,16 +9,16 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/authentication"
+	"github.com/Southclaws/storyden/internal/ent"
+	model_account "github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/authentication"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -37,7 +37,7 @@ func (d *database) Create(ctx context.Context,
 		SetMetadata(metadata).
 		Save(ctx)
 	if err != nil {
-		if model.IsConstraintError(err) {
+		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
@@ -50,7 +50,7 @@ func (d *database) Create(ctx context.Context,
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
@@ -70,7 +70,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, false, nil
 		}
 
@@ -101,7 +101,7 @@ func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier
 		).
 		Only(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/tag"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type AccountID xid.ID
@@ -37,14 +37,14 @@ func (*Account) GetRole() string { return Name }
 
 func (*Account) GetResourceName() string { return Name }
 
-func FromModel(u model.Account) (o *Account) {
+func FromModel(u ent.Account) (o *Account) {
 	result := Account{
 		ID:     AccountID(u.ID),
 		Handle: u.Handle,
 		Name:   u.Name,
 		Bio:    optional.Of(u.Bio),
 		Admin:  u.Admin,
-		Interests: dt.Map(u.Edges.Tags, func(t *model.Tag) tag.Tag {
+		Interests: dt.Map(u.Edges.Tags, func(t *ent.Tag) tag.Tag {
 			return tag.Tag{
 				ID:   t.ID.String(),
 				Name: t.Name,

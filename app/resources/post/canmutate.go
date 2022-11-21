@@ -8,11 +8,11 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/post"
 )
 
-func CanUserMutatePost(ctx context.Context, d *model.Client, authorID, postID PostID) error {
+func CanUserMutatePost(ctx context.Context, d *ent.Client, authorID, postID PostID) error {
 	// First, check if this user is the author of the post.
 	post, err := d.Post.Query().Where(post.IDEQ(xid.ID(postID))).WithAuthor().Only(ctx)
 	if err != nil {

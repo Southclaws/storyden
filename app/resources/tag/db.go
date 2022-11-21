@@ -8,16 +8,16 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/tag"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -39,7 +39,7 @@ func (d *database) GetTags(ctx context.Context, query string) ([]Tag, error) {
 			OrderBy(sql.Desc("posts"))
 	}).Scan(ctx, &tags)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 

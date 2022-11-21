@@ -13,8 +13,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
@@ -55,7 +55,7 @@ func Create() fx.Option {
 // New runs the data seeding script, creating all fake data for testing/demos.
 func New(
 	database *sql.DB,
-	client *model.Client,
+	client *ent.Client,
 	account_repo account.Repository,
 	category_repo category.Repository,
 	thread_repo thread.Repository,

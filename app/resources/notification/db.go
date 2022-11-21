@@ -11,17 +11,17 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model"
-	model_account "github.com/Southclaws/storyden/internal/infrastructure/db/model/account"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/notification"
-	"github.com/Southclaws/storyden/internal/infrastructure/db/model/subscription"
+	"github.com/Southclaws/storyden/internal/ent"
+	model_account "github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/subscription"
 )
 
 type database struct {
-	db *model.Client
+	db *ent.Client
 }
 
-func New(db *model.Client) Repository {
+func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
@@ -104,7 +104,7 @@ func (d *database) GetNotifications(ctx context.Context, accountID account.Accou
 
 	notifs, err := q.All(ctx)
 	if err != nil {
-		if model.IsNotFound(err) {
+		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
@@ -170,7 +170,7 @@ func (d *database) SetReadState(ctx context.Context, accountID account.AccountID
 func (d *database) userHasRightsForNotification(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (bool, error) {
 	n, err := d.db.Notification.Query().
 		Where(notification.IDEQ(xid.ID(notificationID))).
-		WithSubscription(func(sq *model.SubscriptionQuery) {
+		WithSubscription(func(sq *ent.SubscriptionQuery) {
 			sq.WithAccount()
 		}).
 		Only(ctx)
