@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 // HTTPErrorHandler provides an error handler function for use with the Echo

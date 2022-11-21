@@ -4,6 +4,8 @@ run:
   go: "1.18"
 
   issues-exit-code: 0
+  skip-files:
+    - "graphql/.+\\.resolvers\\.go"
 
 severity:
   default-severity: warn

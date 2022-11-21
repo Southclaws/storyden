@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
-	"github.com/Southclaws/storyden/app/transports/openapi/openapi"
+	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Threads struct {
