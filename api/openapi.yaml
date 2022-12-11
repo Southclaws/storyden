@@ -826,7 +826,7 @@ components:
             - pinned
             - author
             - tags
-            - posts
+            - post_count
             - category
             - reacts
             - meta
@@ -870,13 +870,13 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/ThreadReference"
-        - type: object
-          required:
-            [title, slug, short, pinned, author, tags, posts, category, reacts]
-          properties:
-            posts:
-              type: array
-              items: { $ref: "#/components/schemas/Post" }
+        # - type: object
+        #   required:
+        #     [title, slug, short, pinned, author, tags, posts, category, reacts]
+        #   properties:
+        #     posts:
+        #       type: array
+        #       items: { $ref: "#/components/schemas/Post" }
 
     Category:
       type: object

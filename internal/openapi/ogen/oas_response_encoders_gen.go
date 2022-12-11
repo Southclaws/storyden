@@ -584,6 +584,108 @@ func encodeProfilesGetResponse(response ProfilesGetRes, w http.ResponseWriter, s
 	}
 }
 
+func encodeThreadsCreateResponse(response ThreadsCreateRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *ThreadReference:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+		e := jx.GetEncoder()
+
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *Unauthorised:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+		return nil
+
+	case *NotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+		return nil
+
+	case *APIErrorStatusCode:
+		w.Header().Set("Content-Type", "application/json")
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		st := http.StatusText(code)
+		if code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
+		e := jx.GetEncoder()
+
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeThreadsGetResponse(response ThreadsGetRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *ThreadReference:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+		e := jx.GetEncoder()
+
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	case *Unauthorised:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+		return nil
+
+	case *NotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+		return nil
+
+	case *APIErrorStatusCode:
+		w.Header().Set("Content-Type", "application/json")
+		code := response.StatusCode
+		if code == 0 {
+			// Set default status code.
+			code = http.StatusOK
+		}
+		w.WriteHeader(code)
+		st := http.StatusText(code)
+		if code >= http.StatusBadRequest {
+			span.SetStatus(codes.Error, st)
+		} else {
+			span.SetStatus(codes.Ok, st)
+		}
+		e := jx.GetEncoder()
+
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeThreadsListResponse(response ThreadsListRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *ThreadsListOKApplicationJSON:

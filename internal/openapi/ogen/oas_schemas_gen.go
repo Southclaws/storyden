@@ -111,6 +111,8 @@ func (*APIErrorStatusCode) authPasswordSigninRes()        {}
 func (*APIErrorStatusCode) authPasswordSignupRes()        {}
 func (*APIErrorStatusCode) postsCreateRes()               {}
 func (*APIErrorStatusCode) profilesGetRes()               {}
+func (*APIErrorStatusCode) threadsCreateRes()             {}
+func (*APIErrorStatusCode) threadsGetRes()                {}
 func (*APIErrorStatusCode) threadsListRes()               {}
 func (*APIErrorStatusCode) webAuthnGetAssertionRes()      {}
 func (*APIErrorStatusCode) webAuthnMakeAssertionRes()     {}
@@ -585,6 +587,8 @@ func (*NotFound) authOAuthProviderCallbackRes() {}
 func (*NotFound) authPasswordSigninRes()        {}
 func (*NotFound) postsCreateRes()               {}
 func (*NotFound) profilesGetRes()               {}
+func (*NotFound) threadsCreateRes()             {}
+func (*NotFound) threadsGetRes()                {}
 func (*NotFound) threadsListRes()               {}
 func (*NotFound) webAuthnGetAssertionRes()      {}
 func (*NotFound) webAuthnMakeAssertionRes()     {}
@@ -1141,6 +1145,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptThreadsCreateBody returns new OptThreadsCreateBody with value set to v.
+func NewOptThreadsCreateBody(v ThreadsCreateBody) OptThreadsCreateBody {
+	return OptThreadsCreateBody{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptThreadsCreateBody is optional ThreadsCreateBody.
+type OptThreadsCreateBody struct {
+	Value ThreadsCreateBody
+	Set   bool
+}
+
+// IsSet returns true if OptThreadsCreateBody was set.
+func (o OptThreadsCreateBody) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptThreadsCreateBody) Reset() {
+	var v ThreadsCreateBody
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptThreadsCreateBody) SetTo(v ThreadsCreateBody) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptThreadsCreateBody) Get() (v ThreadsCreateBody, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptThreadsCreateBody) Or(d ThreadsCreateBody) ThreadsCreateBody {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // Merged schema.
 // Ref: #/components/schemas/Post
 type Post struct {
@@ -1367,7 +1417,7 @@ type ThreadReference struct {
 	// A list of tags associated with the thread.
 	Tags []string `json:"tags"`
 	// The number of posts under this thread.
-	PostCount OptInt   `json:"post_count"`
+	PostCount int      `json:"post_count"`
 	Category  Category `json:"category"`
 	// A list of reactions this post has had from people.
 	Reacts []React  `json:"reacts"`
@@ -1430,7 +1480,7 @@ func (s ThreadReference) GetTags() []string {
 }
 
 // GetPostCount returns the value of PostCount.
-func (s ThreadReference) GetPostCount() OptInt {
+func (s ThreadReference) GetPostCount() int {
 	return s.PostCount
 }
 
@@ -1505,7 +1555,7 @@ func (s *ThreadReference) SetTags(val []string) {
 }
 
 // SetPostCount sets the value of PostCount.
-func (s *ThreadReference) SetPostCount(val OptInt) {
+func (s *ThreadReference) SetPostCount(val int) {
 	s.PostCount = val
 }
 
@@ -1524,8 +1574,72 @@ func (s *ThreadReference) SetMeta(val Metadata) {
 	s.Meta = val
 }
 
+func (*ThreadReference) threadsCreateRes() {}
+func (*ThreadReference) threadsGetRes()    {}
+
 // Arbitrary extra data stored with the resource.
 type ThreadReferenceMisc struct{}
+
+type ThreadTitle string
+
+// Ref: #/components/schemas/ThreadsCreateBody
+type ThreadsCreateBody struct {
+	Title    ThreadTitle      `json:"title"`
+	Body     PostBodyMarkdown `json:"body"`
+	Tags     TagList          `json:"tags"`
+	Meta     OptMetadata      `json:"meta"`
+	Category Identifier       `json:"category"`
+}
+
+// GetTitle returns the value of Title.
+func (s ThreadsCreateBody) GetTitle() ThreadTitle {
+	return s.Title
+}
+
+// GetBody returns the value of Body.
+func (s ThreadsCreateBody) GetBody() PostBodyMarkdown {
+	return s.Body
+}
+
+// GetTags returns the value of Tags.
+func (s ThreadsCreateBody) GetTags() TagList {
+	return s.Tags
+}
+
+// GetMeta returns the value of Meta.
+func (s ThreadsCreateBody) GetMeta() OptMetadata {
+	return s.Meta
+}
+
+// GetCategory returns the value of Category.
+func (s ThreadsCreateBody) GetCategory() Identifier {
+	return s.Category
+}
+
+// SetTitle sets the value of Title.
+func (s *ThreadsCreateBody) SetTitle(val ThreadTitle) {
+	s.Title = val
+}
+
+// SetBody sets the value of Body.
+func (s *ThreadsCreateBody) SetBody(val PostBodyMarkdown) {
+	s.Body = val
+}
+
+// SetTags sets the value of Tags.
+func (s *ThreadsCreateBody) SetTags(val TagList) {
+	s.Tags = val
+}
+
+// SetMeta sets the value of Meta.
+func (s *ThreadsCreateBody) SetMeta(val OptMetadata) {
+	s.Meta = val
+}
+
+// SetCategory sets the value of Category.
+func (s *ThreadsCreateBody) SetCategory(val Identifier) {
+	s.Category = val
+}
 
 type ThreadsListOKApplicationJSON []ThreadReference
 
@@ -1542,6 +1656,8 @@ func (*Unauthorised) authOAuthProviderCallbackRes() {}
 func (*Unauthorised) authPasswordSigninRes()        {}
 func (*Unauthorised) postsCreateRes()               {}
 func (*Unauthorised) profilesGetRes()               {}
+func (*Unauthorised) threadsCreateRes()             {}
+func (*Unauthorised) threadsGetRes()                {}
 func (*Unauthorised) threadsListRes()               {}
 func (*Unauthorised) webAuthnGetAssertionRes()      {}
 func (*Unauthorised) webAuthnMakeAssertionRes()     {}

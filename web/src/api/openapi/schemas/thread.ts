@@ -6,6 +6,5 @@
  * OpenAPI spec version: 1
  */
 import type { ThreadReference } from "./threadReference";
-import type { ThreadAllOf } from "./threadAllOf";
 
-export type Thread = ThreadReference & ThreadAllOf;
+export type Thread = ThreadReference;

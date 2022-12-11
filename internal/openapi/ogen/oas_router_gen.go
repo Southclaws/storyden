@@ -438,8 +438,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							switch r.Method {
 							case "GET":
 								s.handleThreadsListRequest([0]string{}, w, r)
+							case "POST":
+								s.handleThreadsCreateRequest([0]string{}, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, "GET,POST")
 							}
 
 							return
@@ -462,7 +464,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							elem = elem[idx:]
 
 							if len(elem) == 0 {
-								break
+								switch r.Method {
+								case "GET":
+									s.handleThreadsGetRequest([1]string{
+										args[0],
+									}, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
 							}
 							switch elem[0] {
 							case '/': // Prefix: "/posts"
@@ -984,6 +995,12 @@ func (s *Server) FindRoute(method, path string) (r Route, _ bool) {
 								r.args = args
 								r.count = 0
 								return r, true
+							case "POST":
+								r.name = "ThreadsCreate"
+								r.operationID = "ThreadsCreate"
+								r.args = args
+								r.count = 0
+								return r, true
 							default:
 								return
 							}
@@ -1006,7 +1023,16 @@ func (s *Server) FindRoute(method, path string) (r Route, _ bool) {
 							elem = elem[idx:]
 
 							if len(elem) == 0 {
-								break
+								switch method {
+								case "GET":
+									r.name = "ThreadsGet"
+									r.operationID = "ThreadsGet"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
 							}
 							switch elem[0] {
 							case '/': // Prefix: "/posts"

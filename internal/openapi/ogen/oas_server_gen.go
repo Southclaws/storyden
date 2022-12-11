@@ -82,6 +82,19 @@ type Handler interface {
 	//
 	// GET /v1/profiles/{account_handle}
 	ProfilesGet(ctx context.Context, params ProfilesGetParams) (ProfilesGetRes, error)
+	// ThreadsCreate implements ThreadsCreate operation.
+	//
+	// Create a new thread within the specified category.
+	//
+	// POST /v1/threads
+	ThreadsCreate(ctx context.Context, req OptThreadsCreateBody) (ThreadsCreateRes, error)
+	// ThreadsGet implements ThreadsGet operation.
+	//
+	// Get information about a thread such as its title, author, when it was
+	// created as well as a list of the posts within the thread.
+	//
+	// GET /v1/threads/{thread_id}
+	ThreadsGet(ctx context.Context, params ThreadsGetParams) (ThreadsGetRes, error)
 	// ThreadsList implements ThreadsList operation.
 	//
 	// Get a list of all threads.

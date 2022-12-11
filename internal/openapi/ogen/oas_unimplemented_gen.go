@@ -123,6 +123,25 @@ func (UnimplementedHandler) ProfilesGet(ctx context.Context, params ProfilesGetP
 	return r, ht.ErrNotImplemented
 }
 
+// ThreadsCreate implements ThreadsCreate operation.
+//
+// Create a new thread within the specified category.
+//
+// POST /v1/threads
+func (UnimplementedHandler) ThreadsCreate(ctx context.Context, req OptThreadsCreateBody) (r ThreadsCreateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ThreadsGet implements ThreadsGet operation.
+//
+// Get information about a thread such as its title, author, when it was
+// created as well as a list of the posts within the thread.
+//
+// GET /v1/threads/{thread_id}
+func (UnimplementedHandler) ThreadsGet(ctx context.Context, params ThreadsGetParams) (r ThreadsGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ThreadsList implements ThreadsList operation.
 //
 // Get a list of all threads.

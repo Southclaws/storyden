@@ -202,6 +202,59 @@ func decodeProfilesGetParams(args [1]string, r *http.Request) (params ProfilesGe
 	return params, nil
 }
 
+// ThreadsGetParams is parameters of ThreadsGet operation.
+type ThreadsGetParams struct {
+	// Thread ID.
+	ThreadID Identifier
+}
+
+func unpackThreadsGetParams(packed map[string]any) (params ThreadsGetParams) {
+	params.ThreadID = packed["thread_id"].(Identifier)
+	return params
+}
+
+func decodeThreadsGetParams(args [1]string, r *http.Request) (params ThreadsGetParams, _ error) {
+	// Decode path: thread_id.
+	{
+		param := args[0]
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "thread_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotThreadIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotThreadIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ThreadID = Identifier(paramsDotThreadIDVal)
+				return nil
+			}(); err != nil {
+				return params, errors.Wrap(err, "path: thread_id: parse")
+			}
+		} else {
+			return params, errors.New("path: thread_id: not specified")
+		}
+	}
+	return params, nil
+}
+
 // ThreadsListParams is parameters of ThreadsList operation.
 type ThreadsListParams struct {
 	// Show only results creeated by this user.

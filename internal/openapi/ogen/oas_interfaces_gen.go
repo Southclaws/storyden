@@ -49,6 +49,14 @@ type ProfilesGetRes interface {
 	profilesGetRes()
 }
 
+type ThreadsCreateRes interface {
+	threadsCreateRes()
+}
+
+type ThreadsGetRes interface {
+	threadsGetRes()
+}
+
 type ThreadsListRes interface {
 	threadsListRes()
 }
