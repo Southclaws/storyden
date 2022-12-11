@@ -39,11 +39,11 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Short:  &t.Short,
 		Meta:   t.Meta,
 
-		Category: serialiseCategory(&t.Category),
-		Pinned:   t.Pinned,
-		Posts:    utils.Ref(len(t.Posts)),
-		Reacts:   reacts(t.Reacts),
-		Tags:     t.Tags,
+		Category:  serialiseCategory(&t.Category),
+		Pinned:    t.Pinned,
+		PostCount: utils.Ref(len(t.Posts)),
+		Reacts:    reacts(t.Reacts),
+		Tags:      t.Tags,
 	}
 }
 

@@ -26,7 +26,7 @@ for uniqueness and sortability.
   /** A list of tags associated with the thread. */
   tags: string[];
   /** The number of posts under this thread. */
-  readonly posts: number;
+  readonly post_count: number;
   category: Category;
   /** A list of reactions this post has had from people. */
   reacts: React[];

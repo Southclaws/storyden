@@ -828,7 +828,7 @@ components:
             - pinned
             - author
             - tags
-            - posts
+            - post_count
             - category
             - reacts
             - meta
@@ -857,7 +857,7 @@ components:
               items:
                 type: string
               description: A list of tags associated with the thread.
-            posts:
+            post_count:
               type: integer
               readOnly: true
               description: The number of posts under this thread.
