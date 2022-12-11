@@ -49,13 +49,12 @@ tasks:
     deps: [generate:db, generate:openapi, generate:graphql]
 
   generate:db:
-    cmds:
-      - go generate ./internal/infrastructure/db/...
+    cmds: [go generate ./internal/ent]
 
   generate:openapi:
     deps: [generate:openapi:backend, generate:openapi:frontend]
   generate:openapi:backend:
-    cmds: [go generate ./app/transports/openapi]
+    cmds: [go generate ./internal/openapi]
   generate:openapi:frontend:
     dir: web
     cmds: [yarn openapi]
