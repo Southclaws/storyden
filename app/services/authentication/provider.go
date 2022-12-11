@@ -1,4 +1,4 @@
-package oauth
+package authentication
 
 import (
 	"context"
@@ -6,10 +6,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 )
 
-// Provider describes a type that can provide an OAuth2 authentication
-// method for users.
+// Provider describes a type that can be used to authenticate people.
 //
-// Link simply returns a URL to start the OAuth2 process.
+// Link simply returns a URL to start the authentication process.
 //
 // Login is called by the callback and handles the code/token exchange and
 // returns a User object to the caller to be encoded into a cookie.

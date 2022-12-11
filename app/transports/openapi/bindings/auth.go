@@ -16,7 +16,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/openapi"
@@ -26,7 +25,7 @@ type Authentication struct {
 	p      *password.Password
 	sc     *securecookie.SecureCookie
 	ar     account.Repository
-	oa     *oauth.OAuth
+	am     *authentication.Manager
 	wa     *webauthn.WebAuthn
 	domain string
 }
@@ -36,66 +35,16 @@ func NewAuthentication(
 	p *password.Password,
 	ar account.Repository,
 	sc *securecookie.SecureCookie,
-	oa *oauth.OAuth,
+	am *authentication.Manager,
 	wa *webauthn.WebAuthn,
 ) Authentication {
-	return Authentication{p, sc, ar, oa, wa, cfg.CookieDomain}
+	return Authentication{p, sc, ar, am, wa, cfg.CookieDomain}
 }
 
-func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
-	params := func() openapi.AuthPassword {
-		if request.JSONBody != nil {
-			return *request.JSONBody
-		} else {
-			return *request.FormdataBody
-		}
-	}()
-
-	u, err := i.p.Login(ctx, params.Identifier, params.Token)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	cookie, err := i.encodeSession(u.ID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.AuthPasswordSignin200JSONResponse{
-		Body:    openapi.AuthSuccess{Id: u.ID.String()},
-		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
-	}, nil
-}
-
-func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) (openapi.AuthPasswordSignupResponseObject, error) {
-	params := func() openapi.AuthPassword {
-		if request.JSONBody != nil {
-			return *request.JSONBody
-		} else {
-			return *request.FormdataBody
-		}
-	}()
-
-	u, err := i.p.Register(ctx, params.Identifier, params.Token)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	cookie, err := i.encodeSession(u.ID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.AuthPasswordSignup200JSONResponse{
-		Body:    openapi.AuthSuccess{Id: u.ID.String()},
-		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
-	}, nil
-}
-
-func (o *Authentication) AuthOAuthProviderList(ctx context.Context, request openapi.AuthOAuthProviderListRequestObject) (openapi.AuthOAuthProviderListResponseObject, error) {
-	list := dt.Map(o.oa.Providers(),
-		func(p oauth.Provider) openapi.AuthOAuthProvider {
-			return openapi.AuthOAuthProvider{
+func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
+	list := dt.Map(o.am.Providers(),
+		func(p authentication.Provider) openapi.AuthProvider {
+			return openapi.AuthProvider{
 				Provider: p.ID(),
 				Name:     p.Name(),
 				LogoUrl:  p.LogoURL(),
@@ -104,29 +53,7 @@ func (o *Authentication) AuthOAuthProviderList(ctx context.Context, request open
 		},
 	)
 
-	return openapi.AuthOAuthProviderListJSONResponse(list), nil
-}
-
-func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request openapi.AuthOAuthProviderCallbackRequestObject) (openapi.AuthOAuthProviderCallbackResponseObject, error) {
-	provider, err := o.oa.Provider(string(request.OauthProvider))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	account, err := provider.Login(ctx, request.Body.State, request.Body.Code)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	cookie, err := o.encodeSession(account.ID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.AuthPasswordSignin200JSONResponse{
-		Body:    openapi.AuthSuccess{Id: account.ID.String()},
-		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
-	}, nil
+	return openapi.AuthProviderListJSONResponse(list), nil
 }
 
 func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {

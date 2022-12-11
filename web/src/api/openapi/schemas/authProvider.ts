@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 
-export interface AuthOAuthProvider {
+export interface AuthProvider {
   /** The slug name of the provider. */
   provider: string;
   /** The human-readable name of the provider. */
