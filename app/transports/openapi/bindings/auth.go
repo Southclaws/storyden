@@ -9,8 +9,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
-	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
 

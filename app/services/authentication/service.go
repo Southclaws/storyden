@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
 )
 
 type Manager struct {
@@ -31,6 +32,7 @@ func Build() fx.Option {
 			// (1)
 			// All auth providers are initialised, those that fail are disabled.
 			password.New,
+			webauthn.New,
 			github.New,
 			linkedin.New,
 		),
@@ -41,6 +43,7 @@ func Build() fx.Option {
 
 func New(
 	l *zap.Logger,
+	wa *webauthn.Provider,
 	gh *github.GitHubProvider,
 	li *linkedin.LinkedInProvider,
 ) *Manager {
@@ -48,6 +51,7 @@ func New(
 		// (2)
 		// All OAuth2 providers are statically added to this list regardless of
 		// whether they are enabled or not. Disabled providers are filtered out.
+		wa,
 		gh,
 		li,
 	}
