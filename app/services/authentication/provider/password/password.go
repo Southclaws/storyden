@@ -29,7 +29,7 @@ type Password struct {
 	account account.Repository
 }
 
-func NewBasicAuth(auth authentication.Repository, account account.Repository) *Password {
+func New(auth authentication.Repository, account account.Repository) *Password {
 	return &Password{auth, account}
 }
 
