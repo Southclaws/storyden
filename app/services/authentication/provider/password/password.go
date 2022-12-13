@@ -16,24 +16,33 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 )
 
-const AuthServiceName = `password`
-
 var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
 	ErrNotFound             = errors.New("account not found")
 )
 
-type Password struct {
+const (
+	id   = "password"
+	name = "Password"
+	logo = "" // TODO: a basic logo symbol for password based auth.
+)
+
+type Provider struct {
 	auth    authentication.Repository
 	account account.Repository
 }
 
-func NewBasicAuth(auth authentication.Repository, account account.Repository) *Password {
-	return &Password{auth, account}
+func New(auth authentication.Repository, account account.Repository) *Provider {
+	return &Provider{auth, account}
 }
 
-func (b *Password) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
+func (p *Provider) Enabled() bool   { return true } // TODO: Allow disabling.
+func (p *Provider) ID() string      { return id }
+func (p *Provider) Name() string    { return name }
+func (p *Provider) LogoURL() string { return logo }
+
+func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
 	addr, err := mail.ParseAddress(identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
@@ -41,7 +50,7 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 
 	handle := strings.Split(addr.Address, "@")[0]
 
-	_, exists, err := b.auth.LookupByIdentifier(ctx, AuthServiceName, identifier)
+	_, exists, err := b.auth.LookupByIdentifier(ctx, id, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -60,7 +69,7 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	_, err = b.auth.Create(ctx, account.ID, AuthServiceName, identifier, string(hashed), nil)
+	_, err = b.auth.Create(ctx, account.ID, id, identifier, string(hashed), nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
@@ -68,8 +77,13 @@ func (b *Password) Register(ctx context.Context, identifier string, password str
 	return account, nil
 }
 
-func (b *Password) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	a, exists, err := b.auth.LookupByIdentifier(ctx, AuthServiceName, identifier)
+func (b *Provider) Link() string {
+	// Password provider does not use external links.
+	return ""
+}
+
+func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
+	a, exists, err := b.auth.LookupByIdentifier(ctx, id, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}

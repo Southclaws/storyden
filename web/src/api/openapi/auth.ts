@@ -8,18 +8,64 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  AuthSuccessResponse,
+  AuthProviderListResponse,
   BadRequestResponse,
   InternalServerErrorResponse,
+  AuthSuccessResponse,
   AuthPasswordBody,
   UnauthorisedResponse,
   NotFoundResponse,
-  AuthOAuthProviderListResponse,
   AuthOAuthProviderCallbackBody,
   WebAuthnPublicKeyCreationOptionsResponse,
   WebAuthnMakeCredentialBody,
 } from "./schemas";
 import { fetcher } from "../client";
+
+/**
+ * Retrieve a list of authentication providers. Storyden supports a few 
+ways to authenticate, from simple passwords to OAuth and WebAuthn. This
+endpoint tells a client which auth capabilities are enabled.
+
+ */
+export const authProviderList = () => {
+  return fetcher<AuthProviderListResponse>({ url: `/v1/auth`, method: "get" });
+};
+
+export const getAuthProviderListKey = () => [`/v1/auth`];
+
+export type AuthProviderListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof authProviderList>>
+>;
+export type AuthProviderListQueryError =
+  | BadRequestResponse
+  | InternalServerErrorResponse;
+
+export const useAuthProviderList = <
+  TError = BadRequestResponse | InternalServerErrorResponse
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof authProviderList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAuthProviderListKey() : null));
+  const swrFn = () => authProviderList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 
 /**
  * Register a new account with a username and password.
@@ -43,53 +89,6 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
   });
-};
-
-/**
- * Retrieve a list of OAuth2 providers and their links.
- */
-export const authOAuthProviderList = () => {
-  return fetcher<AuthOAuthProviderListResponse>({
-    url: `/v1/auth/oauth`,
-    method: "get",
-  });
-};
-
-export const getAuthOAuthProviderListKey = () => [`/v1/auth/oauth`];
-
-export type AuthOAuthProviderListQueryResult = NonNullable<
-  Awaited<ReturnType<typeof authOAuthProviderList>>
->;
-export type AuthOAuthProviderListQueryError =
-  | BadRequestResponse
-  | InternalServerErrorResponse;
-
-export const useAuthOAuthProviderList = <
-  TError = BadRequestResponse | InternalServerErrorResponse
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof authOAuthProviderList>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAuthOAuthProviderListKey() : null));
-  const swrFn = () => authOAuthProviderList();
-
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
-    swrKey,
-    swrFn,
-    swrOptions
-  );
-
-  return {
-    swrKey,
-    ...query,
-  };
 };
 
 /**
