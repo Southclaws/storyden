@@ -3,15 +3,16 @@ package webauthn
 import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/duo-labs/webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/webauthn"
+
+	"github.com/Southclaws/storyden/internal/config"
 )
 
-func New() (*webauthn.WebAuthn, error) {
-	// TODO: Read this from config.
+func New(cfg config.Config) (*webauthn.WebAuthn, error) {
 	wa, err := webauthn.New(&webauthn.Config{
-		RPID:          "storyden.org",
 		RPDisplayName: "Storyden",
-		RPOrigin:      "localhost",
+		RPID:          cfg.CookieDomain,
+		RPOrigin:      cfg.CookieDomain,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to init webauthn"))

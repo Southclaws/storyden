@@ -115,6 +115,20 @@ paths:
   # "Y888888  "Y88888  "Y888 888  888
   #
 
+  /v1/auth:
+    get:
+      operationId: AuthProviderList
+      description: |
+        Retrieve a list of authentication providers. Storyden supports a few 
+        ways to authenticate, from simple passwords to OAuth and WebAuthn. This
+        endpoint tells a client which auth capabilities are enabled.
+      tags: [auth]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthProviderList" }
+
   /v1/auth/password/signup:
     post:
       operationId: AuthPasswordSignup
@@ -139,17 +153,6 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccess" }
-
-  /v1/auth/oauth:
-    get:
-      operationId: AuthOAuthProviderList
-      description: Retrieve a list of OAuth2 providers and their links.
-      tags: [auth]
-      security: []
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthOAuthProviderList" }
 
   /v1/auth/oauth/{oauth_provider}/callback:
     post:
@@ -534,12 +537,12 @@ components:
           schema:
             $ref: "#/components/schemas/AuthSuccess"
 
-    AuthOAuthProviderList:
+    AuthProviderList:
       description: OK
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AuthOAuthProviderListBody"
+            $ref: "#/components/schemas/AuthProviderListBody"
 
     WebAuthnPublicKeyCreationOptions:
       description: OK
@@ -690,6 +693,27 @@ components:
     # Auth
     # -
 
+    AuthProviderListBody:
+      type: array
+      items:
+        $ref: "#/components/schemas/AuthProvider"
+
+    AuthProvider:
+      required: [provider, name, logo_url, link]
+      properties:
+        provider:
+          description: The slug name of the provider.
+          type: string
+        name:
+          description: The human-readable name of the provider.
+          type: string
+        logo_url:
+          description: The logo to display for the provider.
+          type: string
+        link:
+          description: The hyperlink to render for the user.
+          type: string
+
     AuthPasswordBody:
       type: object
       required: [identifier, token]
@@ -706,27 +730,6 @@ components:
       required: [id]
       properties:
         id:
-          type: string
-
-    AuthOAuthProviderListBody:
-      type: array
-      items:
-        $ref: "#/components/schemas/AuthOAuthProvider"
-
-    AuthOAuthProvider:
-      required: [provider, name, logo_url, link]
-      properties:
-        provider:
-          description: The slug name of the provider.
-          type: string
-        name:
-          description: The human-readable name of the provider.
-          type: string
-        logo_url:
-          description: The logo to display for the provider.
-          type: string
-        link:
-          description: The hyperlink to render for the user.
           type: string
 
     AuthOAuthProviderCallbackBody:
