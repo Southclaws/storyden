@@ -4,16 +4,17 @@ interface Props {
   name: string;
   icon: JSX.Element;
   method: string;
+  link?: string | undefined;
 }
 
-export function AuthSelectionOption({ name, icon, method }: Props) {
+export function AuthSelectionOption({ name, icon, method, link }: Props) {
   return (
     <Button width="full">
-      <Link href={`/login/${method}`}>
+      <Link href={link ?? `/login/${method}`}>
         <HStack>
           <Box overflow="clip" height="1rem">
             {icon}
-          </Box>{" "}
+          </Box>
           <Text>{name}</Text>
         </HStack>
       </Link>
