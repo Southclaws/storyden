@@ -1,10 +1,15 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, VStack } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
+import { Navigation } from "src/components/Navigation/Navigation";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
-      <Component {...pageProps} />
+      <VStack>
+        <Navigation />
+
+        <Component {...pageProps} />
+      </VStack>
     </ChakraProvider>
   );
 }
