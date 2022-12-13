@@ -1,16 +1,14 @@
-import {
-  Box,
-  Divider,
-  Heading,
-  List,
-  ListItem,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import { AuthSelectionOption } from "./AuthSelectionOption";
+import { Box, Heading, List, ListItem, Text, VStack } from "@chakra-ui/react";
 import { KeyIcon } from "@heroicons/react/20/solid";
+import { useAuthProviderList } from "src/api/openapi/auth";
+import { AuthProvider } from "src/api/openapi/schemas";
+import { AuthSelectionOption } from "./AuthSelectionOption";
 
 export function AuthSelection() {
+  const { data, error } = useAuthProviderList();
+
+  if (error) throw error;
+
   return (
     <VStack gap={4}>
       <Box>
@@ -23,14 +21,17 @@ export function AuthSelection() {
         </Text>
       </Box>
 
-      <List>
-        <ListItem>
-          <AuthSelectionOption
-            name="Password"
-            method="password"
-            icon={<KeyIcon height="100%" />}
-          />
-        </ListItem>
+      <List display="flex" flexDir="column" gap={4} minW="18em">
+        {data?.map((v: AuthProvider) => (
+          <ListItem key={v.provider}>
+            <AuthSelectionOption
+              name={v.name}
+              method={v.provider}
+              icon={<KeyIcon height="100%" />}
+              link={v.link || undefined}
+            />
+          </ListItem>
+        ))}
       </List>
     </VStack>
   );
