@@ -53,7 +53,7 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 			zap.String("path", c.Path()),
 			zap.String("tag", string(errtag)),
 			zap.Any("metadata", errctx),
-			zap.Any("trace", chain.Errors),
+			zap.Any("trace", chain),
 		)
 
 		meta := lo.MapValues(errctx, func(v, k string) any { return v })
