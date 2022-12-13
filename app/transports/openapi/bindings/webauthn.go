@@ -3,20 +3,30 @@ package bindings
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
+
+const cookieName = "storyden-webauthn-session"
+
+var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
 	sm     Session
@@ -36,9 +46,12 @@ func NewWebAuthn(
 	// a session cookie is used which stores the webauthn session information.
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if s, err := c.Cookie("storyden-webauthn-session"); err == nil {
-				session := webauthn.SessionData{}
-				if err := json.Unmarshal([]byte(s.Value), &session); err == nil {
+			if s, err := c.Cookie(cookieName); err == nil {
+
+				r := base64.NewDecoder(base64.URLEncoding, strings.NewReader(s.Value))
+
+				session := &webauthn.SessionData{}
+				if err := json.NewDecoder(r).Decode(&session); err == nil {
 					r := c.Request()
 					ctx := r.Context()
 					ctx = context.WithValue(ctx, "webauthn", session)
@@ -59,23 +72,40 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := json.Marshal(sessionData)
+	// Encode the session data as a base64 JSON string
+
+	j, err := json.Marshal(sessionData)
 	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to encode session data"))
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	value := base64.URLEncoding.EncodeToString(j)
+
+	// save the base64 as a cookie for the WebAuthnMakeCredential call
+
+	cookie := http.Cookie{
+		Name:  cookieName,
+		Value: value,
+		// Expire this exchange after 10 minutes
+		Expires: time.Now().Add(time.Minute * 10),
 	}
 
 	return openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
 		Headers: openapi.WebAuthnPublicKeyCreationOptionsResponseHeaders{
-			SetCookie: string(cookie),
+			SetCookie: cookie.String(),
 		},
 		Body: cred,
 	}, nil
 }
 
 func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.WebAuthnMakeCredentialRequestObject) (openapi.WebAuthnMakeCredentialResponseObject, error) {
-	session, ok := ctx.Value("webauthn").(*webauthn.SessionData)
+	c := ctx.Value("webauthn")
+	session, ok := c.(*webauthn.SessionData)
 	if !ok {
-		return nil, nil
+		return nil, fault.Wrap(errNoCookie,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
 	}
 
 	// NOTE: This is a hack due to oapi-codegen not giving us raw JSON.
@@ -89,7 +119,13 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 
 	cr, err := protocol.ParseCredentialCreationResponseBody(reader)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		pe := err.(*protocol.Error)
+		ctx = fctx.WithMeta(ctx,
+			"type", pe.Type,
+			"details", pe.Details,
+			"info", pe.DevInfo,
+		)
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
 	}
 
 	_, accountID, err := a.wa.FinishRegistration(ctx, string(session.UserID), *session, cr)
@@ -103,7 +139,9 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 	}
 
 	return openapi.WebAuthnMakeCredential200JSONResponse{
-		Body: openapi.AuthSuccess{},
+		Body: openapi.AuthSuccess{
+			Id: xid.NilID().String(),
+		},
 		Headers: openapi.AuthSuccessResponseHeaders{
 			SetCookie: string(cookie),
 		},

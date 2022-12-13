@@ -1,33 +1,34 @@
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {
+  webAuthnMakeCredential,
+  webAuthnRequestCredential,
+} from "src/api/openapi/auth";
 
-export function useAuthScreen() {
-  const { register, handleSubmit } = useForm({});
+import {
+  RegistrationCredential,
+  RegistrationCredentialJSON,
+} from "@simplewebauthn/typescript-types";
 
-  const onSubmit = async () => {
-    const response = await fetch(
-      `https://1f91-212-82-91-46.ngrok.io/api/v1/auth/webauthn/make/southclaws`,
-      {
-        method: "POST",
-      }
-    );
+export function useWebAuthn() {
+  const { register, handleSubmit, formState } = useForm({
+    //
+  });
 
-    if (!response.ok) {
-      throw new Error("Request failed" + response.statusText);
-    }
+  const onSubmit: SubmitHandler<FieldValues> = async ({
+    username,
+  }: FieldValues) => {
+    const response = await webAuthnRequestCredential(username);
 
-    const { publicKey } = await response.json();
-
+    const { publicKey } = response;
     if (!publicKey) {
-      throw new Error("Response was empty");
+      throw new Error("publicKey is empty");
     }
-
-    console.log("WEBAUTHN", publicKey);
 
     const publicKeyCredentialCreationOptions = {
       ...publicKey,
 
       rp: {
-        id: "1f91-212-82-91-46.ngrok.ios",
+        id: "localhost", // TODO: Configure self-domain or get from API.
         name: "Storyden",
       },
 
@@ -44,22 +45,48 @@ export function useAuthScreen() {
       },
     };
 
-    const credential = await navigator.credentials.create({
+    const credential = (await navigator.credentials.create({
       publicKey: publicKeyCredentialCreationOptions,
-    });
+    })) as RegistrationCredential; // cast required as TS is outdated currently.
 
-    const creds = await fetch(
-      `https://1f91-212-82-91-46.ngrok.io/api/v1/auth/webauthn/make`,
-      {
-        method: "GET",
-      }
-    );
+    if (credential == null) {
+      throw new Error("credential was null after create");
+    }
 
-    console.log(credential, creds);
+    const makeCredentialBody: RegistrationCredentialJSON = {
+      id: credential?.id,
+      rawId: bufToBase64(credential.rawId),
+      type: credential.type,
+      response: {
+        clientDataJSON: bufToBase64(credential.response.clientDataJSON),
+        attestationObject: bufToBase64(credential.response.attestationObject),
+      },
+      clientExtensionResults: credential.getClientExtensionResults(),
+      authenticatorAttachment: credential.authenticatorAttachment,
+    };
+
+    console.log({ credential, makeCredentialBody });
+
+    const creds = await webAuthnMakeCredential(makeCredentialBody);
+
+    console.log({ creds });
   };
 
   return {
     register,
     onSubmit: handleSubmit(onSubmit),
   };
+}
+
+function bufToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let str = "";
+
+  for (const charCode of bytes) {
+    str += String.fromCharCode(charCode);
+  }
+
+  const base64String = btoa(str);
+
+  return base64String.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
