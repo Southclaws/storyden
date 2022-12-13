@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -20,23 +19,21 @@ import (
 )
 
 type Authentication struct {
-	p      *password.Password
-	sm     *Session
+	p      *password.Provider
+	sm     Session
 	ar     account.Repository
 	am     *authentication.Manager
-	wa     *webauthn.WebAuthn
 	domain string
 }
 
 func NewAuthentication(
 	cfg config.Config,
-	p *password.Password,
+	p *password.Provider,
 	ar account.Repository,
-	sm *Session,
+	sm Session,
 	am *authentication.Manager,
-	wa *webauthn.WebAuthn,
 ) Authentication {
-	return Authentication{p, sm, ar, am, wa, cfg.CookieDomain}
+	return Authentication{p, sm, ar, am, cfg.CookieDomain}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
