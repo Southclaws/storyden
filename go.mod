@@ -34,7 +34,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 )
 
-require github.com/Southclaws/fault v0.4.3
+require github.com/Southclaws/fault v0.5.0
 
 require github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
 
