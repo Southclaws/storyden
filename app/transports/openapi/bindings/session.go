@@ -15,8 +15,8 @@ type Session struct {
 	domain string
 }
 
-func NewSessionManager(cfg config.Config, sc *securecookie.SecureCookie) *Session {
-	return &Session{sc, cfg.CookieDomain}
+func NewSessionManager(cfg config.Config, sc *securecookie.SecureCookie) Session {
+	return Session{sc, cfg.CookieDomain}
 }
 
 const secureCookieName = "storyden-session"

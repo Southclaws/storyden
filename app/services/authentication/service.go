@@ -43,6 +43,8 @@ func Build() fx.Option {
 
 func New(
 	l *zap.Logger,
+
+	pw *password.Provider,
 	wa *webauthn.Provider,
 	gh *github.GitHubProvider,
 	li *linkedin.LinkedInProvider,
@@ -51,6 +53,7 @@ func New(
 		// (2)
 		// All OAuth2 providers are statically added to this list regardless of
 		// whether they are enabled or not. Disabled providers are filtered out.
+		pw,
 		wa,
 		gh,
 		li,

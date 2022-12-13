@@ -19,7 +19,7 @@ import (
 )
 
 type WebAuthn struct {
-	sm     *Session
+	sm     Session
 	ar     account.Repository
 	wa     *waprovider.Provider
 	domain string
@@ -28,7 +28,7 @@ type WebAuthn struct {
 func NewWebAuthn(
 	cfg config.Config,
 	ar account.Repository,
-	sm *Session,
+	sm Session,
 	wa *waprovider.Provider,
 	router *echo.Echo,
 ) WebAuthn {
