@@ -20,7 +20,7 @@ func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := o.encodeSession(account.ID)
+	cookie, err := o.sm.encodeSession(account.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -11,7 +10,6 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -23,7 +21,7 @@ import (
 
 type Authentication struct {
 	p      *password.Password
-	sc     *securecookie.SecureCookie
+	sm     *Session
 	ar     account.Repository
 	am     *authentication.Manager
 	wa     *webauthn.WebAuthn
@@ -34,11 +32,11 @@ func NewAuthentication(
 	cfg config.Config,
 	p *password.Password,
 	ar account.Repository,
-	sc *securecookie.SecureCookie,
+	sm *Session,
 	am *authentication.Manager,
 	wa *webauthn.WebAuthn,
 ) Authentication {
-	return Authentication{p, sc, ar, am, wa, cfg.CookieDomain}
+	return Authentication{p, sm, ar, am, wa, cfg.CookieDomain}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
@@ -61,7 +59,7 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 		r := c.Request()
 		ctx := r.Context()
 
-		session, ok := i.decodeSession(r)
+		session, ok := i.sm.decodeSession(r)
 		if ok {
 			c.SetRequest(r.WithContext(authentication.WithAccountID(ctx, session.UserID)))
 		}
@@ -87,44 +85,4 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	}
 
 	return nil
-}
-
-const secureCookieName = "storyden-session"
-
-type session struct {
-	UserID account.AccountID
-}
-
-func (i *Authentication) encodeSession(userID account.AccountID) (string, error) {
-	encoded, err := i.sc.Encode(secureCookieName, session{userID})
-	if err != nil {
-		return "", fault.Wrap(err)
-	}
-
-	cookie := &http.Cookie{
-		Name:     secureCookieName,
-		Value:    encoded,
-		SameSite: http.SameSiteNoneMode,
-		Path:     "/",
-		Domain:   i.domain,
-		Secure:   true,
-		HttpOnly: true,
-	}
-
-	return cookie.String(), nil
-}
-
-func (i *Authentication) decodeSession(r *http.Request) (*session, bool) {
-	cookie, err := r.Cookie(secureCookieName)
-	if err != nil {
-		return nil, false
-	}
-
-	u := session{}
-
-	if err = i.sc.Decode(secureCookieName, cookie.Value, &u); err != nil {
-		return nil, false
-	}
-
-	return &u, true
 }
