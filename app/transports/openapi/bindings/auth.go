@@ -66,6 +66,11 @@ func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
+	// security scheme name from openapi.yaml
+	if ai.SecuritySchemeName != "browser" {
+		return nil
+	}
+
 	c := ctx.Value(middleware.EchoContextKey).(echo.Context)
 
 	// first check if the middleware injected an account ID, if not, fail.

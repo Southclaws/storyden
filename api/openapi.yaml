@@ -170,7 +170,7 @@ paths:
         "200": { $ref: "#/components/responses/AuthSuccess" }
 
   /v1/auth/webauthn/make/{account_handle}:
-    post:
+    get:
       operationId: WebAuthnRequestCredential
       description: |
         Start the WebAuthn registration process by requesting a credential.
@@ -184,7 +184,7 @@ paths:
           { $ref: "#/components/responses/WebAuthnPublicKeyCreationOptions" }
 
   /v1/auth/webauthn/make:
-    get:
+    post:
       operationId: WebAuthnMakeCredential
       description: Complete WebAuthn registration by creating a new credential.
       tags: [auth]

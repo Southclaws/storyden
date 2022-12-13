@@ -113,55 +113,39 @@ export const authOAuthProviderCallback = (
 export const webAuthnRequestCredential = (accountHandle: string) => {
   return fetcher<WebAuthnPublicKeyCreationOptionsResponse>({
     url: `/v1/auth/webauthn/make/${accountHandle}`,
-    method: "post",
-  });
-};
-
-/**
- * Complete WebAuthn registration by creating a new credential.
- */
-export const webAuthnMakeCredential = (
-  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody
-) => {
-  return fetcher<AuthSuccessResponse>({
-    url: `/v1/auth/webauthn/make`,
     method: "get",
-    headers: { "Content-Type": "application/json" },
   });
 };
 
-export const getWebAuthnMakeCredentialKey = (
-  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody
-) => [`/v1/auth/webauthn/make`, webAuthnMakeCredentialBody];
+export const getWebAuthnRequestCredentialKey = (accountHandle: string) => [
+  `/v1/auth/webauthn/make/${accountHandle}`,
+];
 
-export type WebAuthnMakeCredentialQueryResult = NonNullable<
-  Awaited<ReturnType<typeof webAuthnMakeCredential>>
+export type WebAuthnRequestCredentialQueryResult = NonNullable<
+  Awaited<ReturnType<typeof webAuthnRequestCredential>>
 >;
-export type WebAuthnMakeCredentialQueryError =
+export type WebAuthnRequestCredentialQueryError =
   | BadRequestResponse
   | InternalServerErrorResponse;
 
-export const useWebAuthnMakeCredential = <
+export const useWebAuthnRequestCredential = <
   TError = BadRequestResponse | InternalServerErrorResponse
 >(
-  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody,
+  accountHandle: string,
   options?: {
     swr?: SWRConfiguration<
-      Awaited<ReturnType<typeof webAuthnMakeCredential>>,
+      Awaited<ReturnType<typeof webAuthnRequestCredential>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
   }
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false;
+  const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
   const swrKey =
     swrOptions?.swrKey ??
-    (() =>
-      isEnabled
-        ? getWebAuthnMakeCredentialKey(webAuthnMakeCredentialBody)
-        : null);
-  const swrFn = () => webAuthnMakeCredential(webAuthnMakeCredentialBody);
+    (() => (isEnabled ? getWebAuthnRequestCredentialKey(accountHandle) : null));
+  const swrFn = () => webAuthnRequestCredential(accountHandle);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -173,6 +157,20 @@ export const useWebAuthnMakeCredential = <
     swrKey,
     ...query,
   };
+};
+
+/**
+ * Complete WebAuthn registration by creating a new credential.
+ */
+export const webAuthnMakeCredential = (
+  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody
+) => {
+  return fetcher<AuthSuccessResponse>({
+    url: `/v1/auth/webauthn/make`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: webAuthnMakeCredentialBody,
+  });
 };
 
 /**

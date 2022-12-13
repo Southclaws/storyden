@@ -1534,7 +1534,7 @@ func NewWebAuthnMakeCredentialRequestWithBody(server string, contentType string,
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), body)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1570,7 +1570,7 @@ func NewWebAuthnRequestCredentialRequest(server string, accountHandle AccountHan
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -3313,10 +3313,10 @@ type ServerInterface interface {
 	// (POST /v1/auth/webauthn/assert/{account_handle})
 	WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandle) error
 
-	// (GET /v1/auth/webauthn/make)
+	// (POST /v1/auth/webauthn/make)
 	WebAuthnMakeCredential(ctx echo.Context) error
 
-	// (POST /v1/auth/webauthn/make/{account_handle})
+	// (GET /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandle) error
 
 	// (GET /v1/profiles/{account_handle})
@@ -3632,8 +3632,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
 	router.GET(baseURL+"/v1/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
 	router.POST(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
-	router.GET(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
-	router.POST(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
+	router.POST(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
+	router.GET(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
 	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfilesGet)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
@@ -4487,10 +4487,10 @@ type StrictServerInterface interface {
 	// (POST /v1/auth/webauthn/assert/{account_handle})
 	WebAuthnGetAssertion(ctx context.Context, request WebAuthnGetAssertionRequestObject) (WebAuthnGetAssertionResponseObject, error)
 
-	// (GET /v1/auth/webauthn/make)
+	// (POST /v1/auth/webauthn/make)
 	WebAuthnMakeCredential(ctx context.Context, request WebAuthnMakeCredentialRequestObject) (WebAuthnMakeCredentialResponseObject, error)
 
-	// (POST /v1/auth/webauthn/make/{account_handle})
+	// (GET /v1/auth/webauthn/make/{account_handle})
 	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
 
 	// (GET /v1/profiles/{account_handle})
@@ -5166,18 +5166,19 @@ var swaggerSpec = []string{
 	"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",
-	"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",
+	"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",
+	"PJibDlIAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

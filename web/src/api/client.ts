@@ -33,6 +33,7 @@ export const fetcher = async <T>({
 
   if (!response.ok) {
     const data = await response.json();
+    console.warn(data);
     throw new Error(data.error);
   }
 
