@@ -62,6 +62,7 @@ type Bindings struct {
 	fx.In
 	Version
 	Spec
+	Session
 	Authentication
 	WebAuthn
 	Accounts
@@ -77,6 +78,7 @@ func bindingsProviders() fx.Option {
 	return fx.Provide(
 		NewVersion,
 		NewSpec,
+		NewSessionManager,
 		NewAuthentication,
 		NewWebAuthn,
 		NewAccounts,

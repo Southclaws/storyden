@@ -3,6 +3,8 @@ package webauthn
 import (
 	"context"
 
+	"github.com/go-webauthn/webauthn/webauthn"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 )
 
@@ -12,10 +14,12 @@ const (
 	logo = "https://www.yubico.com/wp-content/uploads/2021/02/illus-yubikey-fingerprint-password-dkteal-r4.svg" // todo; change this image
 )
 
-type Provider struct{}
+type Provider struct {
+	wa *webauthn.WebAuthn
+}
 
-func New() (*Provider, error) {
-	return &Provider{}, nil
+func New(wa *webauthn.WebAuthn) (*Provider, error) {
+	return &Provider{wa}, nil
 }
 
 func (p *Provider) Enabled() bool   { return true }

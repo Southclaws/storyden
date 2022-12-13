@@ -23,7 +23,7 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := i.encodeSession(u.ID)
+	cookie, err := i.sm.encodeSession(u.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -48,7 +48,7 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := i.encodeSession(u.ID)
+	cookie, err := i.sm.encodeSession(u.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
