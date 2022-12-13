@@ -76,6 +76,7 @@ func (p *LinkedInProvider) Link() string {
 }
 
 func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {
+	// TODO: Use `state` properly to secure the flow.
 	ctx = fctx.WithMeta(ctx,
 		"state", state,
 		"code", code,
