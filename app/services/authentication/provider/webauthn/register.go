@@ -49,6 +49,7 @@ func (p *Provider) FinishRegistration(ctx context.Context, handle string, sessio
 
 	credential, err := p.wa.CreateCredential(&t, session, parsedResponse)
 	if err != nil {
+		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -64,6 +65,7 @@ func (p *Provider) BeginLogin(ctx context.Context, handle string) (*webauthn.Ses
 
 	_, sd, err := p.wa.BeginLogin(&t)
 	if err != nil {
+		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -75,8 +77,23 @@ func (p *Provider) FinishLogin(ctx context.Context, handle string, session webau
 
 	cred, err := p.wa.ValidateLogin(&t, session, parsedResponse)
 	if err != nil {
+		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return cred, nil
+}
+
+func waErrMetadata(in error) []string {
+	switch err := in.(type) {
+	case *protocol.Error:
+		return []string{
+			"wa_details", err.Details,
+			"wa_info", err.DevInfo,
+			"wa_type", err.Type,
+		}
+
+	default:
+		return []string{}
+	}
 }
