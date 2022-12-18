@@ -1248,6 +1248,11 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.4.tgz#0c8b74c50f29ee44f423f7416829c0bf8bb5eb27"
   integrity sha512-LwzQKA4vzIct1zNZzBmRKI9QuNpLgTQMEjsQLf3BXuGYb3QPTP4Yjf6mkdX+X1mYttZ808QpOwAzZjv28kq7DA==
 
+"@simplewebauthn/browser@^6.2.2":
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-6.2.2.tgz#3cd773a9887734331251d1b8dec043547a7bbd57"
+  integrity sha512-VUtne7+s6BmW4usnbitjZEI1VNT/PNh6bYg+AI4OMdfpo5z+yAq+6iVAWBJlIUGVk5InetEQvTUp6OefBam8qg==
+
 "@simplewebauthn/typescript-types@^6.3.0-alpha.1":
   version "6.3.0-alpha.1"
   resolved "https://registry.yarnpkg.com/@simplewebauthn/typescript-types/-/typescript-types-6.3.0-alpha.1.tgz#641d42a37d6fc78358ddfdb01ded156559915c65"
