@@ -87,7 +87,12 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		Name:  cookieName,
 		Value: value,
 		// Expire this exchange after 10 minutes
-		Expires: time.Now().Add(time.Minute * 10),
+		Expires:  time.Now().Add(time.Minute * 10),
+		SameSite: http.SameSiteNoneMode,
+		Path:     "/",
+		Domain:   a.domain,
+		Secure:   true,
+		HttpOnly: true,
 	}
 
 	return openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
