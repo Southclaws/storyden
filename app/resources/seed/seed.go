@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
@@ -27,16 +28,15 @@ var id = func(s string) xid.ID { return utils.Must(xid.FromString(s)) }
 
 // Ready is a type you can depend on during integration tests which, when used
 // will ensure the database is seeded with data before your tests run.
-// Usage is simple, use `bdd.Test` and add this value as a parameter to the
-// test function invoke call:
+// Usage is simple, use `integration.Test` and add this value as a parameter to
+// the test function invoke call:
 //
-// bdd.Test(t, nil, fx.Invoke(
-//     func(
-//         _ seed.Ready,
-//         repo user.Repository,
-//     ) {
-//         ... your test code
-//
+//	integration.Test(t, nil, fx.Invoke(
+//	    func(
+//	        _ seed.Ready,
+//	        repo user.Repository,
+//	    ) {
+//	        ... your test code
 type Ready struct{}
 
 // Seed provides a type to the application which, when present in a component's
@@ -55,6 +55,7 @@ func New(
 	database *sql.DB,
 	client *ent.Client,
 	account_repo account.Repository,
+	auth_repo authentication.Repository,
 	category_repo category.Repository,
 	thread_repo thread.Repository,
 	post_repo post.Repository,
@@ -65,7 +66,7 @@ func New(
 
 	fmt.Println("seeding database")
 
-	accounts(account_repo)
+	accounts(account_repo, auth_repo)
 	categories(category_repo)
 	threads(thread_repo, post_repo)
 

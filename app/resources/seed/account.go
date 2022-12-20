@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/Southclaws/storyden/app/resources/authentication"
 )
+
+const SeedPassword = `$argon2id$v=19$m=65536,t=1,p=2$MAwllQoeGcxCPOC52OQwZA$jLlzHsmSHmQPbpQ6Y5+877NlacOYeyqEqWoKJJXRcHM`
 
 var (
 	Account_000 = account.Account{ID: account.AccountID(id("00000000000000000010")), Name: "Francis J. Underwood", Handle: "francis-j-underwood", Admin: true}
@@ -45,7 +47,7 @@ var (
 	Account_033 = account.Account{ID: account.AccountID(id("00000000000000000340")), Name: "Duncan Shepherd", Handle: "duncan-shepherd"}
 )
 
-func accounts(r account.Repository) {
+func accounts(r account.Repository, auth authentication.Repository) {
 	ctx := context.Background()
 
 	for _, v := range []account.Account{
@@ -84,11 +86,19 @@ func accounts(r account.Repository) {
 		Account_032,
 		Account_033,
 	} {
-		utils.Must(r.Create(ctx, v.Handle,
+		acc, err := r.Create(ctx, v.Handle,
 			account.WithID(v.ID),
 			account.WithName(v.Name),
 			account.WithBio(v.Bio.ElseZero()),
-		))
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), acc.Handle+"@storyd.en", SeedPassword, nil); err != nil {
+			panic(err)
+		}
+
 	}
 
 	fmt.Println("created seed users")
