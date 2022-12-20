@@ -9,8 +9,6 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-default}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-default}
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
 
   swaggerui:
     image: swaggerapi/swagger-ui
