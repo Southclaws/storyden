@@ -13,7 +13,7 @@ import type { AccountName } from "./accountName";
  * A minimal reference to an account.
  */
 export interface ProfileReference {
-  id?: Identifier;
-  handle?: AccountHandle;
-  name?: AccountName;
+  id: Identifier;
+  handle: AccountHandle;
+  name: AccountName;
 }

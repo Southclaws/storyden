@@ -73,20 +73,27 @@ func serialisePost(p *post.Post) openapi.Post {
 		UpdatedAt: p.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
 		Body:      p.Body,
+		Author:    serialiseProfileReference(p.Author),
 	}
 }
 
-func serialiseProfileReference(a thread.AuthorRef) openapi.ProfileReference {
+func serialiseProfileReference(a post.Author) openapi.ProfileReference {
 	return openapi.ProfileReference{
-		Id:     openapi.IdentifierFrom(xid.ID(a.ID)),
-		Handle: (*openapi.AccountHandle)(&a.Handle),
-		Name:   &a.Name,
+		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
+		Handle: (openapi.AccountHandle)(a.Handle),
+		Name:   a.Name,
 	}
 }
 
 func serialiseCategory(c *category.Category) openapi.Category {
 	return openapi.Category{
-		Id: openapi.IdentifierFrom(xid.ID(c.ID)),
+		Id:          openapi.IdentifierFrom(xid.ID(c.ID)),
+		Admin:       &c.Admin,
+		Colour:      &c.Colour,
+		Description: &c.Description,
+		Name:        &c.Name,
+		PostCount:   &c.PostCount,
+		Sort:        &c.Sort,
 	}
 }
 

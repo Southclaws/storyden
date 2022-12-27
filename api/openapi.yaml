@@ -929,9 +929,10 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - type: object
-          required: [body]
+          required: [body, author]
           properties:
             body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+            author: { $ref: "#/components/schemas/ProfileReference" }
             meta: { $ref: "#/components/schemas/Metadata" }
             reply_to:
               $ref: "#/components/schemas/Identifier"
@@ -961,6 +962,7 @@ components:
     ProfileReference:
       type: object
       description: A minimal reference to an account.
+      required: [id, handle, name]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
         handle: { $ref: "#/components/schemas/AccountHandle" }

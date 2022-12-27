@@ -39,8 +39,9 @@ func (u *Post) GetRole() string { return Role }
 type Author struct {
 	ID        account.AccountID `json:"id"`
 	Name      string            `json:"name"`
-	Admin     bool              `json:"admin"`
-	CreatedAt time.Time         `json:"createdAt"`
+	Handle    string
+	Admin     bool      `json:"admin"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func replyTo(m *ent.Post) optional.Optional[PostID] {
@@ -69,6 +70,7 @@ func FromModel(m *ent.Post) (w *Post) {
 		Author: Author{
 			ID:        account.AccountID(m.Edges.Author.ID),
 			Name:      m.Edges.Author.Name,
+			Handle:    m.Edges.Author.Handle,
 			Admin:     m.Edges.Author.Admin,
 			CreatedAt: m.Edges.Author.CreatedAt,
 		},

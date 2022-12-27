@@ -24,18 +24,12 @@ type Thread struct {
 	Slug     string
 	Short    string
 	Pinned   bool
-	Author   AuthorRef
+	Author   post.Author
 	Tags     []string
 	Category category.Category
 	Posts    []*post.Post
 	Reacts   []*react.React
 	Meta     map[string]any
-}
-
-type AuthorRef struct {
-	ID     account.AccountID
-	Handle string
-	Name   string
 }
 
 const Name = "Thread"
@@ -64,7 +58,7 @@ func FromModel(m *ent.Post) *Thread {
 		Slug:   m.Slug,
 		Short:  m.Short,
 		Pinned: m.Pinned,
-		Author: AuthorRef{
+		Author: post.Author{
 			ID:     account.AccountID(m.Edges.Author.ID),
 			Handle: m.Edges.Author.Handle,
 			Name:   m.Edges.Author.Name,
