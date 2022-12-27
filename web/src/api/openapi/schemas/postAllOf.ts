@@ -6,11 +6,13 @@
  * OpenAPI spec version: 1
  */
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { ProfileReference } from "./profileReference";
 import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
 
 export type PostAllOf = {
   body: PostBodyMarkdown;
+  author: ProfileReference;
   meta?: Metadata;
   reply_to?: Identifier;
 };

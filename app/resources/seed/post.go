@@ -13,7 +13,7 @@ var (
 	Post_01 = thread.Thread{
 		ID:       post.PostID(id("00000000000000000010")),
 		Title:    "Hello world!",
-		Author:   thread.AuthorRef{ID: Account_000.ID},
+		Author:   post.Author{ID: Account_000.ID},
 		Category: Category_01_General,
 		Posts: []*post.Post{
 			{
@@ -35,7 +35,7 @@ var (
 	Post_02 = thread.Thread{
 		ID:       post.PostID(id("00000000000000000020")),
 		Title:    "Hello, 世界",
-		Author:   thread.AuthorRef{ID: Account_001.ID},
+		Author:   post.Author{ID: Account_001.ID},
 		Category: Category_01_General,
 		Posts: []*post.Post{
 			{
