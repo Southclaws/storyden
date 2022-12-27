@@ -78,8 +78,9 @@ func serialisePost(p *post.Post) openapi.Post {
 
 func serialiseProfileReference(a thread.AuthorRef) openapi.ProfileReference {
 	return openapi.ProfileReference{
-		Id:   openapi.IdentifierFrom(xid.ID(a.ID)),
-		Name: &a.Name,
+		Id:     openapi.IdentifierFrom(xid.ID(a.ID)),
+		Handle: (*openapi.AccountHandle)(&a.Handle),
+		Name:   &a.Name,
 	}
 }
 

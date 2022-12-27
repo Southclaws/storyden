@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { Identifier } from "./identifier";
+import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 
 /**
@@ -13,5 +14,6 @@ import type { AccountName } from "./accountName";
  */
 export interface ProfileReference {
   id?: Identifier;
+  handle?: AccountHandle;
   name?: AccountName;
 }
