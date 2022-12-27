@@ -1,4 +1,11 @@
-import { Box, Flex, Heading, LinkOverlay, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  LinkBox,
+  LinkOverlay,
+  Text,
+} from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 import { ThreadReference } from "src/api/openapi/schemas";
 
@@ -14,14 +21,18 @@ export function ThreadList(props: Props) {
 export function ThreadListItem(props: { thread: ThreadReference }) {
   return (
     <Flex as="section" flexDir="column" px={4} py={2} width="full">
-      <LinkOverlay href={`/${props.thread.slug}`}>
+      <LinkBox>
         <Flex justifyContent="space-between">
-          <Heading size="sm">{props.thread.title}</Heading>
+          <Heading size="sm">
+            <LinkOverlay href={`/${props.thread.slug}`}>
+              {props.thread.title}
+            </LinkOverlay>
+          </Heading>
           {/* Options menu */}
         </Flex>
 
         <Text noOfLines={3}>{props.thread.short}</Text>
-      </LinkOverlay>
+      </LinkBox>
 
       <Flex justifyContent="space-between">
         <Flex gap={2}>
