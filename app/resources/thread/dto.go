@@ -33,8 +33,9 @@ type Thread struct {
 }
 
 type AuthorRef struct {
-	ID   account.AccountID
-	Name string
+	ID     account.AccountID
+	Handle string
+	Name   string
 }
 
 const Name = "Thread"
@@ -64,8 +65,9 @@ func FromModel(m *ent.Post) *Thread {
 		Short:  m.Short,
 		Pinned: m.Pinned,
 		Author: AuthorRef{
-			ID:   account.AccountID(m.Edges.Author.ID),
-			Name: m.Edges.Author.Name,
+			ID:     account.AccountID(m.Edges.Author.ID),
+			Handle: m.Edges.Author.Handle,
+			Name:   m.Edges.Author.Name,
 		},
 		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
