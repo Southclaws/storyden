@@ -681,7 +681,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (pc *PostCreate) OnConflict(opts ...sql.ConflictOption) *PostUpsertOne {
 	pc.conflict = opts
 	return &PostUpsertOne{
@@ -695,7 +694,6 @@ func (pc *PostCreate) OnConflict(opts ...sql.ConflictOption) *PostUpsertOne {
 //	client.Post.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (pc *PostCreate) OnConflictColumns(columns ...string) *PostUpsertOne {
 	pc.conflict = append(pc.conflict, sql.ConflictColumns(columns...))
 	return &PostUpsertOne{
@@ -913,7 +911,6 @@ func (u *PostUpsert) ClearCategoryID() *PostUpsert {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *PostUpsertOne) UpdateNewValues() *PostUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -930,10 +927,9 @@ func (u *PostUpsertOne) UpdateNewValues() *PostUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//  client.Post.Create().
-//      OnConflict(sql.ResolveWithIgnore()).
-//      Exec(ctx)
-//
+//	client.Post.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
 func (u *PostUpsertOne) Ignore() *PostUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
@@ -1307,7 +1303,6 @@ func (pcb *PostCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (pcb *PostCreateBulk) OnConflict(opts ...sql.ConflictOption) *PostUpsertBulk {
 	pcb.conflict = opts
 	return &PostUpsertBulk{
@@ -1321,7 +1316,6 @@ func (pcb *PostCreateBulk) OnConflict(opts ...sql.ConflictOption) *PostUpsertBul
 //	client.Post.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (pcb *PostCreateBulk) OnConflictColumns(columns ...string) *PostUpsertBulk {
 	pcb.conflict = append(pcb.conflict, sql.ConflictColumns(columns...))
 	return &PostUpsertBulk{
@@ -1346,7 +1340,6 @@ type PostUpsertBulk struct {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *PostUpsertBulk) UpdateNewValues() *PostUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -1368,7 +1361,6 @@ func (u *PostUpsertBulk) UpdateNewValues() *PostUpsertBulk {
 //	client.Post.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-//
 func (u *PostUpsertBulk) Ignore() *PostUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u

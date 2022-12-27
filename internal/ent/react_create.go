@@ -302,7 +302,6 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (rc *ReactCreate) OnConflict(opts ...sql.ConflictOption) *ReactUpsertOne {
 	rc.conflict = opts
 	return &ReactUpsertOne{
@@ -316,7 +315,6 @@ func (rc *ReactCreate) OnConflict(opts ...sql.ConflictOption) *ReactUpsertOne {
 //	client.React.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (rc *ReactCreate) OnConflictColumns(columns ...string) *ReactUpsertOne {
 	rc.conflict = append(rc.conflict, sql.ConflictColumns(columns...))
 	return &ReactUpsertOne{
@@ -360,7 +358,6 @@ func (u *ReactUpsert) UpdateEmoji() *ReactUpsert {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *ReactUpsertOne) UpdateNewValues() *ReactUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -377,10 +374,9 @@ func (u *ReactUpsertOne) UpdateNewValues() *ReactUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//  client.React.Create().
-//      OnConflict(sql.ResolveWithIgnore()).
-//      Exec(ctx)
-//
+//	client.React.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
 func (u *ReactUpsertOne) Ignore() *ReactUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
@@ -551,7 +547,6 @@ func (rcb *ReactCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (rcb *ReactCreateBulk) OnConflict(opts ...sql.ConflictOption) *ReactUpsertBulk {
 	rcb.conflict = opts
 	return &ReactUpsertBulk{
@@ -565,7 +560,6 @@ func (rcb *ReactCreateBulk) OnConflict(opts ...sql.ConflictOption) *ReactUpsertB
 //	client.React.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (rcb *ReactCreateBulk) OnConflictColumns(columns ...string) *ReactUpsertBulk {
 	rcb.conflict = append(rcb.conflict, sql.ConflictColumns(columns...))
 	return &ReactUpsertBulk{
@@ -590,7 +584,6 @@ type ReactUpsertBulk struct {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *ReactUpsertBulk) UpdateNewValues() *ReactUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -612,7 +605,6 @@ func (u *ReactUpsertBulk) UpdateNewValues() *ReactUpsertBulk {
 //	client.React.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-//
 func (u *ReactUpsertBulk) Ignore() *ReactUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u

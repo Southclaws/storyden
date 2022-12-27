@@ -47,7 +47,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 	post, err := p.post_svc.Create(ctx,
 		params.Body,
 		accountID,
-		post.PostID(request.ThreadId.XID()),
+		post.PostID(request.ThreadMark.XID()),
 		reply,
 		meta,
 	)

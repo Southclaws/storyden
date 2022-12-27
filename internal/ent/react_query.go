@@ -336,7 +336,6 @@ func (rq *ReactQuery) WithPost(opts ...func(*PostQuery)) *ReactQuery {
 //		GroupBy(react.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
 	grbuild := &ReactGroupBy{config: rq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -363,7 +362,6 @@ func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
 //	client.React.Query().
 //		Select(react.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (rq *ReactQuery) Select(fields ...string) *ReactSelect {
 	rq.fields = append(rq.fields, fields...)
 	selbuild := &ReactSelect{ReactQuery: rq}

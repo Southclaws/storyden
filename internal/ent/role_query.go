@@ -300,7 +300,6 @@ func (rq *RoleQuery) WithAccounts(opts ...func(*AccountQuery)) *RoleQuery {
 //		GroupBy(role.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (rq *RoleQuery) GroupBy(field string, fields ...string) *RoleGroupBy {
 	grbuild := &RoleGroupBy{config: rq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -327,7 +326,6 @@ func (rq *RoleQuery) GroupBy(field string, fields ...string) *RoleGroupBy {
 //	client.Role.Query().
 //		Select(role.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (rq *RoleQuery) Select(fields ...string) *RoleSelect {
 	rq.fields = append(rq.fields, fields...)
 	selbuild := &RoleSelect{RoleQuery: rq}
