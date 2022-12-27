@@ -1,4 +1,4 @@
-import { Flex, Heading, IconButton, LinkOverlay, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, LinkOverlay, Text } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 import { ThreadReference } from "src/api/openapi/schemas";
 
@@ -8,12 +8,12 @@ export function ThreadList(props: Props) {
     <ThreadListItem key={t.id} thread={t} />
   ));
 
-  return <>{children}</>;
+  return <Box as="main">{children}</Box>;
 }
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
   return (
-    <Flex as="section" flexDir="column" px={4} py={2}>
+    <Flex as="section" flexDir="column" px={4} py={2} width="full">
       <LinkOverlay href={`/${props.thread.slug}`}>
         <Flex justifyContent="space-between">
           <Heading size="sm">{props.thread.title}</Heading>
