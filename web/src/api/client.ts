@@ -1,5 +1,3 @@
-import { API_ADDRESS } from "src/config";
-
 type Options = {
   url: string;
   method: "get" | "post" | "put" | "delete" | "patch";
@@ -16,18 +14,13 @@ export const fetcher = async <T>({
   params,
   data,
 }: Options): Promise<T> => {
-  const req = new Request(
-    `${API_ADDRESS}${url}` + new URLSearchParams(params),
-    {
-      method,
-      mode: "cors",
-      credentials: "include",
-      ...(headers ? { headers } : {}),
-      ...(data ? { body: JSON.stringify(data) } : {}),
-    }
-  );
-
-  console.log(req);
+  const req = new Request(`/api/${url}` + new URLSearchParams(params), {
+    method,
+    mode: "cors",
+    credentials: "include",
+    ...(headers ? { headers } : {}),
+    ...(data ? { body: JSON.stringify(data) } : {}),
+  });
 
   const response = await fetch(req);
 
