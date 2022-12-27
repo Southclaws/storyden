@@ -31,6 +31,16 @@ func (i Identifier) XID() xid.ID {
 	return v
 }
 
+// XID converts a thread mark (id-slug) to just the XID, same as above.
+func (i ThreadMark) XID() xid.ID {
+	v, err := xid.FromString(string(i[:20]))
+	if err != nil {
+		return xid.NilID()
+	}
+
+	return v
+}
+
 // id converts any arbitrary xid.ID derivative to an *openapi.Identifier type.
 func IdentifierFrom(id xid.ID) *Identifier {
 	oid := Identifier(id.String())

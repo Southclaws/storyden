@@ -315,6 +315,16 @@ type Thread struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// ThreadMark A thread's ID and optional slug separated by a dash = it's unique mark.
+// This allows endpoints to respond to varying forms of a thread's ID.
+//
+// For example, given a thread with the ID `cc5lnd2s1s4652adtu50` and the
+// slug `top-10-movies-thread`, Storyden will understand both the forms:
+// `cc5lnd2s1s4652adtu50-top-10-movies-thread` and `cc5lnd2s1s4652adtu50`
+//
+//	as the identifier for that thread.
+type ThreadMark string
+
 // ThreadReference defines model for ThreadReference.
 type ThreadReference struct {
 	// Author A minimal reference to an account.
@@ -385,9 +395,6 @@ type ThreadsCreateBody struct {
 
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
-
-// ThreadID A unique identifier for this resource.
-type ThreadID = Identifier
 
 // AccountsGetSuccess defines model for AccountsGetSuccess.
 type AccountsGetSuccess = Account
@@ -644,14 +651,14 @@ type ClientInterface interface {
 	ThreadsCreateWithFormdataBody(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ThreadsGet request
-	ThreadsGet(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ThreadsGet(ctx context.Context, threadMark ThreadMark, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostsCreate request with any body
-	PostsCreateWithBody(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostsCreateWithBody(ctx context.Context, threadMark ThreadMark, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostsCreate(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostsCreate(ctx context.Context, threadMark ThreadMark, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostsCreateWithFormdataBody(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostsCreateWithFormdataBody(ctx context.Context, threadMark ThreadMark, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVersion request
 	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1005,8 +1012,8 @@ func (c *Client) ThreadsCreateWithFormdataBody(ctx context.Context, body Threads
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsGet(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsGetRequest(c.Server, threadId)
+func (c *Client) ThreadsGet(ctx context.Context, threadMark ThreadMark, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadsGetRequest(c.Server, threadMark)
 	if err != nil {
 		return nil, err
 	}
@@ -1017,8 +1024,8 @@ func (c *Client) ThreadsGet(ctx context.Context, threadId ThreadID, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostsCreateWithBody(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequestWithBody(c.Server, threadId, contentType, body)
+func (c *Client) PostsCreateWithBody(ctx context.Context, threadMark ThreadMark, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequestWithBody(c.Server, threadMark, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1029,8 +1036,8 @@ func (c *Client) PostsCreateWithBody(ctx context.Context, threadId ThreadID, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostsCreate(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequest(c.Server, threadId, body)
+func (c *Client) PostsCreate(ctx context.Context, threadMark ThreadMark, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequest(c.Server, threadMark, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1041,8 +1048,8 @@ func (c *Client) PostsCreate(ctx context.Context, threadId ThreadID, body PostsC
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostsCreateWithFormdataBody(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequestWithFormdataBody(c.Server, threadId, body)
+func (c *Client) PostsCreateWithFormdataBody(ctx context.Context, threadMark ThreadMark, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostsCreateRequestWithFormdataBody(c.Server, threadMark, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1730,12 +1737,12 @@ func NewThreadsCreateRequestWithBody(server string, contentType string, body io.
 }
 
 // NewThreadsGetRequest generates requests for ThreadsGet
-func NewThreadsGetRequest(server string, threadId ThreadID) (*http.Request, error) {
+func NewThreadsGetRequest(server string, threadMark ThreadMark) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, threadId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, threadMark)
 	if err != nil {
 		return nil, err
 	}
@@ -1764,34 +1771,34 @@ func NewThreadsGetRequest(server string, threadId ThreadID) (*http.Request, erro
 }
 
 // NewPostsCreateRequest calls the generic PostsCreate builder with application/json body
-func NewPostsCreateRequest(server string, threadId ThreadID, body PostsCreateJSONRequestBody) (*http.Request, error) {
+func NewPostsCreateRequest(server string, threadMark ThreadMark, body PostsCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostsCreateRequestWithBody(server, threadId, "application/json", bodyReader)
+	return NewPostsCreateRequestWithBody(server, threadMark, "application/json", bodyReader)
 }
 
 // NewPostsCreateRequestWithFormdataBody calls the generic PostsCreate builder with application/x-www-form-urlencoded body
-func NewPostsCreateRequestWithFormdataBody(server string, threadId ThreadID, body PostsCreateFormdataRequestBody) (*http.Request, error) {
+func NewPostsCreateRequestWithFormdataBody(server string, threadMark ThreadMark, body PostsCreateFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	bodyStr, err := runtime.MarshalForm(body, nil)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewPostsCreateRequestWithBody(server, threadId, "application/x-www-form-urlencoded", bodyReader)
+	return NewPostsCreateRequestWithBody(server, threadMark, "application/x-www-form-urlencoded", bodyReader)
 }
 
 // NewPostsCreateRequestWithBody generates requests for PostsCreate with any type of body
-func NewPostsCreateRequestWithBody(server string, threadId ThreadID, contentType string, body io.Reader) (*http.Request, error) {
+func NewPostsCreateRequestWithBody(server string, threadMark ThreadMark, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, threadId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, threadMark)
 	if err != nil {
 		return nil, err
 	}
@@ -1966,14 +1973,14 @@ type ClientWithResponsesInterface interface {
 	ThreadsCreateWithFormdataBodyWithResponse(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
 
 	// ThreadsGet request
-	ThreadsGetWithResponse(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error)
+	ThreadsGetWithResponse(ctx context.Context, threadMark ThreadMark, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error)
 
 	// PostsCreate request with any body
-	PostsCreateWithBodyWithResponse(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+	PostsCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMark, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
 
-	PostsCreateWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+	PostsCreateWithResponse(ctx context.Context, threadMark ThreadMark, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
 
-	PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+	PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadMark ThreadMark, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
 
 	// GetVersion request
 	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
@@ -2659,8 +2666,8 @@ func (c *ClientWithResponses) ThreadsCreateWithFormdataBodyWithResponse(ctx cont
 }
 
 // ThreadsGetWithResponse request returning *ThreadsGetResponse
-func (c *ClientWithResponses) ThreadsGetWithResponse(ctx context.Context, threadId ThreadID, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error) {
-	rsp, err := c.ThreadsGet(ctx, threadId, reqEditors...)
+func (c *ClientWithResponses) ThreadsGetWithResponse(ctx context.Context, threadMark ThreadMark, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error) {
+	rsp, err := c.ThreadsGet(ctx, threadMark, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2668,24 +2675,24 @@ func (c *ClientWithResponses) ThreadsGetWithResponse(ctx context.Context, thread
 }
 
 // PostsCreateWithBodyWithResponse request with arbitrary body returning *PostsCreateResponse
-func (c *ClientWithResponses) PostsCreateWithBodyWithResponse(ctx context.Context, threadId ThreadID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreateWithBody(ctx, threadId, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostsCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMark, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreateWithBody(ctx, threadMark, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParsePostsCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostsCreateWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreate(ctx, threadId, body, reqEditors...)
+func (c *ClientWithResponses) PostsCreateWithResponse(ctx context.Context, threadMark ThreadMark, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreate(ctx, threadMark, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParsePostsCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadId ThreadID, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreateWithFormdataBody(ctx, threadId, body, reqEditors...)
+func (c *ClientWithResponses) PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadMark ThreadMark, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
+	rsp, err := c.PostsCreateWithFormdataBody(ctx, threadMark, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -3331,11 +3338,11 @@ type ServerInterface interface {
 	// (POST /v1/threads)
 	ThreadsCreate(ctx echo.Context) error
 	// Get information about a thread and the posts within the thread.
-	// (GET /v1/threads/{thread_id})
-	ThreadsGet(ctx echo.Context, threadId ThreadID) error
+	// (GET /v1/threads/{thread_mark})
+	ThreadsGet(ctx echo.Context, threadMark ThreadMark) error
 
-	// (POST /v1/threads/{thread_id}/posts)
-	PostsCreate(ctx echo.Context, threadId ThreadID) error
+	// (POST /v1/threads/{thread_mark}/posts)
+	PostsCreate(ctx echo.Context, threadMark ThreadMark) error
 	// Get the software version string.
 	// (GET /version)
 	GetVersion(ctx echo.Context) error
@@ -3556,34 +3563,34 @@ func (w *ServerInterfaceWrapper) ThreadsCreate(ctx echo.Context) error {
 // ThreadsGet converts echo context to params.
 func (w *ServerInterfaceWrapper) ThreadsGet(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "thread_id" -------------
-	var threadId ThreadID
+	// ------------- Path parameter "thread_mark" -------------
+	var threadMark ThreadMark
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, ctx.Param("thread_id"), &threadId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, ctx.Param("thread_mark"), &threadMark)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_id: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_mark: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ThreadsGet(ctx, threadId)
+	err = w.Handler.ThreadsGet(ctx, threadMark)
 	return err
 }
 
 // PostsCreate converts echo context to params.
 func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "thread_id" -------------
-	var threadId ThreadID
+	// ------------- Path parameter "thread_mark" -------------
+	var threadMark ThreadMark
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_id", runtime.ParamLocationPath, ctx.Param("thread_id"), &threadId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, ctx.Param("thread_mark"), &threadMark)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_id: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_mark: %s", err))
 	}
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PostsCreate(ctx, threadId)
+	err = w.Handler.PostsCreate(ctx, threadMark)
 	return err
 }
 
@@ -3640,8 +3647,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfilesGet)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
-	router.GET(baseURL+"/v1/threads/:thread_id", wrapper.ThreadsGet)
-	router.POST(baseURL+"/v1/threads/:thread_id/posts", wrapper.PostsCreate)
+	router.GET(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadsGet)
+	router.POST(baseURL+"/v1/threads/:thread_mark/posts", wrapper.PostsCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
@@ -4350,7 +4357,7 @@ func (response ThreadsCreatedefaultJSONResponse) VisitThreadsCreateResponse(w ht
 }
 
 type ThreadsGetRequestObject struct {
-	ThreadId ThreadID `json:"thread_id"`
+	ThreadMark ThreadMark `json:"thread_mark"`
 }
 
 type ThreadsGetResponseObject interface {
@@ -4393,7 +4400,7 @@ func (response ThreadsGetdefaultJSONResponse) VisitThreadsGetResponse(w http.Res
 }
 
 type PostsCreateRequestObject struct {
-	ThreadId     ThreadID `json:"thread_id"`
+	ThreadMark   ThreadMark `json:"thread_mark"`
 	JSONBody     *PostsCreateJSONRequestBody
 	FormdataBody *PostsCreateFormdataRequestBody
 }
@@ -4505,10 +4512,10 @@ type StrictServerInterface interface {
 	// (POST /v1/threads)
 	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) (ThreadsCreateResponseObject, error)
 	// Get information about a thread and the posts within the thread.
-	// (GET /v1/threads/{thread_id})
+	// (GET /v1/threads/{thread_mark})
 	ThreadsGet(ctx context.Context, request ThreadsGetRequestObject) (ThreadsGetResponseObject, error)
 
-	// (POST /v1/threads/{thread_id}/posts)
+	// (POST /v1/threads/{thread_mark}/posts)
 	PostsCreate(ctx context.Context, request PostsCreateRequestObject) (PostsCreateResponseObject, error)
 	// Get the software version string.
 	// (GET /version)
@@ -5023,10 +5030,10 @@ func (sh *strictHandler) ThreadsCreate(ctx echo.Context) error {
 }
 
 // ThreadsGet operation middleware
-func (sh *strictHandler) ThreadsGet(ctx echo.Context, threadId ThreadID) error {
+func (sh *strictHandler) ThreadsGet(ctx echo.Context, threadMark ThreadMark) error {
 	var request ThreadsGetRequestObject
 
-	request.ThreadId = threadId
+	request.ThreadMark = threadMark
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.ThreadsGet(ctx.Request().Context(), request.(ThreadsGetRequestObject))
@@ -5048,10 +5055,10 @@ func (sh *strictHandler) ThreadsGet(ctx echo.Context, threadId ThreadID) error {
 }
 
 // PostsCreate operation middleware
-func (sh *strictHandler) PostsCreate(ctx echo.Context, threadId ThreadID) error {
+func (sh *strictHandler) PostsCreate(ctx echo.Context, threadMark ThreadMark) error {
 	var request PostsCreateRequestObject
 
-	request.ThreadId = threadId
+	request.ThreadMark = threadMark
 	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
 		var body PostsCreateJSONRequestBody
 		if err := ctx.Bind(&body); err != nil {
@@ -5116,72 +5123,75 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"AAD//1KQ/CRFUgAA",
+	"H4sIAAAAAAAC/+w8XXPcNpJ/Bce9KldtcWbsbHIPqrqqle2Lo8s6Vlny7YNHZWHIniEiEGAAUKM51fz3",
+	"LXyRIIn51NiJtvKUWAS6G/3djcY8JhkvK86AKZmcPSYVFrgEBcL86zzLeM3UT5jlFPQfcpCZIJUinCVn",
+	"/jMqzPdxkibwgMtKL00kr1WRUbyUSZoQvbrCqkjShOFSf8d27xe7N0kTAb/VRECenClRQ5rIrIASa6Rq",
+	"VRmIShC2SNbrNPlwXqviUvB7koMY0nVdACI5MEXmBASac4EwQ2bTd6hy25CsswJhiaaJWhKlQEyT7hHc",
+	"n+P0c1yr4osHdiD914UAnL/H4i5GvP6GakZ+qwFhlqMKRIm1hIJDjeNUKbP5S6khbyPpPwXMk7PkL5NW",
+	"+hP7VU4C4taaWA0FpHrNcwKhVsgrUOf3WGEjgYwzBUzp/8VVRUmG9XkmPFOgRlIJwKX+1pIw56LEKjlL",
+	"ZoRhsUrSAZ80co/rU5VjBVsQ/So19x73PGMX7Guerzy+WhUd7XqDKZ3h7O50qDdh6FFxiaVccpGfFLEH",
+	"6nClHXAPo+VyOdJyGdWCAst4DvmT4GsMl1wq+UbAKcWnYV7Vs5JIqY3mxAcZQF+nPRu1x0EYVVwqtCSq",
+	"IAxhZK1vnDQWfupzd6B+DRnGEDgnICvOZNcBvNvgAEiJFzCp2OJgi+8z+sPPSeAE3oG6qrMMpDy1I9iN",
+	"23qKb48+cBT/IFKd1hsEgL2wN5Nx8rMHMOOI06QAnLtc5ArU6A3ndwS6KGJR4zXOP9qoNYyvr3GOXEjT",
+	"J7tgCgTD9ArEPYj/EYKL053w8sICjBzP40UWMXIL0+QXrn7kNcuHlP/CFZqbT123emrBaNAxkl1mYnxe",
+	"ZjDnOonSuOc1pSvj+C4FnxMKX8NWL+sZJZlDsFlXOz7s1DRY4Fu44xgTBoF3oL4JfkCEWR9LOEN4xmvV",
+	"BCWTSBIljfRkSN3BXoUoKOV+dH6EOQhgGWh8zlCxEDjqaTQhiM8RptQRben8xHSqzQWREDGK5uv/g7GL",
+	"f8JMOxZmleVnWBk9IJx9MDsO0wRHMp/9CplK0uRhtOAjfw62Oq3bWvsE3cZY7zuGVRcK/m0YxhDopYiw",
+	"jNY5YQuEUVGXmCHNRTyjgEqQEi9sPYHZasoEUGPAJSicY4XRXPASqQK8c7RLpeQZsZYO4p5kIMdTlqRJ",
+	"JXgFQrmKAOKUWpV0fs6sSRHjyvyN5ZCbygxYPqolCJQTWVG8Gg/zgjRx5MeYYQ46Ghz0GByWE0Yt8pxo",
+	"DJheBge1VVSPALZC7eqWnZ6/ihummtMHaJ1KaZnXiwVIFdPtc9R8RDgz4tan0fD0aSKnWIdF32cnl5sI",
+	"Vp946LNS+mGenH3ebtBveFlyFnBjnT72tGBGeESz06Ro2gd7pEKu17DW5a0CAVLt9jV4YZzY2pfBeyH6",
+	"RS9dr9c3XZY1/QiSb2PcppaIVnlXuv/d9UWcibqGR7fFcBV2SbqM63qblpsh+VH0DhHiSwZCepVHmjVd",
+	"5K+xYHi2Qj8DMIhZRKRKPvu3EHpMrlvL8sGxdV0VPbdUruDbbpl2WWrh3Gygp1NND0hom0HGBUc6b3+X",
+	"iotVDmzMxSImYMXvgHV3V77tsMu3BOg9oI3nCDp13TNQwu7iWlysKhD6s/agQrtyscv5pQnlC/6lFjQO",
+	"Un/V0LxFeHC+iRcFyTbaWS/w6IXa1HdCrLb2LSWtF/vC6kkkaEYaqgN+pJbTN5GK0ivXXmldR5qDnG5Q",
+	"J/YVdrddbPC6b7CCBRcRK8B5SVgAd8Y5Bcz0poxTXouolXb4HvluSd3GiYtW/QMtGQqbS/XGR1r3Vfu4",
+	"hd0nuYh+iXmoQQQeOiVbe5yruGopUoLL8CSvRQZoiWVbsKRtg0a7+5FeHtPfHCgcjEXyuRq5nfujOlQM",
+	"JZFZJI0SM6IEFisED0pgZPIz7RohN727DrXRHK02AfDAI7tN+552aAhpINCQhpiBXHSCQT+NdBlJ705E",
+	"FUR2zt1GgSz7gbL8O/lKfv9fP3yHc1X/8DI8xwPJ905Y3h+XVzdCaysU56+3iso0L06a1Tr/uKtjov3o",
+	"eyzucr5kvpzYta9hjRF+RVdfFD9E43s6Y0gdasfNgLeIwTLau9ZBx3YI0LldUOIVMqTpyIkZVwUI+4Ww",
+	"KdPicDtnKyQryMh8pQtQ/eHWH+kWOZauxqh3N0eYXjplwdp7TGtAZS0VmkGHSg1U4tKjtJVoVAM6woja",
+	"rOYVUvBgWw4bGvmhSfwFvV+ZZVM2ZdfadIhEGH3Rf/rSbv3iruCQtRVduhGG/lo6Yv7aIbo1kt6dw14d",
+	"uqbZ1rZZIrZfEkZKTJHwi6wgw3qkq/DHZu5HhswnZe3dluC3KGY7MfZkVU/pmhvDCPi7FMHGuzeVsEsm",
+	"w2DUkhULRh8BZ2qYnkDJfyUnSLdiinCNFzHlV3iBlgXJCpRhhkw5UbkGNTLRxLQZ0T3BqDnS0CK2JJJf",
+	"Q+uv8aLR+IFUDICbOAd8K7fPBeo6qwovzOn26+DiRSzDd2gu3sqTYepyKIJwc6/DF0pYY4xWW65hvrdr",
+	"GDau+2ps4uPeFZN31b3ud1eyiihjabr40/8pdFmQJhVhDLTQbYtbHw8vZJI6EtIk82WRBoezqDne7Jg3",
+	"OXdW8EKii7em6csr18w0taiECgvTypytkE6eZYH+GxH1Qvq0Use2sYuJmFK+lAhYXnHClLTVu6w4M63Q",
+	"eyxMeqCDo3SCa7GPdWj9kQvkom6KFuQeguykydYv3qLbWI56aw5gMgpD/K3i1ejVy1HJ7wnIkQVzm6Ir",
+	"1xhBS0IpqlkOQiq9dcYdBkPh2ZRF0YyiYA3uOFlThrA0cAc5OFaddGZ7Dh5F3EvMR5WAOXmAfHQHMzwb",
+	"ZVjCqMnR98vZ+1ZwysjqlHmX3fRTm3Wg7jv2Nt2CI9JwZ3MDM/lnASb1DTJeIpFdbbNYIpEnMPBEQT/C",
+	"ZIpN2z3izOpyBqJJwa1aWsBtQqr/+4HRla+ahj0F5wm2eGezgnAmLXCT+xZYogLn9hqoAl7Zgb69fJyN",
+	"9xHfbR1Z7F5Df0D3IKS7w2rZ+kIGubk2kVqCZnAl4J7A0t0/bWBD0IfVrjSC+dPHf6C5IMByurIOzuYH",
+	"mg8CKntn1PgZw5qLt1NmCDHujoGUxtIlFwrPCCVqtSdNxnvviJrhlVtDRiv+Rh5D4D3e25iyoV+hKHS5",
+	"3q11fgJKOVpyQfP/2NmpOCZ4OTOIRTBnsnuVsc4Q29LG3oCCRCV3LN1+Kz6r1ZTlHKS7lzS7G8nLsPB0",
+	"fEKfJMxrajTTtqV1PKNYLGDKtCClRWsTSy6QrZglUTW2NrcsgKEVr1HO2QuFGEBuI05NqelNaW1qfPD1",
+	"HmLERwixNyex4XLnyN7Hvo6617070FV7c9qzLGoMYnf6Z5m+SdENVxp1bs461FjthiCrBVGrKw3fMVXw",
+	"pbR9OjPBm9npgGaG11/ajCTYZkBr2xX5GYxxL2GmzYrtBuJXboa2NmXmnPvJCFe7OUDdS8LBuEOTSBmn",
+	"RdH55YUxjVlNqJlEyHhZ1oyoFcqFSeYqipVJrkyQtDJpyE3SxAWF5Cx5pdHxChiuSHKW/G38cvxK+w+s",
+	"CsPIifs29oMbC1DRqSk4Mwa2AAYCKy5cz1sijG5LXH22NnFjKsA5zuBxfYvI3AZHIpEEhRSfstv+sMjt",
+	"eDxGkqOLFyX6tZYK1VIfuaJY+wwfvxhf2vigLctsvsiTs+QdqKsKsqQ3W/ndy5e9ERUNaGJg7pggiY1D",
+	"BSqYnH2+SRNZlyXWlqkJMGz5UAHTYvvb+KXr4Lkz6pT1f68+/DL2yn722XbYbzTYyf2rieshyY3M9zhC",
+	"F+zbuFktBDBFV0grqHYEGbaTDk1jqsuxYAx0A9dilt2sm0TGSNdp8v3LV7u3dmaQzKbvd29qJvmMZOa4",
+	"pmr3ptg84nrdCqBhua7rKqyyIjITZa4KTs94N4QfPglYbT5R8GqgN2+frJ8ivu4k7rOWYM+MJhLofIKb",
+	"keqKx/o5nyrKzUAfsisbuR4ozfb5xhME2gLZINPYhOa/j8Aeu8+Y1oHwNvrDoeCc193T9zVCC99qbSjL",
+	"2yX9pvPNEz1oK/VnIs1uGNwi21oVG+X3EZQgcA8IN0VbYHXayfohDDlum0yyrioulM435rBEU7bEK9MZ",
+	"Cy02taW3JDp9R34Mxywzc0mm5vTTrWN0XRA5Zb7PhhRQquFnlABTrqbV4FGGK1ulEp3wCEDA8IxCHstJ",
+	"Bq8NjlKSPhAj7j02BlP7X1HgWrwdYU/MU77JY/dF33qSBS+/4p74iiyY6f2YCzV4IFKZ4Vs3gGfKd2ym",
+	"lUyf2rzlc3IdR3kff3l2qKV3X0f6u53D3PtGYtbHqsTzC9h7K5AX6kSSBbNp+jdSGD8heGURHynp5qnh",
+	"n8LdIdy62izcj7AgUoFA2IxXnEaodfUHEeof2H/7FscESwm23xwN3m+4Dq2uMMoEmOYTpshuMwUvy5Hs",
+	"2OjGhMxH4vf4Ds49gD8N8CjxPgb9rM8364OkPUjBt3hfhYVtR3jhBaJ3PxLQ98mbBa9z4EDuT0/G/9Sb",
+	"r+QWSnwHm7Wi8QqNUgjjyK3I0Wxlu4X2VZV27K3n2O4V3jTrhm7hyBdokbfYz9CbH2fuWopRY4/6+oit",
+	"d8RaCa65ocXrRGMFHAg3Uh95WI4xHQl/+2p851PHP3Dg9lNY+0vUtE5QZc7qh7i0+C7eDs0weIT8u0gm",
+	"8gj6uTtYL7BWhO6Oc4fAaOxVb19e4VPkgbx6hl3wJeKMaruVNVXmAQP4+SRzZeOfB5mLsd9qMLfL/meH",
+	"/GX0Qb/P4JVhne4mx1/aS0DuhjBGh/u056PvduZufZxChgx+7pro9e7GjdREQrr/eRYdroPRMT9C3rRb",
+	"w3mdqEa63285Ij3rAlg/QWjdHzJ4fu3zVl5dxzF5DH6tarvf3zLB4X/FiyhpByJSZA+e2kELotASyynz",
+	"P1iBJVoC1UVf4Jy2DXxE0oDgdx0OjS7hj2s9xZI17udqyN0r6B2/WbFNNMmhSjZpZnf3cBybnoT0Uo3g",
+	"562erAwH+pgQ91EeJvIjMs/Pv1iZOsH74ZENzuS6gGbq0I1bNiNjWrHMvblRO9K+wBVAAUuwMy1IO5PW",
+	"g9hBRgGVAAlMYRXMM74jyoy/EDNdWWwYAvk/R/LvPgci+VwtsWgZZCHGpj/69Vwz0mTLOWkkFcveNP9/",
+	"ur6+RM2sjZ+AJhLlPKtLYMr9vskMzPRNqRMwyBG3pn87wRW5RVNWYXcnhllTw0nEayVJ7kRHJJppwZml",
+	"ZtJ7Zt5TP5DmhzmmbC4Mi3NE5u2NHZFI1IzpmpBoRmCWY8oZoJLnYAVpnpknmpokKGGH00dsNKslMVOj",
+	"lC9IhqSq5/Nxmwoapg4zy/PuvaJ/9CjH3WQ2svOTBOH7V53l/q5zuOWyU1aFm5q8f7jpRy7qMkzqOz9C",
+	"GUUTOnLcTBsFztVjNTa9vln/KwAA//9OY8uNoFQAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

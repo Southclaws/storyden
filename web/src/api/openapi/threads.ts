@@ -92,15 +92,15 @@ created as well as a list of the posts within the thread.
 
  * @summary Get information about a thread and the posts within the thread.
  */
-export const threadsGet = (threadId: string) => {
+export const threadsGet = (threadMark: string) => {
   return fetcher<ThreadsGetResponse>({
-    url: `/v1/threads/${threadId}`,
+    url: `/v1/threads/${threadMark}`,
     method: "get",
   });
 };
 
-export const getThreadsGetKey = (threadId: string) => [
-  `/v1/threads/${threadId}`,
+export const getThreadsGetKey = (threadMark: string) => [
+  `/v1/threads/${threadMark}`,
 ];
 
 export type ThreadsGetQueryResult = NonNullable<
@@ -114,7 +114,7 @@ export type ThreadsGetQueryError =
 export const useThreadsGet = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
-  threadId: string,
+  threadMark: string,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof threadsGet>>, TError> & {
       swrKey?: Key;
@@ -124,11 +124,11 @@ export const useThreadsGet = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false && !!threadId;
+  const isEnabled = swrOptions?.enabled !== false && !!threadMark;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getThreadsGetKey(threadId) : null));
-  const swrFn = () => threadsGet(threadId);
+    (() => (isEnabled ? getThreadsGetKey(threadMark) : null));
+  const swrFn = () => threadsGet(threadMark);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

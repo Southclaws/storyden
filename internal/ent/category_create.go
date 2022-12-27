@@ -382,7 +382,6 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (cc *CategoryCreate) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertOne {
 	cc.conflict = opts
 	return &CategoryUpsertOne{
@@ -396,7 +395,6 @@ func (cc *CategoryCreate) OnConflict(opts ...sql.ConflictOption) *CategoryUpsert
 //	client.Category.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (cc *CategoryCreate) OnConflictColumns(columns ...string) *CategoryUpsertOne {
 	cc.conflict = append(cc.conflict, sql.ConflictColumns(columns...))
 	return &CategoryUpsertOne{
@@ -506,7 +504,6 @@ func (u *CategoryUpsert) UpdateAdmin() *CategoryUpsert {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *CategoryUpsertOne) UpdateNewValues() *CategoryUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -523,10 +520,9 @@ func (u *CategoryUpsertOne) UpdateNewValues() *CategoryUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//  client.Category.Create().
-//      OnConflict(sql.ResolveWithIgnore()).
-//      Exec(ctx)
-//
+//	client.Category.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
 func (u *CategoryUpsertOne) Ignore() *CategoryUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
@@ -774,7 +770,6 @@ func (ccb *CategoryCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (ccb *CategoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertBulk {
 	ccb.conflict = opts
 	return &CategoryUpsertBulk{
@@ -788,7 +783,6 @@ func (ccb *CategoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *CategoryU
 //	client.Category.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (ccb *CategoryCreateBulk) OnConflictColumns(columns ...string) *CategoryUpsertBulk {
 	ccb.conflict = append(ccb.conflict, sql.ConflictColumns(columns...))
 	return &CategoryUpsertBulk{
@@ -813,7 +807,6 @@ type CategoryUpsertBulk struct {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *CategoryUpsertBulk) UpdateNewValues() *CategoryUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -835,7 +828,6 @@ func (u *CategoryUpsertBulk) UpdateNewValues() *CategoryUpsertBulk {
 //	client.Category.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-//
 func (u *CategoryUpsertBulk) Ignore() *CategoryUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u

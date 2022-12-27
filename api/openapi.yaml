@@ -357,7 +357,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadsList" }
 
-  /v1/threads/{thread_id}:
+  /v1/threads/{thread_mark}:
     get:
       operationId: ThreadsGet
       summary: Get information about a thread and the posts within the thread.
@@ -366,7 +366,7 @@ paths:
         created as well as a list of the posts within the thread.
       security: []
       tags: [threads]
-      parameters: [$ref: "#/components/parameters/ThreadID"]
+      parameters: [$ref: "#/components/parameters/ThreadMark"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -387,12 +387,12 @@ paths:
   #  888
   #
 
-  /v1/threads/{thread_id}/posts:
+  /v1/threads/{thread_mark}/posts:
     post:
       operationId: PostsCreate
       description: Create a new post within a thread.
       tags: [posts]
-      parameters: [$ref: "#/components/parameters/ThreadID"]
+      parameters: [$ref: "#/components/parameters/ThreadMark"]
       requestBody: { $ref: "#/components/requestBodies/PostsCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -432,13 +432,13 @@ components:
       schema:
         type: string
 
-    ThreadID:
-      description: Thread ID
-      name: thread_id
+    ThreadMark:
+      description: Thread unique and permanent identifier.
+      name: thread_mark
       in: path
       required: true
       schema:
-        $ref: "#/components/schemas/Identifier"
+        $ref: "#/components/schemas/ThreadMark"
 
     OAuthProvider:
       description: The identifier for an OAuth2 provider such as "twitter".
@@ -638,6 +638,20 @@ components:
       #   path: github.com/rs/xid
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
+
+    ThreadMark:
+      description: |
+        A thread's ID and optional slug separated by a dash = it's unique mark.
+        This allows endpoints to respond to varying forms of a thread's ID.
+
+        For example, given a thread with the ID `cc5lnd2s1s4652adtu50` and the
+        slug `top-10-movies-thread`, Storyden will understand both the forms:
+        `cc5lnd2s1s4652adtu50-top-10-movies-thread` and `cc5lnd2s1s4652adtu50`
+         as the identifier for that thread.
+      x-go-type: string
+      type: string
+      format: xid-prefixed-kebab-case-string
+      example: "cc5lnd2s1s4652adtu50-top-10-movies-thread"
 
     CommonProperties:
       type: object

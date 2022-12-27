@@ -301,7 +301,6 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (nc *NotificationCreate) OnConflict(opts ...sql.ConflictOption) *NotificationUpsertOne {
 	nc.conflict = opts
 	return &NotificationUpsertOne{
@@ -315,7 +314,6 @@ func (nc *NotificationCreate) OnConflict(opts ...sql.ConflictOption) *Notificati
 //	client.Notification.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (nc *NotificationCreate) OnConflictColumns(columns ...string) *NotificationUpsertOne {
 	nc.conflict = append(nc.conflict, sql.ConflictColumns(columns...))
 	return &NotificationUpsertOne{
@@ -395,7 +393,6 @@ func (u *NotificationUpsert) UpdateRead() *NotificationUpsert {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *NotificationUpsertOne) UpdateNewValues() *NotificationUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -412,10 +409,9 @@ func (u *NotificationUpsertOne) UpdateNewValues() *NotificationUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//  client.Notification.Create().
-//      OnConflict(sql.ResolveWithIgnore()).
-//      Exec(ctx)
-//
+//	client.Notification.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
 func (u *NotificationUpsertOne) Ignore() *NotificationUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
@@ -628,7 +624,6 @@ func (ncb *NotificationCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-//
 func (ncb *NotificationCreateBulk) OnConflict(opts ...sql.ConflictOption) *NotificationUpsertBulk {
 	ncb.conflict = opts
 	return &NotificationUpsertBulk{
@@ -642,7 +637,6 @@ func (ncb *NotificationCreateBulk) OnConflict(opts ...sql.ConflictOption) *Notif
 //	client.Notification.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-//
 func (ncb *NotificationCreateBulk) OnConflictColumns(columns ...string) *NotificationUpsertBulk {
 	ncb.conflict = append(ncb.conflict, sql.ConflictColumns(columns...))
 	return &NotificationUpsertBulk{
@@ -667,7 +661,6 @@ type NotificationUpsertBulk struct {
 //			}),
 //		).
 //		Exec(ctx)
-//
 func (u *NotificationUpsertBulk) UpdateNewValues() *NotificationUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
@@ -689,7 +682,6 @@ func (u *NotificationUpsertBulk) UpdateNewValues() *NotificationUpsertBulk {
 //	client.Notification.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-//
 func (u *NotificationUpsertBulk) Ignore() *NotificationUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u

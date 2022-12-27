@@ -300,7 +300,6 @@ func (cq *CategoryQuery) WithPosts(opts ...func(*PostQuery)) *CategoryQuery {
 //		GroupBy(category.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (cq *CategoryQuery) GroupBy(field string, fields ...string) *CategoryGroupBy {
 	grbuild := &CategoryGroupBy{config: cq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -327,7 +326,6 @@ func (cq *CategoryQuery) GroupBy(field string, fields ...string) *CategoryGroupB
 //	client.Category.Query().
 //		Select(category.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (cq *CategoryQuery) Select(fields ...string) *CategorySelect {
 	cq.fields = append(cq.fields, fields...)
 	selbuild := &CategorySelect{CategoryQuery: cq}

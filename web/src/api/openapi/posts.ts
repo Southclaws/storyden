@@ -12,11 +12,11 @@ import { fetcher } from "../client";
  * Create a new post within a thread.
  */
 export const postsCreate = (
-  threadId: string,
+  threadMark: string,
   postsCreateBody: PostsCreateBody
 ) => {
   return fetcher<PostsCreateSuccessResponse>({
-    url: `/v1/threads/${threadId}/posts`,
+    url: `/v1/threads/${threadMark}/posts`,
     method: "post",
     headers: { "Content-Type": "application/json" },
     data: postsCreateBody,

@@ -549,7 +549,6 @@ func (pq *PostQuery) WithReacts(opts ...func(*ReactQuery)) *PostQuery {
 //		GroupBy(post.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (pq *PostQuery) GroupBy(field string, fields ...string) *PostGroupBy {
 	grbuild := &PostGroupBy{config: pq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -576,7 +575,6 @@ func (pq *PostQuery) GroupBy(field string, fields ...string) *PostGroupBy {
 //	client.Post.Query().
 //		Select(post.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (pq *PostQuery) Select(fields ...string) *PostSelect {
 	pq.fields = append(pq.fields, fields...)
 	selbuild := &PostSelect{PostQuery: pq}

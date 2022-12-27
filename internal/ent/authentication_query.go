@@ -300,7 +300,6 @@ func (aq *AuthenticationQuery) WithAccount(opts ...func(*AccountQuery)) *Authent
 //		GroupBy(authentication.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (aq *AuthenticationQuery) GroupBy(field string, fields ...string) *AuthenticationGroupBy {
 	grbuild := &AuthenticationGroupBy{config: aq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -327,7 +326,6 @@ func (aq *AuthenticationQuery) GroupBy(field string, fields ...string) *Authenti
 //	client.Authentication.Query().
 //		Select(authentication.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (aq *AuthenticationQuery) Select(fields ...string) *AuthenticationSelect {
 	aq.fields = append(aq.fields, fields...)
 	selbuild := &AuthenticationSelect{AuthenticationQuery: aq}

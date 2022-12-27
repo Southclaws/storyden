@@ -480,7 +480,6 @@ func (aq *AccountQuery) WithTags(opts ...func(*TagQuery)) *AccountQuery {
 //		GroupBy(account.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy {
 	grbuild := &AccountGroupBy{config: aq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -507,7 +506,6 @@ func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy 
 //	client.Account.Query().
 //		Select(account.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (aq *AccountQuery) Select(fields ...string) *AccountSelect {
 	aq.fields = append(aq.fields, fields...)
 	selbuild := &AccountSelect{AccountQuery: aq}

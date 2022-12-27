@@ -95,7 +95,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 }
 
 func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
-	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadId.XID()))
+	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadMark.XID()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

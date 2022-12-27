@@ -300,7 +300,6 @@ func (nq *NotificationQuery) WithSubscription(opts ...func(*SubscriptionQuery)) 
 //		GroupBy(notification.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (nq *NotificationQuery) GroupBy(field string, fields ...string) *NotificationGroupBy {
 	grbuild := &NotificationGroupBy{config: nq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -327,7 +326,6 @@ func (nq *NotificationQuery) GroupBy(field string, fields ...string) *Notificati
 //	client.Notification.Query().
 //		Select(notification.FieldCreatedAt).
 //		Scan(ctx, &v)
-//
 func (nq *NotificationQuery) Select(fields ...string) *NotificationSelect {
 	nq.fields = append(nq.fields, fields...)
 	selbuild := &NotificationSelect{NotificationQuery: nq}
