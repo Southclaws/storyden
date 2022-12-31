@@ -1,23 +1,23 @@
-import { Box, HStack } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Profile } from "../Profile/Profile";
 import { SearchBar } from "../SearchBar/SearchBar";
 import { StorydenLogo } from "../StorydenLogo";
 
 export function Navigation() {
   return (
-    <HStack
-      width="full"
-      padding="1em"
-      justifyContent="center"
-      bgColor="#E5E5E5"
-    >
-      <HStack width="full" maxW="container.lg" justifyContent="space-around">
+    <Flex py="1em" width="full" justifyContent="center" bgColor="#E5E5E5">
+      <Flex
+        width="full"
+        px={2}
+        maxW="container.lg"
+        justifyContent="space-around"
+      >
         <StorydenLogo />
 
         <SearchBar />
 
         <Profile />
-      </HStack>
-    </HStack>
+      </Flex>
+    </Flex>
   );
 }
