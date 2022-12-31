@@ -1,21 +1,29 @@
-import { Heading, ListItem, OrderedList, VStack } from "@chakra-ui/react";
-import { Thread } from "src/api/openapi/schemas";
+import { Box, Heading, ListItem, OrderedList, VStack } from "@chakra-ui/react";
+import { Post, Thread } from "src/api/openapi/schemas";
 import { CategoryPill } from "src/components/CategoryPill";
-import { Post } from "./Post";
+import { PostView } from "./Post";
 
-export function Thread(props: Thread) {
+export function PostListView(props: { posts: Post[] }) {
   return (
-    <VStack alignItems="start" px={3}>
-      <Heading>{props.title}</Heading>
-      <CategoryPill category={props.category} />
+    <OrderedList gap={2} display="flex" flexDir="column">
+      {props.posts.map((p) => (
+        <ListItem key={p.id} listStyleType="none" m={0}>
+          <PostView {...p} />
+        </ListItem>
+      ))}
+    </OrderedList>
+  );
+}
 
-      <OrderedList gap={2} display="flex" flexDir="column">
-        {props.posts.map((p) => (
-          <ListItem key={p.id} listStyleType="none" m={0}>
-            <Post {...p} />
-          </ListItem>
-        ))}
-      </OrderedList>
-    </VStack>
+export function ThreadView(props: Thread) {
+  return (
+    <Box as="main">
+      <VStack alignItems="start" px={3}>
+        <Heading>{props.title}</Heading>
+        <CategoryPill category={props.category} />
+
+        <PostListView {...props} />
+      </VStack>
+    </Box>
   );
 }
