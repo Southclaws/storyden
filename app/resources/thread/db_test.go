@@ -27,7 +27,7 @@ func TestCreate(t *testing.T) {
 			p, err := repo.Create(ctx,
 				"A Super Nice Thread",
 				"Lorem ipsum",
-				seed.Account_002.ID,
+				seed.Account_002_Frigg.ID,
 				seed.Category_01_General.ID,
 				[]string{})
 			r.NoError(err)
@@ -61,11 +61,11 @@ func TestList(t *testing.T) {
 
 			a.Len(threads, 2)
 
-			threads, err = repo.List(ctx, time.Now(), 10, thread.WithAuthor(seed.Account_000.ID))
+			threads, err = repo.List(ctx, time.Now(), 10, thread.WithAuthor(seed.Account_001_Odin.ID))
 			r.NoError(err)
 			r.NotNil(threads)
 
-			a.Len(threads, 1)
+			a.Len(threads, 2)
 		}),
 	)
 }
@@ -80,7 +80,7 @@ func TestGet(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			threads, err := repo.Get(ctx, seed.Post_01.ID)
+			threads, err := repo.Get(ctx, seed.Post_01_Welcome.ID)
 			r.NoError(err)
 			r.NotNil(threads)
 
@@ -94,15 +94,15 @@ func TestGet(t *testing.T) {
 
 			p0 := threads.Posts[0]
 			a.Equal("", p0.Body)
-			a.Equal(seed.Account_000.ID, p0.Author.ID)
+			a.Equal(seed.Account_001_Odin.ID, p0.Author.ID)
 
 			p1 := threads.Posts[1]
 			a.Equal("First reply", p1.Body)
-			a.Equal(seed.Account_003.ID, p1.Author.ID)
+			a.Equal(seed.Account_003_Baldur.ID, p1.Author.ID)
 
 			p2 := threads.Posts[2]
 			a.Equal("Second reply", p2.Body)
-			a.Equal(seed.Account_004.ID, p2.Author.ID)
+			a.Equal(seed.Account_004_Loki.ID, p2.Author.ID)
 		}),
 	)
 }
