@@ -26,8 +26,8 @@ func TestCreate(t *testing.T) {
 
 			p, err := repo.Create(ctx,
 				"My cool post in reply to your thread",
-				seed.Account_002.ID,
-				seed.Post_01.ID,
+				seed.Account_002_Frigg.ID,
+				seed.Post_01_Welcome.ID,
 				nil, nil)
 			r.NoError(err)
 			r.NotNil(p)

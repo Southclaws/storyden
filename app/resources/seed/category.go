@@ -19,8 +19,8 @@ var (
 
 	Category_02_Photos = category.Category{
 		ID:          category.CategoryID(id("00000000000000000020")),
-		Name:        "Media",
-		Description: "Movies and tv shows",
+		Name:        "Photos",
+		Description: "Share your photos with the community",
 		Colour:      "#ffffff",
 		Sort:        1,
 	}
@@ -36,7 +36,7 @@ var (
 	Category_04_Music = category.Category{
 		ID:          category.CategoryID(id("00000000000000000040")),
 		Name:        "Music",
-		Description: "Music discussion",
+		Description: "Music, playlists and events",
 		Colour:      "#ffffff",
 		Sort:        3,
 	}
@@ -49,18 +49,20 @@ var (
 		Sort:        4,
 		Admin:       true,
 	}
-)
 
-func categories(r category.Repository) {
-	ctx := context.Background()
-
-	for _, c := range []category.Category{
+	Categories = []category.Category{
 		Category_01_General,
 		Category_02_Photos,
 		Category_03_Movies,
 		Category_04_Music,
 		Category_05_Admin,
-	} {
+	}
+)
+
+func categories(r category.Repository) {
+	ctx := context.Background()
+
+	for _, c := range Categories {
 		utils.Must(r.CreateCategory(ctx, c.Name, c.Description, c.Colour, c.Sort, c.Admin, category.WithID(c.ID)))
 	}
 

@@ -43,11 +43,11 @@ func TestGetByID(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		acc, err := repo.GetByID(ctx, seed.Account_000.ID)
+		acc, err := repo.GetByID(ctx, seed.Account_001_Odin.ID)
 		r.NoError(err)
 		r.NotNil(acc)
 
-		a.Equal(seed.Account_000.Name, acc.Name)
+		a.Equal(seed.Account_001_Odin.Name, acc.Name)
 	}))
 }
 
@@ -67,7 +67,7 @@ func TestGetAll(t *testing.T) {
 
 			handles := lo.Map(u, func(t *account.Account, i int) string { return t.Handle })
 
-			a.Contains(handles, seed.Account_000.Handle)
-			a.Contains(handles, seed.Account_001.Handle)
+			a.Contains(handles, seed.Account_001_Odin.Handle)
+			a.Contains(handles, seed.Account_002_Frigg.Handle)
 		}))
 }
