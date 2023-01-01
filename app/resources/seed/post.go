@@ -2,11 +2,10 @@ package seed
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 var (
@@ -164,35 +163,37 @@ If I've missed anything, post in this thread and I'll add it here 😃
 func threads(tr thread.Repository, pr post.Repository) {
 	ctx := context.Background()
 
-	for ti, t := range Threads {
+	for _, t := range Threads {
 		first := t.Posts[0]
 
-		th := utils.Must(tr.Create(ctx,
+		th, err := tr.Create(ctx,
 			t.Title,
 			first.Body,
 			t.Author.ID,
 			t.Category.ID,
 			t.Tags,
-			thread.WithID(t.ID)),
-		)
-
-		th.Posts = make([]*post.Post, len(t.Posts))
-
-		for pi, p := range t.Posts[1:] {
-			p = utils.Must(pr.Create(ctx, p.Body, p.Author.ID, th.ID, nil, nil))
-
-			// See comment below.
-			th.Posts[pi] = p
+			thread.WithID(t.ID))
+		if err != nil {
+			if ent.IsConstraintError(err) {
+				continue
+			}
+			panic(err)
 		}
 
-		// Re-assign computed values.
-		//
-		// because the Create methods here do some extra work to compute fields
-		// such as the post slug and the short summary of the body, we simply
-		// re-assign the result back into the seed data's global variable so
-		// that it's available in tests and we don't need to manually write it.
-		Threads[ti] = *th
+		for _, p := range t.Posts[1:] {
+			_, err = pr.Create(ctx,
+				p.Body,
+				p.Author.ID,
+				th.ID,
+				nil,
+				nil,
+				post.WithID(p.ID))
+			if err != nil {
+				if ent.IsConstraintError(err) {
+					continue
+				}
+				panic(err)
+			}
+		}
 	}
-
-	fmt.Println("created seed threads")
 }
