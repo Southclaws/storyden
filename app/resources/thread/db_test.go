@@ -84,25 +84,25 @@ func TestGet(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(threads)
 
-			a.Equal("Hello world!", threads.Title)
-			a.Contains(threads.Slug, "hello-world")
+			a.Equal("Welcome to Storyden!", threads.Title)
+			a.Equal("00000000000000000010-welcome-to-storyden", threads.Slug)
 			a.Equal(false, threads.Pinned)
 			a.False(threads.DeletedAt.IsPresent())
 			a.Equal(seed.Category_01_General.ID, threads.Category.ID)
 
-			r.Len(threads.Posts, 3)
+			r.Len(threads.Posts, 10)
 
 			p0 := threads.Posts[0]
-			a.Equal("", p0.Body)
+			a.Len(p0.Body, 2304)
 			a.Equal(seed.Account_001_Odin.ID, p0.Author.ID)
 
 			p1 := threads.Posts[1]
-			a.Equal("First reply", p1.Body)
-			a.Equal(seed.Account_003_Baldur.ID, p1.Author.ID)
+			a.Equal("first 😁", p1.Body)
+			a.Equal(seed.Account_004_Loki.ID, p1.Author.ID)
 
 			p2 := threads.Posts[2]
-			a.Equal("Second reply", p2.Body)
-			a.Equal(seed.Account_004_Loki.ID, p2.Author.ID)
+			a.Equal("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?", p2.Body)
+			a.Equal(seed.Account_002_Frigg.ID, p2.Author.ID)
 		}),
 	)
 }
