@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/post"
 	"github.com/Southclaws/storyden/app/services/rbac"
 	"github.com/Southclaws/storyden/app/services/thread"
+	"github.com/Southclaws/storyden/app/services/thread_mark"
 )
 
 func Build() fx.Option {
@@ -19,5 +20,6 @@ func Build() fx.Option {
 		thread.Build(),
 		post.Build(),
 		avatar.Build(),
+		thread_mark.Build(),
 	)
 }

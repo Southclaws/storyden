@@ -12,23 +12,25 @@ import (
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
+	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Threads struct {
-	thread_svc   thread_service.Service
-	account_repo account_resource.Repository
+	thread_svc      thread_service.Service
+	thread_mark_svc thread_mark.Service
+	account_repo    account_resource.Repository
 }
 
 func NewThreads(
 	thread_svc thread_service.Service,
+	thread_mark_svc thread_mark.Service,
 	account_repo account_resource.Repository,
 ) Threads {
-	return Threads{thread_svc, account_repo}
+	return Threads{thread_svc, thread_mark_svc, account_repo}
 }
 
 func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
@@ -95,7 +97,12 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 }
 
 func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
-	thread, err := i.thread_svc.Get(ctx, post.PostID(request.ThreadMark.XID()))
+	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	thread, err := i.thread_svc.Get(ctx, postID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

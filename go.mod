@@ -39,6 +39,7 @@ require github.com/Southclaws/fault v0.5.0
 require github.com/Southclaws/opt v0.0.0-20221012140115-c9ebd71d26d4
 
 require (
+	github.com/dboslee/lru v0.0.1 // indirect
 	github.com/go-webauthn/revoke v0.1.6 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
