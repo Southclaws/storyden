@@ -10,17 +10,26 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	post_service "github.com/Southclaws/storyden/app/services/post"
+	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Posts struct {
-	post_svc post_service.Service
+	post_svc        post_service.Service
+	thread_mark_svc thread_mark.Service
 }
 
-func NewPosts(post_svc post_service.Service) Posts { return Posts{post_svc} }
+func NewPosts(post_svc post_service.Service, thread_mark_svc thread_mark.Service) Posts {
+	return Posts{post_svc, thread_mark_svc}
+}
 
 func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequestObject) (openapi.PostsCreateResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	postID, err := p.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -47,7 +56,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 	post, err := p.post_svc.Create(ctx,
 		params.Body,
 		accountID,
-		post.PostID(request.ThreadMark.XID()),
+		postID,
 		reply,
 		meta,
 	)
