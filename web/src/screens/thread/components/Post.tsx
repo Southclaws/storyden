@@ -45,7 +45,7 @@ const components: Partial<
 
   // Typography
   p: (props) => (
-    <Text overflowWrap="anywhere" wordBreak="break-all" overflowX="clip">
+    <Text overflowWrap="break-word" wordBreak="break-word" overflowX="clip">
       {props.children}
     </Text>
   ),
