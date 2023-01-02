@@ -59,7 +59,7 @@ func TestList(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(threads)
 
-			a.Len(threads, 2)
+			a.Len(threads, 3)
 
 			threads, err = repo.List(ctx, time.Now(), 10, thread.WithAuthor(seed.Account_001_Odin.ID))
 			r.NoError(err)
