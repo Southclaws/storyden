@@ -5,7 +5,7 @@ import { PostView } from "./Post";
 
 export function PostListView(props: { posts: Post[] }) {
   return (
-    <OrderedList gap={2} display="flex" flexDir="column">
+    <OrderedList gap={2} display="flex" flexDir="column" width="full">
       {props.posts.map((p) => (
         <ListItem key={p.id} listStyleType="none" m={0}>
           <PostView {...p} />
