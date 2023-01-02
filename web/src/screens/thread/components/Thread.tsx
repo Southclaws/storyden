@@ -17,7 +17,7 @@ export function PostListView(props: { posts: Post[] }) {
 
 export function ThreadView(props: Thread) {
   return (
-    <VStack alignItems="start" px={3}>
+    <VStack alignItems="start">
       <Heading>{props.title}</Heading>
       <CategoryPill category={props.category} />
 
