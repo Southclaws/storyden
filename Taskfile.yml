@@ -66,9 +66,9 @@ tasks:
   # Database
   # -
 
-  db:migrate:
+  seed:
     cmds:
-      - go run ./tools/migrate {{.CLI_ARGS}}
+      - go run ./cmd/seed
 
   db:ui:
     cmds:
