@@ -42,6 +42,7 @@ require (
 	github.com/go-webauthn/revoke v0.1.6 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 )

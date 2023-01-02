@@ -2,10 +2,13 @@ package seed
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 )
 
 var (
@@ -140,7 +143,7 @@ If I've missed anything, post in this thread and I'll add it here 😃
 `,
 			},
 			{
-				ID:         post.PostID(id("00000000000000002020")),
+				ID:         post.PostID(id("00000000000000001020")),
 				Body:       "Is there a wiki?",
 				RootPostID: post.PostID(id("00000000000000000020")),
 				Author:     post.Author{ID: Account_006_Freyja.ID},
@@ -154,9 +157,42 @@ If I've missed anything, post in this thread and I'll add it here 😃
 		},
 	}
 
+	Post_03_LoremIpsum = thread.Thread{
+		ID:       post.PostID(id("00000000000000000030")),
+		Title:    "The lorem ipsum thread",
+		Author:   post.Author{ID: Account_005_Þórr.ID},
+		Category: Category_01_General,
+		Posts: []*post.Post{
+			{
+				Body: `In this thread:
+
+Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
+			},
+			{
+				ID:         post.PostID(id("00000000000000001030")),
+				Body:       "ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01,
+				RootPostID: post.PostID(id("00000000000000000030")),
+				Author:     post.Author{ID: Account_006_Freyja.ID},
+			},
+			{
+				ID:         post.PostID(id("00000000000000002030")),
+				Body:       "That's pretty useful, here's mine:\n\n" + markdownTest02,
+				RootPostID: post.PostID(id("00000000000000000030")),
+				Author:     post.Author{ID: Account_007_Freyr.ID},
+			},
+			{
+				ID:         post.PostID(id("00000000000000003030")),
+				Body:       "nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"),
+				RootPostID: post.PostID(id("00000000000000000030")),
+				Author:     post.Author{ID: Account_004_Loki.ID},
+			},
+		},
+	}
+
 	Threads = []thread.Thread{
 		Post_01_Welcome,
 		Post_02_HowToContribute,
+		Post_03_LoremIpsum,
 	}
 )
 
@@ -196,4 +232,6 @@ func threads(tr thread.Repository, pr post.Repository) {
 			}
 		}
 	}
+
+	fmt.Println("created seed threads and posts")
 }
