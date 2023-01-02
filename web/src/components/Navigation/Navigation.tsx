@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { Profile } from "../Profile/Profile";
 import { SearchBar } from "../SearchBar/SearchBar";
-import { StorydenLogo } from "../StorydenLogo";
+import { HomeLink } from "./HomeLink";
 
 export function Navigation() {
   return (
@@ -12,7 +12,7 @@ export function Navigation() {
         maxW="container.lg"
         justifyContent="space-around"
       >
-        <StorydenLogo />
+        <HomeLink />
 
         <SearchBar />
 
