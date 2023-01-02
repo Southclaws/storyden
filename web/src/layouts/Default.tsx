@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 export function Default(props: PropsWithChildren) {
   return (
     <Flex width="full" justifyContent="center">
-      <Box as="main" width="full" maxW="container.lg" px={2}>
+      <Box as="main" width="full" maxW="container.lg" px={4}>
         {props.children}
       </Box>
     </Flex>
