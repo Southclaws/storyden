@@ -1,6 +1,7 @@
 package post
 
 import (
+	"fmt"
 	"time"
 
 	"4d63.com/optional"
@@ -42,6 +43,10 @@ type Author struct {
 	Handle    string
 	Admin     bool      `json:"admin"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+func (p Post) String() string {
+	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, MakeShortBody(p.Body))
 }
 
 func replyTo(m *ent.Post) optional.Optional[PostID] {

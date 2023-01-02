@@ -30,6 +30,7 @@ func (d *database) Create(
 	parentID PostID,
 	replyToID optional.Optional[PostID],
 	meta map[string]any,
+	opts ...Option,
 ) (*Post, error) {
 	short := MakeShortBody(body)
 
@@ -53,6 +54,10 @@ func (d *database) Create(
 		SetFirst(false).
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))
+
+	for _, fn := range opts {
+		fn(q.Mutation())
+	}
 
 	replyToID.If(func(value PostID) {
 		q.SetReplyToID(xid.ID(value))

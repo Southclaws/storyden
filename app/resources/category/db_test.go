@@ -72,7 +72,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(xid.ID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002_Frigg.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -82,7 +82,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(xid.ID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002_Frigg.ID)).
 				SetCategory(c1).
 				Save(ctx)
 			r.NoError(err)
@@ -92,7 +92,7 @@ func TestGetCategories(t *testing.T) {
 				SetFirst(true).
 				SetCreatedAt(time.Now()).
 				SetUpdatedAt(time.Now()).
-				SetAuthorID(xid.ID(seed.Account_002.ID)).
+				SetAuthorID(xid.ID(seed.Account_002_Frigg.ID)).
 				SetCategory(c2).
 				Save(ctx)
 			r.NoError(err)
