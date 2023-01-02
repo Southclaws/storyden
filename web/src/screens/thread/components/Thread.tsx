@@ -17,13 +17,11 @@ export function PostListView(props: { posts: Post[] }) {
 
 export function ThreadView(props: Thread) {
   return (
-    <Box as="main">
-      <VStack alignItems="start" px={3}>
-        <Heading>{props.title}</Heading>
-        <CategoryPill category={props.category} />
+    <VStack alignItems="start" px={3}>
+      <Heading>{props.title}</Heading>
+      <CategoryPill category={props.category} />
 
-        <PostListView {...props} />
-      </VStack>
-    </Box>
+      <PostListView {...props} />
+    </VStack>
   );
 }
