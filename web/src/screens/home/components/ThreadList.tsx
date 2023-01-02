@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { ThreadListItem } from "./ThreadListItem";
 
@@ -9,5 +8,5 @@ export function ThreadList(props: Props) {
     <ThreadListItem key={t.id} thread={t} />
   ));
 
-  return <Box>{children}</Box>;
+  return <>{children}</>;
 }
