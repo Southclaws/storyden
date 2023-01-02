@@ -22,7 +22,7 @@ func TestThreadCreate(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		t, err := thread_svc.Create(ctx, "New thread", "hi there", seed.Account_002.ID, seed.Category_01_General.ID, []string{"hello"}, nil)
+		t, err := thread_svc.Create(ctx, "New thread", "hi there", seed.Account_002_Frigg.ID, seed.Category_01_General.ID, []string{"hello"}, nil)
 		r.NoError(err)
 		r.NotNil(t)
 
@@ -31,7 +31,7 @@ func TestThreadCreate(t *testing.T) {
 		a.Contains(t.Slug, "new-thread")
 		a.Equal("hi there", t.Short)
 		a.Equal(false, t.Pinned)
-		a.Equal(seed.Account_002.Name, t.Author.Name)
+		a.Equal(seed.Account_002_Frigg.Name, t.Author.Name)
 		// a.Equal([]string{"hello"}, t.Tags) // TODO: upsert tags in resource
 		a.Equal(seed.Category_01_General.Name, t.Category.Name)
 		a.Len(t.Posts, 1)
