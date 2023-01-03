@@ -1,6 +1,6 @@
 import { Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react";
-import { formatDistanceToNow } from "date-fns";
 import { ThreadReference } from "src/api/openapi/schemas";
+import { Byline } from "src/screens/thread/components/Byline";
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
   return (
@@ -19,13 +19,10 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
       </LinkBox>
 
       <Flex justifyContent="space-between">
-        <Flex gap={2}>
-          <Text>{props.thread.author.handle ?? "Unknown"}</Text>
-          <Text>•</Text>
-          <Text>
-            {formatDistanceToNow(new Date(props.thread.createdAt))} ago
-          </Text>
-        </Flex>
+        <Byline
+          author={props.thread.author.handle}
+          time={new Date(props.thread.createdAt)}
+        />
 
         {/* Tags list */}
       </Flex>
