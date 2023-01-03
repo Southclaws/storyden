@@ -11,6 +11,7 @@ export function Navigation() {
         px={2}
         maxW="container.lg"
         justifyContent="space-around"
+        alignItems="center"
       >
         <HomeLink />
 
