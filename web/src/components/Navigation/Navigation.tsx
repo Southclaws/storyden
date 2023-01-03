@@ -5,7 +5,7 @@ import { HomeLink } from "./HomeLink";
 
 export function Navigation() {
   return (
-    <Flex py="1em" width="full" justifyContent="center" bgColor="#E5E5E5">
+    <Flex py="1em" width="full" justifyContent="center" bgColor="teal.200">
       <Flex
         width="full"
         px={2}
