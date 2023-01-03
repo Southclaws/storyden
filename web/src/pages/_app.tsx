@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { ReactElement, ReactNode } from "react";
 import { Navigation } from "src/components/Navigation/Navigation";
 import { Default } from "src/layouts/Default";
+import { extended } from "src/theme";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -18,7 +19,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout || ((page) => <Default> {page}</Default>);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={extended}>
       <VStack>
         <Navigation />
 

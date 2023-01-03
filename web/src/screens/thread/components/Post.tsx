@@ -18,27 +18,27 @@ const components: Partial<
   Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
 > = {
   h1: (props) => (
-    <Heading as="h1" size="2xl">
+    <Heading as="h1" variant="h1">
       {props.children}
     </Heading>
   ),
   h2: (props) => (
-    <Heading as="h2" size="xl">
+    <Heading as="h2" variant="h2">
       {props.children}
     </Heading>
   ),
   h3: (props) => (
-    <Heading as="h3" size="lg">
+    <Heading as="h3" variant="h3">
       {props.children}
     </Heading>
   ),
   h4: (props) => (
-    <Heading as="h4" size="md">
+    <Heading as="h4" variant="h4">
       {props.children}
     </Heading>
   ),
   h5: (props) => (
-    <Heading as="h5" size="sm">
+    <Heading as="h5" variant="h5">
       {props.children}
     </Heading>
   ),
