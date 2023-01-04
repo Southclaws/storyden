@@ -10,11 +10,12 @@ export function Default(props: PropsWithChildren) {
       height="full"
       minHeight="100vh"
       justifyContent="start"
+      alignItems="center"
       flexDirection="column"
     >
       <Navigation />
 
-      <Box as="main" width="full" height="full" maxW="container.lg" px={4}>
+      <Box as="main" width="full" height="full" maxW="container.md" px={4}>
         {props.children}
       </Box>
 

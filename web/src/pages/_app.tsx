@@ -15,7 +15,7 @@ type AppPropsWithLayout = AppProps & {
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const withLayout =
-    Component.getLayout || ((page) => <Default> {page}</Default>);
+    Component.getLayout || ((page) => <Default>{page}</Default>);
 
   return (
     <ChakraProvider theme={extended}>
