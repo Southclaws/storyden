@@ -1,8 +1,13 @@
-import { NextPage } from "next";
+import { ReactElement } from "react";
+import { Fullpage } from "src/layouts/Fullpage";
 import { AuthScreen } from "../../screens/auth/AuthScreen";
 
-const Page: NextPage = () => {
+function Page() {
   return <AuthScreen method={null} />;
+}
+
+Page.getLayout = function getLayout(page: ReactElement) {
+  return <Fullpage>{page}</Fullpage>;
 };
 
 export default Page;
