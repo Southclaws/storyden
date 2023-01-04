@@ -15,7 +15,14 @@ export function Default(props: PropsWithChildren) {
     >
       <Navigation />
 
-      <Box as="main" width="full" height="full" maxW="container.md" px={4}>
+      <Box
+        as="main"
+        flexGrow={1}
+        width="full"
+        height="full"
+        maxW="container.md"
+        px={4}
+      >
         {props.children}
       </Box>
 
