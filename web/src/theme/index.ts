@@ -5,7 +5,7 @@ import * as components from "./components";
 const extended = extendTheme({
   config: {
     // TODO: dark mode
-    useSystemColorMode: true,
+    useSystemColorMode: false,
     initialColorMode: "light",
   },
 
