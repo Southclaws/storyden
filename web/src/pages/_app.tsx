@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ChakraProvider theme={extended}>
-      <VStack>{withLayout(<Component {...pageProps} />)}</VStack>
+      <>{withLayout(<Component {...pageProps} />)}</>
     </ChakraProvider>
   );
 }
