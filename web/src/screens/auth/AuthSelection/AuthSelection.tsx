@@ -21,7 +21,7 @@ export function AuthSelection() {
         </Text>
       </Box>
 
-      <List display="flex" flexDir="column" gap={4}>
+      <List display="flex" flexDir="column" gap={4} w="full">
         {data?.map((v: AuthProvider) => (
           <ListItem key={v.provider}>
             <AuthSelectionOption
