@@ -2,12 +2,7 @@ import { Link, VStack, HStack, Text } from "@chakra-ui/react";
 
 export function Footer() {
   return (
-    <VStack
-      bgColor="hsla(0, 0%, 77%, 1)"
-      color="hsla(0, 0%, 19%, 1)"
-      width="full"
-      p={4}
-    >
+    <VStack bgColor="teal.200" color="hsla(0, 0%, 19%, 1)" width="full" p={4}>
       <HStack>
         <Link
           href="https://github.com/Southclaws/storyden"
