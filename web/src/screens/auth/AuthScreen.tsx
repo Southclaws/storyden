@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Input } from "@chakra-ui/react";
 import { AuthMethod } from "./AuthMethod/AuthMethod";
 import { AuthSelection } from "./AuthSelection/AuthSelection";
 import { AuthBox } from "./components/AuthBox";
@@ -18,6 +18,7 @@ export function AuthScreen({ method }: Props) {
       backgroundPosition="center"
       backgroundSize="cover"
       gap={4}
+      padding={8}
     >
       <AuthBox>
         {method === null ? <AuthSelection /> : <AuthMethod method={method} />}

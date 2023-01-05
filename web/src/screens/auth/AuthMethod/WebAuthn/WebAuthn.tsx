@@ -13,7 +13,6 @@ export function WebAuthn() {
             {...register("username")}
             variant="filled"
             placeholder="username"
-            w="10em"
           />
           <Button type="submit" width="full">
             Authenticate
