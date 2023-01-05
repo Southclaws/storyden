@@ -1,3 +1,3 @@
 import { Heading } from "./Heading";
 
-export { Heading };
+export const components = { Heading };
