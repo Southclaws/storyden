@@ -4,7 +4,7 @@ export function Password() {
   return (
     <VStack gap={4}>
       <Heading size="sm">Sign in</Heading>
-      <form>
+      <Box as="form" width="full">
         <VStack>
           <Input variant="filled" placeholder="username" />
           <Input variant="filled" placeholder="password" />
@@ -12,7 +12,7 @@ export function Password() {
             Login
           </Button>
         </VStack>
-      </form>
+      </Box>
     </VStack>
   );
 }

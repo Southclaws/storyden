@@ -1,4 +1,4 @@
-import { Button, Heading, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Input, VStack } from "@chakra-ui/react";
 import { useWebAuthn } from "./useWebAuthn";
 
 export function WebAuthn() {
@@ -7,18 +7,19 @@ export function WebAuthn() {
   return (
     <VStack gap={4}>
       <Heading size="sm">Passkey</Heading>
-      <form onSubmit={onSubmit}>
+      <Box as="form" width="full" onSubmit={onSubmit}>
         <VStack>
           <Input
             {...register("username")}
             variant="filled"
             placeholder="username"
+            width="full"
           />
           <Button type="submit" width="full">
             Authenticate
           </Button>
         </VStack>
-      </form>
+      </Box>
     </VStack>
   );
 }

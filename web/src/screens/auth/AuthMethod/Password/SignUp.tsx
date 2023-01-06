@@ -1,4 +1,11 @@
-import { Button, FormLabel, Heading, Input, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  FormLabel,
+  Heading,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
 import useSignUp from "./useSignUp";
 
 export function SignUp() {
@@ -9,7 +16,7 @@ export function SignUp() {
   return (
     <VStack gap={4}>
       <Heading size="sm">Sign up</Heading>
-      <form onSubmit={onSubmit}>
+      <Box as="form" width="full" onSubmit={onSubmit}>
         <VStack>
           <Input
             {...register("identifier")}
@@ -29,7 +36,7 @@ export function SignUp() {
             Login
           </Button>
         </VStack>
-      </form>
+      </Box>
     </VStack>
   );
 }
