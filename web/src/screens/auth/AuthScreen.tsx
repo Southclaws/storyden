@@ -9,6 +9,7 @@ type Props = {
 export function AuthScreen({ method }: Props) {
   return (
     <Flex
+      id="AuthScreen"
       height="100vh"
       width="full"
       justifyContent="center"
@@ -18,7 +19,7 @@ export function AuthScreen({ method }: Props) {
       backgroundPosition="center"
       backgroundSize="cover"
       gap={4}
-      padding={8}
+      padding={6}
     >
       <AuthBox>
         {method === null ? <AuthSelection /> : <AuthMethod method={method} />}
