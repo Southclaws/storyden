@@ -1,4 +1,5 @@
-import { Flex, Input } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import { StorydenLogo } from "src/components/StorydenLogo";
 import { AuthMethod } from "./AuthMethod/AuthMethod";
 import { AuthSelection } from "./AuthSelection/AuthSelection";
 import { AuthBox } from "./components/AuthBox";
@@ -21,9 +22,20 @@ export function AuthScreen({ method }: Props) {
       gap={4}
       padding={6}
     >
-      <AuthBox>
-        {method === null ? <AuthSelection /> : <AuthMethod method={method} />}
-      </AuthBox>
+      <StorydenLogo height="3em" />
+      {method === null ? ( //
+        <AuthBox bg="linear-gradient(141.91deg, #B7CEF1 0%, #2FD596 99.55%)">
+          <AuthSelection />
+        </AuthBox>
+      ) : (
+        <AuthBox
+          bg="light"
+          boxShadow="0 10px 30px rgba(0, 0, 0, 0.05)"
+          borderRadius="md"
+        >
+          <AuthMethod method={method} />
+        </AuthBox>
+      )}
     </Flex>
   );
 }
