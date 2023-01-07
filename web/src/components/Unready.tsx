@@ -1,5 +1,6 @@
 import { Box, Flex, Spinner } from "@chakra-ui/react";
 import { APIError } from "src/api/openapi/schemas";
+import ErrorBanner from "./ErrorBanner";
 
 export function Unready(props: Partial<APIError>) {
   if (!props.error)
@@ -14,5 +15,5 @@ export function Unready(props: Partial<APIError>) {
       </Flex>
     );
 
-  return <Box>{props.message ?? props.error}</Box>;
+  return <ErrorBanner error={props.error} message={props.message} />;
 }

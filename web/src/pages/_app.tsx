@@ -1,7 +1,8 @@
-import { ChakraProvider, VStack } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { ReactElement, ReactNode } from "react";
+import { AuthProvider } from "src/auth/AuthProvider";
 import { Default } from "src/layouts/Default";
 import { extended } from "src/theme";
 
@@ -19,7 +20,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ChakraProvider theme={extended}>
-      <>{withLayout(<Component {...pageProps} />)}</>
+      <AuthProvider>
+        <>{withLayout(<Component {...pageProps} />)}</>
+      </AuthProvider>
     </ChakraProvider>
   );
 }

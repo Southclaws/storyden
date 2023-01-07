@@ -1,4 +1,5 @@
 import { Account } from "src/api/openapi/schemas";
+import { useSession } from "src/auth";
 
 type UseProfileData =
   | {
@@ -10,9 +11,11 @@ type UseProfileData =
     };
 
 export function useProfile(): UseProfileData {
-  // TODO: useSession and get account.
+  const account = useSession();
+  if (!account) return { authenticated: false };
 
   return {
-    authenticated: false,
+    authenticated: true,
+    account,
   };
 }
