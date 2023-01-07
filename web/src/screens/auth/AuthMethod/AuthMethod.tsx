@@ -1,5 +1,5 @@
 import { Spinner } from "@chakra-ui/react";
-import { SignUp } from "./Password/SignUp";
+import { Password } from "./Password/Password";
 import { WebAuthn } from "./WebAuthn/WebAuthn";
 
 interface Props {
@@ -12,7 +12,7 @@ export function AuthMethod({ method }: Props) {
 
   switch (method) {
     case "password":
-      return <SignUp />;
+      return <Password />;
 
     case "webauthn":
       return <WebAuthn />;
