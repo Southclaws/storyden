@@ -9,6 +9,10 @@ export function AuthSelection() {
 
   if (error) throw error;
 
+  // sort by alphabetical because lazy
+  // TODO: allow the order to be configured by the admin.
+  data?.sort((a, b) => a.provider.localeCompare(b.provider));
+
   return (
     <VStack gap={4}>
       <Box>
