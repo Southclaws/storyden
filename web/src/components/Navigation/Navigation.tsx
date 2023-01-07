@@ -1,4 +1,5 @@
 import { Flex } from "@chakra-ui/react";
+import { useSession } from "src/auth";
 import { Profile } from "../Profile/Profile";
 import { SearchBar } from "../SearchBar/SearchBar";
 import { HomeLink } from "./HomeLink";

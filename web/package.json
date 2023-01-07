@@ -21,6 +21,7 @@
     "framer-motion": "^7.2.1",
     "identicon.js": "^2.3.3",
     "next": "^13.0.6",
+    "nookies": "^2.5.2",
     "polished": "^4.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
