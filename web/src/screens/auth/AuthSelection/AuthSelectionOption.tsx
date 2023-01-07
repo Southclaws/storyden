@@ -10,7 +10,7 @@ interface Props {
 export function AuthSelectionOption({ name, icon, method, link }: Props) {
   return (
     <Button width="full">
-      <Link href={link ?? `/login/${method}`}>
+      <Link href={link ?? `/auth/${method}`}>
         <HStack>
           <Box overflow="clip" height="1rem">
             {icon}

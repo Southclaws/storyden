@@ -14,7 +14,7 @@ export function Profile() {
 
   if (!authenticated) {
     return (
-      <Link href="/login" padding="0.1em" _hover={{ cursor: "pointer" }}>
+      <Link href="/auth" padding="0.1em" _hover={{ cursor: "pointer" }}>
         <UserIcon aria-label="authenticate" width="2em" />
       </Link>
     );
