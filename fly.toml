@@ -6,9 +6,9 @@ kill_timeout = 5
 processes    = []
 
 [env]
-  COOKIE_DOMAIN      = "storyden-demo.vercel.app"
+  COOKIE_DOMAIN      = "demo.storyden.org"
   PUBLIC_API_ADDRESS = "https://storyden.fly.dev"
-  PUBLIC_WEB_ADDRESS = "https://storyden-demo.vercel.app"
+  PUBLIC_WEB_ADDRESS = "https://demo.storyden.org"
 
 [experimental]
   allowed_public_ports = []
