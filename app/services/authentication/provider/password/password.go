@@ -2,8 +2,6 @@ package password
 
 import (
 	"context"
-	"net/mail"
-	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -43,13 +41,6 @@ func (p *Provider) Name() string    { return name }
 func (p *Provider) LogoURL() string { return logo }
 
 func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	addr, err := mail.ParseAddress(identifier)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
-	handle := strings.Split(addr.Address, "@")[0]
-
 	_, exists, err := b.auth.LookupByIdentifier(ctx, id, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
@@ -59,7 +50,7 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 		return nil, fault.Wrap(ErrAccountAlreadyExists, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 	}
 
-	account, err := b.account.Create(ctx, handle)
+	account, err := b.account.Create(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
