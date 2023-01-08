@@ -12,7 +12,7 @@ func New(cfg config.Config) (*webauthn.WebAuthn, error) {
 	wa, err := webauthn.New(&webauthn.Config{
 		RPDisplayName: "Storyden",
 		RPID:          cfg.CookieDomain,
-		RPOrigin:      cfg.PublicApiAddress,
+		RPOrigin:      cfg.PublicWebAddress,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to init webauthn"))

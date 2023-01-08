@@ -2,6 +2,7 @@ package webauthn
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -53,11 +54,16 @@ func (p *Provider) FinishRegistration(ctx context.Context, handle string, sessio
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Create a new account and then create an authentication item using
-	// the credential obtained above.
-	accountID := account.AccountID(xid.NilID())
+	acc, err := p.getOrCreateAccount(ctx,
+		handle,
+		base64.RawURLEncoding.EncodeToString(credential.ID),
+		base64.RawURLEncoding.EncodeToString(credential.PublicKey),
+	)
+	if err != nil {
+		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
+	}
 
-	return credential, accountID, nil
+	return credential, acc.ID, nil
 }
 
 func (p *Provider) BeginLogin(ctx context.Context, handle string) (*webauthn.SessionData, error) {

@@ -6,8 +6,13 @@ import {
 
 import { startRegistration } from "@simplewebauthn/browser";
 import { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/typescript-types";
+import { useToast } from "@chakra-ui/react";
+import { APIError } from "src/api/openapi/schemas";
+import { useRouter } from "next/router";
 
 export function useWebAuthn() {
+  const router = useRouter();
+  const toast = useToast();
   const { register, handleSubmit } = useForm({
     //
   });
@@ -27,9 +32,18 @@ export function useWebAuthn() {
       excludeCredentials: [],
     });
 
-    const creds = await webAuthnMakeCredential(credential);
-
-    console.info("webauthn success", { accountID: creds.id });
+    webAuthnMakeCredential(credential)
+      .then((account) => {
+        console.info("webauthn success", { accountID: account.id });
+        router.push("/");
+      })
+      .catch((e: APIError) => {
+        toast({
+          title: "Problem",
+          status: "error",
+          description: e.message,
+        });
+      });
   };
 
   return {
