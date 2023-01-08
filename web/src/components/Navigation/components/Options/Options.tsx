@@ -1,7 +1,6 @@
 import {
-  Box,
+  Button,
   HStack,
-  IconButton,
   Link,
   Menu,
   MenuButton,
@@ -12,12 +11,12 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
-import { UserIcon } from "@heroicons/react/24/solid";
-import { Avatar } from "../Avatar/Avatar";
-import { useProfile } from "./useProfile";
+import { ChevronDownIcon, UserIcon } from "@heroicons/react/24/solid";
+import { Avatar } from "../../../Avatar/Avatar";
+import { useOptions } from "./useOptions";
 
-export function Profile() {
-  const profile = useProfile();
+export function Options() {
+  const profile = useOptions();
 
   if (!profile.authenticated) {
     return (
@@ -30,12 +29,18 @@ export function Profile() {
   return (
     <Menu>
       <MenuButton
-        as={IconButton}
+        as={Button}
         padding={1}
-        aria-label="Profile"
-        icon={<UserIcon />}
+        aria-label="menu"
         variant="ghost"
-      />
+        _hover={{ bgColor: "whiteAlpha.500" }}
+      >
+        <HStack>
+          {/* NOTE: Custom sizing tokens here */}
+          <Avatar account={profile.account} boxSize="1.5em" />
+          <ChevronDownIcon width="1em" />
+        </HStack>
+      </MenuButton>
 
       <MenuList>
         <HStack alignItems="center" spacing={4} px={4} py={1}>

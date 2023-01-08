@@ -1,7 +1,7 @@
 import { Account } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 
-type UseProfileData =
+type UseOptions =
   | {
       authenticated: false;
     }
@@ -10,7 +10,7 @@ type UseProfileData =
       account: Account;
     };
 
-export function useProfile(): UseProfileData {
+export function useOptions(): UseOptions {
   const account = useSession();
   if (!account) return { authenticated: false };
 
