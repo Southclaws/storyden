@@ -12,7 +12,8 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
               {props.thread.title}
             </LinkOverlay>
           </Heading>
-          {/* Options menu */}
+
+          {/* <ThreadMenu postID={props.thread.id} /> */}
         </Flex>
 
         <Text noOfLines={3}>{props.thread.short}</Text>
