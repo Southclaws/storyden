@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostSubmission } from "./postSubmission";
+import type { PostInitialProps } from "./postInitialProps";
 
 /**
  * Create a post within a thread.
  */
-export type PostsCreateBody = PostSubmission;
+export type PostsCreateBody = PostInitialProps;
