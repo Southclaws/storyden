@@ -1,5 +1,5 @@
-import Link from "../site/Link";
-import { StorydenLogo } from "../StorydenLogo";
+import Link from "../../site/Link";
+import { StorydenLogo } from "../../StorydenLogo";
 
 export function HomeLink() {
   return (

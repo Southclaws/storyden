@@ -1,24 +1,23 @@
 import { Flex } from "@chakra-ui/react";
-import { useSession } from "src/auth";
-import { Profile } from "../Profile/Profile";
 import { SearchBar } from "../SearchBar/SearchBar";
-import { HomeLink } from "./HomeLink";
+import { HomeLink } from "./components/HomeLink";
+import { Options } from "./components/Options/Options";
 
 export function Navigation() {
   return (
     <Flex py="1em" width="full" justifyContent="center" bgColor="teal.200">
       <Flex
         width="full"
-        px={2}
+        px={4}
         maxW="container.lg"
-        justifyContent="space-around"
+        justifyContent="space-between"
         alignItems="center"
       >
         <HomeLink />
 
         <SearchBar />
 
-        <Profile />
+        <Options />
       </Flex>
     </Flex>
   );
