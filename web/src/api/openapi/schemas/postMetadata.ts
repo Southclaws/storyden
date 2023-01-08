@@ -5,6 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Post } from "./post";
+import type { CommonProperties } from "./commonProperties";
 
-export type PostSubmission = Post;
+export type PostMetadata = CommonProperties;
