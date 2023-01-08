@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useThreadsGet } from "src/api/openapi/threads";
 import { Unready } from "src/components/Unready";
-import { ThreadView } from "./components/Thread";
+import { ThreadView } from "./components/ThreadView.tsx/ThreadView";
 
 export function ThreadScreen() {
   const router = useRouter();
