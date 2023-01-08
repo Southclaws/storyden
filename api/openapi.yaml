@@ -497,9 +497,9 @@ components:
       description: Create a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostSubmission" }
+          schema: { $ref: "#/components/schemas/PostInitialProps" }
         application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/PostSubmission" }
+          schema: { $ref: "#/components/schemas/PostInitialProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -917,9 +917,6 @@ components:
     # Posts
     # -
 
-    PostSubmission:
-      $ref: "#/components/schemas/Post"
-
     Post:
       type: object
       description: |
@@ -927,15 +924,30 @@ components:
         the thread by specifying the `reply_to` property. The identifier in the
         `reply_to` value must be post within the same thread.
       allOf:
-        - $ref: "#/components/schemas/CommonProperties"
-        - type: object
-          required: [body, author]
-          properties:
-            body: { $ref: "#/components/schemas/PostBodyMarkdown" }
-            author: { $ref: "#/components/schemas/ProfileReference" }
-            meta: { $ref: "#/components/schemas/Metadata" }
-            reply_to:
-              $ref: "#/components/schemas/Identifier"
+        - { $ref: "#/components/schemas/PostMetadata" }
+        - { $ref: "#/components/schemas/PostCommonProps" }
+
+    PostMetadata:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+
+    PostCommonProps:
+      type: object
+      required: [body, author]
+      properties:
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+        reply_to: { $ref: "#/components/schemas/Identifier" }
+
+    PostInitialProps:
+      type: object
+      required: [body]
+      properties:
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+        reply_to: { $ref: "#/components/schemas/Identifier" }
 
     React:
       type: object

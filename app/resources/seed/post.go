@@ -80,7 +80,7 @@ Storyden is still in development so please give the repository a watch if you're
 				ID: post.PostID(id("00000000000000005010")),
 				Body: `oh you can do that like this:
 
-![https://i.imgur.com/BZwqnseh.jpg](https://i.imgur.com/BZwqnseh.jpg)
+![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
 `,
 				RootPostID: post.PostID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_004_Loki.ID},
