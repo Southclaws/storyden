@@ -70,7 +70,10 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, handle, credentialID,
 		}
 	}
 
-	authrecord, authfound, err := p.auth_repo.LookupByIdentifier(ctx, authentication.Service(id), credentialID)
+	// TODO: Don't do this, instead get ALL auth methods of type "webauthn" and
+	// iterate through them calling Validate. Each webauthn should be converted
+	// into some type that satisfies `webauthn.User` for `p.wa.ValidateLogin()`.
+	authrecord, authfound, err := p.auth_repo.LookupByIdentifier(ctx, authentication.Service(id), pubkey)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -113,7 +116,7 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, handle, credentialID,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, id, credentialID, pubkey, nil)
+	_, err = p.auth_repo.Create(ctx, acc.ID, id, pubkey, credentialID, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
