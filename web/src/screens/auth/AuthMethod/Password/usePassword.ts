@@ -4,7 +4,13 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { authPasswordSignin, authPasswordSignup } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
-import { Form, FormSchema } from "./common";
+import * as z from "zod";
+
+export const FormSchema = z.object({
+  identifier: z.string(),
+  token: z.string(),
+});
+export type Form = z.infer<typeof FormSchema>;
 
 export function usePassword() {
   const {
@@ -17,7 +23,7 @@ export function usePassword() {
   const toast = useToast();
   const { push } = useRouter();
 
-  async function signin(payload: Form, x: any) {
+  async function signin(payload: Form) {
     await authPasswordSignin(payload)
       .then(() => {
         push("/");
