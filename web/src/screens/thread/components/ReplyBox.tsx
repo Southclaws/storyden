@@ -1,9 +1,9 @@
 import { Box, Button, ChakraProvider, Flex } from "@chakra-ui/react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useCallback } from "react";
 import { extended } from "src/theme";
 
 import { AllStyledComponent } from "@remirror/styles/emotion";
-import { ExtensionPriority } from "remirror";
+import { EditorState, EMPTY_PARAGRAPH_NODE, ExtensionPriority } from "remirror";
 
 import {
   EditorComponent,
@@ -62,20 +62,6 @@ type Props = {
 };
 
 export function ReplyBox({ onSave }: Props) {
-  const onSaveAll = (md: string) => {
-    onSave(md);
-  };
-
-  return (
-    <Box minH={32} width="full" borderRadius="2xl" p={2}>
-      <Editor>
-        <Save onSave={onSaveAll} />
-      </Editor>
-    </Box>
-  );
-}
-
-export function Editor({ children }: PropsWithChildren) {
   const { manager } = useRemirror({
     extensions,
     stringHandler: "markdown",
@@ -83,22 +69,30 @@ export function Editor({ children }: PropsWithChildren) {
     selection: "end",
   });
 
+  const onSaveAll = (md: string) => {
+    onSave(md);
+  };
+
   return (
-    <AllStyledComponent style={{ width: "100%", minHeight: "6em" }}>
-      <ThemeProvider>
-        <Remirror manager={manager}>
-          <Flex flexDir="column" width="full" minHeight="6em">
-            <EditorComponent />
+    <Box minH={32} width="full" borderRadius="2xl" p={2}>
+      <AllStyledComponent style={{ width: "100%", minHeight: "6em" }}>
+        <ThemeProvider>
+          <Remirror manager={manager}>
+            <Flex flexDir="column" width="full" minHeight="6em">
+              <EditorComponent />
 
-            <TableComponents />
-            <FloatingToolbar />
+              <TableComponents />
+              <FloatingToolbar />
 
-            {/* NOTE: Remirror is doing some janky stuff and blocking Chakra */}
-            <ChakraProvider theme={extended}>{children}</ChakraProvider>
-          </Flex>
-        </Remirror>
-      </ThemeProvider>
-    </AllStyledComponent>
+              {/* NOTE: Remirror is doing some janky stuff and blocking Chakra */}
+              <ChakraProvider theme={extended}>
+                <Save onSave={onSaveAll} />
+              </ChakraProvider>
+            </Flex>
+          </Remirror>
+        </ThemeProvider>
+      </AllStyledComponent>
+    </Box>
   );
 }
 

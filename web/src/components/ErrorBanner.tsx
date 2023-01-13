@@ -1,6 +1,8 @@
 import { Flex, Heading, Box, Text } from "@chakra-ui/layout";
 import React, { FC } from "react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { CreateToastFnReturn } from "@chakra-ui/react";
+import { APIError } from "src/api/openapi/schemas";
 
 type Props = {
   error: string;
@@ -36,3 +38,10 @@ const ErrorBanner: FC<Props> = ({ error, message, ...rest }) => {
 };
 
 export default ErrorBanner;
+
+export const errorToast = (toast: CreateToastFnReturn) => (e: APIError) =>
+  toast({
+    title: "Error",
+    status: "error",
+    description: e.message,
+  });
