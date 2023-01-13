@@ -472,6 +472,12 @@ type PostsCreate = PostInitialProps
 // ThreadsCreate defines model for ThreadsCreate.
 type ThreadsCreate = ThreadsCreateBody
 
+// WebAuthnMakeAssertionJSONBody defines parameters for WebAuthnMakeAssertion.
+type WebAuthnMakeAssertionJSONBody = map[string]interface{}
+
+// WebAuthnGetAssertionJSONBody defines parameters for WebAuthnGetAssertion.
+type WebAuthnGetAssertionJSONBody = map[string]interface{}
+
 // WebAuthnMakeCredentialJSONBody defines parameters for WebAuthnMakeCredential.
 type WebAuthnMakeCredentialJSONBody = map[string]interface{}
 
@@ -503,16 +509,10 @@ type AuthPasswordSignupJSONRequestBody = AuthPasswordBody
 type AuthPasswordSignupFormdataRequestBody = AuthPasswordBody
 
 // WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
-type WebAuthnMakeAssertionJSONRequestBody = AuthPasswordBody
-
-// WebAuthnMakeAssertionFormdataRequestBody defines body for WebAuthnMakeAssertion for application/x-www-form-urlencoded ContentType.
-type WebAuthnMakeAssertionFormdataRequestBody = AuthPasswordBody
+type WebAuthnMakeAssertionJSONRequestBody = WebAuthnMakeAssertionJSONBody
 
 // WebAuthnGetAssertionJSONRequestBody defines body for WebAuthnGetAssertion for application/json ContentType.
-type WebAuthnGetAssertionJSONRequestBody = AuthPasswordBody
-
-// WebAuthnGetAssertionFormdataRequestBody defines body for WebAuthnGetAssertion for application/x-www-form-urlencoded ContentType.
-type WebAuthnGetAssertionFormdataRequestBody = AuthPasswordBody
+type WebAuthnGetAssertionJSONRequestBody = WebAuthnGetAssertionJSONBody
 
 // WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
 type WebAuthnMakeCredentialJSONRequestBody = WebAuthnMakeCredentialJSONBody
@@ -646,14 +646,10 @@ type ClientInterface interface {
 
 	WebAuthnMakeAssertion(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	WebAuthnMakeAssertionWithFormdataBody(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// WebAuthnGetAssertion request with any body
 	WebAuthnGetAssertionWithBody(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	WebAuthnGetAssertion(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	WebAuthnGetAssertionWithFormdataBody(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// WebAuthnMakeCredential request with any body
 	WebAuthnMakeCredentialWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -894,18 +890,6 @@ func (c *Client) WebAuthnMakeAssertion(ctx context.Context, body WebAuthnMakeAss
 	return c.Client.Do(req)
 }
 
-func (c *Client) WebAuthnMakeAssertionWithFormdataBody(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewWebAuthnMakeAssertionRequestWithFormdataBody(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) WebAuthnGetAssertionWithBody(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewWebAuthnGetAssertionRequestWithBody(c.Server, accountHandle, contentType, body)
 	if err != nil {
@@ -920,18 +904,6 @@ func (c *Client) WebAuthnGetAssertionWithBody(ctx context.Context, accountHandle
 
 func (c *Client) WebAuthnGetAssertion(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewWebAuthnGetAssertionRequest(c.Server, accountHandle, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) WebAuthnGetAssertionWithFormdataBody(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewWebAuthnGetAssertionRequestWithFormdataBody(c.Server, accountHandle, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1442,17 +1414,6 @@ func NewWebAuthnMakeAssertionRequest(server string, body WebAuthnMakeAssertionJS
 	return NewWebAuthnMakeAssertionRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewWebAuthnMakeAssertionRequestWithFormdataBody calls the generic WebAuthnMakeAssertion builder with application/x-www-form-urlencoded body
-func NewWebAuthnMakeAssertionRequestWithFormdataBody(server string, body WebAuthnMakeAssertionFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewWebAuthnMakeAssertionRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
-}
-
 // NewWebAuthnMakeAssertionRequestWithBody generates requests for WebAuthnMakeAssertion with any type of body
 func NewWebAuthnMakeAssertionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
@@ -1491,17 +1452,6 @@ func NewWebAuthnGetAssertionRequest(server string, accountHandle AccountHandle, 
 	}
 	bodyReader = bytes.NewReader(buf)
 	return NewWebAuthnGetAssertionRequestWithBody(server, accountHandle, "application/json", bodyReader)
-}
-
-// NewWebAuthnGetAssertionRequestWithFormdataBody calls the generic WebAuthnGetAssertion builder with application/x-www-form-urlencoded body
-func NewWebAuthnGetAssertionRequestWithFormdataBody(server string, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewWebAuthnGetAssertionRequestWithBody(server, accountHandle, "application/x-www-form-urlencoded", bodyReader)
 }
 
 // NewWebAuthnGetAssertionRequestWithBody generates requests for WebAuthnGetAssertion with any type of body
@@ -1968,14 +1918,10 @@ type ClientWithResponsesInterface interface {
 
 	WebAuthnMakeAssertionWithResponse(ctx context.Context, body WebAuthnMakeAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
 
-	WebAuthnMakeAssertionWithFormdataBodyWithResponse(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
-
 	// WebAuthnGetAssertion request with any body
 	WebAuthnGetAssertionWithBodyWithResponse(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
 
 	WebAuthnGetAssertionWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
-
-	WebAuthnGetAssertionWithFormdataBodyWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error)
 
 	// WebAuthnMakeCredential request with any body
 	WebAuthnMakeCredentialWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeCredentialResponse, error)
@@ -2589,14 +2535,6 @@ func (c *ClientWithResponses) WebAuthnMakeAssertionWithResponse(ctx context.Cont
 	return ParseWebAuthnMakeAssertionResponse(rsp)
 }
 
-func (c *ClientWithResponses) WebAuthnMakeAssertionWithFormdataBodyWithResponse(ctx context.Context, body WebAuthnMakeAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error) {
-	rsp, err := c.WebAuthnMakeAssertionWithFormdataBody(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseWebAuthnMakeAssertionResponse(rsp)
-}
-
 // WebAuthnGetAssertionWithBodyWithResponse request with arbitrary body returning *WebAuthnGetAssertionResponse
 func (c *ClientWithResponses) WebAuthnGetAssertionWithBodyWithResponse(ctx context.Context, accountHandle AccountHandle, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
 	rsp, err := c.WebAuthnGetAssertionWithBody(ctx, accountHandle, contentType, body, reqEditors...)
@@ -2608,14 +2546,6 @@ func (c *ClientWithResponses) WebAuthnGetAssertionWithBodyWithResponse(ctx conte
 
 func (c *ClientWithResponses) WebAuthnGetAssertionWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionJSONRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
 	rsp, err := c.WebAuthnGetAssertion(ctx, accountHandle, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseWebAuthnGetAssertionResponse(rsp)
-}
-
-func (c *ClientWithResponses) WebAuthnGetAssertionWithFormdataBodyWithResponse(ctx context.Context, accountHandle AccountHandle, body WebAuthnGetAssertionFormdataRequestBody, reqEditors ...RequestEditorFn) (*WebAuthnGetAssertionResponse, error) {
-	rsp, err := c.WebAuthnGetAssertionWithFormdataBody(ctx, accountHandle, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -4088,8 +4018,7 @@ func (response AuthPasswordSignupdefaultJSONResponse) VisitAuthPasswordSignupRes
 }
 
 type WebAuthnMakeAssertionRequestObject struct {
-	JSONBody     *WebAuthnMakeAssertionJSONRequestBody
-	FormdataBody *WebAuthnMakeAssertionFormdataRequestBody
+	Body *WebAuthnMakeAssertionJSONRequestBody
 }
 
 type WebAuthnMakeAssertionResponseObject interface {
@@ -4134,8 +4063,7 @@ func (response WebAuthnMakeAssertiondefaultJSONResponse) VisitWebAuthnMakeAssert
 
 type WebAuthnGetAssertionRequestObject struct {
 	AccountHandle AccountHandle `json:"account_handle"`
-	JSONBody      *WebAuthnGetAssertionJSONRequestBody
-	FormdataBody  *WebAuthnGetAssertionFormdataRequestBody
+	Body          *WebAuthnGetAssertionJSONRequestBody
 }
 
 type WebAuthnGetAssertionResponseObject interface {
@@ -4828,24 +4756,11 @@ func (sh *strictHandler) AuthPasswordSignup(ctx echo.Context) error {
 func (sh *strictHandler) WebAuthnMakeAssertion(ctx echo.Context) error {
 	var request WebAuthnMakeAssertionRequestObject
 
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body WebAuthnMakeAssertionJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+	var body WebAuthnMakeAssertionJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body WebAuthnMakeAssertionFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.WebAuthnMakeAssertion(ctx.Request().Context(), request.(WebAuthnMakeAssertionRequestObject))
@@ -4871,24 +4786,12 @@ func (sh *strictHandler) WebAuthnGetAssertion(ctx echo.Context, accountHandle Ac
 	var request WebAuthnGetAssertionRequestObject
 
 	request.AccountHandle = accountHandle
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body WebAuthnGetAssertionJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+
+	var body WebAuthnGetAssertionJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body WebAuthnGetAssertionFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.WebAuthnGetAssertion(ctx.Request().Context(), request.(WebAuthnGetAssertionRequestObject))
@@ -5150,31 +5053,31 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 var swaggerSpec = []string{
 
 	"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",
-	"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",
+	"Fb5IkAT1ZSUz3punxALQ3egvdDcafEwyXpScAVMyOXtMSixwAQqE+es8y3jF1E+Y5RT0DznITJBSEc6S",
 	"Mz+MlmZ8nKQJPOCi1FMTySu1zCheySRNiJ5dYrVM0oThQo9ju/aLXZukiYDfKiIgT86UqCBNZLaEAmuk",
 	"al0aiEoQtkg2mzT5cF6p5aXg9yQH0afregmI5MAUmRMQaM4FwgyZRd+h0i1DssqWCEs0TdSKKAVimrS3",
-	"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",
+	"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",
-	"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",
+	"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",
-	"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",
+	"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",
-	"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",
+	"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",
-	"XkQtiWztuzkFsuwHyvLv5Cv5/X/98B3OVfXDy3AfDyTfO2B5f1xcXQutyVCcv94qKlO82Duq1bNr+nRE",
+	"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",
@@ -5183,13 +5086,13 @@ var swaggerSpec = []string{
 	"qb69Q8F/JSeIjmOx7DVexMxD4QVaLUm2RBlmyGR/pbtPQObwN1VhdE8wqrfUt5ktcf/XsItrvBi2iUFT",
 	"8AoQ4QJ1hXCFF2Z3+xXc8SKWkDk0F2/lyTC1ORRBOFya8nkt1hijybG739jbNfTvGbpqbKKuvRNce/fV",
 	"u6xoS1YRZSxN5+r6n6XO4tKkJIxB3hyzaaL5mqSOhDTJfBarweEsao43O1qEzp0VvJDo4q2p0fPS1Z5N",
-	"6UBCiYWpPM/WSOc6con+GxH1QvosQEdMYxdpYUr5SiJgeckJU9IWW2TJmalc32Nhgk4dckknuAb7WAds",
+	"6UBCiYWpPM/WSOc6con+ExH1QvosQEdMYxdpYUr5SiJgeckJU9IWW2TJmalc32Nhgk4dckknuAb7WAds",
 	"P3KBXCyXogW5hyDmrZOri7foNpZS3JoNmDjVEH+reDl69XJU8HsCcmTB3KboytWx0IpQiiqWg5BKL51x",
 	"h8FQeDZlUTSjKFiDO07WlCEsDdxeyoRVK0jenjJFEXfyqFEpYE4eIB/dwQzPRhmWMKpTqv1SrK4VnPJk",
 	"PT4+zoKizVYi/LwjgkVncz0z+ecSTEIV5FFEIjvb5kZEIk9g4ImC8pHJP+pbkogzq4oZiDqxs2ppATdp",
 	"jv73A6Nrn+T2S0DOE2zxzmYG4Uxa4CajWmKJlji3t3Yl8NL2YO7l4+x5H/Hd1pHFrqH0ALoHId2VY8PW",
 	"FzLI+LSJVBI0g0sB9wRW7rpwgA1B2Vy70gjmTx//geaCAMvp2jo4Gx9oPggo7RVf7WcMay7eTpkhxLg7",
-	"BlIaS5dcKDwjlKj1njQZ773j1AxvSGsyGvHX8ugD7/DenikD5SVFoc31dgb9E1DK0YoLmv/HzsLSMYeX",
+	"BlIaS5dcKDwjlKj1njQZ773j1AxvSGsyGvHX8ugD7/DenikD5SVFoc31dgb9E1DK0YoLmv/bzsLSMYeX",
 	"M4PYCeZMNnKQpQMnV5D82AtrkKjgjqXbmxhmlZqynIN018hmdS15GZYzHJ/QJwnzihrNtLcI+jyjWCxg",
 	"yrQgpUVrA0sukK3DSKIqbG1utQSG1rxCOWcvFGIAuT1xKkpNKVFrU+2Dr/cQIz5CiJ22loG7uCMz9H0d",
 	"dafYeqCr9ua0Z1pUG8Tu8M8yfUjRXe3DqXO9177GajcEWSWIWl9p+I6pgq+kLauapuvMNnPUbdf+jm0k",
@@ -5197,28 +5100,28 @@ var swaggerSpec = []string{
 	"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",
-	"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",
+	"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",
-	"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",
+	"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",
-	"bJp2TiPUqvyDCPUP7L99iWOCpQRbb44e3m+4PlpdYpQJMMUnTJFdZhJeliPZstHBgMyfxO/xHZx7AH8a",
-	"4FHifQzqWZ9vNgdJuxeCb/G+CgtbjvDCC0TvvuvQ9cnDgtcxcCD3pwfjf+rNV3ILBb6DYa2ovUKtFMI4",
-	"cityNFvbaqF9BKcde+M5tnuFN/W8vls48sFg5On8M/Tmx5m7lmLU2KO+PmLrLbGWgmtuaPE60VgBB8KN",
-	"5EcelmNMS8LfPhvf+TL1D3xw+y6s/SVqSieoNHv1TVxafBdv+2YYvBn/XSQTebP+3B2sF1gjQnfHuUNg",
-	"NPYIuyuv8OV4T14dw17yFeKMaruVFVXmvQn4/iRzZeNfc5mLsd8qMLfL/ktR/jL6oM9peGXYpLvJ8Zf2",
-	"EpC7IYzR4Yb2fKPf9NxtjlPIkMHPXRO93t24lprIke6/pqOP66B1zD9MqMutYb9OVCPd53aOCM/aADZP",
-	"EFr7uxPPr3zeyKvtOCaPwQfGtvv9LR0c/sNrREnbEJEiu/HUNloQhVZYTpn/vgiWaAVUJ32Bc9rW8BEJ",
-	"A4LPcBx6uoTfQ3uKJWvcz9WQ21fQOz4xsk00yaFKNql7d/dwHEMPjTqhRvBFsicrw4E+JsR9lIeJfPPn",
-	"+fkXK1MneN88MuBMrpdQdx26dsu6ZUwrlrk3N2pHmgfTAihgCbanBWln0ngQ28gooBQggSmsgn7Gd0SZ",
-	"9hdiuiuXA00g/+dI/t37QCSfqxUWDYMsxFj3Rzefq1uabDonjaRi0Zvm/0/X15eo7rXxHdBEopxnVQFM",
-	"uc/RzMB03xQ6AIMccWv6txNckls0ZSV2d2KY1TmcRLxSkuROdESimRacmWo6vWfm+fsDqb+jMmVzYVic",
-	"IzJvbuyIRKJiTOeERDMCsxxTzgAVPAcrSPNVgERTkwQpbL/7iI1mlSSma5TyBcmQVNV8Pm5CQcPUfmR5",
-	"3r5X9G9U5bgdzEZWfpIgfP2qNd3fdfaXXLbSqnBRHff3F/3IRVWEQX3ru6FRNKEjx3W3UeBcPVZj05ub",
-	"zb8CAAD//6l2SnlTVgAA",
+	"bJp2TiPUqvyDCPUP7L99iWOCpQRbb44e3m+4PlpdYpQJMMUnTJFdZhJeliPZstHBgMyfxO/xHZx7AH1Z",
+	"HfkyKPJG9v+HLT4Gpa3PN5uDBN+Lxrc4YoWFrUx4OQZa4D7x0HXPwzqgw+FABZ4el/+pQl/fWRT4DoYV",
+	"pPYVtX4I496t9NFsbWuI9mmcdveNP9nuK97U8/54zuJ39fHHWb6WYtTuoydAxOxbYi0F19zQ4nWisQIO",
+	"hBvJmjwsx5iWhL99jr7zveof+Dj3vVn7S9QUVFBp9upbu7T4Lt72zTB4Sf67SCbykv25O1gvsEaE7uZz",
+	"h8Bo7Gl2V17he/KevDqGveQrxBnVdisrqswrFPBdS+Yix7/xMtdlv1Vg7pz996P8FfVBH9nwyrBJd5Pj",
+	"r/IlIHdvGKPDDe35cr/pxNscp5Ahg5+7Jnq9u3GNNpEj3X9jRx/XQUOZf65QF2HDLp6oRrqP8ByRmLUB",
+	"bJ4gtPbXKJ5fUb2RV9txTB6Dz45t9/tb+jr859iIkrZNIkV246ltvyAKrbCcMv/VESzRCqhOBQPntK0N",
+	"JBIGBB/nOPR0Cb+S9hRL1rifqyG3L6Z3fHhkm2iSQ5VsUnf07uE4hp4fdUKN4DtlT1aGA31MiPsoDxP5",
+	"EtDz8y9Wpk7wvqVkwJlcL6HuRXRNmHUjmVYsc5tu1I40z6gFUMASbKcL0s6k8SC2vVFAKUACU1gFXY7v",
+	"iDJNMcT0XC4HWkP+x5H8u3eHSD5XKywaBlmIsZ6Qbj5XNzrZdE4aScWiN83/n66vL1HdgeP7oolEOc+q",
+	"AphyH6mZgenJKXQABjni1vRvJ7gkt2jKSuxuyjCrcziJeKUkyZ3oiEQzLTgz1fR/z8yj+AdSf11lyubC",
+	"sDhHZN7c4xGJRMWYzgmJZgRmOaacASp4DlaQ5lsBiaYmCVLYfk8SG80qSUwvKeULkiGpqvl83ISChqn9",
+	"yPK8fdvoX67KcTuYjaz8JEH4UlZrur8B7S+5bKVV4aI67u8v+pGLqgiD+tbXRKNoQkeO6x6kwLl6rMam",
+	"Nzeb/wsAAP//K1kJxWlWAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

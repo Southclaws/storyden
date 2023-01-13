@@ -18,6 +18,8 @@ import type {
   AuthOAuthProviderCallbackBody,
   WebAuthnPublicKeyCreationOptionsResponse,
   WebAuthnMakeCredentialBody,
+  WebAuthnGetAssertionBody,
+  WebAuthnMakeAssertionBody,
 } from "./schemas";
 import { fetcher } from "../client";
 
@@ -178,20 +180,22 @@ export const webAuthnMakeCredential = (
  */
 export const webAuthnGetAssertion = (
   accountHandle: string,
-  authPasswordBody: AuthPasswordBody
+  webAuthnGetAssertionBody: WebAuthnGetAssertionBody
 ) => {
   return fetcher<AuthSuccessResponse>({
     url: `/v1/auth/webauthn/assert/${accountHandle}`,
     method: "post",
     headers: { "Content-Type": "application/json" },
-    data: authPasswordBody,
+    data: webAuthnGetAssertionBody,
   });
 };
 
 /**
  * Complete the credential assertion and sign in to an account.
  */
-export const webAuthnMakeAssertion = (authPasswordBody: AuthPasswordBody) => {
+export const webAuthnMakeAssertion = (
+  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
+) => {
   return fetcher<AuthSuccessResponse>({
     url: `/v1/auth/webauthn/assert`,
     method: "get",
@@ -200,8 +204,8 @@ export const webAuthnMakeAssertion = (authPasswordBody: AuthPasswordBody) => {
 };
 
 export const getWebAuthnMakeAssertionKey = (
-  authPasswordBody: AuthPasswordBody
-) => [`/v1/auth/webauthn/assert`, authPasswordBody];
+  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
+) => [`/v1/auth/webauthn/assert`, webAuthnMakeAssertionBody];
 
 export type WebAuthnMakeAssertionQueryResult = NonNullable<
   Awaited<ReturnType<typeof webAuthnMakeAssertion>>
@@ -214,7 +218,7 @@ export type WebAuthnMakeAssertionQueryError =
 export const useWebAuthnMakeAssertion = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
-  authPasswordBody: AuthPasswordBody,
+  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody,
   options?: {
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof webAuthnMakeAssertion>>,
@@ -227,8 +231,11 @@ export const useWebAuthnMakeAssertion = <
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getWebAuthnMakeAssertionKey(authPasswordBody) : null));
-  const swrFn = () => webAuthnMakeAssertion(authPasswordBody);
+    (() =>
+      isEnabled
+        ? getWebAuthnMakeAssertionKey(webAuthnMakeAssertionBody)
+        : null);
+  const swrFn = () => webAuthnMakeAssertion(webAuthnMakeAssertionBody);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

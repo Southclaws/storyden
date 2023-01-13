@@ -207,7 +207,11 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandle"]
-      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -220,7 +224,11 @@ paths:
       description: Complete the credential assertion and sign in to an account.
       tags: [auth]
       security: [webauthn: []]
-      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
