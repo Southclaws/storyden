@@ -37,7 +37,7 @@ func (s *Session) encodeSession(userID account.AccountID) (string, error) {
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 		Domain:   s.domain,
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 	}
 

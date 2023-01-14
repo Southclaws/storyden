@@ -91,7 +91,7 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 		Domain:   a.domain,
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 	}
 
@@ -180,7 +180,7 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 		Domain:   a.domain,
-		Secure:   true,
+		Secure:   false,
 		HttpOnly: true,
 	}
 
