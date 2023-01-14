@@ -547,7 +547,10 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AuthProviderListBody"
+            type: object
+            required: [providers]
+            properties:
+              providers: { $ref: "#/components/schemas/AuthProviderListBody" }
 
     WebAuthnPublicKeyCreationOptions:
       description: OK
@@ -614,9 +617,10 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/ThreadReference"
+            type: object
+            required: [threads]
+            properties:
+              threads: { $ref: "#/components/schemas/ThreadList" }
 
     ThreadsGet:
       description: The information about a thread and its posts.
@@ -901,6 +905,11 @@ components:
               items: { $ref: "#/components/schemas/React" }
               description: A list of reactions this post has had from people.
             meta: { $ref: "#/components/schemas/Metadata" }
+
+    ThreadList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ThreadReference"
 
     Thread:
       allOf:

@@ -11,7 +11,7 @@ export function AuthSelection() {
 
   // sort by alphabetical because lazy
   // TODO: allow the order to be configured by the admin.
-  data?.sort((a, b) => a.provider.localeCompare(b.provider));
+  data?.providers?.sort((a, b) => a.provider.localeCompare(b.provider));
 
   return (
     <VStack gap={4}>
@@ -26,7 +26,7 @@ export function AuthSelection() {
       </Box>
 
       <List display="flex" flexDir="column" gap={4} w="full">
-        {data?.map((v: AuthProvider) => (
+        {data?.providers?.map((v: AuthProvider) => (
           <ListItem key={v.provider}>
             <AuthSelectionOption
               name={v.name}

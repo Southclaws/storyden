@@ -7,5 +7,5 @@ export function HomeScreen() {
 
   if (!threads.data) return <Unready {...threads.error} />;
 
-  return <ThreadList threads={threads.data} />;
+  return <ThreadList threads={threads.data.threads} />;
 }
