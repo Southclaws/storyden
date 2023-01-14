@@ -2299,10 +2299,10 @@
   resolved "https://registry.yarnpkg.com/@seznam/compose-react-refs/-/compose-react-refs-1.0.6.tgz#6ec4e70bdd6e32f8e70b4100f27267cf306bd8df"
   integrity sha512-izzOXQfeQLonzrIQb8u6LQ8dk+ymz3WXTIXjvOlTXHq6sbzROg3NWU+9TTAOpEoK9Bth24/6F/XrfHJ5yR5n6Q==
 
-"@simplewebauthn/browser@^6.2.2":
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-6.2.2.tgz#3cd773a9887734331251d1b8dec043547a7bbd57"
-  integrity sha512-VUtne7+s6BmW4usnbitjZEI1VNT/PNh6bYg+AI4OMdfpo5z+yAq+6iVAWBJlIUGVk5InetEQvTUp6OefBam8qg==
+"@simplewebauthn/browser@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-7.0.0.tgz#eef6285788348848278d497b1d0a448eff9bb5ff"
+  integrity sha512-GOKFzY9S4uVhQsrIdPLHs1d/eqRyChKilQ/UIHMFdwwztiSgn97odM1ikxYDtwO6Kn+Wi3AZyapG3g1n07hEFA==
 
 "@simplewebauthn/typescript-types@^6.3.0-alpha.1":
   version "6.3.0-alpha.1"
