@@ -34,7 +34,7 @@ func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*proto
 	credentialOptions, sessionData, err := p.wa.BeginRegistration(&t,
 		webauthn.WithAuthenticatorSelection(
 			protocol.AuthenticatorSelection{
-				// AuthenticatorAttachment: protocol.AuthenticatorAttachment(authType),
+				AuthenticatorAttachment: protocol.AuthenticatorAttachment(protocol.Platform),
 				// RequireResidentKey:      residentKeyRequirement,
 				// UserVerification:        protocol.UserVerificationRequirement(userVer),
 			}),
