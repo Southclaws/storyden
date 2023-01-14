@@ -80,7 +80,7 @@ export function useWebAuthn() {
     } catch (error) {
       errorToast(toast)(error as APIError);
     }
-    return null;
+    return;
   }
 
   return {
