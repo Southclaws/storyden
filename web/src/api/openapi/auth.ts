@@ -241,3 +241,47 @@ export const webAuthnMakeAssertion = (
     data: webAuthnMakeAssertionBody,
   });
 };
+
+/**
+ * Remove cookies from requesting client.
+ */
+export const authProviderLogout = () => {
+  return fetcher<void>({ url: `/v1/auth/logout`, method: "get" });
+};
+
+export const getAuthProviderLogoutKey = () => [`/v1/auth/logout`];
+
+export type AuthProviderLogoutQueryResult = NonNullable<
+  Awaited<ReturnType<typeof authProviderLogout>>
+>;
+export type AuthProviderLogoutQueryError =
+  | BadRequestResponse
+  | InternalServerErrorResponse;
+
+export const useAuthProviderLogout = <
+  TError = BadRequestResponse | InternalServerErrorResponse
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof authProviderLogout>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAuthProviderLogoutKey() : null));
+  const swrFn = () => authProviderLogout();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};

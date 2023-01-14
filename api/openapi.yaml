@@ -232,6 +232,18 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccess" }
 
+  /v1/auth/logout:
+    get:
+      operationId: AuthProviderLogout
+      description: Remove cookies from requesting client.
+      tags: [auth]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200":
+          description: OK
+          headers: { Set-Cookie: { schema: { type: string } } }
+
   #
   #                                                      888
   #                                                      888
