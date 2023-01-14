@@ -35,52 +35,56 @@ export function useWebAuthn() {
   });
 
   async function signin({ username }: Form) {
-    const response = await webAuthnGetAssertion(username);
-
-    // TODO: OpenAPI spec for WebAuthn requests and responses.
-    const publicKey = response[
-      "publicKey"
-    ] as PublicKeyCredentialCreationOptionsJSON;
-
-    console.log({ response, publicKey });
-
-    const credential = await startAuthentication({
-      ...publicKey,
-    });
-
-    console.log({ credential });
-
-    const r = await webAuthnMakeAssertion(credential);
-    console.log({ r });
-
-    // router.push("/");
-  }
-
-  async function signup({ username }: Form) {
-    const response = await webAuthnRequestCredential(username);
-
-    // TODO: OpenAPI spec for WebAuthn requests and responses.
-    const publicKey = response[
-      "publicKey"
-    ] as PublicKeyCredentialCreationOptionsJSON;
-
-    const credential = await startRegistration({
-      ...publicKey,
-      excludeCredentials: [],
-    });
-
-    await webAuthnMakeCredential(credential);
-
-    router.push("/");
-  }
-
-  function onSubmit(action: "signin" | "signup") {
     try {
-      return action === "signin" ? handleSubmit(signin) : handleSubmit(signup);
+      const response = await webAuthnGetAssertion(username);
+
+      // TODO: OpenAPI spec for WebAuthn requests and responses.
+      const publicKey = response[
+        "publicKey"
+      ] as PublicKeyCredentialCreationOptionsJSON;
+
+      const credential = await startAuthentication({
+        ...publicKey,
+      });
+
+      // HACK:
+      // 1. https://github.com/MasterKale/SimpleWebAuthn/issues/330
+      // 2. https://github.com/go-webauthn/webauthn/issues/93
+      credential.response.userHandle =
+        credential.response.userHandle?.replaceAll("=", "");
+
+      await webAuthnMakeAssertion(credential);
+
+      router.push("/");
     } catch (error) {
       errorToast(toast)(error as APIError);
     }
-    return;
+  }
+
+  async function signup({ username }: Form) {
+    try {
+      const response = await webAuthnRequestCredential(username);
+
+      // TODO: OpenAPI spec for WebAuthn requests and responses.
+      const publicKey = response[
+        "publicKey"
+      ] as PublicKeyCredentialCreationOptionsJSON;
+
+      const credential = await startRegistration({
+        ...publicKey,
+        excludeCredentials: [],
+      });
+
+      await webAuthnMakeCredential(credential);
+
+      router.push("/");
+    } catch (error) {
+      errorToast(toast)(error as APIError);
+    }
+  }
+
+  function onSubmit(action: "signin" | "signup") {
+    return action === "signin" ? handleSubmit(signin) : handleSubmit(signup);
   }
 
   return {
