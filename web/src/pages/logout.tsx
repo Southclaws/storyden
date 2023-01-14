@@ -19,7 +19,7 @@ export default function Page() {
 export async function getServerSideProps(
   ctx: GetServerSidePropsContext
 ): Promise<GetServerSidePropsResult<{}>> {
-  ctx.res.setHeader("Clear-Site-Data", "cookies");
+  ctx.res.setHeader("Clear-Site-Data", `"cookies"`);
   ctx.res.setHeader("Set-Cookie", "storyden-session=x; Max-Age=0");
   nookies.destroy(ctx, "storyden-session");
   return {
