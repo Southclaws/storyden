@@ -18,7 +18,7 @@ import type {
   AuthOAuthProviderCallbackBody,
   WebAuthnPublicKeyCreationOptionsResponse,
   WebAuthnMakeCredentialBody,
-  WebAuthnGetAssertionBody,
+  WebAuthnPublicKeyAuthenticationOptionsResponse,
   WebAuthnMakeAssertionBody,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -178,64 +178,43 @@ export const webAuthnMakeCredential = (
 /**
  * Start the WebAuthn assertion for an existing account.
  */
-export const webAuthnGetAssertion = (
-  accountHandle: string,
-  webAuthnGetAssertionBody: WebAuthnGetAssertionBody
-) => {
-  return fetcher<AuthSuccessResponse>({
+export const webAuthnGetAssertion = (accountHandle: string) => {
+  return fetcher<WebAuthnPublicKeyAuthenticationOptionsResponse>({
     url: `/v1/auth/webauthn/assert/${accountHandle}`,
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-    data: webAuthnGetAssertionBody,
-  });
-};
-
-/**
- * Complete the credential assertion and sign in to an account.
- */
-export const webAuthnMakeAssertion = (
-  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
-) => {
-  return fetcher<AuthSuccessResponse>({
-    url: `/v1/auth/webauthn/assert`,
     method: "get",
-    headers: { "Content-Type": "application/json" },
   });
 };
 
-export const getWebAuthnMakeAssertionKey = (
-  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
-) => [`/v1/auth/webauthn/assert`, webAuthnMakeAssertionBody];
+export const getWebAuthnGetAssertionKey = (accountHandle: string) => [
+  `/v1/auth/webauthn/assert/${accountHandle}`,
+];
 
-export type WebAuthnMakeAssertionQueryResult = NonNullable<
-  Awaited<ReturnType<typeof webAuthnMakeAssertion>>
+export type WebAuthnGetAssertionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof webAuthnGetAssertion>>
 >;
-export type WebAuthnMakeAssertionQueryError =
+export type WebAuthnGetAssertionQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useWebAuthnMakeAssertion = <
+export const useWebAuthnGetAssertion = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
-  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody,
+  accountHandle: string,
   options?: {
     swr?: SWRConfiguration<
-      Awaited<ReturnType<typeof webAuthnMakeAssertion>>,
+      Awaited<ReturnType<typeof webAuthnGetAssertion>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
   }
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false;
+  const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
   const swrKey =
     swrOptions?.swrKey ??
-    (() =>
-      isEnabled
-        ? getWebAuthnMakeAssertionKey(webAuthnMakeAssertionBody)
-        : null);
-  const swrFn = () => webAuthnMakeAssertion(webAuthnMakeAssertionBody);
+    (() => (isEnabled ? getWebAuthnGetAssertionKey(accountHandle) : null));
+  const swrFn = () => webAuthnGetAssertion(accountHandle);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -247,4 +226,18 @@ export const useWebAuthnMakeAssertion = <
     swrKey,
     ...query,
   };
+};
+
+/**
+ * Complete the credential assertion and sign in to an account.
+ */
+export const webAuthnMakeAssertion = (
+  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
+) => {
+  return fetcher<AuthSuccessResponse>({
+    url: `/v1/auth/webauthn/assert`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: webAuthnMakeAssertionBody,
+  });
 };

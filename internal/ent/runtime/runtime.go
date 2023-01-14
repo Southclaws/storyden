@@ -5,6 +5,6 @@ package runtime
 // The schema-stitching logic is generated in github.com/Southclaws/storyden/internal/ent/runtime.go
 
 const (
-	Version = "v0.11.5-0.20221117090453-a5aadd7737a5"           // Version of ent codegen.
-	Sum     = "h1:xqV/nAAUFilbAZLNu2vOS/Ll03ieMGzwl1ulSP6/boo=" // Sum of ent codegen.
+	Version = "v0.11.5"                                         // Version of ent codegen.
+	Sum     = "h1:V2qhG91C4PMQTa82Q4StoESMQ4dzkMNeStCzszxi0jQ=" // Sum of ent codegen.
 )

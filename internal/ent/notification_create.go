@@ -103,50 +103,8 @@ func (nc *NotificationCreate) Mutation() *NotificationMutation {
 
 // Save creates the Notification in the database.
 func (nc *NotificationCreate) Save(ctx context.Context) (*Notification, error) {
-	var (
-		err  error
-		node *Notification
-	)
 	nc.defaults()
-	if len(nc.hooks) == 0 {
-		if err = nc.check(); err != nil {
-			return nil, err
-		}
-		node, err = nc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*NotificationMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = nc.check(); err != nil {
-				return nil, err
-			}
-			nc.mutation = mutation
-			if node, err = nc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(nc.hooks) - 1; i >= 0; i-- {
-			if nc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = nc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, nc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Notification)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from NotificationMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Notification, NotificationMutation](ctx, nc.sqlSave, nc.mutation, nc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -209,6 +167,9 @@ func (nc *NotificationCreate) check() error {
 }
 
 func (nc *NotificationCreate) sqlSave(ctx context.Context) (*Notification, error) {
+	if err := nc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := nc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, nc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -223,6 +184,8 @@ func (nc *NotificationCreate) sqlSave(ctx context.Context) (*Notification, error
 			return nil, err
 		}
 	}
+	nc.mutation.id = &_node.ID
+	nc.mutation.done = true
 	return _node, nil
 }
 

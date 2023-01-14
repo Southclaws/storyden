@@ -176,7 +176,7 @@ paths:
         Start the WebAuthn registration process by requesting a credential.
       tags: [auth]
       security: []
-      parameters: [$ref: "#/components/parameters/AccountHandle"]
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -201,25 +201,21 @@ paths:
         "200": { $ref: "#/components/responses/AuthSuccess" }
 
   /v1/auth/webauthn/assert/{account_handle}:
-    post:
+    get:
       operationId: WebAuthnGetAssertion
       description: Start the WebAuthn assertion for an existing account.
       tags: [auth]
       security: []
-      parameters: [$ref: "#/components/parameters/AccountHandle"]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200":
+          $ref: "#/components/responses/WebAuthnPublicKeyAuthenticationOptions"
 
   /v1/auth/webauthn/assert:
-    get:
+    post:
       operationId: WebAuthnMakeAssertion
       description: Complete the credential assertion and sign in to an account.
       tags: [auth]
@@ -229,6 +225,7 @@ paths:
           application/json:
             schema:
               type: object
+
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -286,7 +283,7 @@ paths:
       description: Get an avatar for the specified account.
       tags: [accounts]
       security: []
-      parameters: [$ref: "#/components/parameters/AccountHandle"]
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -313,7 +310,7 @@ paths:
       description: Get a public profile by ID.
       tags: [profiles]
       security: []
-      parameters: [$ref: "#/components/parameters/AccountHandle"]
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -374,7 +371,7 @@ paths:
         created as well as a list of the posts within the thread.
       security: []
       tags: [threads]
-      parameters: [$ref: "#/components/parameters/ThreadMark"]
+      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -400,7 +397,7 @@ paths:
       operationId: PostsCreate
       description: Create a new post within a thread.
       tags: [posts]
-      parameters: [$ref: "#/components/parameters/ThreadMark"]
+      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
       requestBody: { $ref: "#/components/requestBodies/PostsCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -431,16 +428,16 @@ components:
   #
 
   parameters:
-    AccountHandle:
+    AccountHandleParam:
       description: Account handle.
       example: southclaws
       name: account_handle
       in: path
       required: true
       schema:
-        type: string
+        $ref: "#/components/schemas/AccountHandle"
 
-    ThreadMark:
+    ThreadMarkParam:
       description: Thread unique and permanent identifier.
       name: thread_mark
       in: path
@@ -543,7 +540,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AuthSuccess"
+            $ref: "#/components/schemas/AuthSuccessBody"
 
     AuthProviderList:
       description: OK
@@ -553,6 +550,18 @@ components:
             $ref: "#/components/schemas/AuthProviderListBody"
 
     WebAuthnPublicKeyCreationOptions:
+      description: OK
+      headers:
+        "Set-Cookie":
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            x-go-type: any
+
+    WebAuthnPublicKeyAuthenticationOptions:
       description: OK
       headers:
         "Set-Cookie":
@@ -747,7 +756,7 @@ components:
           example: "password"
           type: string
 
-    AuthSuccess:
+    AuthSuccessBody:
       type: object
       required: [id]
       properties:

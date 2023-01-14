@@ -30,7 +30,6 @@ import (
 //     }))
 // }
 //
-//
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	defaultConfig := config.Config{}
 

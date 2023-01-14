@@ -112,7 +112,7 @@ func serialiseTag(t tag.Tag) openapi.Tag {
 }
 
 func tagID(t openapi.Tag) xid.ID {
-	return t.Id.XID()
+	return openapi.ParseID(t.Id)
 }
 
 // tagsIDs just applies tagID to a slice so we get a slice of IDs back.

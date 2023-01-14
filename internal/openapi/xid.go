@@ -22,7 +22,7 @@ var (
 // XID converts an openapi identifier to an xid. This is to work around an fmsg
 // with the oapi-codegen generated code which generates the identifier as a new
 // type instead of an alias which results in the marshal functions being hidden.
-func (i Identifier) XID() xid.ID {
+func GetAccountID(i Identifier) xid.ID {
 	v, err := xid.FromString(string(i))
 	if err != nil {
 		return xid.NilID()
@@ -32,7 +32,7 @@ func (i Identifier) XID() xid.ID {
 }
 
 // XID converts a thread mark (id-slug) to just the XID, same as above.
-func (i ThreadMark) XID() xid.ID {
+func ParseID(i Identifier) xid.ID {
 	v, err := xid.FromString(string(i[:20]))
 	if err != nil {
 		return xid.NilID()
@@ -50,7 +50,7 @@ func IdentifierFrom(id xid.ID) *Identifier {
 // ID will resolve the Unique value to an account's ID using a repository. Since
 // this is used a lot as most of the system supports using IDs and handles
 // interchangably, the repository this uses should make heavy use of caching.
-func (u AccountHandle) ID(ctx context.Context, r account.Repository) (account.AccountID, error) {
+func ResolveHandle(ctx context.Context, r account.Repository, u AccountHandle) (account.AccountID, error) {
 	if id, err := xid.FromString(string(u)); err == nil {
 		a, err := r.GetByID(ctx, account.AccountID(id))
 		if err != nil {
@@ -78,12 +78,12 @@ func (u AccountHandle) ID(ctx context.Context, r account.Repository) (account.Ac
 	return account.AccountID(a.ID), nil
 }
 
-func (u *AccountHandle) OptionalID(ctx context.Context, r account.Repository) (opt.Optional[account.AccountID], error) {
+func OptionalID(ctx context.Context, r account.Repository, u *AccountHandle) (opt.Optional[account.AccountID], error) {
 	if u == nil {
 		return opt.NewEmpty[account.AccountID](), nil
 	}
 
-	id, err := u.ID(ctx, r)
+	id, err := ResolveHandle(ctx, r, *u)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,6 @@ package webauthn
 
 import (
 	"context"
-	"encoding/base64"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -15,16 +14,19 @@ import (
 )
 
 // TODO: Move to actual accounts model.
-type temporary struct{ handle string }
+type temporary struct {
+	handle      string
+	credentials []webauthn.Credential
+}
 
 func (t *temporary) WebAuthnID() []byte                         { return []byte(t.handle) }
 func (t *temporary) WebAuthnName() string                       { return t.handle }
 func (t *temporary) WebAuthnDisplayName() string                { return t.handle }
 func (t *temporary) WebAuthnIcon() string                       { return "" }
-func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return nil }
+func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return t.credentials }
 
 func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
-	t := temporary{handle}
+	t := temporary{handle: handle}
 
 	// TODO: Check if handle already exists
 	// if it exists, maybe we can short circuit the flow and switch to login?
@@ -45,8 +47,12 @@ func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*proto
 	return credentialOptions, sessionData, nil
 }
 
-func (p *Provider) FinishRegistration(ctx context.Context, handle string, session webauthn.SessionData, parsedResponse *protocol.ParsedCredentialCreationData) (*webauthn.Credential, account.AccountID, error) {
-	t := temporary{handle}
+func (p *Provider) FinishRegistration(ctx context.Context,
+	handle string,
+	session webauthn.SessionData,
+	parsedResponse *protocol.ParsedCredentialCreationData,
+) (*webauthn.Credential, account.AccountID, error) {
+	t := temporary{handle: handle}
 
 	credential, err := p.wa.CreateCredential(&t, session, parsedResponse)
 	if err != nil {
@@ -54,40 +60,12 @@ func (p *Provider) FinishRegistration(ctx context.Context, handle string, sessio
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := p.getOrCreateAccount(ctx,
-		handle,
-		base64.RawURLEncoding.EncodeToString(credential.ID),
-		base64.RawURLEncoding.EncodeToString(credential.PublicKey),
-	)
+	acc, err := p.register(ctx, handle, credential)
 	if err != nil {
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return credential, acc.ID, nil
-}
-
-func (p *Provider) BeginLogin(ctx context.Context, handle string) (*webauthn.SessionData, error) {
-	t := temporary{handle}
-
-	_, sd, err := p.wa.BeginLogin(&t)
-	if err != nil {
-		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return sd, nil
-}
-
-func (p *Provider) FinishLogin(ctx context.Context, handle string, session webauthn.SessionData, parsedResponse *protocol.ParsedCredentialAssertionData) (*webauthn.Credential, error) {
-	t := temporary{handle}
-
-	cred, err := p.wa.ValidateLogin(&t, session, parsedResponse)
-	if err != nil {
-		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return cred, nil
 }
 
 func waErrMetadata(in error) []string {

@@ -24,6 +24,7 @@ type NotificationQuery struct {
 	unique           *bool
 	order            []OrderFunc
 	fields           []string
+	inters           []Interceptor
 	predicates       []predicate.Notification
 	withSubscription *SubscriptionQuery
 	withFKs          bool
@@ -39,13 +40,13 @@ func (nq *NotificationQuery) Where(ps ...predicate.Notification) *NotificationQu
 	return nq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (nq *NotificationQuery) Limit(limit int) *NotificationQuery {
 	nq.limit = &limit
 	return nq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (nq *NotificationQuery) Offset(offset int) *NotificationQuery {
 	nq.offset = &offset
 	return nq
@@ -58,7 +59,7 @@ func (nq *NotificationQuery) Unique(unique bool) *NotificationQuery {
 	return nq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (nq *NotificationQuery) Order(o ...OrderFunc) *NotificationQuery {
 	nq.order = append(nq.order, o...)
 	return nq
@@ -66,7 +67,7 @@ func (nq *NotificationQuery) Order(o ...OrderFunc) *NotificationQuery {
 
 // QuerySubscription chains the current query on the "subscription" edge.
 func (nq *NotificationQuery) QuerySubscription() *SubscriptionQuery {
-	query := &SubscriptionQuery{config: nq.config}
+	query := (&SubscriptionClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -89,7 +90,7 @@ func (nq *NotificationQuery) QuerySubscription() *SubscriptionQuery {
 // First returns the first Notification entity from the query.
 // Returns a *NotFoundError when no Notification was found.
 func (nq *NotificationQuery) First(ctx context.Context) (*Notification, error) {
-	nodes, err := nq.Limit(1).All(ctx)
+	nodes, err := nq.Limit(1).All(newQueryContext(ctx, TypeNotification, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func (nq *NotificationQuery) FirstX(ctx context.Context) *Notification {
 // Returns a *NotFoundError when no Notification ID was found.
 func (nq *NotificationQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = nq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = nq.Limit(1).IDs(newQueryContext(ctx, TypeNotification, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -135,7 +136,7 @@ func (nq *NotificationQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one Notification entity is found.
 // Returns a *NotFoundError when no Notification entities are found.
 func (nq *NotificationQuery) Only(ctx context.Context) (*Notification, error) {
-	nodes, err := nq.Limit(2).All(ctx)
+	nodes, err := nq.Limit(2).All(newQueryContext(ctx, TypeNotification, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +164,7 @@ func (nq *NotificationQuery) OnlyX(ctx context.Context) *Notification {
 // Returns a *NotFoundError when no entities are found.
 func (nq *NotificationQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = nq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = nq.Limit(2).IDs(newQueryContext(ctx, TypeNotification, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -188,10 +189,12 @@ func (nq *NotificationQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of Notifications.
 func (nq *NotificationQuery) All(ctx context.Context) ([]*Notification, error) {
+	ctx = newQueryContext(ctx, TypeNotification, "All")
 	if err := nq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return nq.sqlAll(ctx)
+	qr := querierAll[[]*Notification, *NotificationQuery]()
+	return withInterceptors[[]*Notification](ctx, nq, qr, nq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -206,6 +209,7 @@ func (nq *NotificationQuery) AllX(ctx context.Context) []*Notification {
 // IDs executes the query and returns a list of Notification IDs.
 func (nq *NotificationQuery) IDs(ctx context.Context) ([]xid.ID, error) {
 	var ids []xid.ID
+	ctx = newQueryContext(ctx, TypeNotification, "IDs")
 	if err := nq.Select(notification.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -223,10 +227,11 @@ func (nq *NotificationQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (nq *NotificationQuery) Count(ctx context.Context) (int, error) {
+	ctx = newQueryContext(ctx, TypeNotification, "Count")
 	if err := nq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return nq.sqlCount(ctx)
+	return withInterceptors[int](ctx, nq, querierCount[*NotificationQuery](), nq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -240,10 +245,15 @@ func (nq *NotificationQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (nq *NotificationQuery) Exist(ctx context.Context) (bool, error) {
-	if err := nq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = newQueryContext(ctx, TypeNotification, "Exist")
+	switch _, err := nq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return nq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -266,6 +276,7 @@ func (nq *NotificationQuery) Clone() *NotificationQuery {
 		limit:            nq.limit,
 		offset:           nq.offset,
 		order:            append([]OrderFunc{}, nq.order...),
+		inters:           append([]Interceptor{}, nq.inters...),
 		predicates:       append([]predicate.Notification{}, nq.predicates...),
 		withSubscription: nq.withSubscription.Clone(),
 		// clone intermediate query.
@@ -278,7 +289,7 @@ func (nq *NotificationQuery) Clone() *NotificationQuery {
 // WithSubscription tells the query-builder to eager-load the nodes that are connected to
 // the "subscription" edge. The optional arguments are used to configure the query builder of the edge.
 func (nq *NotificationQuery) WithSubscription(opts ...func(*SubscriptionQuery)) *NotificationQuery {
-	query := &SubscriptionQuery{config: nq.config}
+	query := (&SubscriptionClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -301,16 +312,11 @@ func (nq *NotificationQuery) WithSubscription(opts ...func(*SubscriptionQuery)) 
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (nq *NotificationQuery) GroupBy(field string, fields ...string) *NotificationGroupBy {
-	grbuild := &NotificationGroupBy{config: nq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := nq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return nq.sqlQuery(ctx), nil
-	}
+	nq.fields = append([]string{field}, fields...)
+	grbuild := &NotificationGroupBy{build: nq}
+	grbuild.flds = &nq.fields
 	grbuild.label = notification.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -328,10 +334,10 @@ func (nq *NotificationQuery) GroupBy(field string, fields ...string) *Notificati
 //		Scan(ctx, &v)
 func (nq *NotificationQuery) Select(fields ...string) *NotificationSelect {
 	nq.fields = append(nq.fields, fields...)
-	selbuild := &NotificationSelect{NotificationQuery: nq}
-	selbuild.label = notification.Label
-	selbuild.flds, selbuild.scan = &nq.fields, selbuild.Scan
-	return selbuild
+	sbuild := &NotificationSelect{NotificationQuery: nq}
+	sbuild.label = notification.Label
+	sbuild.flds, sbuild.scan = &nq.fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a NotificationSelect configured with the given aggregations.
@@ -340,6 +346,16 @@ func (nq *NotificationQuery) Aggregate(fns ...AggregateFunc) *NotificationSelect
 }
 
 func (nq *NotificationQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range nq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, nq); err != nil {
+				return err
+			}
+		}
+	}
 	for _, f := range nq.fields {
 		if !notification.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
@@ -442,17 +458,6 @@ func (nq *NotificationQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, nq.driver, _spec)
 }
 
-func (nq *NotificationQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := nq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (nq *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
@@ -544,13 +549,8 @@ func (nq *NotificationQuery) Modify(modifiers ...func(s *sql.Selector)) *Notific
 
 // NotificationGroupBy is the group-by builder for Notification entities.
 type NotificationGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *NotificationQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -559,58 +559,46 @@ func (ngb *NotificationGroupBy) Aggregate(fns ...AggregateFunc) *NotificationGro
 	return ngb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (ngb *NotificationGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := ngb.path(ctx)
-	if err != nil {
+	ctx = newQueryContext(ctx, TypeNotification, "GroupBy")
+	if err := ngb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ngb.sql = query
-	return ngb.sqlScan(ctx, v)
+	return scanWithInterceptors[*NotificationQuery, *NotificationGroupBy](ctx, ngb.build, ngb, ngb.build.inters, v)
 }
 
-func (ngb *NotificationGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range ngb.fields {
-		if !notification.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (ngb *NotificationGroupBy) sqlScan(ctx context.Context, root *NotificationQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(ngb.fns))
+	for _, fn := range ngb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := ngb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*ngb.flds)+len(ngb.fns))
+		for _, f := range *ngb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*ngb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ngb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := ngb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (ngb *NotificationGroupBy) sqlQuery() *sql.Selector {
-	selector := ngb.sql.Select()
-	aggregation := make([]string, 0, len(ngb.fns))
-	for _, fn := range ngb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(ngb.fields)+len(ngb.fns))
-		for _, f := range ngb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(ngb.fields...)...)
-}
-
 // NotificationSelect is the builder for selecting fields of Notification entities.
 type NotificationSelect struct {
 	*NotificationQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -621,26 +609,27 @@ func (ns *NotificationSelect) Aggregate(fns ...AggregateFunc) *NotificationSelec
 
 // Scan applies the selector query and scans the result into the given value.
 func (ns *NotificationSelect) Scan(ctx context.Context, v any) error {
+	ctx = newQueryContext(ctx, TypeNotification, "Select")
 	if err := ns.prepareQuery(ctx); err != nil {
 		return err
 	}
-	ns.sql = ns.NotificationQuery.sqlQuery(ctx)
-	return ns.sqlScan(ctx, v)
+	return scanWithInterceptors[*NotificationQuery, *NotificationSelect](ctx, ns.NotificationQuery, ns, ns.inters, v)
 }
 
-func (ns *NotificationSelect) sqlScan(ctx context.Context, v any) error {
+func (ns *NotificationSelect) sqlScan(ctx context.Context, root *NotificationQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(ns.fns))
 	for _, fn := range ns.fns {
-		aggregation = append(aggregation, fn(ns.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*ns.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		ns.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		ns.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := ns.sql.Query()
+	query, args := selector.Query()
 	if err := ns.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

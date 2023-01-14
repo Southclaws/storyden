@@ -24,7 +24,7 @@ func NewProfiles(as account.Service, ar account_repo.Repository) Profiles {
 }
 
 func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetRequestObject) (openapi.ProfilesGetResponseObject, error) {
-	id, err := request.AccountHandle.ID(ctx, p.ar)
+	id, err := openapi.ResolveHandle(ctx, p.ar, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -37,11 +37,13 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 	interests := dt.Map(acc.Interests, serialiseTag)
 
 	return openapi.ProfilesGet200JSONResponse{
-		Id:        openapi.Identifier(acc.ID.String()),
-		Bio:       utils.Ref(acc.Bio.ElseZero()),
-		Handle:    (*openapi.AccountHandle)(&acc.Handle),
-		Name:      &acc.Name,
-		Interests: &interests,
-		CreatedAt: acc.CreatedAt.Format(time.RFC3339),
+		ProfilesGetSuccessJSONResponse: openapi.ProfilesGetSuccessJSONResponse{
+			Id:        openapi.Identifier(acc.ID.String()),
+			Bio:       utils.Ref(acc.Bio.ElseZero()),
+			Handle:    (*openapi.AccountHandle)(&acc.Handle),
+			Name:      &acc.Name,
+			Interests: &interests,
+			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
+		},
 	}, nil
 }

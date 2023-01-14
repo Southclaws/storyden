@@ -2,11 +2,11 @@ package webauthn
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/webauthn"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -58,7 +58,7 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 	return nil, nil
 }
 
-func (p *Provider) getOrCreateAccount(ctx context.Context, handle, credentialID, pubkey string) (*account.Account, error) {
+func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential) (*account.Account, error) {
 	// TODO: LookupByHandle returning (account, bool, error) to stop this mess.
 	accfound := true
 	acc, err := p.account_repo.GetByHandle(ctx, handle)
@@ -70,53 +70,21 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, handle, credentialID,
 		}
 	}
 
-	// TODO: Don't do this, instead get ALL auth methods of type "webauthn" and
-	// iterate through them calling Validate. Each webauthn should be converted
-	// into some type that satisfies `webauthn.User` for `p.wa.ValidateLogin()`.
-	authrecord, authfound, err := p.auth_repo.LookupByIdentifier(ctx, authentication.Service(id), pubkey)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	if accfound {
+		return nil, fault.New("requester already has an account")
 	}
-
-	// if we found an account with the given handle
-	// and
-	// we found an authentication record with the public key
-	if accfound && authfound {
-		// and they are the same account
-		if acc.ID == authrecord.Account.ID {
-			// log the user in
-			return acc, nil
-		} else {
-			// they are for different accounts...
-			// TODO: informative error
-			return nil, fault.New("requester already has an account")
-		}
-	}
-
-	// if we found an account, but no authentication record
-	// this requester does not have access
-	if accfound && !authfound {
-		return nil, fault.Wrap(ErrNoAuthRecord,
-			fctx.With(ctx),
-			ftag.With(ftag.Unauthenticated),
-			fmsg.WithDesc("account already exists without webauthn",
-				"This handle has already been registered without a Passkey. If this is your account, you need to sign in to the account via another method and add your Passkey via settings."),
-		)
-	}
-
-	if !accfound && authfound {
-		// the handle is unused but this webauthn ID is used on another account
-		return nil, fault.Wrap(ErrExistsOnAnotherAccount, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
-	}
-
-	// no account or auth record, create a new account.
 
 	acc, err = p.account_repo.Create(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, id, pubkey, credentialID, nil)
+	encoded, err := json.Marshal(credential)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = p.auth_repo.Create(ctx, acc.ID, id, base64.RawURLEncoding.EncodeToString(credential.ID), string(encoded), nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

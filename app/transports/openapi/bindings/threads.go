@@ -56,7 +56,7 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 		params.Title,
 		params.Body,
 		accountID,
-		category.CategoryID(params.Category.XID()),
+		category.CategoryID(openapi.ParseID(params.Category)),
 		dt.Map(params.Tags, func(t openapi.Tag) string { return string(t.Id) }),
 		meta,
 	)
@@ -64,7 +64,9 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsCreate200JSONResponse(serialiseThread(thread)), nil
+	return openapi.ThreadsCreate200JSONResponse{
+		ThreadsCreateSuccessJSONResponse: openapi.ThreadsCreateSuccessJSONResponse(serialiseThread(thread)),
+	}, nil
 }
 
 func reacts(reacts []*react.React) []openapi.React {
@@ -73,7 +75,7 @@ func reacts(reacts []*react.React) []openapi.React {
 
 func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) (openapi.ThreadsListResponseObject, error) {
 	// optionally map from OpenAPI account handle type to AccountID type.
-	author, err := request.Params.Author.OptionalID(ctx, i.account_repo)
+	author, err := openapi.OptionalID(ctx, i.account_repo, request.Params.Author)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -81,7 +83,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 	// optionally map from OpenAPI identifier type to xid.ID type.
 	tags := opt.NewPtrMap(request.Params.Tags, func(t []openapi.Identifier) []xid.ID {
 		return dt.Map(t, func(i openapi.Identifier) xid.ID {
-			return i.XID()
+			return openapi.ParseID(i)
 		})
 	})
 
@@ -93,7 +95,9 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsList200JSONResponse(dt.Map(threads, serialiseThreadReference)), nil
+	return openapi.ThreadsList200JSONResponse{
+		ThreadsListJSONResponse: openapi.ThreadsListJSONResponse(dt.Map(threads, serialiseThreadReference)),
+	}, nil
 }
 
 func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
@@ -107,5 +111,7 @@ func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsGet200JSONResponse(serialiseThread(thread)), nil
+	return openapi.ThreadsGet200JSONResponse{
+		ThreadsGetJSONResponse: openapi.ThreadsGetJSONResponse(serialiseThread(thread)),
+	}, nil
 }

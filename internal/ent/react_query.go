@@ -25,6 +25,7 @@ type ReactQuery struct {
 	unique      *bool
 	order       []OrderFunc
 	fields      []string
+	inters      []Interceptor
 	predicates  []predicate.React
 	withAccount *AccountQuery
 	withPost    *PostQuery
@@ -41,13 +42,13 @@ func (rq *ReactQuery) Where(ps ...predicate.React) *ReactQuery {
 	return rq
 }
 
-// Limit adds a limit step to the query.
+// Limit the number of records to be returned by this query.
 func (rq *ReactQuery) Limit(limit int) *ReactQuery {
 	rq.limit = &limit
 	return rq
 }
 
-// Offset adds an offset step to the query.
+// Offset to start from.
 func (rq *ReactQuery) Offset(offset int) *ReactQuery {
 	rq.offset = &offset
 	return rq
@@ -60,7 +61,7 @@ func (rq *ReactQuery) Unique(unique bool) *ReactQuery {
 	return rq
 }
 
-// Order adds an order step to the query.
+// Order specifies how the records should be ordered.
 func (rq *ReactQuery) Order(o ...OrderFunc) *ReactQuery {
 	rq.order = append(rq.order, o...)
 	return rq
@@ -68,7 +69,7 @@ func (rq *ReactQuery) Order(o ...OrderFunc) *ReactQuery {
 
 // QueryAccount chains the current query on the "account" edge.
 func (rq *ReactQuery) QueryAccount() *AccountQuery {
-	query := &AccountQuery{config: rq.config}
+	query := (&AccountClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -90,7 +91,7 @@ func (rq *ReactQuery) QueryAccount() *AccountQuery {
 
 // QueryPost chains the current query on the "Post" edge.
 func (rq *ReactQuery) QueryPost() *PostQuery {
-	query := &PostQuery{config: rq.config}
+	query := (&PostClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -113,7 +114,7 @@ func (rq *ReactQuery) QueryPost() *PostQuery {
 // First returns the first React entity from the query.
 // Returns a *NotFoundError when no React was found.
 func (rq *ReactQuery) First(ctx context.Context) (*React, error) {
-	nodes, err := rq.Limit(1).All(ctx)
+	nodes, err := rq.Limit(1).All(newQueryContext(ctx, TypeReact, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +137,7 @@ func (rq *ReactQuery) FirstX(ctx context.Context) *React {
 // Returns a *NotFoundError when no React ID was found.
 func (rq *ReactQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
+	if ids, err = rq.Limit(1).IDs(newQueryContext(ctx, TypeReact, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -159,7 +160,7 @@ func (rq *ReactQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one React entity is found.
 // Returns a *NotFoundError when no React entities are found.
 func (rq *ReactQuery) Only(ctx context.Context) (*React, error) {
-	nodes, err := rq.Limit(2).All(ctx)
+	nodes, err := rq.Limit(2).All(newQueryContext(ctx, TypeReact, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func (rq *ReactQuery) OnlyX(ctx context.Context) *React {
 // Returns a *NotFoundError when no entities are found.
 func (rq *ReactQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = rq.Limit(2).IDs(ctx); err != nil {
+	if ids, err = rq.Limit(2).IDs(newQueryContext(ctx, TypeReact, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -212,10 +213,12 @@ func (rq *ReactQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of Reacts.
 func (rq *ReactQuery) All(ctx context.Context) ([]*React, error) {
+	ctx = newQueryContext(ctx, TypeReact, "All")
 	if err := rq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	return rq.sqlAll(ctx)
+	qr := querierAll[[]*React, *ReactQuery]()
+	return withInterceptors[[]*React](ctx, rq, qr, rq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
@@ -230,6 +233,7 @@ func (rq *ReactQuery) AllX(ctx context.Context) []*React {
 // IDs executes the query and returns a list of React IDs.
 func (rq *ReactQuery) IDs(ctx context.Context) ([]xid.ID, error) {
 	var ids []xid.ID
+	ctx = newQueryContext(ctx, TypeReact, "IDs")
 	if err := rq.Select(react.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -247,10 +251,11 @@ func (rq *ReactQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (rq *ReactQuery) Count(ctx context.Context) (int, error) {
+	ctx = newQueryContext(ctx, TypeReact, "Count")
 	if err := rq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return rq.sqlCount(ctx)
+	return withInterceptors[int](ctx, rq, querierCount[*ReactQuery](), rq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
@@ -264,10 +269,15 @@ func (rq *ReactQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (rq *ReactQuery) Exist(ctx context.Context) (bool, error) {
-	if err := rq.prepareQuery(ctx); err != nil {
-		return false, err
+	ctx = newQueryContext(ctx, TypeReact, "Exist")
+	switch _, err := rq.FirstID(ctx); {
+	case IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("ent: check existence: %w", err)
+	default:
+		return true, nil
 	}
-	return rq.sqlExist(ctx)
 }
 
 // ExistX is like Exist, but panics if an error occurs.
@@ -290,6 +300,7 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 		limit:       rq.limit,
 		offset:      rq.offset,
 		order:       append([]OrderFunc{}, rq.order...),
+		inters:      append([]Interceptor{}, rq.inters...),
 		predicates:  append([]predicate.React{}, rq.predicates...),
 		withAccount: rq.withAccount.Clone(),
 		withPost:    rq.withPost.Clone(),
@@ -303,7 +314,7 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 // WithAccount tells the query-builder to eager-load the nodes that are connected to
 // the "account" edge. The optional arguments are used to configure the query builder of the edge.
 func (rq *ReactQuery) WithAccount(opts ...func(*AccountQuery)) *ReactQuery {
-	query := &AccountQuery{config: rq.config}
+	query := (&AccountClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -314,7 +325,7 @@ func (rq *ReactQuery) WithAccount(opts ...func(*AccountQuery)) *ReactQuery {
 // WithPost tells the query-builder to eager-load the nodes that are connected to
 // the "Post" edge. The optional arguments are used to configure the query builder of the edge.
 func (rq *ReactQuery) WithPost(opts ...func(*PostQuery)) *ReactQuery {
-	query := &PostQuery{config: rq.config}
+	query := (&PostClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -337,16 +348,11 @@ func (rq *ReactQuery) WithPost(opts ...func(*PostQuery)) *ReactQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
-	grbuild := &ReactGroupBy{config: rq.config}
-	grbuild.fields = append([]string{field}, fields...)
-	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return rq.sqlQuery(ctx), nil
-	}
+	rq.fields = append([]string{field}, fields...)
+	grbuild := &ReactGroupBy{build: rq}
+	grbuild.flds = &rq.fields
 	grbuild.label = react.Label
-	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	grbuild.scan = grbuild.Scan
 	return grbuild
 }
 
@@ -364,10 +370,10 @@ func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
 //		Scan(ctx, &v)
 func (rq *ReactQuery) Select(fields ...string) *ReactSelect {
 	rq.fields = append(rq.fields, fields...)
-	selbuild := &ReactSelect{ReactQuery: rq}
-	selbuild.label = react.Label
-	selbuild.flds, selbuild.scan = &rq.fields, selbuild.Scan
-	return selbuild
+	sbuild := &ReactSelect{ReactQuery: rq}
+	sbuild.label = react.Label
+	sbuild.flds, sbuild.scan = &rq.fields, sbuild.Scan
+	return sbuild
 }
 
 // Aggregate returns a ReactSelect configured with the given aggregations.
@@ -376,6 +382,16 @@ func (rq *ReactQuery) Aggregate(fns ...AggregateFunc) *ReactSelect {
 }
 
 func (rq *ReactQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range rq.inters {
+		if inter == nil {
+			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
+		}
+		if trv, ok := inter.(Traverser); ok {
+			if err := trv.Traverse(ctx, rq); err != nil {
+				return err
+			}
+		}
+	}
 	for _, f := range rq.fields {
 		if !react.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
@@ -514,17 +530,6 @@ func (rq *ReactQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, rq.driver, _spec)
 }
 
-func (rq *ReactQuery) sqlExist(ctx context.Context) (bool, error) {
-	switch _, err := rq.FirstID(ctx); {
-	case IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("ent: check existence: %w", err)
-	default:
-		return true, nil
-	}
-}
-
 func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
@@ -616,13 +621,8 @@ func (rq *ReactQuery) Modify(modifiers ...func(s *sql.Selector)) *ReactSelect {
 
 // ReactGroupBy is the group-by builder for React entities.
 type ReactGroupBy struct {
-	config
 	selector
-	fields []string
-	fns    []AggregateFunc
-	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	build *ReactQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
@@ -631,58 +631,46 @@ func (rgb *ReactGroupBy) Aggregate(fns ...AggregateFunc) *ReactGroupBy {
 	return rgb
 }
 
-// Scan applies the group-by query and scans the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (rgb *ReactGroupBy) Scan(ctx context.Context, v any) error {
-	query, err := rgb.path(ctx)
-	if err != nil {
+	ctx = newQueryContext(ctx, TypeReact, "GroupBy")
+	if err := rgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	rgb.sql = query
-	return rgb.sqlScan(ctx, v)
+	return scanWithInterceptors[*ReactQuery, *ReactGroupBy](ctx, rgb.build, rgb, rgb.build.inters, v)
 }
 
-func (rgb *ReactGroupBy) sqlScan(ctx context.Context, v any) error {
-	for _, f := range rgb.fields {
-		if !react.ValidColumn(f) {
-			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
-		}
+func (rgb *ReactGroupBy) sqlScan(ctx context.Context, root *ReactQuery, v any) error {
+	selector := root.sqlQuery(ctx).Select()
+	aggregation := make([]string, 0, len(rgb.fns))
+	for _, fn := range rgb.fns {
+		aggregation = append(aggregation, fn(selector))
 	}
-	selector := rgb.sqlQuery()
+	if len(selector.SelectedColumns()) == 0 {
+		columns := make([]string, 0, len(*rgb.flds)+len(rgb.fns))
+		for _, f := range *rgb.flds {
+			columns = append(columns, selector.C(f))
+		}
+		columns = append(columns, aggregation...)
+		selector.Select(columns...)
+	}
+	selector.GroupBy(selector.Columns(*rgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := rgb.driver.Query(ctx, query, args, rows); err != nil {
+	if err := rgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-func (rgb *ReactGroupBy) sqlQuery() *sql.Selector {
-	selector := rgb.sql.Select()
-	aggregation := make([]string, 0, len(rgb.fns))
-	for _, fn := range rgb.fns {
-		aggregation = append(aggregation, fn(selector))
-	}
-	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(rgb.fields)+len(rgb.fns))
-		for _, f := range rgb.fields {
-			columns = append(columns, selector.C(f))
-		}
-		columns = append(columns, aggregation...)
-		selector.Select(columns...)
-	}
-	return selector.GroupBy(selector.Columns(rgb.fields...)...)
-}
-
 // ReactSelect is the builder for selecting fields of React entities.
 type ReactSelect struct {
 	*ReactQuery
 	selector
-	// intermediate query (i.e. traversal path).
-	sql *sql.Selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
@@ -693,26 +681,27 @@ func (rs *ReactSelect) Aggregate(fns ...AggregateFunc) *ReactSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (rs *ReactSelect) Scan(ctx context.Context, v any) error {
+	ctx = newQueryContext(ctx, TypeReact, "Select")
 	if err := rs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	rs.sql = rs.ReactQuery.sqlQuery(ctx)
-	return rs.sqlScan(ctx, v)
+	return scanWithInterceptors[*ReactQuery, *ReactSelect](ctx, rs.ReactQuery, rs, rs.inters, v)
 }
 
-func (rs *ReactSelect) sqlScan(ctx context.Context, v any) error {
+func (rs *ReactSelect) sqlScan(ctx context.Context, root *ReactQuery, v any) error {
+	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(rs.fns))
 	for _, fn := range rs.fns {
-		aggregation = append(aggregation, fn(rs.sql))
+		aggregation = append(aggregation, fn(selector))
 	}
 	switch n := len(*rs.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
-		rs.sql.Select(aggregation...)
+		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
-		rs.sql.AppendSelect(aggregation...)
+		selector.AppendSelect(aggregation...)
 	}
 	rows := &sql.Rows{}
-	query, args := rs.sql.Query()
+	query, args := selector.Query()
 	if err := rs.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}

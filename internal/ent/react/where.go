@@ -13,250 +13,162 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.React(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.React(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id xid.ID) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.React(sql.FieldLTE(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // Emoji applies equality check predicate on the "emoji" field. It's identical to EmojiEQ.
 func Emoji(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldEQ(FieldEmoji, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.React {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.React(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.React {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.React(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.React(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // EmojiEQ applies the EQ predicate on the "emoji" field.
 func EmojiEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldEQ(FieldEmoji, v))
 }
 
 // EmojiNEQ applies the NEQ predicate on the "emoji" field.
 func EmojiNEQ(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldNEQ(FieldEmoji, v))
 }
 
 // EmojiIn applies the In predicate on the "emoji" field.
 func EmojiIn(vs ...string) predicate.React {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldEmoji), v...))
-	})
+	return predicate.React(sql.FieldIn(FieldEmoji, vs...))
 }
 
 // EmojiNotIn applies the NotIn predicate on the "emoji" field.
 func EmojiNotIn(vs ...string) predicate.React {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldEmoji), v...))
-	})
+	return predicate.React(sql.FieldNotIn(FieldEmoji, vs...))
 }
 
 // EmojiGT applies the GT predicate on the "emoji" field.
 func EmojiGT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldGT(FieldEmoji, v))
 }
 
 // EmojiGTE applies the GTE predicate on the "emoji" field.
 func EmojiGTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldGTE(FieldEmoji, v))
 }
 
 // EmojiLT applies the LT predicate on the "emoji" field.
 func EmojiLT(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldLT(FieldEmoji, v))
 }
 
 // EmojiLTE applies the LTE predicate on the "emoji" field.
 func EmojiLTE(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldLTE(FieldEmoji, v))
 }
 
 // EmojiContains applies the Contains predicate on the "emoji" field.
 func EmojiContains(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldContains(FieldEmoji, v))
 }
 
 // EmojiHasPrefix applies the HasPrefix predicate on the "emoji" field.
 func EmojiHasPrefix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldHasPrefix(FieldEmoji, v))
 }
 
 // EmojiHasSuffix applies the HasSuffix predicate on the "emoji" field.
 func EmojiHasSuffix(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldHasSuffix(FieldEmoji, v))
 }
 
 // EmojiEqualFold applies the EqualFold predicate on the "emoji" field.
 func EmojiEqualFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldEqualFold(FieldEmoji, v))
 }
 
 // EmojiContainsFold applies the ContainsFold predicate on the "emoji" field.
 func EmojiContainsFold(v string) predicate.React {
-	return predicate.React(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldEmoji), v))
-	})
+	return predicate.React(sql.FieldContainsFold(FieldEmoji, v))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.
@@ -264,7 +176,6 @@ func HasAccount() predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(AccountTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, AccountTable, AccountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -292,7 +203,6 @@ func HasPost() predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PostTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, PostTable, PostColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

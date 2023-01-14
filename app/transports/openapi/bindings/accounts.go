@@ -35,7 +35,9 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsGet200JSONResponse(serialiseAccount(acc)), nil
+	return openapi.AccountsGet200JSONResponse{
+		AccountsGetSuccessJSONResponse: openapi.AccountsGetSuccessJSONResponse(serialiseAccount(acc)),
+	}, nil
 }
 
 func (i *Accounts) AccountsUpdate(ctx context.Context, request openapi.AccountsUpdateRequestObject) (openapi.AccountsUpdateResponseObject, error) {
@@ -54,11 +56,13 @@ func (i *Accounts) AccountsUpdate(ctx context.Context, request openapi.AccountsU
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsUpdateSuccessJSONResponse(serialiseAccount(acc)), nil
+	return openapi.AccountsUpdate200JSONResponse{
+		AccountsUpdateSuccessJSONResponse: openapi.AccountsUpdateSuccessJSONResponse(serialiseAccount(acc)),
+	}, nil
 }
 
 func (i *Accounts) AccountsGetAvatar(ctx context.Context, request openapi.AccountsGetAvatarRequestObject) (openapi.AccountsGetAvatarResponseObject, error) {
-	id, err := request.AccountHandle.ID(ctx, i.ar)
+	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -68,8 +72,10 @@ func (i *Accounts) AccountsGetAvatar(ctx context.Context, request openapi.Accoun
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsGetAvatarImagepngResponse{
-		Body: r,
+	return openapi.AccountsGetAvatar200ImagepngResponse{
+		AccountsGetAvatarImagepngResponse: openapi.AccountsGetAvatarImagepngResponse{
+			Body: r,
+		},
 	}, nil
 }
 

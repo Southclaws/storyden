@@ -95,11 +95,13 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		HttpOnly: true,
 	}
 
-	return openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
-		Headers: openapi.WebAuthnPublicKeyCreationOptionsResponseHeaders{
-			SetCookie: cookie.String(),
+	return openapi.WebAuthnRequestCredential200JSONResponse{
+		WebAuthnPublicKeyCreationOptionsJSONResponse: openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
+			Headers: openapi.WebAuthnPublicKeyCreationOptionsResponseHeaders{
+				SetCookie: cookie.String(),
+			},
+			Body: cred,
 		},
-		Body: cred,
 	}, nil
 }
 
@@ -144,19 +146,100 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 	}
 
 	return openapi.WebAuthnMakeCredential200JSONResponse{
-		Body: openapi.AuthSuccess{
-			Id: xid.NilID().String(),
-		},
-		Headers: openapi.AuthSuccessResponseHeaders{
-			SetCookie: string(cookie),
+		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+			Body: openapi.AuthSuccess{
+				Id: xid.NilID().String(),
+			},
+			Headers: openapi.AuthSuccessResponseHeaders{
+				SetCookie: string(cookie),
+			},
 		},
 	}, nil
 }
 
 func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.WebAuthnGetAssertionRequestObject) (openapi.WebAuthnGetAssertionResponseObject, error) {
-	return nil, nil
+	cred, sessionData, err := a.wa.BeginLogin(ctx, string(request.AccountHandle))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	j, err := json.Marshal(sessionData)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	value := base64.URLEncoding.EncodeToString(j)
+
+	// save the base64 as a cookie for the WebAuthnMakeCredential call
+
+	cookie := http.Cookie{
+		Name:  cookieName,
+		Value: value,
+		// Expire this exchange after 10 minutes
+		Expires:  time.Now().Add(time.Minute * 10),
+		SameSite: http.SameSiteNoneMode,
+		Path:     "/",
+		Domain:   a.domain,
+		Secure:   true,
+		HttpOnly: true,
+	}
+
+	return openapi.WebAuthnGetAssertion200JSONResponse{
+		WebAuthnPublicKeyAuthenticationOptionsJSONResponse: openapi.WebAuthnPublicKeyAuthenticationOptionsJSONResponse{
+			Body: cred,
+			Headers: openapi.WebAuthnPublicKeyAuthenticationOptionsResponseHeaders{
+				SetCookie: cookie.String(),
+			},
+		},
+	}, nil
 }
 
 func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.WebAuthnMakeAssertionRequestObject) (openapi.WebAuthnMakeAssertionResponseObject, error) {
-	return nil, nil
+	c := ctx.Value("webauthn")
+	session, ok := c.(*webauthn.SessionData)
+	if !ok {
+		return nil, fault.Wrap(errNoCookie,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
+	}
+
+	b, err := json.Marshal(request.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	reader := bytes.NewReader(b)
+
+	cr, err := protocol.ParseCredentialRequestResponseBody(reader)
+	if err != nil {
+		pe := err.(*protocol.Error)
+		ctx = fctx.WithMeta(ctx,
+			"type", pe.Type,
+			"details", pe.Details,
+			"info", pe.DevInfo,
+		)
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
+	}
+
+	_, accountID, err := a.wa.FinishLogin(ctx, string(session.UserID), *session, cr)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	cookie, err := a.sm.encodeSession(accountID.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.WebAuthnMakeAssertion200JSONResponse{
+		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+			Body: openapi.AuthSuccess{
+				Id: xid.NilID().String(),
+			},
+			Headers: openapi.AuthSuccessResponseHeaders{
+				SetCookie: string(cookie),
+			},
+		},
+	}, nil
 }
