@@ -10,6 +10,9 @@ export default function Page() {
     router.push("/");
   }, [router]);
 
+  document.cookie =
+    "storyden-session=; Path=/; Domain=demo.storyden.org; HttpOnly; Secure";
+
   return <Link href="/login">Logged out. Returning to login.</Link>;
 }
 
