@@ -7,7 +7,6 @@
  */
 import type { AuthProviderListBody } from "./authProviderListBody";
 
-/**
- * OK
- */
-export type AuthProviderListResponse = AuthProviderListBody;
+export type AuthProviderListResponse = {
+  providers: AuthProviderListBody;
+};

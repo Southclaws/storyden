@@ -96,7 +96,9 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 	}
 
 	return openapi.ThreadsList200JSONResponse{
-		ThreadsListJSONResponse: openapi.ThreadsListJSONResponse(dt.Map(threads, serialiseThreadReference)),
+		ThreadsListJSONResponse: openapi.ThreadsListJSONResponse{
+			Threads: dt.Map(threads, serialiseThreadReference),
+		},
 	}, nil
 }
 

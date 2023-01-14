@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ThreadList } from "./threadList";
+import type { ThreadReference } from "./threadReference";
 
-export type ThreadsListResponse = {
-  threads: ThreadList;
-};
+export type ThreadList = ThreadReference[];
