@@ -1,9 +1,8 @@
 package: openapi
+output: generated.go
 generate:
-  server: true
   client: true
   echo-server: true
   strict-server: true
   models: true
   embedded-spec: true
-output: generated.go

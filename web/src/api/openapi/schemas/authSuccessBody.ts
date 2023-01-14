@@ -6,4 +6,6 @@
  * OpenAPI spec version: 1
  */
 
-export type WebAuthnGetAssertionBody = { [key: string]: any };
+export interface AuthSuccessBody {
+  id: string;
+}

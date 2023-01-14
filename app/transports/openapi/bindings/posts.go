@@ -45,7 +45,8 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 	var reply optional.Optional[post.PostID]
 
 	if params.ReplyTo != nil {
-		reply = optional.Of(post.PostID(params.ReplyTo.XID()))
+		tm := openapi.ParseID(*params.ReplyTo)
+		reply = optional.Of(post.PostID(tm))
 	}
 
 	var meta map[string]any
@@ -64,5 +65,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.PostsCreate200JSONResponse(serialisePost(post)), nil
+	return openapi.PostsCreate200JSONResponse{
+		PostsCreateSuccessJSONResponse: openapi.PostsCreateSuccessJSONResponse(serialisePost(post)),
+	}, nil
 }

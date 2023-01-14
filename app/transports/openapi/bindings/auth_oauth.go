@@ -25,8 +25,10 @@ func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AuthPasswordSignin200JSONResponse{
-		Body:    openapi.AuthSuccess{Id: account.ID.String()},
-		Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+	return openapi.AuthOAuthProviderCallback200JSONResponse{
+		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+			Body:    openapi.AuthSuccess{Id: account.ID.String()},
+			Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+		},
 	}, nil
 }

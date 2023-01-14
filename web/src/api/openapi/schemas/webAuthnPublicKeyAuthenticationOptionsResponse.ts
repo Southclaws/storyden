@@ -6,6 +6,6 @@
  * OpenAPI spec version: 1
  */
 
-export interface AuthSuccess {
-  id: string;
-}
+export type WebAuthnPublicKeyAuthenticationOptionsResponse = {
+  [key: string]: any;
+};

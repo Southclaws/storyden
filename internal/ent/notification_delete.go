@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,34 +27,7 @@ func (nd *NotificationDelete) Where(ps ...predicate.Notification) *NotificationD
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (nd *NotificationDelete) Exec(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(nd.hooks) == 0 {
-		affected, err = nd.sqlExec(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*NotificationMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			nd.mutation = mutation
-			affected, err = nd.sqlExec(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(nd.hooks) - 1; i >= 0; i-- {
-			if nd.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = nd.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, nd.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, NotificationMutation](ctx, nd.sqlExec, nd.mutation, nd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -88,6 +60,7 @@ func (nd *NotificationDelete) sqlExec(ctx context.Context) (int, error) {
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
+	nd.mutation.done = true
 	return affected, err
 }
 

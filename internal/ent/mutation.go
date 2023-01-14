@@ -22,6 +22,7 @@ import (
 	"github.com/rs/xid"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -792,9 +793,24 @@ func (m *AccountMutation) Where(ps ...predicate.Account) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the AccountMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AccountMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Account, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *AccountMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AccountMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Account).
@@ -1594,9 +1610,24 @@ func (m *AuthenticationMutation) Where(ps ...predicate.Authentication) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the AuthenticationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AuthenticationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Authentication, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *AuthenticationMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AuthenticationMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Authentication).
@@ -2314,9 +2345,24 @@ func (m *CategoryMutation) Where(ps ...predicate.Category) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the CategoryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CategoryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Category, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *CategoryMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CategoryMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Category).
@@ -2973,9 +3019,24 @@ func (m *NotificationMutation) Where(ps ...predicate.Notification) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the NotificationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NotificationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Notification, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *NotificationMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NotificationMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Notification).
@@ -4295,9 +4356,24 @@ func (m *PostMutation) Where(ps ...predicate.Post) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the PostMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PostMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Post, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *PostMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PostMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Post).
@@ -5166,9 +5242,24 @@ func (m *ReactMutation) Where(ps ...predicate.React) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ReactMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReactMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.React, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ReactMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReactMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (React).
@@ -5675,9 +5766,24 @@ func (m *RoleMutation) Where(ps ...predicate.Role) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the RoleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RoleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Role, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *RoleMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RoleMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Role).
@@ -6234,9 +6340,24 @@ func (m *SubscriptionMutation) Where(ps ...predicate.Subscription) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the SubscriptionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Subscription, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *SubscriptionMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SubscriptionMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Subscription).
@@ -6790,9 +6911,24 @@ func (m *TagMutation) Where(ps ...predicate.Tag) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the TagMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TagMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Tag, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *TagMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TagMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Tag).

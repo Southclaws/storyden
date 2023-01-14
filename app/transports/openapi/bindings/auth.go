@@ -48,7 +48,9 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 		},
 	)
 
-	return openapi.AuthProviderListJSONResponse(list), nil
+	return openapi.AuthProviderList200JSONResponse{
+		AuthProviderListJSONResponse: list,
+	}, nil
 }
 
 func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {

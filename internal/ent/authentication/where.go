@@ -13,476 +13,312 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Authentication(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Authentication(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id xid.ID) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Authentication(sql.FieldLTE(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // Service applies equality check predicate on the "service" field. It's identical to ServiceEQ.
 func Service(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldService, v))
 }
 
 // Identifier applies equality check predicate on the "identifier" field. It's identical to IdentifierEQ.
 func Identifier(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldIdentifier, v))
 }
 
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
 func Token(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldToken, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Authentication(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Authentication(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Authentication(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // ServiceEQ applies the EQ predicate on the "service" field.
 func ServiceEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldService, v))
 }
 
 // ServiceNEQ applies the NEQ predicate on the "service" field.
 func ServiceNEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldNEQ(FieldService, v))
 }
 
 // ServiceIn applies the In predicate on the "service" field.
 func ServiceIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldService), v...))
-	})
+	return predicate.Authentication(sql.FieldIn(FieldService, vs...))
 }
 
 // ServiceNotIn applies the NotIn predicate on the "service" field.
 func ServiceNotIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldService), v...))
-	})
+	return predicate.Authentication(sql.FieldNotIn(FieldService, vs...))
 }
 
 // ServiceGT applies the GT predicate on the "service" field.
 func ServiceGT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldGT(FieldService, v))
 }
 
 // ServiceGTE applies the GTE predicate on the "service" field.
 func ServiceGTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldGTE(FieldService, v))
 }
 
 // ServiceLT applies the LT predicate on the "service" field.
 func ServiceLT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldLT(FieldService, v))
 }
 
 // ServiceLTE applies the LTE predicate on the "service" field.
 func ServiceLTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldLTE(FieldService, v))
 }
 
 // ServiceContains applies the Contains predicate on the "service" field.
 func ServiceContains(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldContains(FieldService, v))
 }
 
 // ServiceHasPrefix applies the HasPrefix predicate on the "service" field.
 func ServiceHasPrefix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldHasPrefix(FieldService, v))
 }
 
 // ServiceHasSuffix applies the HasSuffix predicate on the "service" field.
 func ServiceHasSuffix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldHasSuffix(FieldService, v))
 }
 
 // ServiceEqualFold applies the EqualFold predicate on the "service" field.
 func ServiceEqualFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldEqualFold(FieldService, v))
 }
 
 // ServiceContainsFold applies the ContainsFold predicate on the "service" field.
 func ServiceContainsFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldService), v))
-	})
+	return predicate.Authentication(sql.FieldContainsFold(FieldService, v))
 }
 
 // IdentifierEQ applies the EQ predicate on the "identifier" field.
 func IdentifierEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldIdentifier, v))
 }
 
 // IdentifierNEQ applies the NEQ predicate on the "identifier" field.
 func IdentifierNEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldNEQ(FieldIdentifier, v))
 }
 
 // IdentifierIn applies the In predicate on the "identifier" field.
 func IdentifierIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldIdentifier), v...))
-	})
+	return predicate.Authentication(sql.FieldIn(FieldIdentifier, vs...))
 }
 
 // IdentifierNotIn applies the NotIn predicate on the "identifier" field.
 func IdentifierNotIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldIdentifier), v...))
-	})
+	return predicate.Authentication(sql.FieldNotIn(FieldIdentifier, vs...))
 }
 
 // IdentifierGT applies the GT predicate on the "identifier" field.
 func IdentifierGT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldGT(FieldIdentifier, v))
 }
 
 // IdentifierGTE applies the GTE predicate on the "identifier" field.
 func IdentifierGTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldGTE(FieldIdentifier, v))
 }
 
 // IdentifierLT applies the LT predicate on the "identifier" field.
 func IdentifierLT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldLT(FieldIdentifier, v))
 }
 
 // IdentifierLTE applies the LTE predicate on the "identifier" field.
 func IdentifierLTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldLTE(FieldIdentifier, v))
 }
 
 // IdentifierContains applies the Contains predicate on the "identifier" field.
 func IdentifierContains(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldContains(FieldIdentifier, v))
 }
 
 // IdentifierHasPrefix applies the HasPrefix predicate on the "identifier" field.
 func IdentifierHasPrefix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldHasPrefix(FieldIdentifier, v))
 }
 
 // IdentifierHasSuffix applies the HasSuffix predicate on the "identifier" field.
 func IdentifierHasSuffix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldHasSuffix(FieldIdentifier, v))
 }
 
 // IdentifierEqualFold applies the EqualFold predicate on the "identifier" field.
 func IdentifierEqualFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldEqualFold(FieldIdentifier, v))
 }
 
 // IdentifierContainsFold applies the ContainsFold predicate on the "identifier" field.
 func IdentifierContainsFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldIdentifier), v))
-	})
+	return predicate.Authentication(sql.FieldContainsFold(FieldIdentifier, v))
 }
 
 // TokenEQ applies the EQ predicate on the "token" field.
 func TokenEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldEQ(FieldToken, v))
 }
 
 // TokenNEQ applies the NEQ predicate on the "token" field.
 func TokenNEQ(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldNEQ(FieldToken, v))
 }
 
 // TokenIn applies the In predicate on the "token" field.
 func TokenIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldToken), v...))
-	})
+	return predicate.Authentication(sql.FieldIn(FieldToken, vs...))
 }
 
 // TokenNotIn applies the NotIn predicate on the "token" field.
 func TokenNotIn(vs ...string) predicate.Authentication {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldToken), v...))
-	})
+	return predicate.Authentication(sql.FieldNotIn(FieldToken, vs...))
 }
 
 // TokenGT applies the GT predicate on the "token" field.
 func TokenGT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldGT(FieldToken, v))
 }
 
 // TokenGTE applies the GTE predicate on the "token" field.
 func TokenGTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldGTE(FieldToken, v))
 }
 
 // TokenLT applies the LT predicate on the "token" field.
 func TokenLT(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldLT(FieldToken, v))
 }
 
 // TokenLTE applies the LTE predicate on the "token" field.
 func TokenLTE(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldLTE(FieldToken, v))
 }
 
 // TokenContains applies the Contains predicate on the "token" field.
 func TokenContains(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldContains(FieldToken, v))
 }
 
 // TokenHasPrefix applies the HasPrefix predicate on the "token" field.
 func TokenHasPrefix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldHasPrefix(FieldToken, v))
 }
 
 // TokenHasSuffix applies the HasSuffix predicate on the "token" field.
 func TokenHasSuffix(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldHasSuffix(FieldToken, v))
 }
 
 // TokenEqualFold applies the EqualFold predicate on the "token" field.
 func TokenEqualFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldEqualFold(FieldToken, v))
 }
 
 // TokenContainsFold applies the ContainsFold predicate on the "token" field.
 func TokenContainsFold(v string) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldToken), v))
-	})
+	return predicate.Authentication(sql.FieldContainsFold(FieldToken, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.
 func MetadataIsNil() predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldMetadata)))
-	})
+	return predicate.Authentication(sql.FieldIsNull(FieldMetadata))
 }
 
 // MetadataNotNil applies the NotNil predicate on the "metadata" field.
 func MetadataNotNil() predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldMetadata)))
-	})
+	return predicate.Authentication(sql.FieldNotNull(FieldMetadata))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.
@@ -490,7 +326,6 @@ func HasAccount() predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(AccountTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

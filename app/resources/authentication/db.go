@@ -84,6 +84,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 	r, err := d.db.Authentication.
 		Query().
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
+		WithAccount().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

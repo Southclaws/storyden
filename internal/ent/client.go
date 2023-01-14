@@ -53,7 +53,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -180,6 +180,46 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Tag.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Account.Intercept(interceptors...)
+	c.Authentication.Intercept(interceptors...)
+	c.Category.Intercept(interceptors...)
+	c.Notification.Intercept(interceptors...)
+	c.Post.Intercept(interceptors...)
+	c.React.Intercept(interceptors...)
+	c.Role.Intercept(interceptors...)
+	c.Subscription.Intercept(interceptors...)
+	c.Tag.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *AccountMutation:
+		return c.Account.mutate(ctx, m)
+	case *AuthenticationMutation:
+		return c.Authentication.mutate(ctx, m)
+	case *CategoryMutation:
+		return c.Category.mutate(ctx, m)
+	case *NotificationMutation:
+		return c.Notification.mutate(ctx, m)
+	case *PostMutation:
+		return c.Post.mutate(ctx, m)
+	case *ReactMutation:
+		return c.React.mutate(ctx, m)
+	case *RoleMutation:
+		return c.Role.mutate(ctx, m)
+	case *SubscriptionMutation:
+		return c.Subscription.mutate(ctx, m)
+	case *TagMutation:
+		return c.Tag.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // AccountClient is a client for the Account schema.
 type AccountClient struct {
 	config
@@ -194,6 +234,12 @@ func NewAccountClient(c config) *AccountClient {
 // A call to `Use(f, g, h)` equals to `account.Hooks(f(g(h())))`.
 func (c *AccountClient) Use(hooks ...Hook) {
 	c.hooks.Account = append(c.hooks.Account, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `account.Intercept(f(g(h())))`.
+func (c *AccountClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Account = append(c.inters.Account, interceptors...)
 }
 
 // Create returns a builder for creating a Account entity.
@@ -248,6 +294,7 @@ func (c *AccountClient) DeleteOneID(id xid.ID) *AccountDeleteOne {
 func (c *AccountClient) Query() *AccountQuery {
 	return &AccountQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -267,7 +314,7 @@ func (c *AccountClient) GetX(ctx context.Context, id xid.ID) *Account {
 
 // QueryPosts queries the posts edge of a Account.
 func (c *AccountClient) QueryPosts(a *Account) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -283,7 +330,7 @@ func (c *AccountClient) QueryPosts(a *Account) *PostQuery {
 
 // QueryReacts queries the reacts edge of a Account.
 func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
-	query := &ReactQuery{config: c.config}
+	query := (&ReactClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -299,7 +346,7 @@ func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
 
 // QueryRoles queries the roles edge of a Account.
 func (c *AccountClient) QueryRoles(a *Account) *RoleQuery {
-	query := &RoleQuery{config: c.config}
+	query := (&RoleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -315,7 +362,7 @@ func (c *AccountClient) QueryRoles(a *Account) *RoleQuery {
 
 // QuerySubscriptions queries the subscriptions edge of a Account.
 func (c *AccountClient) QuerySubscriptions(a *Account) *SubscriptionQuery {
-	query := &SubscriptionQuery{config: c.config}
+	query := (&SubscriptionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -331,7 +378,7 @@ func (c *AccountClient) QuerySubscriptions(a *Account) *SubscriptionQuery {
 
 // QueryAuthentication queries the authentication edge of a Account.
 func (c *AccountClient) QueryAuthentication(a *Account) *AuthenticationQuery {
-	query := &AuthenticationQuery{config: c.config}
+	query := (&AuthenticationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -347,7 +394,7 @@ func (c *AccountClient) QueryAuthentication(a *Account) *AuthenticationQuery {
 
 // QueryTags queries the tags edge of a Account.
 func (c *AccountClient) QueryTags(a *Account) *TagQuery {
-	query := &TagQuery{config: c.config}
+	query := (&TagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -366,6 +413,26 @@ func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
 }
 
+// Interceptors returns the client interceptors.
+func (c *AccountClient) Interceptors() []Interceptor {
+	return c.inters.Account
+}
+
+func (c *AccountClient) mutate(ctx context.Context, m *AccountMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AccountCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AccountUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AccountDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Account mutation op: %q", m.Op())
+	}
+}
+
 // AuthenticationClient is a client for the Authentication schema.
 type AuthenticationClient struct {
 	config
@@ -380,6 +447,12 @@ func NewAuthenticationClient(c config) *AuthenticationClient {
 // A call to `Use(f, g, h)` equals to `authentication.Hooks(f(g(h())))`.
 func (c *AuthenticationClient) Use(hooks ...Hook) {
 	c.hooks.Authentication = append(c.hooks.Authentication, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `authentication.Intercept(f(g(h())))`.
+func (c *AuthenticationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Authentication = append(c.inters.Authentication, interceptors...)
 }
 
 // Create returns a builder for creating a Authentication entity.
@@ -434,6 +507,7 @@ func (c *AuthenticationClient) DeleteOneID(id xid.ID) *AuthenticationDeleteOne {
 func (c *AuthenticationClient) Query() *AuthenticationQuery {
 	return &AuthenticationQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -453,7 +527,7 @@ func (c *AuthenticationClient) GetX(ctx context.Context, id xid.ID) *Authenticat
 
 // QueryAccount queries the account edge of a Authentication.
 func (c *AuthenticationClient) QueryAccount(a *Authentication) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
@@ -472,6 +546,26 @@ func (c *AuthenticationClient) Hooks() []Hook {
 	return c.hooks.Authentication
 }
 
+// Interceptors returns the client interceptors.
+func (c *AuthenticationClient) Interceptors() []Interceptor {
+	return c.inters.Authentication
+}
+
+func (c *AuthenticationClient) mutate(ctx context.Context, m *AuthenticationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AuthenticationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AuthenticationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AuthenticationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AuthenticationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Authentication mutation op: %q", m.Op())
+	}
+}
+
 // CategoryClient is a client for the Category schema.
 type CategoryClient struct {
 	config
@@ -486,6 +580,12 @@ func NewCategoryClient(c config) *CategoryClient {
 // A call to `Use(f, g, h)` equals to `category.Hooks(f(g(h())))`.
 func (c *CategoryClient) Use(hooks ...Hook) {
 	c.hooks.Category = append(c.hooks.Category, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `category.Intercept(f(g(h())))`.
+func (c *CategoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Category = append(c.inters.Category, interceptors...)
 }
 
 // Create returns a builder for creating a Category entity.
@@ -540,6 +640,7 @@ func (c *CategoryClient) DeleteOneID(id xid.ID) *CategoryDeleteOne {
 func (c *CategoryClient) Query() *CategoryQuery {
 	return &CategoryQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -559,7 +660,7 @@ func (c *CategoryClient) GetX(ctx context.Context, id xid.ID) *Category {
 
 // QueryPosts queries the posts edge of a Category.
 func (c *CategoryClient) QueryPosts(ca *Category) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
@@ -578,6 +679,26 @@ func (c *CategoryClient) Hooks() []Hook {
 	return c.hooks.Category
 }
 
+// Interceptors returns the client interceptors.
+func (c *CategoryClient) Interceptors() []Interceptor {
+	return c.inters.Category
+}
+
+func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Category mutation op: %q", m.Op())
+	}
+}
+
 // NotificationClient is a client for the Notification schema.
 type NotificationClient struct {
 	config
@@ -592,6 +713,12 @@ func NewNotificationClient(c config) *NotificationClient {
 // A call to `Use(f, g, h)` equals to `notification.Hooks(f(g(h())))`.
 func (c *NotificationClient) Use(hooks ...Hook) {
 	c.hooks.Notification = append(c.hooks.Notification, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `notification.Intercept(f(g(h())))`.
+func (c *NotificationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Notification = append(c.inters.Notification, interceptors...)
 }
 
 // Create returns a builder for creating a Notification entity.
@@ -646,6 +773,7 @@ func (c *NotificationClient) DeleteOneID(id xid.ID) *NotificationDeleteOne {
 func (c *NotificationClient) Query() *NotificationQuery {
 	return &NotificationQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -665,7 +793,7 @@ func (c *NotificationClient) GetX(ctx context.Context, id xid.ID) *Notification 
 
 // QuerySubscription queries the subscription edge of a Notification.
 func (c *NotificationClient) QuerySubscription(n *Notification) *SubscriptionQuery {
-	query := &SubscriptionQuery{config: c.config}
+	query := (&SubscriptionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
@@ -684,6 +812,26 @@ func (c *NotificationClient) Hooks() []Hook {
 	return c.hooks.Notification
 }
 
+// Interceptors returns the client interceptors.
+func (c *NotificationClient) Interceptors() []Interceptor {
+	return c.inters.Notification
+}
+
+func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NotificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Notification mutation op: %q", m.Op())
+	}
+}
+
 // PostClient is a client for the Post schema.
 type PostClient struct {
 	config
@@ -698,6 +846,12 @@ func NewPostClient(c config) *PostClient {
 // A call to `Use(f, g, h)` equals to `post.Hooks(f(g(h())))`.
 func (c *PostClient) Use(hooks ...Hook) {
 	c.hooks.Post = append(c.hooks.Post, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `post.Intercept(f(g(h())))`.
+func (c *PostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Post = append(c.inters.Post, interceptors...)
 }
 
 // Create returns a builder for creating a Post entity.
@@ -752,6 +906,7 @@ func (c *PostClient) DeleteOneID(id xid.ID) *PostDeleteOne {
 func (c *PostClient) Query() *PostQuery {
 	return &PostQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -771,7 +926,7 @@ func (c *PostClient) GetX(ctx context.Context, id xid.ID) *Post {
 
 // QueryAuthor queries the author edge of a Post.
 func (c *PostClient) QueryAuthor(po *Post) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -787,7 +942,7 @@ func (c *PostClient) QueryAuthor(po *Post) *AccountQuery {
 
 // QueryCategory queries the category edge of a Post.
 func (c *PostClient) QueryCategory(po *Post) *CategoryQuery {
-	query := &CategoryQuery{config: c.config}
+	query := (&CategoryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -803,7 +958,7 @@ func (c *PostClient) QueryCategory(po *Post) *CategoryQuery {
 
 // QueryTags queries the tags edge of a Post.
 func (c *PostClient) QueryTags(po *Post) *TagQuery {
-	query := &TagQuery{config: c.config}
+	query := (&TagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -819,7 +974,7 @@ func (c *PostClient) QueryTags(po *Post) *TagQuery {
 
 // QueryRoot queries the root edge of a Post.
 func (c *PostClient) QueryRoot(po *Post) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -835,7 +990,7 @@ func (c *PostClient) QueryRoot(po *Post) *PostQuery {
 
 // QueryPosts queries the posts edge of a Post.
 func (c *PostClient) QueryPosts(po *Post) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -851,7 +1006,7 @@ func (c *PostClient) QueryPosts(po *Post) *PostQuery {
 
 // QueryReplyTo queries the replyTo edge of a Post.
 func (c *PostClient) QueryReplyTo(po *Post) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -867,7 +1022,7 @@ func (c *PostClient) QueryReplyTo(po *Post) *PostQuery {
 
 // QueryReplies queries the replies edge of a Post.
 func (c *PostClient) QueryReplies(po *Post) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -883,7 +1038,7 @@ func (c *PostClient) QueryReplies(po *Post) *PostQuery {
 
 // QueryReacts queries the reacts edge of a Post.
 func (c *PostClient) QueryReacts(po *Post) *ReactQuery {
-	query := &ReactQuery{config: c.config}
+	query := (&ReactClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
@@ -902,6 +1057,26 @@ func (c *PostClient) Hooks() []Hook {
 	return c.hooks.Post
 }
 
+// Interceptors returns the client interceptors.
+func (c *PostClient) Interceptors() []Interceptor {
+	return c.inters.Post
+}
+
+func (c *PostClient) mutate(ctx context.Context, m *PostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Post mutation op: %q", m.Op())
+	}
+}
+
 // ReactClient is a client for the React schema.
 type ReactClient struct {
 	config
@@ -916,6 +1091,12 @@ func NewReactClient(c config) *ReactClient {
 // A call to `Use(f, g, h)` equals to `react.Hooks(f(g(h())))`.
 func (c *ReactClient) Use(hooks ...Hook) {
 	c.hooks.React = append(c.hooks.React, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `react.Intercept(f(g(h())))`.
+func (c *ReactClient) Intercept(interceptors ...Interceptor) {
+	c.inters.React = append(c.inters.React, interceptors...)
 }
 
 // Create returns a builder for creating a React entity.
@@ -970,6 +1151,7 @@ func (c *ReactClient) DeleteOneID(id xid.ID) *ReactDeleteOne {
 func (c *ReactClient) Query() *ReactQuery {
 	return &ReactQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -989,7 +1171,7 @@ func (c *ReactClient) GetX(ctx context.Context, id xid.ID) *React {
 
 // QueryAccount queries the account edge of a React.
 func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
@@ -1005,7 +1187,7 @@ func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
 
 // QueryPost queries the Post edge of a React.
 func (c *ReactClient) QueryPost(r *React) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
@@ -1024,6 +1206,26 @@ func (c *ReactClient) Hooks() []Hook {
 	return c.hooks.React
 }
 
+// Interceptors returns the client interceptors.
+func (c *ReactClient) Interceptors() []Interceptor {
+	return c.inters.React
+}
+
+func (c *ReactClient) mutate(ctx context.Context, m *ReactMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReactCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReactUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReactDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown React mutation op: %q", m.Op())
+	}
+}
+
 // RoleClient is a client for the Role schema.
 type RoleClient struct {
 	config
@@ -1038,6 +1240,12 @@ func NewRoleClient(c config) *RoleClient {
 // A call to `Use(f, g, h)` equals to `role.Hooks(f(g(h())))`.
 func (c *RoleClient) Use(hooks ...Hook) {
 	c.hooks.Role = append(c.hooks.Role, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `role.Intercept(f(g(h())))`.
+func (c *RoleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Role = append(c.inters.Role, interceptors...)
 }
 
 // Create returns a builder for creating a Role entity.
@@ -1092,6 +1300,7 @@ func (c *RoleClient) DeleteOneID(id xid.ID) *RoleDeleteOne {
 func (c *RoleClient) Query() *RoleQuery {
 	return &RoleQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1111,7 +1320,7 @@ func (c *RoleClient) GetX(ctx context.Context, id xid.ID) *Role {
 
 // QueryAccounts queries the accounts edge of a Role.
 func (c *RoleClient) QueryAccounts(r *Role) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
@@ -1130,6 +1339,26 @@ func (c *RoleClient) Hooks() []Hook {
 	return c.hooks.Role
 }
 
+// Interceptors returns the client interceptors.
+func (c *RoleClient) Interceptors() []Interceptor {
+	return c.inters.Role
+}
+
+func (c *RoleClient) mutate(ctx context.Context, m *RoleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Role mutation op: %q", m.Op())
+	}
+}
+
 // SubscriptionClient is a client for the Subscription schema.
 type SubscriptionClient struct {
 	config
@@ -1144,6 +1373,12 @@ func NewSubscriptionClient(c config) *SubscriptionClient {
 // A call to `Use(f, g, h)` equals to `subscription.Hooks(f(g(h())))`.
 func (c *SubscriptionClient) Use(hooks ...Hook) {
 	c.hooks.Subscription = append(c.hooks.Subscription, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subscription.Intercept(f(g(h())))`.
+func (c *SubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Subscription = append(c.inters.Subscription, interceptors...)
 }
 
 // Create returns a builder for creating a Subscription entity.
@@ -1198,6 +1433,7 @@ func (c *SubscriptionClient) DeleteOneID(id xid.ID) *SubscriptionDeleteOne {
 func (c *SubscriptionClient) Query() *SubscriptionQuery {
 	return &SubscriptionQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1217,7 +1453,7 @@ func (c *SubscriptionClient) GetX(ctx context.Context, id xid.ID) *Subscription 
 
 // QueryAccount queries the account edge of a Subscription.
 func (c *SubscriptionClient) QueryAccount(s *Subscription) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
@@ -1233,7 +1469,7 @@ func (c *SubscriptionClient) QueryAccount(s *Subscription) *AccountQuery {
 
 // QueryNotifications queries the notifications edge of a Subscription.
 func (c *SubscriptionClient) QueryNotifications(s *Subscription) *NotificationQuery {
-	query := &NotificationQuery{config: c.config}
+	query := (&NotificationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
@@ -1252,6 +1488,26 @@ func (c *SubscriptionClient) Hooks() []Hook {
 	return c.hooks.Subscription
 }
 
+// Interceptors returns the client interceptors.
+func (c *SubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.Subscription
+}
+
+func (c *SubscriptionClient) mutate(ctx context.Context, m *SubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Subscription mutation op: %q", m.Op())
+	}
+}
+
 // TagClient is a client for the Tag schema.
 type TagClient struct {
 	config
@@ -1266,6 +1522,12 @@ func NewTagClient(c config) *TagClient {
 // A call to `Use(f, g, h)` equals to `tag.Hooks(f(g(h())))`.
 func (c *TagClient) Use(hooks ...Hook) {
 	c.hooks.Tag = append(c.hooks.Tag, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tag.Intercept(f(g(h())))`.
+func (c *TagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tag = append(c.inters.Tag, interceptors...)
 }
 
 // Create returns a builder for creating a Tag entity.
@@ -1320,6 +1582,7 @@ func (c *TagClient) DeleteOneID(id xid.ID) *TagDeleteOne {
 func (c *TagClient) Query() *TagQuery {
 	return &TagQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -1339,7 +1602,7 @@ func (c *TagClient) GetX(ctx context.Context, id xid.ID) *Tag {
 
 // QueryPosts queries the posts edge of a Tag.
 func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
-	query := &PostQuery{config: c.config}
+	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
@@ -1355,7 +1618,7 @@ func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
 
 // QueryAccounts queries the accounts edge of a Tag.
 func (c *TagClient) QueryAccounts(t *Tag) *AccountQuery {
-	query := &AccountQuery{config: c.config}
+	query := (&AccountClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
@@ -1372,4 +1635,24 @@ func (c *TagClient) QueryAccounts(t *Tag) *AccountQuery {
 // Hooks returns the client hooks.
 func (c *TagClient) Hooks() []Hook {
 	return c.hooks.Tag
+}
+
+// Interceptors returns the client interceptors.
+func (c *TagClient) Interceptors() []Interceptor {
+	return c.inters.Tag
+}
+
+func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tag mutation op: %q", m.Op())
+	}
 }

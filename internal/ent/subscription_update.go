@@ -111,40 +111,7 @@ func (su *SubscriptionUpdate) RemoveNotifications(n ...*Notification) *Subscript
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (su *SubscriptionUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
-	if len(su.hooks) == 0 {
-		if err = su.check(); err != nil {
-			return 0, err
-		}
-		affected, err = su.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*SubscriptionMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = su.check(); err != nil {
-				return 0, err
-			}
-			su.mutation = mutation
-			affected, err = su.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(su.hooks) - 1; i >= 0; i-- {
-			if su.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = su.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, su.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, SubscriptionMutation](ctx, su.sqlSave, su.mutation, su.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -191,6 +158,9 @@ func (su *SubscriptionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *S
 }
 
 func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   subscription.Table,
@@ -312,6 +282,7 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	su.mutation.done = true
 	return n, nil
 }
 
@@ -411,46 +382,7 @@ func (suo *SubscriptionUpdateOne) Select(field string, fields ...string) *Subscr
 
 // Save executes the query and returns the updated Subscription entity.
 func (suo *SubscriptionUpdateOne) Save(ctx context.Context) (*Subscription, error) {
-	var (
-		err  error
-		node *Subscription
-	)
-	if len(suo.hooks) == 0 {
-		if err = suo.check(); err != nil {
-			return nil, err
-		}
-		node, err = suo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*SubscriptionMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = suo.check(); err != nil {
-				return nil, err
-			}
-			suo.mutation = mutation
-			node, err = suo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(suo.hooks) - 1; i >= 0; i-- {
-			if suo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = suo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, suo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Subscription)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from SubscriptionMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Subscription, SubscriptionMutation](ctx, suo.sqlSave, suo.mutation, suo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -497,6 +429,9 @@ func (suo *SubscriptionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)
 }
 
 func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscription, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   subscription.Table,
@@ -638,5 +573,6 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		}
 		return nil, err
 	}
+	suo.mutation.done = true
 	return _node, nil
 }
