@@ -3,6 +3,8 @@ import Link from "next/link";
 import nookies from "nookies";
 
 export default function Page() {
+  document.cookie =
+    "storyden-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   return <Link href="/login">Logged out. Returning to login.</Link>;
 }
 
