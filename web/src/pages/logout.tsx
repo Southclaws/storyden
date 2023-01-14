@@ -3,15 +3,16 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { destroyCookie } from "nookies";
 import { useEffect } from "react";
+import { useAuthProviderLogout } from "src/api/openapi/auth";
 
 export default function Page() {
   const router = useRouter();
-  useEffect(() => {
-    router.push("/");
-  }, [router]);
+  const logout = useAuthProviderLogout();
 
-  document.cookie =
-    "storyden-session=; Path=/; Domain=demo.storyden.org; HttpOnly; Secure";
+  useEffect(() => {
+    console.log(logout);
+    router.push("/");
+  }, [router, logout]);
 
   return <Link href="/login">Logged out. Returning to login.</Link>;
 }

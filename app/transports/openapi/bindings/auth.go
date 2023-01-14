@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -51,6 +52,22 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 	return openapi.AuthProviderList200JSONResponse{
 		AuthProviderListJSONResponse: openapi.AuthProviderListJSONResponse{
 			Providers: list,
+		},
+	}, nil
+}
+
+func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi.AuthProviderLogoutRequestObject) (openapi.AuthProviderLogoutResponseObject, error) {
+	return openapi.AuthProviderLogout200Response{
+		Headers: openapi.AuthProviderLogout200ResponseHeaders{
+			SetCookie: (&http.Cookie{
+				Name:     secureCookieName,
+				Value:    "",
+				SameSite: http.SameSiteDefaultMode,
+				Path:     "/",
+				Domain:   a.domain,
+				Secure:   true,
+				HttpOnly: true,
+			}).String(),
 		},
 	}, nil
 }
