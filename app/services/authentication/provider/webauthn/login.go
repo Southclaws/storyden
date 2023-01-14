@@ -61,16 +61,40 @@ func (p *Provider) FinishLogin(ctx context.Context,
 	session webauthn.SessionData,
 	parsedResponse *protocol.ParsedCredentialAssertionData,
 ) (*webauthn.Credential, *account.Account, error) {
-	t := temporary{handle: handle}
+	acc, err := p.account_repo.GetByHandle(ctx, handle)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	ams, err := p.auth_repo.GetAuthMethods(ctx, acc.ID)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	ams = dt.Filter(ams, func(a authentication.Authentication) bool { return a.Service == id })
+	if len(ams) == 0 {
+		return nil, nil, fault.Wrap(ErrNoAuthRecord,
+			fctx.With(ctx),
+			fmsg.WithDesc("no auth method", "This account does not have a Passkey (WebAuthn) credential."),
+		)
+	}
+
+	credentials, err := dt.MapErr(ams, func(a authentication.Authentication) (webauthn.Credential, error) {
+		var wac webauthn.Credential
+		if err := json.Unmarshal([]byte(a.Token), &wac); err != nil {
+			return wac, fault.Wrap(err, fmsg.With("malformed credential from auth storage"))
+		}
+		return wac, nil
+	})
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	t := temporary{handle: handle, credentials: credentials}
 
 	cred, err := p.wa.ValidateLogin(&t, session, parsedResponse)
 	if err != nil {
 		ctx = fctx.WithMeta(ctx, waErrMetadata(err)...)
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := p.account_repo.GetByHandle(ctx, handle)
-	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
