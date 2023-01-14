@@ -34,10 +34,10 @@ func (s *Session) encodeSession(userID account.AccountID) (string, error) {
 	cookie := &http.Cookie{
 		Name:     secureCookieName,
 		Value:    encoded,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
 		Domain:   s.domain,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 	}
 

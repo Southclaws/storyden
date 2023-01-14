@@ -88,10 +88,10 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		Value: value,
 		// Expire this exchange after 10 minutes
 		Expires:  time.Now().Add(time.Minute * 10),
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
 		Domain:   a.domain,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 	}
 
@@ -177,10 +177,10 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 		Value: value,
 		// Expire this exchange after 10 minutes
 		Expires:  time.Now().Add(time.Minute * 10),
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
 		Domain:   a.domain,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: true,
 	}
 
