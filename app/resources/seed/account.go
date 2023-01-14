@@ -53,9 +53,10 @@ func accounts(r account.Repository, auth authentication.Repository) {
 			panic(err)
 		}
 
-		email := acc.Handle + "@storyd.en"
+		// TODO: email+password auth provider.
+		// email := acc.Handle + "@storyd.en"
 
-		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), email, SeedPassword, nil); err != nil {
+		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), acc.Handle, SeedPassword, nil); err != nil {
 			panic(err)
 		}
 
