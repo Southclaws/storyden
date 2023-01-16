@@ -181,7 +181,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "200":
-          { $ref: "#/components/responses/WebAuthnPublicKeyCreationOptions" }
+          { $ref: "#/components/responses/WebAuthnRequestCredentialSuccess" }
 
   /v1/auth/webauthn/make:
     post:
@@ -189,12 +189,7 @@ paths:
       description: Complete WebAuthn registration by creating a new credential.
       tags: [auth]
       security: [webauthn: []]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-
+      requestBody: { $ref: "#/components/requestBodies/WebAuthnMakeCredential" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -212,7 +207,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200":
-          $ref: "#/components/responses/WebAuthnPublicKeyAuthenticationOptions"
+          $ref: "#/components/responses/WebAuthnGetAssertionSuccess"
 
   /v1/auth/webauthn/assert:
     post:
@@ -491,6 +486,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthOAuthProviderCallbackBody" }
 
+    WebAuthnMakeCredential:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PublicKeyCredential" }
+
     AccountsUpdate:
       content:
         application/json:
@@ -564,7 +564,7 @@ components:
             properties:
               providers: { $ref: "#/components/schemas/AuthProviderListBody" }
 
-    WebAuthnPublicKeyCreationOptions:
+    WebAuthnRequestCredentialSuccess:
       description: OK
       headers:
         "Set-Cookie":
@@ -573,10 +573,9 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            x-go-type: any
+            { $ref: "#/components/schemas/WebAuthnPublicKeyCreationOptions" }
 
-    WebAuthnPublicKeyAuthenticationOptions:
+    WebAuthnGetAssertionSuccess:
       description: OK
       headers:
         "Set-Cookie":
@@ -585,8 +584,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            x-go-type: any
+            $ref: "#/components/schemas/WebAuthnPublicKeyAuthenticationOptions"
 
     AccountsGetSuccess:
       description: OK
@@ -789,6 +787,150 @@ components:
           type: string
         code:
           type: string
+
+    WebAuthnPublicKeyCreationOptions:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#sctn-credentialcreationoptions-extension
+      type: object
+      required: [publicKey]
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/PublicKeyCredentialCreationOptions"
+
+    PublicKeyCredentialCreationOptions:
+      description: |
+        https://www.w3.org/TR/webautehn-2/#dictdef-publickeycredentialcreationoptions
+      type: object
+      required:
+        - rp
+        - user
+        - challenge
+        - pubKeyCredParams
+      properties:
+        rp: { $ref: "#/components/schemas/PublicKeyCredentialRpEntity" }
+        user: { $ref: "#/components/schemas/PublicKeyCredentialUserEntity" }
+
+        challenge:
+          type: string
+        pubKeyCredParams:
+          type: array
+          items: { $ref: "#/components/schemas/PublicKeyCredentialParameters" }
+
+        timeout:
+          type: integer
+        excludeCredentials:
+          type: array
+          items: { $ref: "#/components/schemas/PublicKeyCredentialDescriptor" }
+        authenticatorSelection:
+          { $ref: "#/components/schemas/AuthenticatorSelectionCriteria" }
+        attestation:
+          type: string
+        extensions:
+          { $ref: "#/components/schemas/AuthenticationExtensionsClientInputs" }
+
+    PublicKeyCredentialRpEntity:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrpentity
+      type: object
+      required: [name, id]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    PublicKeyCredentialUserEntity:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialuserentity
+      type: object
+      required: [id, name, displayName]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+
+    PublicKeyCredentialParameters:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
+      properties:
+        type:
+          type: string
+        alg:
+          type: number
+
+    PublicKeyCredentialDescriptor:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialdescriptor
+      type: object
+      required: [type, id]
+      properties:
+        type:
+          type: string
+        id:
+          type: string
+        transports:
+          type: array
+          items:
+            type: string
+
+    AuthenticatorSelectionCriteria:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-authenticatorselectioncriteria
+      type: object
+      required:
+        - authenticatorAttachment
+      properties:
+        authenticatorAttachment:
+          type: string
+
+    AuthenticationExtensionsClientInputs:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-authenticationextensionsclientinputs
+      type: object
+      additionalProperties: true
+
+    PublicKeyCredential:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+      type: object
+      required:
+        - id
+        - rawId
+        - response
+        - type
+      properties:
+        id:
+          type: string
+        rawId:
+          type: string
+        response: { $ref: "#/components/schemas/AuthenticatorResponse" }
+        type:
+          type: string
+        clientExtensionResults:
+          type: object
+        authenticatorAttachment:
+          type: string
+
+    AuthenticatorResponse:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#authenticatorresponse
+      type: object
+      required: [clientDataJSON]
+      properties:
+        clientDataJSON:
+          type: string
+        attestationObject:
+          type: string
+        transports:
+          type: array
+          items:
+            type: string
+
+    WebAuthnPublicKeyAuthenticationOptions:
+      type: object
 
     # -
     # Account
