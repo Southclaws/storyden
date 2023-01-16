@@ -16,7 +16,7 @@ import type {
   UnauthorisedResponse,
   NotFoundResponse,
   AuthOAuthProviderCallbackBody,
-  WebAuthnPublicKeyCreationOptionsResponse,
+  WebAuthnRequestCredentialSuccessResponse,
   WebAuthnMakeCredentialBody,
   WebAuthnPublicKeyAuthenticationOptionsResponse,
   WebAuthnMakeAssertionBody,
@@ -113,7 +113,7 @@ export const authOAuthProviderCallback = (
 
  */
 export const webAuthnRequestCredential = (accountHandle: string) => {
-  return fetcher<WebAuthnPublicKeyCreationOptionsResponse>({
+  return fetcher<WebAuthnRequestCredentialSuccessResponse>({
     url: `/v1/auth/webauthn/make/${accountHandle}`,
     method: "get",
   });
