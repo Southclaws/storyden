@@ -1,4 +1,4 @@
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   webAuthnGetAssertion,
   webAuthnMakeAssertion,
@@ -6,17 +6,17 @@ import {
   webAuthnRequestCredential,
 } from "src/api/openapi/auth";
 
+import { useToast } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
 import { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/typescript-types";
-import { useToast } from "@chakra-ui/react";
-import { APIError } from "src/api/openapi/schemas";
 import { useRouter } from "next/router";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/ErrorBanner";
+import * as z from "zod";
 
 export const FormSchema = z.object({
   username: z.string(),
@@ -36,15 +36,8 @@ export function useWebAuthn() {
 
   async function signin({ username }: Form) {
     try {
-      const response = await webAuthnGetAssertion(username);
-
-      // TODO: OpenAPI spec for WebAuthn requests and responses.
-      const publicKey = response[
-        "publicKey"
-      ] as PublicKeyCredentialCreationOptionsJSON;
-
+      const { publicKey } = await webAuthnGetAssertion(username);
       const credential = await startAuthentication(publicKey);
-      console.log(credential.response.userHandle);
 
       // HACK:
       // 1. https://github.com/MasterKale/SimpleWebAuthn/issues/330

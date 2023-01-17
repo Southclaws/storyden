@@ -5,7 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { CredentialRequestOptions } from "./credentialRequestOptions";
 
-export type WebAuthnPublicKeyAuthenticationOptionsResponse = {
-  [key: string]: any;
-};
+/**
+ * OK
+ */
+export type WebAuthnGetAssertionSuccessResponse = CredentialRequestOptions;

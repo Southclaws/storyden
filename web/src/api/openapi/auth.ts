@@ -18,7 +18,7 @@ import type {
   AuthOAuthProviderCallbackBody,
   WebAuthnRequestCredentialSuccessResponse,
   WebAuthnMakeCredentialBody,
-  WebAuthnPublicKeyAuthenticationOptionsResponse,
+  WebAuthnGetAssertionSuccessResponse,
   WebAuthnMakeAssertionBody,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -179,7 +179,7 @@ export const webAuthnMakeCredential = (
  * Start the WebAuthn assertion for an existing account.
  */
 export const webAuthnGetAssertion = (accountHandle: string) => {
-  return fetcher<WebAuthnPublicKeyAuthenticationOptionsResponse>({
+  return fetcher<WebAuthnGetAssertionSuccessResponse>({
     url: `/v1/auth/webauthn/assert/${accountHandle}`,
     method: "get",
   });

@@ -186,9 +186,9 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 	}
 
 	return openapi.WebAuthnGetAssertion200JSONResponse{
-		WebAuthnPublicKeyAuthenticationOptionsJSONResponse: openapi.WebAuthnPublicKeyAuthenticationOptionsJSONResponse{
-			Body: cred,
-			Headers: openapi.WebAuthnPublicKeyAuthenticationOptionsResponseHeaders{
+		WebAuthnGetAssertionSuccessJSONResponse: openapi.WebAuthnGetAssertionSuccessJSONResponse{
+			Body: serialiseWebAuthnCredentialRequestOptions(cred.Response),
+			Headers: openapi.WebAuthnGetAssertionSuccessResponseHeaders{
 				SetCookie: cookie.String(),
 			},
 		},
@@ -267,11 +267,11 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 	})
 
 	excludeCredentials := dt.Map(cred.Response.CredentialExcludeList, func(d protocol.CredentialDescriptor) openapi.PublicKeyCredentialDescriptor {
-		transports := dt.Map(d.Transport, func(t protocol.AuthenticatorTransport) string {
-			return string(t)
+		transports := dt.Map(d.Transport, func(t protocol.AuthenticatorTransport) openapi.PublicKeyCredentialDescriptorTransports {
+			return openapi.PublicKeyCredentialDescriptorTransports(t)
 		})
 		return openapi.PublicKeyCredentialDescriptor{
-			Type:       string(d.Type),
+			Type:       openapi.PublicKeyCredentialDescriptorType(d.Type),
 			Id:         string(d.CredentialID),
 			Transports: &transports,
 		}
@@ -294,6 +294,29 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 			AuthenticatorSelection: authenticatorSelection,
 			Attestation:            (*string)(&cred.Response.Attestation),
 			Extensions:             (*openapi.AuthenticationExtensionsClientInputs)(&cred.Response.Extensions),
+		},
+	}
+}
+
+func serialiseWebAuthnCredentialRequestOptions(cred protocol.PublicKeyCredentialRequestOptions) openapi.CredentialRequestOptions {
+	allowedCredentials := dt.Map(cred.AllowedCredentials, func(cd protocol.CredentialDescriptor) openapi.PublicKeyCredentialDescriptor {
+		transports := dt.Map(cd.Transport, func(t protocol.AuthenticatorTransport) openapi.PublicKeyCredentialDescriptorTransports {
+			return openapi.PublicKeyCredentialDescriptorTransports(t)
+		})
+		return openapi.PublicKeyCredentialDescriptor{
+			Id:         string(cd.CredentialID),
+			Transports: &transports,
+			Type:       openapi.PublicKeyCredentialDescriptorType(cd.Type),
+		}
+	})
+
+	return openapi.CredentialRequestOptions{
+		PublicKey: openapi.PublicKeyCredentialRequestOptions{
+			AllowCredentials: &allowedCredentials,
+			Challenge:        cred.Challenge.String(),
+			RpId:             &cred.RelyingPartyID,
+			Timeout:          &cred.Timeout,
+			UserVerification: (*openapi.PublicKeyCredentialRequestOptionsUserVerification)(&cred.UserVerification),
 		},
 	}
 }
