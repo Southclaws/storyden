@@ -43,17 +43,13 @@ export function useWebAuthn() {
         "publicKey"
       ] as PublicKeyCredentialCreationOptionsJSON;
 
-      const credential = await startAuthentication({
-        ...publicKey,
-      });
+      const credential = await startAuthentication(publicKey);
+      console.log(credential.response.userHandle);
 
       // HACK:
       // 1. https://github.com/MasterKale/SimpleWebAuthn/issues/330
       // 2. https://github.com/go-webauthn/webauthn/issues/93
-      // credential.response.userHandle =
-      //   credential.response.userHandle?.replaceAll("=", "");
-
-      console.log({ username, publicKey, credential });
+      credential.response.userHandle = undefined;
 
       await webAuthnMakeAssertion(credential);
 
