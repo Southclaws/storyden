@@ -5,5 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AuthenticatorResponse } from "./authenticatorResponse";
 
-export type WebAuthnMakeAssertionBody = { [key: string]: any };
+export type WebAuthnMakeAssertionBody = AuthenticatorResponse;

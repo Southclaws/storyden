@@ -215,12 +215,7 @@ paths:
       description: Complete the credential assertion and sign in to an account.
       tags: [auth]
       security: [webauthn: []]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-
+      requestBody: { $ref: "#/components/requestBodies/WebAuthnMakeAssertion" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -491,6 +486,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/PublicKeyCredential" }
 
+    WebAuthnMakeAssertion:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthenticatorResponse" }
+
     AccountsUpdate:
       content:
         application/json:
@@ -584,7 +584,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/WebAuthnPublicKeyAuthenticationOptions"
+            $ref: "#/components/schemas/CredentialRequestOptions"
 
     AccountsGetSuccess:
       description: OK
@@ -869,12 +869,14 @@ components:
       properties:
         type:
           type: string
+          enum: [public-key]
         id:
           type: string
         transports:
           type: array
           items:
             type: string
+            enum: ["ble", "internal", "nfc", "usb", "cable", "hybrid"]
 
     AuthenticatorSelectionCriteria:
       description: |
@@ -929,8 +931,34 @@ components:
           items:
             type: string
 
-    WebAuthnPublicKeyAuthenticationOptions:
+    CredentialRequestOptions:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
       type: object
+      required: [publicKey]
+      properties:
+        publicKey:
+          $ref: "#/components/schemas/PublicKeyCredentialRequestOptions"
+
+    PublicKeyCredentialRequestOptions:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
+      type: object
+      required: [challenge]
+      properties:
+        challenge:
+          type: string
+        timeout:
+          type: integer
+        rpId:
+          type: string
+        allowCredentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicKeyCredentialDescriptor"
+        userVerification:
+          type: string
+          enum: ["discouraged", "preferred", "required"]
 
     # -
     # Account
