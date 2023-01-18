@@ -489,7 +489,7 @@ components:
     WebAuthnMakeAssertion:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthenticatorResponse" }
+          schema: { $ref: "#/components/schemas/PublicKeyCredential" }
 
     AccountsUpdate:
       content:
@@ -930,6 +930,12 @@ components:
           type: array
           items:
             type: string
+        authenticatorData:
+          type: string
+        signature:
+          type: string
+        userHandle:
+          type: string
 
     CredentialRequestOptions:
       description: |

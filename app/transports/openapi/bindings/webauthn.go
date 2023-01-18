@@ -133,7 +133,7 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 			"details", pe.Details,
 			"info", pe.DevInfo,
 		)
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
 	_, accountID, err := a.wa.FinishRegistration(ctx, string(session.UserID), *session, cr)
@@ -221,7 +221,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 			"details", pe.Details,
 			"info", pe.DevInfo,
 		)
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
 	_, accountID, err := a.wa.FinishLogin(ctx, string(session.UserID), *session, cr)
@@ -303,8 +303,10 @@ func serialiseWebAuthnCredentialRequestOptions(cred protocol.PublicKeyCredential
 		transports := dt.Map(cd.Transport, func(t protocol.AuthenticatorTransport) openapi.PublicKeyCredentialDescriptorTransports {
 			return openapi.PublicKeyCredentialDescriptorTransports(t)
 		})
+		id := make([]byte, base64.RawStdEncoding.EncodedLen(len(cd.CredentialID)))
+		base64.RawURLEncoding.Encode(id, cd.CredentialID)
 		return openapi.PublicKeyCredentialDescriptor{
-			Id:         string(cd.CredentialID),
+			Id:         string(id),
 			Transports: &transports,
 			Type:       openapi.PublicKeyCredentialDescriptorType(cd.Type),
 		}
