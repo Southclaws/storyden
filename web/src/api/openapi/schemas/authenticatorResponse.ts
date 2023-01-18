@@ -14,4 +14,7 @@ export interface AuthenticatorResponse {
   clientDataJSON: string;
   attestationObject?: string;
   transports?: string[];
+  authenticatorData?: string;
+  signature?: string;
+  userHandle?: string;
 }
