@@ -18,7 +18,7 @@ export function useAuthProvider(): UseAuthProvider {
   const { push, pathname } = useRouter();
   const account = useAccountsGet();
 
-  const loggedIn = Boolean(account.data) && !Boolean(account.error);
+  const loggedIn = Boolean(account.data) && !account.error;
   const firstTime = account.data === undefined && account.error === undefined;
   const isPrivate = pathname && privatePage(pathname);
 
