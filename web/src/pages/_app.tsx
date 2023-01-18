@@ -6,7 +6,7 @@ import { AuthProvider } from "src/auth/AuthProvider";
 import { Default } from "src/layouts/Default";
 import { extended } from "src/theme";
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
