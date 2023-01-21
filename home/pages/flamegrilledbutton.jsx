@@ -75,8 +75,6 @@ function Flamegrilled() {
         <Circle c={colours[8]} x1={16} x2={-99} y1={50} y2={-20} />
         <Circle c={colours[9]} x1={16} x2={-99} y1={50} y2={-20} />
       </Box>
-
-      <style jsx>{``}</style>
     </Button>
   );
 }
