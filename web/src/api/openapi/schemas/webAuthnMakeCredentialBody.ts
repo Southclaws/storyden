@@ -5,5 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { PublicKeyCredential } from "./publicKeyCredential";
 
-export type WebAuthnMakeCredentialBody = { [key: string]: any };
+export type WebAuthnMakeCredentialBody = PublicKeyCredential;

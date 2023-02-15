@@ -16,9 +16,9 @@ import type {
   UnauthorisedResponse,
   NotFoundResponse,
   AuthOAuthProviderCallbackBody,
-  WebAuthnPublicKeyCreationOptionsResponse,
+  WebAuthnRequestCredentialSuccessResponse,
   WebAuthnMakeCredentialBody,
-  WebAuthnPublicKeyAuthenticationOptionsResponse,
+  WebAuthnGetAssertionSuccessResponse,
   WebAuthnMakeAssertionBody,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -113,7 +113,7 @@ export const authOAuthProviderCallback = (
 
  */
 export const webAuthnRequestCredential = (accountHandle: string) => {
-  return fetcher<WebAuthnPublicKeyCreationOptionsResponse>({
+  return fetcher<WebAuthnRequestCredentialSuccessResponse>({
     url: `/v1/auth/webauthn/make/${accountHandle}`,
     method: "get",
   });
@@ -179,7 +179,7 @@ export const webAuthnMakeCredential = (
  * Start the WebAuthn assertion for an existing account.
  */
 export const webAuthnGetAssertion = (accountHandle: string) => {
-  return fetcher<WebAuthnPublicKeyAuthenticationOptionsResponse>({
+  return fetcher<WebAuthnGetAssertionSuccessResponse>({
     url: `/v1/auth/webauthn/assert/${accountHandle}`,
     method: "get",
   });
