@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -96,11 +97,11 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 	}
 
 	return openapi.WebAuthnRequestCredential200JSONResponse{
-		WebAuthnPublicKeyCreationOptionsJSONResponse: openapi.WebAuthnPublicKeyCreationOptionsJSONResponse{
-			Headers: openapi.WebAuthnPublicKeyCreationOptionsResponseHeaders{
+		WebAuthnRequestCredentialSuccessJSONResponse: openapi.WebAuthnRequestCredentialSuccessJSONResponse{
+			Headers: openapi.WebAuthnRequestCredentialSuccessResponseHeaders{
 				SetCookie: cookie.String(),
 			},
-			Body: cred,
+			Body: serialiseWebAuthnCredentialCreationOptions(*cred),
 		},
 	}, nil
 }
@@ -132,7 +133,7 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 			"details", pe.Details,
 			"info", pe.DevInfo,
 		)
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
 	_, accountID, err := a.wa.FinishRegistration(ctx, string(session.UserID), *session, cr)
@@ -185,9 +186,9 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 	}
 
 	return openapi.WebAuthnGetAssertion200JSONResponse{
-		WebAuthnPublicKeyAuthenticationOptionsJSONResponse: openapi.WebAuthnPublicKeyAuthenticationOptionsJSONResponse{
-			Body: cred,
-			Headers: openapi.WebAuthnPublicKeyAuthenticationOptionsResponseHeaders{
+		WebAuthnGetAssertionSuccessJSONResponse: openapi.WebAuthnGetAssertionSuccessJSONResponse{
+			Body: serialiseWebAuthnCredentialRequestOptions(cred.Response),
+			Headers: openapi.WebAuthnGetAssertionSuccessResponseHeaders{
 				SetCookie: cookie.String(),
 			},
 		},
@@ -204,6 +205,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 		)
 	}
 
+	// something here is messing up userHandle
 	b, err := json.Marshal(request.Body)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -219,7 +221,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 			"details", pe.Details,
 			"info", pe.DevInfo,
 		)
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With(pe.DevInfo))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
 	_, accountID, err := a.wa.FinishLogin(ctx, string(session.UserID), *session, cr)
@@ -242,4 +244,81 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 			},
 		},
 	}, nil
+}
+
+func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation) openapi.WebAuthnPublicKeyCreationOptions {
+	rp := openapi.PublicKeyCredentialRpEntity{
+		Id:   cred.Response.RelyingParty.ID,
+		Name: cred.Response.RelyingParty.Name,
+	}
+
+	user := openapi.PublicKeyCredentialUserEntity{
+		DisplayName: cred.Response.User.DisplayName,
+		Id:          string(cred.Response.User.ID),
+		Name:        cred.Response.User.Name,
+	}
+
+	pubKeyCredParams := dt.Map(cred.Response.Parameters, func(p protocol.CredentialParameter) openapi.PublicKeyCredentialParameters {
+		alg := float32(p.Algorithm)
+		return openapi.PublicKeyCredentialParameters{
+			Type: (*string)(&p.Type),
+			Alg:  &alg,
+		}
+	})
+
+	excludeCredentials := dt.Map(cred.Response.CredentialExcludeList, func(d protocol.CredentialDescriptor) openapi.PublicKeyCredentialDescriptor {
+		transports := dt.Map(d.Transport, func(t protocol.AuthenticatorTransport) openapi.PublicKeyCredentialDescriptorTransports {
+			return openapi.PublicKeyCredentialDescriptorTransports(t)
+		})
+		return openapi.PublicKeyCredentialDescriptor{
+			Type:       openapi.PublicKeyCredentialDescriptorType(d.Type),
+			Id:         string(d.CredentialID),
+			Transports: &transports,
+		}
+	})
+
+	authenticatorSelection := &openapi.AuthenticatorSelectionCriteria{
+		AuthenticatorAttachment: string(cred.Response.AuthenticatorSelection.AuthenticatorAttachment),
+	}
+
+	return openapi.WebAuthnPublicKeyCreationOptions{
+		PublicKey: openapi.PublicKeyCredentialCreationOptions{
+			Rp:   rp,
+			User: user,
+
+			Challenge:        cred.Response.Challenge.String(),
+			PubKeyCredParams: pubKeyCredParams,
+
+			Timeout:                &cred.Response.Timeout,
+			ExcludeCredentials:     &excludeCredentials,
+			AuthenticatorSelection: authenticatorSelection,
+			Attestation:            (*string)(&cred.Response.Attestation),
+			Extensions:             (*openapi.AuthenticationExtensionsClientInputs)(&cred.Response.Extensions),
+		},
+	}
+}
+
+func serialiseWebAuthnCredentialRequestOptions(cred protocol.PublicKeyCredentialRequestOptions) openapi.CredentialRequestOptions {
+	allowedCredentials := dt.Map(cred.AllowedCredentials, func(cd protocol.CredentialDescriptor) openapi.PublicKeyCredentialDescriptor {
+		transports := dt.Map(cd.Transport, func(t protocol.AuthenticatorTransport) openapi.PublicKeyCredentialDescriptorTransports {
+			return openapi.PublicKeyCredentialDescriptorTransports(t)
+		})
+		id := make([]byte, base64.RawStdEncoding.EncodedLen(len(cd.CredentialID)))
+		base64.RawURLEncoding.Encode(id, cd.CredentialID)
+		return openapi.PublicKeyCredentialDescriptor{
+			Id:         string(id),
+			Transports: &transports,
+			Type:       openapi.PublicKeyCredentialDescriptorType(cd.Type),
+		}
+	})
+
+	return openapi.CredentialRequestOptions{
+		PublicKey: openapi.PublicKeyCredentialRequestOptions{
+			AllowCredentials: &allowedCredentials,
+			Challenge:        cred.Challenge.String(),
+			RpId:             &cred.RelyingPartyID,
+			Timeout:          &cred.Timeout,
+			UserVerification: (*openapi.PublicKeyCredentialRequestOptionsUserVerification)(&cred.UserVerification),
+		},
+	}
 }

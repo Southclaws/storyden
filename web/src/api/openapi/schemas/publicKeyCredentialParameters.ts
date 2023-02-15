@@ -6,4 +6,11 @@
  * OpenAPI spec version: 1
  */
 
-export type WebAuthnPublicKeyCreationOptionsResponse = { [key: string]: any };
+/**
+ * https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
+
+ */
+export interface PublicKeyCredentialParameters {
+  type?: string;
+  alg?: number;
+}

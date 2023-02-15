@@ -19,7 +19,7 @@ export default function Page() {
 
 export async function getServerSideProps(
   ctx: GetServerSidePropsContext
-): Promise<GetServerSidePropsResult<{}>> {
+): Promise<GetServerSidePropsResult<object>> {
   ctx.res.setHeader("Clear-Site-Data", `"cookies"`);
   destroyCookie(ctx, "storyden-session");
 

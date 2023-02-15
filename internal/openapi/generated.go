@@ -27,6 +27,28 @@ const (
 	WebauthnScopes = "webauthn.Scopes"
 )
 
+// Defines values for PublicKeyCredentialDescriptorTransports.
+const (
+	Ble      PublicKeyCredentialDescriptorTransports = "ble"
+	Cable    PublicKeyCredentialDescriptorTransports = "cable"
+	Hybrid   PublicKeyCredentialDescriptorTransports = "hybrid"
+	Internal PublicKeyCredentialDescriptorTransports = "internal"
+	Nfc      PublicKeyCredentialDescriptorTransports = "nfc"
+	Usb      PublicKeyCredentialDescriptorTransports = "usb"
+)
+
+// Defines values for PublicKeyCredentialDescriptorType.
+const (
+	PublicKey PublicKeyCredentialDescriptorType = "public-key"
+)
+
+// Defines values for PublicKeyCredentialRequestOptionsUserVerification.
+const (
+	Discouraged PublicKeyCredentialRequestOptionsUserVerification = "discouraged"
+	Preferred   PublicKeyCredentialRequestOptionsUserVerification = "preferred"
+	Required    PublicKeyCredentialRequestOptionsUserVerification = "required"
+)
+
 // APIError A description of an error including a human readable message and any
 // related metadata from the request and associated services.
 type APIError struct {
@@ -127,6 +149,24 @@ type AuthSuccessBody struct {
 	Id string `json:"id"`
 }
 
+// AuthenticationExtensionsClientInputs https://www.w3.org/TR/webauthn-2/#dictdef-authenticationextensionsclientinputs
+type AuthenticationExtensionsClientInputs map[string]interface{}
+
+// AuthenticatorResponse https://www.w3.org/TR/webauthn-2/#authenticatorresponse
+type AuthenticatorResponse struct {
+	AttestationObject *string   `json:"attestationObject,omitempty"`
+	AuthenticatorData *string   `json:"authenticatorData,omitempty"`
+	ClientDataJSON    string    `json:"clientDataJSON"`
+	Signature         *string   `json:"signature,omitempty"`
+	Transports        *[]string `json:"transports,omitempty"`
+	UserHandle        *string   `json:"userHandle,omitempty"`
+}
+
+// AuthenticatorSelectionCriteria https://www.w3.org/TR/webauthn-2/#dictdef-authenticatorselectioncriteria
+type AuthenticatorSelectionCriteria struct {
+	AuthenticatorAttachment string `json:"authenticatorAttachment"`
+}
+
 // Category defines model for Category.
 type Category struct {
 	Admin       *bool   `json:"admin,omitempty"`
@@ -156,6 +196,12 @@ type CommonProperties struct {
 
 	// UpdatedAt The time the resource was updated.
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// CredentialRequestOptions https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
+type CredentialRequestOptions struct {
+	// PublicKey https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
+	PublicKey PublicKeyCredentialRequestOptions `json:"publicKey"`
 }
 
 // Identifier A unique identifier for this resource.
@@ -237,6 +283,83 @@ type ProfileReference struct {
 
 	// Name The account owners display name.
 	Name AccountName `json:"name"`
+}
+
+// PublicKeyCredential https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+type PublicKeyCredential struct {
+	AuthenticatorAttachment *string                 `json:"authenticatorAttachment,omitempty"`
+	ClientExtensionResults  *map[string]interface{} `json:"clientExtensionResults,omitempty"`
+	Id                      string                  `json:"id"`
+	RawId                   string                  `json:"rawId"`
+
+	// Response https://www.w3.org/TR/webauthn-2/#authenticatorresponse
+	Response AuthenticatorResponse `json:"response"`
+	Type     string                `json:"type"`
+}
+
+// PublicKeyCredentialCreationOptions https://www.w3.org/TR/webautehn-2/#dictdef-publickeycredentialcreationoptions
+type PublicKeyCredentialCreationOptions struct {
+	Attestation *string `json:"attestation,omitempty"`
+
+	// AuthenticatorSelection https://www.w3.org/TR/webauthn-2/#dictdef-authenticatorselectioncriteria
+	AuthenticatorSelection *AuthenticatorSelectionCriteria  `json:"authenticatorSelection,omitempty"`
+	Challenge              string                           `json:"challenge"`
+	ExcludeCredentials     *[]PublicKeyCredentialDescriptor `json:"excludeCredentials,omitempty"`
+
+	// Extensions https://www.w3.org/TR/webauthn-2/#dictdef-authenticationextensionsclientinputs
+	Extensions       *AuthenticationExtensionsClientInputs `json:"extensions,omitempty"`
+	PubKeyCredParams []PublicKeyCredentialParameters       `json:"pubKeyCredParams"`
+
+	// Rp https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrpentity
+	Rp      PublicKeyCredentialRpEntity `json:"rp"`
+	Timeout *int                        `json:"timeout,omitempty"`
+
+	// User https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialuserentity
+	User PublicKeyCredentialUserEntity `json:"user"`
+}
+
+// PublicKeyCredentialDescriptor https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialdescriptor
+type PublicKeyCredentialDescriptor struct {
+	Id         string                                     `json:"id"`
+	Transports *[]PublicKeyCredentialDescriptorTransports `json:"transports,omitempty"`
+	Type       PublicKeyCredentialDescriptorType          `json:"type"`
+}
+
+// PublicKeyCredentialDescriptorTransports defines model for PublicKeyCredentialDescriptor.Transports.
+type PublicKeyCredentialDescriptorTransports string
+
+// PublicKeyCredentialDescriptorType defines model for PublicKeyCredentialDescriptor.Type.
+type PublicKeyCredentialDescriptorType string
+
+// PublicKeyCredentialParameters https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
+type PublicKeyCredentialParameters struct {
+	Alg  *float32 `json:"alg,omitempty"`
+	Type *string  `json:"type,omitempty"`
+}
+
+// PublicKeyCredentialRequestOptions https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
+type PublicKeyCredentialRequestOptions struct {
+	AllowCredentials *[]PublicKeyCredentialDescriptor                   `json:"allowCredentials,omitempty"`
+	Challenge        string                                             `json:"challenge"`
+	RpId             *string                                            `json:"rpId,omitempty"`
+	Timeout          *int                                               `json:"timeout,omitempty"`
+	UserVerification *PublicKeyCredentialRequestOptionsUserVerification `json:"userVerification,omitempty"`
+}
+
+// PublicKeyCredentialRequestOptionsUserVerification defines model for PublicKeyCredentialRequestOptions.UserVerification.
+type PublicKeyCredentialRequestOptionsUserVerification string
+
+// PublicKeyCredentialRpEntity https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrpentity
+type PublicKeyCredentialRpEntity struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// PublicKeyCredentialUserEntity https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialuserentity
+type PublicKeyCredentialUserEntity struct {
+	DisplayName string `json:"displayName"`
+	Id          string `json:"id"`
+	Name        string `json:"name"`
 }
 
 // PublicProfile defines model for PublicProfile.
@@ -424,6 +547,12 @@ type ThreadsCreateBody struct {
 	Title ThreadTitle `json:"title"`
 }
 
+// WebAuthnPublicKeyCreationOptions https://www.w3.org/TR/webauthn-2/#sctn-credentialcreationoptions-extension
+type WebAuthnPublicKeyCreationOptions struct {
+	// PublicKey https://www.w3.org/TR/webautehn-2/#dictdef-publickeycredentialcreationoptions
+	PublicKey PublicKeyCredentialCreationOptions `json:"publicKey"`
+}
+
 // AccountHandleParam The unique @ handle of an account.
 type AccountHandleParam = AccountHandle
 
@@ -477,11 +606,11 @@ type ThreadsList struct {
 	Threads ThreadList `json:"threads"`
 }
 
-// WebAuthnPublicKeyAuthenticationOptions defines model for WebAuthnPublicKeyAuthenticationOptions.
-type WebAuthnPublicKeyAuthenticationOptions = any
+// WebAuthnGetAssertionSuccess https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
+type WebAuthnGetAssertionSuccess = CredentialRequestOptions
 
-// WebAuthnPublicKeyCreationOptions defines model for WebAuthnPublicKeyCreationOptions.
-type WebAuthnPublicKeyCreationOptions = any
+// WebAuthnRequestCredentialSuccess https://www.w3.org/TR/webauthn-2/#sctn-credentialcreationoptions-extension
+type WebAuthnRequestCredentialSuccess = WebAuthnPublicKeyCreationOptions
 
 // AccountsUpdate defines model for AccountsUpdate.
 type AccountsUpdate = AccountsUpdateBody
@@ -498,11 +627,11 @@ type PostsCreate = PostInitialProps
 // ThreadsCreate defines model for ThreadsCreate.
 type ThreadsCreate = ThreadsCreateBody
 
-// WebAuthnMakeAssertionJSONBody defines parameters for WebAuthnMakeAssertion.
-type WebAuthnMakeAssertionJSONBody = map[string]interface{}
+// WebAuthnMakeAssertion https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+type WebAuthnMakeAssertion = PublicKeyCredential
 
-// WebAuthnMakeCredentialJSONBody defines parameters for WebAuthnMakeCredential.
-type WebAuthnMakeCredentialJSONBody = map[string]interface{}
+// WebAuthnMakeCredential https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+type WebAuthnMakeCredential = PublicKeyCredential
 
 // ThreadsListParams defines parameters for ThreadsList.
 type ThreadsListParams struct {
@@ -532,10 +661,10 @@ type AuthPasswordSignupJSONRequestBody = AuthPasswordBody
 type AuthPasswordSignupFormdataRequestBody = AuthPasswordBody
 
 // WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
-type WebAuthnMakeAssertionJSONRequestBody = WebAuthnMakeAssertionJSONBody
+type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
 
 // WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
-type WebAuthnMakeCredentialJSONRequestBody = WebAuthnMakeCredentialJSONBody
+type WebAuthnMakeCredentialJSONRequestBody = PublicKeyCredential
 
 // ThreadsCreateJSONRequestBody defines body for ThreadsCreate for application/json ContentType.
 type ThreadsCreateJSONRequestBody = ThreadsCreateBody
@@ -2247,7 +2376,7 @@ func (r WebAuthnMakeAssertionResponse) StatusCode() int {
 type WebAuthnGetAssertionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *any
+	JSON200      *CredentialRequestOptions
 	JSONDefault  *APIError
 }
 
@@ -2293,7 +2422,7 @@ func (r WebAuthnMakeCredentialResponse) StatusCode() int {
 type WebAuthnRequestCredentialResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *any
+	JSON200      *WebAuthnPublicKeyCreationOptions
 	JSONDefault  *APIError
 }
 
@@ -3069,7 +3198,7 @@ func ParseWebAuthnGetAssertionResponse(rsp *http.Response) (*WebAuthnGetAssertio
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest any
+		var dest CredentialRequestOptions
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3135,7 +3264,7 @@ func ParseWebAuthnRequestCredentialResponse(rsp *http.Response) (*WebAuthnReques
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest any
+		var dest WebAuthnPublicKeyCreationOptions
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3763,22 +3892,22 @@ type ThreadsListJSONResponse struct {
 type UnauthorisedResponse struct {
 }
 
-type WebAuthnPublicKeyAuthenticationOptionsResponseHeaders struct {
+type WebAuthnGetAssertionSuccessResponseHeaders struct {
 	SetCookie string
 }
-type WebAuthnPublicKeyAuthenticationOptionsJSONResponse struct {
-	Body any
+type WebAuthnGetAssertionSuccessJSONResponse struct {
+	Body CredentialRequestOptions
 
-	Headers WebAuthnPublicKeyAuthenticationOptionsResponseHeaders
+	Headers WebAuthnGetAssertionSuccessResponseHeaders
 }
 
-type WebAuthnPublicKeyCreationOptionsResponseHeaders struct {
+type WebAuthnRequestCredentialSuccessResponseHeaders struct {
 	SetCookie string
 }
-type WebAuthnPublicKeyCreationOptionsJSONResponse struct {
-	Body any
+type WebAuthnRequestCredentialSuccessJSONResponse struct {
+	Body WebAuthnPublicKeyCreationOptions
 
-	Headers WebAuthnPublicKeyCreationOptionsResponseHeaders
+	Headers WebAuthnRequestCredentialSuccessResponseHeaders
 }
 
 type GetSpecRequestObject struct {
@@ -4235,7 +4364,7 @@ type WebAuthnGetAssertionResponseObject interface {
 }
 
 type WebAuthnGetAssertion200JSONResponse struct {
-	WebAuthnPublicKeyAuthenticationOptionsJSONResponse
+	WebAuthnGetAssertionSuccessJSONResponse
 }
 
 func (response WebAuthnGetAssertion200JSONResponse) VisitWebAuthnGetAssertionResponse(w http.ResponseWriter) error {
@@ -4318,7 +4447,7 @@ type WebAuthnRequestCredentialResponseObject interface {
 }
 
 type WebAuthnRequestCredential200JSONResponse struct {
-	WebAuthnPublicKeyCreationOptionsJSONResponse
+	WebAuthnRequestCredentialSuccessJSONResponse
 }
 
 func (response WebAuthnRequestCredential200JSONResponse) VisitWebAuthnRequestCredentialResponse(w http.ResponseWriter) error {
@@ -5242,77 +5371,88 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"jutGrsDDeqzGpjfXm/8LAAD//y/pTppeWQAA",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
