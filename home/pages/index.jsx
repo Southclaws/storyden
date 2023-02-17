@@ -185,136 +185,154 @@ function Hero() {
 
 function Story() {
   return (
-    <Grid
-      maxW="100vw"
-      bgColor="black"
-      //
-      // The grid template rows and columns are defined in order to produce an
-      // overlapping effect so that the end of one overlaps with the next start.
-      gridTemplateRows={`100px [top] auto [one] 0.4fr [one-text-start] 0.2fr [one-text-end] 0.4fr [two] 90px [one-end] auto [two-text-start] auto [two-text-end] auto [three] 90px [two-end] 0.4fr [three-text-start] 0.2fr [three-text-end] 0.4fr 90px [three-end] auto [bot] 100px`}
-      gridTemplateColumns={{
-        base: `1em [left] 1fr [left-far] 2fr [left-near] 50% [right-near] 2fr [right-far] 1fr [right] 1em`,
-        lg: `10% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 10%`,
-        xl: `25% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 25%`,
-      }}
-    >
-      <GridItem maxW="100vw" gridRow="top / bot" gridColumn="left / right">
-        <VStack
-          width="full"
-          height="full"
-          alignItems="center"
-          justifyContent="center"
+    <>
+      <Grid
+        maxW="100vw"
+        bgColor="black"
+        //
+        // The grid template rows and columns are defined in order to produce an
+        // overlapping effect so that the end of one overlaps with the next start.
+        gridTemplateRows={`100px [top] auto [one] 0.4fr [one-text-start] 0.2fr [one-text-end] 0.4fr [two] 90px [one-end] auto [two-text-start] auto [two-text-end] auto [three] 90px [two-end] 0.4fr [three-text-start] 0.2fr [three-text-end] 0.4fr 90px [three-end] auto [bot] 100px`}
+        gridTemplateColumns={{
+          base: `1em [left] 1fr [left-far] 2fr [left-near] 50% [right-near] 2fr [right-far] 1fr [right] 1em`,
+          lg: `10% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 10%`,
+          xl: `25% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 25%`,
+        }}
+      >
+        <GridItem maxW="100vw" gridRow="top / bot" gridColumn="left / right">
+          <VStack
+            width="full"
+            height="full"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <picture>
+              <source media="(max-width: 768px)" srcset="tall-bg-stars.png" />
+              <source media="(min-width: 768px)" srcset="bg-stars.png" />
+              <img src="bg-stars.png" />
+            </picture>
+          </VStack>
+        </GridItem>
+
+        <GridItem gridRow="one / one-end" gridColumn="left-near / right-far">
+          <HStack justify="center">
+            <Box>
+              <Image src="/squircle-tree-smol.png" width={512} height={512} />
+            </Box>
+          </HStack>
+        </GridItem>
+
+        <GridItem
+          gridRow="one-text-start / one-text-end"
+          gridColumn="left-far / right-near"
+          zIndex={2}
         >
-          <picture>
-            <source media="(max-width: 768px)" srcset="tall-bg-stars.png" />
-            <source media="(min-width: 768px)" srcset="bg-stars.png" />
-            <img src="bg-stars.png" />
-          </picture>
-        </VStack>
-      </GridItem>
+          <HStack>
+            <Text
+              className="story__text-overlay"
+              background="rgba(48, 48, 48, 0.1)"
+              boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
+              backdropFilter="blur(16px)"
+              borderRadius="1em"
+              width="min-content"
+              p={{ base: 2, lg: 3, xl: 4 }}
+              fontSize={{ base: "md", sm: "2xl" }}
+              color="white"
+              fontFamily="Mona-Sans"
+              wordBreak="keep-all"
+            >
+              Ideas,&nbsp;big&nbsp;or&nbsp;small,&nbsp;always
+              <wbr />
+              &nbsp;start&nbsp;with&nbsp;people&nbsp;in&nbsp;mind.
+            </Text>
+          </HStack>
+        </GridItem>
 
-      <GridItem gridRow="one / one-end" gridColumn="left-near / right-far">
-        <HStack justify="center">
-          <Box>
-            <Image src="/squircle-tree-smol.png" width={512} height={512} />
-          </Box>
-        </HStack>
-      </GridItem>
+        <GridItem gridRow="two / two-end" gridColumn="left-far / right-near">
+          <HStack justify="center">
+            <Box>
+              <Image src="/squircle-tree-midaf.png" width={512} height={512} />
+            </Box>
+          </HStack>
+        </GridItem>
 
-      <GridItem
-        gridRow="one-text-start / one-text-end"
-        gridColumn="left-far / right-near"
-        zIndex={2}
-      >
-        <HStack>
-          <Text
-            background="rgba(48, 48, 48, 0.1)"
-            boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
-            backdropFilter="blur(16px)"
-            borderRadius="1em"
-            width="min-content"
-            p={{ base: 2, lg: 3, xl: 4 }}
-            fontSize={{ base: "md", sm: "2xl" }}
-            color="white"
-            fontFamily="Mona-Sans"
-            wordBreak="keep-all"
-          >
-            Ideas,&nbsp;big&nbsp;or&nbsp;small,&nbsp;always
-            <wbr />
-            &nbsp;start&nbsp;with&nbsp;people&nbsp;in&nbsp;mind.
-          </Text>
-        </HStack>
-      </GridItem>
+        <GridItem
+          gridRow="two-text-start / two-text-end"
+          gridColumn="left-near / right-far"
+          zIndex={2}
+        >
+          <HStack justify="end">
+            <Text
+              className="story__text-overlay"
+              background="rgba(48, 48, 48, 0.1)"
+              boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
+              backdropFilter="blur(16px)"
+              borderRadius="1em"
+              width="min-content"
+              p={{ base: 2, lg: 3, xl: 4 }}
+              fontSize={{ base: "md", sm: "2xl" }}
+              color="white"
+              fontFamily="Mona-Sans"
+              wordBreak="keep-all"
+              textAlign="center"
+            >
+              Projects,&nbsp;products&nbsp;and
+              <wbr />
+              &nbsp; people&nbsp;oriented&nbsp;ideas
+              <wbr />
+              &nbsp; grow&nbsp;into&nbsp;communities.
+            </Text>
+          </HStack>
+        </GridItem>
 
-      <GridItem gridRow="two / two-end" gridColumn="left-far / right-near">
-        <HStack justify="center">
-          <Box>
-            <Image src="/squircle-tree-midaf.png" width={512} height={512} />
-          </Box>
-        </HStack>
-      </GridItem>
+        <GridItem
+          gridRow="three / three-end"
+          gridColumn="left-near / right-far"
+        >
+          <HStack justify="center">
+            <Box>
+              <Image src="/squircle-tree-bigly.png" width={512} height={512} />
+            </Box>
+          </HStack>
+        </GridItem>
 
-      <GridItem
-        gridRow="two-text-start / two-text-end"
-        gridColumn="left-near / right-far"
-        zIndex={2}
-      >
-        <HStack justify="end">
-          <Text
-            background="rgba(48, 48, 48, 0.1)"
-            boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
-            backdropFilter="blur(16px)"
-            borderRadius="1em"
-            width="min-content"
-            p={{ base: 2, lg: 3, xl: 4 }}
-            fontSize={{ base: "md", sm: "2xl" }}
-            color="white"
-            fontFamily="Mona-Sans"
-            wordBreak="keep-all"
-            textAlign="center"
-          >
-            Projects,&nbsp;products&nbsp;and
-            <wbr />
-            &nbsp; people&nbsp;oriented&nbsp;ideas
-            <wbr />
-            &nbsp; grow&nbsp;into&nbsp;communities.
-          </Text>
-        </HStack>
-      </GridItem>
+        <GridItem
+          gridRow="three-text-start / three-text-end"
+          gridColumn="left-far / right-near"
+          zIndex={2}
+        >
+          <HStack>
+            <Text
+              className="story__text-overlay"
+              background="rgba(48, 48, 48, 0.1)"
+              boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
+              backdropFilter="blur(16px)"
+              borderRadius="1em"
+              width="min-content"
+              p={{ base: 2, lg: 3, xl: 4 }}
+              fontSize={{ base: "md", sm: "2xl" }}
+              color="white"
+              fontFamily="Mona-Sans"
+              wordBreak="keep-all"
+            >
+              Collaboration&nbsp;occurs&nbsp;best&nbsp;when
+              <wbr />
+              &nbsp;the&nbsp;platform&nbsp;flows&nbsp;with&nbsp;everyone.
+            </Text>
+          </HStack>
+        </GridItem>
+      </Grid>
 
-      <GridItem gridRow="three / three-end" gridColumn="left-near / right-far">
-        <HStack justify="center">
-          <Box>
-            <Image src="/squircle-tree-bigly.png" width={512} height={512} />
-          </Box>
-        </HStack>
-      </GridItem>
-
-      <GridItem
-        gridRow="three-text-start / three-text-end"
-        gridColumn="left-far / right-near"
-        zIndex={2}
-      >
-        <HStack>
-          <Text
-            background="rgba(48, 48, 48, 0.1)"
-            boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
-            backdropFilter="blur(16px)"
-            borderRadius="1em"
-            width="min-content"
-            p={{ base: 2, lg: 3, xl: 4 }}
-            fontSize={{ base: "md", sm: "2xl" }}
-            color="white"
-            fontFamily="Mona-Sans"
-            wordBreak="keep-all"
-          >
-            Collaboration&nbsp;occurs&nbsp;best&nbsp;when
-            <wbr />
-            &nbsp;the&nbsp;platform&nbsp;flows&nbsp;with&nbsp;everyone.
-          </Text>
-        </HStack>
-      </GridItem>
-    </Grid>
+      <style jsx global>{`
+        @supports not (
+          (-webkit-backdrop-filter: none) or (backdrop-filter: none)
+        ) {
+          .story__text-overlay {
+            background-color: rgba(8, 8, 8, 0.4);
+          }
+        }
+      `}</style>
+    </>
   );
 }
 
