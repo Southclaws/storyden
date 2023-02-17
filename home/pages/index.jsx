@@ -224,6 +224,7 @@ function Story() {
       <GridItem
         gridRow="one-text-start / one-text-end"
         gridColumn="left-far / right-near"
+        zIndex={2}
       >
         <HStack>
           <Text
@@ -256,6 +257,7 @@ function Story() {
       <GridItem
         gridRow="two-text-start / two-text-end"
         gridColumn="left-near / right-far"
+        zIndex={2}
       >
         <HStack justify="end">
           <Text
@@ -291,6 +293,7 @@ function Story() {
       <GridItem
         gridRow="three-text-start / three-text-end"
         gridColumn="left-far / right-near"
+        zIndex={2}
       >
         <HStack>
           <Text
