@@ -135,11 +135,23 @@ function Hero() {
     <Grid>
       <GridItem gridRow="1/2" gridColumn="1/2">
         <picture>
-          <source media="(max-width: 768px)" srcSet="square-nice-lake.png" />
-          <source media="(min-width: 768px)" srcSet="wide-nice-lake.png" />
+          <source
+            media="(max-width: 768px)"
+            srcSet="square-nice-lake.webp"
+            width={1024}
+            height={1024}
+          />
+          <source
+            media="(min-width: 768px)"
+            srcSet="wide-nice-lake.webp"
+            width={3456}
+            height={1728}
+          />
           <img
-            src="wide-nice-lake.png"
+            src="wide-nice-lake.webp"
             alt="A sun-lit lake sitting before tall snow-covered mountains in the distance which are reflecting on the lake."
+            width={3456}
+            height={1728}
           />
         </picture>
       </GridItem>
@@ -165,7 +177,7 @@ function Hero() {
               width={["xs", "sm", "2xl"]}
             >
               <Image
-                src="/brushything.png"
+                src="/brushything.webp"
                 width="716"
                 height="214"
                 alt=""
@@ -216,9 +228,15 @@ function Story() {
             justifyContent="center"
           >
             <picture>
-              <source media="(max-width: 768px)" srcSet="tall-bg-stars.png" />
-              <source media="(min-width: 768px)" srcSet="bg-stars.png" />
-              <img src="bg-stars.png" alt="" role="presentation" />
+              <source media="(max-width: 768px)" srcSet="tall-bg-stars.webp" />
+              <source media="(min-width: 768px)" srcSet="bg-stars.webp" />
+              <img
+                src="bg-stars.webp"
+                alt=""
+                role="presentation"
+                width={2048}
+                height={2048}
+              />
             </picture>
           </VStack>
         </GridItem>
@@ -227,10 +245,10 @@ function Story() {
           <HStack justify="center">
             <Box>
               <Image
-                src="/squircle-tree-smol.png"
+                src="/squircle-tree-smol.webp"
                 width={512}
                 height={512}
-                alt=""
+                alt="A baby tree sapling about a foot tall"
               />
             </Box>
           </HStack>
@@ -264,7 +282,12 @@ function Story() {
         <GridItem gridRow="two / two-end" gridColumn="left-far / right-near">
           <HStack justify="center">
             <Box>
-              <Image src="/squircle-tree-midaf.png" width={512} height={512} />
+              <Image
+                src="/squircle-tree-midaf.webp"
+                width={512}
+                height={512}
+                alt="A young growing tree about 5ft tall"
+              />
             </Box>
           </HStack>
         </GridItem>
@@ -303,7 +326,12 @@ function Story() {
         >
           <HStack justify="center">
             <Box>
-              <Image src="/squircle-tree-bigly.png" width={512} height={512} />
+              <Image
+                src="/squircle-tree-bigly.webp"
+                width={512}
+                height={512}
+                alt="A huge magnificent tree in a forest clearing bathed in sunlight"
+              />
             </Box>
           </HStack>
         </GridItem>
