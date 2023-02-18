@@ -1,5 +1,6 @@
 import {
   Box,
+  Flex,
   Grid,
   GridItem,
   Heading,
@@ -375,11 +376,140 @@ function Story() {
   );
 }
 
+function Why() {
+  return (
+    <Flex
+      flexDir={{
+        base: "column",
+        lg: "row",
+      }}
+      bgColor="hsla(140, 16%, 88%, 1)"
+      px={{ base: 12, md: 48, lg: 48, xl: 80, "2xl": 96 }}
+      py={{ base: 12, lg: 12 }}
+      alignItems="center"
+      justifyContent="center"
+      gap={4}
+      flex="1"
+    >
+      <Box>
+        <Heading
+          textAlign="right"
+          fontFamily="Mona-Sans, sans-serif"
+          fontStyle="normal"
+          fontWeight="900"
+          fontSize={{
+            base: "4xl",
+            md: "7xl",
+            lg: "6xl",
+            xl: "7xl",
+            "2xl": "8xl",
+          }}
+          width={{ base: "max-content", lg: "min-content" }}
+          lineHeight={{ base: 1, lg: 1.4 }}
+        >
+          Why
+          <wbr /> Storyden
+        </Heading>
+      </Box>
+
+      <Flex flexDir="column" gap={{ base: 2, lg: 1 }} pt="10.1px">
+        <Text>Storyden is a platform for building communities.</Text>
+        <Text wordBreak="keep-all">
+          But not just another chat app or another forum site.
+          <wbr /> Storyden is a modern take on oldschool bulletin board
+          <wbr /> forums you may remember from the earlier days of the
+          <wbr /> internet.
+        </Text>
+        <Text>
+          With a fresh perspective and new objectives, Storyden is
+          <wbr /> designed to be the community platform for the next era of
+          <wbr /> internet culture.
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}
+
+function Feature({ image, alt, heading, body }) {
+  return (
+    <Grid width={394}>
+      <GridItem gridRow="1/2" gridColumn="2/3">
+        <Image src={image} width={394} height={394} alt={alt} />
+      </GridItem>
+
+      <GridItem gridRow="1/2" gridColumn="2/3" p={8}>
+        <Flex flexDir="column" justifyContent="end" height="full" color="white">
+          <Heading>{heading}</Heading>
+          <Text>{body}</Text>
+        </Flex>
+      </GridItem>
+    </Grid>
+  );
+}
+
+function Features() {
+  return (
+    <Flex
+      flexWrap="wrap"
+      bgColor="hsla(140, 16%, 88%, 1)"
+      px={{ base: 6, md: 9, lg: 12, xl: 12 }}
+      pb={12}
+      alignItems="center"
+      justifyContent="center"
+      gap={4}
+    >
+      <Feature
+        image="/accessible.webp"
+        alt=""
+        heading="Accessible"
+        body="Accessibility is non-negotiable and no one can be left behind. WAI and WCAG are a primary focus to ensure great experience for people regardless of a disability."
+      />
+
+      <Feature
+        image="/secure.webp"
+        alt=""
+        heading="Secure"
+        body="The latest and greatest industry standard security practices as well as new emerging systems such as WebAuthn guarantee the most secure experience for everyone."
+      />
+
+      <Feature
+        image="/web3.webp"
+        alt=""
+        heading="Web3"
+        body="Love it or hate it, it’s here and it’s staying. So we embrace the new web and provide features such as wallet based login, NFT avatars and more for web3 communities."
+      />
+
+      <Feature
+        image="/opensource.webp"
+        alt=""
+        heading="Open source"
+        body="The benefits of open source software are impossible to ignore. When it comes to the security, development velocity, and ability to report issues, this is the way forward."
+      />
+
+      <Feature
+        image="/extensible.webp"
+        alt=""
+        heading="Extensible"
+        body="A fully documented OpenAPI schema means that you can extend the platform with plugins or even build a whole new frontend from scratch if you want to!"
+      />
+
+      <Feature
+        image="/builttolast.webp"
+        alt=""
+        heading="Built to last"
+        body="Harnessing the power of technology that’s just-modern-enough helps balance stability with longevity. Storyden uses a carefully chosen toolbox with this in mind."
+      />
+    </Flex>
+  );
+}
+
 export default function Home() {
   return (
     <Box>
       <Hero />
       <Story />
+      <Why />
+      <Features />
     </Box>
   );
 }
