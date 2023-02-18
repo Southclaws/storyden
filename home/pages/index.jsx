@@ -10,6 +10,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
+import localFont from "@next/font/local";
+
+const monasans = localFont({ src: "./Mona-Sans.woff2" });
 
 function Logo() {
   return (
@@ -392,7 +395,7 @@ function Why() {
       <Box>
         <Heading
           textAlign="right"
-          fontFamily="Mona-Sans, sans-serif"
+          fontFamily={monasans}
           fontStyle="normal"
           fontWeight="900"
           fontSize={{
