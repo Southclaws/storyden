@@ -1,8 +1,11 @@
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import localFont from "@next/font/local";
 import "../fonts.css";
 import "../styles.css";
+
+const monasans = localFont({ src: "./Mona-Sans.woff2" });
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -44,7 +47,9 @@ function MyApp({ Component, pageProps }) {
           titleTemplate="Storyden | %s"
           description="With a fresh new take on traditional bulletin board web forum software, Storyden is a modern, secure and extensible platform for building communities."
         />
-        <Component {...pageProps} />
+        <main className={monasans.className}>
+          <Component {...pageProps} />
+        </main>
       </ChakraProvider>
     </>
   );
