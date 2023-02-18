@@ -14,8 +14,8 @@ function Logo() {
     <svg viewBox="0 0 142 143" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_1118_12433)">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M66.274 23.2302C67.7837 21.7351 70.216 21.7351 71.7257 23.2302L94.3731 45.6577C95.1078 46.3853 95.5211 47.3763 95.5211 48.4103V78.3796C95.5211 79.8608 94.3204 81.0616 92.8392 81.0616C91.358 81.0616 90.1573 79.8608 90.1573 78.3796V49.5289C90.1573 49.2107 90.0301 48.9058 89.804 48.6819L69.8386 28.9103C69.374 28.4503 68.6256 28.4503 68.1611 28.9103L61.9264 35.0844C60.874 36.1267 59.1759 36.1184 58.1336 35.0659C57.0914 34.0135 57.0997 32.3154 58.1521 31.2732L66.274 23.2302ZM59.9454 51.8012C59.476 52.266 59.4741 53.0239 59.9412 53.491L68.157 61.7067C68.6225 62.1722 69.3772 62.1722 69.8427 61.7067L78.0584 53.491C78.5255 53.0239 78.5237 52.266 78.0543 51.8012L69.8386 43.6652C69.374 43.2052 68.6256 43.2052 68.1611 43.6652L59.9454 51.8012ZM73.6355 67.1853C73.17 66.7198 73.17 65.9651 73.6355 65.4996L83.7569 55.3781C85.275 53.8601 85.269 51.3969 83.7435 49.8863L71.7257 37.9851C70.216 36.4901 67.7837 36.4901 66.274 37.9851L54.2561 49.8863C52.7307 51.3969 52.7247 53.8601 54.2427 55.3781L64.3642 65.4996C64.8296 65.965 64.8296 66.7198 64.3642 67.1853L56.2008 75.3486C55.9773 75.5721 55.6741 75.6977 55.358 75.6977H49.0343C48.376 75.6977 47.8424 75.164 47.8424 74.5057V49.5243C47.8424 49.207 47.9689 48.9028 48.1939 48.6791L52.6352 44.2632C53.6856 43.2189 53.6905 41.5208 52.6461 40.4704C51.6018 39.4201 49.9037 39.4152 48.8533 40.4595L43.621 45.6618C42.8897 46.3889 42.4785 47.3776 42.4785 48.4089V77.1876C42.4785 79.3271 44.2129 81.0616 46.3524 81.0616H56.4689C57.4963 81.0616 58.4816 80.6534 59.2081 79.9269L68.157 70.9781C68.6225 70.5126 69.3772 70.5126 69.8427 70.9781L79.1406 80.276C80.188 81.3234 81.8861 81.3234 82.9334 80.276C83.9808 79.2287 83.9808 77.5306 82.9334 76.4832L73.6355 67.1853Z"
           fill="white"
         />
@@ -62,9 +62,9 @@ function Logo() {
           width="101.042"
           height="106.953"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -97,9 +97,9 @@ function Logo() {
           width="143.357"
           height="76.6074"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -135,9 +135,12 @@ function Hero() {
     <Grid>
       <GridItem gridRow="1/2" gridColumn="1/2">
         <picture>
-          <source media="(max-width: 768px)" srcset="square-nice-lake.png" />
-          <source media="(min-width: 768px)" srcset="wide-nice-lake.png" />
-          <img src="wide-nice-lake.png" />
+          <source media="(max-width: 768px)" srcSet="square-nice-lake.png" />
+          <source media="(min-width: 768px)" srcSet="wide-nice-lake.png" />
+          <img
+            src="wide-nice-lake.png"
+            alt="A sun-lit lake sitting before tall snow-covered mountains in the distance which are reflecting on the lake."
+          />
         </picture>
       </GridItem>
 
@@ -161,7 +164,13 @@ function Hero() {
               gridColumn="1/2"
               width={["xs", "sm", "2xl"]}
             >
-              <Image src="/brushything.png" width="716" height="214" />
+              <Image
+                src="/brushything.png"
+                width="716"
+                height="214"
+                alt=""
+                role="presentation"
+              />
             </GridItem>
 
             <GridItem
@@ -207,9 +216,9 @@ function Story() {
             justifyContent="center"
           >
             <picture>
-              <source media="(max-width: 768px)" srcset="tall-bg-stars.png" />
-              <source media="(min-width: 768px)" srcset="bg-stars.png" />
-              <img src="bg-stars.png" />
+              <source media="(max-width: 768px)" srcSet="tall-bg-stars.png" />
+              <source media="(min-width: 768px)" srcSet="bg-stars.png" />
+              <img src="bg-stars.png" alt="" role="presentation" />
             </picture>
           </VStack>
         </GridItem>
@@ -217,7 +226,12 @@ function Story() {
         <GridItem gridRow="one / one-end" gridColumn="left-near / right-far">
           <HStack justify="center">
             <Box>
-              <Image src="/squircle-tree-smol.png" width={512} height={512} />
+              <Image
+                src="/squircle-tree-smol.png"
+                width={512}
+                height={512}
+                alt=""
+              />
             </Box>
           </HStack>
         </GridItem>
@@ -230,7 +244,6 @@ function Story() {
           <HStack>
             <Text
               className="story__text-overlay"
-              background="rgba(48, 48, 48, 0.1)"
               boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
               backdropFilter="blur(16px)"
               borderRadius="1em"
@@ -264,7 +277,6 @@ function Story() {
           <HStack justify="end">
             <Text
               className="story__text-overlay"
-              background="rgba(48, 48, 48, 0.1)"
               boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
               backdropFilter="blur(16px)"
               borderRadius="1em"
@@ -304,7 +316,6 @@ function Story() {
           <HStack>
             <Text
               className="story__text-overlay"
-              background="rgba(48, 48, 48, 0.1)"
               boxShadow="2px 2px 10px rgba(0, 0, 0, 0.1)"
               backdropFilter="blur(16px)"
               borderRadius="1em"
