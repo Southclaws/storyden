@@ -271,7 +271,6 @@ function Story() {
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
               color="white"
-              fontFamily="Mona-Sans"
               wordBreak="keep-all"
             >
               Ideas,&nbsp;big&nbsp;or&nbsp;small,&nbsp;always
@@ -309,7 +308,6 @@ function Story() {
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
               color="white"
-              fontFamily="Mona-Sans"
               wordBreak="keep-all"
               textAlign="center"
             >
@@ -353,7 +351,6 @@ function Story() {
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
               color="white"
-              fontFamily="Mona-Sans"
               wordBreak="keep-all"
             >
               Collaboration&nbsp;occurs&nbsp;best&nbsp;when
