@@ -5,6 +5,7 @@ import {
   GridItem,
   Heading,
   HStack,
+  Link,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -503,6 +504,224 @@ function Features() {
   );
 }
 
+function Pair({ big, heading, children }) {
+  return (
+    <Flex
+      flexDir={{ base: "column", md: "row" }}
+      alignItems="flex-start"
+      gap={6}
+      mt={big ? 10 : 2}
+    >
+      <Heading
+        width={{ base: "100%", sm: "33%", xl: "50%" }}
+        textAlign={{ base: "left", md: "right" }}
+        // whiteSpace="nowrap"
+        fontWeight="black"
+        fontSize={
+          big
+            ? {
+                base: "3xl",
+                md: "2xl",
+                lg: "2xl",
+                xl: "3xl",
+                "2xl": "4xl",
+              }
+            : {
+                base: "xl",
+                md: "lg",
+                lg: "lg",
+                xl: "xl",
+                "2xl": "2xl",
+              }
+        }
+      >
+        {heading}
+      </Heading>
+      <Box width={{ base: "100%", sm: "67%", xl: "50%" }} mt={1}>
+        {children}
+      </Box>
+    </Flex>
+  );
+}
+
+function WallOfText() {
+  return (
+    <Flex
+      flexDir="column"
+      bgColor="hsla(140, 16%, 88%, 1)"
+      px={{ base: 12, md: 12, lg: 24, xl: 48, "2xl": 80 }}
+      py={{ base: 12, lg: 12 }}
+      alignItems="center"
+      justifyContent="center"
+      gap={4}
+      flex="1"
+    >
+      <Pair big heading="For community leaders">
+        <Text>
+          Fearless <b>futurism</b>, radical <b>accessibility</b>, endless
+          extensibility. Every modern service, product and movement has
+          community at the centre. Communities often grow out of their humble
+          beginnings on walled-garden platforms. In an era of growing awareness
+          in personal <b>privacy</b>, tech <b>monopoly</b> and{" "}
+          <b>decentralisation</b>, communities of all size are affected.
+        </Text>
+      </Pair>
+      <Pair heading="Flexible by nature">
+        <Text>
+          Whether you operate a product <b>support forum</b>, a{" "}
+          <b>gaming community</b> or the next big cryptocurrency, web3 or DAO
+          project, the <b>people</b> at the centre of whatever you’re doing
+          deserve a platform that fades into the background and brings{" "}
+          <b>what matters</b> front & centre
+        </Text>
+      </Pair>
+      <Pair heading="Accessible by design">
+        <Text>
+          And by people, that means{" "}
+          <em>
+            <b>all</b>
+          </em>{" "}
+          people. A truly welcoming, inclusive and <b>diverse</b> community
+          warrants a platform that takes accessibility seriously,{" "}
+          <b>no questions asked</b>.
+        </Text>
+      </Pair>
+
+      <Pair big heading="For dev-ops heroes">
+        <Text>
+          Simple <b>deployment</b>, simple <b>maintenance</b> and simple
+          <b>updates</b>. That’s what matters when you’re self-hosting, so you
+          can spend time where it brings the most value.
+        </Text>
+        <Text>
+          The choice of technologies behind the Storyden platform are all
+          <b>meticulously</b> intentional to fit those values of simplicity in
+          order to <b>get out of the way</b>.
+        </Text>
+      </Pair>
+      <Pair heading="Container first">
+        <Text>
+          Zero <b>installation</b> steps. Set some environment variables and
+          spin up a container image. Behaving like all other modern server-side
+          software is the key to <b>simplicity</b>.
+        </Text>
+      </Pair>
+      <Pair heading="Bring your own frontend">
+        <Text>
+          Not a fan of themes? That’s fine, <b>headless</b> mode is for you.
+          Storyden is, at the core, a powerful API service with which you can
+          <b>wire up</b> anything you want.
+        </Text>
+        <Text>
+          From web to mobile apps and everything in between, the <b>OpenAPI</b>
+          specification provides a fast integration path.
+        </Text>
+      </Pair>
+
+      <Pair big heading="For you and your friends">
+        <Text>
+          Optimised for <b>humans</b>, ready for the web <b>renaissance</b>.
+          Storyden is built to be a stable foundation for the future decades of
+          internet citizens and the <b>networks</b> they build.
+        </Text>
+      </Pair>
+      <Pair heading="Sign-in your way">
+        <Text>
+          Rough relationship with <b>email</b>? Just don’t enable it then. Sign
+          in with <b>Passkey</b>, WebAuthn, Web3 <b>wallet</b>, or choose from a
+          variety of popular OAuth2 and <b>SSO</b> providers.
+        </Text>
+      </Pair>
+      <Pair heading="Take part">
+        <Text>
+          Staying <b>closed source</b> is pointless in today’s internet. Fork
+          it, hack on it, provide hosting, use as a basis for other apps,
+          <b>contribute</b> back to the community. Not sure where to start? Use
+          Storyden to <b>learn</b> about building!
+        </Text>
+      </Pair>
+    </Flex>
+  );
+}
+
+function CTA() {
+  return (
+    <VStack
+      bgColor="hsla(160, 9%, 92%, 1)"
+      color="hsla(0, 0%, 19%, 1)"
+      p={8}
+      gap={2}
+      w="full"
+      textAlign="center"
+    >
+      <Heading fontWeight="bold" fontSize={{ base: "2xl", lg: "4xl" }}>
+        Interested?
+      </Heading>
+      <Text>
+        Storyden is early in development and is looking for <b>feedback</b> and
+        <b>contributors</b>!
+      </Text>
+      <Text>
+        If you have <b>opinions</b> about forum software,{" "}
+        <Link
+          isExternal
+          href="https://airtable.com/shrLY0jDp9CuXPB2X"
+          color="hsla(265, 56%, 42%, 1)"
+        >
+          please click this link!
+        </Link>
+      </Text>
+      <Text>
+        If you know <b>Golang</b> or <b>React.js</b> and are interested in
+        contributing to a <b>high quality</b> open source project,{" "}
+        <Link
+          isExternal
+          href="https://github.com/Southclaws/storyden"
+          color="hsla(265, 56%, 42%, 1)"
+        >
+          please click this link!
+        </Link>
+      </Text>
+    </VStack>
+  );
+}
+
+function Footer() {
+  return (
+    <Flex
+      flexDir="column"
+      bgColor="hsla(140, 16%, 88%, 1)"
+      px={{ base: 12, md: 12, lg: 24, xl: 48, "2xl": 80 }}
+      py={{ base: 12, lg: 12 }}
+      alignItems="center"
+      justifyContent="center"
+      gap={2}
+      flex="1"
+    >
+      <Image src="/mark.png" width={150} height={50} />
+
+      <Link href="https://twitter.com/Southclaws">Twitter</Link>
+      <Link href="https://github.com/Southclaws/storyden">GitHub</Link>
+
+      <svg
+        width="24"
+        height="25"
+        viewBox="0 0 24 25"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12 1.95117C9.10051 1.95117 6.75 4.30168 6.75 7.20117V10.2012C5.09315 10.2012 3.75 11.5443 3.75 13.2012V19.9512C3.75 21.608 5.09315 22.9512 6.75 22.9512H17.25C18.9069 22.9512 20.25 21.608 20.25 19.9512V13.2012C20.25 11.5443 18.9069 10.2012 17.25 10.2012V7.20117C17.25 4.30168 14.8995 1.95117 12 1.95117ZM15.75 10.2012V7.20117C15.75 5.1301 14.0711 3.45117 12 3.45117C9.92893 3.45117 8.25 5.1301 8.25 7.20117V10.2012H15.75Z"
+          fill="#0F172A"
+        />
+      </svg>
+      <Text>Storyden brand, logo and other assets &copy; Barnaby Keene</Text>
+    </Flex>
+  );
+}
+
 export default function Home() {
   return (
     <Box>
@@ -510,6 +729,9 @@ export default function Home() {
       <Story />
       <Why />
       <Features />
+      <WallOfText />
+      <CTA />
+      <Footer />
     </Box>
   );
 }
