@@ -273,6 +273,7 @@ function Story() {
               width="min-content"
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
+              fontWeight="medium"
               color="white"
               wordBreak="keep-all"
             >
@@ -310,6 +311,7 @@ function Story() {
               width="min-content"
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
+              fontWeight="medium"
               color="white"
               wordBreak="keep-all"
               textAlign="center"
@@ -353,6 +355,7 @@ function Story() {
               width="min-content"
               p={{ base: 2, lg: 3, xl: 4 }}
               fontSize={{ base: "md", sm: "2xl" }}
+              fontWeight="medium"
               color="white"
               wordBreak="keep-all"
             >
