@@ -35,7 +35,7 @@ function MyApp({ Component, pageProps }) {
         theme={extendTheme({
           fonts: {
             heading: "p22-mackinac-pro",
-            body: "halyard-display",
+            body: "mona-sans",
           },
         })}
       >

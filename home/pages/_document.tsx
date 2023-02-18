@@ -13,7 +13,7 @@ export default function Document() {
       </Head>
       <body>
         <Main />
-        <NextScript />f
+        <NextScript />
       </body>
     </Html>
   );
