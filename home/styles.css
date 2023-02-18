@@ -1,0 +1,10 @@
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .story__text-overlay {
+    background-color: rgba(8, 8, 8, 0.4);
+  }
+}
+/* @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .story__text-overlay {
+    background-color: rgba(48, 48, 48, 0.1);
+  }
+} */
