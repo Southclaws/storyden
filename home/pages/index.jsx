@@ -154,7 +154,8 @@ function Hero() {
           />
           <img
             src="wide-nice-lake.webp"
-            alt="A sun-lit lake sitting before tall snow-covered mountains in the distance which are reflecting on the lake."
+            role="presentation"
+            alt="A sun-lit lake sitting before tall snow-covered mountains in the distance."
             width={3456}
             height={1728}
           />
@@ -218,9 +219,9 @@ function Story() {
         //
         // The grid template rows and columns are defined in order to produce an
         // overlapping effect so that the end of one overlaps with the next start.
-        gridTemplateRows={`100px [top] auto [one] 0.4fr [one-text-start] 0.2fr [one-text-end] 0.4fr [two] 90px [one-end] auto [two-text-start] auto [two-text-end] auto [three] 90px [two-end] 0.4fr [three-text-start] 0.2fr [three-text-end] 0.4fr 90px [three-end] auto [bot] 100px`}
+        gridTemplateRows={`48px [top] auto [one] 0.4fr [one-text-start] 0.2fr [one-text-end] 0.4fr [two] 90px [one-end] auto [two-text-start] auto [two-text-end] auto [three] 90px [two-end] 0.4fr [three-text-start] 0.2fr [three-text-end] 0.4fr 90px [three-end] auto [bot] 1px`}
         gridTemplateColumns={{
-          base: `1em [left] 1fr [left-far] 2fr [left-near] 50% [right-near] 2fr [right-far] 1fr [right] 1em`,
+          base: `0em [left] 1fr [left-far] 2fr [left-near] 50% [right-near] 2fr [right-far] 1fr [right] 1em`,
           lg: `10% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 10%`,
           xl: `25% [left] 2fr [left-far] 2fr [left-near] 25% [right-near] 2fr [right-far] 2fr [right] 25%`,
         }}
@@ -437,11 +438,27 @@ function Why() {
 function Feature({ image, alt, heading, body }) {
   return (
     <Grid width={394}>
-      <GridItem gridRow="1/2" gridColumn="2/3">
+      <GridItem
+        gridRow="1/2"
+        gridColumn="2/3"
+        filter="drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2))"
+        zIndex={0}
+        bgColor="hsla(0, 0%, 19%, 1)"
+        height="90%"
+        width="90%"
+        m="auto"
+      />
+
+      <GridItem
+        gridRow="1/2"
+        gridColumn="2/3"
+        filter="drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2))"
+        zIndex={1}
+      >
         <Image src={image} width={394} height={394} alt={alt} />
       </GridItem>
 
-      <GridItem gridRow="1/2" gridColumn="2/3" p={8}>
+      <GridItem gridRow="1/2" gridColumn="2/3" p={8} zIndex={2}>
         <Flex flexDir="column" justifyContent="end" height="full" color="white">
           <Heading textShadow="4px 4px 8px #000000">{heading}</Heading>
           <Text textShadow="2px 2px 4px #000000">{body}</Text>
@@ -460,7 +477,7 @@ function Features() {
       pb={12}
       alignItems="center"
       justifyContent="center"
-      gap={4}
+      gap={8}
     >
       <Feature
         image="/accessible.webp"
@@ -565,8 +582,8 @@ function WallOfText() {
           extensibility. Every modern service, product and movement has
           community at the centre. Communities often grow out of their humble
           beginnings on walled-garden platforms. In an era of growing awareness
-          in personal <b>privacy</b>, tech <b>monopoly</b> and{" "}
-          <b>decentralisation</b>, communities of all size are affected.
+          of personal <b>privacy</b>, tech <b>monopoly</b> and{" "}
+          <b>decentralisation</b>, communities of all sizes are affected.
         </Text>
       </Pair>
       <Pair heading="Flexible by nature">
@@ -592,12 +609,12 @@ function WallOfText() {
 
       <Pair big heading="For dev-ops heroes">
         <Text>
-          Simple <b>deployment</b>, simple <b>maintenance</b> and simple
+          Simple <b>deployment</b>, simple <b>maintenance</b> and simple{" "}
           <b>updates</b>. That’s what matters when you’re self-hosting, so you
           can spend time where it brings the most value.
         </Text>
         <Text>
-          The choice of technologies behind the Storyden platform are all
+          The choice of technologies behind the Storyden platform are all{" "}
           <b>meticulously</b> intentional to fit those values of simplicity in
           order to <b>get out of the way</b>.
         </Text>
@@ -612,11 +629,11 @@ function WallOfText() {
       <Pair heading="Bring your own frontend">
         <Text>
           Not a fan of themes? That’s fine, <b>headless</b> mode is for you.
-          Storyden is, at the core, a powerful API service with which you can
+          Storyden is, at the core, a powerful API service with which you can{" "}
           <b>wire up</b> anything you want.
         </Text>
         <Text>
-          From web to mobile apps and everything in between, the <b>OpenAPI</b>
+          From web to mobile apps and everything in between, the <b>OpenAPI</b>{" "}
           specification provides a fast integration path.
         </Text>
       </Pair>
@@ -638,7 +655,7 @@ function WallOfText() {
       <Pair heading="Take part">
         <Text>
           Staying <b>closed source</b> is pointless in today’s internet. Fork
-          it, hack on it, provide hosting, use as a basis for other apps,
+          it, hack on it, provide hosting, use as a basis for other apps,{" "}
           <b>contribute</b> back to the community. Not sure where to start? Use
           Storyden to <b>learn</b> about building!
         </Text>
@@ -661,28 +678,28 @@ function CTA() {
         Interested?
       </Heading>
       <Text>
-        Storyden is early in development and is looking for <b>feedback</b> and
+        Storyden is early in development and is looking for <b>feedback</b> and{" "}
         <b>contributors</b>!
       </Text>
       <Text>
-        If you have <b>opinions</b> about forum software,{" "}
+        If you have <b>opinions</b> about forum software, please click{" "}
         <Link
           isExternal
           href="https://airtable.com/shrLY0jDp9CuXPB2X"
           color="hsla(265, 56%, 42%, 1)"
         >
-          please click this link!
+          this link!
         </Link>
       </Text>
       <Text>
         If you know <b>Golang</b> or <b>React.js</b> and are interested in
-        contributing to a <b>high quality</b> open source project,{" "}
+        contributing to a <b>high-quality</b> open source project, please click{" "}
         <Link
           isExternal
           href="https://github.com/Southclaws/storyden"
           color="hsla(265, 56%, 42%, 1)"
         >
-          please click this link!
+          this link!
         </Link>
       </Text>
     </VStack>
@@ -701,7 +718,12 @@ function Footer() {
       gap={2}
       flex="1"
     >
-      <Image src="/mark.png" width={150} height={50} />
+      <Image
+        src="/mark.png"
+        alt="The Storyden logomark and wordmark"
+        width={150}
+        height={50}
+      />
 
       <Link href="https://twitter.com/Southclaws">Twitter</Link>
       <Link href="https://github.com/Southclaws/storyden">GitHub</Link>
