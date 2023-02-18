@@ -6,13 +6,14 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <link
-          rel="stylesheet"
+          rel="preload"
+          as="font"
           href="https://use.typekit.net/gnq7poa.css"
         ></link>
       </Head>
       <body>
         <Main />
-        <NextScript />
+        <NextScript />f
       </body>
     </Html>
   );
