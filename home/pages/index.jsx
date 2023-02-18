@@ -439,8 +439,8 @@ function Feature({ image, alt, heading, body }) {
 
       <GridItem gridRow="1/2" gridColumn="2/3" p={8}>
         <Flex flexDir="column" justifyContent="end" height="full" color="white">
-          <Heading>{heading}</Heading>
-          <Text>{body}</Text>
+          <Heading textShadow="4px 4px 8px #000000">{heading}</Heading>
+          <Text textShadow="2px 2px 4px #000000">{body}</Text>
         </Flex>
       </GridItem>
     </Grid>
