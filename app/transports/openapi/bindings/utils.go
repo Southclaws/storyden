@@ -39,7 +39,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Short:  &t.Short,
 		Meta:   t.Meta,
 
-		Category:  serialiseCategory(&t.Category),
+		Category:  serialiseCategoryReference(&t.Category),
 		Pinned:    t.Pinned,
 		PostCount: utils.Ref(len(t.Posts)),
 		Reacts:    reacts(t.Reacts),
@@ -50,7 +50,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 func serialiseThread(t *thread.Thread) openapi.Thread {
 	return openapi.Thread{
 		Author:    serialiseProfileReference(t.Author),
-		Category:  serialiseCategory(&t.Category),
+		Category:  serialiseCategoryReference(&t.Category),
 		CreatedAt: t.CreatedAt,
 		// DeletedAt: t.DeletedAt,
 		Id:        openapi.Identifier(t.ID.String()),
@@ -91,9 +91,20 @@ func serialiseCategory(c *category.Category) openapi.Category {
 		Admin:       &c.Admin,
 		Colour:      &c.Colour,
 		Description: &c.Description,
-		Name:        &c.Name,
-		PostCount:   &c.PostCount,
-		Sort:        &c.Sort,
+		Name:        c.Name,
+		PostCount:   c.PostCount,
+		Sort:        c.Sort,
+	}
+}
+
+func serialiseCategoryReference(c *category.Category) openapi.CategoryReference {
+	return openapi.CategoryReference{
+		Id:          openapi.IdentifierFrom(xid.ID(c.ID)),
+		Admin:       &c.Admin,
+		Colour:      &c.Colour,
+		Description: &c.Description,
+		Name:        c.Name,
+		Sort:        c.Sort,
 	}
 }
 

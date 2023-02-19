@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -65,7 +66,7 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 	return FromModel(c), nil
 }
 
-func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, error) {
+func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, error) {
 	filters := []predicate.Category{}
 
 	if !admin {
@@ -92,7 +93,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 	}
 
 	if len(categories) == 0 {
-		return []Category{}, nil
+		return []*Category{}, nil
 	}
 
 	// NOTE:
@@ -128,15 +129,11 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]Category, e
 		categoryPosts[c.ID] = c.Posts
 	}
 
-	result := []Category{}
-
-	for _, c := range categories {
-		category := FromModel(c)
-		category.PostCount = categoryPosts[c.ID]
-		result = append(result, *category)
-	}
-
-	return result, nil
+	return dt.Map(categories, func(in *ent.Category) *Category {
+		category := FromModel(in)
+		category.PostCount = categoryPosts[in.ID]
+		return category
+	}), nil
 }
 
 func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {

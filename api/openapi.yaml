@@ -41,6 +41,8 @@ tags:
     description: User accounts.
   - name: profiles
     description: Public profiles.
+  - name: categories
+    description: Thread categories.
   - name: threads
     description: Forum threads.
   - name: posts
@@ -318,6 +320,30 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfilesGetSuccess" }
+
+  #
+  #                   888                                      d8b
+  #                   888                                      Y8P
+  #                   888
+  #  .d8888b  8888b.  888888 .d88b.   .d88b.   .d88b.  888d888 888  .d88b.  .d8888b
+  # d88P"        "88b 888   d8P  Y8b d88P"88b d88""88b 888P"   888 d8P  Y8b 88K
+  # 888      .d888888 888   88888888 888  888 888  888 888     888 88888888 "Y8888b.
+  # Y88b.    888  888 Y88b. Y8b.     Y88b 888 Y88..88P 888     888 Y8b.          X88
+  #  "Y8888P "Y888888  "Y888 "Y8888   "Y88888  "Y88P"  888     888  "Y8888   88888P'
+  #                                       888
+  #                                  Y8b d88P
+  #                                   "Y88P"
+  #
+
+  /v1/categories:
+    get:
+      operationId: CategoriesList
+      description: Get a list of all categories on the site.
+      security: []
+      tags: [categories]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/CategoriesListSuccess" }
 
   #
   # 888    888                                    888
@@ -614,6 +640,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/PublicProfile"
+
+    CategoriesListSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CategoryList"
 
     ThreadsCreateSuccess:
       description: Thread created.
@@ -1021,6 +1054,58 @@ components:
               $ref: "#/components/schemas/TagList"
 
     # -
+    # Categories
+    # -
+
+    Category:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CategoryMetadata"
+        - $ref: "#/components/schemas/CategoryCommon"
+        - $ref: "#/components/schemas/CategoryAdditional"
+
+    CategoryReference:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CategoryMetadata"
+        - $ref: "#/components/schemas/CategoryCommon"
+
+    CategoryMetadata:
+      type: object
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+
+    CategoryCommon:
+      type: object
+      required: [name, sort]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        colour:
+          type: string
+        sort:
+          type: integer
+        admin:
+          type: boolean
+
+    CategoryAdditional:
+      type: object
+      required: [postCount]
+      properties:
+        postCount:
+          type: integer
+
+    CategoryList:
+      type: object
+      required: [categories]
+      properties:
+        categories:
+          type: array
+          items: { $ref: "#/components/schemas/Category" }
+
+    # -
     # Threads
     # -
 
@@ -1087,7 +1172,7 @@ components:
               type: integer
               readOnly: true
               description: The number of posts under this thread.
-            category: { $ref: "#/components/schemas/Category" }
+            category: { $ref: "#/components/schemas/CategoryReference" }
             reacts:
               type: array
               items: { $ref: "#/components/schemas/React" }
@@ -1109,23 +1194,6 @@ components:
             posts:
               type: array
               items: { $ref: "#/components/schemas/Post" }
-
-    Category:
-      type: object
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        name:
-          type: string
-        description:
-          type: string
-        colour:
-          type: string
-        sort:
-          type: integer
-        admin:
-          type: boolean
-        postCount:
-          type: integer
 
     # -
     # Posts

@@ -67,6 +67,7 @@ type Bindings struct {
 	WebAuthn
 	Accounts
 	Profiles
+	Categories
 	Threads
 	Posts
 }
@@ -83,6 +84,7 @@ func bindingsProviders() fx.Option {
 		NewWebAuthn,
 		NewAccounts,
 		NewProfiles,
+		NewCategories,
 		NewThreads,
 		NewPosts,
 	)

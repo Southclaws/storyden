@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { ProfileReference } from "./profileReference";
-import type { Category } from "./category";
+import type { CategoryReference } from "./categoryReference";
 import type { React } from "./react";
 import type { Metadata } from "./metadata";
 
@@ -27,7 +27,7 @@ for uniqueness and sortability.
   tags: string[];
   /** The number of posts under this thread. */
   readonly post_count: number;
-  category: Category;
+  category: CategoryReference;
   /** A list of reactions this post has had from people. */
   reacts: React[];
   meta: Metadata;
