@@ -1,6 +1,5 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { Footer } from "src/components/Footer";
 import { Navigation } from "src/components/Navigation/Navigation";
 
 export function Default(props: PropsWithChildren) {
@@ -25,8 +24,6 @@ export function Default(props: PropsWithChildren) {
       >
         {props.children}
       </Box>
-
-      <Footer />
     </Flex>
   );
 }
