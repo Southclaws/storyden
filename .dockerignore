@@ -1,0 +1,16 @@
+.git/
+home/
+web/
+
+.env
+.task
+
+data/
+node_modules/
+
+*.exe
+*.db
+
+.DS_Store
+
+__debug_bin
