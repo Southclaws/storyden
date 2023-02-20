@@ -1,5 +1,7 @@
 FROM golang:latest
 
+RUN git config --global --add safe.directory /server
+
 WORKDIR /server
 ADD . .
 
