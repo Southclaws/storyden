@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Flex,
   Grid,
   GridItem,
@@ -172,10 +173,9 @@ function Hero() {
         background="linear-gradient(180deg, rgba(59, 83, 111, 0) 49.48%, #000000 97.92%)"
       >
         <VStack>
-          <Box width={[16, 20, 24, 32]}>
+          <Box width={[20, 36, 40, 48]}>
             <Logo />
           </Box>
-
           <Grid>
             <GridItem
               gridRow="1/2"
@@ -204,6 +204,23 @@ function Hero() {
               </Heading>
             </GridItem>
           </Grid>
+
+          <HStack gap={4}>
+            <Link href="https://airtable.com/shrLY0jDp9CuXPB2X">
+              <Button size="lg">Get started</Button>
+            </Link>
+            <Link href="https://github.com/Southclaws/storyden">
+              <Button
+                variant="outline"
+                colorScheme="whiteAlpha"
+                size="lg"
+                backdropFilter="blur(3px)"
+                className="story__text-overlay"
+              >
+                Source code
+              </Button>
+            </Link>
+          </HStack>
         </VStack>
       </GridItem>
     </Grid>
@@ -435,9 +452,9 @@ function Why() {
   );
 }
 
-function Feature({ image, alt, heading, body }) {
+function Feature({ image, alt, heading, body, ...rest }) {
   return (
-    <Grid width={394}>
+    <Grid width="full" maxW={394} {...rest}>
       <GridItem
         gridRow="1/2"
         gridColumn="2/3"
@@ -470,70 +487,176 @@ function Feature({ image, alt, heading, body }) {
 
 function Features() {
   return (
-    <Flex
-      flexWrap="wrap"
-      bgColor="hsla(140, 16%, 88%, 1)"
-      px={{ base: 6, md: 9, lg: 12, xl: 12 }}
-      pb={12}
-      alignItems="center"
-      justifyContent="center"
-      gap={8}
-    >
-      <Feature
-        image="/accessible.webp"
-        alt=""
-        heading="Accessible"
-        body="Accessibility is non-negotiable and no one can be left behind. WAI and WCAG are a primary focus to ensure great experience for people regardless of a disability."
-      />
+    <VStack bgColor="hsla(140, 16%, 88%, 1)" py={8}>
+      <VStack maxW="container.lg" gap={8}>
+        <Flex
+          flexWrap="wrap"
+          px={{ base: 6, md: 9, lg: 12, xl: 12 }}
+          pb={12}
+          alignItems="center"
+          justifyContent="center"
+          gap={8}
+        >
+          <Feature
+            image="/accessible.webp"
+            alt=""
+            heading="Accessible"
+            body="Accessibility is non-negotiable and no one can be left behind. WAI and WCAG are a primary focus to ensure great experience for people regardless of a disability."
+          />
 
-      <Feature
-        image="/secure.webp"
-        alt=""
-        heading="Secure"
-        body="The latest and greatest industry standard security practices as well as new emerging systems such as WebAuthn guarantee the most secure experience for everyone."
-      />
+          <Feature
+            pt={24}
+            image="/secure.webp"
+            alt=""
+            heading="Secure"
+            body="The latest and greatest industry standard security practices as well as new emerging systems such as WebAuthn guarantee the most secure experience for everyone."
+          />
+        </Flex>
+        <Pair big heading="For community leaders">
+          <Text>
+            Fearless <b>futurism</b>, radical <b>accessibility</b>, endless
+            extensibility. Every modern service, product and movement has
+            community at the centre. Communities often grow out of their humble
+            beginnings on walled-garden platforms. In an era of growing
+            awareness of personal <b>privacy</b>, tech <b>monopoly</b> and{" "}
+            <b>decentralisation</b>, communities of all sizes are affected.
+          </Text>
+        </Pair>
+        <Pair heading="Flexible by nature">
+          <Text>
+            Whether you operate a product <b>support forum</b>, a{" "}
+            <b>gaming community</b> or the next big cryptocurrency, web3 or DAO
+            project, the <b>people</b> at the centre of whatever you’re doing
+            deserve a platform that fades into the background and brings{" "}
+            <b>what matters</b> front & centre
+          </Text>
+        </Pair>
+        <Pair heading="Accessible by design">
+          <Text>
+            And by people, that means{" "}
+            <em>
+              <b>all</b>
+            </em>{" "}
+            people. A truly welcoming, inclusive and <b>diverse</b> community
+            warrants a platform that takes accessibility seriously,{" "}
+            <b>no questions asked</b>.
+          </Text>
+        </Pair>
+        <Flex
+          flexWrap="wrap"
+          bgColor="hsla(140, 16%, 88%, 1)"
+          px={{ base: 6, md: 9, lg: 12, xl: 12 }}
+          pb={12}
+          alignItems="center"
+          justifyContent="center"
+          gap={8}
+        >
+          <Feature
+            image="/web3.webp"
+            alt=""
+            heading="Web3"
+            body="Love it or hate it, it’s here and it’s staying. So we embrace the new web and provide features such as wallet based login, NFT avatars and more for web3 communities."
+          />
 
-      <Feature
-        image="/web3.webp"
-        alt=""
-        heading="Web3"
-        body="Love it or hate it, it’s here and it’s staying. So we embrace the new web and provide features such as wallet based login, NFT avatars and more for web3 communities."
-      />
+          <Feature
+            pt={24}
+            image="/opensource.webp"
+            alt=""
+            heading="Open source"
+            body="The benefits of open source software are impossible to ignore. When it comes to the security, development velocity, and ability to report issues, this is the way forward."
+          />
+        </Flex>
+        <Pair big heading="For dev-ops heroes">
+          <Text>
+            Simple <b>deployment</b>, simple <b>maintenance</b> and simple{" "}
+            <b>updates</b>. That’s what matters when you’re self-hosting, so you
+            can spend time where it brings the most value.
+          </Text>
+          <Text>
+            The choice of technologies behind the Storyden platform are all{" "}
+            <b>meticulously</b> intentional to fit those values of simplicity in
+            order to <b>get out of the way</b>.
+          </Text>
+        </Pair>
+        <Pair heading="Container first">
+          <Text>
+            Zero <b>installation</b> steps. Set some environment variables and
+            spin up a container image. Behaving like all other modern
+            server-side software is the key to <b>simplicity</b>.
+          </Text>
+        </Pair>
+        <Pair heading="Bring your own frontend">
+          <Text>
+            Not a fan of themes? That’s fine, <b>headless</b> mode is for you.
+            Storyden is, at the core, a powerful API service with which you can{" "}
+            <b>wire up</b> anything you want.
+          </Text>
+          <Text>
+            From web to mobile apps and everything in between, the{" "}
+            <b>OpenAPI</b> specification provides a fast integration path.
+          </Text>
+        </Pair>
+        <Flex
+          flexWrap="wrap"
+          px={{ base: 6, md: 9, lg: 12, xl: 12 }}
+          pb={12}
+          alignItems="center"
+          justifyContent="center"
+          gap={8}
+        >
+          <Feature
+            image="/extensible.webp"
+            alt=""
+            heading="Extensible"
+            body="A fully documented OpenAPI schema means that you can extend the platform with plugins or even build a whole new frontend from scratch if you want to!"
+          />
 
-      <Feature
-        image="/opensource.webp"
-        alt=""
-        heading="Open source"
-        body="The benefits of open source software are impossible to ignore. When it comes to the security, development velocity, and ability to report issues, this is the way forward."
-      />
-
-      <Feature
-        image="/extensible.webp"
-        alt=""
-        heading="Extensible"
-        body="A fully documented OpenAPI schema means that you can extend the platform with plugins or even build a whole new frontend from scratch if you want to!"
-      />
-
-      <Feature
-        image="/builttolast.webp"
-        alt=""
-        heading="Built to last"
-        body="Harnessing the power of technology that’s just-modern-enough helps balance stability with longevity. Storyden uses a carefully chosen toolbox with this in mind."
-      />
-    </Flex>
+          <Feature
+            pt={24}
+            image="/builttolast.webp"
+            alt=""
+            heading="Built to last"
+            body="Harnessing the power of technology that’s just-modern-enough helps balance stability with longevity. Storyden uses a carefully chosen toolbox with this in mind."
+          />
+        </Flex>
+        <Pair big heading="For you and your friends">
+          <Text>
+            Optimised for <b>humans</b>, ready for the web <b>renaissance</b>.
+            Storyden is built to be a stable foundation for the future decades
+            of internet citizens and the <b>networks</b> they build.
+          </Text>
+        </Pair>
+        <Pair heading="Sign-in your way">
+          <Text>
+            Rough relationship with <b>email</b>? Just don’t enable it then.
+            Sign in with <b>Passkey</b>, WebAuthn, Web3 <b>wallet</b>, or choose
+            from a variety of popular OAuth2 and <b>SSO</b> providers.
+          </Text>
+        </Pair>
+        <Pair heading="Take part">
+          <Text>
+            Staying <b>closed source</b> is pointless in today’s internet. Fork
+            it, hack on it, provide hosting, use as a basis for other apps,{" "}
+            <b>contribute</b> back to the community. Not sure where to start?
+            Use Storyden to <b>learn</b> about building!
+          </Text>
+        </Pair>
+      </VStack>
+    </VStack>
   );
 }
 
 function Pair({ big, heading, children }) {
   return (
     <Flex
+      px={{ base: 6, md: 9, lg: 12, xl: 12 }}
       flexDir={{ base: "column", md: "row" }}
       alignItems="flex-start"
       gap={6}
       mt={big ? 10 : 2}
     >
       <Heading
-        width={{ base: "100%", sm: "33%", xl: "50%" }}
+        width={{ base: "100%", sm: "66%", xl: "50%" }}
         textAlign={{ base: "left", md: "right" }}
         // whiteSpace="nowrap"
         fontWeight="black"
@@ -560,106 +683,6 @@ function Pair({ big, heading, children }) {
       <Box width={{ base: "100%", sm: "67%", xl: "50%" }} mt={1}>
         {children}
       </Box>
-    </Flex>
-  );
-}
-
-function WallOfText() {
-  return (
-    <Flex
-      flexDir="column"
-      bgColor="hsla(140, 16%, 88%, 1)"
-      px={{ base: 12, md: 12, lg: 24, xl: 48, "2xl": 80 }}
-      py={{ base: 12, lg: 12 }}
-      alignItems="center"
-      justifyContent="center"
-      gap={4}
-      flex="1"
-    >
-      <Pair big heading="For community leaders">
-        <Text>
-          Fearless <b>futurism</b>, radical <b>accessibility</b>, endless
-          extensibility. Every modern service, product and movement has
-          community at the centre. Communities often grow out of their humble
-          beginnings on walled-garden platforms. In an era of growing awareness
-          of personal <b>privacy</b>, tech <b>monopoly</b> and{" "}
-          <b>decentralisation</b>, communities of all sizes are affected.
-        </Text>
-      </Pair>
-      <Pair heading="Flexible by nature">
-        <Text>
-          Whether you operate a product <b>support forum</b>, a{" "}
-          <b>gaming community</b> or the next big cryptocurrency, web3 or DAO
-          project, the <b>people</b> at the centre of whatever you’re doing
-          deserve a platform that fades into the background and brings{" "}
-          <b>what matters</b> front & centre
-        </Text>
-      </Pair>
-      <Pair heading="Accessible by design">
-        <Text>
-          And by people, that means{" "}
-          <em>
-            <b>all</b>
-          </em>{" "}
-          people. A truly welcoming, inclusive and <b>diverse</b> community
-          warrants a platform that takes accessibility seriously,{" "}
-          <b>no questions asked</b>.
-        </Text>
-      </Pair>
-
-      <Pair big heading="For dev-ops heroes">
-        <Text>
-          Simple <b>deployment</b>, simple <b>maintenance</b> and simple{" "}
-          <b>updates</b>. That’s what matters when you’re self-hosting, so you
-          can spend time where it brings the most value.
-        </Text>
-        <Text>
-          The choice of technologies behind the Storyden platform are all{" "}
-          <b>meticulously</b> intentional to fit those values of simplicity in
-          order to <b>get out of the way</b>.
-        </Text>
-      </Pair>
-      <Pair heading="Container first">
-        <Text>
-          Zero <b>installation</b> steps. Set some environment variables and
-          spin up a container image. Behaving like all other modern server-side
-          software is the key to <b>simplicity</b>.
-        </Text>
-      </Pair>
-      <Pair heading="Bring your own frontend">
-        <Text>
-          Not a fan of themes? That’s fine, <b>headless</b> mode is for you.
-          Storyden is, at the core, a powerful API service with which you can{" "}
-          <b>wire up</b> anything you want.
-        </Text>
-        <Text>
-          From web to mobile apps and everything in between, the <b>OpenAPI</b>{" "}
-          specification provides a fast integration path.
-        </Text>
-      </Pair>
-
-      <Pair big heading="For you and your friends">
-        <Text>
-          Optimised for <b>humans</b>, ready for the web <b>renaissance</b>.
-          Storyden is built to be a stable foundation for the future decades of
-          internet citizens and the <b>networks</b> they build.
-        </Text>
-      </Pair>
-      <Pair heading="Sign-in your way">
-        <Text>
-          Rough relationship with <b>email</b>? Just don’t enable it then. Sign
-          in with <b>Passkey</b>, WebAuthn, Web3 <b>wallet</b>, or choose from a
-          variety of popular OAuth2 and <b>SSO</b> providers.
-        </Text>
-      </Pair>
-      <Pair heading="Take part">
-        <Text>
-          Staying <b>closed source</b> is pointless in today’s internet. Fork
-          it, hack on it, provide hosting, use as a basis for other apps,{" "}
-          <b>contribute</b> back to the community. Not sure where to start? Use
-          Storyden to <b>learn</b> about building!
-        </Text>
-      </Pair>
     </Flex>
   );
 }
@@ -754,7 +777,6 @@ export default function Home() {
       <Story />
       <Why />
       <Features />
-      <WallOfText />
       <CTA />
       <Footer />
     </Box>

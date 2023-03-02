@@ -1,3 +1,8 @@
+*::selection {
+  color: hsla(160, 9%, 92%, 1);
+  background-color: hsla(0, 0%, 19%, 1);
+}
+
 @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
   .story__text-overlay {
     background-color: rgba(8, 8, 8, 0.4);
