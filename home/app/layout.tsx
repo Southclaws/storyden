@@ -58,6 +58,13 @@ export default function RootLayout({
             url: "https://www.storyden.org/",
             images: [
               {
+                url: "https://www.storyden.org/social-1280-640.png",
+                width: 1280,
+                height: 640,
+                alt: "Storyden: A forum for the modern age.",
+                type: "image/png",
+              },
+              {
                 url: "https://www.storyden.org/social.png",
                 width: 1728,
                 height: 864,
