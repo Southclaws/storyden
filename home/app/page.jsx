@@ -14,7 +14,11 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import localFont from "@next/font/local";
-const monasans = localFont({ src: "./Mona-Sans.woff2" });
+
+const monasans = localFont({
+  src: "./mona-sans.woff2",
+  display: "swap",
+});
 
 function Logo() {
   return (
