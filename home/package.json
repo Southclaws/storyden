@@ -10,23 +10,24 @@
     "openapi": "orval"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.3.1",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
+    "@chakra-ui/next-js": "^2.0.1",
+    "@chakra-ui/react": "^2.5.1",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@heroicons/react": "^2.0.10",
     "@next/font": "^13.1.6",
-    "framer-motion": "^7.2.1",
-    "next": "^13.1.6",
+    "framer-motion": "^10.2.4",
+    "next": "^13.2.4",
     "next-seo": "^5.5.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-hook-form": "^7.34.2"
   },
   "devDependencies": {
     "@types/node": "^18.7.13",
     "@types/react": "^18.0.17",
     "eslint": "8.23.0",
-    "eslint-config-next": "12.2.5",
+    "eslint-config-next": "^13.2.4",
     "typescript": "^4.8.2"
   }
 }

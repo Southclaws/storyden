@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Button,
@@ -12,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import localFont from "@next/font/local";
-
 const monasans = localFont({ src: "./Mona-Sans.woff2" });
 
 function Logo() {
