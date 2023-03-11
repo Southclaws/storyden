@@ -573,8 +573,8 @@ function ForCommunityLeaders() {
         <HStack maxW={{ base: "full", sm: "container.md" }}>
           <Box p={{ base: 0, sm: 4 }}>
             <svg
-              width="150"
-              height="150"
+              width="100%"
+              height="100%"
               viewBox="0 0 156 156"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -620,8 +620,8 @@ function ForCommunityLeaders() {
 
           <Box p={{ base: 0, sm: 4 }}>
             <svg
-              width="161"
-              height="161"
+              width="100%"
+              height="100%"
               viewBox="0 0 161 161"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -839,15 +839,15 @@ function ForYou() {
 
 function Pair({ heading, headingColour, children }) {
   return (
-    <Flex px={{ base: 6, md: 9, lg: 12, xl: 12 }} flexDir="column" gap={6}>
+    <Flex px={{ base: 1, md: 9, lg: 12, xl: 12 }} flexDir="column" gap={6}>
       <Heading
         width="min-content"
         textAlign="left"
         whiteSpace="nowrap"
         fontWeight="black"
         fontSize={{
-          base: "3xl",
-          md: "2xl",
+          base: "2xl",
+          md: "3xl",
           lg: "3xl",
           xl: "4xl",
           "2xl": "5xl",
