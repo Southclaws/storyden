@@ -39,9 +39,11 @@ const ErrorBanner: FC<Props> = ({ error, message, ...rest }) => {
 
 export default ErrorBanner;
 
-export const errorToast = (toast: CreateToastFnReturn) => (e: APIError) =>
+export const errorToast = (toast: CreateToastFnReturn) => (e: APIError) => {
+  console.error(e);
   toast({
     title: "Error",
     status: "error",
     description: e.message,
   });
+};

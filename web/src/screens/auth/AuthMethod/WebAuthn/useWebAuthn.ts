@@ -12,7 +12,6 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/typescript-types";
 import { useRouter } from "next/router";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/ErrorBanner";
@@ -54,16 +53,10 @@ export function useWebAuthn() {
 
   async function signup({ username }: Form) {
     try {
-      const response = await webAuthnRequestCredential(username);
-
-      // TODO: OpenAPI spec for WebAuthn requests and responses.
-      const publicKey = response[
-        "publicKey"
-      ] as PublicKeyCredentialCreationOptionsJSON;
+      const { publicKey } = await webAuthnRequestCredential(username);
 
       const credential = await startRegistration({
         ...publicKey,
-        excludeCredentials: [],
       });
 
       await webAuthnMakeCredential(credential);

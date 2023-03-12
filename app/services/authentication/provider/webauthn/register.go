@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/rs/xid"
@@ -35,6 +36,7 @@ func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*proto
 		webauthn.WithAuthenticatorSelection(
 			protocol.AuthenticatorSelection{
 				AuthenticatorAttachment: protocol.AuthenticatorAttachment(protocol.Platform),
+				RequireResidentKey:      opt.New(true).Ptr(),
 				// RequireResidentKey:      residentKeyRequirement,
 				// UserVerification:        protocol.UserVerificationRequirement(userVer),
 			}),
