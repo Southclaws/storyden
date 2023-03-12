@@ -261,8 +261,8 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 	pubKeyCredParams := dt.Map(cred.Response.Parameters, func(p protocol.CredentialParameter) openapi.PublicKeyCredentialParameters {
 		alg := float32(p.Algorithm)
 		return openapi.PublicKeyCredentialParameters{
-			Type: (*string)(&p.Type),
-			Alg:  &alg,
+			Type: openapi.PublicKeyCredentialType(p.Type),
+			Alg:  alg,
 		}
 	})
 
@@ -278,7 +278,10 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 	})
 
 	authenticatorSelection := &openapi.AuthenticatorSelectionCriteria{
-		AuthenticatorAttachment: string(cred.Response.AuthenticatorSelection.AuthenticatorAttachment),
+		AuthenticatorAttachment: openapi.AuthenticatorAttachment(cred.Response.AuthenticatorSelection.AuthenticatorAttachment),
+		RequireResidentKey:      cred.Response.AuthenticatorSelection.RequireResidentKey,
+		ResidentKey:             openapi.ResidentKeyRequirement(cred.Response.AuthenticatorSelection.ResidentKey),
+		UserVerification:        (*openapi.UserVerificationRequirement)(&cred.Response.AuthenticatorSelection.UserVerification),
 	}
 
 	return openapi.WebAuthnPublicKeyCreationOptions{
@@ -290,9 +293,9 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 			PubKeyCredParams: pubKeyCredParams,
 
 			Timeout:                &cred.Response.Timeout,
-			ExcludeCredentials:     &excludeCredentials,
+			ExcludeCredentials:     excludeCredentials,
 			AuthenticatorSelection: authenticatorSelection,
-			Attestation:            (*string)(&cred.Response.Attestation),
+			Attestation:            (*openapi.AttestationConveyancePreference)(&cred.Response.Attestation),
 			Extensions:             (*openapi.AuthenticationExtensionsClientInputs)(&cred.Response.Extensions),
 		},
 	}

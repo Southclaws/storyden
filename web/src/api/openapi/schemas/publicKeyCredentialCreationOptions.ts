@@ -10,6 +10,7 @@ import type { PublicKeyCredentialUserEntity } from "./publicKeyCredentialUserEnt
 import type { PublicKeyCredentialParameters } from "./publicKeyCredentialParameters";
 import type { PublicKeyCredentialDescriptor } from "./publicKeyCredentialDescriptor";
 import type { AuthenticatorSelectionCriteria } from "./authenticatorSelectionCriteria";
+import type { AttestationConveyancePreference } from "./attestationConveyancePreference";
 import type { AuthenticationExtensionsClientInputs } from "./authenticationExtensionsClientInputs";
 
 /**
@@ -22,8 +23,8 @@ export interface PublicKeyCredentialCreationOptions {
   challenge: string;
   pubKeyCredParams: PublicKeyCredentialParameters[];
   timeout?: number;
-  excludeCredentials?: PublicKeyCredentialDescriptor[];
+  excludeCredentials: PublicKeyCredentialDescriptor[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
-  attestation?: string;
+  attestation?: AttestationConveyancePreference;
   extensions?: AuthenticationExtensionsClientInputs;
 }

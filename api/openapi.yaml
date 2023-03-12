@@ -838,6 +838,7 @@ components:
         - rp
         - user
         - challenge
+        - excludeCredentials
         - pubKeyCredParams
       properties:
         rp: { $ref: "#/components/schemas/PublicKeyCredentialRpEntity" }
@@ -857,7 +858,7 @@ components:
         authenticatorSelection:
           { $ref: "#/components/schemas/AuthenticatorSelectionCriteria" }
         attestation:
-          type: string
+          { $ref: "#/components/schemas/AttestationConveyancePreference" }
         extensions:
           { $ref: "#/components/schemas/AuthenticationExtensionsClientInputs" }
 
@@ -888,11 +889,18 @@ components:
     PublicKeyCredentialParameters:
       description: |
         https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
+      required: [type, alg]
       properties:
         type:
-          type: string
+          $ref: "#/components/schemas/PublicKeyCredentialType"
         alg:
           type: number
+
+    PublicKeyCredentialType:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#enumdef-publickeycredentialtype
+      type: string
+      enum: [public-key]
 
     PublicKeyCredentialDescriptor:
       description: |
@@ -917,9 +925,51 @@ components:
       type: object
       required:
         - authenticatorAttachment
+        - residentKey
       properties:
         authenticatorAttachment:
-          type: string
+          $ref: "#/components/schemas/AuthenticatorAttachment"
+        residentKey:
+          $ref: "#/components/schemas/ResidentKeyRequirement"
+        requireResidentKey:
+          type: boolean
+        userVerification:
+          $ref: "#/components/schemas/UserVerificationRequirement"
+
+    AuthenticatorAttachment:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#enumdef-authenticatorattachment
+      type: string
+      enum: [platform, cross-platform]
+
+    ResidentKeyRequirement:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#enumdef-residentkeyrequirement
+      type: string
+      enum:
+        - discouraged
+        - preferred
+        - required
+
+    UserVerificationRequirement:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#enumdef-userverificationrequirement
+      type: string
+      default: preferred
+      enum:
+        - discouraged
+        - preferred
+        - required
+
+    AttestationConveyancePreference:
+      description: |
+        https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
+      type: string
+      enum:
+        - direct
+        - enterprise
+        - indirect
+        - none
 
     AuthenticationExtensionsClientInputs:
       description: |
