@@ -7,10 +7,7 @@
  */
 import type { CategoryName } from "./categoryName";
 
-export interface CategoryCommon {
-  name: CategoryName;
-  description?: string;
-  colour?: string;
-  sort: number;
-  admin?: boolean;
-}
+/**
+ * A list of category names.
+ */
+export type CategoryNameList = CategoryName[];

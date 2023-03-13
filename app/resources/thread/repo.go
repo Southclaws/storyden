@@ -7,10 +7,11 @@ import (
 	"github.com/rs/xid"
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/category"
+	category_resource "github.com/Southclaws/storyden/app/resources/category"
 	post_resource "github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
@@ -31,7 +32,7 @@ type Repository interface {
 		title string,
 		body string,
 		authorID account_resource.AccountID,
-		categoryID category.CategoryID,
+		categoryID category_resource.CategoryID,
 		tags []string,
 		opts ...option,
 	) (*Thread, error)
@@ -75,5 +76,11 @@ func WithAuthor(id account_resource.AccountID) Query {
 func WithTags(ids []xid.ID) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(post.HasTagsWith(tag.IDIn(ids...)))
+	}
+}
+
+func WithCategories(ids []string) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(post.HasCategoryWith(category.NameIn(ids...)))
 	}
 }

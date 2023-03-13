@@ -382,6 +382,11 @@ paths:
           required: false
           in: query
           schema: { $ref: "#/components/schemas/TagListIDs" }
+        - name: categories
+          description: Show only results with these categories
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/CategoryNameList" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1221,7 +1226,7 @@ components:
       required: [name, sort]
       properties:
         name:
-          type: string
+          $ref: "#/components/schemas/CategoryName"
         description:
           type: string
         colour:
@@ -1230,6 +1235,16 @@ components:
           type: integer
         admin:
           type: boolean
+
+    CategoryName:
+      description: A category's user-facing name.
+      type: string
+
+    CategoryNameList:
+      description: A list of category names.
+      type: array
+      items:
+        $ref: "#/components/schemas/CategoryName"
 
     CategoryAdditional:
       type: object
