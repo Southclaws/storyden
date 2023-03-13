@@ -23,6 +23,7 @@
     "date-fns": "^2.29.3",
     "framer-motion": "^7.2.1",
     "identicon.js": "^2.3.3",
+    "lodash": "^4.17.21",
     "next": "^13.0.6",
     "nookies": "^2.5.2",
     "polished": "^4.2.2",
