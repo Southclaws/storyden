@@ -296,49 +296,49 @@ func (po *Post) assignValues(columns []string, values []any) error {
 
 // QueryAuthor queries the "author" edge of the Post entity.
 func (po *Post) QueryAuthor() *AccountQuery {
-	return (&PostClient{config: po.config}).QueryAuthor(po)
+	return NewPostClient(po.config).QueryAuthor(po)
 }
 
 // QueryCategory queries the "category" edge of the Post entity.
 func (po *Post) QueryCategory() *CategoryQuery {
-	return (&PostClient{config: po.config}).QueryCategory(po)
+	return NewPostClient(po.config).QueryCategory(po)
 }
 
 // QueryTags queries the "tags" edge of the Post entity.
 func (po *Post) QueryTags() *TagQuery {
-	return (&PostClient{config: po.config}).QueryTags(po)
+	return NewPostClient(po.config).QueryTags(po)
 }
 
 // QueryRoot queries the "root" edge of the Post entity.
 func (po *Post) QueryRoot() *PostQuery {
-	return (&PostClient{config: po.config}).QueryRoot(po)
+	return NewPostClient(po.config).QueryRoot(po)
 }
 
 // QueryPosts queries the "posts" edge of the Post entity.
 func (po *Post) QueryPosts() *PostQuery {
-	return (&PostClient{config: po.config}).QueryPosts(po)
+	return NewPostClient(po.config).QueryPosts(po)
 }
 
 // QueryReplyTo queries the "replyTo" edge of the Post entity.
 func (po *Post) QueryReplyTo() *PostQuery {
-	return (&PostClient{config: po.config}).QueryReplyTo(po)
+	return NewPostClient(po.config).QueryReplyTo(po)
 }
 
 // QueryReplies queries the "replies" edge of the Post entity.
 func (po *Post) QueryReplies() *PostQuery {
-	return (&PostClient{config: po.config}).QueryReplies(po)
+	return NewPostClient(po.config).QueryReplies(po)
 }
 
 // QueryReacts queries the "reacts" edge of the Post entity.
 func (po *Post) QueryReacts() *ReactQuery {
-	return (&PostClient{config: po.config}).QueryReacts(po)
+	return NewPostClient(po.config).QueryReacts(po)
 }
 
 // Update returns a builder for updating this Post.
 // Note that you need to call Post.Unwrap() before calling this method if this Post
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (po *Post) Update() *PostUpdateOne {
-	return (&PostClient{config: po.config}).UpdateOne(po)
+	return NewPostClient(po.config).UpdateOne(po)
 }
 
 // Unwrap unwraps the Post entity that was returned from a transaction after it was closed,
@@ -403,9 +403,3 @@ func (po *Post) String() string {
 
 // Posts is a parsable slice of Post.
 type Posts []*Post
-
-func (po Posts) config(cfg config) {
-	for _i := range po {
-		po[_i].config = cfg
-	}
-}

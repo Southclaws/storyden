@@ -40,15 +40,7 @@ func (nd *NotificationDelete) ExecX(ctx context.Context) int {
 }
 
 func (nd *NotificationDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: notification.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: notification.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(notification.Table, sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString))
 	if ps := nd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type NotificationDeleteOne struct {
 	nd *NotificationDelete
 }
 
+// Where appends a list predicates to the NotificationDelete builder.
+func (ndo *NotificationDeleteOne) Where(ps ...predicate.Notification) *NotificationDeleteOne {
+	ndo.nd.mutation.Where(ps...)
+	return ndo
+}
+
 // Exec executes the deletion query.
 func (ndo *NotificationDeleteOne) Exec(ctx context.Context) error {
 	n, err := ndo.nd.Exec(ctx)
@@ -84,5 +82,7 @@ func (ndo *NotificationDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (ndo *NotificationDeleteOne) ExecX(ctx context.Context) {
-	ndo.nd.ExecX(ctx)
+	if err := ndo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

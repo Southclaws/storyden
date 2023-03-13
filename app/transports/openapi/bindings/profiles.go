@@ -23,7 +23,7 @@ func NewProfiles(as account.Service, ar account_repo.Repository) Profiles {
 	return Profiles{as, ar}
 }
 
-func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetRequestObject) (openapi.ProfilesGetResponseObject, error) {
+func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, p.ar, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -36,8 +36,8 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 
 	interests := dt.Map(acc.Interests, serialiseTag)
 
-	return openapi.ProfilesGet200JSONResponse{
-		ProfilesGetOKJSONResponse: openapi.ProfilesGetOKJSONResponse{
+	return openapi.ProfileGet200JSONResponse{
+		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
 			Bio:       utils.Ref(acc.Bio.ElseZero()),
 			Handle:    (*openapi.AccountHandle)(&acc.Handle),

@@ -146,14 +146,14 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 
 // QuerySubscription queries the "subscription" edge of the Notification entity.
 func (n *Notification) QuerySubscription() *SubscriptionQuery {
-	return (&NotificationClient{config: n.config}).QuerySubscription(n)
+	return NewNotificationClient(n.config).QuerySubscription(n)
 }
 
 // Update returns a builder for updating this Notification.
 // Note that you need to call Notification.Unwrap() before calling this method if this Notification
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (n *Notification) Update() *NotificationUpdateOne {
-	return (&NotificationClient{config: n.config}).UpdateOne(n)
+	return NewNotificationClient(n.config).UpdateOne(n)
 }
 
 // Unwrap unwraps the Notification entity that was returned from a transaction after it was closed,
@@ -192,9 +192,3 @@ func (n *Notification) String() string {
 
 // Notifications is a parsable slice of Notification.
 type Notifications []*Notification
-
-func (n Notifications) config(cfg config) {
-	for _i := range n {
-		n[_i].config = cfg
-	}
-}

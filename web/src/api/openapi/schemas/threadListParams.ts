@@ -8,4 +8,4 @@
 import type { AccountHandle } from "./accountHandle";
 import type { TagListIDs } from "./tagListIDs";
 
-export type ThreadsListParams = { author?: AccountHandle; tags?: TagListIDs };
+export type ThreadListParams = { author?: AccountHandle; tags?: TagListIDs };

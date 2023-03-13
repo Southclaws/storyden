@@ -40,15 +40,7 @@ func (rd *ReactDelete) ExecX(ctx context.Context) int {
 }
 
 func (rd *ReactDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: react.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: react.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(react.Table, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	if ps := rd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type ReactDeleteOne struct {
 	rd *ReactDelete
 }
 
+// Where appends a list predicates to the ReactDelete builder.
+func (rdo *ReactDeleteOne) Where(ps ...predicate.React) *ReactDeleteOne {
+	rdo.rd.mutation.Where(ps...)
+	return rdo
+}
+
 // Exec executes the deletion query.
 func (rdo *ReactDeleteOne) Exec(ctx context.Context) error {
 	n, err := rdo.rd.Exec(ctx)
@@ -84,5 +82,7 @@ func (rdo *ReactDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (rdo *ReactDeleteOne) ExecX(ctx context.Context) {
-	rdo.rd.ExecX(ctx)
+	if err := rdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

@@ -194,13 +194,7 @@ func (ac *AuthenticationCreate) sqlSave(ctx context.Context) (*Authentication, e
 func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Authentication{config: ac.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: authentication.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: authentication.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(authentication.Table, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = ac.conflict
 	if id, ok := ac.mutation.ID(); ok {

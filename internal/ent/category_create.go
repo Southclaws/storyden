@@ -266,13 +266,7 @@ func (cc *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
 func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Category{config: cc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: category.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: category.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(category.Table, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = cc.conflict
 	if id, ok := cc.mutation.ID(); ok {

@@ -139,14 +139,14 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 
 // QueryAccount queries the "account" edge of the Authentication entity.
 func (a *Authentication) QueryAccount() *AccountQuery {
-	return (&AuthenticationClient{config: a.config}).QueryAccount(a)
+	return NewAuthenticationClient(a.config).QueryAccount(a)
 }
 
 // Update returns a builder for updating this Authentication.
 // Note that you need to call Authentication.Unwrap() before calling this method if this Authentication
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (a *Authentication) Update() *AuthenticationUpdateOne {
-	return (&AuthenticationClient{config: a.config}).UpdateOne(a)
+	return NewAuthenticationClient(a.config).UpdateOne(a)
 }
 
 // Unwrap unwraps the Authentication entity that was returned from a transaction after it was closed,
@@ -184,9 +184,3 @@ func (a *Authentication) String() string {
 
 // Authentications is a parsable slice of Authentication.
 type Authentications []*Authentication
-
-func (a Authentications) config(cfg config) {
-	for _i := range a {
-		a[_i].config = cfg
-	}
-}

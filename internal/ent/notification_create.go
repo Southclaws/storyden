@@ -192,13 +192,7 @@ func (nc *NotificationCreate) sqlSave(ctx context.Context) (*Notification, error
 func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Notification{config: nc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: notification.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: notification.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(notification.Table, sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = nc.conflict
 	if id, ok := nc.mutation.ID(); ok {

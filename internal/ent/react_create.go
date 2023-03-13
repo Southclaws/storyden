@@ -185,13 +185,7 @@ func (rc *ReactCreate) sqlSave(ctx context.Context) (*React, error) {
 func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 	var (
 		_node = &React{config: rc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: react.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: react.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(react.Table, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = rc.conflict
 	if id, ok := rc.mutation.ID(); ok {

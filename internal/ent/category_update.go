@@ -190,16 +190,7 @@ func (cu *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Categ
 }
 
 func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   category.Table,
-			Columns: category.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: category.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -420,6 +411,12 @@ func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
 	return cuo.RemovePostIDs(ids...)
 }
 
+// Where appends a list predicates to the CategoryUpdate builder.
+func (cuo *CategoryUpdateOne) Where(ps ...predicate.Category) *CategoryUpdateOne {
+	cuo.mutation.Where(ps...)
+	return cuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (cuo *CategoryUpdateOne) Select(field string, fields ...string) *CategoryUpdateOne {
@@ -470,16 +467,7 @@ func (cuo *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *C
 }
 
 func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   category.Table,
-			Columns: category.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: category.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Category.id" for update`)}

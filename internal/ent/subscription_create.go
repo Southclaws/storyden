@@ -200,13 +200,7 @@ func (sc *SubscriptionCreate) sqlSave(ctx context.Context) (*Subscription, error
 func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Subscription{config: sc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: subscription.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: subscription.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(subscription.Table, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = sc.conflict
 	if id, ok := sc.mutation.ID(); ok {

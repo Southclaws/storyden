@@ -40,15 +40,7 @@ func (sd *SubscriptionDelete) ExecX(ctx context.Context) int {
 }
 
 func (sd *SubscriptionDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: subscription.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: subscription.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(subscription.Table, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeString))
 	if ps := sd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type SubscriptionDeleteOne struct {
 	sd *SubscriptionDelete
 }
 
+// Where appends a list predicates to the SubscriptionDelete builder.
+func (sdo *SubscriptionDeleteOne) Where(ps ...predicate.Subscription) *SubscriptionDeleteOne {
+	sdo.sd.mutation.Where(ps...)
+	return sdo
+}
+
 // Exec executes the deletion query.
 func (sdo *SubscriptionDeleteOne) Exec(ctx context.Context) error {
 	n, err := sdo.sd.Exec(ctx)
@@ -84,5 +82,7 @@ func (sdo *SubscriptionDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (sdo *SubscriptionDeleteOne) ExecX(ctx context.Context) {
-	sdo.sd.ExecX(ctx)
+	if err := sdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

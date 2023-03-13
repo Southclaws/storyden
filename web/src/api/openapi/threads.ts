@@ -8,59 +8,59 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  ThreadsCreateOKResponse,
+  ThreadCreateOKResponse,
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
-  ThreadsCreateBody,
-  ThreadsListOKResponse,
-  ThreadsListParams,
-  ThreadsGetResponse,
+  ThreadCreateBody,
+  ThreadListOKResponse,
+  ThreadListParams,
+  ThreadGetResponse,
 } from "./schemas";
 import { fetcher } from "../client";
 
 /**
  * Create a new thread within the specified category.
  */
-export const threadsCreate = (threadsCreateBody: ThreadsCreateBody) => {
-  return fetcher<ThreadsCreateOKResponse>({
+export const threadCreate = (threadCreateBody: ThreadCreateBody) => {
+  return fetcher<ThreadCreateOKResponse>({
     url: `/v1/threads`,
     method: "post",
     headers: { "Content-Type": "application/json" },
-    data: threadsCreateBody,
+    data: threadCreateBody,
   });
 };
 
 /**
  * Get a list of all threads.
  */
-export const threadsList = (params?: ThreadsListParams) => {
-  return fetcher<ThreadsListOKResponse>({
+export const threadList = (params?: ThreadListParams) => {
+  return fetcher<ThreadListOKResponse>({
     url: `/v1/threads`,
     method: "get",
     params,
   });
 };
 
-export const getThreadsListKey = (params?: ThreadsListParams) => [
+export const getThreadListKey = (params?: ThreadListParams) => [
   `/v1/threads`,
   ...(params ? [params] : []),
 ];
 
-export type ThreadsListQueryResult = NonNullable<
-  Awaited<ReturnType<typeof threadsList>>
+export type ThreadListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof threadList>>
 >;
-export type ThreadsListQueryError =
+export type ThreadListQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useThreadsList = <
+export const useThreadList = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
-  params?: ThreadsListParams,
+  params?: ThreadListParams,
   options?: {
-    swr?: SWRConfiguration<Awaited<ReturnType<typeof threadsList>>, TError> & {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof threadList>>, TError> & {
       swrKey?: Key;
       enabled?: boolean;
     };
@@ -70,9 +70,8 @@ export const useThreadsList = <
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getThreadsListKey(params) : null));
-  const swrFn = () => threadsList(params);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getThreadListKey(params) : null));
+  const swrFn = () => threadList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -92,31 +91,31 @@ created as well as a list of the posts within the thread.
 
  * @summary Get information about a thread and the posts within the thread.
  */
-export const threadsGet = (threadMark: string) => {
-  return fetcher<ThreadsGetResponse>({
+export const threadGet = (threadMark: string) => {
+  return fetcher<ThreadGetResponse>({
     url: `/v1/threads/${threadMark}`,
     method: "get",
   });
 };
 
-export const getThreadsGetKey = (threadMark: string) => [
+export const getThreadGetKey = (threadMark: string) => [
   `/v1/threads/${threadMark}`,
 ];
 
-export type ThreadsGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof threadsGet>>
+export type ThreadGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof threadGet>>
 >;
-export type ThreadsGetQueryError =
+export type ThreadGetQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useThreadsGet = <
+export const useThreadGet = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
   threadMark: string,
   options?: {
-    swr?: SWRConfiguration<Awaited<ReturnType<typeof threadsGet>>, TError> & {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof threadGet>>, TError> & {
       swrKey?: Key;
       enabled?: boolean;
     };
@@ -127,8 +126,8 @@ export const useThreadsGet = <
   const isEnabled = swrOptions?.enabled !== false && !!threadMark;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getThreadsGetKey(threadMark) : null));
-  const swrFn = () => threadsGet(threadMark);
+    (() => (isEnabled ? getThreadGetKey(threadMark) : null));
+  const swrFn = () => threadGet(threadMark);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

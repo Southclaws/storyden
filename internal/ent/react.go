@@ -156,19 +156,19 @@ func (r *React) assignValues(columns []string, values []any) error {
 
 // QueryAccount queries the "account" edge of the React entity.
 func (r *React) QueryAccount() *AccountQuery {
-	return (&ReactClient{config: r.config}).QueryAccount(r)
+	return NewReactClient(r.config).QueryAccount(r)
 }
 
 // QueryPost queries the "Post" edge of the React entity.
 func (r *React) QueryPost() *PostQuery {
-	return (&ReactClient{config: r.config}).QueryPost(r)
+	return NewReactClient(r.config).QueryPost(r)
 }
 
 // Update returns a builder for updating this React.
 // Note that you need to call React.Unwrap() before calling this method if this React
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (r *React) Update() *ReactUpdateOne {
-	return (&ReactClient{config: r.config}).UpdateOne(r)
+	return NewReactClient(r.config).UpdateOne(r)
 }
 
 // Unwrap unwraps the React entity that was returned from a transaction after it was closed,
@@ -198,9 +198,3 @@ func (r *React) String() string {
 
 // Reacts is a parsable slice of React.
 type Reacts []*React
-
-func (r Reacts) config(cfg config) {
-	for _i := range r {
-		r[_i].config = cfg
-	}
-}

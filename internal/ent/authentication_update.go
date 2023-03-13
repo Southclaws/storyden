@@ -137,16 +137,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if err := au.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   authentication.Table,
-			Columns: authentication.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: authentication.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(authentication.Table, authentication.Columns, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -278,6 +269,12 @@ func (auo *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
 	return auo
 }
 
+// Where appends a list predicates to the AuthenticationUpdate builder.
+func (auo *AuthenticationUpdateOne) Where(ps ...predicate.Authentication) *AuthenticationUpdateOne {
+	auo.mutation.Where(ps...)
+	return auo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (auo *AuthenticationUpdateOne) Select(field string, fields ...string) *AuthenticationUpdateOne {
@@ -340,16 +337,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	if err := auo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   authentication.Table,
-			Columns: authentication.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: authentication.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(authentication.Table, authentication.Columns, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
 	id, ok := auo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Authentication.id" for update`)}
