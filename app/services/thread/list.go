@@ -15,8 +15,9 @@ import (
 )
 
 type Params struct {
-	AccountID opt.Optional[account.AccountID]
-	Tags      opt.Optional[[]xid.ID]
+	AccountID  opt.Optional[account.AccountID]
+	Tags       opt.Optional[[]xid.ID]
+	Categories opt.Optional[[]string]
 }
 
 func (s *service) ListAll(
@@ -29,6 +30,7 @@ func (s *service) ListAll(
 
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.WithAuthor(a)) })
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.WithTags(a)) })
+	opts.Categories.Call(func(a []string) { q = append(q, thread.WithCategories(a)) })
 
 	thr, err := s.thread_repo.List(ctx, before, max, q...)
 	if err != nil {

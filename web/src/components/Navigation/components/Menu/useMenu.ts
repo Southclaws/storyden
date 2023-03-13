@@ -1,10 +1,10 @@
-import { useCategoriesList } from "src/api/openapi/categories";
+import { useCategoryList } from "src/api/openapi/categories";
 import { useAuthProvider } from "src/auth/useAuthProvider";
 
 export function useMenu() {
   const { account } = useAuthProvider();
 
-  const { data, error } = useCategoriesList();
+  const { data, error } = useCategoryList();
 
   return {
     isAuthenticated: !!account,

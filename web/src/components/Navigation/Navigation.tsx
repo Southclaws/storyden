@@ -8,7 +8,7 @@ const inactive = `hsla(180, 2%, 98%, 0.8)`;
 const active = `hsla(220, 15%, 95%, 0.75)`;
 
 export function Navigation() {
-  const { isAuthenticated, isExpanded, onExpand } = useNavigation();
+  const { isAuthenticated, isExpanded, onExpand, category } = useNavigation();
 
   return (
     <Box
@@ -60,9 +60,9 @@ export function Navigation() {
           pointerEvents="auto"
         >
           {isAuthenticated ? (
-            <Authenticated onExpand={onExpand} />
+            <Authenticated onExpand={onExpand} category={category} />
           ) : (
-            <Unauthenticated onExpand={onExpand} />
+            <Unauthenticated onExpand={onExpand} category={category} />
           )}
         </Flex>
       </Flex>

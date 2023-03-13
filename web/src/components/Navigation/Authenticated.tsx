@@ -2,9 +2,9 @@ import { IconButton } from "@chakra-ui/react";
 import { BellIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Anchor } from "../site/Anchor";
 
-type Props = { onExpand: () => void };
+type Props = { onExpand: () => void; category?: string };
 
-export function Authenticated({ onExpand }: Props) {
+export function Authenticated({ onExpand, category }: Props) {
   return (
     <>
       <Anchor href="/notifications">
@@ -16,7 +16,7 @@ export function Authenticated({ onExpand }: Props) {
       </Anchor>
 
       <Anchor href="/categories" onClick={onExpand}>
-        General
+        {category ?? "Categories"}
       </Anchor>
 
       <Anchor href="/new">
