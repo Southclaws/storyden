@@ -1,8 +1,10 @@
+import { isNil, omitBy } from "lodash/fp";
+
 type Options = {
   url: string;
   method: "get" | "post" | "put" | "delete" | "patch";
   headers?: Record<string, string>;
-  params?: any;
+  params?: Record<string, string | string[]>;
   data?: unknown;
   responseType?: string;
 };
@@ -14,9 +16,7 @@ export const fetcher = async <T>({
   params,
   data,
 }: Options): Promise<T> => {
-  const query = params ? `?${new URLSearchParams(params)}` : "";
-
-  const req = new Request(`/api${url}${query}`, {
+  const req = new Request(`/api${url}${cleanQuery(params)}`, {
     method,
     mode: "cors",
     credentials: "include",
@@ -40,3 +40,13 @@ export const fetcher = async <T>({
 };
 
 export default fetcher;
+
+const removeEmpty = omitBy(isNil);
+
+const cleanQuery = (params?: Record<string, string | string[]>): string => {
+  if (!params) return "";
+
+  const clean = removeEmpty(params);
+
+  return new URLSearchParams(clean).toString();
+};
