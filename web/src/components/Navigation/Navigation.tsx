@@ -14,6 +14,7 @@ export function Navigation() {
     <Box
       id="navigation-overlay"
       position="fixed"
+      bottom="env(safe-area-inset-bottom)"
       width="100vw"
       height="100vh"
       pointerEvents="none"
