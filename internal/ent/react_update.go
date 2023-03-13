@@ -126,16 +126,7 @@ func (ru *ReactUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpd
 }
 
 func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   react.Table,
-			Columns: react.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: react.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	if ps := ru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -299,6 +290,12 @@ func (ruo *ReactUpdateOne) ClearPost() *ReactUpdateOne {
 	return ruo
 }
 
+// Where appends a list predicates to the ReactUpdate builder.
+func (ruo *ReactUpdateOne) Where(ps ...predicate.React) *ReactUpdateOne {
+	ruo.mutation.Where(ps...)
+	return ruo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (ruo *ReactUpdateOne) Select(field string, fields ...string) *ReactUpdateOne {
@@ -340,16 +337,7 @@ func (ruo *ReactUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Reac
 }
 
 func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   react.Table,
-			Columns: react.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: react.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	id, ok := ruo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "React.id" for update`)}

@@ -21,11 +21,8 @@ import (
 // TagQuery is the builder for querying Tag entities.
 type TagQuery struct {
 	config
-	limit        *int
-	offset       *int
-	unique       *bool
+	ctx          *QueryContext
 	order        []OrderFunc
-	fields       []string
 	inters       []Interceptor
 	predicates   []predicate.Tag
 	withPosts    *PostQuery
@@ -44,20 +41,20 @@ func (tq *TagQuery) Where(ps ...predicate.Tag) *TagQuery {
 
 // Limit the number of records to be returned by this query.
 func (tq *TagQuery) Limit(limit int) *TagQuery {
-	tq.limit = &limit
+	tq.ctx.Limit = &limit
 	return tq
 }
 
 // Offset to start from.
 func (tq *TagQuery) Offset(offset int) *TagQuery {
-	tq.offset = &offset
+	tq.ctx.Offset = &offset
 	return tq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (tq *TagQuery) Unique(unique bool) *TagQuery {
-	tq.unique = &unique
+	tq.ctx.Unique = &unique
 	return tq
 }
 
@@ -114,7 +111,7 @@ func (tq *TagQuery) QueryAccounts() *AccountQuery {
 // First returns the first Tag entity from the query.
 // Returns a *NotFoundError when no Tag was found.
 func (tq *TagQuery) First(ctx context.Context) (*Tag, error) {
-	nodes, err := tq.Limit(1).All(newQueryContext(ctx, TypeTag, "First"))
+	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +134,7 @@ func (tq *TagQuery) FirstX(ctx context.Context) *Tag {
 // Returns a *NotFoundError when no Tag ID was found.
 func (tq *TagQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = tq.Limit(1).IDs(newQueryContext(ctx, TypeTag, "FirstID")); err != nil {
+	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -160,7 +157,7 @@ func (tq *TagQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one Tag entity is found.
 // Returns a *NotFoundError when no Tag entities are found.
 func (tq *TagQuery) Only(ctx context.Context) (*Tag, error) {
-	nodes, err := tq.Limit(2).All(newQueryContext(ctx, TypeTag, "Only"))
+	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +185,7 @@ func (tq *TagQuery) OnlyX(ctx context.Context) *Tag {
 // Returns a *NotFoundError when no entities are found.
 func (tq *TagQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = tq.Limit(2).IDs(newQueryContext(ctx, TypeTag, "OnlyID")); err != nil {
+	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -213,7 +210,7 @@ func (tq *TagQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of Tags.
 func (tq *TagQuery) All(ctx context.Context) ([]*Tag, error) {
-	ctx = newQueryContext(ctx, TypeTag, "All")
+	ctx = setContextOp(ctx, tq.ctx, "All")
 	if err := tq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,10 +228,12 @@ func (tq *TagQuery) AllX(ctx context.Context) []*Tag {
 }
 
 // IDs executes the query and returns a list of Tag IDs.
-func (tq *TagQuery) IDs(ctx context.Context) ([]xid.ID, error) {
-	var ids []xid.ID
-	ctx = newQueryContext(ctx, TypeTag, "IDs")
-	if err := tq.Select(tag.FieldID).Scan(ctx, &ids); err != nil {
+func (tq *TagQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if tq.ctx.Unique == nil && tq.path != nil {
+		tq.Unique(true)
+	}
+	ctx = setContextOp(ctx, tq.ctx, "IDs")
+	if err = tq.Select(tag.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -251,7 +250,7 @@ func (tq *TagQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (tq *TagQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeTag, "Count")
+	ctx = setContextOp(ctx, tq.ctx, "Count")
 	if err := tq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -269,7 +268,7 @@ func (tq *TagQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (tq *TagQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeTag, "Exist")
+	ctx = setContextOp(ctx, tq.ctx, "Exist")
 	switch _, err := tq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -297,17 +296,15 @@ func (tq *TagQuery) Clone() *TagQuery {
 	}
 	return &TagQuery{
 		config:       tq.config,
-		limit:        tq.limit,
-		offset:       tq.offset,
+		ctx:          tq.ctx.Clone(),
 		order:        append([]OrderFunc{}, tq.order...),
 		inters:       append([]Interceptor{}, tq.inters...),
 		predicates:   append([]predicate.Tag{}, tq.predicates...),
 		withPosts:    tq.withPosts.Clone(),
 		withAccounts: tq.withAccounts.Clone(),
 		// clone intermediate query.
-		sql:    tq.sql.Clone(),
-		path:   tq.path,
-		unique: tq.unique,
+		sql:  tq.sql.Clone(),
+		path: tq.path,
 	}
 }
 
@@ -348,9 +345,9 @@ func (tq *TagQuery) WithAccounts(opts ...func(*AccountQuery)) *TagQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tq *TagQuery) GroupBy(field string, fields ...string) *TagGroupBy {
-	tq.fields = append([]string{field}, fields...)
+	tq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &TagGroupBy{build: tq}
-	grbuild.flds = &tq.fields
+	grbuild.flds = &tq.ctx.Fields
 	grbuild.label = tag.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -369,10 +366,10 @@ func (tq *TagQuery) GroupBy(field string, fields ...string) *TagGroupBy {
 //		Select(tag.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (tq *TagQuery) Select(fields ...string) *TagSelect {
-	tq.fields = append(tq.fields, fields...)
+	tq.ctx.Fields = append(tq.ctx.Fields, fields...)
 	sbuild := &TagSelect{TagQuery: tq}
 	sbuild.label = tag.Label
-	sbuild.flds, sbuild.scan = &tq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &tq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -392,7 +389,7 @@ func (tq *TagQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range tq.fields {
+	for _, f := range tq.ctx.Fields {
 		if !tag.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -477,27 +474,30 @@ func (tq *TagQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Ta
 	if err := query.prepareQuery(ctx); err != nil {
 		return err
 	}
-	neighbors, err := query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-		assign := spec.Assign
-		values := spec.ScanValues
-		spec.ScanValues = func(columns []string) ([]any, error) {
-			values, err := values(columns[1:])
-			if err != nil {
-				return nil, err
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
 			}
-			return append([]any{new(xid.ID)}, values...), nil
-		}
-		spec.Assign = func(columns []string, values []any) error {
-			outValue := *values[0].(*xid.ID)
-			inValue := *values[1].(*xid.ID)
-			if nids[inValue] == nil {
-				nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
-				return assign(columns[1:], values[1:])
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
 			}
-			nids[inValue][byID[outValue]] = struct{}{}
-			return nil
-		}
+		})
 	})
+	neighbors, err := withInterceptors[[]*Post](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -535,27 +535,30 @@ func (tq *TagQuery) loadAccounts(ctx context.Context, query *AccountQuery, nodes
 	if err := query.prepareQuery(ctx); err != nil {
 		return err
 	}
-	neighbors, err := query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-		assign := spec.Assign
-		values := spec.ScanValues
-		spec.ScanValues = func(columns []string) ([]any, error) {
-			values, err := values(columns[1:])
-			if err != nil {
-				return nil, err
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
 			}
-			return append([]any{new(xid.ID)}, values...), nil
-		}
-		spec.Assign = func(columns []string, values []any) error {
-			outValue := *values[0].(*xid.ID)
-			inValue := *values[1].(*xid.ID)
-			if nids[inValue] == nil {
-				nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
-				return assign(columns[1:], values[1:])
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
 			}
-			nids[inValue][byID[outValue]] = struct{}{}
-			return nil
-		}
+		})
 	})
+	neighbors, err := withInterceptors[[]*Account](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -576,30 +579,22 @@ func (tq *TagQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(tq.modifiers) > 0 {
 		_spec.Modifiers = tq.modifiers
 	}
-	_spec.Node.Columns = tq.fields
-	if len(tq.fields) > 0 {
-		_spec.Unique = tq.unique != nil && *tq.unique
+	_spec.Node.Columns = tq.ctx.Fields
+	if len(tq.ctx.Fields) > 0 {
+		_spec.Unique = tq.ctx.Unique != nil && *tq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, tq.driver, _spec)
 }
 
 func (tq *TagQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   tag.Table,
-			Columns: tag.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: tag.FieldID,
-			},
-		},
-		From:   tq.sql,
-		Unique: true,
-	}
-	if unique := tq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
+	_spec.From = tq.sql
+	if unique := tq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if tq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := tq.fields; len(fields) > 0 {
+	if fields := tq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, tag.FieldID)
 		for i := range fields {
@@ -615,10 +610,10 @@ func (tq *TagQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := tq.limit; limit != nil {
+	if limit := tq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := tq.offset; offset != nil {
+	if offset := tq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := tq.order; len(ps) > 0 {
@@ -634,7 +629,7 @@ func (tq *TagQuery) querySpec() *sqlgraph.QuerySpec {
 func (tq *TagQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(tq.driver.Dialect())
 	t1 := builder.Table(tag.Table)
-	columns := tq.fields
+	columns := tq.ctx.Fields
 	if len(columns) == 0 {
 		columns = tag.Columns
 	}
@@ -643,7 +638,7 @@ func (tq *TagQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = tq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if tq.unique != nil && *tq.unique {
+	if tq.ctx.Unique != nil && *tq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range tq.modifiers {
@@ -655,12 +650,12 @@ func (tq *TagQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range tq.order {
 		p(selector)
 	}
-	if offset := tq.offset; offset != nil {
+	if offset := tq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := tq.limit; limit != nil {
+	if limit := tq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -686,7 +681,7 @@ func (tgb *TagGroupBy) Aggregate(fns ...AggregateFunc) *TagGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (tgb *TagGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeTag, "GroupBy")
+	ctx = setContextOp(ctx, tgb.build.ctx, "GroupBy")
 	if err := tgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -734,7 +729,7 @@ func (ts *TagSelect) Aggregate(fns ...AggregateFunc) *TagSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ts *TagSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeTag, "Select")
+	ctx = setContextOp(ctx, ts.ctx, "Select")
 	if err := ts.prepareQuery(ctx); err != nil {
 		return err
 	}

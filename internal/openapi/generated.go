@@ -51,11 +51,6 @@ const (
 	Usb      PublicKeyCredentialDescriptorTransports = "usb"
 )
 
-// Defines values for PublicKeyCredentialDescriptorType.
-const (
-	PublicKeyCredentialDescriptorTypePublicKey PublicKeyCredentialDescriptorType = "public-key"
-)
-
 // Defines values for PublicKeyCredentialRequestOptionsUserVerification.
 const (
 	PublicKeyCredentialRequestOptionsUserVerificationDiscouraged PublicKeyCredentialRequestOptionsUserVerification = "discouraged"
@@ -65,7 +60,7 @@ const (
 
 // Defines values for PublicKeyCredentialType.
 const (
-	PublicKeyCredentialTypePublicKey PublicKeyCredentialType = "public-key"
+	PublicKey PublicKeyCredentialType = "public-key"
 )
 
 // Defines values for ResidentKeyRequirement.
@@ -407,14 +402,13 @@ type PublicKeyCredentialCreationOptions struct {
 type PublicKeyCredentialDescriptor struct {
 	Id         string                                     `json:"id"`
 	Transports *[]PublicKeyCredentialDescriptorTransports `json:"transports,omitempty"`
-	Type       PublicKeyCredentialDescriptorType          `json:"type"`
+
+	// Type https://www.w3.org/TR/webauthn-2/#enumdef-publickeycredentialtype
+	Type PublicKeyCredentialType `json:"type"`
 }
 
 // PublicKeyCredentialDescriptorTransports defines model for PublicKeyCredentialDescriptor.Transports.
 type PublicKeyCredentialDescriptorTransports string
-
-// PublicKeyCredentialDescriptorType defines model for PublicKeyCredentialDescriptor.Type.
-type PublicKeyCredentialDescriptorType string
 
 // PublicKeyCredentialParameters https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
 type PublicKeyCredentialParameters struct {
@@ -679,29 +673,29 @@ type AuthProviderListOK struct {
 // AuthSuccessOK defines model for AuthSuccessOK.
 type AuthSuccessOK = AuthSuccess
 
-// CategoriesListOK defines model for CategoriesListOK.
-type CategoriesListOK = CategoryList
+// CategoryListOK defines model for CategoryListOK.
+type CategoryListOK = CategoryList
 
 // InternalServerError A description of an error including a human readable message and any
 // related metadata from the request and associated services.
 type InternalServerError = APIError
 
-// PostsCreateOK A new post within a thread of posts. A post may reply to another post in
+// PostCreateOK A new post within a thread of posts. A post may reply to another post in
 // the thread by specifying the `reply_to` property. The identifier in the
 // `reply_to` value must be post within the same thread.
-type PostsCreateOK = Post
+type PostCreateOK = Post
 
-// ProfilesGetOK defines model for ProfilesGetOK.
-type ProfilesGetOK = PublicProfile
+// ProfileGetOK defines model for ProfileGetOK.
+type ProfileGetOK = PublicProfile
 
-// ThreadsCreateOK defines model for ThreadsCreateOK.
-type ThreadsCreateOK = Thread
+// ThreadCreateOK defines model for ThreadCreateOK.
+type ThreadCreateOK = Thread
 
-// ThreadsGet defines model for ThreadsGet.
-type ThreadsGet = Thread
+// ThreadGet defines model for ThreadGet.
+type ThreadGet = Thread
 
-// ThreadsListOK defines model for ThreadsListOK.
-type ThreadsListOK struct {
+// ThreadListOK defines model for ThreadListOK.
+type ThreadListOK struct {
 	Threads ThreadList `json:"threads"`
 }
 
@@ -720,11 +714,11 @@ type AuthPassword = AuthPair
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
 
-// PostsCreate defines model for PostsCreate.
-type PostsCreate = PostInitialProps
+// PostCreate defines model for PostCreate.
+type PostCreate = PostInitialProps
 
-// ThreadsCreate defines model for ThreadsCreate.
-type ThreadsCreate = ThreadMutableProps
+// ThreadCreate defines model for ThreadCreate.
+type ThreadCreate = ThreadMutableProps
 
 // WebAuthnMakeAssertion https://www.w3.org/TR/webauthn-2/#iface-pkcredential
 type WebAuthnMakeAssertion = PublicKeyCredential
@@ -732,8 +726,8 @@ type WebAuthnMakeAssertion = PublicKeyCredential
 // WebAuthnMakeCredential https://www.w3.org/TR/webauthn-2/#iface-pkcredential
 type WebAuthnMakeCredential = PublicKeyCredential
 
-// ThreadsListParams defines parameters for ThreadsList.
-type ThreadsListParams struct {
+// ThreadListParams defines parameters for ThreadList.
+type ThreadListParams struct {
 	// Author Show only results creeated by this user.
 	Author *AccountHandle `form:"author,omitempty" json:"author,omitempty"`
 
@@ -750,14 +744,8 @@ type OAuthProviderCallbackJSONRequestBody = OAuthCallback
 // AuthPasswordSigninJSONRequestBody defines body for AuthPasswordSignin for application/json ContentType.
 type AuthPasswordSigninJSONRequestBody = AuthPair
 
-// AuthPasswordSigninFormdataRequestBody defines body for AuthPasswordSignin for application/x-www-form-urlencoded ContentType.
-type AuthPasswordSigninFormdataRequestBody = AuthPair
-
 // AuthPasswordSignupJSONRequestBody defines body for AuthPasswordSignup for application/json ContentType.
 type AuthPasswordSignupJSONRequestBody = AuthPair
-
-// AuthPasswordSignupFormdataRequestBody defines body for AuthPasswordSignup for application/x-www-form-urlencoded ContentType.
-type AuthPasswordSignupFormdataRequestBody = AuthPair
 
 // WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
 type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
@@ -765,17 +753,11 @@ type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
 // WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
 type WebAuthnMakeCredentialJSONRequestBody = PublicKeyCredential
 
-// ThreadsCreateJSONRequestBody defines body for ThreadsCreate for application/json ContentType.
-type ThreadsCreateJSONRequestBody = ThreadMutableProps
+// ThreadCreateJSONRequestBody defines body for ThreadCreate for application/json ContentType.
+type ThreadCreateJSONRequestBody = ThreadMutableProps
 
-// ThreadsCreateFormdataRequestBody defines body for ThreadsCreate for application/x-www-form-urlencoded ContentType.
-type ThreadsCreateFormdataRequestBody = ThreadMutableProps
-
-// PostsCreateJSONRequestBody defines body for PostsCreate for application/json ContentType.
-type PostsCreateJSONRequestBody = PostInitialProps
-
-// PostsCreateFormdataRequestBody defines body for PostsCreate for application/x-www-form-urlencoded ContentType.
-type PostsCreateFormdataRequestBody = PostInitialProps
+// PostCreateJSONRequestBody defines body for PostCreate for application/json ContentType.
+type PostCreateJSONRequestBody = PostInitialProps
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -883,14 +865,10 @@ type ClientInterface interface {
 
 	AuthPasswordSignin(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AuthPasswordSigninWithFormdataBody(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// AuthPasswordSignup request with any body
 	AuthPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	AuthPasswordSignupWithFormdataBody(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// WebAuthnMakeAssertion request with any body
 	WebAuthnMakeAssertionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -908,31 +886,27 @@ type ClientInterface interface {
 	// WebAuthnRequestCredential request
 	WebAuthnRequestCredential(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CategoriesList request
-	CategoriesList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CategoryList request
+	CategoryList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ProfilesGet request
-	ProfilesGet(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ProfileGet request
+	ProfileGet(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ThreadsList request
-	ThreadsList(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ThreadList request
+	ThreadList(ctx context.Context, params *ThreadListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ThreadsCreate request with any body
-	ThreadsCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ThreadCreate request with any body
+	ThreadCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ThreadsCreate(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ThreadCreate(ctx context.Context, body ThreadCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ThreadsCreateWithFormdataBody(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ThreadGet request
+	ThreadGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ThreadsGet request
-	ThreadsGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// PostCreate request with any body
+	PostCreateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostsCreate request with any body
-	PostsCreateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostsCreate(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PostsCreateWithFormdataBody(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PostCreate(ctx context.Context, threadMark ThreadMarkParam, body PostCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVersion request
 	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1082,18 +1056,6 @@ func (c *Client) AuthPasswordSignin(ctx context.Context, body AuthPasswordSignin
 	return c.Client.Do(req)
 }
 
-func (c *Client) AuthPasswordSigninWithFormdataBody(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAuthPasswordSigninRequestWithFormdataBody(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) AuthPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthPasswordSignupRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1108,18 +1070,6 @@ func (c *Client) AuthPasswordSignupWithBody(ctx context.Context, contentType str
 
 func (c *Client) AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthPasswordSignupRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) AuthPasswordSignupWithFormdataBody(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAuthPasswordSignupRequestWithFormdataBody(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1202,8 +1152,8 @@ func (c *Client) WebAuthnRequestCredential(ctx context.Context, accountHandle Ac
 	return c.Client.Do(req)
 }
 
-func (c *Client) CategoriesList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCategoriesListRequest(c.Server)
+func (c *Client) CategoryList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCategoryListRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -1214,8 +1164,8 @@ func (c *Client) CategoriesList(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) ProfilesGet(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewProfilesGetRequest(c.Server, accountHandle)
+func (c *Client) ProfileGet(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProfileGetRequest(c.Server, accountHandle)
 	if err != nil {
 		return nil, err
 	}
@@ -1226,8 +1176,8 @@ func (c *Client) ProfilesGet(ctx context.Context, accountHandle AccountHandlePar
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsList(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsListRequest(c.Server, params)
+func (c *Client) ThreadList(ctx context.Context, params *ThreadListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadListRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1238,8 +1188,8 @@ func (c *Client) ThreadsList(ctx context.Context, params *ThreadsListParams, req
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsCreateRequestWithBody(c.Server, contentType, body)
+func (c *Client) ThreadCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadCreateRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1250,8 +1200,8 @@ func (c *Client) ThreadsCreateWithBody(ctx context.Context, contentType string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsCreate(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsCreateRequest(c.Server, body)
+func (c *Client) ThreadCreate(ctx context.Context, body ThreadCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadCreateRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1262,8 +1212,8 @@ func (c *Client) ThreadsCreate(ctx context.Context, body ThreadsCreateJSONReques
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsCreateWithFormdataBody(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsCreateRequestWithFormdataBody(c.Server, body)
+func (c *Client) ThreadGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadGetRequest(c.Server, threadMark)
 	if err != nil {
 		return nil, err
 	}
@@ -1274,8 +1224,8 @@ func (c *Client) ThreadsCreateWithFormdataBody(ctx context.Context, body Threads
 	return c.Client.Do(req)
 }
 
-func (c *Client) ThreadsGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewThreadsGetRequest(c.Server, threadMark)
+func (c *Client) PostCreateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateRequestWithBody(c.Server, threadMark, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1286,32 +1236,8 @@ func (c *Client) ThreadsGet(ctx context.Context, threadMark ThreadMarkParam, req
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostsCreateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequestWithBody(c.Server, threadMark, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PostsCreate(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequest(c.Server, threadMark, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PostsCreateWithFormdataBody(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostsCreateRequestWithFormdataBody(c.Server, threadMark, body)
+func (c *Client) PostCreate(ctx context.Context, threadMark ThreadMarkParam, body PostCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostCreateRequest(c.Server, threadMark, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1603,17 +1529,6 @@ func NewAuthPasswordSigninRequest(server string, body AuthPasswordSigninJSONRequ
 	return NewAuthPasswordSigninRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewAuthPasswordSigninRequestWithFormdataBody calls the generic AuthPasswordSignin builder with application/x-www-form-urlencoded body
-func NewAuthPasswordSigninRequestWithFormdataBody(server string, body AuthPasswordSigninFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewAuthPasswordSigninRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
-}
-
 // NewAuthPasswordSigninRequestWithBody generates requests for AuthPasswordSignin with any type of body
 func NewAuthPasswordSigninRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
@@ -1652,17 +1567,6 @@ func NewAuthPasswordSignupRequest(server string, body AuthPasswordSignupJSONRequ
 	}
 	bodyReader = bytes.NewReader(buf)
 	return NewAuthPasswordSignupRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewAuthPasswordSignupRequestWithFormdataBody calls the generic AuthPasswordSignup builder with application/x-www-form-urlencoded body
-func NewAuthPasswordSignupRequestWithFormdataBody(server string, body AuthPasswordSignupFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewAuthPasswordSignupRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
 }
 
 // NewAuthPasswordSignupRequestWithBody generates requests for AuthPasswordSignup with any type of body
@@ -1842,8 +1746,8 @@ func NewWebAuthnRequestCredentialRequest(server string, accountHandle AccountHan
 	return req, nil
 }
 
-// NewCategoriesListRequest generates requests for CategoriesList
-func NewCategoriesListRequest(server string) (*http.Request, error) {
+// NewCategoryListRequest generates requests for CategoryList
+func NewCategoryListRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1869,8 +1773,8 @@ func NewCategoriesListRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewProfilesGetRequest generates requests for ProfilesGet
-func NewProfilesGetRequest(server string, accountHandle AccountHandleParam) (*http.Request, error) {
+// NewProfileGetRequest generates requests for ProfileGet
+func NewProfileGetRequest(server string, accountHandle AccountHandleParam) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1903,8 +1807,8 @@ func NewProfilesGetRequest(server string, accountHandle AccountHandleParam) (*ht
 	return req, nil
 }
 
-// NewThreadsListRequest generates requests for ThreadsList
-func NewThreadsListRequest(server string, params *ThreadsListParams) (*http.Request, error) {
+// NewThreadListRequest generates requests for ThreadList
+func NewThreadListRequest(server string, params *ThreadListParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1966,30 +1870,19 @@ func NewThreadsListRequest(server string, params *ThreadsListParams) (*http.Requ
 	return req, nil
 }
 
-// NewThreadsCreateRequest calls the generic ThreadsCreate builder with application/json body
-func NewThreadsCreateRequest(server string, body ThreadsCreateJSONRequestBody) (*http.Request, error) {
+// NewThreadCreateRequest calls the generic ThreadCreate builder with application/json body
+func NewThreadCreateRequest(server string, body ThreadCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewThreadsCreateRequestWithBody(server, "application/json", bodyReader)
+	return NewThreadCreateRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewThreadsCreateRequestWithFormdataBody calls the generic ThreadsCreate builder with application/x-www-form-urlencoded body
-func NewThreadsCreateRequestWithFormdataBody(server string, body ThreadsCreateFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewThreadsCreateRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
-}
-
-// NewThreadsCreateRequestWithBody generates requests for ThreadsCreate with any type of body
-func NewThreadsCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewThreadCreateRequestWithBody generates requests for ThreadCreate with any type of body
+func NewThreadCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -2017,8 +1910,8 @@ func NewThreadsCreateRequestWithBody(server string, contentType string, body io.
 	return req, nil
 }
 
-// NewThreadsGetRequest generates requests for ThreadsGet
-func NewThreadsGetRequest(server string, threadMark ThreadMarkParam) (*http.Request, error) {
+// NewThreadGetRequest generates requests for ThreadGet
+func NewThreadGetRequest(server string, threadMark ThreadMarkParam) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2051,30 +1944,19 @@ func NewThreadsGetRequest(server string, threadMark ThreadMarkParam) (*http.Requ
 	return req, nil
 }
 
-// NewPostsCreateRequest calls the generic PostsCreate builder with application/json body
-func NewPostsCreateRequest(server string, threadMark ThreadMarkParam, body PostsCreateJSONRequestBody) (*http.Request, error) {
+// NewPostCreateRequest calls the generic PostCreate builder with application/json body
+func NewPostCreateRequest(server string, threadMark ThreadMarkParam, body PostCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostsCreateRequestWithBody(server, threadMark, "application/json", bodyReader)
+	return NewPostCreateRequestWithBody(server, threadMark, "application/json", bodyReader)
 }
 
-// NewPostsCreateRequestWithFormdataBody calls the generic PostsCreate builder with application/x-www-form-urlencoded body
-func NewPostsCreateRequestWithFormdataBody(server string, threadMark ThreadMarkParam, body PostsCreateFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewPostsCreateRequestWithBody(server, threadMark, "application/x-www-form-urlencoded", bodyReader)
-}
-
-// NewPostsCreateRequestWithBody generates requests for PostsCreate with any type of body
-func NewPostsCreateRequestWithBody(server string, threadMark ThreadMarkParam, contentType string, body io.Reader) (*http.Request, error) {
+// NewPostCreateRequestWithBody generates requests for PostCreate with any type of body
+func NewPostCreateRequestWithBody(server string, threadMark ThreadMarkParam, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2212,14 +2094,10 @@ type ClientWithResponsesInterface interface {
 
 	AuthPasswordSigninWithResponse(ctx context.Context, body AuthPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
 
-	AuthPasswordSigninWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
-
 	// AuthPasswordSignup request with any body
 	AuthPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
 
 	AuthPasswordSignupWithResponse(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
-
-	AuthPasswordSignupWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
 
 	// WebAuthnMakeAssertion request with any body
 	WebAuthnMakeAssertionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
@@ -2237,31 +2115,27 @@ type ClientWithResponsesInterface interface {
 	// WebAuthnRequestCredential request
 	WebAuthnRequestCredentialWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*WebAuthnRequestCredentialResponse, error)
 
-	// CategoriesList request
-	CategoriesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CategoriesListResponse, error)
+	// CategoryList request
+	CategoryListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CategoryListResponse, error)
 
-	// ProfilesGet request
-	ProfilesGetWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*ProfilesGetResponse, error)
+	// ProfileGet request
+	ProfileGetWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error)
 
-	// ThreadsList request
-	ThreadsListWithResponse(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*ThreadsListResponse, error)
+	// ThreadList request
+	ThreadListWithResponse(ctx context.Context, params *ThreadListParams, reqEditors ...RequestEditorFn) (*ThreadListResponse, error)
 
-	// ThreadsCreate request with any body
-	ThreadsCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+	// ThreadCreate request with any body
+	ThreadCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadCreateResponse, error)
 
-	ThreadsCreateWithResponse(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+	ThreadCreateWithResponse(ctx context.Context, body ThreadCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadCreateResponse, error)
 
-	ThreadsCreateWithFormdataBodyWithResponse(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error)
+	// ThreadGet request
+	ThreadGetWithResponse(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*ThreadGetResponse, error)
 
-	// ThreadsGet request
-	ThreadsGetWithResponse(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error)
+	// PostCreate request with any body
+	PostCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateResponse, error)
 
-	// PostsCreate request with any body
-	PostsCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
-
-	PostsCreateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
-
-	PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error)
+	PostCreateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateResponse, error)
 
 	// GetVersion request
 	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
@@ -2586,7 +2460,7 @@ func (r WebAuthnRequestCredentialResponse) StatusCode() int {
 	return 0
 }
 
-type CategoriesListResponse struct {
+type CategoryListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *CategoryList
@@ -2594,7 +2468,7 @@ type CategoriesListResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CategoriesListResponse) Status() string {
+func (r CategoryListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2602,14 +2476,14 @@ func (r CategoriesListResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CategoriesListResponse) StatusCode() int {
+func (r CategoryListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ProfilesGetResponse struct {
+type ProfileGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *PublicProfile
@@ -2617,7 +2491,7 @@ type ProfilesGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ProfilesGetResponse) Status() string {
+func (r ProfileGetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2625,14 +2499,14 @@ func (r ProfilesGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ProfilesGetResponse) StatusCode() int {
+func (r ProfileGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ThreadsListResponse struct {
+type ThreadListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
@@ -2642,7 +2516,7 @@ type ThreadsListResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ThreadsListResponse) Status() string {
+func (r ThreadListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2650,14 +2524,14 @@ func (r ThreadsListResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ThreadsListResponse) StatusCode() int {
+func (r ThreadListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ThreadsCreateResponse struct {
+type ThreadCreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Thread
@@ -2665,7 +2539,7 @@ type ThreadsCreateResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ThreadsCreateResponse) Status() string {
+func (r ThreadCreateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2673,14 +2547,14 @@ func (r ThreadsCreateResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ThreadsCreateResponse) StatusCode() int {
+func (r ThreadCreateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type ThreadsGetResponse struct {
+type ThreadGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Thread
@@ -2688,7 +2562,7 @@ type ThreadsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ThreadsGetResponse) Status() string {
+func (r ThreadGetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2696,14 +2570,14 @@ func (r ThreadsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ThreadsGetResponse) StatusCode() int {
+func (r ThreadGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PostsCreateResponse struct {
+type PostCreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Post
@@ -2711,7 +2585,7 @@ type PostsCreateResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r PostsCreateResponse) Status() string {
+func (r PostCreateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2719,7 +2593,7 @@ func (r PostsCreateResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostsCreateResponse) StatusCode() int {
+func (r PostCreateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2852,14 +2726,6 @@ func (c *ClientWithResponses) AuthPasswordSigninWithResponse(ctx context.Context
 	return ParseAuthPasswordSigninResponse(rsp)
 }
 
-func (c *ClientWithResponses) AuthPasswordSigninWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSigninFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error) {
-	rsp, err := c.AuthPasswordSigninWithFormdataBody(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAuthPasswordSigninResponse(rsp)
-}
-
 // AuthPasswordSignupWithBodyWithResponse request with arbitrary body returning *AuthPasswordSignupResponse
 func (c *ClientWithResponses) AuthPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
 	rsp, err := c.AuthPasswordSignupWithBody(ctx, contentType, body, reqEditors...)
@@ -2871,14 +2737,6 @@ func (c *ClientWithResponses) AuthPasswordSignupWithBodyWithResponse(ctx context
 
 func (c *ClientWithResponses) AuthPasswordSignupWithResponse(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
 	rsp, err := c.AuthPasswordSignup(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAuthPasswordSignupResponse(rsp)
-}
-
-func (c *ClientWithResponses) AuthPasswordSignupWithFormdataBodyWithResponse(ctx context.Context, body AuthPasswordSignupFormdataRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error) {
-	rsp, err := c.AuthPasswordSignupWithFormdataBody(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2937,90 +2795,74 @@ func (c *ClientWithResponses) WebAuthnRequestCredentialWithResponse(ctx context.
 	return ParseWebAuthnRequestCredentialResponse(rsp)
 }
 
-// CategoriesListWithResponse request returning *CategoriesListResponse
-func (c *ClientWithResponses) CategoriesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CategoriesListResponse, error) {
-	rsp, err := c.CategoriesList(ctx, reqEditors...)
+// CategoryListWithResponse request returning *CategoryListResponse
+func (c *ClientWithResponses) CategoryListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CategoryListResponse, error) {
+	rsp, err := c.CategoryList(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCategoriesListResponse(rsp)
+	return ParseCategoryListResponse(rsp)
 }
 
-// ProfilesGetWithResponse request returning *ProfilesGetResponse
-func (c *ClientWithResponses) ProfilesGetWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*ProfilesGetResponse, error) {
-	rsp, err := c.ProfilesGet(ctx, accountHandle, reqEditors...)
+// ProfileGetWithResponse request returning *ProfileGetResponse
+func (c *ClientWithResponses) ProfileGetWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*ProfileGetResponse, error) {
+	rsp, err := c.ProfileGet(ctx, accountHandle, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseProfilesGetResponse(rsp)
+	return ParseProfileGetResponse(rsp)
 }
 
-// ThreadsListWithResponse request returning *ThreadsListResponse
-func (c *ClientWithResponses) ThreadsListWithResponse(ctx context.Context, params *ThreadsListParams, reqEditors ...RequestEditorFn) (*ThreadsListResponse, error) {
-	rsp, err := c.ThreadsList(ctx, params, reqEditors...)
+// ThreadListWithResponse request returning *ThreadListResponse
+func (c *ClientWithResponses) ThreadListWithResponse(ctx context.Context, params *ThreadListParams, reqEditors ...RequestEditorFn) (*ThreadListResponse, error) {
+	rsp, err := c.ThreadList(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseThreadsListResponse(rsp)
+	return ParseThreadListResponse(rsp)
 }
 
-// ThreadsCreateWithBodyWithResponse request with arbitrary body returning *ThreadsCreateResponse
-func (c *ClientWithResponses) ThreadsCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
-	rsp, err := c.ThreadsCreateWithBody(ctx, contentType, body, reqEditors...)
+// ThreadCreateWithBodyWithResponse request with arbitrary body returning *ThreadCreateResponse
+func (c *ClientWithResponses) ThreadCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadCreateResponse, error) {
+	rsp, err := c.ThreadCreateWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseThreadsCreateResponse(rsp)
+	return ParseThreadCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) ThreadsCreateWithResponse(ctx context.Context, body ThreadsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
-	rsp, err := c.ThreadsCreate(ctx, body, reqEditors...)
+func (c *ClientWithResponses) ThreadCreateWithResponse(ctx context.Context, body ThreadCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadCreateResponse, error) {
+	rsp, err := c.ThreadCreate(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseThreadsCreateResponse(rsp)
+	return ParseThreadCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) ThreadsCreateWithFormdataBodyWithResponse(ctx context.Context, body ThreadsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*ThreadsCreateResponse, error) {
-	rsp, err := c.ThreadsCreateWithFormdataBody(ctx, body, reqEditors...)
+// ThreadGetWithResponse request returning *ThreadGetResponse
+func (c *ClientWithResponses) ThreadGetWithResponse(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*ThreadGetResponse, error) {
+	rsp, err := c.ThreadGet(ctx, threadMark, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseThreadsCreateResponse(rsp)
+	return ParseThreadGetResponse(rsp)
 }
 
-// ThreadsGetWithResponse request returning *ThreadsGetResponse
-func (c *ClientWithResponses) ThreadsGetWithResponse(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*ThreadsGetResponse, error) {
-	rsp, err := c.ThreadsGet(ctx, threadMark, reqEditors...)
+// PostCreateWithBodyWithResponse request with arbitrary body returning *PostCreateResponse
+func (c *ClientWithResponses) PostCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateResponse, error) {
+	rsp, err := c.PostCreateWithBody(ctx, threadMark, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseThreadsGetResponse(rsp)
+	return ParsePostCreateResponse(rsp)
 }
 
-// PostsCreateWithBodyWithResponse request with arbitrary body returning *PostsCreateResponse
-func (c *ClientWithResponses) PostsCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreateWithBody(ctx, threadMark, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PostCreateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostCreateResponse, error) {
+	rsp, err := c.PostCreate(ctx, threadMark, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParsePostsCreateResponse(rsp)
-}
-
-func (c *ClientWithResponses) PostsCreateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreate(ctx, threadMark, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostsCreateResponse(rsp)
-}
-
-func (c *ClientWithResponses) PostsCreateWithFormdataBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, body PostsCreateFormdataRequestBody, reqEditors ...RequestEditorFn) (*PostsCreateResponse, error) {
-	rsp, err := c.PostsCreateWithFormdataBody(ctx, threadMark, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePostsCreateResponse(rsp)
+	return ParsePostCreateResponse(rsp)
 }
 
 // GetVersionWithResponse request returning *GetVersionResponse
@@ -3458,15 +3300,15 @@ func ParseWebAuthnRequestCredentialResponse(rsp *http.Response) (*WebAuthnReques
 	return response, nil
 }
 
-// ParseCategoriesListResponse parses an HTTP response from a CategoriesListWithResponse call
-func ParseCategoriesListResponse(rsp *http.Response) (*CategoriesListResponse, error) {
+// ParseCategoryListResponse parses an HTTP response from a CategoryListWithResponse call
+func ParseCategoryListResponse(rsp *http.Response) (*CategoryListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CategoriesListResponse{
+	response := &CategoryListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3491,15 +3333,15 @@ func ParseCategoriesListResponse(rsp *http.Response) (*CategoriesListResponse, e
 	return response, nil
 }
 
-// ParseProfilesGetResponse parses an HTTP response from a ProfilesGetWithResponse call
-func ParseProfilesGetResponse(rsp *http.Response) (*ProfilesGetResponse, error) {
+// ParseProfileGetResponse parses an HTTP response from a ProfileGetWithResponse call
+func ParseProfileGetResponse(rsp *http.Response) (*ProfileGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ProfilesGetResponse{
+	response := &ProfileGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3524,15 +3366,15 @@ func ParseProfilesGetResponse(rsp *http.Response) (*ProfilesGetResponse, error) 
 	return response, nil
 }
 
-// ParseThreadsListResponse parses an HTTP response from a ThreadsListWithResponse call
-func ParseThreadsListResponse(rsp *http.Response) (*ThreadsListResponse, error) {
+// ParseThreadListResponse parses an HTTP response from a ThreadListWithResponse call
+func ParseThreadListResponse(rsp *http.Response) (*ThreadListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ThreadsListResponse{
+	response := &ThreadListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3559,15 +3401,15 @@ func ParseThreadsListResponse(rsp *http.Response) (*ThreadsListResponse, error) 
 	return response, nil
 }
 
-// ParseThreadsCreateResponse parses an HTTP response from a ThreadsCreateWithResponse call
-func ParseThreadsCreateResponse(rsp *http.Response) (*ThreadsCreateResponse, error) {
+// ParseThreadCreateResponse parses an HTTP response from a ThreadCreateWithResponse call
+func ParseThreadCreateResponse(rsp *http.Response) (*ThreadCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ThreadsCreateResponse{
+	response := &ThreadCreateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3592,15 +3434,15 @@ func ParseThreadsCreateResponse(rsp *http.Response) (*ThreadsCreateResponse, err
 	return response, nil
 }
 
-// ParseThreadsGetResponse parses an HTTP response from a ThreadsGetWithResponse call
-func ParseThreadsGetResponse(rsp *http.Response) (*ThreadsGetResponse, error) {
+// ParseThreadGetResponse parses an HTTP response from a ThreadGetWithResponse call
+func ParseThreadGetResponse(rsp *http.Response) (*ThreadGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ThreadsGetResponse{
+	response := &ThreadGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3625,15 +3467,15 @@ func ParseThreadsGetResponse(rsp *http.Response) (*ThreadsGetResponse, error) {
 	return response, nil
 }
 
-// ParsePostsCreateResponse parses an HTTP response from a PostsCreateWithResponse call
-func ParsePostsCreateResponse(rsp *http.Response) (*PostsCreateResponse, error) {
+// ParsePostCreateResponse parses an HTTP response from a PostCreateWithResponse call
+func ParsePostCreateResponse(rsp *http.Response) (*PostCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostsCreateResponse{
+	response := &PostCreateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3720,22 +3562,22 @@ type ServerInterface interface {
 	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandleParam) error
 
 	// (GET /v1/categories)
-	CategoriesList(ctx echo.Context) error
+	CategoryList(ctx echo.Context) error
 
 	// (GET /v1/profiles/{account_handle})
-	ProfilesGet(ctx echo.Context, accountHandle AccountHandleParam) error
+	ProfileGet(ctx echo.Context, accountHandle AccountHandleParam) error
 
 	// (GET /v1/threads)
-	ThreadsList(ctx echo.Context, params ThreadsListParams) error
+	ThreadList(ctx echo.Context, params ThreadListParams) error
 
 	// (POST /v1/threads)
-	ThreadsCreate(ctx echo.Context) error
+	ThreadCreate(ctx echo.Context) error
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_mark})
-	ThreadsGet(ctx echo.Context, threadMark ThreadMarkParam) error
+	ThreadGet(ctx echo.Context, threadMark ThreadMarkParam) error
 
 	// (POST /v1/threads/{thread_mark}/posts)
-	PostsCreate(ctx echo.Context, threadMark ThreadMarkParam) error
+	PostCreate(ctx echo.Context, threadMark ThreadMarkParam) error
 	// Get the software version string.
 	// (GET /version)
 	GetVersion(ctx echo.Context) error
@@ -3912,17 +3754,17 @@ func (w *ServerInterfaceWrapper) WebAuthnRequestCredential(ctx echo.Context) err
 	return err
 }
 
-// CategoriesList converts echo context to params.
-func (w *ServerInterfaceWrapper) CategoriesList(ctx echo.Context) error {
+// CategoryList converts echo context to params.
+func (w *ServerInterfaceWrapper) CategoryList(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.CategoriesList(ctx)
+	err = w.Handler.CategoryList(ctx)
 	return err
 }
 
-// ProfilesGet converts echo context to params.
-func (w *ServerInterfaceWrapper) ProfilesGet(ctx echo.Context) error {
+// ProfileGet converts echo context to params.
+func (w *ServerInterfaceWrapper) ProfileGet(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "account_handle" -------------
 	var accountHandle AccountHandleParam
@@ -3933,16 +3775,16 @@ func (w *ServerInterfaceWrapper) ProfilesGet(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ProfilesGet(ctx, accountHandle)
+	err = w.Handler.ProfileGet(ctx, accountHandle)
 	return err
 }
 
-// ThreadsList converts echo context to params.
-func (w *ServerInterfaceWrapper) ThreadsList(ctx echo.Context) error {
+// ThreadList converts echo context to params.
+func (w *ServerInterfaceWrapper) ThreadList(ctx echo.Context) error {
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params ThreadsListParams
+	var params ThreadListParams
 	// ------------- Optional query parameter "author" -------------
 
 	err = runtime.BindQueryParameter("form", true, false, "author", ctx.QueryParams(), &params.Author)
@@ -3958,23 +3800,23 @@ func (w *ServerInterfaceWrapper) ThreadsList(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ThreadsList(ctx, params)
+	err = w.Handler.ThreadList(ctx, params)
 	return err
 }
 
-// ThreadsCreate converts echo context to params.
-func (w *ServerInterfaceWrapper) ThreadsCreate(ctx echo.Context) error {
+// ThreadCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) ThreadCreate(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ThreadsCreate(ctx)
+	err = w.Handler.ThreadCreate(ctx)
 	return err
 }
 
-// ThreadsGet converts echo context to params.
-func (w *ServerInterfaceWrapper) ThreadsGet(ctx echo.Context) error {
+// ThreadGet converts echo context to params.
+func (w *ServerInterfaceWrapper) ThreadGet(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "thread_mark" -------------
 	var threadMark ThreadMarkParam
@@ -3985,12 +3827,12 @@ func (w *ServerInterfaceWrapper) ThreadsGet(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.ThreadsGet(ctx, threadMark)
+	err = w.Handler.ThreadGet(ctx, threadMark)
 	return err
 }
 
-// PostsCreate converts echo context to params.
-func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
+// PostCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) PostCreate(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "thread_mark" -------------
 	var threadMark ThreadMarkParam
@@ -4003,7 +3845,7 @@ func (w *ServerInterfaceWrapper) PostsCreate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.PostsCreate(ctx, threadMark)
+	err = w.Handler.PostCreate(ctx, threadMark)
 	return err
 }
 
@@ -4058,12 +3900,12 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
 	router.POST(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
 	router.GET(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
-	router.GET(baseURL+"/v1/categories", wrapper.CategoriesList)
-	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfilesGet)
-	router.GET(baseURL+"/v1/threads", wrapper.ThreadsList)
-	router.POST(baseURL+"/v1/threads", wrapper.ThreadsCreate)
-	router.GET(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadsGet)
-	router.POST(baseURL+"/v1/threads/:thread_mark/posts", wrapper.PostsCreate)
+	router.GET(baseURL+"/v1/categories", wrapper.CategoryList)
+	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfileGet)
+	router.GET(baseURL+"/v1/threads", wrapper.ThreadList)
+	router.POST(baseURL+"/v1/threads", wrapper.ThreadCreate)
+	router.GET(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadGet)
+	router.POST(baseURL+"/v1/threads/:thread_mark/posts", wrapper.PostCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
@@ -4094,22 +3936,22 @@ type AuthSuccessOKJSONResponse struct {
 type BadRequestResponse struct {
 }
 
-type CategoriesListOKJSONResponse CategoryList
+type CategoryListOKJSONResponse CategoryList
 
 type InternalServerErrorJSONResponse APIError
 
 type NotFoundResponse struct {
 }
 
-type PostsCreateOKJSONResponse Post
+type PostCreateOKJSONResponse Post
 
-type ProfilesGetOKJSONResponse PublicProfile
+type ProfileGetOKJSONResponse PublicProfile
 
-type ThreadsCreateOKJSONResponse Thread
+type ThreadCreateOKJSONResponse Thread
 
-type ThreadsGetJSONResponse Thread
+type ThreadGetJSONResponse Thread
 
-type ThreadsListOKJSONResponse struct {
+type ThreadListOKJSONResponse struct {
 	Threads ThreadList `json:"threads"`
 }
 
@@ -4451,8 +4293,7 @@ func (response OAuthProviderCallbackdefaultJSONResponse) VisitOAuthProviderCallb
 }
 
 type AuthPasswordSigninRequestObject struct {
-	JSONBody     *AuthPasswordSigninJSONRequestBody
-	FormdataBody *AuthPasswordSigninFormdataRequestBody
+	Body *AuthPasswordSigninJSONRequestBody
 }
 
 type AuthPasswordSigninResponseObject interface {
@@ -4496,8 +4337,7 @@ func (response AuthPasswordSignindefaultJSONResponse) VisitAuthPasswordSigninRes
 }
 
 type AuthPasswordSignupRequestObject struct {
-	JSONBody     *AuthPasswordSignupJSONRequestBody
-	FormdataBody *AuthPasswordSignupFormdataRequestBody
+	Body *AuthPasswordSignupJSONRequestBody
 }
 
 type AuthPasswordSignupResponseObject interface {
@@ -4699,246 +4539,244 @@ func (response WebAuthnRequestCredentialdefaultJSONResponse) VisitWebAuthnReques
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type CategoriesListRequestObject struct {
+type CategoryListRequestObject struct {
 }
 
-type CategoriesListResponseObject interface {
-	VisitCategoriesListResponse(w http.ResponseWriter) error
+type CategoryListResponseObject interface {
+	VisitCategoryListResponse(w http.ResponseWriter) error
 }
 
-type CategoriesList200JSONResponse struct{ CategoriesListOKJSONResponse }
+type CategoryList200JSONResponse struct{ CategoryListOKJSONResponse }
 
-func (response CategoriesList200JSONResponse) VisitCategoriesListResponse(w http.ResponseWriter) error {
+func (response CategoryList200JSONResponse) VisitCategoryListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CategoriesListdefaultJSONResponse struct {
+type CategoryListdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response CategoriesListdefaultJSONResponse) VisitCategoriesListResponse(w http.ResponseWriter) error {
+func (response CategoryListdefaultJSONResponse) VisitCategoryListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ProfilesGetRequestObject struct {
+type ProfileGetRequestObject struct {
 	AccountHandle AccountHandleParam `json:"account_handle"`
 }
 
-type ProfilesGetResponseObject interface {
-	VisitProfilesGetResponse(w http.ResponseWriter) error
+type ProfileGetResponseObject interface {
+	VisitProfileGetResponse(w http.ResponseWriter) error
 }
 
-type ProfilesGet200JSONResponse struct{ ProfilesGetOKJSONResponse }
+type ProfileGet200JSONResponse struct{ ProfileGetOKJSONResponse }
 
-func (response ProfilesGet200JSONResponse) VisitProfilesGetResponse(w http.ResponseWriter) error {
+func (response ProfileGet200JSONResponse) VisitProfileGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ProfilesGet401Response = UnauthorisedResponse
+type ProfileGet401Response = UnauthorisedResponse
 
-func (response ProfilesGet401Response) VisitProfilesGetResponse(w http.ResponseWriter) error {
+func (response ProfileGet401Response) VisitProfileGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type ProfilesGet404Response = NotFoundResponse
+type ProfileGet404Response = NotFoundResponse
 
-func (response ProfilesGet404Response) VisitProfilesGetResponse(w http.ResponseWriter) error {
+func (response ProfileGet404Response) VisitProfileGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type ProfilesGetdefaultJSONResponse struct {
+type ProfileGetdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response ProfilesGetdefaultJSONResponse) VisitProfilesGetResponse(w http.ResponseWriter) error {
+func (response ProfileGetdefaultJSONResponse) VisitProfileGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ThreadsListRequestObject struct {
-	Params ThreadsListParams
+type ThreadListRequestObject struct {
+	Params ThreadListParams
 }
 
-type ThreadsListResponseObject interface {
-	VisitThreadsListResponse(w http.ResponseWriter) error
+type ThreadListResponseObject interface {
+	VisitThreadListResponse(w http.ResponseWriter) error
 }
 
-type ThreadsList200JSONResponse struct{ ThreadsListOKJSONResponse }
+type ThreadList200JSONResponse struct{ ThreadListOKJSONResponse }
 
-func (response ThreadsList200JSONResponse) VisitThreadsListResponse(w http.ResponseWriter) error {
+func (response ThreadList200JSONResponse) VisitThreadListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ThreadsList401Response = UnauthorisedResponse
+type ThreadList401Response = UnauthorisedResponse
 
-func (response ThreadsList401Response) VisitThreadsListResponse(w http.ResponseWriter) error {
+func (response ThreadList401Response) VisitThreadListResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type ThreadsList404Response = NotFoundResponse
+type ThreadList404Response = NotFoundResponse
 
-func (response ThreadsList404Response) VisitThreadsListResponse(w http.ResponseWriter) error {
+func (response ThreadList404Response) VisitThreadListResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type ThreadsListdefaultJSONResponse struct {
+type ThreadListdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response ThreadsListdefaultJSONResponse) VisitThreadsListResponse(w http.ResponseWriter) error {
+func (response ThreadListdefaultJSONResponse) VisitThreadListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ThreadsCreateRequestObject struct {
-	JSONBody     *ThreadsCreateJSONRequestBody
-	FormdataBody *ThreadsCreateFormdataRequestBody
+type ThreadCreateRequestObject struct {
+	Body *ThreadCreateJSONRequestBody
 }
 
-type ThreadsCreateResponseObject interface {
-	VisitThreadsCreateResponse(w http.ResponseWriter) error
+type ThreadCreateResponseObject interface {
+	VisitThreadCreateResponse(w http.ResponseWriter) error
 }
 
-type ThreadsCreate200JSONResponse struct{ ThreadsCreateOKJSONResponse }
+type ThreadCreate200JSONResponse struct{ ThreadCreateOKJSONResponse }
 
-func (response ThreadsCreate200JSONResponse) VisitThreadsCreateResponse(w http.ResponseWriter) error {
+func (response ThreadCreate200JSONResponse) VisitThreadCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ThreadsCreate401Response = UnauthorisedResponse
+type ThreadCreate401Response = UnauthorisedResponse
 
-func (response ThreadsCreate401Response) VisitThreadsCreateResponse(w http.ResponseWriter) error {
+func (response ThreadCreate401Response) VisitThreadCreateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type ThreadsCreate404Response = NotFoundResponse
+type ThreadCreate404Response = NotFoundResponse
 
-func (response ThreadsCreate404Response) VisitThreadsCreateResponse(w http.ResponseWriter) error {
+func (response ThreadCreate404Response) VisitThreadCreateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type ThreadsCreatedefaultJSONResponse struct {
+type ThreadCreatedefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response ThreadsCreatedefaultJSONResponse) VisitThreadsCreateResponse(w http.ResponseWriter) error {
+func (response ThreadCreatedefaultJSONResponse) VisitThreadCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ThreadsGetRequestObject struct {
+type ThreadGetRequestObject struct {
 	ThreadMark ThreadMarkParam `json:"thread_mark"`
 }
 
-type ThreadsGetResponseObject interface {
-	VisitThreadsGetResponse(w http.ResponseWriter) error
+type ThreadGetResponseObject interface {
+	VisitThreadGetResponse(w http.ResponseWriter) error
 }
 
-type ThreadsGet200JSONResponse struct{ ThreadsGetJSONResponse }
+type ThreadGet200JSONResponse struct{ ThreadGetJSONResponse }
 
-func (response ThreadsGet200JSONResponse) VisitThreadsGetResponse(w http.ResponseWriter) error {
+func (response ThreadGet200JSONResponse) VisitThreadGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ThreadsGet401Response = UnauthorisedResponse
+type ThreadGet401Response = UnauthorisedResponse
 
-func (response ThreadsGet401Response) VisitThreadsGetResponse(w http.ResponseWriter) error {
+func (response ThreadGet401Response) VisitThreadGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type ThreadsGet404Response = NotFoundResponse
+type ThreadGet404Response = NotFoundResponse
 
-func (response ThreadsGet404Response) VisitThreadsGetResponse(w http.ResponseWriter) error {
+func (response ThreadGet404Response) VisitThreadGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type ThreadsGetdefaultJSONResponse struct {
+type ThreadGetdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response ThreadsGetdefaultJSONResponse) VisitThreadsGetResponse(w http.ResponseWriter) error {
+func (response ThreadGetdefaultJSONResponse) VisitThreadGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type PostsCreateRequestObject struct {
-	ThreadMark   ThreadMarkParam `json:"thread_mark"`
-	JSONBody     *PostsCreateJSONRequestBody
-	FormdataBody *PostsCreateFormdataRequestBody
+type PostCreateRequestObject struct {
+	ThreadMark ThreadMarkParam `json:"thread_mark"`
+	Body       *PostCreateJSONRequestBody
 }
 
-type PostsCreateResponseObject interface {
-	VisitPostsCreateResponse(w http.ResponseWriter) error
+type PostCreateResponseObject interface {
+	VisitPostCreateResponse(w http.ResponseWriter) error
 }
 
-type PostsCreate200JSONResponse struct{ PostsCreateOKJSONResponse }
+type PostCreate200JSONResponse struct{ PostCreateOKJSONResponse }
 
-func (response PostsCreate200JSONResponse) VisitPostsCreateResponse(w http.ResponseWriter) error {
+func (response PostCreate200JSONResponse) VisitPostCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PostsCreate401Response = UnauthorisedResponse
+type PostCreate401Response = UnauthorisedResponse
 
-func (response PostsCreate401Response) VisitPostsCreateResponse(w http.ResponseWriter) error {
+func (response PostCreate401Response) VisitPostCreateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type PostsCreate404Response = NotFoundResponse
+type PostCreate404Response = NotFoundResponse
 
-func (response PostsCreate404Response) VisitPostsCreateResponse(w http.ResponseWriter) error {
+func (response PostCreate404Response) VisitPostCreateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type PostsCreatedefaultJSONResponse struct {
+type PostCreatedefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response PostsCreatedefaultJSONResponse) VisitPostsCreateResponse(w http.ResponseWriter) error {
+func (response PostCreatedefaultJSONResponse) VisitPostCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -5008,22 +4846,22 @@ type StrictServerInterface interface {
 	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
 
 	// (GET /v1/categories)
-	CategoriesList(ctx context.Context, request CategoriesListRequestObject) (CategoriesListResponseObject, error)
+	CategoryList(ctx context.Context, request CategoryListRequestObject) (CategoryListResponseObject, error)
 
 	// (GET /v1/profiles/{account_handle})
-	ProfilesGet(ctx context.Context, request ProfilesGetRequestObject) (ProfilesGetResponseObject, error)
+	ProfileGet(ctx context.Context, request ProfileGetRequestObject) (ProfileGetResponseObject, error)
 
 	// (GET /v1/threads)
-	ThreadsList(ctx context.Context, request ThreadsListRequestObject) (ThreadsListResponseObject, error)
+	ThreadList(ctx context.Context, request ThreadListRequestObject) (ThreadListResponseObject, error)
 
 	// (POST /v1/threads)
-	ThreadsCreate(ctx context.Context, request ThreadsCreateRequestObject) (ThreadsCreateResponseObject, error)
+	ThreadCreate(ctx context.Context, request ThreadCreateRequestObject) (ThreadCreateResponseObject, error)
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_mark})
-	ThreadsGet(ctx context.Context, request ThreadsGetRequestObject) (ThreadsGetResponseObject, error)
+	ThreadGet(ctx context.Context, request ThreadGetRequestObject) (ThreadGetResponseObject, error)
 
 	// (POST /v1/threads/{thread_mark}/posts)
-	PostsCreate(ctx context.Context, request PostsCreateRequestObject) (PostsCreateResponseObject, error)
+	PostCreate(ctx context.Context, request PostCreateRequestObject) (PostCreateResponseObject, error)
 	// Get the software version string.
 	// (GET /version)
 	GetVersion(ctx context.Context, request GetVersionRequestObject) (GetVersionResponseObject, error)
@@ -5248,24 +5086,11 @@ func (sh *strictHandler) OAuthProviderCallback(ctx echo.Context, oauthProvider O
 func (sh *strictHandler) AuthPasswordSignin(ctx echo.Context) error {
 	var request AuthPasswordSigninRequestObject
 
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body AuthPasswordSigninJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+	var body AuthPasswordSigninJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body AuthPasswordSigninFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.AuthPasswordSignin(ctx.Request().Context(), request.(AuthPasswordSigninRequestObject))
@@ -5290,24 +5115,11 @@ func (sh *strictHandler) AuthPasswordSignin(ctx echo.Context) error {
 func (sh *strictHandler) AuthPasswordSignup(ctx echo.Context) error {
 	var request AuthPasswordSignupRequestObject
 
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body AuthPasswordSignupJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+	var body AuthPasswordSignupJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body AuthPasswordSignupFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.AuthPasswordSignup(ctx.Request().Context(), request.(AuthPasswordSignupRequestObject))
@@ -5436,183 +5248,158 @@ func (sh *strictHandler) WebAuthnRequestCredential(ctx echo.Context, accountHand
 	return nil
 }
 
-// CategoriesList operation middleware
-func (sh *strictHandler) CategoriesList(ctx echo.Context) error {
-	var request CategoriesListRequestObject
+// CategoryList operation middleware
+func (sh *strictHandler) CategoryList(ctx echo.Context) error {
+	var request CategoryListRequestObject
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CategoriesList(ctx.Request().Context(), request.(CategoriesListRequestObject))
+		return sh.ssi.CategoryList(ctx.Request().Context(), request.(CategoryListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CategoriesList")
+		handler = middleware(handler, "CategoryList")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(CategoriesListResponseObject); ok {
-		return validResponse.VisitCategoriesListResponse(ctx.Response())
+	} else if validResponse, ok := response.(CategoryListResponseObject); ok {
+		return validResponse.VisitCategoryListResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// ProfilesGet operation middleware
-func (sh *strictHandler) ProfilesGet(ctx echo.Context, accountHandle AccountHandleParam) error {
-	var request ProfilesGetRequestObject
+// ProfileGet operation middleware
+func (sh *strictHandler) ProfileGet(ctx echo.Context, accountHandle AccountHandleParam) error {
+	var request ProfileGetRequestObject
 
 	request.AccountHandle = accountHandle
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ProfilesGet(ctx.Request().Context(), request.(ProfilesGetRequestObject))
+		return sh.ssi.ProfileGet(ctx.Request().Context(), request.(ProfileGetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ProfilesGet")
+		handler = middleware(handler, "ProfileGet")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ProfilesGetResponseObject); ok {
-		return validResponse.VisitProfilesGetResponse(ctx.Response())
+	} else if validResponse, ok := response.(ProfileGetResponseObject); ok {
+		return validResponse.VisitProfileGetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// ThreadsList operation middleware
-func (sh *strictHandler) ThreadsList(ctx echo.Context, params ThreadsListParams) error {
-	var request ThreadsListRequestObject
+// ThreadList operation middleware
+func (sh *strictHandler) ThreadList(ctx echo.Context, params ThreadListParams) error {
+	var request ThreadListRequestObject
 
 	request.Params = params
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ThreadsList(ctx.Request().Context(), request.(ThreadsListRequestObject))
+		return sh.ssi.ThreadList(ctx.Request().Context(), request.(ThreadListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ThreadsList")
+		handler = middleware(handler, "ThreadList")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ThreadsListResponseObject); ok {
-		return validResponse.VisitThreadsListResponse(ctx.Response())
+	} else if validResponse, ok := response.(ThreadListResponseObject); ok {
+		return validResponse.VisitThreadListResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// ThreadsCreate operation middleware
-func (sh *strictHandler) ThreadsCreate(ctx echo.Context) error {
-	var request ThreadsCreateRequestObject
+// ThreadCreate operation middleware
+func (sh *strictHandler) ThreadCreate(ctx echo.Context) error {
+	var request ThreadCreateRequestObject
 
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body ThreadsCreateJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+	var body ThreadCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body ThreadsCreateFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ThreadsCreate(ctx.Request().Context(), request.(ThreadsCreateRequestObject))
+		return sh.ssi.ThreadCreate(ctx.Request().Context(), request.(ThreadCreateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ThreadsCreate")
+		handler = middleware(handler, "ThreadCreate")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ThreadsCreateResponseObject); ok {
-		return validResponse.VisitThreadsCreateResponse(ctx.Response())
+	} else if validResponse, ok := response.(ThreadCreateResponseObject); ok {
+		return validResponse.VisitThreadCreateResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// ThreadsGet operation middleware
-func (sh *strictHandler) ThreadsGet(ctx echo.Context, threadMark ThreadMarkParam) error {
-	var request ThreadsGetRequestObject
+// ThreadGet operation middleware
+func (sh *strictHandler) ThreadGet(ctx echo.Context, threadMark ThreadMarkParam) error {
+	var request ThreadGetRequestObject
 
 	request.ThreadMark = threadMark
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ThreadsGet(ctx.Request().Context(), request.(ThreadsGetRequestObject))
+		return sh.ssi.ThreadGet(ctx.Request().Context(), request.(ThreadGetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ThreadsGet")
+		handler = middleware(handler, "ThreadGet")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ThreadsGetResponseObject); ok {
-		return validResponse.VisitThreadsGetResponse(ctx.Response())
+	} else if validResponse, ok := response.(ThreadGetResponseObject); ok {
+		return validResponse.VisitThreadGetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// PostsCreate operation middleware
-func (sh *strictHandler) PostsCreate(ctx echo.Context, threadMark ThreadMarkParam) error {
-	var request PostsCreateRequestObject
+// PostCreate operation middleware
+func (sh *strictHandler) PostCreate(ctx echo.Context, threadMark ThreadMarkParam) error {
+	var request PostCreateRequestObject
 
 	request.ThreadMark = threadMark
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/json") {
-		var body PostsCreateJSONRequestBody
-		if err := ctx.Bind(&body); err != nil {
-			return err
-		}
-		request.JSONBody = &body
+
+	var body PostCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
 	}
-	if strings.HasPrefix(ctx.Request().Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-		if form, err := ctx.FormParams(); err == nil {
-			var body PostsCreateFormdataRequestBody
-			if err := runtime.BindForm(&body, form, nil, nil); err != nil {
-				return err
-			}
-			request.FormdataBody = &body
-		} else {
-			return err
-		}
-	}
+	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.PostsCreate(ctx.Request().Context(), request.(PostsCreateRequestObject))
+		return sh.ssi.PostCreate(ctx.Request().Context(), request.(PostCreateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "PostsCreate")
+		handler = middleware(handler, "PostCreate")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(PostsCreateResponseObject); ok {
-		return validResponse.VisitPostsCreateResponse(ctx.Response())
+	} else if validResponse, ok := response.(PostCreateResponseObject); ok {
+		return validResponse.VisitPostCreateResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
@@ -5645,94 +5432,93 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

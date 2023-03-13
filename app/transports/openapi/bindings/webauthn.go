@@ -272,7 +272,7 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 			return openapi.PublicKeyCredentialDescriptorTransports(t)
 		})
 		return openapi.PublicKeyCredentialDescriptor{
-			Type:       openapi.PublicKeyCredentialDescriptorType(d.Type),
+			Type:       openapi.PublicKeyCredentialType(d.Type),
 			Id:         string(d.CredentialID),
 			Transports: &transports,
 		}
@@ -312,7 +312,7 @@ func serialiseWebAuthnCredentialRequestOptions(cred protocol.PublicKeyCredential
 		return openapi.PublicKeyCredentialDescriptor{
 			Id:         string(id),
 			Transports: &transports,
-			Type:       openapi.PublicKeyCredentialDescriptorType(cd.Type),
+			Type:       openapi.PublicKeyCredentialType(cd.Type),
 		}
 	})
 

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useAccountsGet } from "src/api/openapi/accounts";
+import { useAccountGet } from "src/api/openapi/accounts";
 import { Account } from "src/api/openapi/schemas";
 
 const PRIVATE_PAGES = ["/settings"];
@@ -16,7 +16,7 @@ type UseAuthProvider = {
 
 export function useAuthProvider(): UseAuthProvider {
   const { push, pathname } = useRouter();
-  const account = useAccountsGet();
+  const account = useAccountGet();
 
   const loggedIn = Boolean(account.data) && !account.error;
   const firstTime = account.data === undefined && account.error === undefined;

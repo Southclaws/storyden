@@ -11,6 +11,10 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/migrate"
 	"github.com/rs/xid"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -20,10 +24,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
-
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -71,6 +71,55 @@ func (c *Client) init() {
 	c.Role = NewRoleClient(c.config)
 	c.Subscription = NewSubscriptionClient(c.config)
 	c.Tag = NewTagClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -169,29 +218,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Account.Use(hooks...)
-	c.Authentication.Use(hooks...)
-	c.Category.Use(hooks...)
-	c.Notification.Use(hooks...)
-	c.Post.Use(hooks...)
-	c.React.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.Subscription.Use(hooks...)
-	c.Tag.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Account, c.Authentication, c.Category, c.Notification, c.Post, c.React,
+		c.Role, c.Subscription, c.Tag,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Account.Intercept(interceptors...)
-	c.Authentication.Intercept(interceptors...)
-	c.Category.Intercept(interceptors...)
-	c.Notification.Intercept(interceptors...)
-	c.Post.Intercept(interceptors...)
-	c.React.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.Subscription.Intercept(interceptors...)
-	c.Tag.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Account, c.Authentication, c.Category, c.Notification, c.Post, c.React,
+		c.Role, c.Subscription, c.Tag,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -236,7 +279,7 @@ func (c *AccountClient) Use(hooks ...Hook) {
 	c.hooks.Account = append(c.hooks.Account, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `account.Intercept(f(g(h())))`.
 func (c *AccountClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Account = append(c.inters.Account, interceptors...)
@@ -294,6 +337,7 @@ func (c *AccountClient) DeleteOneID(id xid.ID) *AccountDeleteOne {
 func (c *AccountClient) Query() *AccountQuery {
 	return &AccountQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeAccount},
 		inters: c.Interceptors(),
 	}
 }
@@ -449,7 +493,7 @@ func (c *AuthenticationClient) Use(hooks ...Hook) {
 	c.hooks.Authentication = append(c.hooks.Authentication, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `authentication.Intercept(f(g(h())))`.
 func (c *AuthenticationClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Authentication = append(c.inters.Authentication, interceptors...)
@@ -507,6 +551,7 @@ func (c *AuthenticationClient) DeleteOneID(id xid.ID) *AuthenticationDeleteOne {
 func (c *AuthenticationClient) Query() *AuthenticationQuery {
 	return &AuthenticationQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeAuthentication},
 		inters: c.Interceptors(),
 	}
 }
@@ -582,7 +627,7 @@ func (c *CategoryClient) Use(hooks ...Hook) {
 	c.hooks.Category = append(c.hooks.Category, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `category.Intercept(f(g(h())))`.
 func (c *CategoryClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Category = append(c.inters.Category, interceptors...)
@@ -640,6 +685,7 @@ func (c *CategoryClient) DeleteOneID(id xid.ID) *CategoryDeleteOne {
 func (c *CategoryClient) Query() *CategoryQuery {
 	return &CategoryQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCategory},
 		inters: c.Interceptors(),
 	}
 }
@@ -715,7 +761,7 @@ func (c *NotificationClient) Use(hooks ...Hook) {
 	c.hooks.Notification = append(c.hooks.Notification, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `notification.Intercept(f(g(h())))`.
 func (c *NotificationClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Notification = append(c.inters.Notification, interceptors...)
@@ -773,6 +819,7 @@ func (c *NotificationClient) DeleteOneID(id xid.ID) *NotificationDeleteOne {
 func (c *NotificationClient) Query() *NotificationQuery {
 	return &NotificationQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeNotification},
 		inters: c.Interceptors(),
 	}
 }
@@ -848,7 +895,7 @@ func (c *PostClient) Use(hooks ...Hook) {
 	c.hooks.Post = append(c.hooks.Post, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `post.Intercept(f(g(h())))`.
 func (c *PostClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Post = append(c.inters.Post, interceptors...)
@@ -906,6 +953,7 @@ func (c *PostClient) DeleteOneID(id xid.ID) *PostDeleteOne {
 func (c *PostClient) Query() *PostQuery {
 	return &PostQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypePost},
 		inters: c.Interceptors(),
 	}
 }
@@ -1093,7 +1141,7 @@ func (c *ReactClient) Use(hooks ...Hook) {
 	c.hooks.React = append(c.hooks.React, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `react.Intercept(f(g(h())))`.
 func (c *ReactClient) Intercept(interceptors ...Interceptor) {
 	c.inters.React = append(c.inters.React, interceptors...)
@@ -1151,6 +1199,7 @@ func (c *ReactClient) DeleteOneID(id xid.ID) *ReactDeleteOne {
 func (c *ReactClient) Query() *ReactQuery {
 	return &ReactQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeReact},
 		inters: c.Interceptors(),
 	}
 }
@@ -1242,7 +1291,7 @@ func (c *RoleClient) Use(hooks ...Hook) {
 	c.hooks.Role = append(c.hooks.Role, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `role.Intercept(f(g(h())))`.
 func (c *RoleClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Role = append(c.inters.Role, interceptors...)
@@ -1300,6 +1349,7 @@ func (c *RoleClient) DeleteOneID(id xid.ID) *RoleDeleteOne {
 func (c *RoleClient) Query() *RoleQuery {
 	return &RoleQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeRole},
 		inters: c.Interceptors(),
 	}
 }
@@ -1375,7 +1425,7 @@ func (c *SubscriptionClient) Use(hooks ...Hook) {
 	c.hooks.Subscription = append(c.hooks.Subscription, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `subscription.Intercept(f(g(h())))`.
 func (c *SubscriptionClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Subscription = append(c.inters.Subscription, interceptors...)
@@ -1433,6 +1483,7 @@ func (c *SubscriptionClient) DeleteOneID(id xid.ID) *SubscriptionDeleteOne {
 func (c *SubscriptionClient) Query() *SubscriptionQuery {
 	return &SubscriptionQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubscription},
 		inters: c.Interceptors(),
 	}
 }
@@ -1524,7 +1575,7 @@ func (c *TagClient) Use(hooks ...Hook) {
 	c.hooks.Tag = append(c.hooks.Tag, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `tag.Intercept(f(g(h())))`.
 func (c *TagClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Tag = append(c.inters.Tag, interceptors...)
@@ -1582,6 +1633,7 @@ func (c *TagClient) DeleteOneID(id xid.ID) *TagDeleteOne {
 func (c *TagClient) Query() *TagQuery {
 	return &TagQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeTag},
 		inters: c.Interceptors(),
 	}
 }
@@ -1656,3 +1708,15 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 		return nil, fmt.Errorf("ent: unknown Tag mutation op: %q", m.Op())
 	}
 }
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Account, Authentication, Category, Notification, Post, React, Role,
+		Subscription, Tag []ent.Hook
+	}
+	inters struct {
+		Account, Authentication, Category, Notification, Post, React, Role,
+		Subscription, Tag []ent.Interceptor
+	}
+)

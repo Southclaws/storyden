@@ -33,39 +33,31 @@ func NewThreads(
 	return Threads{thread_svc, thread_mark_svc, account_repo}
 }
 
-func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
-	params := func() openapi.ThreadsCreate {
-		if request.FormdataBody != nil {
-			return *request.FormdataBody
-		} else {
-			return *request.JSONBody
-		}
-	}()
-
+func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreateRequestObject) (openapi.ThreadCreateResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	var meta map[string]any
-	if params.Meta != nil {
-		meta = *params.Meta
+	if request.Body.Meta != nil {
+		meta = *request.Body.Meta
 	}
 
 	thread, err := i.thread_svc.Create(ctx,
-		params.Title,
-		params.Body,
+		request.Body.Title,
+		request.Body.Body,
 		accountID,
-		category.CategoryID(openapi.ParseID(params.Category)),
-		dt.Map(params.Tags, func(t openapi.Tag) string { return string(t.Id) }),
+		category.CategoryID(openapi.ParseID(request.Body.Category)),
+		dt.Map(request.Body.Tags, func(t openapi.Tag) string { return string(t.Id) }),
 		meta,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsCreate200JSONResponse{
-		ThreadsCreateOKJSONResponse: openapi.ThreadsCreateOKJSONResponse(serialiseThread(thread)),
+	return openapi.ThreadCreate200JSONResponse{
+		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 
@@ -73,7 +65,7 @@ func reacts(reacts []*react.React) []openapi.React {
 	return (dt.Map(reacts, serialiseReact))
 }
 
-func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRequestObject) (openapi.ThreadsListResponseObject, error) {
+func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequestObject) (openapi.ThreadListResponseObject, error) {
 	// optionally map from OpenAPI account handle type to AccountID type.
 	author, err := openapi.OptionalID(ctx, i.account_repo, request.Params.Author)
 	if err != nil {
@@ -95,14 +87,14 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsList200JSONResponse{
-		ThreadsListOKJSONResponse: openapi.ThreadsListOKJSONResponse{
+	return openapi.ThreadList200JSONResponse{
+		ThreadListOKJSONResponse: openapi.ThreadListOKJSONResponse{
 			Threads: dt.Map(threads, serialiseThreadReference),
 		},
 	}, nil
 }
 
-func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequestObject) (openapi.ThreadsGetResponseObject, error) {
+func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetRequestObject) (openapi.ThreadGetResponseObject, error) {
 	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -113,7 +105,7 @@ func (i *Threads) ThreadsGet(ctx context.Context, request openapi.ThreadsGetRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.ThreadsGet200JSONResponse{
-		ThreadsGetJSONResponse: openapi.ThreadsGetJSONResponse(serialiseThread(thread)),
+	return openapi.ThreadGet200JSONResponse{
+		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(serialiseThread(thread)),
 	}, nil
 }

@@ -10,4 +10,4 @@ import type { CategoryList } from "./categoryList";
 /**
  * OK
  */
-export type CategoriesListOKResponse = CategoryList;
+export type CategoryListOKResponse = CategoryList;

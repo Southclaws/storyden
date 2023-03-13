@@ -139,19 +139,19 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 
 // QueryAccount queries the "account" edge of the Subscription entity.
 func (s *Subscription) QueryAccount() *AccountQuery {
-	return (&SubscriptionClient{config: s.config}).QueryAccount(s)
+	return NewSubscriptionClient(s.config).QueryAccount(s)
 }
 
 // QueryNotifications queries the "notifications" edge of the Subscription entity.
 func (s *Subscription) QueryNotifications() *NotificationQuery {
-	return (&SubscriptionClient{config: s.config}).QueryNotifications(s)
+	return NewSubscriptionClient(s.config).QueryNotifications(s)
 }
 
 // Update returns a builder for updating this Subscription.
 // Note that you need to call Subscription.Unwrap() before calling this method if this Subscription
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (s *Subscription) Update() *SubscriptionUpdateOne {
-	return (&SubscriptionClient{config: s.config}).UpdateOne(s)
+	return NewSubscriptionClient(s.config).UpdateOne(s)
 }
 
 // Unwrap unwraps the Subscription entity that was returned from a transaction after it was closed,
@@ -184,9 +184,3 @@ func (s *Subscription) String() string {
 
 // Subscriptions is a parsable slice of Subscription.
 type Subscriptions []*Subscription
-
-func (s Subscriptions) config(cfg config) {
-	for _i := range s {
-		s[_i].config = cfg
-	}
-}

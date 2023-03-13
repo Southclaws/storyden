@@ -335,13 +335,13 @@ paths:
 
   /v1/categories:
     get:
-      operationId: CategoriesList
+      operationId: CategoryList
       description: Get a list of all categories on the site.
       security: []
       tags: [categories]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoriesListOK" }
+        "200": { $ref: "#/components/responses/CategoryListOK" }
 
   #
   # 888    888                                    888
@@ -356,18 +356,18 @@ paths:
 
   /v1/threads:
     post:
-      operationId: ThreadsCreate
+      operationId: ThreadCreate
       description: Create a new thread within the specified category.
       tags: [threads]
-      requestBody: { $ref: "#/components/requestBodies/ThreadsCreate" }
+      requestBody: { $ref: "#/components/requestBodies/ThreadCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadsCreateOK" }
+        "200": { $ref: "#/components/responses/ThreadCreateOK" }
 
     get:
-      operationId: ThreadsList
+      operationId: ThreadList
       description: Get a list of all threads.
       tags: [threads]
       security: []
@@ -386,11 +386,11 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadsListOK" }
+        "200": { $ref: "#/components/responses/ThreadListOK" }
 
   /v1/threads/{thread_mark}:
     get:
-      operationId: ThreadsGet
+      operationId: ThreadGet
       summary: Get information about a thread and the posts within the thread.
       description: |
         Get information about a thread such as its title, author, when it was
@@ -402,7 +402,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadsGet" }
+        "200": { $ref: "#/components/responses/ThreadGet" }
 
   #
   #                             888
@@ -420,20 +420,20 @@ paths:
 
   /v1/threads/{thread_mark}/posts:
     post:
-      operationId: PostsCreate
+      operationId: PostCreate
       description: Create a new post within a thread.
       tags: [posts]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/PostsCreate" }
+      requestBody: { $ref: "#/components/requestBodies/PostCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostsCreateOK" }
+        "200": { $ref: "#/components/responses/PostCreateOK" }
 
   # /v1/threads/{thread_id}/posts/{post_id}:
   #   get:
-  #     operationId: PostsGet
+  #     operationId: PostGet
   #     description: Get the data for a single post.
   #     tags: [posts]
   #     responses:
@@ -525,12 +525,12 @@ components:
             type: string
             format: binary
 
-    ThreadsCreate:
+    ThreadCreate:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ThreadMutableProps" }
 
-    PostsCreate:
+    PostCreate:
       description: Create a post within a thread.
       content:
         application/json:
@@ -633,21 +633,21 @@ components:
           schema:
             $ref: "#/components/schemas/PublicProfile"
 
-    CategoriesListOK:
+    CategoryListOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CategoryList"
 
-    ThreadsCreateOK:
+    ThreadCreateOK:
       description: Thread created.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Thread"
 
-    ThreadsListOK:
+    ThreadListOK:
       description: List of all threads.
       content:
         application/json:
@@ -657,13 +657,13 @@ components:
             properties:
               threads: { $ref: "#/components/schemas/ThreadList" }
 
-    ThreadsGet:
+    ThreadGet:
       description: The information about a thread and its posts.
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
 
-    PostsCreateOK:
+    PostCreateOK:
       description: Thread post created successfully.
       content:
         application/json:

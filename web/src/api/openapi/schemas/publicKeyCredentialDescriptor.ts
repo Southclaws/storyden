@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PublicKeyCredentialDescriptorType } from "./publicKeyCredentialDescriptorType";
+import type { PublicKeyCredentialType } from "./publicKeyCredentialType";
 import type { PublicKeyCredentialDescriptorTransportsItem } from "./publicKeyCredentialDescriptorTransportsItem";
 
 /**
@@ -13,7 +13,7 @@ import type { PublicKeyCredentialDescriptorTransportsItem } from "./publicKeyCre
 
  */
 export interface PublicKeyCredentialDescriptor {
-  type: PublicKeyCredentialDescriptorType;
+  type: PublicKeyCredentialType;
   id: string;
   transports?: PublicKeyCredentialDescriptorTransportsItem[];
 }

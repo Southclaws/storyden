@@ -20,11 +20,8 @@ import (
 // ReactQuery is the builder for querying React entities.
 type ReactQuery struct {
 	config
-	limit       *int
-	offset      *int
-	unique      *bool
+	ctx         *QueryContext
 	order       []OrderFunc
-	fields      []string
 	inters      []Interceptor
 	predicates  []predicate.React
 	withAccount *AccountQuery
@@ -44,20 +41,20 @@ func (rq *ReactQuery) Where(ps ...predicate.React) *ReactQuery {
 
 // Limit the number of records to be returned by this query.
 func (rq *ReactQuery) Limit(limit int) *ReactQuery {
-	rq.limit = &limit
+	rq.ctx.Limit = &limit
 	return rq
 }
 
 // Offset to start from.
 func (rq *ReactQuery) Offset(offset int) *ReactQuery {
-	rq.offset = &offset
+	rq.ctx.Offset = &offset
 	return rq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (rq *ReactQuery) Unique(unique bool) *ReactQuery {
-	rq.unique = &unique
+	rq.ctx.Unique = &unique
 	return rq
 }
 
@@ -114,7 +111,7 @@ func (rq *ReactQuery) QueryPost() *PostQuery {
 // First returns the first React entity from the query.
 // Returns a *NotFoundError when no React was found.
 func (rq *ReactQuery) First(ctx context.Context) (*React, error) {
-	nodes, err := rq.Limit(1).All(newQueryContext(ctx, TypeReact, "First"))
+	nodes, err := rq.Limit(1).All(setContextOp(ctx, rq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +134,7 @@ func (rq *ReactQuery) FirstX(ctx context.Context) *React {
 // Returns a *NotFoundError when no React ID was found.
 func (rq *ReactQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = rq.Limit(1).IDs(newQueryContext(ctx, TypeReact, "FirstID")); err != nil {
+	if ids, err = rq.Limit(1).IDs(setContextOp(ctx, rq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -160,7 +157,7 @@ func (rq *ReactQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one React entity is found.
 // Returns a *NotFoundError when no React entities are found.
 func (rq *ReactQuery) Only(ctx context.Context) (*React, error) {
-	nodes, err := rq.Limit(2).All(newQueryContext(ctx, TypeReact, "Only"))
+	nodes, err := rq.Limit(2).All(setContextOp(ctx, rq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +185,7 @@ func (rq *ReactQuery) OnlyX(ctx context.Context) *React {
 // Returns a *NotFoundError when no entities are found.
 func (rq *ReactQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = rq.Limit(2).IDs(newQueryContext(ctx, TypeReact, "OnlyID")); err != nil {
+	if ids, err = rq.Limit(2).IDs(setContextOp(ctx, rq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -213,7 +210,7 @@ func (rq *ReactQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of Reacts.
 func (rq *ReactQuery) All(ctx context.Context) ([]*React, error) {
-	ctx = newQueryContext(ctx, TypeReact, "All")
+	ctx = setContextOp(ctx, rq.ctx, "All")
 	if err := rq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,10 +228,12 @@ func (rq *ReactQuery) AllX(ctx context.Context) []*React {
 }
 
 // IDs executes the query and returns a list of React IDs.
-func (rq *ReactQuery) IDs(ctx context.Context) ([]xid.ID, error) {
-	var ids []xid.ID
-	ctx = newQueryContext(ctx, TypeReact, "IDs")
-	if err := rq.Select(react.FieldID).Scan(ctx, &ids); err != nil {
+func (rq *ReactQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if rq.ctx.Unique == nil && rq.path != nil {
+		rq.Unique(true)
+	}
+	ctx = setContextOp(ctx, rq.ctx, "IDs")
+	if err = rq.Select(react.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -251,7 +250,7 @@ func (rq *ReactQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (rq *ReactQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeReact, "Count")
+	ctx = setContextOp(ctx, rq.ctx, "Count")
 	if err := rq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -269,7 +268,7 @@ func (rq *ReactQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (rq *ReactQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeReact, "Exist")
+	ctx = setContextOp(ctx, rq.ctx, "Exist")
 	switch _, err := rq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -297,17 +296,15 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 	}
 	return &ReactQuery{
 		config:      rq.config,
-		limit:       rq.limit,
-		offset:      rq.offset,
+		ctx:         rq.ctx.Clone(),
 		order:       append([]OrderFunc{}, rq.order...),
 		inters:      append([]Interceptor{}, rq.inters...),
 		predicates:  append([]predicate.React{}, rq.predicates...),
 		withAccount: rq.withAccount.Clone(),
 		withPost:    rq.withPost.Clone(),
 		// clone intermediate query.
-		sql:    rq.sql.Clone(),
-		path:   rq.path,
-		unique: rq.unique,
+		sql:  rq.sql.Clone(),
+		path: rq.path,
 	}
 }
 
@@ -348,9 +345,9 @@ func (rq *ReactQuery) WithPost(opts ...func(*PostQuery)) *ReactQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
-	rq.fields = append([]string{field}, fields...)
+	rq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ReactGroupBy{build: rq}
-	grbuild.flds = &rq.fields
+	grbuild.flds = &rq.ctx.Fields
 	grbuild.label = react.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -369,10 +366,10 @@ func (rq *ReactQuery) GroupBy(field string, fields ...string) *ReactGroupBy {
 //		Select(react.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (rq *ReactQuery) Select(fields ...string) *ReactSelect {
-	rq.fields = append(rq.fields, fields...)
+	rq.ctx.Fields = append(rq.ctx.Fields, fields...)
 	sbuild := &ReactSelect{ReactQuery: rq}
 	sbuild.label = react.Label
-	sbuild.flds, sbuild.scan = &rq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &rq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -392,7 +389,7 @@ func (rq *ReactQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range rq.fields {
+	for _, f := range rq.ctx.Fields {
 		if !react.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -472,6 +469,9 @@ func (rq *ReactQuery) loadAccount(ctx context.Context, query *AccountQuery, node
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(account.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -501,6 +501,9 @@ func (rq *ReactQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*R
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(post.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -523,30 +526,22 @@ func (rq *ReactQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(rq.modifiers) > 0 {
 		_spec.Modifiers = rq.modifiers
 	}
-	_spec.Node.Columns = rq.fields
-	if len(rq.fields) > 0 {
-		_spec.Unique = rq.unique != nil && *rq.unique
+	_spec.Node.Columns = rq.ctx.Fields
+	if len(rq.ctx.Fields) > 0 {
+		_spec.Unique = rq.ctx.Unique != nil && *rq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, rq.driver, _spec)
 }
 
 func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   react.Table,
-			Columns: react.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: react.FieldID,
-			},
-		},
-		From:   rq.sql,
-		Unique: true,
-	}
-	if unique := rq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
+	_spec.From = rq.sql
+	if unique := rq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if rq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := rq.fields; len(fields) > 0 {
+	if fields := rq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, react.FieldID)
 		for i := range fields {
@@ -562,10 +557,10 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := rq.limit; limit != nil {
+	if limit := rq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := rq.offset; offset != nil {
+	if offset := rq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := rq.order; len(ps) > 0 {
@@ -581,7 +576,7 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 func (rq *ReactQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(rq.driver.Dialect())
 	t1 := builder.Table(react.Table)
-	columns := rq.fields
+	columns := rq.ctx.Fields
 	if len(columns) == 0 {
 		columns = react.Columns
 	}
@@ -590,7 +585,7 @@ func (rq *ReactQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = rq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if rq.unique != nil && *rq.unique {
+	if rq.ctx.Unique != nil && *rq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range rq.modifiers {
@@ -602,12 +597,12 @@ func (rq *ReactQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range rq.order {
 		p(selector)
 	}
-	if offset := rq.offset; offset != nil {
+	if offset := rq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := rq.limit; limit != nil {
+	if limit := rq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -633,7 +628,7 @@ func (rgb *ReactGroupBy) Aggregate(fns ...AggregateFunc) *ReactGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (rgb *ReactGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeReact, "GroupBy")
+	ctx = setContextOp(ctx, rgb.build.ctx, "GroupBy")
 	if err := rgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -681,7 +676,7 @@ func (rs *ReactSelect) Aggregate(fns ...AggregateFunc) *ReactSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (rs *ReactSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeReact, "Select")
+	ctx = setContextOp(ctx, rs.ctx, "Select")
 	if err := rs.prepareQuery(ctx); err != nil {
 		return err
 	}

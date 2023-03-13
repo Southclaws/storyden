@@ -8,7 +8,7 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  ProfilesGetOKResponse,
+  ProfileGetOKResponse,
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
@@ -18,31 +18,31 @@ import { fetcher } from "../client";
 /**
  * Get a public profile by ID.
  */
-export const profilesGet = (accountHandle: string) => {
-  return fetcher<ProfilesGetOKResponse>({
+export const profileGet = (accountHandle: string) => {
+  return fetcher<ProfileGetOKResponse>({
     url: `/v1/profiles/${accountHandle}`,
     method: "get",
   });
 };
 
-export const getProfilesGetKey = (accountHandle: string) => [
+export const getProfileGetKey = (accountHandle: string) => [
   `/v1/profiles/${accountHandle}`,
 ];
 
-export type ProfilesGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof profilesGet>>
+export type ProfileGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof profileGet>>
 >;
-export type ProfilesGetQueryError =
+export type ProfileGetQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useProfilesGet = <
+export const useProfileGet = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
   accountHandle: string,
   options?: {
-    swr?: SWRConfiguration<Awaited<ReturnType<typeof profilesGet>>, TError> & {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof profileGet>>, TError> & {
       swrKey?: Key;
       enabled?: boolean;
     };
@@ -53,8 +53,8 @@ export const useProfilesGet = <
   const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getProfilesGetKey(accountHandle) : null));
-  const swrFn = () => profilesGet(accountHandle);
+    (() => (isEnabled ? getProfileGetKey(accountHandle) : null));
+  const swrFn = () => profileGet(accountHandle);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

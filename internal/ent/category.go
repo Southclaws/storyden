@@ -139,14 +139,14 @@ func (c *Category) assignValues(columns []string, values []any) error {
 
 // QueryPosts queries the "posts" edge of the Category entity.
 func (c *Category) QueryPosts() *PostQuery {
-	return (&CategoryClient{config: c.config}).QueryPosts(c)
+	return NewCategoryClient(c.config).QueryPosts(c)
 }
 
 // Update returns a builder for updating this Category.
 // Note that you need to call Category.Unwrap() before calling this method if this Category
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Category) Update() *CategoryUpdateOne {
-	return (&CategoryClient{config: c.config}).UpdateOne(c)
+	return NewCategoryClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Category entity that was returned from a transaction after it was closed,
@@ -191,9 +191,3 @@ func (c *Category) String() string {
 
 // Categories is a parsable slice of Category.
 type Categories []*Category
-
-func (c Categories) config(cfg config) {
-	for _i := range c {
-		c[_i].config = cfg
-	}
-}

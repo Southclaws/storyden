@@ -142,16 +142,7 @@ func (tu *TagUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpdate 
 }
 
 func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   tag.Table,
-			Columns: tag.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: tag.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -366,6 +357,12 @@ func (tuo *TagUpdateOne) RemoveAccounts(a ...*Account) *TagUpdateOne {
 	return tuo.RemoveAccountIDs(ids...)
 }
 
+// Where appends a list predicates to the TagUpdate builder.
+func (tuo *TagUpdateOne) Where(ps ...predicate.Tag) *TagUpdateOne {
+	tuo.mutation.Where(ps...)
+	return tuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (tuo *TagUpdateOne) Select(field string, fields ...string) *TagUpdateOne {
@@ -407,16 +404,7 @@ func (tuo *TagUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpd
 }
 
 func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   tag.Table,
-			Columns: tag.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: tag.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
 	id, ok := tuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Tag.id" for update`)}

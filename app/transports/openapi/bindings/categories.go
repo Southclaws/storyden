@@ -21,14 +21,14 @@ func NewCategories(
 	return Categories{category_repo}
 }
 
-func (c Categories) CategoriesList(ctx context.Context, request openapi.CategoriesListRequestObject) (openapi.CategoriesListResponseObject, error) {
+func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryListRequestObject) (openapi.CategoryListResponseObject, error) {
 	cats, err := c.category_repo.GetCategories(ctx, false)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.CategoriesList200JSONResponse{
-		CategoriesListOKJSONResponse: openapi.CategoriesListOKJSONResponse{
+	return openapi.CategoryList200JSONResponse{
+		CategoryListOKJSONResponse: openapi.CategoryListOKJSONResponse{
 			Categories: dt.Map(cats, serialiseCategory),
 		},
 	}, nil

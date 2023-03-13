@@ -8,7 +8,7 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  CategoriesListOKResponse,
+  CategoryListOKResponse,
   InternalServerErrorResponse,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -16,24 +16,24 @@ import { fetcher } from "../client";
 /**
  * Get a list of all categories on the site.
  */
-export const categoriesList = () => {
-  return fetcher<CategoriesListOKResponse>({
+export const categoryList = () => {
+  return fetcher<CategoryListOKResponse>({
     url: `/v1/categories`,
     method: "get",
   });
 };
 
-export const getCategoriesListKey = () => [`/v1/categories`];
+export const getCategoryListKey = () => [`/v1/categories`];
 
-export type CategoriesListQueryResult = NonNullable<
-  Awaited<ReturnType<typeof categoriesList>>
+export type CategoryListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof categoryList>>
 >;
-export type CategoriesListQueryError = InternalServerErrorResponse;
+export type CategoryListQueryError = InternalServerErrorResponse;
 
-export const useCategoriesList = <
+export const useCategoryList = <
   TError = InternalServerErrorResponse
 >(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof categoriesList>>, TError> & {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof categoryList>>, TError> & {
     swrKey?: Key;
     enabled?: boolean;
   };
@@ -42,8 +42,8 @@ export const useCategoriesList = <
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getCategoriesListKey() : null));
-  const swrFn = () => categoriesList();
+    swrOptions?.swrKey ?? (() => (isEnabled ? getCategoryListKey() : null));
+  const swrFn = () => categoryList();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

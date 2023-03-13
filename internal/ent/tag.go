@@ -106,19 +106,19 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 
 // QueryPosts queries the "posts" edge of the Tag entity.
 func (t *Tag) QueryPosts() *PostQuery {
-	return (&TagClient{config: t.config}).QueryPosts(t)
+	return NewTagClient(t.config).QueryPosts(t)
 }
 
 // QueryAccounts queries the "accounts" edge of the Tag entity.
 func (t *Tag) QueryAccounts() *AccountQuery {
-	return (&TagClient{config: t.config}).QueryAccounts(t)
+	return NewTagClient(t.config).QueryAccounts(t)
 }
 
 // Update returns a builder for updating this Tag.
 // Note that you need to call Tag.Unwrap() before calling this method if this Tag
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (t *Tag) Update() *TagUpdateOne {
-	return (&TagClient{config: t.config}).UpdateOne(t)
+	return NewTagClient(t.config).UpdateOne(t)
 }
 
 // Unwrap unwraps the Tag entity that was returned from a transaction after it was closed,
@@ -148,9 +148,3 @@ func (t *Tag) String() string {
 
 // Tags is a parsable slice of Tag.
 type Tags []*Tag
-
-func (t Tags) config(cfg config) {
-	for _i := range t {
-		t[_i].config = cfg
-	}
-}

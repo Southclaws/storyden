@@ -10,15 +10,7 @@ import (
 )
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
-	params := func() openapi.AuthPassword {
-		if request.JSONBody != nil {
-			return *request.JSONBody
-		} else {
-			return *request.FormdataBody
-		}
-	}()
-
-	u, err := i.p.Login(ctx, params.Identifier, params.Token)
+	u, err := i.p.Login(ctx, request.Body.Identifier, request.Body.Token)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -37,15 +29,7 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 }
 
 func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) (openapi.AuthPasswordSignupResponseObject, error) {
-	params := func() openapi.AuthPassword {
-		if request.JSONBody != nil {
-			return *request.JSONBody
-		} else {
-			return *request.FormdataBody
-		}
-	}()
-
-	u, err := i.p.Register(ctx, params.Identifier, params.Token)
+	u, err := i.p.Register(ctx, request.Body.Identifier, request.Body.Token)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

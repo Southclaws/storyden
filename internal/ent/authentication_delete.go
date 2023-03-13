@@ -40,15 +40,7 @@ func (ad *AuthenticationDelete) ExecX(ctx context.Context) int {
 }
 
 func (ad *AuthenticationDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: authentication.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeString,
-				Column: authentication.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(authentication.Table, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
 	if ps := ad.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type AuthenticationDeleteOne struct {
 	ad *AuthenticationDelete
 }
 
+// Where appends a list predicates to the AuthenticationDelete builder.
+func (ado *AuthenticationDeleteOne) Where(ps ...predicate.Authentication) *AuthenticationDeleteOne {
+	ado.ad.mutation.Where(ps...)
+	return ado
+}
+
 // Exec executes the deletion query.
 func (ado *AuthenticationDeleteOne) Exec(ctx context.Context) error {
 	n, err := ado.ad.Exec(ctx)
@@ -84,5 +82,7 @@ func (ado *AuthenticationDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (ado *AuthenticationDeleteOne) ExecX(ctx context.Context) {
-	ado.ad.ExecX(ctx)
+	if err := ado.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

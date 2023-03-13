@@ -23,7 +23,7 @@ func NewPosts(post_svc post_service.Service, thread_mark_svc thread_mark.Service
 	return Posts{post_svc, thread_mark_svc}
 }
 
-func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequestObject) (openapi.PostsCreateResponseObject, error) {
+func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateRequestObject) (openapi.PostCreateResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -34,28 +34,20 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	params := func() openapi.PostsCreate {
-		if request.FormdataBody != nil {
-			return *request.FormdataBody
-		} else {
-			return *request.JSONBody
-		}
-	}()
-
 	var reply optional.Optional[post.PostID]
 
-	if params.ReplyTo != nil {
-		tm := openapi.ParseID(*params.ReplyTo)
+	if request.Body.ReplyTo != nil {
+		tm := openapi.ParseID(*request.Body.ReplyTo)
 		reply = optional.Of(post.PostID(tm))
 	}
 
 	var meta map[string]any
-	if params.Meta != nil {
-		meta = *params.Meta
+	if request.Body.Meta != nil {
+		meta = *request.Body.Meta
 	}
 
 	post, err := p.post_svc.Create(ctx,
-		params.Body,
+		request.Body.Body,
 		accountID,
 		postID,
 		reply,
@@ -65,7 +57,7 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.PostsCreate200JSONResponse{
-		PostsCreateOKJSONResponse: openapi.PostsCreateOKJSONResponse(serialisePost(post)),
+	return openapi.PostCreate200JSONResponse{
+		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(serialisePost(post)),
 	}, nil
 }
