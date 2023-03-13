@@ -50,7 +50,7 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 	)
 
 	return openapi.AuthProviderList200JSONResponse{
-		AuthProviderListJSONResponse: openapi.AuthProviderListJSONResponse{
+		AuthProviderListOKJSONResponse: openapi.AuthProviderListOKJSONResponse{
 			Providers: list,
 		},
 	}, nil

@@ -24,7 +24,7 @@ func NewAccounts(as account.Service, av avatar.Service, ar account_repo.Reposito
 	return Accounts{as, av, ar}
 }
 
-func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetRequestObject) (openapi.AccountsGetResponseObject, error) {
+func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -35,12 +35,12 @@ func (i *Accounts) AccountsGet(ctx context.Context, request openapi.AccountsGetR
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsGet200JSONResponse{
-		AccountsGetSuccessJSONResponse: openapi.AccountsGetSuccessJSONResponse(serialiseAccount(acc)),
+	return openapi.AccountGet200JSONResponse{
+		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse(serialiseAccount(acc)),
 	}, nil
 }
 
-func (i *Accounts) AccountsUpdate(ctx context.Context, request openapi.AccountsUpdateRequestObject) (openapi.AccountsUpdateResponseObject, error) {
+func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpdateRequestObject) (openapi.AccountUpdateResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -56,12 +56,12 @@ func (i *Accounts) AccountsUpdate(ctx context.Context, request openapi.AccountsU
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsUpdate200JSONResponse{
-		AccountsUpdateSuccessJSONResponse: openapi.AccountsUpdateSuccessJSONResponse(serialiseAccount(acc)),
+	return openapi.AccountUpdate200JSONResponse{
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
 	}, nil
 }
 
-func (i *Accounts) AccountsGetAvatar(ctx context.Context, request openapi.AccountsGetAvatarRequestObject) (openapi.AccountsGetAvatarResponseObject, error) {
+func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.AccountGetAvatarRequestObject) (openapi.AccountGetAvatarResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -72,14 +72,14 @@ func (i *Accounts) AccountsGetAvatar(ctx context.Context, request openapi.Accoun
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsGetAvatar200ImagepngResponse{
-		AccountsGetAvatarImagepngResponse: openapi.AccountsGetAvatarImagepngResponse{
+	return openapi.AccountGetAvatar200ImagepngResponse{
+		AccountGetAvatarImagepngResponse: openapi.AccountGetAvatarImagepngResponse{
 			Body: r,
 		},
 	}, nil
 }
 
-func (i *Accounts) AccountsSetAvatar(ctx context.Context, request openapi.AccountsSetAvatarRequestObject) (openapi.AccountsSetAvatarResponseObject, error) {
+func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.AccountSetAvatarRequestObject) (openapi.AccountSetAvatarResponseObject, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -89,5 +89,5 @@ func (i *Accounts) AccountsSetAvatar(ctx context.Context, request openapi.Accoun
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountsSetAvatar200Response{}, nil
+	return openapi.AccountSetAvatar200Response{}, nil
 }

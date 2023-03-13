@@ -5,6 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AuthProvider } from "./authProvider";
+import type { ThreadList } from "./threadList";
 
-export type AuthProviderListBody = AuthProvider[];
+export type ThreadsListOKResponse = {
+  threads: ThreadList;
+};

@@ -8,17 +8,17 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  AuthProviderListResponse,
+  AuthProviderListOKResponse,
   BadRequestResponse,
   InternalServerErrorResponse,
-  AuthSuccessResponse,
+  AuthSuccessOKResponse,
   AuthPasswordBody,
   UnauthorisedResponse,
   NotFoundResponse,
-  AuthOAuthProviderCallbackBody,
-  WebAuthnRequestCredentialSuccessResponse,
+  OAuthProviderCallbackBody,
+  WebAuthnRequestCredentialOKResponse,
   WebAuthnMakeCredentialBody,
-  WebAuthnGetAssertionSuccessResponse,
+  WebAuthnGetAssertionOKResponse,
   WebAuthnMakeAssertionBody,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -30,7 +30,10 @@ endpoint tells a client which auth capabilities are enabled.
 
  */
 export const authProviderList = () => {
-  return fetcher<AuthProviderListResponse>({ url: `/v1/auth`, method: "get" });
+  return fetcher<AuthProviderListOKResponse>({
+    url: `/v1/auth`,
+    method: "get",
+  });
 };
 
 export const getAuthProviderListKey = () => [`/v1/auth`];
@@ -73,7 +76,7 @@ export const useAuthProviderList = <
  * Register a new account with a username and password.
  */
 export const authPasswordSignup = (authPasswordBody: AuthPasswordBody) => {
-  return fetcher<AuthSuccessResponse>({
+  return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/password/signup`,
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -85,7 +88,7 @@ export const authPasswordSignup = (authPasswordBody: AuthPasswordBody) => {
  * Sign in to an existing account with a username and password.
  */
 export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
-  return fetcher<AuthSuccessResponse>({
+  return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/password/signin`,
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -96,15 +99,15 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
 /**
  * Sign in to an existing account with a username and password.
  */
-export const authOAuthProviderCallback = (
+export const oAuthProviderCallback = (
   oauthProvider: string,
-  authOAuthProviderCallbackBody: AuthOAuthProviderCallbackBody
+  oAuthProviderCallbackBody: OAuthProviderCallbackBody
 ) => {
-  return fetcher<AuthSuccessResponse>({
+  return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/oauth/${oauthProvider}/callback`,
     method: "post",
     headers: { "Content-Type": "application/json" },
-    data: authOAuthProviderCallbackBody,
+    data: oAuthProviderCallbackBody,
   });
 };
 
@@ -113,7 +116,7 @@ export const authOAuthProviderCallback = (
 
  */
 export const webAuthnRequestCredential = (accountHandle: string) => {
-  return fetcher<WebAuthnRequestCredentialSuccessResponse>({
+  return fetcher<WebAuthnRequestCredentialOKResponse>({
     url: `/v1/auth/webauthn/make/${accountHandle}`,
     method: "get",
   });
@@ -167,7 +170,7 @@ export const useWebAuthnRequestCredential = <
 export const webAuthnMakeCredential = (
   webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody
 ) => {
-  return fetcher<AuthSuccessResponse>({
+  return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/webauthn/make`,
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -179,7 +182,7 @@ export const webAuthnMakeCredential = (
  * Start the WebAuthn assertion for an existing account.
  */
 export const webAuthnGetAssertion = (accountHandle: string) => {
-  return fetcher<WebAuthnGetAssertionSuccessResponse>({
+  return fetcher<WebAuthnGetAssertionOKResponse>({
     url: `/v1/auth/webauthn/assert/${accountHandle}`,
     method: "get",
   });
@@ -234,7 +237,7 @@ export const useWebAuthnGetAssertion = <
 export const webAuthnMakeAssertion = (
   webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
 ) => {
-  return fetcher<AuthSuccessResponse>({
+  return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/webauthn/assert`,
     method: "post",
     headers: { "Content-Type": "application/json" },

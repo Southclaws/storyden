@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
+
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 )
 
 var (

@@ -130,11 +130,8 @@ type Account struct {
 // AccountHandle The unique @ handle of an account.
 type AccountHandle = string
 
-// AccountName The account owners display name.
-type AccountName = string
-
-// AccountsUpdateBody defines model for AccountsUpdateBody.
-type AccountsUpdateBody struct {
+// AccountMutableProps defines model for AccountMutableProps.
+type AccountMutableProps struct {
 	Bio *string `json:"bio,omitempty"`
 
 	// Handle The unique @ handle of an account.
@@ -147,17 +144,14 @@ type AccountsUpdateBody struct {
 	Name *AccountName `json:"name,omitempty"`
 }
 
+// AccountName The account owners display name.
+type AccountName = string
+
 // AttestationConveyancePreference https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
 type AttestationConveyancePreference string
 
-// AuthOAuthProviderCallbackBody defines model for AuthOAuthProviderCallbackBody.
-type AuthOAuthProviderCallbackBody struct {
-	Code  string `json:"code"`
-	State string `json:"state"`
-}
-
-// AuthPasswordBody defines model for AuthPasswordBody.
-type AuthPasswordBody struct {
+// AuthPair defines model for AuthPair.
+type AuthPair struct {
 	Identifier string `json:"identifier"`
 	Token      string `json:"token"`
 }
@@ -177,11 +171,11 @@ type AuthProvider struct {
 	Provider string `json:"provider"`
 }
 
-// AuthProviderListBody defines model for AuthProviderListBody.
-type AuthProviderListBody = []AuthProvider
+// AuthProviderList defines model for AuthProviderList.
+type AuthProviderList = []AuthProvider
 
-// AuthSuccessBody defines model for AuthSuccessBody.
-type AuthSuccessBody struct {
+// AuthSuccess defines model for AuthSuccess.
+type AuthSuccess struct {
 	Id string `json:"id"`
 }
 
@@ -293,6 +287,12 @@ type Identifier = string
 
 // Metadata Arbitrary metadata for the resource.
 type Metadata map[string]interface{}
+
+// OAuthCallback defines model for OAuthCallback.
+type OAuthCallback struct {
+	Code  string `json:"code"`
+	State string `json:"state"`
+}
 
 // Post defines model for Post.
 type Post struct {
@@ -572,6 +572,24 @@ type ThreadList = []ThreadReference
 //	as the identifier for that thread.
 type ThreadMark = string
 
+// ThreadMutableProps defines model for ThreadMutableProps.
+type ThreadMutableProps struct {
+	// Body The body text of a post within a thread.
+	Body PostBodyMarkdown `json:"body"`
+
+	// Category A unique identifier for this resource.
+	Category Identifier `json:"category"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Tags A list of tags.
+	Tags TagList `json:"tags"`
+
+	// Title The title of a thread.
+	Title ThreadTitle `json:"title"`
+}
+
 // ThreadReference defines model for ThreadReference.
 type ThreadReference struct {
 	// Author A minimal reference to an account.
@@ -622,24 +640,6 @@ type ThreadReference struct {
 // ThreadTitle The title of a thread.
 type ThreadTitle = string
 
-// ThreadsCreateBody defines model for ThreadsCreateBody.
-type ThreadsCreateBody struct {
-	// Body The body text of a post within a thread.
-	Body PostBodyMarkdown `json:"body"`
-
-	// Category A unique identifier for this resource.
-	Category Identifier `json:"category"`
-
-	// Meta Arbitrary metadata for the resource.
-	Meta *Metadata `json:"meta,omitempty"`
-
-	// Tags A list of tags.
-	Tags TagList `json:"tags"`
-
-	// Title The title of a thread.
-	Title ThreadTitle `json:"title"`
-}
-
 // UserVerificationRequirement https://www.w3.org/TR/webauthn-2/#enumdef-userverificationrequirement
 type UserVerificationRequirement string
 
@@ -665,66 +665,66 @@ type OAuthProvider = string
 //	as the identifier for that thread.
 type ThreadMarkParam = ThreadMark
 
-// AccountsGetSuccess defines model for AccountsGetSuccess.
-type AccountsGetSuccess = Account
+// AccountGetOK defines model for AccountGetOK.
+type AccountGetOK = Account
 
-// AccountsUpdateSuccess defines model for AccountsUpdateSuccess.
-type AccountsUpdateSuccess = Account
+// AccountUpdateOK defines model for AccountUpdateOK.
+type AccountUpdateOK = Account
 
-// AuthProviderList defines model for AuthProviderList.
-type AuthProviderList struct {
-	Providers AuthProviderListBody `json:"providers"`
+// AuthProviderListOK defines model for AuthProviderListOK.
+type AuthProviderListOK struct {
+	Providers AuthProviderList `json:"providers"`
 }
 
-// AuthSuccess defines model for AuthSuccess.
-type AuthSuccess = AuthSuccessBody
+// AuthSuccessOK defines model for AuthSuccessOK.
+type AuthSuccessOK = AuthSuccess
 
-// CategoriesListSuccess defines model for CategoriesListSuccess.
-type CategoriesListSuccess = CategoryList
+// CategoriesListOK defines model for CategoriesListOK.
+type CategoriesListOK = CategoryList
 
 // InternalServerError A description of an error including a human readable message and any
 // related metadata from the request and associated services.
 type InternalServerError = APIError
 
-// PostsCreateSuccess A new post within a thread of posts. A post may reply to another post in
+// PostsCreateOK A new post within a thread of posts. A post may reply to another post in
 // the thread by specifying the `reply_to` property. The identifier in the
 // `reply_to` value must be post within the same thread.
-type PostsCreateSuccess = Post
+type PostsCreateOK = Post
 
-// ProfilesGetSuccess defines model for ProfilesGetSuccess.
-type ProfilesGetSuccess = PublicProfile
+// ProfilesGetOK defines model for ProfilesGetOK.
+type ProfilesGetOK = PublicProfile
 
-// ThreadsCreateSuccess defines model for ThreadsCreateSuccess.
-type ThreadsCreateSuccess = Thread
+// ThreadsCreateOK defines model for ThreadsCreateOK.
+type ThreadsCreateOK = Thread
 
 // ThreadsGet defines model for ThreadsGet.
 type ThreadsGet = Thread
 
-// ThreadsList defines model for ThreadsList.
-type ThreadsList struct {
+// ThreadsListOK defines model for ThreadsListOK.
+type ThreadsListOK struct {
 	Threads ThreadList `json:"threads"`
 }
 
-// WebAuthnGetAssertionSuccess https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
-type WebAuthnGetAssertionSuccess = CredentialRequestOptions
+// WebAuthnGetAssertionOK https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
+type WebAuthnGetAssertionOK = CredentialRequestOptions
 
-// WebAuthnRequestCredentialSuccess https://www.w3.org/TR/webauthn-2/#sctn-credentialcreationoptions-extension
-type WebAuthnRequestCredentialSuccess = WebAuthnPublicKeyCreationOptions
+// WebAuthnRequestCredentialOK https://www.w3.org/TR/webauthn-2/#sctn-credentialcreationoptions-extension
+type WebAuthnRequestCredentialOK = WebAuthnPublicKeyCreationOptions
 
-// AccountsUpdate defines model for AccountsUpdate.
-type AccountsUpdate = AccountsUpdateBody
-
-// AuthOAuthProviderCallback defines model for AuthOAuthProviderCallback.
-type AuthOAuthProviderCallback = AuthOAuthProviderCallbackBody
+// AccountUpdate defines model for AccountUpdate.
+type AccountUpdate = AccountMutableProps
 
 // AuthPassword defines model for AuthPassword.
-type AuthPassword = AuthPasswordBody
+type AuthPassword = AuthPair
+
+// OAuthProviderCallback defines model for OAuthProviderCallback.
+type OAuthProviderCallback = OAuthCallback
 
 // PostsCreate defines model for PostsCreate.
 type PostsCreate = PostInitialProps
 
 // ThreadsCreate defines model for ThreadsCreate.
-type ThreadsCreate = ThreadsCreateBody
+type ThreadsCreate = ThreadMutableProps
 
 // WebAuthnMakeAssertion https://www.w3.org/TR/webauthn-2/#iface-pkcredential
 type WebAuthnMakeAssertion = PublicKeyCredential
@@ -741,23 +741,23 @@ type ThreadsListParams struct {
 	Tags *TagListIDs `form:"tags,omitempty" json:"tags,omitempty"`
 }
 
-// AccountsUpdateJSONRequestBody defines body for AccountsUpdate for application/json ContentType.
-type AccountsUpdateJSONRequestBody = AccountsUpdateBody
+// AccountUpdateJSONRequestBody defines body for AccountUpdate for application/json ContentType.
+type AccountUpdateJSONRequestBody = AccountMutableProps
 
-// AuthOAuthProviderCallbackJSONRequestBody defines body for AuthOAuthProviderCallback for application/json ContentType.
-type AuthOAuthProviderCallbackJSONRequestBody = AuthOAuthProviderCallbackBody
+// OAuthProviderCallbackJSONRequestBody defines body for OAuthProviderCallback for application/json ContentType.
+type OAuthProviderCallbackJSONRequestBody = OAuthCallback
 
 // AuthPasswordSigninJSONRequestBody defines body for AuthPasswordSignin for application/json ContentType.
-type AuthPasswordSigninJSONRequestBody = AuthPasswordBody
+type AuthPasswordSigninJSONRequestBody = AuthPair
 
 // AuthPasswordSigninFormdataRequestBody defines body for AuthPasswordSignin for application/x-www-form-urlencoded ContentType.
-type AuthPasswordSigninFormdataRequestBody = AuthPasswordBody
+type AuthPasswordSigninFormdataRequestBody = AuthPair
 
 // AuthPasswordSignupJSONRequestBody defines body for AuthPasswordSignup for application/json ContentType.
-type AuthPasswordSignupJSONRequestBody = AuthPasswordBody
+type AuthPasswordSignupJSONRequestBody = AuthPair
 
 // AuthPasswordSignupFormdataRequestBody defines body for AuthPasswordSignup for application/x-www-form-urlencoded ContentType.
-type AuthPasswordSignupFormdataRequestBody = AuthPasswordBody
+type AuthPasswordSignupFormdataRequestBody = AuthPair
 
 // WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
 type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
@@ -766,10 +766,10 @@ type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
 type WebAuthnMakeCredentialJSONRequestBody = PublicKeyCredential
 
 // ThreadsCreateJSONRequestBody defines body for ThreadsCreate for application/json ContentType.
-type ThreadsCreateJSONRequestBody = ThreadsCreateBody
+type ThreadsCreateJSONRequestBody = ThreadMutableProps
 
 // ThreadsCreateFormdataRequestBody defines body for ThreadsCreate for application/x-www-form-urlencoded ContentType.
-type ThreadsCreateFormdataRequestBody = ThreadsCreateBody
+type ThreadsCreateFormdataRequestBody = ThreadMutableProps
 
 // PostsCreateJSONRequestBody defines body for PostsCreate for application/json ContentType.
 type PostsCreateJSONRequestBody = PostInitialProps
@@ -853,19 +853,19 @@ type ClientInterface interface {
 	// GetSpec request
 	GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AccountsGet request
-	AccountsGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AccountGet request
+	AccountGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AccountsUpdate request with any body
-	AccountsUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AccountUpdate request with any body
+	AccountUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AccountsUpdate(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AccountUpdate(ctx context.Context, body AccountUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AccountsSetAvatar request with any body
-	AccountsSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AccountSetAvatar request with any body
+	AccountSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AccountsGetAvatar request
-	AccountsGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AccountGetAvatar request
+	AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AuthProviderList request
 	AuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -873,10 +873,10 @@ type ClientInterface interface {
 	// AuthProviderLogout request
 	AuthProviderLogout(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AuthOAuthProviderCallback request with any body
-	AuthOAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// OAuthProviderCallback request with any body
+	OAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AuthOAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	OAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body OAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AuthPasswordSignin request with any body
 	AuthPasswordSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -950,8 +950,8 @@ func (c *Client) GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 	return c.Client.Do(req)
 }
 
-func (c *Client) AccountsGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAccountsGetRequest(c.Server)
+func (c *Client) AccountGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountGetRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -962,8 +962,8 @@ func (c *Client) AccountsGet(ctx context.Context, reqEditors ...RequestEditorFn)
 	return c.Client.Do(req)
 }
 
-func (c *Client) AccountsUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAccountsUpdateRequestWithBody(c.Server, contentType, body)
+func (c *Client) AccountUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountUpdateRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -974,8 +974,8 @@ func (c *Client) AccountsUpdateWithBody(ctx context.Context, contentType string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) AccountsUpdate(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAccountsUpdateRequest(c.Server, body)
+func (c *Client) AccountUpdate(ctx context.Context, body AccountUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountUpdateRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -986,8 +986,8 @@ func (c *Client) AccountsUpdate(ctx context.Context, body AccountsUpdateJSONRequ
 	return c.Client.Do(req)
 }
 
-func (c *Client) AccountsSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAccountsSetAvatarRequestWithBody(c.Server, contentType, body)
+func (c *Client) AccountSetAvatarWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountSetAvatarRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -998,8 +998,8 @@ func (c *Client) AccountsSetAvatarWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) AccountsGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAccountsGetAvatarRequest(c.Server, accountHandle)
+func (c *Client) AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountGetAvatarRequest(c.Server, accountHandle)
 	if err != nil {
 		return nil, err
 	}
@@ -1034,8 +1034,8 @@ func (c *Client) AuthProviderLogout(ctx context.Context, reqEditors ...RequestEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) AuthOAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAuthOAuthProviderCallbackRequestWithBody(c.Server, oauthProvider, contentType, body)
+func (c *Client) OAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthProviderCallbackRequestWithBody(c.Server, oauthProvider, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1046,8 +1046,8 @@ func (c *Client) AuthOAuthProviderCallbackWithBody(ctx context.Context, oauthPro
 	return c.Client.Do(req)
 }
 
-func (c *Client) AuthOAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAuthOAuthProviderCallbackRequest(c.Server, oauthProvider, body)
+func (c *Client) OAuthProviderCallback(ctx context.Context, oauthProvider OAuthProvider, body OAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthProviderCallbackRequest(c.Server, oauthProvider, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1361,8 +1361,8 @@ func NewGetSpecRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewAccountsGetRequest generates requests for AccountsGet
-func NewAccountsGetRequest(server string) (*http.Request, error) {
+// NewAccountGetRequest generates requests for AccountGet
+func NewAccountGetRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1388,19 +1388,19 @@ func NewAccountsGetRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewAccountsUpdateRequest calls the generic AccountsUpdate builder with application/json body
-func NewAccountsUpdateRequest(server string, body AccountsUpdateJSONRequestBody) (*http.Request, error) {
+// NewAccountUpdateRequest calls the generic AccountUpdate builder with application/json body
+func NewAccountUpdateRequest(server string, body AccountUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewAccountsUpdateRequestWithBody(server, "application/json", bodyReader)
+	return NewAccountUpdateRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewAccountsUpdateRequestWithBody generates requests for AccountsUpdate with any type of body
-func NewAccountsUpdateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewAccountUpdateRequestWithBody generates requests for AccountUpdate with any type of body
+func NewAccountUpdateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1428,8 +1428,8 @@ func NewAccountsUpdateRequestWithBody(server string, contentType string, body io
 	return req, nil
 }
 
-// NewAccountsSetAvatarRequestWithBody generates requests for AccountsSetAvatar with any type of body
-func NewAccountsSetAvatarRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewAccountSetAvatarRequestWithBody generates requests for AccountSetAvatar with any type of body
+func NewAccountSetAvatarRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1457,8 +1457,8 @@ func NewAccountsSetAvatarRequestWithBody(server string, contentType string, body
 	return req, nil
 }
 
-// NewAccountsGetAvatarRequest generates requests for AccountsGetAvatar
-func NewAccountsGetAvatarRequest(server string, accountHandle AccountHandleParam) (*http.Request, error) {
+// NewAccountGetAvatarRequest generates requests for AccountGetAvatar
+func NewAccountGetAvatarRequest(server string, accountHandle AccountHandleParam) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1545,19 +1545,19 @@ func NewAuthProviderLogoutRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewAuthOAuthProviderCallbackRequest calls the generic AuthOAuthProviderCallback builder with application/json body
-func NewAuthOAuthProviderCallbackRequest(server string, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody) (*http.Request, error) {
+// NewOAuthProviderCallbackRequest calls the generic OAuthProviderCallback builder with application/json body
+func NewOAuthProviderCallbackRequest(server string, oauthProvider OAuthProvider, body OAuthProviderCallbackJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewAuthOAuthProviderCallbackRequestWithBody(server, oauthProvider, "application/json", bodyReader)
+	return NewOAuthProviderCallbackRequestWithBody(server, oauthProvider, "application/json", bodyReader)
 }
 
-// NewAuthOAuthProviderCallbackRequestWithBody generates requests for AuthOAuthProviderCallback with any type of body
-func NewAuthOAuthProviderCallbackRequestWithBody(server string, oauthProvider OAuthProvider, contentType string, body io.Reader) (*http.Request, error) {
+// NewOAuthProviderCallbackRequestWithBody generates requests for OAuthProviderCallback with any type of body
+func NewOAuthProviderCallbackRequestWithBody(server string, oauthProvider OAuthProvider, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2182,19 +2182,19 @@ type ClientWithResponsesInterface interface {
 	// GetSpec request
 	GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error)
 
-	// AccountsGet request
-	AccountsGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountsGetResponse, error)
+	// AccountGet request
+	AccountGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountGetResponse, error)
 
-	// AccountsUpdate request with any body
-	AccountsUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error)
+	// AccountUpdate request with any body
+	AccountUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountUpdateResponse, error)
 
-	AccountsUpdateWithResponse(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error)
+	AccountUpdateWithResponse(ctx context.Context, body AccountUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountUpdateResponse, error)
 
-	// AccountsSetAvatar request with any body
-	AccountsSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsSetAvatarResponse, error)
+	// AccountSetAvatar request with any body
+	AccountSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountSetAvatarResponse, error)
 
-	// AccountsGetAvatar request
-	AccountsGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountsGetAvatarResponse, error)
+	// AccountGetAvatar request
+	AccountGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountGetAvatarResponse, error)
 
 	// AuthProviderList request
 	AuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderListResponse, error)
@@ -2202,10 +2202,10 @@ type ClientWithResponsesInterface interface {
 	// AuthProviderLogout request
 	AuthProviderLogoutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderLogoutResponse, error)
 
-	// AuthOAuthProviderCallback request with any body
-	AuthOAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error)
+	// OAuthProviderCallback request with any body
+	OAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthProviderCallbackResponse, error)
 
-	AuthOAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error)
+	OAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body OAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthProviderCallbackResponse, error)
 
 	// AuthPasswordSignin request with any body
 	AuthPasswordSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthPasswordSigninResponse, error)
@@ -2288,7 +2288,7 @@ func (r GetSpecResponse) StatusCode() int {
 	return 0
 }
 
-type AccountsGetResponse struct {
+type AccountGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Account
@@ -2296,7 +2296,7 @@ type AccountsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r AccountsGetResponse) Status() string {
+func (r AccountGetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2304,14 +2304,14 @@ func (r AccountsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AccountsGetResponse) StatusCode() int {
+func (r AccountGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type AccountsUpdateResponse struct {
+type AccountUpdateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Account
@@ -2319,7 +2319,7 @@ type AccountsUpdateResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r AccountsUpdateResponse) Status() string {
+func (r AccountUpdateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2327,21 +2327,21 @@ func (r AccountsUpdateResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AccountsUpdateResponse) StatusCode() int {
+func (r AccountUpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type AccountsSetAvatarResponse struct {
+type AccountSetAvatarResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSONDefault  *APIError
 }
 
 // Status returns HTTPResponse.Status
-func (r AccountsSetAvatarResponse) Status() string {
+func (r AccountSetAvatarResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2349,21 +2349,21 @@ func (r AccountsSetAvatarResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AccountsSetAvatarResponse) StatusCode() int {
+func (r AccountSetAvatarResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type AccountsGetAvatarResponse struct {
+type AccountGetAvatarResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSONDefault  *APIError
 }
 
 // Status returns HTTPResponse.Status
-func (r AccountsGetAvatarResponse) Status() string {
+func (r AccountGetAvatarResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2371,7 +2371,7 @@ func (r AccountsGetAvatarResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AccountsGetAvatarResponse) StatusCode() int {
+func (r AccountGetAvatarResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2382,7 +2382,7 @@ type AuthProviderListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		Providers AuthProviderListBody `json:"providers"`
+		Providers AuthProviderList `json:"providers"`
 	}
 	JSONDefault *APIError
 }
@@ -2425,15 +2425,15 @@ func (r AuthProviderLogoutResponse) StatusCode() int {
 	return 0
 }
 
-type AuthOAuthProviderCallbackResponse struct {
+type OAuthProviderCallbackResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AuthSuccessBody
+	JSON200      *AuthSuccess
 	JSONDefault  *APIError
 }
 
 // Status returns HTTPResponse.Status
-func (r AuthOAuthProviderCallbackResponse) Status() string {
+func (r OAuthProviderCallbackResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2441,7 +2441,7 @@ func (r AuthOAuthProviderCallbackResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AuthOAuthProviderCallbackResponse) StatusCode() int {
+func (r OAuthProviderCallbackResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2451,7 +2451,7 @@ func (r AuthOAuthProviderCallbackResponse) StatusCode() int {
 type AuthPasswordSigninResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AuthSuccessBody
+	JSON200      *AuthSuccess
 	JSONDefault  *APIError
 }
 
@@ -2474,7 +2474,7 @@ func (r AuthPasswordSigninResponse) StatusCode() int {
 type AuthPasswordSignupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AuthSuccessBody
+	JSON200      *AuthSuccess
 	JSONDefault  *APIError
 }
 
@@ -2497,7 +2497,7 @@ func (r AuthPasswordSignupResponse) StatusCode() int {
 type WebAuthnMakeAssertionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AuthSuccessBody
+	JSON200      *AuthSuccess
 	JSONDefault  *APIError
 }
 
@@ -2543,7 +2543,7 @@ func (r WebAuthnGetAssertionResponse) StatusCode() int {
 type WebAuthnMakeCredentialResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *AuthSuccessBody
+	JSON200      *AuthSuccess
 	JSONDefault  *APIError
 }
 
@@ -2756,48 +2756,48 @@ func (c *ClientWithResponses) GetSpecWithResponse(ctx context.Context, reqEditor
 	return ParseGetSpecResponse(rsp)
 }
 
-// AccountsGetWithResponse request returning *AccountsGetResponse
-func (c *ClientWithResponses) AccountsGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountsGetResponse, error) {
-	rsp, err := c.AccountsGet(ctx, reqEditors...)
+// AccountGetWithResponse request returning *AccountGetResponse
+func (c *ClientWithResponses) AccountGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountGetResponse, error) {
+	rsp, err := c.AccountGet(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccountsGetResponse(rsp)
+	return ParseAccountGetResponse(rsp)
 }
 
-// AccountsUpdateWithBodyWithResponse request with arbitrary body returning *AccountsUpdateResponse
-func (c *ClientWithResponses) AccountsUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error) {
-	rsp, err := c.AccountsUpdateWithBody(ctx, contentType, body, reqEditors...)
+// AccountUpdateWithBodyWithResponse request with arbitrary body returning *AccountUpdateResponse
+func (c *ClientWithResponses) AccountUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountUpdateResponse, error) {
+	rsp, err := c.AccountUpdateWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccountsUpdateResponse(rsp)
+	return ParseAccountUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) AccountsUpdateWithResponse(ctx context.Context, body AccountsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsUpdateResponse, error) {
-	rsp, err := c.AccountsUpdate(ctx, body, reqEditors...)
+func (c *ClientWithResponses) AccountUpdateWithResponse(ctx context.Context, body AccountUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountUpdateResponse, error) {
+	rsp, err := c.AccountUpdate(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccountsUpdateResponse(rsp)
+	return ParseAccountUpdateResponse(rsp)
 }
 
-// AccountsSetAvatarWithBodyWithResponse request with arbitrary body returning *AccountsSetAvatarResponse
-func (c *ClientWithResponses) AccountsSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsSetAvatarResponse, error) {
-	rsp, err := c.AccountsSetAvatarWithBody(ctx, contentType, body, reqEditors...)
+// AccountSetAvatarWithBodyWithResponse request with arbitrary body returning *AccountSetAvatarResponse
+func (c *ClientWithResponses) AccountSetAvatarWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountSetAvatarResponse, error) {
+	rsp, err := c.AccountSetAvatarWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccountsSetAvatarResponse(rsp)
+	return ParseAccountSetAvatarResponse(rsp)
 }
 
-// AccountsGetAvatarWithResponse request returning *AccountsGetAvatarResponse
-func (c *ClientWithResponses) AccountsGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountsGetAvatarResponse, error) {
-	rsp, err := c.AccountsGetAvatar(ctx, accountHandle, reqEditors...)
+// AccountGetAvatarWithResponse request returning *AccountGetAvatarResponse
+func (c *ClientWithResponses) AccountGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountGetAvatarResponse, error) {
+	rsp, err := c.AccountGetAvatar(ctx, accountHandle, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccountsGetAvatarResponse(rsp)
+	return ParseAccountGetAvatarResponse(rsp)
 }
 
 // AuthProviderListWithResponse request returning *AuthProviderListResponse
@@ -2818,21 +2818,21 @@ func (c *ClientWithResponses) AuthProviderLogoutWithResponse(ctx context.Context
 	return ParseAuthProviderLogoutResponse(rsp)
 }
 
-// AuthOAuthProviderCallbackWithBodyWithResponse request with arbitrary body returning *AuthOAuthProviderCallbackResponse
-func (c *ClientWithResponses) AuthOAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error) {
-	rsp, err := c.AuthOAuthProviderCallbackWithBody(ctx, oauthProvider, contentType, body, reqEditors...)
+// OAuthProviderCallbackWithBodyWithResponse request with arbitrary body returning *OAuthProviderCallbackResponse
+func (c *ClientWithResponses) OAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthProviderCallbackResponse, error) {
+	rsp, err := c.OAuthProviderCallbackWithBody(ctx, oauthProvider, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAuthOAuthProviderCallbackResponse(rsp)
+	return ParseOAuthProviderCallbackResponse(rsp)
 }
 
-func (c *ClientWithResponses) AuthOAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body AuthOAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthOAuthProviderCallbackResponse, error) {
-	rsp, err := c.AuthOAuthProviderCallback(ctx, oauthProvider, body, reqEditors...)
+func (c *ClientWithResponses) OAuthProviderCallbackWithResponse(ctx context.Context, oauthProvider OAuthProvider, body OAuthProviderCallbackJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthProviderCallbackResponse, error) {
+	rsp, err := c.OAuthProviderCallback(ctx, oauthProvider, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAuthOAuthProviderCallbackResponse(rsp)
+	return ParseOAuthProviderCallbackResponse(rsp)
 }
 
 // AuthPasswordSigninWithBodyWithResponse request with arbitrary body returning *AuthPasswordSigninResponse
@@ -3048,15 +3048,15 @@ func ParseGetSpecResponse(rsp *http.Response) (*GetSpecResponse, error) {
 	return response, nil
 }
 
-// ParseAccountsGetResponse parses an HTTP response from a AccountsGetWithResponse call
-func ParseAccountsGetResponse(rsp *http.Response) (*AccountsGetResponse, error) {
+// ParseAccountGetResponse parses an HTTP response from a AccountGetWithResponse call
+func ParseAccountGetResponse(rsp *http.Response) (*AccountGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AccountsGetResponse{
+	response := &AccountGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3081,15 +3081,15 @@ func ParseAccountsGetResponse(rsp *http.Response) (*AccountsGetResponse, error) 
 	return response, nil
 }
 
-// ParseAccountsUpdateResponse parses an HTTP response from a AccountsUpdateWithResponse call
-func ParseAccountsUpdateResponse(rsp *http.Response) (*AccountsUpdateResponse, error) {
+// ParseAccountUpdateResponse parses an HTTP response from a AccountUpdateWithResponse call
+func ParseAccountUpdateResponse(rsp *http.Response) (*AccountUpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AccountsUpdateResponse{
+	response := &AccountUpdateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3114,15 +3114,15 @@ func ParseAccountsUpdateResponse(rsp *http.Response) (*AccountsUpdateResponse, e
 	return response, nil
 }
 
-// ParseAccountsSetAvatarResponse parses an HTTP response from a AccountsSetAvatarWithResponse call
-func ParseAccountsSetAvatarResponse(rsp *http.Response) (*AccountsSetAvatarResponse, error) {
+// ParseAccountSetAvatarResponse parses an HTTP response from a AccountSetAvatarWithResponse call
+func ParseAccountSetAvatarResponse(rsp *http.Response) (*AccountSetAvatarResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AccountsSetAvatarResponse{
+	response := &AccountSetAvatarResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3140,15 +3140,15 @@ func ParseAccountsSetAvatarResponse(rsp *http.Response) (*AccountsSetAvatarRespo
 	return response, nil
 }
 
-// ParseAccountsGetAvatarResponse parses an HTTP response from a AccountsGetAvatarWithResponse call
-func ParseAccountsGetAvatarResponse(rsp *http.Response) (*AccountsGetAvatarResponse, error) {
+// ParseAccountGetAvatarResponse parses an HTTP response from a AccountGetAvatarWithResponse call
+func ParseAccountGetAvatarResponse(rsp *http.Response) (*AccountGetAvatarResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AccountsGetAvatarResponse{
+	response := &AccountGetAvatarResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3182,7 +3182,7 @@ func ParseAuthProviderListResponse(rsp *http.Response) (*AuthProviderListRespons
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Providers AuthProviderListBody `json:"providers"`
+			Providers AuthProviderList `json:"providers"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3227,22 +3227,22 @@ func ParseAuthProviderLogoutResponse(rsp *http.Response) (*AuthProviderLogoutRes
 	return response, nil
 }
 
-// ParseAuthOAuthProviderCallbackResponse parses an HTTP response from a AuthOAuthProviderCallbackWithResponse call
-func ParseAuthOAuthProviderCallbackResponse(rsp *http.Response) (*AuthOAuthProviderCallbackResponse, error) {
+// ParseOAuthProviderCallbackResponse parses an HTTP response from a OAuthProviderCallbackWithResponse call
+func ParseOAuthProviderCallbackResponse(rsp *http.Response) (*OAuthProviderCallbackResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AuthOAuthProviderCallbackResponse{
+	response := &OAuthProviderCallbackResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AuthSuccessBody
+		var dest AuthSuccess
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3275,7 +3275,7 @@ func ParseAuthPasswordSigninResponse(rsp *http.Response) (*AuthPasswordSigninRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AuthSuccessBody
+		var dest AuthSuccess
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3308,7 +3308,7 @@ func ParseAuthPasswordSignupResponse(rsp *http.Response) (*AuthPasswordSignupRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AuthSuccessBody
+		var dest AuthSuccess
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3341,7 +3341,7 @@ func ParseWebAuthnMakeAssertionResponse(rsp *http.Response) (*WebAuthnMakeAssert
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AuthSuccessBody
+		var dest AuthSuccess
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3407,7 +3407,7 @@ func ParseWebAuthnMakeCredentialResponse(rsp *http.Response) (*WebAuthnMakeCrede
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest AuthSuccessBody
+		var dest AuthSuccess
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3681,16 +3681,16 @@ type ServerInterface interface {
 	GetSpec(ctx echo.Context) error
 
 	// (GET /v1/accounts)
-	AccountsGet(ctx echo.Context) error
+	AccountGet(ctx echo.Context) error
 
 	// (PATCH /v1/accounts)
-	AccountsUpdate(ctx echo.Context) error
+	AccountUpdate(ctx echo.Context) error
 
 	// (POST /v1/accounts/self/avatar)
-	AccountsSetAvatar(ctx echo.Context) error
+	AccountSetAvatar(ctx echo.Context) error
 
 	// (GET /v1/accounts/{account_handle}/avatar)
-	AccountsGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
+	AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
 
 	// (GET /v1/auth)
 	AuthProviderList(ctx echo.Context) error
@@ -3699,7 +3699,7 @@ type ServerInterface interface {
 	AuthProviderLogout(ctx echo.Context) error
 
 	// (POST /v1/auth/oauth/{oauth_provider}/callback)
-	AuthOAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
+	OAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
 
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx echo.Context) error
@@ -3755,41 +3755,41 @@ func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 	return err
 }
 
-// AccountsGet converts echo context to params.
-func (w *ServerInterfaceWrapper) AccountsGet(ctx echo.Context) error {
+// AccountGet converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountGet(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsGet(ctx)
+	err = w.Handler.AccountGet(ctx)
 	return err
 }
 
-// AccountsUpdate converts echo context to params.
-func (w *ServerInterfaceWrapper) AccountsUpdate(ctx echo.Context) error {
+// AccountUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountUpdate(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsUpdate(ctx)
+	err = w.Handler.AccountUpdate(ctx)
 	return err
 }
 
-// AccountsSetAvatar converts echo context to params.
-func (w *ServerInterfaceWrapper) AccountsSetAvatar(ctx echo.Context) error {
+// AccountSetAvatar converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountSetAvatar(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BrowserScopes, []string{""})
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsSetAvatar(ctx)
+	err = w.Handler.AccountSetAvatar(ctx)
 	return err
 }
 
-// AccountsGetAvatar converts echo context to params.
-func (w *ServerInterfaceWrapper) AccountsGetAvatar(ctx echo.Context) error {
+// AccountGetAvatar converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountGetAvatar(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "account_handle" -------------
 	var accountHandle AccountHandleParam
@@ -3800,7 +3800,7 @@ func (w *ServerInterfaceWrapper) AccountsGetAvatar(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AccountsGetAvatar(ctx, accountHandle)
+	err = w.Handler.AccountGetAvatar(ctx, accountHandle)
 	return err
 }
 
@@ -3824,8 +3824,8 @@ func (w *ServerInterfaceWrapper) AuthProviderLogout(ctx echo.Context) error {
 	return err
 }
 
-// AuthOAuthProviderCallback converts echo context to params.
-func (w *ServerInterfaceWrapper) AuthOAuthProviderCallback(ctx echo.Context) error {
+// OAuthProviderCallback converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthProviderCallback(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "oauth_provider" -------------
 	var oauthProvider OAuthProvider
@@ -3836,7 +3836,7 @@ func (w *ServerInterfaceWrapper) AuthOAuthProviderCallback(ctx echo.Context) err
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.AuthOAuthProviderCallback(ctx, oauthProvider)
+	err = w.Handler.OAuthProviderCallback(ctx, oauthProvider)
 	return err
 }
 
@@ -4045,13 +4045,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
-	router.GET(baseURL+"/v1/accounts", wrapper.AccountsGet)
-	router.PATCH(baseURL+"/v1/accounts", wrapper.AccountsUpdate)
-	router.POST(baseURL+"/v1/accounts/self/avatar", wrapper.AccountsSetAvatar)
-	router.GET(baseURL+"/v1/accounts/:account_handle/avatar", wrapper.AccountsGetAvatar)
+	router.GET(baseURL+"/v1/accounts", wrapper.AccountGet)
+	router.PATCH(baseURL+"/v1/accounts", wrapper.AccountUpdate)
+	router.POST(baseURL+"/v1/accounts/self/avatar", wrapper.AccountSetAvatar)
+	router.GET(baseURL+"/v1/accounts/:account_handle/avatar", wrapper.AccountGetAvatar)
 	router.GET(baseURL+"/v1/auth", wrapper.AuthProviderList)
 	router.GET(baseURL+"/v1/auth/logout", wrapper.AuthProviderLogout)
-	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.AuthOAuthProviderCallback)
+	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
 	router.POST(baseURL+"/v1/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
@@ -4068,70 +4068,70 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 }
 
-type AccountsGetAvatarImagepngResponse struct {
+type AccountGetAvatarImagepngResponse struct {
 	Body io.Reader
 
 	ContentLength int64
 }
 
-type AccountsGetSuccessJSONResponse Account
+type AccountGetOKJSONResponse Account
 
-type AccountsUpdateSuccessJSONResponse Account
+type AccountUpdateOKJSONResponse Account
 
-type AuthProviderListJSONResponse struct {
-	Providers AuthProviderListBody `json:"providers"`
+type AuthProviderListOKJSONResponse struct {
+	Providers AuthProviderList `json:"providers"`
 }
 
-type AuthSuccessResponseHeaders struct {
+type AuthSuccessOKResponseHeaders struct {
 	SetCookie string
 }
-type AuthSuccessJSONResponse struct {
-	Body AuthSuccessBody
+type AuthSuccessOKJSONResponse struct {
+	Body AuthSuccess
 
-	Headers AuthSuccessResponseHeaders
+	Headers AuthSuccessOKResponseHeaders
 }
 
 type BadRequestResponse struct {
 }
 
-type CategoriesListSuccessJSONResponse CategoryList
+type CategoriesListOKJSONResponse CategoryList
 
 type InternalServerErrorJSONResponse APIError
 
 type NotFoundResponse struct {
 }
 
-type PostsCreateSuccessJSONResponse Post
+type PostsCreateOKJSONResponse Post
 
-type ProfilesGetSuccessJSONResponse PublicProfile
+type ProfilesGetOKJSONResponse PublicProfile
 
-type ThreadsCreateSuccessJSONResponse Thread
+type ThreadsCreateOKJSONResponse Thread
 
 type ThreadsGetJSONResponse Thread
 
-type ThreadsListJSONResponse struct {
+type ThreadsListOKJSONResponse struct {
 	Threads ThreadList `json:"threads"`
 }
 
 type UnauthorisedResponse struct {
 }
 
-type WebAuthnGetAssertionSuccessResponseHeaders struct {
+type WebAuthnGetAssertionOKResponseHeaders struct {
 	SetCookie string
 }
-type WebAuthnGetAssertionSuccessJSONResponse struct {
+type WebAuthnGetAssertionOKJSONResponse struct {
 	Body CredentialRequestOptions
 
-	Headers WebAuthnGetAssertionSuccessResponseHeaders
+	Headers WebAuthnGetAssertionOKResponseHeaders
 }
 
-type WebAuthnRequestCredentialSuccessResponseHeaders struct {
+type WebAuthnRequestCredentialOKResponseHeaders struct {
 	SetCookie string
 }
-type WebAuthnRequestCredentialSuccessJSONResponse struct {
+type WebAuthnRequestCredentialOKJSONResponse struct {
 	Body WebAuthnPublicKeyCreationOptions
 
-	Headers WebAuthnRequestCredentialSuccessResponseHeaders
+	Headers WebAuthnRequestCredentialOKResponseHeaders
 }
 
 type GetSpecRequestObject struct {
@@ -4151,148 +4151,146 @@ func (response GetSpec200TextResponse) VisitGetSpecResponse(w http.ResponseWrite
 	return err
 }
 
-type AccountsGetRequestObject struct {
+type AccountGetRequestObject struct {
 }
 
-type AccountsGetResponseObject interface {
-	VisitAccountsGetResponse(w http.ResponseWriter) error
+type AccountGetResponseObject interface {
+	VisitAccountGetResponse(w http.ResponseWriter) error
 }
 
-type AccountsGet200JSONResponse struct{ AccountsGetSuccessJSONResponse }
+type AccountGet200JSONResponse struct{ AccountGetOKJSONResponse }
 
-func (response AccountsGet200JSONResponse) VisitAccountsGetResponse(w http.ResponseWriter) error {
+func (response AccountGet200JSONResponse) VisitAccountGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type AccountsGet401Response = UnauthorisedResponse
+type AccountGet401Response = UnauthorisedResponse
 
-func (response AccountsGet401Response) VisitAccountsGetResponse(w http.ResponseWriter) error {
+func (response AccountGet401Response) VisitAccountGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type AccountsGet404Response = NotFoundResponse
+type AccountGet404Response = NotFoundResponse
 
-func (response AccountsGet404Response) VisitAccountsGetResponse(w http.ResponseWriter) error {
+func (response AccountGet404Response) VisitAccountGetResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type AccountsGetdefaultJSONResponse struct {
+type AccountGetdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response AccountsGetdefaultJSONResponse) VisitAccountsGetResponse(w http.ResponseWriter) error {
+func (response AccountGetdefaultJSONResponse) VisitAccountGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type AccountsUpdateRequestObject struct {
-	Body *AccountsUpdateJSONRequestBody
+type AccountUpdateRequestObject struct {
+	Body *AccountUpdateJSONRequestBody
 }
 
-type AccountsUpdateResponseObject interface {
-	VisitAccountsUpdateResponse(w http.ResponseWriter) error
+type AccountUpdateResponseObject interface {
+	VisitAccountUpdateResponse(w http.ResponseWriter) error
 }
 
-type AccountsUpdate200JSONResponse struct {
-	AccountsUpdateSuccessJSONResponse
-}
+type AccountUpdate200JSONResponse struct{ AccountUpdateOKJSONResponse }
 
-func (response AccountsUpdate200JSONResponse) VisitAccountsUpdateResponse(w http.ResponseWriter) error {
+func (response AccountUpdate200JSONResponse) VisitAccountUpdateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type AccountsUpdate401Response = UnauthorisedResponse
+type AccountUpdate401Response = UnauthorisedResponse
 
-func (response AccountsUpdate401Response) VisitAccountsUpdateResponse(w http.ResponseWriter) error {
+func (response AccountUpdate401Response) VisitAccountUpdateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type AccountsUpdate404Response = NotFoundResponse
+type AccountUpdate404Response = NotFoundResponse
 
-func (response AccountsUpdate404Response) VisitAccountsUpdateResponse(w http.ResponseWriter) error {
+func (response AccountUpdate404Response) VisitAccountUpdateResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type AccountsUpdatedefaultJSONResponse struct {
+type AccountUpdatedefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response AccountsUpdatedefaultJSONResponse) VisitAccountsUpdateResponse(w http.ResponseWriter) error {
+func (response AccountUpdatedefaultJSONResponse) VisitAccountUpdateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type AccountsSetAvatarRequestObject struct {
+type AccountSetAvatarRequestObject struct {
 	Body io.Reader
 }
 
-type AccountsSetAvatarResponseObject interface {
-	VisitAccountsSetAvatarResponse(w http.ResponseWriter) error
+type AccountSetAvatarResponseObject interface {
+	VisitAccountSetAvatarResponse(w http.ResponseWriter) error
 }
 
-type AccountsSetAvatar200Response struct {
+type AccountSetAvatar200Response struct {
 }
 
-func (response AccountsSetAvatar200Response) VisitAccountsSetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountSetAvatar200Response) VisitAccountSetAvatarResponse(w http.ResponseWriter) error {
 	w.WriteHeader(200)
 	return nil
 }
 
-type AccountsSetAvatar401Response = UnauthorisedResponse
+type AccountSetAvatar401Response = UnauthorisedResponse
 
-func (response AccountsSetAvatar401Response) VisitAccountsSetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountSetAvatar401Response) VisitAccountSetAvatarResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type AccountsSetAvatar404Response = NotFoundResponse
+type AccountSetAvatar404Response = NotFoundResponse
 
-func (response AccountsSetAvatar404Response) VisitAccountsSetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountSetAvatar404Response) VisitAccountSetAvatarResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type AccountsSetAvatardefaultJSONResponse struct {
+type AccountSetAvatardefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response AccountsSetAvatardefaultJSONResponse) VisitAccountsSetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountSetAvatardefaultJSONResponse) VisitAccountSetAvatarResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type AccountsGetAvatarRequestObject struct {
+type AccountGetAvatarRequestObject struct {
 	AccountHandle AccountHandleParam `json:"account_handle"`
 }
 
-type AccountsGetAvatarResponseObject interface {
-	VisitAccountsGetAvatarResponse(w http.ResponseWriter) error
+type AccountGetAvatarResponseObject interface {
+	VisitAccountGetAvatarResponse(w http.ResponseWriter) error
 }
 
-type AccountsGetAvatar200ImagepngResponse struct {
-	AccountsGetAvatarImagepngResponse
+type AccountGetAvatar200ImagepngResponse struct {
+	AccountGetAvatarImagepngResponse
 }
 
-func (response AccountsGetAvatar200ImagepngResponse) VisitAccountsGetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountGetAvatar200ImagepngResponse) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "image/png")
 	if response.ContentLength != 0 {
 		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
@@ -4306,26 +4304,26 @@ func (response AccountsGetAvatar200ImagepngResponse) VisitAccountsGetAvatarRespo
 	return err
 }
 
-type AccountsGetAvatar401Response = UnauthorisedResponse
+type AccountGetAvatar401Response = UnauthorisedResponse
 
-func (response AccountsGetAvatar401Response) VisitAccountsGetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountGetAvatar401Response) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type AccountsGetAvatar404Response = NotFoundResponse
+type AccountGetAvatar404Response = NotFoundResponse
 
-func (response AccountsGetAvatar404Response) VisitAccountsGetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountGetAvatar404Response) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type AccountsGetAvatardefaultJSONResponse struct {
+type AccountGetAvatardefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response AccountsGetAvatardefaultJSONResponse) VisitAccountsGetAvatarResponse(w http.ResponseWriter) error {
+func (response AccountGetAvatardefaultJSONResponse) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -4339,7 +4337,7 @@ type AuthProviderListResponseObject interface {
 	VisitAuthProviderListResponse(w http.ResponseWriter) error
 }
 
-type AuthProviderList200JSONResponse struct{ AuthProviderListJSONResponse }
+type AuthProviderList200JSONResponse struct{ AuthProviderListOKJSONResponse }
 
 func (response AuthProviderList200JSONResponse) VisitAuthProviderListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4407,18 +4405,18 @@ func (response AuthProviderLogoutdefaultJSONResponse) VisitAuthProviderLogoutRes
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type AuthOAuthProviderCallbackRequestObject struct {
+type OAuthProviderCallbackRequestObject struct {
 	OauthProvider OAuthProvider `json:"oauth_provider"`
-	Body          *AuthOAuthProviderCallbackJSONRequestBody
+	Body          *OAuthProviderCallbackJSONRequestBody
 }
 
-type AuthOAuthProviderCallbackResponseObject interface {
-	VisitAuthOAuthProviderCallbackResponse(w http.ResponseWriter) error
+type OAuthProviderCallbackResponseObject interface {
+	VisitOAuthProviderCallbackResponse(w http.ResponseWriter) error
 }
 
-type AuthOAuthProviderCallback200JSONResponse struct{ AuthSuccessJSONResponse }
+type OAuthProviderCallback200JSONResponse struct{ AuthSuccessOKJSONResponse }
 
-func (response AuthOAuthProviderCallback200JSONResponse) VisitAuthOAuthProviderCallbackResponse(w http.ResponseWriter) error {
+func (response OAuthProviderCallback200JSONResponse) VisitOAuthProviderCallbackResponse(w http.ResponseWriter) error {
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
@@ -4426,26 +4424,26 @@ func (response AuthOAuthProviderCallback200JSONResponse) VisitAuthOAuthProviderC
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type AuthOAuthProviderCallback401Response = UnauthorisedResponse
+type OAuthProviderCallback401Response = UnauthorisedResponse
 
-func (response AuthOAuthProviderCallback401Response) VisitAuthOAuthProviderCallbackResponse(w http.ResponseWriter) error {
+func (response OAuthProviderCallback401Response) VisitOAuthProviderCallbackResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
 	return nil
 }
 
-type AuthOAuthProviderCallback404Response = NotFoundResponse
+type OAuthProviderCallback404Response = NotFoundResponse
 
-func (response AuthOAuthProviderCallback404Response) VisitAuthOAuthProviderCallbackResponse(w http.ResponseWriter) error {
+func (response OAuthProviderCallback404Response) VisitOAuthProviderCallbackResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
 	return nil
 }
 
-type AuthOAuthProviderCallbackdefaultJSONResponse struct {
+type OAuthProviderCallbackdefaultJSONResponse struct {
 	Body       APIError
 	StatusCode int
 }
 
-func (response AuthOAuthProviderCallbackdefaultJSONResponse) VisitAuthOAuthProviderCallbackResponse(w http.ResponseWriter) error {
+func (response OAuthProviderCallbackdefaultJSONResponse) VisitOAuthProviderCallbackResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -4461,7 +4459,7 @@ type AuthPasswordSigninResponseObject interface {
 	VisitAuthPasswordSigninResponse(w http.ResponseWriter) error
 }
 
-type AuthPasswordSignin200JSONResponse struct{ AuthSuccessJSONResponse }
+type AuthPasswordSignin200JSONResponse struct{ AuthSuccessOKJSONResponse }
 
 func (response AuthPasswordSignin200JSONResponse) VisitAuthPasswordSigninResponse(w http.ResponseWriter) error {
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
@@ -4506,7 +4504,7 @@ type AuthPasswordSignupResponseObject interface {
 	VisitAuthPasswordSignupResponse(w http.ResponseWriter) error
 }
 
-type AuthPasswordSignup200JSONResponse struct{ AuthSuccessJSONResponse }
+type AuthPasswordSignup200JSONResponse struct{ AuthSuccessOKJSONResponse }
 
 func (response AuthPasswordSignup200JSONResponse) VisitAuthPasswordSignupResponse(w http.ResponseWriter) error {
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
@@ -4543,7 +4541,7 @@ type WebAuthnMakeAssertionResponseObject interface {
 	VisitWebAuthnMakeAssertionResponse(w http.ResponseWriter) error
 }
 
-type WebAuthnMakeAssertion200JSONResponse struct{ AuthSuccessJSONResponse }
+type WebAuthnMakeAssertion200JSONResponse struct{ AuthSuccessOKJSONResponse }
 
 func (response WebAuthnMakeAssertion200JSONResponse) VisitWebAuthnMakeAssertionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
@@ -4588,7 +4586,7 @@ type WebAuthnGetAssertionResponseObject interface {
 }
 
 type WebAuthnGetAssertion200JSONResponse struct {
-	WebAuthnGetAssertionSuccessJSONResponse
+	WebAuthnGetAssertionOKJSONResponse
 }
 
 func (response WebAuthnGetAssertion200JSONResponse) VisitWebAuthnGetAssertionResponse(w http.ResponseWriter) error {
@@ -4633,7 +4631,7 @@ type WebAuthnMakeCredentialResponseObject interface {
 	VisitWebAuthnMakeCredentialResponse(w http.ResponseWriter) error
 }
 
-type WebAuthnMakeCredential200JSONResponse struct{ AuthSuccessJSONResponse }
+type WebAuthnMakeCredential200JSONResponse struct{ AuthSuccessOKJSONResponse }
 
 func (response WebAuthnMakeCredential200JSONResponse) VisitWebAuthnMakeCredentialResponse(w http.ResponseWriter) error {
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
@@ -4671,7 +4669,7 @@ type WebAuthnRequestCredentialResponseObject interface {
 }
 
 type WebAuthnRequestCredential200JSONResponse struct {
-	WebAuthnRequestCredentialSuccessJSONResponse
+	WebAuthnRequestCredentialOKJSONResponse
 }
 
 func (response WebAuthnRequestCredential200JSONResponse) VisitWebAuthnRequestCredentialResponse(w http.ResponseWriter) error {
@@ -4708,9 +4706,7 @@ type CategoriesListResponseObject interface {
 	VisitCategoriesListResponse(w http.ResponseWriter) error
 }
 
-type CategoriesList200JSONResponse struct {
-	CategoriesListSuccessJSONResponse
-}
+type CategoriesList200JSONResponse struct{ CategoriesListOKJSONResponse }
 
 func (response CategoriesList200JSONResponse) VisitCategoriesListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4739,7 +4735,7 @@ type ProfilesGetResponseObject interface {
 	VisitProfilesGetResponse(w http.ResponseWriter) error
 }
 
-type ProfilesGet200JSONResponse struct{ ProfilesGetSuccessJSONResponse }
+type ProfilesGet200JSONResponse struct{ ProfilesGetOKJSONResponse }
 
 func (response ProfilesGet200JSONResponse) VisitProfilesGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4782,7 +4778,7 @@ type ThreadsListResponseObject interface {
 	VisitThreadsListResponse(w http.ResponseWriter) error
 }
 
-type ThreadsList200JSONResponse struct{ ThreadsListJSONResponse }
+type ThreadsList200JSONResponse struct{ ThreadsListOKJSONResponse }
 
 func (response ThreadsList200JSONResponse) VisitThreadsListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4826,9 +4822,7 @@ type ThreadsCreateResponseObject interface {
 	VisitThreadsCreateResponse(w http.ResponseWriter) error
 }
 
-type ThreadsCreate200JSONResponse struct {
-	ThreadsCreateSuccessJSONResponse
-}
+type ThreadsCreate200JSONResponse struct{ ThreadsCreateOKJSONResponse }
 
 func (response ThreadsCreate200JSONResponse) VisitThreadsCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4916,7 +4910,7 @@ type PostsCreateResponseObject interface {
 	VisitPostsCreateResponse(w http.ResponseWriter) error
 }
 
-type PostsCreate200JSONResponse struct{ PostsCreateSuccessJSONResponse }
+type PostsCreate200JSONResponse struct{ PostsCreateOKJSONResponse }
 
 func (response PostsCreate200JSONResponse) VisitPostsCreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4975,16 +4969,16 @@ type StrictServerInterface interface {
 	GetSpec(ctx context.Context, request GetSpecRequestObject) (GetSpecResponseObject, error)
 
 	// (GET /v1/accounts)
-	AccountsGet(ctx context.Context, request AccountsGetRequestObject) (AccountsGetResponseObject, error)
+	AccountGet(ctx context.Context, request AccountGetRequestObject) (AccountGetResponseObject, error)
 
 	// (PATCH /v1/accounts)
-	AccountsUpdate(ctx context.Context, request AccountsUpdateRequestObject) (AccountsUpdateResponseObject, error)
+	AccountUpdate(ctx context.Context, request AccountUpdateRequestObject) (AccountUpdateResponseObject, error)
 
 	// (POST /v1/accounts/self/avatar)
-	AccountsSetAvatar(ctx context.Context, request AccountsSetAvatarRequestObject) (AccountsSetAvatarResponseObject, error)
+	AccountSetAvatar(ctx context.Context, request AccountSetAvatarRequestObject) (AccountSetAvatarResponseObject, error)
 
 	// (GET /v1/accounts/{account_handle}/avatar)
-	AccountsGetAvatar(ctx context.Context, request AccountsGetAvatarRequestObject) (AccountsGetAvatarResponseObject, error)
+	AccountGetAvatar(ctx context.Context, request AccountGetAvatarRequestObject) (AccountGetAvatarResponseObject, error)
 
 	// (GET /v1/auth)
 	AuthProviderList(ctx context.Context, request AuthProviderListRequestObject) (AuthProviderListResponseObject, error)
@@ -4993,7 +4987,7 @@ type StrictServerInterface interface {
 	AuthProviderLogout(ctx context.Context, request AuthProviderLogoutRequestObject) (AuthProviderLogoutResponseObject, error)
 
 	// (POST /v1/auth/oauth/{oauth_provider}/callback)
-	AuthOAuthProviderCallback(ctx context.Context, request AuthOAuthProviderCallbackRequestObject) (AuthOAuthProviderCallbackResponseObject, error)
+	OAuthProviderCallback(ctx context.Context, request OAuthProviderCallbackRequestObject) (OAuthProviderCallbackResponseObject, error)
 
 	// (POST /v1/auth/password/signin)
 	AuthPasswordSignin(ctx context.Context, request AuthPasswordSigninRequestObject) (AuthPasswordSigninResponseObject, error)
@@ -5071,102 +5065,102 @@ func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 	return nil
 }
 
-// AccountsGet operation middleware
-func (sh *strictHandler) AccountsGet(ctx echo.Context) error {
-	var request AccountsGetRequestObject
+// AccountGet operation middleware
+func (sh *strictHandler) AccountGet(ctx echo.Context) error {
+	var request AccountGetRequestObject
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AccountsGet(ctx.Request().Context(), request.(AccountsGetRequestObject))
+		return sh.ssi.AccountGet(ctx.Request().Context(), request.(AccountGetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AccountsGet")
+		handler = middleware(handler, "AccountGet")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(AccountsGetResponseObject); ok {
-		return validResponse.VisitAccountsGetResponse(ctx.Response())
+	} else if validResponse, ok := response.(AccountGetResponseObject); ok {
+		return validResponse.VisitAccountGetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// AccountsUpdate operation middleware
-func (sh *strictHandler) AccountsUpdate(ctx echo.Context) error {
-	var request AccountsUpdateRequestObject
+// AccountUpdate operation middleware
+func (sh *strictHandler) AccountUpdate(ctx echo.Context) error {
+	var request AccountUpdateRequestObject
 
-	var body AccountsUpdateJSONRequestBody
+	var body AccountUpdateJSONRequestBody
 	if err := ctx.Bind(&body); err != nil {
 		return err
 	}
 	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AccountsUpdate(ctx.Request().Context(), request.(AccountsUpdateRequestObject))
+		return sh.ssi.AccountUpdate(ctx.Request().Context(), request.(AccountUpdateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AccountsUpdate")
+		handler = middleware(handler, "AccountUpdate")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(AccountsUpdateResponseObject); ok {
-		return validResponse.VisitAccountsUpdateResponse(ctx.Response())
+	} else if validResponse, ok := response.(AccountUpdateResponseObject); ok {
+		return validResponse.VisitAccountUpdateResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// AccountsSetAvatar operation middleware
-func (sh *strictHandler) AccountsSetAvatar(ctx echo.Context) error {
-	var request AccountsSetAvatarRequestObject
+// AccountSetAvatar operation middleware
+func (sh *strictHandler) AccountSetAvatar(ctx echo.Context) error {
+	var request AccountSetAvatarRequestObject
 
 	request.Body = ctx.Request().Body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AccountsSetAvatar(ctx.Request().Context(), request.(AccountsSetAvatarRequestObject))
+		return sh.ssi.AccountSetAvatar(ctx.Request().Context(), request.(AccountSetAvatarRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AccountsSetAvatar")
+		handler = middleware(handler, "AccountSetAvatar")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(AccountsSetAvatarResponseObject); ok {
-		return validResponse.VisitAccountsSetAvatarResponse(ctx.Response())
+	} else if validResponse, ok := response.(AccountSetAvatarResponseObject); ok {
+		return validResponse.VisitAccountSetAvatarResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// AccountsGetAvatar operation middleware
-func (sh *strictHandler) AccountsGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error {
-	var request AccountsGetAvatarRequestObject
+// AccountGetAvatar operation middleware
+func (sh *strictHandler) AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error {
+	var request AccountGetAvatarRequestObject
 
 	request.AccountHandle = accountHandle
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AccountsGetAvatar(ctx.Request().Context(), request.(AccountsGetAvatarRequestObject))
+		return sh.ssi.AccountGetAvatar(ctx.Request().Context(), request.(AccountGetAvatarRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AccountsGetAvatar")
+		handler = middleware(handler, "AccountGetAvatar")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(AccountsGetAvatarResponseObject); ok {
-		return validResponse.VisitAccountsGetAvatarResponse(ctx.Response())
+	} else if validResponse, ok := response.(AccountGetAvatarResponseObject); ok {
+		return validResponse.VisitAccountGetAvatarResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
@@ -5219,31 +5213,31 @@ func (sh *strictHandler) AuthProviderLogout(ctx echo.Context) error {
 	return nil
 }
 
-// AuthOAuthProviderCallback operation middleware
-func (sh *strictHandler) AuthOAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error {
-	var request AuthOAuthProviderCallbackRequestObject
+// OAuthProviderCallback operation middleware
+func (sh *strictHandler) OAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error {
+	var request OAuthProviderCallbackRequestObject
 
 	request.OauthProvider = oauthProvider
 
-	var body AuthOAuthProviderCallbackJSONRequestBody
+	var body OAuthProviderCallbackJSONRequestBody
 	if err := ctx.Bind(&body); err != nil {
 		return err
 	}
 	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AuthOAuthProviderCallback(ctx.Request().Context(), request.(AuthOAuthProviderCallbackRequestObject))
+		return sh.ssi.OAuthProviderCallback(ctx.Request().Context(), request.(OAuthProviderCallbackRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AuthOAuthProviderCallback")
+		handler = middleware(handler, "OAuthProviderCallback")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(AuthOAuthProviderCallbackResponseObject); ok {
-		return validResponse.VisitAuthOAuthProviderCallbackResponse(ctx.Response())
+	} else if validResponse, ok := response.(OAuthProviderCallbackResponseObject); ok {
+		return validResponse.VisitOAuthProviderCallbackResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
@@ -5651,94 +5645,94 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+w973PbtpL/Co69mc68oaQkbe+DZ27mOU6b+vUl8djOex8iTwyRKwk1CbAAaFnn0f9+",
-	"g18kSIISJStJ3btPbUxgF9hf2F0sVo9RwvKCUaBSRCePUYE5zkEC1/86TRJWUvkrpmkGF+qT+msKIuGk",
-	"kITR6MSNQUs9aBzFETzgvMggOokEK+UyyfBKRHFE1OgCy2UURxTn6js2cz+buVEccfijJBzS6ETyEuJI",
-	"JEvIsUL6nxzm0Un03aRe78R8FZPGMqPNJo4+nJZyecHZPUmBd9d8vQREUqCSzAlwNGccYYr0pFeosNOQ",
-	"KJMlwgJNI7kiUgKfRs3t2T+H98ZwKZefHbCte5PrQlNLckIXev3XSw44fYf5XQ/VzQBUUvJHCQjTFBXA",
-	"c6zo4u1sHF6a1JM/55jfHUzzeoXRRq1YQQEhX7OUgC874grk6T2WWLMhYVQClep/cVFkJMFqPxOWSJAj",
-	"ITmYvdZLmDOeYxmdRDNCMV9HcYdYCrnD9bFIsYQtiH4XinqP+8mVBfuapWuHr5TLhoid4Syb4eTueKj7",
-	"MLRWcYGFWDGeHhWxA2pxxQ1wD6PVajVSfBmVPAOasBTSJ8FXGC6YkOKMwzHZp2CeUyIJzi44K8SxtxKA",
-	"v4lbemq2hDAqmJBoReSSUISR0cBxVKn6sffegPol+BhCoFD8G2aKxfQdvoNTIYAbQhyLpeUsI8lvsD7j",
-	"oK0czgJ4vY9fGrG2fKJgVDSt3tseq0dyvIBJQRd7m7m2ZH34LfIs31uQV2WSgBDHtn67cRvz+PXRe9bx",
-	"n0TIvTAXnBVKNg3X3CktBlkvD2elWfUh+smDdlPxkc1+h2THZo5OwRqmU9AA8jhaAnZ7vwI5OmPsjkAT",
-	"TejQfY3TS3Pod92T1zhF1iNQuzvDEhaMExCKaMfep4W+1kLQS+FzKoFTnF0Bvwf+M+eMH4/SF+cGYAC7",
-	"w4sMYmQHxtF7Jn9hJU271HvPJJrrT82T8diEU6BDS7bOpT6yEo05Vc6wwj0vs2ytz60LzuYkgy9heYyx",
-	"tQj6Odo4go69BgN8C3UsYfwz/C3Ir4IfEKHmxCCMIjxjpax8Ch0LECk094S/uifaSANeDFu3VcWmXXQQ",
-	"hlhFBQCxOcJZZjdm9vKRqrCKcSIgoDjV1/8BrTvOKVCnsfNFjm59KofAWsMPejXi2ObW7cViqdEee0MO",
-	"ke/yaDhfZGMbF3Aa98kZ0m6aAXn/1pJBEaihiNAkK1NCFwijZZljipS44FkGKAch8MLEx5iup5RDpq1Z",
-	"DhKnWGI05yxHcgnutDJDhWAJMWYP+D1JQIynNIpbGgHhlRr9tEZfj4kRZVL/jaaQ6nQD0HRUCuAoJaLI",
-	"8HrcdfniyC4/RAy90VFno4fgMJTQMpOmRGEw8YzbqMkKtBZA16geXZPT0VcyTVS9ew+t0/c4EuViAUKG",
-	"lPgUVR8RTjS71W4UPLWbwC5adsbw5SaA1fmUaq9Z9mEenXzaodwszxn1qLGJ23ZxRlhAsuPI5rT2S13F",
-	"kZYcEHK3ocULY2VdWmcQovdq6GazuWmSrErAkXQb4X6t9tQVeZuK+rtNBFoVtRm+Zt7syk8LNgkXRw+j",
-	"BRt1qOkvP4jeIkJsRYELJ/JIkaaJ/DXmFM/W6DcACiGNCGR9Tv4STA/xVUoQUlv3M0bvYY1pAhcc5sCB",
-	"JgFSL6UsxMlkslqtxqsfxowvJteXkxXM1MFLR68m3wEt8xGu4Y4SDVjbT/VNiVtKuFqA+oMEXqjTXGcq",
-	"q79TRsETRI85W/NiHT4lLIUgo9TiIJx79fXCDIsNnKBitNNZnSXU2Vh9ZgRy438XkvF1ClSRMySRkt0B",
-	"bc4uXN5vlzH00DtAvfvw8uXNPWSE3oXVbrkugKvPyuRzdfbwXdY6jjK2YJ9LnoVBqq8KmlNhB86F1UGQ",
-	"tNcwtE5KNVDZpp0Qi623ByIrF0Nh9aQHXD7eo0dsKH0TyG444SIS8r3SFFGt95hzvG5lG/qEdrdu9B0V",
-	"pVwqkTO+588PEqhQbuNZRoDKc1qUxswNdzZ225yUJDKF+Qg3cEOFO9G4icatDdG2VTN+KiVOlrn1pA8x",
-	"gK3FMI4rkA1DWGRYqkhOmRjOhBhVf+gzfhXES5t2PGSJjaW5/GXAw/XM+AdDqpAtbUB7Y33JzijDA/X5",
-	"H1cf3oeNMllQLEseNtmSYyoKxo34VHrQHdcSdmWGasdlu0y3FnmzS1KuIAPtop5xIoETfAg3AtLLuHCQ",
-	"Ews5xJ5+od1lHULTalpcgtDnxm+w9mg2YywDTM24xoBt2DxYlwa6Q6YY8y/gZG71dRekj63xDXAtRvaR",
-	"prn0EH9dNnGPIMHOeOdCKRUkDJlgoovBw08rixlttq3cG9fNdDMhz1wMZCEo73OhDor2QVWN3YbNbqKD",
-	"Cac5oWHpSVjGSh5U3obuPPaf813bwfiQPdkTV4/etiuXLGu5k1Uee/BRXIlTxzK1TU8Ne9vC3nnxeujM",
-	"3raW89oXDEYDDsel7/9/JR0I7rkdfXcZYpKwpzLspUmSg83uCFbyBNAKizpzG9f3birUG6nhIVcwhQz2",
-	"xiLYXI7szOGo9mNiHOVEJIEUCp8RyTFfI3iQHCOdm1FRBqT6Drqx2mB+ptTB755btpOG7rbrT8YeQ/01",
-	"BIWjL+96wAksEklHSQXQ5gKZATiq/MjAEVy4JOkBF8idfHHL/FagQ9s/b4SV7QyaTca0apzkkogG2+t4",
-	"Mkl+ymj6SrwUP/7XT69wKsufXvhsfCDp4FzNu8NSipXM1slZG/ltlVR9iTXYTqnRg23UhT4AnQ0S2ki1",
-	"KU1hFaztUHGhuYJBp2ZAjteIQ5GtVXCLKZNL4OYLoVOq9mlnztZIFJCQ+ZrQhSbArZ73WbJbZMVvPUat",
-	"IjZC1dAp9cbe46wElJdCohk0VqmACpw7lONwUKT2r+LDd5jfpWxFw7ZgxtI1kvBg7mt6Cl18WfsOvVvr",
-	"YVM6pddKJolAGH1Wf/pcT/1sy9SQEUIJqdrj33K7mL81Fl1LX5tpXcdEXxHt1Fdz+1gfhZs4mtlYeZfM",
-	"NGhmc+y75nlCGTkO7nme+8ZDLzV2e73pYW6jeqmb5Hxm2+3bZcMeHZj2D8Jui0jAEOeEkhxnqEqpGuX3",
-	"8+JNoh+aQd7Tbzgke9w5rKtbAw0tSKJA2dQB5zOZ4wRGxV19RO8XDfckI6rk1CWIMpN+OqHeQjAVFkcc",
-	"r857vniJmcFheJXNqfzyxyHuklmFh9POHsiL9s3uXqyBZvbCuCt3sK6ZlFjw1pHanmDaSa4dVxXtRFSV",
-	"mtmLD92EjpKWJc4yoItw5AkPSVamXtHh8OAwwJI3lv4smLitU5p77Ko/DbuJlZdp8etK8yet/aJ+PBBY",
-	"Oy8O8ZGLn6kk0oTPJAdWBqN8k0w6AP5HAdxhaCkYLyIL1peAIL8DZByogR67n5A5DOheWgEOqF2PTevJ",
-	"sLpk9czcENvSBmX254km0UxRCJvPy/WMN24G+hOzzs5VyXC9i9FdI+LpsX76a+919XbZPC6h6xczIfuW",
-	"LTxK0zKf+Rcye0vrtZrWQwqF6ia896cHyFv23wyWgzTI2OqrWMftdpoXPQf2TrvSTlLX19giYSXHC0j1",
-	"rtVZxCH139TsFOR6zQMFubKIR2ZjARrscGvRk4oNJ1yHK+q1VY1Dr90Ce1Nom9du2yxNcFXeOXFcuiv5",
-	"6qW8vQJ/35f0fhJntANp2eMj6ueTq8j9GuVTjczu0epsctxjHL5N2VUgimqmQOtlhbhyCTgJ3FJAzn4n",
-	"W+TlKVcEPbd5T9BXdx93B2teQ2yVCx1gZ+PoGi9CIbnEC7RakmSJEkyRrl0pbC070glHXW2M7glGFfm7",
-	"cfqWO6wvEYtf40V/HN4bfjthDVAhswXWEi/07gadyIqigXPXojl/I46GqUmhAML+SkBXlYMVxmBpj62t",
-	"H2zGzHg/FRi6Vt3DsWHGgGy9D5REaqsgsnKh/rNkXFmEglCqRd+m9uJI0VV90EuI3T3iWmsHToKm46Yi",
-	"ghOPYezv0KHLmfpZcEj19NfvBTp/owutjdOIM1NOJUD50hJ0BhyjFIsl+m9E5PfC3WfkmN+Nbc5Yu5UC",
-	"AU0LRqgUpgBNFIzq8uN7zHX6fM54Lqw41NjHUzqlvzCObFY6RgtyD172vrolO3+DbkOXI7d6Azrjrhd/",
-	"K1kxevlilLN7AmJkwNzG6MrW9qEVyTJU0hS4kGrqjFkMeoUnUxpEMwqC1bjDy5pShIWG27n8wbKR7t9+",
-	"+RNE3LoRGilTTB4gHd3BDM9GCRYwqi6Hhl0WtWXqmL7F4Zn+xCsCGXKL3Zi8b/7bqnRHX/69BH1H5F0N",
-	"EYHMaHPdQwRyK/UMnVdpoa9Uqpr3gK3UEWl1V2Xk0wCub27Ufz/QbO3u7bpBkjU0W4y/HqECRANcXxIt",
-	"sUBLnJo3GAWwwrSPGGSKjOsTMEDGToYeFagP6B64sA9IarJ+L7xLLKUrpQBF4ILDPYGVffzRQwavBEVZ",
-	"6gDmj5f/RHNOgKbZ2lg6434oOnAozIONyuBo0py/mVK9EG33KAihVV4wLvGMZESuB65JHw47DmX/vUu1",
-	"jJr9wyvtzJHVUzAgM2hSvXkp+CtkGUMrxrP0P3aWChxyNlo1CB2QVmUD52Tcc4R59znm+REIlDNL0u3v",
-	"82alnNKUgbCPgvTsivPCv6G1dEIfBczLTEumKbFWB1uG+QKmVDFSGLTGb2UcmatlQWSJjc6tlkDRmpUo",
-	"ZfR7iShAao6eMst0cYiSpsoYXw9gIz6Aia0Xmz0vKw68dBxqsVvlM3uaaqdOAyPESiF2e1WG6H2Cbq9z",
-	"rThXew35/NuqJDVP57jM1AHux1GHBm+l0I+aK2RHjuB2PkV8eq1P647qixX7dB9RDq/2UWcLJCUncn2l",
-	"MFhN4WxlLz10j5/EvLesuvy4VyUjAUJtqFZIXBCFaBNHjjC7gVQk7IW20WmUOXMPUW1uwgJqPrvqPCCt",
-	"3GR9EmXo9OJc27tZSTL9tjNheV5SItco5dpVd5XyOqa0ilYtN4oje9JHJ9FLhY4VQHFBopPoh/GL8UvF",
-	"WyyXmpAT+23s3skuQAYf5cOJtpoLoMCxZNxWEgqE0W2Oi09GcG901mCOE3jc3CIyNx4PEUiARJJN6W37",
-	"be7teDxGgqHz73P0eykkKoXacpFhdRA4p4SylTn0lUjqyedpdBK9BXlVQBK1GpG8evGi9SJYAZpomDve",
-	"5IZe23siGJ18uokjUeY5VuZWLUCT5UMBVLHth/ELW79k96gCkn9cfXg/dhbs5JOpW7xRYCf3Lye2GkL0",
-	"Et/h8M9VVx2WlJwDldkaefe/+u1oVWLRpJjXM6WHaiHdrsZNAj1XNnH044uXu6c2nq/rST/unlQ1itCc",
-	"seZ716RQu4vNpmZARfKbjVaFZBl4Tq8LMI9PeNumy28atu7fkddXrNWRK9o8hX3NtjXPmoMtNZoIyOYT",
-	"XPUfKlgoB/ixyJjuF4HMyIqve3KzbvD2BIbWQHp4GmoA8tdh2GOzE+LGY16vPewyzlrdgbavYprf87En",
-	"6VIPmQR6QpprjSeY0Zr1z4SlzbNwC4NLuexl4iVITuAeEK7C8eYDxupRqRjXeURRFrpEA2E0hxWa0hVe",
-	"6+Snr7axSaoIogIz5B4L62H69bTOJjjveoyul0RMqUulIglZpuCbKjmbrVDgUYILk38gyuvhgIDiWQZp",
-	"yDHp9Oc6SEjaQDS7B0z0ulN9QYYr9jaYPcnYwtYS9PA8Z/eAjJstDJesRdRerqb4eDstDYaBZvLgfjPf",
-	"gspb6KrbqU4em11VN5PEa7wZPuauyILqbKmuu4UHYijt+kXohBfWb9X1xZFupWr1JcyHcOPPfc1os0Ot",
-	"uxje7+zsXczmUFV7ft7QYMV0TJ0IsqAmBvpKAuP6Q1wZxAdyuur0+v/M3cHcsuhn7iUsiJDAEdYvd47D",
-	"1LL4kzD1T3wuuvzRBOtGbP0cOmPKZ7FhZ52nQ9g1cDM3IQ0l7XV3w91oD2BWGND/TVV89NKGn242e/G9",
-	"E+n0ekpXEnOT9HG090TAdmxvG+d+AfA7AH67kGdbP8K/oFWueJ/jOxig8RWjubbSho1otjZ5VtPhT1nt",
-	"2ips13jv0dETVd7v+vz8LfVhCqyY+CT1bXC14ExRQ3HXi3+wz9tATNnbBPPb63RvX84/8cnc7GfRn2mq",
-	"8xNZhupJiNmXxERCVxObTZ8Piv7DfaO/HHX8HhyORq42dLjoG5KZCz1XWqrk/PxNl0heF+VvJ8KBVs7P",
-	"/TRyXKv56PUvHijoVd/hNtP8hsodprXM4JKtEKOZsnL6jakycOCKHPXNoGuTp+9f/yhBV6a4H8hxhSwH",
-	"/hDO7uW4gh8ByFYXhNZhPw1sXV2XA28OE0ifwM9dEquu17YcL+D/uN8IUb6NV3/q+jRUWX2/1i8okfZH",
-	"RA5wdpoANk9gWrMd+/O7pan51TQck0fvZ5O2G/8t1V/uN6WIFKaYKkZm47Ep0iISrbCYUtd2Hwu0gkxF",
-	"v55x2lYsFnCavO70+x4x7d+hepI6qwU8V21uljvsaL+/jT/RvpI2qd4WDLAefc1XWk6H92NLx5GIPa2N",
-	"v4CDbE3gRzGen6UxjLXcd9VKPWbleglV7bIt2q4KT5V06UINLXuk7knLIQMswBRRIWVWaltiyqE5FBwE",
-	"UNNXwc17S6SutyK6RnvZU3X0L7vkb154JNhcrjCvCWQghsqN2nFwVUNnwmBTzRjy4xT9f72+vkBVcZd7",
-	"UEEESllS5kCl/YmCGehyr1y5YpC6IOl2ggtyi6a0wPb+FdMq9hWIlVKQ1LKOCDRTjNND9cORme4w/ECq",
-	"3vpTOueaxCki8/p2mAjES0pVLE0UITBNccYooJylYBipGy9HajWRF/p3y93oaFYKomvPM7YgCRKynM/H",
-	"tVOoidr1MZudJ6rmXWLcdGsDMz8K4C6V1xju7tW7Uy4aUZY/qYoAupPcL7hU0Z43zQsBuxN/YbzM/big",
-	"8YOKwfX5xwCu6uI80+yWq43B5mbzvwEAAP//JAlblJJzAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

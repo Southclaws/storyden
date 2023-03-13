@@ -66,6 +66,6 @@ func (p *Posts) PostsCreate(ctx context.Context, request openapi.PostsCreateRequ
 	}
 
 	return openapi.PostsCreate200JSONResponse{
-		PostsCreateSuccessJSONResponse: openapi.PostsCreateSuccessJSONResponse(serialisePost(post)),
+		PostsCreateOKJSONResponse: openapi.PostsCreateOKJSONResponse(serialisePost(post)),
 	}, nil
 }

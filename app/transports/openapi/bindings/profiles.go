@@ -37,7 +37,7 @@ func (p *Profiles) ProfilesGet(ctx context.Context, request openapi.ProfilesGetR
 	interests := dt.Map(acc.Interests, serialiseTag)
 
 	return openapi.ProfilesGet200JSONResponse{
-		ProfilesGetSuccessJSONResponse: openapi.ProfilesGetSuccessJSONResponse{
+		ProfilesGetOKJSONResponse: openapi.ProfilesGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
 			Bio:       utils.Ref(acc.Bio.ElseZero()),
 			Handle:    (*openapi.AccountHandle)(&acc.Handle),

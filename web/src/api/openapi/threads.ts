@@ -8,12 +8,12 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  ThreadsCreateSuccessResponse,
+  ThreadsCreateOKResponse,
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
   ThreadsCreateBody,
-  ThreadsListResponse,
+  ThreadsListOKResponse,
   ThreadsListParams,
   ThreadsGetResponse,
 } from "./schemas";
@@ -23,7 +23,7 @@ import { fetcher } from "../client";
  * Create a new thread within the specified category.
  */
 export const threadsCreate = (threadsCreateBody: ThreadsCreateBody) => {
-  return fetcher<ThreadsCreateSuccessResponse>({
+  return fetcher<ThreadsCreateOKResponse>({
     url: `/v1/threads`,
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -35,7 +35,7 @@ export const threadsCreate = (threadsCreateBody: ThreadsCreateBody) => {
  * Get a list of all threads.
  */
 export const threadsList = (params?: ThreadsListParams) => {
-  return fetcher<ThreadsListResponse>({
+  return fetcher<ThreadsListOKResponse>({
     url: `/v1/threads`,
     method: "get",
     params,

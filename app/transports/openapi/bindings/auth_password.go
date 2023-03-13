@@ -29,9 +29,9 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 	}
 
 	return openapi.AuthPasswordSignin200JSONResponse{
-		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body:    openapi.AuthSuccess{Id: u.ID.String()},
-			Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+			Headers: openapi.AuthSuccessOKResponseHeaders{SetCookie: cookie},
 		},
 	}, nil
 }
@@ -56,9 +56,9 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 	}
 
 	return openapi.AuthPasswordSignup200JSONResponse{
-		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
-			Body:    openapi.AuthSuccess{Id: u.ID.String()},
-			Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
+			Body:    openapi.AuthSuccessOK{Id: u.ID.String()},
+			Headers: openapi.AuthSuccessOKResponseHeaders{SetCookie: cookie},
 		},
 	}, nil
 }

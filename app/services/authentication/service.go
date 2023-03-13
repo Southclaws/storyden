@@ -25,7 +25,6 @@ var ErrInvalidProvider = fault.New("invalid provider")
 // 2. Add the instance to `allProviders` in the Manager constructor.
 //
 // See lines annotated with (1) and (2) below...
-//
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(

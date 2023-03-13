@@ -9,7 +9,7 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { TagList } from "./tagList";
 
-export interface AccountsUpdateBody {
+export interface AccountMutableProps {
   handle?: AccountHandle;
   name?: AccountName;
   bio?: string;

@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1
  */
 
-/**
- * OK
- */
-export type AccountsGetAvatarResponse = Blob;
+export interface AuthSuccess {
+  id: string;
+}

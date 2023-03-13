@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostsCreateSuccessResponse, PostsCreateBody } from "./schemas";
+import type { PostsCreateOKResponse, PostsCreateBody } from "./schemas";
 import { fetcher } from "../client";
 
 /**
@@ -15,7 +15,7 @@ export const postsCreate = (
   threadMark: string,
   postsCreateBody: PostsCreateBody
 ) => {
-  return fetcher<PostsCreateSuccessResponse>({
+  return fetcher<PostsCreateOKResponse>({
     url: `/v1/threads/${threadMark}/posts`,
     method: "post",
     headers: { "Content-Type": "application/json" },

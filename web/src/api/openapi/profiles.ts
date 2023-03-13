@@ -8,7 +8,7 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  ProfilesGetSuccessResponse,
+  ProfilesGetOKResponse,
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
@@ -19,7 +19,7 @@ import { fetcher } from "../client";
  * Get a public profile by ID.
  */
 export const profilesGet = (accountHandle: string) => {
-  return fetcher<ProfilesGetSuccessResponse>({
+  return fetcher<ProfilesGetOKResponse>({
     url: `/v1/profiles/${accountHandle}`,
     method: "get",
   });

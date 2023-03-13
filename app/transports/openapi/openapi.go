@@ -8,7 +8,6 @@
 // Within this package, all you will find is fx providers for the actual HTTP
 // server, the router and the bindings. The bindings package is where most of
 // the logic is and it depends on the router to mount the bindings.
-//
 package openapi
 
 import (

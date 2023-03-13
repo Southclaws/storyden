@@ -129,7 +129,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthProviderList" }
+        "200": { $ref: "#/components/responses/AuthProviderListOK" }
 
   /v1/auth/password/signup:
     post:
@@ -141,7 +141,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/password/signin:
     post:
@@ -154,22 +154,21 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/oauth/{oauth_provider}/callback:
     post:
-      operationId: AuthOAuthProviderCallback
+      operationId: OAuthProviderCallback
       description: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/OAuthProvider"]
-      requestBody:
-        { $ref: "#/components/requestBodies/AuthOAuthProviderCallback" }
+      requestBody: { $ref: "#/components/requestBodies/OAuthProviderCallback" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/webauthn/make/{account_handle}:
     get:
@@ -182,8 +181,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "200":
-          { $ref: "#/components/responses/WebAuthnRequestCredentialSuccess" }
+        "200": { $ref: "#/components/responses/WebAuthnRequestCredentialOK" }
 
   /v1/auth/webauthn/make:
     post:
@@ -195,7 +193,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/webauthn/assert/{account_handle}:
     get:
@@ -209,7 +207,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200":
-          $ref: "#/components/responses/WebAuthnGetAssertionSuccess"
+          $ref: "#/components/responses/WebAuthnGetAssertionOK"
 
   /v1/auth/webauthn/assert:
     post:
@@ -222,7 +220,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccess" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/logout:
     get:
@@ -249,32 +247,32 @@ paths:
 
   /v1/accounts:
     get:
-      operationId: AccountsGet
+      operationId: AccountGet
       description: Get the information for the currently authenticated account.
       tags: [accounts]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountsGetSuccess" }
+        "200": { $ref: "#/components/responses/AccountGetOK" }
 
     patch:
-      operationId: AccountsUpdate
+      operationId: AccountUpdate
       description: Update the information for the currently authenticated account.
       tags: [accounts]
-      requestBody: { $ref: "#/components/requestBodies/AccountsUpdate" }
+      requestBody: { $ref: "#/components/requestBodies/AccountUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountsUpdateSuccess" }
+        "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
   /v1/accounts/self/avatar:
     post:
-      operationId: AccountsSetAvatar
+      operationId: AccountSetAvatar
       description: Upload an avatar for the authenticated account.
       tags: [accounts]
-      requestBody: { $ref: "#/components/requestBodies/AccountsSetAvatar" }
+      requestBody: { $ref: "#/components/requestBodies/AccountSetAvatar" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -283,7 +281,7 @@ paths:
 
   /v1/accounts/{account_handle}/avatar:
     get:
-      operationId: AccountsGetAvatar
+      operationId: AccountGetAvatar
       description: Get an avatar for the specified account.
       tags: [accounts]
       security: []
@@ -292,7 +290,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountsGetAvatar" }
+        "200": { $ref: "#/components/responses/AccountGetAvatar" }
 
   #
   #                           .d888 d8b 888
@@ -310,7 +308,7 @@ paths:
 
   /v1/profiles/{account_handle}:
     get:
-      operationId: ProfilesGet
+      operationId: ProfileGet
       description: Get a public profile by ID.
       tags: [profiles]
       security: []
@@ -319,7 +317,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfilesGetSuccess" }
+        "200": { $ref: "#/components/responses/ProfileGetOK" }
 
   #
   #                   888                                      d8b
@@ -343,7 +341,7 @@ paths:
       tags: [categories]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoriesListSuccess" }
+        "200": { $ref: "#/components/responses/CategoriesListOK" }
 
   #
   # 888    888                                    888
@@ -366,7 +364,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadsCreateSuccess" }
+        "200": { $ref: "#/components/responses/ThreadsCreateOK" }
 
     get:
       operationId: ThreadsList
@@ -388,7 +386,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadsList" }
+        "200": { $ref: "#/components/responses/ThreadsListOK" }
 
   /v1/threads/{thread_mark}:
     get:
@@ -431,7 +429,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostsCreateSuccess" }
+        "200": { $ref: "#/components/responses/PostsCreateOK" }
 
   # /v1/threads/{thread_id}/posts/{post_id}:
   #   get:
@@ -498,14 +496,12 @@ components:
     AuthPassword:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthPasswordBody" }
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/AuthPasswordBody" }
+          schema: { $ref: "#/components/schemas/AuthPair" }
 
-    AuthOAuthProviderCallback:
+    OAuthProviderCallback:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthOAuthProviderCallbackBody" }
+          schema: { $ref: "#/components/schemas/OAuthCallback" }
 
     WebAuthnMakeCredential:
       content:
@@ -517,12 +513,12 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/PublicKeyCredential" }
 
-    AccountsUpdate:
+    AccountUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AccountsUpdateBody" }
+          schema: { $ref: "#/components/schemas/AccountMutableProps" }
 
-    AccountsSetAvatar:
+    AccountSetAvatar:
       content:
         application/octet-stream:
           schema:
@@ -532,16 +528,12 @@ components:
     ThreadsCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
-        application/x-www-form-urlencoded:
-          schema: { $ref: "#/components/schemas/ThreadsCreateBody" }
+          schema: { $ref: "#/components/schemas/ThreadMutableProps" }
 
     PostsCreate:
       description: Create a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostInitialProps" }
-        application/x-www-form-urlencoded:
           schema: { $ref: "#/components/schemas/PostInitialProps" }
 
   #
@@ -569,7 +561,7 @@ components:
           schema:
             $ref: "#/components/schemas/APIError"
 
-    AuthSuccess:
+    AuthSuccessOK:
       description: OK
       headers:
         "Set-Cookie":
@@ -578,9 +570,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AuthSuccessBody"
+            $ref: "#/components/schemas/AuthSuccess"
 
-    AuthProviderList:
+    AuthProviderListOK:
       description: OK
       content:
         application/json:
@@ -588,9 +580,9 @@ components:
             type: object
             required: [providers]
             properties:
-              providers: { $ref: "#/components/schemas/AuthProviderListBody" }
+              providers: { $ref: "#/components/schemas/AuthProviderList" }
 
-    WebAuthnRequestCredentialSuccess:
+    WebAuthnRequestCredentialOK:
       description: OK
       headers:
         "Set-Cookie":
@@ -601,7 +593,7 @@ components:
           schema:
             { $ref: "#/components/schemas/WebAuthnPublicKeyCreationOptions" }
 
-    WebAuthnGetAssertionSuccess:
+    WebAuthnGetAssertionOK:
       description: OK
       headers:
         "Set-Cookie":
@@ -612,21 +604,21 @@ components:
           schema:
             $ref: "#/components/schemas/CredentialRequestOptions"
 
-    AccountsGetSuccess:
+    AccountGetOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
 
-    AccountsUpdateSuccess:
+    AccountUpdateOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
 
-    AccountsGetAvatar:
+    AccountGetAvatar:
       description: OK
       content:
         image/png:
@@ -634,28 +626,28 @@ components:
             type: string
             format: binary
 
-    ProfilesGetSuccess:
+    ProfileGetOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/PublicProfile"
 
-    CategoriesListSuccess:
+    CategoriesListOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/CategoryList"
 
-    ThreadsCreateSuccess:
+    ThreadsCreateOK:
       description: Thread created.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Thread"
 
-    ThreadsList:
+    ThreadsListOK:
       description: List of all threads.
       content:
         application/json:
@@ -671,7 +663,7 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
 
-    PostsCreateSuccess:
+    PostsCreateOK:
       description: Thread post created successfully.
       content:
         application/json:
@@ -690,6 +682,17 @@ components:
   #
 
   schemas:
+    #
+    #  .d8888b.
+    # d88P  Y88b
+    # 888    888
+    # 888         .d88b.  88888b.d88b.  88888b.d88b.   .d88b.  88888b.
+    # 888        d88""88b 888 "888 "88b 888 "888 "88b d88""88b 888 "88b
+    # 888    888 888  888 888  888  888 888  888  888 888  888 888  888
+    # Y88b  d88P Y88..88P 888  888  888 888  888  888 Y88..88P 888  888
+    #  "Y8888P"   "Y88P"  888  888  888 888  888  888  "Y88P"  888  888
+    #
+
     Identifier:
       type: string
       format: xid
@@ -767,16 +770,80 @@ components:
       additionalProperties: true
       description: Arbitrary metadata for the resource.
 
-    # -
-    # Auth
-    # -
+    AccountName:
+      type: string
+      description: The account owners display name.
+      example: Barnaby Keene
 
-    AuthProviderListBody:
+    AccountHandle:
+      type: string
+      x-go-type: string
+      description: The unique @ handle of an account.
+      example: Southclaws
+
+    ProfileReference:
+      type: object
+      description: A minimal reference to an account.
+      required: [id, handle, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        handle: { $ref: "#/components/schemas/AccountHandle" }
+        name: { $ref: "#/components/schemas/AccountName" }
+
+    ThreadTitle:
+      type: string
+      description: The title of a thread.
+      example: Hello world!
+
+    Tag:
+      type: object
+      description: A tag which can link profiles or threads via interests.
+      required: [id, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name: { $ref: "#/components/schemas/TagName" }
+        colour: { type: string }
+
+    TagName:
+      type: string
+      description: The name of a tag.
+
+    TagList:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/Tag" }
+
+    TagListIDs:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/Identifier" }
+
+    PostBodyMarkdown:
+      type: string
+      description: The body text of a post within a thread.
+      example: |
+        # My post
+
+        This is a _post_ within a _thread_ formatted in *markdown*.
+
+    #
+    #        d8888          888    888
+    #       d88888          888    888
+    #      d88P888          888    888
+    #     d88P 888 888  888 888888 88888b.
+    #    d88P  888 888  888 888    888 "88b
+    #   d88P   888 888  888 888    888  888
+    #  d8888888888 Y88b 888 Y88b.  888  888
+    # d88P     888  "Y88888  "Y888 888  888
+    #
+
+    AuthProviderList:
       type: array
       items:
         $ref: "#/components/schemas/AuthProvider"
 
     AuthProvider:
+      type: object
       required: [provider, name, logo_url, link]
       properties:
         provider:
@@ -792,7 +859,7 @@ components:
           description: The hyperlink to render for the user.
           type: string
 
-    AuthPasswordBody:
+    AuthPair:
       type: object
       required: [identifier, token]
       properties:
@@ -803,14 +870,14 @@ components:
           example: "password"
           type: string
 
-    AuthSuccessBody:
+    AuthSuccess:
       type: object
       required: [id]
       properties:
         id:
           type: string
 
-    AuthOAuthProviderCallbackBody:
+    OAuthCallback:
       type: object
       required:
         - state
@@ -889,6 +956,7 @@ components:
     PublicKeyCredentialParameters:
       description: |
         https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialparameters
+      type: object
       required: [type, alg]
       properties:
         type:
@@ -909,8 +977,7 @@ components:
       required: [type, id]
       properties:
         type:
-          type: string
-          enum: [public-key]
+          $ref: "#/components/schemas/PublicKeyCredentialType"
         id:
           type: string
         transports:
@@ -1049,9 +1116,16 @@ components:
           type: string
           enum: ["discouraged", "preferred", "required"]
 
-    # -
-    # Account
-    # -
+    #
+    #        d8888                                            888
+    #       d88888                                            888
+    #      d88P888                                            888
+    #     d88P 888  .d8888b .d8888b .d88b.  888  888 88888b.  888888
+    #    d88P  888 d88P"   d88P"   d88""88b 888  888 888 "88b 888
+    #   d88P   888 888     888     888  888 888  888 888  888 888
+    #  d8888888888 Y88b.   Y88b.   Y88..88P Y88b 888 888  888 Y88b.
+    # d88P     888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888
+    #
 
     Account:
       type: object
@@ -1068,7 +1142,7 @@ components:
             interests:
               $ref: "#/components/schemas/TagList"
 
-    AccountsUpdateBody:
+    AccountMutableProps:
       type: object
       properties:
         handle:
@@ -1080,9 +1154,16 @@ components:
         interests:
           $ref: "#/components/schemas/TagList"
 
-    # -
-    # PublicProfile
-    # -
+    #
+    # 8888888b.                   .d888 d8b 888
+    # 888   Y88b                 d88P"  Y8P 888
+    # 888    888                 888        888
+    # 888   d88P 888d888 .d88b.  888888 888 888  .d88b.
+    # 8888888P"  888P"  d88""88b 888    888 888 d8P  Y8b
+    # 888        888    888  888 888    888 888 88888888
+    # 888        888    Y88..88P 888    888 888 Y8b.
+    # 888        888     "Y88P"  888    888 888  "Y8888
+    #
 
     PublicProfile:
       type: object
@@ -1103,9 +1184,19 @@ components:
             interests:
               $ref: "#/components/schemas/TagList"
 
-    # -
-    # Categories
-    # -
+    #
+    #  .d8888b.           888
+    # d88P  Y88b          888
+    # 888    888          888
+    # 888         8888b.  888888 .d88b.   .d88b.   .d88b.  888d888 888  888
+    # 888            "88b 888   d8P  Y8b d88P"88b d88""88b 888P"   888  888
+    # 888    888 .d888888 888   88888888 888  888 888  888 888     888  888
+    # Y88b  d88P 888  888 Y88b. Y8b.     Y88b 888 Y88..88P 888     Y88b 888
+    #  "Y8888P"  "Y888888  "Y888 "Y8888   "Y88888  "Y88P"  888      "Y88888
+    #                                         888                       888
+    #                                    Y8b d88P                  Y8b d88P
+    #                                     "Y88P"                    "Y88P"
+    #
 
     Category:
       type: object
@@ -1155,11 +1246,18 @@ components:
           type: array
           items: { $ref: "#/components/schemas/Category" }
 
-    # -
-    # Threads
-    # -
+    #
+    # 88888888888 888                                    888
+    #     888     888                                    888
+    #     888     888                                    888
+    #     888     88888b.  888d888 .d88b.   8888b.   .d88888
+    #     888     888 "88b 888P"  d8P  Y8b     "88b d88" 888
+    #     888     888  888 888    88888888 .d888888 888  888
+    #     888     888  888 888    Y8b.     888  888 Y88b 888
+    #     888     888  888 888     "Y8888  "Y888888  "Y88888
+    #
 
-    ThreadsCreateBody:
+    ThreadMutableProps:
       type: object
       required:
         - title
@@ -1245,9 +1343,16 @@ components:
               type: array
               items: { $ref: "#/components/schemas/Post" }
 
-    # -
-    # Posts
-    # -
+    #
+    # 8888888b.                   888
+    # 888   Y88b                  888
+    # 888    888                  888
+    # 888   d88P .d88b.  .d8888b  888888
+    # 8888888P" d88""88b 88K      888
+    # 888       888  888 "Y8888b. 888
+    # 888       Y88..88P      X88 Y88b.
+    # 888        "Y88P"   88888P'  "Y888
+    #
 
     Post:
       type: object
@@ -1287,66 +1392,6 @@ components:
         id: { $ref: "#/components/schemas/Identifier" }
         emoji:
           type: string
-
-    # -
-    # Commonly used small/simple types.
-    # -
-
-    AccountName:
-      type: string
-      description: The account owners display name.
-      example: Barnaby Keene
-
-    AccountHandle:
-      type: string
-      x-go-type: string
-      description: The unique @ handle of an account.
-      example: Southclaws
-
-    ProfileReference:
-      type: object
-      description: A minimal reference to an account.
-      required: [id, handle, name]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        handle: { $ref: "#/components/schemas/AccountHandle" }
-        name: { $ref: "#/components/schemas/AccountName" }
-
-    ThreadTitle:
-      type: string
-      description: The title of a thread.
-      example: Hello world!
-
-    Tag:
-      type: object
-      description: A tag which can link profiles or threads via interests.
-      required: [id, name]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        name: { $ref: "#/components/schemas/TagName" }
-        colour: { type: string }
-
-    TagName:
-      type: string
-      description: The name of a tag.
-
-    TagList:
-      type: array
-      description: A list of tags.
-      items: { $ref: "#/components/schemas/Tag" }
-
-    TagListIDs:
-      type: array
-      description: A list of tags.
-      items: { $ref: "#/components/schemas/Identifier" }
-
-    PostBodyMarkdown:
-      type: string
-      description: The body text of a post within a thread.
-      example: |
-        # My post
-
-        This is a _post_ within a _thread_ formatted in *markdown*.
 
   securitySchemes:
     browser:

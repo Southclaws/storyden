@@ -20,16 +20,15 @@ import (
 // context cancellation function for immediate shutdown once all test functions
 // have finished. Usage is a simple call and defer:
 //
-// func TestMyThing(t *testing.T) {
-//     defer bdd.Test(t, nil, fx.Invoke(func(test dependencies...) {
-//         r := require.New(t)
-//         a := assert.New(t)
+//	func TestMyThing(t *testing.T) {
+//	    defer bdd.Test(t, nil, fx.Invoke(func(test dependencies...) {
+//	        r := require.New(t)
+//	        a := assert.New(t)
 //
-//         your behavioural test code...
+//	        your behavioural test code...
 //
-//     }))
-// }
-//
+//	    }))
+//	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	defaultConfig := config.Config{}
 

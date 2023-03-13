@@ -17,6 +17,7 @@ linters:
     - wrapcheck
   disable:
     - scopelint
+    - asciicheck
   presets:
     - bugs
     - unused

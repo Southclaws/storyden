@@ -3,12 +3,11 @@ package thread_mark
 import (
 	"context"
 
-	"go.uber.org/fx"
-
+	"github.com/Southclaws/fault"
 	"github.com/dboslee/lru"
 	"github.com/rs/xid"
+	"go.uber.org/fx"
 
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
