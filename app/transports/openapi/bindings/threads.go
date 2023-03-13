@@ -79,9 +79,12 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		})
 	})
 
+	cats := opt.NewPtr(request.Params.Categories)
+
 	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000, thread_service.Params{
-		AccountID: author,
-		Tags:      tags,
+		AccountID:  author,
+		Tags:       tags,
+		Categories: cats,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

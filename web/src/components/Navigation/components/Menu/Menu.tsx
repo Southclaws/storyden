@@ -1,12 +1,15 @@
-import { Button, Flex, HStack, IconButton } from "@chakra-ui/react";
+import { Flex, HStack, IconButton } from "@chakra-ui/react";
 import { Cog8ToothIcon, UserIcon } from "@heroicons/react/24/outline";
 import map from "lodash/fp/map";
 import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
+import Link from "src/components/site/Link";
 import { Unready } from "src/components/Unready";
 import { useMenu } from "./useMenu";
 
-const mapCategories = map((c: Category) => <Button>{c.name}</Button>);
+const mapCategories = map((c: Category) => (
+  <Link href={`/c/${c.name}`}>{c.name}</Link>
+));
 
 export function Menu() {
   const { isAuthenticated, data, error } = useMenu();

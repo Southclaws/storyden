@@ -14,7 +14,9 @@ export const fetcher = async <T>({
   params,
   data,
 }: Options): Promise<T> => {
-  const req = new Request(`/api${url}` + new URLSearchParams(params), {
+  const query = params ? `?${new URLSearchParams(params)}` : "";
+
+  const req = new Request(`/api${url}${query}`, {
     method,
     mode: "cors",
     credentials: "include",

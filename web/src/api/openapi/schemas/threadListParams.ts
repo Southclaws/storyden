@@ -7,5 +7,10 @@
  */
 import type { AccountHandle } from "./accountHandle";
 import type { TagListIDs } from "./tagListIDs";
+import type { CategoryNameList } from "./categoryNameList";
 
-export type ThreadListParams = { author?: AccountHandle; tags?: TagListIDs };
+export type ThreadListParams = {
+  author?: AccountHandle;
+  tags?: TagListIDs;
+  categories?: CategoryNameList;
+};
