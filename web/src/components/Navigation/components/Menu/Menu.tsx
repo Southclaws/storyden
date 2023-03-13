@@ -3,12 +3,13 @@ import { Cog8ToothIcon, UserIcon } from "@heroicons/react/24/outline";
 import map from "lodash/fp/map";
 import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
-import Link from "src/components/site/Link";
 import { Unready } from "src/components/Unready";
 import { useMenu } from "./useMenu";
 
 const mapCategories = map((c: Category) => (
-  <Link href={`/c/${c.name}`}>{c.name}</Link>
+  <Anchor key={c.id} href={`/c/${c.name}`}>
+    {c.name}
+  </Anchor>
 ));
 
 export function Menu() {
