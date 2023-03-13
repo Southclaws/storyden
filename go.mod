@@ -39,17 +39,32 @@ require github.com/Southclaws/fault v0.5.1
 require (
 	github.com/Southclaws/opt v0.6.0
 	github.com/dboslee/lru v0.0.1
+	github.com/go-faster/errors v0.6.1
+	github.com/go-faster/jx v1.0.0
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
+	github.com/ogen-go/ogen v0.59.0
+	go.opentelemetry.io/otel v1.14.0
+	go.opentelemetry.io/otel/metric v0.37.0
+	go.opentelemetry.io/otel/trace v1.14.0
 )
 
 require (
+	github.com/dlclark/regexp2 v1.8.0 // indirect
+	github.com/fatih/color v1.14.1 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/go-faster/yamlx v0.4.1 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-webauthn/revoke v0.1.9 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 require (
@@ -112,7 +127,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/multierr v1.10.0
 	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
