@@ -10,4 +10,4 @@ import type { Post } from "./post";
 /**
  * Thread post created successfully.
  */
-export type PostsCreateSuccessResponse = Post;
+export type PostsCreateOKResponse = Post;

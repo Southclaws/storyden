@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AuthPair } from "./authPair";
 
-export interface AuthPasswordBody {
-  identifier: string;
-  token: string;
-}
+export type AuthPasswordBody = AuthPair;

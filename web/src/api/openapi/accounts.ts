@@ -8,41 +8,38 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  AccountsGetSuccessResponse,
+  AccountGetOKResponse,
   UnauthorisedResponse,
   NotFoundResponse,
   InternalServerErrorResponse,
-  AccountsUpdateSuccessResponse,
-  AccountsUpdateBody,
-  AccountsSetAvatarBody,
-  AccountsGetAvatarResponse,
+  AccountUpdateOKResponse,
+  AccountUpdateBody,
+  AccountSetAvatarBody,
+  AccountGetAvatarResponse,
 } from "./schemas";
 import { fetcher } from "../client";
 
 /**
  * Get the information for the currently authenticated account.
  */
-export const accountsGet = () => {
-  return fetcher<AccountsGetSuccessResponse>({
-    url: `/v1/accounts`,
-    method: "get",
-  });
+export const accountGet = () => {
+  return fetcher<AccountGetOKResponse>({ url: `/v1/accounts`, method: "get" });
 };
 
-export const getAccountsGetKey = () => [`/v1/accounts`];
+export const getAccountGetKey = () => [`/v1/accounts`];
 
-export type AccountsGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof accountsGet>>
+export type AccountGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountGet>>
 >;
-export type AccountsGetQueryError =
+export type AccountGetQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useAccountsGet = <
+export const useAccountGet = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof accountsGet>>, TError> & {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof accountGet>>, TError> & {
     swrKey?: Key;
     enabled?: boolean;
   };
@@ -51,8 +48,8 @@ export const useAccountsGet = <
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getAccountsGetKey() : null));
-  const swrFn = () => accountsGet();
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAccountGetKey() : null));
+  const swrFn = () => accountGet();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -69,58 +66,58 @@ export const useAccountsGet = <
 /**
  * Update the information for the currently authenticated account.
  */
-export const accountsUpdate = (accountsUpdateBody: AccountsUpdateBody) => {
-  return fetcher<AccountsUpdateSuccessResponse>({
+export const accountUpdate = (accountUpdateBody: AccountUpdateBody) => {
+  return fetcher<AccountUpdateOKResponse>({
     url: `/v1/accounts`,
     method: "patch",
     headers: { "Content-Type": "application/json" },
-    data: accountsUpdateBody,
+    data: accountUpdateBody,
   });
 };
 
 /**
  * Upload an avatar for the authenticated account.
  */
-export const accountsSetAvatar = (
-  accountsSetAvatarBody: AccountsSetAvatarBody
+export const accountSetAvatar = (
+  accountSetAvatarBody: AccountSetAvatarBody
 ) => {
   return fetcher<void>({
     url: `/v1/accounts/self/avatar`,
     method: "post",
     headers: { "Content-Type": "application/octet-stream" },
-    data: accountsSetAvatarBody,
+    data: accountSetAvatarBody,
   });
 };
 
 /**
  * Get an avatar for the specified account.
  */
-export const accountsGetAvatar = (accountHandle: string) => {
-  return fetcher<AccountsGetAvatarResponse>({
+export const accountGetAvatar = (accountHandle: string) => {
+  return fetcher<AccountGetAvatarResponse>({
     url: `/v1/accounts/${accountHandle}/avatar`,
     method: "get",
   });
 };
 
-export const getAccountsGetAvatarKey = (accountHandle: string) => [
+export const getAccountGetAvatarKey = (accountHandle: string) => [
   `/v1/accounts/${accountHandle}/avatar`,
 ];
 
-export type AccountsGetAvatarQueryResult = NonNullable<
-  Awaited<ReturnType<typeof accountsGetAvatar>>
+export type AccountGetAvatarQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountGetAvatar>>
 >;
-export type AccountsGetAvatarQueryError =
+export type AccountGetAvatarQueryError =
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
-export const useAccountsGetAvatar = <
+export const useAccountGetAvatar = <
   TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
 >(
   accountHandle: string,
   options?: {
     swr?: SWRConfiguration<
-      Awaited<ReturnType<typeof accountsGetAvatar>>,
+      Awaited<ReturnType<typeof accountGetAvatar>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
   }
@@ -130,8 +127,8 @@ export const useAccountsGetAvatar = <
   const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccountsGetAvatarKey(accountHandle) : null));
-  const swrFn = () => accountsGetAvatar(accountHandle);
+    (() => (isEnabled ? getAccountGetAvatarKey(accountHandle) : null));
+  const swrFn = () => accountGetAvatar(accountHandle);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

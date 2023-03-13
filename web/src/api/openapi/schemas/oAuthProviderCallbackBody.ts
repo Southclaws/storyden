@@ -5,5 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { OAuthCallback } from "./oAuthCallback";
 
-export type AccountsSetAvatarBody = Blob;
+export type OAuthProviderCallbackBody = OAuthCallback;

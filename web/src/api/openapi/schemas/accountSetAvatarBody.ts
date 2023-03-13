@@ -5,9 +5,5 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CategoryList } from "./categoryList";
 
-/**
- * OK
- */
-export type CategoriesListSuccessResponse = CategoryList;
+export type AccountSetAvatarBody = Blob;

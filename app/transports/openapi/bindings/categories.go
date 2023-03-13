@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -27,7 +28,7 @@ func (c Categories) CategoriesList(ctx context.Context, request openapi.Categori
 	}
 
 	return openapi.CategoriesList200JSONResponse{
-		CategoriesListSuccessJSONResponse: openapi.CategoriesListSuccessJSONResponse{
+		CategoriesListOKJSONResponse: openapi.CategoriesListOKJSONResponse{
 			Categories: dt.Map(cats, serialiseCategory),
 		},
 	}, nil

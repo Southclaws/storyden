@@ -27,8 +27,8 @@ func (s *service) ListAll(
 ) ([]*thread.Thread, error) {
 	q := []thread.Query{}
 
-	opts.AccountID.If(func(a account.AccountID) { q = append(q, thread.WithAuthor(a)) })
-	opts.Tags.If(func(a []xid.ID) { q = append(q, thread.WithTags(a)) })
+	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.WithAuthor(a)) })
+	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.WithTags(a)) })
 
 	thr, err := s.thread_repo.List(ctx, before, max, q...)
 	if err != nil {

@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 
-export interface AuthOAuthProviderCallbackBody {
-  state: string;
-  code: string;
+export interface AuthPair {
+  identifier: string;
+  token: string;
 }

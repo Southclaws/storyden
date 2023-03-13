@@ -8,7 +8,7 @@
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
 import type {
-  CategoriesListSuccessResponse,
+  CategoriesListOKResponse,
   InternalServerErrorResponse,
 } from "./schemas";
 import { fetcher } from "../client";
@@ -17,7 +17,7 @@ import { fetcher } from "../client";
  * Get a list of all categories on the site.
  */
 export const categoriesList = () => {
-  return fetcher<CategoriesListSuccessResponse>({
+  return fetcher<CategoriesListOKResponse>({
     url: `/v1/categories`,
     method: "get",
   });

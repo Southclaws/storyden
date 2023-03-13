@@ -5,6 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ThreadMutableProps } from "./threadMutableProps";
+import type { Account } from "./account";
 
-export type ThreadsCreateBody = ThreadMutableProps;
+/**
+ * OK
+ */
+export type AccountGetOKResponse = Account;

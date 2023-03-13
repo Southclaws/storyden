@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
-func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request openapi.AuthOAuthProviderCallbackRequestObject) (openapi.AuthOAuthProviderCallbackResponseObject, error) {
+func (o *Authentication) OAuthProviderCallback(ctx context.Context, request openapi.OAuthProviderCallbackRequestObject) (openapi.OAuthProviderCallbackResponseObject, error) {
 	provider, err := o.am.Provider(string(request.OauthProvider))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -25,10 +25,10 @@ func (o *Authentication) AuthOAuthProviderCallback(ctx context.Context, request 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AuthOAuthProviderCallback200JSONResponse{
-		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+	return openapi.OAuthProviderCallback200JSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body:    openapi.AuthSuccess{Id: account.ID.String()},
-			Headers: openapi.AuthSuccessResponseHeaders{SetCookie: cookie},
+			Headers: openapi.AuthSuccessOKResponseHeaders{SetCookie: cookie},
 		},
 	}, nil
 }

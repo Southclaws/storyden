@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AuthProviderListBody } from "./authProviderListBody";
+import type { AccountMutableProps } from "./accountMutableProps";
 
-export type AuthProviderListResponse = {
-  providers: AuthProviderListBody;
-};
+export type AccountUpdateBody = AccountMutableProps;

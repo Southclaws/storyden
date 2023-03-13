@@ -34,7 +34,7 @@ func NewThreads(
 }
 
 func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCreateRequestObject) (openapi.ThreadsCreateResponseObject, error) {
-	params := func() openapi.ThreadsCreateBody {
+	params := func() openapi.ThreadsCreate {
 		if request.FormdataBody != nil {
 			return *request.FormdataBody
 		} else {
@@ -65,7 +65,7 @@ func (i *Threads) ThreadsCreate(ctx context.Context, request openapi.ThreadsCrea
 	}
 
 	return openapi.ThreadsCreate200JSONResponse{
-		ThreadsCreateSuccessJSONResponse: openapi.ThreadsCreateSuccessJSONResponse(serialiseThread(thread)),
+		ThreadsCreateOKJSONResponse: openapi.ThreadsCreateOKJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 
@@ -96,7 +96,7 @@ func (i *Threads) ThreadsList(ctx context.Context, request openapi.ThreadsListRe
 	}
 
 	return openapi.ThreadsList200JSONResponse{
-		ThreadsListJSONResponse: openapi.ThreadsListJSONResponse{
+		ThreadsListOKJSONResponse: openapi.ThreadsListOKJSONResponse{
 			Threads: dt.Map(threads, serialiseThreadReference),
 		},
 	}, nil

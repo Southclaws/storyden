@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -97,8 +98,8 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 	}
 
 	return openapi.WebAuthnRequestCredential200JSONResponse{
-		WebAuthnRequestCredentialSuccessJSONResponse: openapi.WebAuthnRequestCredentialSuccessJSONResponse{
-			Headers: openapi.WebAuthnRequestCredentialSuccessResponseHeaders{
+		WebAuthnRequestCredentialOKJSONResponse: openapi.WebAuthnRequestCredentialOKJSONResponse{
+			Headers: openapi.WebAuthnRequestCredentialOKResponseHeaders{
 				SetCookie: cookie.String(),
 			},
 			Body: serialiseWebAuthnCredentialCreationOptions(*cred),
@@ -147,11 +148,11 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 	}
 
 	return openapi.WebAuthnMakeCredential200JSONResponse{
-		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{
 				Id: xid.NilID().String(),
 			},
-			Headers: openapi.AuthSuccessResponseHeaders{
+			Headers: openapi.AuthSuccessOKResponseHeaders{
 				SetCookie: string(cookie),
 			},
 		},
@@ -186,9 +187,9 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 	}
 
 	return openapi.WebAuthnGetAssertion200JSONResponse{
-		WebAuthnGetAssertionSuccessJSONResponse: openapi.WebAuthnGetAssertionSuccessJSONResponse{
+		WebAuthnGetAssertionOKJSONResponse: openapi.WebAuthnGetAssertionOKJSONResponse{
 			Body: serialiseWebAuthnCredentialRequestOptions(cred.Response),
-			Headers: openapi.WebAuthnGetAssertionSuccessResponseHeaders{
+			Headers: openapi.WebAuthnGetAssertionOKResponseHeaders{
 				SetCookie: cookie.String(),
 			},
 		},
@@ -235,11 +236,11 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 	}
 
 	return openapi.WebAuthnMakeAssertion200JSONResponse{
-		AuthSuccessJSONResponse: openapi.AuthSuccessJSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{
 				Id: xid.NilID().String(),
 			},
-			Headers: openapi.AuthSuccessResponseHeaders{
+			Headers: openapi.AuthSuccessOKResponseHeaders{
 				SetCookie: string(cookie),
 			},
 		},
@@ -254,7 +255,7 @@ func serialiseWebAuthnCredentialCreationOptions(cred protocol.CredentialCreation
 
 	user := openapi.PublicKeyCredentialUserEntity{
 		DisplayName: cred.Response.User.DisplayName,
-		Id:          string(cred.Response.User.ID),
+		Id:          fmt.Sprint(cred.Response.User.ID),
 		Name:        cred.Response.User.Name,
 	}
 
