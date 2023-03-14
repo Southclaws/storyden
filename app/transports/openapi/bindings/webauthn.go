@@ -31,7 +31,7 @@ const cookieName = "storyden-webauthn-session"
 var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
-	sm     Session
+	sm     *cookieJar
 	ar     account.Repository
 	wa     *waprovider.Provider
 	domain string
@@ -40,7 +40,7 @@ type WebAuthn struct {
 func NewWebAuthn(
 	cfg config.Config,
 	ar account.Repository,
-	sm Session,
+	sm *cookieJar,
 	wa *waprovider.Provider,
 	router *echo.Echo,
 ) WebAuthn {
@@ -142,18 +142,13 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := a.sm.encodeSession(accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.WebAuthnMakeCredential200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: string(cookie),
+				SetCookie: a.sm.Create(accountID.String()),
 			},
 		},
 	}, nil
@@ -225,12 +220,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
-	_, accountID, err := a.wa.FinishLogin(ctx, string(session.UserID), *session, cr)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	cookie, err := a.sm.encodeSession(accountID.ID)
+	_, acc, err := a.wa.FinishLogin(ctx, string(session.UserID), *session, cr)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -241,7 +231,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: string(cookie),
+				SetCookie: a.sm.Create(acc.ID.String()),
 			},
 		},
 	}, nil

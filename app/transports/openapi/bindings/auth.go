@@ -21,7 +21,7 @@ import (
 
 type Authentication struct {
 	p      *password.Provider
-	sm     Session
+	sm     *cookieJar
 	ar     account.Repository
 	am     *authentication.Manager
 	domain string
@@ -31,7 +31,7 @@ func NewAuthentication(
 	cfg config.Config,
 	p *password.Provider,
 	ar account.Repository,
-	sm Session,
+	sm *cookieJar,
 	am *authentication.Manager,
 ) Authentication {
 	return Authentication{p, sm, ar, am, cfg.CookieDomain}
@@ -70,20 +70,6 @@ func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi
 			}).String(),
 		},
 	}, nil
-}
-
-func (i *Authentication) middleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		r := c.Request()
-		ctx := r.Context()
-
-		session, ok := i.sm.decodeSession(r)
-		if ok {
-			c.SetRequest(r.WithContext(authentication.WithAccountID(ctx, session.UserID)))
-		}
-
-		return next(c)
-	}
 }
 
 func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
