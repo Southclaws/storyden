@@ -62,7 +62,6 @@ type Bindings struct {
 	fx.In
 	Version
 	Spec
-	Session
 	Authentication
 	WebAuthn
 	Accounts
@@ -79,7 +78,6 @@ func bindingsProviders() fx.Option {
 	return fx.Provide(
 		NewVersion,
 		NewSpec,
-		NewSessionManager,
 		NewAuthentication,
 		NewWebAuthn,
 		NewAccounts,
@@ -136,11 +134,13 @@ func mount(lc fx.Lifecycle, l *zap.Logger, mux *http.ServeMux, router *echo.Echo
 	})
 }
 
-func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Authentication) error {
+func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *cookieJar, auth Authentication) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
 		return fault.Wrap(err, fmsg.With("failed to get openapi specification"))
 	}
+
+	router.Use(echo.WrapMiddleware(cj.WithAuth))
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -174,7 +174,6 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, auth Aut
 	// 	})
 	// }))
 
-	router.Use(auth.middleware)
 	router.Use(oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
 		Skipper: openApiSkipper,
 		Options: openapi3filter.Options{
@@ -234,6 +233,9 @@ func Build() fx.Option {
 
 		// Add the middleware bindings.
 		fx.Invoke(addMiddleware),
+
+		// Add the cookie session manager.
+		fx.Provide(newCookieJar),
 
 		// Mount the bound OpenAPI routes onto the router.
 		fx.Invoke(mount),

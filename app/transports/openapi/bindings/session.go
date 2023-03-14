@@ -1,60 +1,64 @@
 package bindings
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/Southclaws/fault"
-	"github.com/gorilla/securecookie"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/securecookie"
 )
-
-type Session struct {
-	sc     *securecookie.SecureCookie
-	domain string
-}
-
-func NewSessionManager(cfg config.Config, sc *securecookie.SecureCookie) Session {
-	return Session{sc, cfg.CookieDomain}
-}
 
 const secureCookieName = "storyden-session"
 
-type session struct {
-	UserID account.AccountID
+type cookieJar struct {
+	ss     *securecookie.Session
+	domain string
 }
 
-func (s *Session) encodeSession(userID account.AccountID) (string, error) {
-	encoded, err := s.sc.Encode(secureCookieName, session{userID})
-	if err != nil {
-		return "", fault.Wrap(err)
-	}
+func newCookieJar(cfg config.Config, ss *securecookie.Session) *cookieJar {
+	return &cookieJar{domain: cfg.CookieDomain, ss: ss}
+}
 
-	cookie := &http.Cookie{
+// Create an encrypted cookie from an account ID.
+func (j *cookieJar) Create(accountID string) string {
+	return (&http.Cookie{
 		Name:     secureCookieName,
-		Value:    encoded,
+		Value:    j.ss.Encrypt(accountID),
 		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
-		Domain:   s.domain,
+		Domain:   j.domain,
 		Secure:   true,
 		HttpOnly: true,
-	}
-
-	return cookie.String(), nil
+	}).String()
 }
 
-func (s *Session) decodeSession(r *http.Request) (*session, bool) {
+// withSession checks the request for a session and drops it into a context.
+func (j *cookieJar) withSession(r *http.Request) context.Context {
 	cookie, err := r.Cookie(secureCookieName)
 	if err != nil {
-		return nil, false
+		return r.Context()
 	}
 
-	u := session{}
-
-	if err = s.sc.Decode(secureCookieName, cookie.Value, &u); err != nil {
-		return nil, false
+	accountID, ok := j.ss.Decrypt(cookie.Value)
+	if !ok {
+		return r.Context()
 	}
 
-	return &u, true
+	id, err := xid.FromString(accountID)
+	if err != nil {
+		return r.Context()
+	}
+
+	return authentication.WithAccountID(r.Context(), account.AccountID(id))
+}
+
+// WithAuth simply pulls out the session from the cookie and propagates it.
+func (j *cookieJar) WithAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r.WithContext(j.withSession(r)))
+	})
 }

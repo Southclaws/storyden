@@ -15,7 +15,6 @@ require (
 	github.com/forPelevin/gomoji v1.1.8
 	github.com/getkin/kin-openapi v0.114.0
 	github.com/gomarkdown/markdown v0.0.0-20230312215031-f439dd2b4436
-	github.com/gorilla/securecookie v1.1.1
 	github.com/gosimple/slug v1.13.1
 	github.com/imdario/mergo v0.3.13
 	github.com/jackc/pgx/v4 v4.18.1
@@ -128,7 +127,7 @@ require (
 	github.com/zclconf/go-cty v1.13.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.10.0
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.7.0
 	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
 	golang.org/x/net v0.8.0 // indirect

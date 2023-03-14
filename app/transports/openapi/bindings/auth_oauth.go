@@ -20,15 +20,12 @@ func (o *Authentication) OAuthProviderCallback(ctx context.Context, request open
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cookie, err := o.sm.encodeSession(account.ID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.OAuthProviderCallback200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
-			Body:    openapi.AuthSuccess{Id: account.ID.String()},
-			Headers: openapi.AuthSuccessOKResponseHeaders{SetCookie: cookie},
+			Body: openapi.AuthSuccess{Id: account.ID.String()},
+			Headers: openapi.AuthSuccessOKResponseHeaders{
+				SetCookie: o.sm.Create(account.ID.String()),
+			},
 		},
 	}, nil
 }

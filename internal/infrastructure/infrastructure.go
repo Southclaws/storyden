@@ -15,7 +15,7 @@ func Build() fx.Option {
 	return fx.Options(
 		logger.Build(),
 		db.Build(),
-		fx.Provide(securecookie.New),
+		securecookie.Build(),
 		fx.Provide(webauthn.New),
 		fx.Provide(object.NewS3Storer),
 	)
