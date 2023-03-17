@@ -212,13 +212,15 @@ function Hero() {
 
           <HStack gap={4}>
             <Link href="https://airtable.com/shrLY0jDp9CuXPB2X">
-              <Button size="lg">Get started</Button>
+              <Button size={{ base: "sm", sm: "md", lg: "lg" }}>
+                Get started
+              </Button>
             </Link>
             <Link href="https://github.com/Southclaws/storyden">
               <Button
                 variant="outline"
                 colorScheme="whiteAlpha"
-                size="lg"
+                size={{ base: "sm", sm: "md", lg: "lg" }}
                 backdropFilter="blur(3px)"
                 className="story__text-overlay"
               >
