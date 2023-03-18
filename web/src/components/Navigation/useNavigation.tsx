@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useCategoryList } from "src/api/openapi/categories";
 import { useAuthProvider } from "src/auth/useAuthProvider";
 import { z } from "zod";
 
@@ -13,6 +14,8 @@ export function useNavigation() {
 
   const { category } = QuerySchema.parse(query);
 
+  const { data, error } = useCategoryList();
+
   const { account } = useAuthProvider();
   const [isExpanded, setExpanded] = useState(false);
 
@@ -20,7 +23,11 @@ export function useNavigation() {
     setExpanded(!isExpanded);
   };
 
+  console.log({ isAuthenticated: account });
+
   return {
+    categories: data?.categories ?? [],
+    error,
     isAuthenticated: !!account,
     isExpanded,
     onExpand,

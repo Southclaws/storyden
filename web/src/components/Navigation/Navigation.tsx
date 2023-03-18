@@ -1,14 +1,41 @@
-import { Box, Flex, SlideFade, VStack } from "@chakra-ui/react";
-import { Authenticated } from "./Authenticated";
-import { Menu } from "./components/Menu/Menu";
-import { Unauthenticated } from "./Unauthenticated";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Input,
+  SlideFade,
+  VStack,
+} from "@chakra-ui/react";
+import {
+  BellIcon,
+  Cog8ToothIcon,
+  PlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { map } from "lodash/fp";
+import { Category } from "src/api/openapi/schemas";
+import { Anchor } from "../site/Anchor";
+import { Unready } from "../Unready";
+import { MenuIcon } from "./components/MenuIcon";
 import { useNavigation } from "./useNavigation";
 
 const inactive = `hsla(180, 2%, 98%, 0.8)`;
 const active = `hsla(220, 15%, 95%, 0.75)`;
 
+const mapCategories = (selected?: string) =>
+  map((c: Category) => (
+    <Anchor key={c.id} href={`/c/${c.name}`}>
+      <Button bgColor={c.name === selected ? "blue.200" : ""}>{c.name}</Button>
+    </Anchor>
+  ));
+
 export function Navigation() {
-  const { isAuthenticated, isExpanded, onExpand, category } = useNavigation();
+  const { error, isAuthenticated, isExpanded, onExpand, categories, category } =
+    useNavigation();
+
+  if (error) return <Unready {...error} />;
 
   return (
     <Box
@@ -21,6 +48,7 @@ export function Navigation() {
       zIndex="overlay"
     >
       <Flex
+        id="flex-container"
         height="full"
         gap={3}
         p={2}
@@ -28,43 +56,110 @@ export function Navigation() {
         alignItems="center"
         flexDir="column"
       >
-        <Box
-          maxW={{ base: "23em", md: "container.sm" }}
-          width="full"
-          minH="0"
-          flex="0 0 1"
-        >
-          <SlideFade
-            in={isExpanded}
-            style={{
-              maxHeight: "100%",
-              display: "flex",
-            }}
-          >
-            <VStack width="full">
-              <Menu />
-            </VStack>
-          </SlideFade>
-        </Box>
-
         <Flex
-          p={{ base: 1, md: 2 }}
-          borderRadius={{ base: 24, md: 28 }}
+          px={{ base: isExpanded ? 2 : 4 }}
+          py={{ base: 2 }}
+          gap={2}
+          flexDirection="column"
+          borderRadius={{ base: 16 }}
           backdropFilter="blur(1em)"
           transitionProperty="background-color"
           transitionDuration="0.5s"
           bgColor={isExpanded ? active : inactive}
-          width="full"
+          width={isExpanded ? "100%" : "min-content"}
           maxW={{ base: "23em", md: "container.sm" }}
           justifyContent="space-between"
           alignItems="center"
           pointerEvents="auto"
         >
-          {isAuthenticated ? (
-            <Authenticated onExpand={onExpand} category={category} />
-          ) : (
-            <Unauthenticated onExpand={onExpand} category={category} />
-          )}
+          <SlideFade
+            in={isExpanded}
+            style={{
+              maxHeight: "100%",
+              width: "100%",
+              display: isExpanded ? "flex" : "none",
+            }}
+          >
+            <VStack width="full" p={2}>
+              <Flex
+                maxHeight="80vh"
+                flexDir="column"
+                justifyContent="center"
+                alignItems="center"
+                maxW="container.sm"
+                width="full"
+                pointerEvents="auto"
+                gap={2}
+              >
+                <HStack
+                  width="full"
+                  justifyContent={isAuthenticated ? "end" : "space-between"}
+                >
+                  {isAuthenticated && (
+                    <Anchor variant="outline" size="sm">
+                      <IconButton
+                        aria-label="Settings"
+                        borderRadius="50%"
+                        icon={<Cog8ToothIcon width="1em" />}
+                      />
+                    </Anchor>
+                  )}
+
+                  <IconButton
+                    aria-label="Close menu"
+                    borderRadius="50%"
+                    icon={<XMarkIcon width="1em" />}
+                    onClick={onExpand}
+                  />
+                </HStack>
+
+                <Flex
+                  height="full"
+                  width="full"
+                  gap={2}
+                  flexDir="column"
+                  justifyContent="space-between"
+                  alignItems="start"
+                  overflowY="scroll"
+                >
+                  {mapCategories(category)(categories)}
+                </Flex>
+              </Flex>
+            </VStack>
+          </SlideFade>
+
+          <HStack gap={4} w="full" justifyContent="space-between">
+            <Anchor href="/notifications">
+              <IconButton
+                aria-label=""
+                borderRadius={12}
+                icon={<BellIcon width="1em" />}
+              />
+            </Anchor>
+
+            {isExpanded ? (
+              <Input
+                variant="outline"
+                border="none"
+                placeholder="Search anything..."
+              />
+            ) : (
+              <IconButton
+                aria-label="main menu"
+                borderRadius={12}
+                icon={<MenuIcon />}
+                onClick={onExpand}
+              />
+            )}
+
+            <Anchor href="/new">
+              <IconButton
+                aria-label=""
+                borderRadius={12}
+                icon={<PlusIcon width="1em" />}
+              />
+            </Anchor>
+          </HStack>
         </Flex>
       </Flex>
     </Box>
