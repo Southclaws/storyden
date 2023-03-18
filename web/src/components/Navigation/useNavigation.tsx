@@ -23,8 +23,6 @@ export function useNavigation() {
     setExpanded(!isExpanded);
   };
 
-  console.log({ isAuthenticated: account });
-
   return {
     categories: data?.categories ?? [],
     error,
