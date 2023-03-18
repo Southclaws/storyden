@@ -1,9 +1,8 @@
 import { Box, Button, ChakraProvider, Flex } from "@chakra-ui/react";
-import { PropsWithChildren, useCallback } from "react";
 import { extended } from "src/theme";
 
 import { AllStyledComponent } from "@remirror/styles/emotion";
-import { EditorState, EMPTY_PARAGRAPH_NODE, ExtensionPriority } from "remirror";
+import { ExtensionPriority } from "remirror";
 
 import {
   EditorComponent,

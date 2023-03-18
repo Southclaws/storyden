@@ -33,6 +33,10 @@ func GetAccountID(i Identifier) xid.ID {
 
 // XID converts a thread mark (id-slug) to just the XID, same as above.
 func ParseID(i Identifier) xid.ID {
+	if len(i) < 20 {
+		return xid.NilID()
+	}
+
 	v, err := xid.FromString(string(i[:20]))
 	if err != nil {
 		return xid.NilID()

@@ -1,8 +1,10 @@
 import { Heading, Spinner, VStack } from "@chakra-ui/react";
+
 import { Thread } from "src/api/openapi/schemas";
 import { CategoryPill } from "src/components/CategoryPill";
+import { ReplyBox } from "src/components/ReplyBox";
+
 import { PostListView } from "../PostList";
-import { ReplyBox } from "../ReplyBox";
 import { useThread } from "./useThread";
 
 export function ThreadView(props: Thread) {
