@@ -21,13 +21,12 @@ import { Unready } from "../Unready";
 import { MenuIcon } from "./components/MenuIcon";
 import { useNavigation } from "./useNavigation";
 
-const inactive = `hsla(180, 2%, 98%, 0.8)`;
-const active = `hsla(220, 15%, 95%, 0.75)`;
-
 const mapCategories = (selected?: string) =>
   map((c: Category) => (
-    <Anchor key={c.id} href={`/c/${c.name}`}>
-      <Button bgColor={c.name === selected ? "blue.200" : ""}>{c.name}</Button>
+    <Anchor key={c.id} href={`/c/${c.name}`} w="full">
+      <Button bgColor={c.name === selected ? "blackAlpha.200" : ""} w="full">
+        {c.name}
+      </Button>
     </Anchor>
   ));
 
@@ -65,7 +64,8 @@ export function Navigation() {
           backdropFilter="blur(1em)"
           transitionProperty="background-color"
           transitionDuration="0.5s"
-          bgColor={isExpanded ? active : inactive}
+          backgroundColor="hsla(210, 38.5%, 94.9%, 0.8)"
+          border="1px solid hsla(209, 100%, 20%, 0.02)"
           width={isExpanded ? "100%" : "min-content"}
           maxW={{ base: "23em", md: "container.sm" }}
           justifyContent="space-between"
@@ -93,7 +93,7 @@ export function Navigation() {
               >
                 <HStack
                   width="full"
-                  justifyContent={isAuthenticated ? "end" : "space-between"}
+                  justifyContent={isAuthenticated ? "space-between" : "end"}
                 >
                   {isAuthenticated && (
                     <Anchor variant="outline" size="sm">
@@ -110,6 +110,8 @@ export function Navigation() {
                     borderRadius="50%"
                     icon={<XMarkIcon width="1em" />}
                     onClick={onExpand}
+                    colorScheme="gray"
+                    size="xs"
                   />
                 </HStack>
 
