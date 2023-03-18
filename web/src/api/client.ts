@@ -48,5 +48,7 @@ const cleanQuery = (params?: Record<string, string | string[]>): string => {
 
   const clean = removeEmpty(params);
 
-  return new URLSearchParams(clean).toString();
+  const format = new URLSearchParams(clean).toString();
+
+  return `?${format}`;
 };
