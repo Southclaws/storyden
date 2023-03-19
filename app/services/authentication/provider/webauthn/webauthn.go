@@ -7,6 +7,8 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/webauthn"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -17,6 +19,7 @@ import (
 var (
 	ErrNoAuthRecord           = fault.New("webauthn does not match account")
 	ErrExistsOnAnotherAccount = fault.New("webauthn id already bound to another account")
+	ErrAccountExists          = fault.New("requester already has an account")
 )
 
 const (
@@ -71,7 +74,14 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 	}
 
 	if accfound {
-		return nil, fault.New("requester already has an account")
+		return nil, fault.Wrap(ErrAccountExists,
+			fctx.With(ctx),
+			ftag.With(ftag.AlreadyExists),
+			fmsg.WithDesc(
+				"already exists",
+				"An account with this handle has already been registered without Webauthn/Passkey.",
+			),
+		)
 	}
 
 	acc, err = p.account_repo.Create(ctx, handle)
