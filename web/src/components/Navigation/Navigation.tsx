@@ -31,8 +31,15 @@ const mapCategories = (selected?: string) =>
   ));
 
 export function Navigation() {
-  const { error, isAuthenticated, isExpanded, onExpand, categories, category } =
-    useNavigation();
+  const {
+    error,
+    isAuthenticated,
+    isExpanded,
+    onExpand,
+    categories,
+    category,
+    ref,
+  } = useNavigation();
 
   if (error) return <Unready {...error} />;
 
@@ -54,6 +61,7 @@ export function Navigation() {
         justifyContent="end"
         alignItems="center"
         flexDir="column"
+        ref={ref}
       >
         <Flex
           px={{ base: isExpanded ? 2 : 4 }}
@@ -96,7 +104,7 @@ export function Navigation() {
                   justifyContent={isAuthenticated ? "space-between" : "end"}
                 >
                   {isAuthenticated && (
-                    <Anchor variant="outline" size="sm">
+                    <Anchor variant="outline" size="sm" href="/settings">
                       <IconButton
                         aria-label="Settings"
                         borderRadius="50%"
