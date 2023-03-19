@@ -79,7 +79,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 			ftag.With(ftag.AlreadyExists),
 			fmsg.WithDesc(
 				"already exists",
-				"An account with this handle has already been registered without Webauthn/Passkey.",
+				"An account with this handle has already been registered without a Passkey (WebAuthn) credential.",
 			),
 		)
 	}
