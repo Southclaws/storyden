@@ -1,7 +1,7 @@
 import Identicon from "identicon.js";
 import { useEffect, useState } from "react";
 
-export function useByLine(handle: string) {
+export function useProfileReference(handle: string) {
   const [fallback, setFallback] = useState("");
 
   useEffect(() => {
