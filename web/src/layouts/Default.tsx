@@ -23,7 +23,7 @@ export function Default(props: PropsWithChildren) {
 
       <Flex
         as="header"
-        width={{ md: "33%", lg: "40%" }}
+        width={{ md: "33%", lg: "33%" }}
         bgColor="blackAlpha.50"
         px={4}
         visibility={{
@@ -32,7 +32,7 @@ export function Default(props: PropsWithChildren) {
         }}
         justifyContent="end"
       >
-        <Box width="xs">
+        <Box width="2xs">
           <Sidebar />
         </Box>
       </Flex>
@@ -41,6 +41,7 @@ export function Default(props: PropsWithChildren) {
         <Box
           maxW={{
             base: "full",
+            sm: "container.sm",
             md: "container.md",
           }}
         >
