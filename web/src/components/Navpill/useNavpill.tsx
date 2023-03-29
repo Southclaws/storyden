@@ -10,7 +10,7 @@ export const QuerySchema = z.object({
 });
 export type Query = z.infer<typeof QuerySchema>;
 
-export function useNavigation() {
+export function useNavpill() {
   const { query } = useRouter();
 
   // TODO: Check if this is the correct way to handle refs in strict TypeScript.

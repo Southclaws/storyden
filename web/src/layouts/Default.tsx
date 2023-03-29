@@ -1,6 +1,7 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { Navigation } from "src/components/Navigation/Navigation";
+import { Navpill } from "src/components/Navpill/Navpill";
+import { Sidebar } from "src/components/Sidebar/Sidebar";
 
 export function Default(props: PropsWithChildren) {
   return (
@@ -8,22 +9,44 @@ export function Default(props: PropsWithChildren) {
       width="full"
       height="full"
       minHeight="100vh"
-      justifyContent="start"
-      alignItems="center"
-      flexDirection="column"
+      alignItems="stretch"
+      flexDirection="row"
     >
-      <Navigation />
-
       <Box
-        as="main"
-        flexGrow={1}
-        width="full"
-        height="full"
-        maxW="container.md"
-        px={4}
+        visibility={{
+          base: "unset",
+          md: "collapse",
+        }}
       >
-        {props.children}
+        <Navpill />
       </Box>
+
+      <Flex
+        as="header"
+        width={{ md: "33%", lg: "40%" }}
+        bgColor="blackAlpha.50"
+        px={4}
+        visibility={{
+          base: "collapse",
+          md: "unset",
+        }}
+        justifyContent="end"
+      >
+        <Box width="xs">
+          <Sidebar />
+        </Box>
+      </Flex>
+
+      <Flex as="main" px={4}>
+        <Box
+          maxW={{
+            base: "full",
+            md: "container.md",
+          }}
+        >
+          {props.children}
+        </Box>
+      </Flex>
     </Flex>
   );
 }
