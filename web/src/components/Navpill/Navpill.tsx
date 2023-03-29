@@ -19,7 +19,7 @@ import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "../site/Anchor";
 import { Unready } from "../Unready";
 import { MenuIcon } from "./components/MenuIcon";
-import { useNavigation } from "./useNavigation";
+import { useNavpill } from "./useNavpill";
 
 const mapCategories = (selected?: string) =>
   map((c: Category) => (
@@ -30,7 +30,7 @@ const mapCategories = (selected?: string) =>
     </Anchor>
   ));
 
-export function Navigation() {
+export function Navpill() {
   const {
     error,
     isAuthenticated,
@@ -39,13 +39,13 @@ export function Navigation() {
     categories,
     category,
     ref,
-  } = useNavigation();
+  } = useNavpill();
 
   if (error) return <Unready {...error} />;
 
   return (
     <Box
-      id="navigation-overlay"
+      id="navpill-overlay"
       position="fixed"
       bottom="env(safe-area-inset-bottom)"
       width="100vw"
