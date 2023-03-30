@@ -1,3 +1,4 @@
+import { Divider, List } from "@chakra-ui/react";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { ThreadListItem } from "./ThreadListItem";
 
@@ -5,8 +6,15 @@ type Props = { threads: ThreadReference[] };
 
 export function ThreadList(props: Props) {
   const children = props.threads.map((t) => (
-    <ThreadListItem key={t.id} thread={t} />
+    <>
+      <Divider />
+      <ThreadListItem key={t.id} thread={t} />
+    </>
   ));
 
-  return <>{children}</>;
+  return (
+    <List display="flex" flexDirection="column" gap={2}>
+      {children}
+    </List>
+  );
 }
