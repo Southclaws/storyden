@@ -21,6 +21,7 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
 
       <Flex justifyContent="space-between">
         <Byline
+          id={props.thread.id}
           author={props.thread.author.handle}
           time={new Date(props.thread.createdAt)}
         />
