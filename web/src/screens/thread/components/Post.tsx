@@ -79,7 +79,7 @@ export function PostView(props: Post) {
   return (
     <Flex id={props.id} flexDir="column" gap={2}>
       <Byline
-        id={props.id}
+        href={`#${props.id}`}
         author={props.author.handle}
         time={new Date(props.createdAt)}
       />

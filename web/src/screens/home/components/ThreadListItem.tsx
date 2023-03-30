@@ -3,14 +3,14 @@ import { ThreadReference } from "src/api/openapi/schemas";
 import { Byline } from "src/screens/thread/components/Byline";
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
+  const permalink = `/t/${props.thread.slug}`;
+
   return (
     <Flex as="section" flexDir="column" py={2} width="full">
       <LinkBox>
         <Flex justifyContent="space-between">
           <Heading size="sm">
-            <LinkOverlay href={`/t/${props.thread.slug}`}>
-              {props.thread.title}
-            </LinkOverlay>
+            <LinkOverlay href={permalink}>{props.thread.title}</LinkOverlay>
           </Heading>
 
           {/* <ThreadMenu postID={props.thread.id} /> */}
@@ -21,7 +21,7 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
 
       <Flex justifyContent="space-between">
         <Byline
-          id={props.thread.id}
+          href={permalink}
           author={props.thread.author.handle}
           time={new Date(props.thread.createdAt)}
         />
