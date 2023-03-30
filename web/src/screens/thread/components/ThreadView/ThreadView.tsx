@@ -1,15 +1,12 @@
-import { Heading, Spinner, VStack } from "@chakra-ui/react";
+import { Heading, VStack } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
 import { CategoryPill } from "src/components/CategoryPill";
-import { ReplyBox } from "src/components/ReplyBox";
 
 import { PostListView } from "../PostList";
-import { useThread } from "./useThread";
+import { Reply } from "../Reply";
 
 export function ThreadView(props: Thread) {
-  const { loggedIn, onReply, isLoading } = useThread(props);
-  // NOTE: isLoading is a hack to easily reset the ReplyBox + provide feedback.
   return (
     <VStack alignItems="start" gap={2} py={4} width="full">
       <Heading>{props.title}</Heading>
@@ -17,14 +14,7 @@ export function ThreadView(props: Thread) {
 
       <PostListView {...props} />
 
-      {loggedIn &&
-        (isLoading ? (
-          <VStack width="full" py={6}>
-            <Spinner />
-          </VStack>
-        ) : (
-          <ReplyBox onSave={onReply} />
-        ))}
+      <Reply {...props} />
     </VStack>
   );
 }
