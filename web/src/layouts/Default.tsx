@@ -44,6 +44,7 @@ export function Default(props: PropsWithChildren) {
             sm: "container.sm",
             md: "container.md",
           }}
+          px={1}
         >
           {props.children}
         </Box>
