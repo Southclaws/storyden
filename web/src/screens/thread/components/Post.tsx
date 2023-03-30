@@ -77,8 +77,12 @@ const components: Partial<
 };
 export function PostView(props: Post) {
   return (
-    <Flex flexDir="column" gap={2}>
-      <Byline author={props.author.handle} time={new Date(props.createdAt)} />
+    <Flex id={props.id} flexDir="column" gap={2}>
+      <Byline
+        id={props.id}
+        author={props.author.handle}
+        time={new Date(props.createdAt)}
+      />
       <ReactMarkdown components={components}>{props.body}</ReactMarkdown>
     </Flex>
   );
