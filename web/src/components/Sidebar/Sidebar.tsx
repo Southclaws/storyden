@@ -1,4 +1,4 @@
-import { Heading, HStack, List, VStack } from "@chakra-ui/react";
+import { Divider, Heading, HStack, List, VStack } from "@chakra-ui/react";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { map } from "lodash/fp";
 import { Category } from "src/api/openapi/schemas";
@@ -20,12 +20,15 @@ export function Sidebar() {
   if (error) return <Unready {...error} />;
 
   return (
-    <VStack as="nav" py={4} gap={4} alignItems="start">
-      <HStack gap={2}>
+    <VStack as="nav" py={4} gap={2} alignItems="start">
+      <HStack gap={2} pb={2}>
         <NavItem href="/">
           <HomeIcon width="1.5em" />
         </NavItem>
       </HStack>
+
+      <Divider />
+
       <List
         margin={0}
         display="flex"
