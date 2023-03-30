@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
@@ -80,6 +81,7 @@ func columnChecker(table string) func(string) error {
 		post.Table:           post.ValidColumn,
 		react.Table:          react.ValidColumn,
 		role.Table:           role.ValidColumn,
+		setting.Table:        setting.ValidColumn,
 		subscription.Table:   subscription.ValidColumn,
 		tag.Table:            tag.ValidColumn,
 	}
