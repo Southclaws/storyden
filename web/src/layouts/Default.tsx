@@ -23,7 +23,7 @@ export function Default(props: PropsWithChildren) {
 
       <Flex
         as="header"
-        width={{ md: "33%", lg: "33%" }}
+        width={{ md: "25%", lg: "33%" }}
         bgColor="blackAlpha.50"
         px={4}
         visibility={{
