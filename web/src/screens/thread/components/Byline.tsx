@@ -4,7 +4,7 @@ import { ProfileReference } from "src/components/ProfileReference/ProfileReferen
 import { Anchor } from "src/components/site/Anchor";
 
 type Props = {
-  id: string;
+  href: string;
   author: string;
   time: Date;
 };
@@ -14,7 +14,7 @@ export function Byline(props: Props) {
     <Flex alignItems="center" gap={2} fontSize="sm" color="blackAlpha.700">
       <ProfileReference handle={props.author} />
       <span>•</span>
-      <Anchor href={`#${props.id}`}>
+      <Anchor href={props.href}>
         <Text>{formatDistanceToNow(props.time)} ago</Text>
       </Anchor>
     </Flex>
