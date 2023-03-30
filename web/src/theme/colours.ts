@@ -1,8 +1,8 @@
 export const colours = {
   transparent: "transparent",
   current: "currentColor",
-  black: "#000000",
-  white: "#FFFFFF",
+  black: "#454545",
+  white: "#FEFEFE",
   light: "hsl(150, 9.5%, 91.8%)",
   dark: "hsl(0, 0%, 18.8%)",
   primary: {
