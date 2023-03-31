@@ -903,7 +903,7 @@ function CTA() {
         and want to steer Storyden's development as an early bird, please click{" "}
         <Link
           isExternal
-          href="https://discord.gg/bFkJDvpcmg"
+          href="https://discord.gg/XF6ZBGF9XF"
           color="hsla(265, 56%, 42%, 1)"
         >
           this link!
