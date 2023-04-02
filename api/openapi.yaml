@@ -106,6 +106,17 @@ paths:
               schema:
                 type: string
 
+  /v1/info:
+    get:
+      operationId: GetInfo
+      description: |
+        Get the basic forum installation info such as title, description, etc.
+      security: []
+      tags: [misc]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/GetInfoOK" }
+
   #
   #                   888    888
   #                   888    888
@@ -566,6 +577,13 @@ components:
           schema:
             $ref: "#/components/schemas/APIError"
 
+    GetInfoOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Info"
+
     AuthSuccessOK:
       description: OK
       headers:
@@ -710,6 +728,16 @@ components:
       #   path: github.com/rs/xid
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
+
+    Info:
+      description: Basic public information about the Storyden installation.
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
 
     ThreadMark:
       description: |
