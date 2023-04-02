@@ -3,20 +3,45 @@ package settings
 import (
 	"context"
 	"reflect"
+	"strconv"
+
+	"github.com/Southclaws/fault"
 
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/kr/pretty"
 )
 
-type Value[T any] struct {
+type Value[T ~string | ~int | ~float64 | ~uint32 | bool] struct {
 	value T
 }
 
-// func (s Value[T]) Get(ctx context.Context, r Repository) (v T, err error) {
-// 	raw, _ := r.GetValue(ctx, "reflect the key name from the struct")
-// 	// cast the raw value to T somehow
-// 	return nil, nil
-// }
+func (s Value[T]) Get(ctx context.Context, r Repository) (v T, err error) {
+	raw, err := r.GetValue(ctx, "reflect the key name from the struct")
+	if err != nil {
+		return
+	}
+
+	// output variable, upcasted to `any` in order to perform a type switch.
+	out := any(v)
+
+	// Within each block, we know the concrete type of the underlying value. So,
+	// we can simply assign the upcasted output variable to the decoded raw data
+	// and then downcast (via type assertion) this back into an actual `T` type.
+	switch out.(type) {
+	case string:
+		out = raw
+
+	case int, int32, int64:
+		out, err = strconv.ParseInt(raw, 10, 64)
+		if err != nil {
+			return
+		}
+
+	default:
+		panic("idk 🤷")
+	}
+
+	return out.(T), nil
+}
 
 func (s Value[T]) Set(ctx context.Context, r Repository, v T) error {
 	r.SetValue(ctx, "reflect the key name somehow", "cast v to a string")
@@ -29,7 +54,7 @@ func fromEnt(raw []*ent.Setting) (*Settings, error) {
 	keys := map[string]reflect.Type{}
 
 	rt := reflect.TypeOf(s)
-	rv := reflect.ValueOf(s)
+	rv := reflect.ValueOf(&s).Elem()
 
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
@@ -41,10 +66,34 @@ func fromEnt(raw []*ent.Setting) (*Settings, error) {
 	for _, entry := range raw {
 		f := rv.FieldByName(entry.ID)
 
-		f.SetString(entry.Value)
+		fv, err := bindEntry(entry, f)
+		if err != nil {
+			return nil, err
+		}
+
+		f.Set(fv)
 	}
 
-	pretty.Println(keys)
-
 	return &s, nil
+}
+
+func bindEntry(entry *ent.Setting, f reflect.Value) (v reflect.Value, err error) {
+	k := f.Type().Field(0).Type.Kind()
+	switch k {
+	case reflect.String:
+		v = reflect.ValueOf(Value[string]{value: entry.Value})
+
+	case reflect.Uint32:
+		u64, err := strconv.ParseUint(entry.Value, 10, 32)
+		if err != nil {
+			panic(err)
+		}
+
+		v = reflect.ValueOf(Value[uint32]{value: uint32(u64)})
+
+	default:
+		fault.Newf("cannot auto bind type: '%s'", k.String())
+	}
+
+	return
 }
