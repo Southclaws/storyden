@@ -9,12 +9,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
 func Build() fx.Option {
 	return fx.Provide(
+		settings.New,
 		account.New,
 		authentication.New,
 		category.New,
