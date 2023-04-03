@@ -13,9 +13,9 @@ export function Default(props: PropsWithChildren) {
       flexDirection="row"
     >
       <Box
-        visibility={{
+        display={{
           base: "unset",
-          md: "collapse",
+          md: "none",
         }}
       >
         <Navpill />
@@ -26,8 +26,8 @@ export function Default(props: PropsWithChildren) {
         width={{ md: "25%", lg: "33%" }}
         bgColor="blackAlpha.50"
         px={4}
-        visibility={{
-          base: "collapse",
+        display={{
+          base: "none",
           md: "unset",
         }}
         justifyContent="end"
