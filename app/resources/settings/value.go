@@ -119,32 +119,3 @@ func bindEntry(f reflect.Value, key string, value *string) (v reflect.Value, err
 
 	return
 }
-
-func get[T any](ctx context.Context, r Repository) (v T, err error) {
-	raw, err := r.GetValue(ctx, "reflect the key name from the struct")
-	if err != nil {
-		return
-	}
-
-	// output variable, upcasted to `any` in order to perform a type switch.
-	out := any(v)
-
-	// Within each block, we know the concrete type of the underlying value. So,
-	// we can simply assign the upcasted output variable to the decoded raw data
-	// and then downcast (via type assertion) this back into an actual `T` type.
-	switch out.(type) {
-	case string:
-		out = raw
-
-	case int, int32, int64:
-		out, err = strconv.ParseInt(raw, 10, 64)
-		if err != nil {
-			return
-		}
-
-	default:
-		panic("idk 🤷")
-	}
-
-	return out.(T), nil
-}
