@@ -13,8 +13,8 @@ import (
 )
 
 type Value[T ~string | ~int | ~float64 | ~uint32 | bool] struct {
+	value T // value must remain as field 0 for simple reflection code
 	key   string
-	value T
 }
 
 // Get a setting value.
