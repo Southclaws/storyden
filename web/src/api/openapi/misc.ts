@@ -7,6 +7,7 @@
  */
 import useSwr from "swr";
 import type { SWRConfiguration, Key } from "swr";
+import type { GetInfoOKResponse, InternalServerErrorResponse } from "./schemas";
 import { fetcher } from "../client";
 
 /**
@@ -80,6 +81,46 @@ export const useGetSpec = <TError = unknown>(options?: {
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getGetSpecKey() : null));
   const swrFn = () => getSpec();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+
+/**
+ * Get the basic forum installation info such as title, description, etc.
+
+ */
+export const getInfo = () => {
+  return fetcher<GetInfoOKResponse>({ url: `/v1/info`, method: "get" });
+};
+
+export const getGetInfoKey = () => [`/v1/info`];
+
+export type GetInfoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getInfo>>
+>;
+export type GetInfoQueryError = InternalServerErrorResponse;
+
+export const useGetInfo = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof getInfo>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getGetInfoKey() : null));
+  const swrFn = () => getInfo();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
