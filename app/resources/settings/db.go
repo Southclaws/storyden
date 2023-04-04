@@ -15,6 +15,7 @@ type database struct {
 }
 
 func New(db *ent.Client) Repository {
+	// TODO: Write defaults to DB
 	return &database{db}
 }
 

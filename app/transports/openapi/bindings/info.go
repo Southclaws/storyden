@@ -26,20 +26,10 @@ func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	title, err := settings.Title.Get(ctx, i.sr)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	description, err := settings.Description.Get(ctx, i.sr)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.GetInfo200JSONResponse{
 		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse{
-			Title:       title,
-			Description: description,
+			Title:       settings.Title.Get(),
+			Description: settings.Description.Get(),
 		},
 	}, nil
 }
