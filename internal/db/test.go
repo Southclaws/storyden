@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
+	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
@@ -26,6 +27,7 @@ func Truncate(db *sql.DB) error {
 		category.Table,
 		tag.Table,
 		post.Table,
+		setting.Table,
 	}
 
 	if _, err := db.Exec(fmt.Sprintf("truncate table %s CASCADE;", strings.Join(tables, ", "))); err != nil {
