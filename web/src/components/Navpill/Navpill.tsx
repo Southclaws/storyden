@@ -17,7 +17,6 @@ import {
 import { map } from "lodash/fp";
 import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "../site/Anchor";
-import { Unready } from "../Unready";
 import { MenuIcon } from "./components/MenuIcon";
 import { useNavpill } from "./useNavpill";
 
@@ -40,8 +39,6 @@ export function Navpill() {
     category,
     ref,
   } = useNavpill();
-
-  if (error) return <Unready {...error} />;
 
   return (
     <Box
@@ -141,6 +138,8 @@ export function Navpill() {
           <HStack gap={4} w="full" justifyContent="space-between">
             <Anchor href="/notifications">
               <IconButton
+                disabled={!!error}
+                title={error?.message}
                 aria-label=""
                 borderRadius={12}
                 icon={<BellIcon width="1em" />}
@@ -155,6 +154,8 @@ export function Navpill() {
               />
             ) : (
               <IconButton
+                disabled={!!error}
+                title={error?.message}
                 aria-label="main menu"
                 borderRadius={12}
                 icon={<MenuIcon />}
@@ -164,6 +165,8 @@ export function Navpill() {
 
             <Anchor href="/new">
               <IconButton
+                disabled={!!error}
+                title={error?.message}
                 aria-label=""
                 borderRadius={12}
                 icon={<PlusIcon width="1em" />}
