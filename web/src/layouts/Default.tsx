@@ -37,8 +37,9 @@ export function Default(props: PropsWithChildren) {
         </Box>
       </Flex>
 
-      <Flex as="main" px={4}>
+      <Flex as="main" px={4} w="full">
         <Box
+          w="full"
           maxW={{
             base: "full",
             sm: "container.sm",
