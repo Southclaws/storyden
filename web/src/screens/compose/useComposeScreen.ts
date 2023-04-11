@@ -9,13 +9,13 @@ export function useComposeScreen() {
 
   const loggedIn = !!account;
 
-  async function onCreate(md: string) {
+  async function onCreate(title: string, category: string, md: string) {
     if (!loggedIn) return;
 
     await threadCreate({
-      title: "",
+      title: title,
       body: md,
-      category: "",
+      category: category,
       tags: [],
     }).catch(errorToast(toast));
   }
