@@ -1,5 +1,5 @@
 import { HStack } from "@chakra-ui/react";
-import { Bell, Home, Login } from "src/components/Action/Action";
+import { Bell, Create, Home, Login } from "src/components/Action/Action";
 
 type Props = { isAuthenticated: boolean };
 
@@ -10,6 +10,7 @@ export function Toolbar(props: Props) {
         <>
           <Home />
           <Bell />
+          <Create />
         </>
       ) : (
         <>

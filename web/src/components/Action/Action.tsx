@@ -2,6 +2,7 @@ import { Link, LinkProps } from "@chakra-ui/next-js";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { LoginIcon } from "../graphics/LoginIcon";
+import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
 
 export function Action({ children, ...props }: LinkProps) {
   return (
@@ -50,6 +51,14 @@ export function Login({ href = "/auth", ...props }: WithOptionalURL) {
   return (
     <Action href={href} title="Home" {...props}>
       <LoginIcon width="1.5em" />
+    </Action>
+  );
+}
+
+export function Create({ href = "/new", ...props }: WithOptionalURL) {
+  return (
+    <Action href={href} title="Home" {...props}>
+      <SpeechPlusIcon width="1.25em" />
     </Action>
   );
 }
