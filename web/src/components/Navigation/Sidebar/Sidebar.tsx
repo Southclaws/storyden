@@ -1,10 +1,11 @@
-import { Divider, Heading, HStack, List, VStack } from "@chakra-ui/react";
-import { HomeIcon } from "@heroicons/react/24/outline";
+import { Divider, Heading, List, VStack } from "@chakra-ui/react";
 import { map } from "lodash/fp";
 import { Category } from "src/api/openapi/schemas";
-import { Unready } from "../Unready";
+import { Unready } from "src/components/Unready";
+import { useNavigation } from "../useNavigation";
 import { NavItem } from "./components/NavItem";
-import { useSidebar } from "./useSidebar";
+import { Title } from "./components/Title";
+import { Toolbar } from "./components/Toolbar";
 
 const mapCategories = map((c: Category) => (
   <NavItem key={c.id} href={`/c/${c.name}`} w="full">
@@ -15,17 +16,15 @@ const mapCategories = map((c: Category) => (
 ));
 
 export function Sidebar() {
-  const { error, categories } = useSidebar();
+  const { error, categories, title } = useNavigation();
 
   if (error) return <Unready {...error} />;
 
   return (
     <VStack as="nav" py={4} gap={2} alignItems="start">
-      <HStack gap={2} pb={2}>
-        <NavItem href="/">
-          <HomeIcon width="1.5em" />
-        </NavItem>
-      </HStack>
+      <Title>{title}</Title>
+
+      <Toolbar />
 
       <Divider />
 

@@ -16,9 +16,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { map } from "lodash/fp";
 import { Category } from "src/api/openapi/schemas";
-import { Anchor } from "../site/Anchor";
+import { Anchor } from "src/components/site/Anchor";
 import { MenuIcon } from "./components/MenuIcon";
-import { useNavpill } from "./useNavpill";
+import { useNavigation } from "../useNavigation";
 
 const mapCategories = (selected?: string) =>
   map((c: Category) => (
@@ -37,8 +37,8 @@ export function Navpill() {
     onExpand,
     categories,
     category,
-    ref,
-  } = useNavpill();
+    overlayRef,
+  } = useNavigation();
 
   return (
     <Box
@@ -58,7 +58,7 @@ export function Navpill() {
         justifyContent="end"
         alignItems="center"
         flexDir="column"
-        ref={ref}
+        ref={overlayRef}
       >
         <Flex
           px={{ base: isExpanded ? 2 : 4 }}
