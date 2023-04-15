@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   HStack,
   IconButton,
@@ -14,31 +13,14 @@ import {
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { map } from "lodash/fp";
-import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
+import { CategoryList } from "./components/CategoryList";
 import { MenuIcon } from "./components/MenuIcon";
-import { useNavigation } from "../useNavigation";
-
-const mapCategories = (selected?: string) =>
-  map((c: Category) => (
-    <Anchor key={c.id} href={`/c/${c.name}`} w="full">
-      <Button bgColor={c.name === selected ? "blackAlpha.200" : ""} w="full">
-        {c.name}
-      </Button>
-    </Anchor>
-  ));
+import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
-  const {
-    error,
-    isAuthenticated,
-    isExpanded,
-    onExpand,
-    categories,
-    category,
-    overlayRef,
-  } = useNavigation();
+  const { isAuthenticated, isExpanded, onExpand, category, overlayRef } =
+    useNavpill();
 
   return (
     <Box
@@ -120,17 +102,7 @@ export function Navpill() {
                   />
                 </HStack>
 
-                <Flex
-                  height="full"
-                  width="full"
-                  gap={2}
-                  flexDir="column"
-                  justifyContent="space-between"
-                  alignItems="start"
-                  overflowY="scroll"
-                >
-                  {mapCategories(category)(categories)}
-                </Flex>
+                <CategoryList category={category} />
               </Flex>
             </VStack>
           </SlideFade>
@@ -138,8 +110,6 @@ export function Navpill() {
           <HStack gap={4} w="full" justifyContent="space-between">
             <Anchor href="/notifications">
               <IconButton
-                disabled={!!error}
-                title={error?.message}
                 aria-label=""
                 borderRadius={12}
                 icon={<BellIcon width="1em" />}
@@ -154,8 +124,6 @@ export function Navpill() {
               />
             ) : (
               <IconButton
-                disabled={!!error}
-                title={error?.message}
                 aria-label="main menu"
                 borderRadius={12}
                 icon={<MenuIcon />}
@@ -165,8 +133,6 @@ export function Navpill() {
 
             <Anchor href="/new">
               <IconButton
-                disabled={!!error}
-                title={error?.message}
                 aria-label=""
                 borderRadius={12}
                 icon={<PlusIcon width="1em" />}
