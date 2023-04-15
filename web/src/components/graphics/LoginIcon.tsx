@@ -2,7 +2,13 @@ import { SVGProps } from "react";
 
 export function LoginIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="1em"
+      fill="none"
+      {...props}
+    >
       <path
         stroke="#141414"
         strokeLinecap="round"
