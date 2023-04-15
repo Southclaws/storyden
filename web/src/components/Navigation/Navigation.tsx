@@ -22,7 +22,6 @@ export function Navigation() {
           base: "none",
           md: "flex",
         }}
-        border="1px solid red"
         as="header"
         minWidth={{
           md: "25%",
@@ -33,7 +32,6 @@ export function Navigation() {
         bgColor="blackAlpha.50"
       >
         <Box
-          border="1px solid blue"
           maxWidth="2xs"
           //
         >
