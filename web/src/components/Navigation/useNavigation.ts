@@ -2,6 +2,7 @@ import { useOutsideClick } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { RefObject, useRef, useState } from "react";
 import { useCategoryList } from "src/api/openapi/categories";
+import { useGetInfo } from "src/api/openapi/misc";
 import { useAuthProvider } from "src/auth/useAuthProvider";
 import { z } from "zod";
 
@@ -10,21 +11,22 @@ export const QuerySchema = z.object({
 });
 export type Query = z.infer<typeof QuerySchema>;
 
-export function useNavpill() {
+export function useNavigation() {
   const { query } = useRouter();
-
-  // TODO: Check if this is the correct way to handle refs in strict TypeScript.
-  const ref = useRef<HTMLDivElement>() as RefObject<HTMLDivElement>;
-
-  const { category } = QuerySchema.parse(query);
-
-  const { data, error } = useCategoryList();
-
+  const { data: infoResult, error: infoError } = useGetInfo();
+  const { data: categoriesResult, error: categoriesError } = useCategoryList();
+  const overlayRef = useRef<HTMLDivElement>() as RefObject<HTMLDivElement>;
   const { account } = useAuthProvider();
   const [isExpanded, setExpanded] = useState(false);
 
+  const { category } = QuerySchema.parse(query);
+
+  const error = infoError ?? categoriesError ?? undefined;
+  const categories = categoriesResult?.categories ?? [];
+  const title = infoResult?.title ?? "be";
+
   useOutsideClick({
-    ref: ref,
+    ref: overlayRef,
     handler: () => setExpanded(false),
   });
 
@@ -33,12 +35,13 @@ export function useNavpill() {
   };
 
   return {
-    categories: data?.categories ?? [],
+    categories,
+    title,
     error,
     isAuthenticated: !!account,
     isExpanded,
     onExpand,
     category,
-    ref,
+    overlayRef,
   };
 }
