@@ -16,7 +16,7 @@ const mapCategories = map((c: Category) => (
 ));
 
 export function Sidebar() {
-  const { error, categories, title } = useNavigation();
+  const { error, categories, title, isAuthenticated } = useNavigation();
 
   if (error) return <Unready {...error} />;
 
@@ -24,7 +24,7 @@ export function Sidebar() {
     <VStack as="nav" py={4} gap={2} alignItems="start">
       <Title>{title}</Title>
 
-      <Toolbar />
+      <Toolbar isAuthenticated={isAuthenticated} />
 
       <Divider />
 
