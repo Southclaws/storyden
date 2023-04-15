@@ -384,6 +384,13 @@
     aria-hidden "^1.1.1"
     react-remove-scroll "^2.5.4"
 
+"@chakra-ui/next-js@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@chakra-ui/next-js/-/next-js-2.1.2.tgz#1abae617999c6ab66a1d46bb8d8853864217b793"
+  integrity sha512-fbTeuFDBBk72HQ2UgtKIAMdT7Zuoz9icQIxZMGJMuzbB91gHHs5ZVUB965qPB0lg9UkzqQdb/lmT13BYa0PG0A==
+  dependencies:
+    "@emotion/cache" "^11.10.5"
+
 "@chakra-ui/number-input@2.0.9":
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/@chakra-ui/number-input/-/number-input-2.0.9.tgz#c5ebfa0311f7586fb4c1e5f4284355b1d1f04383"
