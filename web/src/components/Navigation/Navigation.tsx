@@ -33,7 +33,10 @@ export function Navigation() {
       >
         <Box
           maxWidth="2xs"
-          //
+          minWidth={{
+            base: "full",
+            lg: "3xs",
+          }}
         >
           <Sidebar />
         </Box>
