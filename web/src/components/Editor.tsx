@@ -1,16 +1,19 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, HStack } from "@chakra-ui/react";
 
 import { AllStyledComponent } from "@remirror/styles/emotion";
 import { ExtensionPriority } from "remirror";
 
 import {
+  BasicFormattingButtonGroup,
   EditorComponent,
   FloatingToolbar,
+  HeadingLevelButtonGroup,
   Remirror,
   TableComponents,
   TableExtension,
   ThemeProvider,
-  useHelpers,
+  Toolbar,
+  VerticalDivider,
   useRemirror,
 } from "@remirror/react";
 
@@ -93,6 +96,14 @@ export function Editor({ onChange }: Props) {
             }}
           >
             <Flex flexDir="column" width="full" minHeight="6em">
+              <Toolbar>
+                <HStack width="full" justifyContent={["center", "start"]}>
+                  <BasicFormattingButtonGroup />
+                  <VerticalDivider />
+                  <HeadingLevelButtonGroup />
+                </HStack>
+              </Toolbar>
+
               <EditorComponent />
 
               <TableComponents />

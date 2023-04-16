@@ -1,26 +1,59 @@
 import { useToast } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { useCategoryList } from "src/api/openapi/categories";
+import { ThreadCreateOKResponse } from "src/api/openapi/schemas";
 import { threadCreate } from "src/api/openapi/threads";
-import { useSession } from "src/auth";
 import { errorToast } from "src/components/ErrorBanner";
+import { z } from "zod";
+
+export const ThreadCreateSchema = z.object({
+  title: z.string().min(1),
+  body: z.string().min(1),
+  category: z.string(),
+  tags: z.string().array().optional(),
+});
+export type ThreadCreate = z.infer<typeof ThreadCreateSchema>;
 
 export function useComposeScreen() {
-  const account = useSession();
+  const router = useRouter();
   const toast = useToast();
+  const { data } = useCategoryList();
+  const {
+    handleSubmit,
+    control,
+    register,
+    formState: { isValid, errors, isSubmitting },
+  } = useForm<ThreadCreate>({
+    resolver: zodResolver(ThreadCreateSchema),
+    reValidateMode: "onChange",
+    defaultValues: {
+      // hack: the underlying category list select component can't do this.
+      category: data?.categories[0]?.id,
+    },
+  });
 
-  const loggedIn = !!account;
-
-  async function onCreate(title: string, category: string, md: string) {
-    if (!loggedIn) return;
-
+  const onSubmit = async ({ title, body, category }: ThreadCreate) => {
     await threadCreate({
-      title: title,
-      body: md,
-      category: category,
+      title,
+      body,
+      category,
       tags: [],
-    }).catch(errorToast(toast));
-  }
+    })
+      .then((thread: ThreadCreateOKResponse) =>
+        router.push(`/t/${thread.slug}`)
+      )
+      .catch(errorToast(toast));
+  };
 
   return {
-    onCreate,
+    isValid,
+    onSubmit,
+    handleSubmit,
+    control,
+    register,
+    errors,
+    isSubmitting,
   };
 }

@@ -1305,7 +1305,6 @@ components:
       required:
         - title
         - body
-        - tags
         - category
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
