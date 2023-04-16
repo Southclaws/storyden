@@ -31,14 +31,6 @@ export function Bell({ href = "/notifications", ...props }: WithOptionalURL) {
   );
 }
 
-export function Menu(props: LinkProps) {
-  return (
-    <Action {...props}>
-      <BellIcon />
-    </Action>
-  );
-}
-
 export function Home({ href = "/", ...props }: WithOptionalURL) {
   return (
     <Action href={href} title="Home" {...props}>
@@ -49,7 +41,7 @@ export function Home({ href = "/", ...props }: WithOptionalURL) {
 
 export function Login({ href = "/auth", ...props }: WithOptionalURL) {
   return (
-    <Action href={href} title="Home" {...props}>
+    <Action href={href} title="Sign up or Log in" {...props}>
       <LoginIcon width="1.5em" />
     </Action>
   );
@@ -57,7 +49,7 @@ export function Login({ href = "/auth", ...props }: WithOptionalURL) {
 
 export function Create({ href = "/new", ...props }: WithOptionalURL) {
   return (
-    <Action href={href} title="Home" {...props}>
+    <Action href={href} title="New thread" {...props}>
       <SpeechPlusIcon width="1.25em" />
     </Action>
   );
