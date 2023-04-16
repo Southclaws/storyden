@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { Navigation } from "src/components/Navigation/Navigation";
 
@@ -13,18 +13,16 @@ export function Default(props: PropsWithChildren) {
     >
       <Navigation />
 
-      <Flex as="main" px={4} w="full">
-        <Box
-          w="full"
-          maxW={{
-            base: "full",
-            sm: "container.sm",
-            md: "container.md",
-          }}
-          px={1}
-        >
-          {props.children}
-        </Box>
+      <Flex
+        as="main"
+        px={4}
+        w="full"
+        maxW={{
+          base: "full",
+          lg: "container.md",
+        }}
+      >
+        {props.children}
       </Flex>
     </Flex>
   );
