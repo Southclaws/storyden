@@ -1,27 +1,17 @@
+import { Box, Flex, HStack, Input, SlideFade } from "@chakra-ui/react";
 import {
-  Box,
-  Flex,
-  HStack,
-  IconButton,
-  Input,
-  SlideFade,
-  VStack,
-} from "@chakra-ui/react";
-import {
-  BellIcon,
-  Cog8ToothIcon,
-  PlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { Anchor } from "src/components/site/Anchor";
-import { CategoryList } from "./components/CategoryList";
-import { MenuIcon } from "./components/MenuIcon";
+  Bell,
+  Close,
+  Create,
+  Dashboard,
+  Login,
+  Settings,
+} from "src/components/Action/Action";
 import { useNavpill } from "./useNavpill";
+import { Menu } from "./components/Menu/Menu";
 
 export function Navpill() {
-  const { isAuthenticated, isExpanded, onExpand, category, overlayRef } =
-    useNavpill();
-
+  const { overlayRef, isExpanded, onExpand, isAuthenticated } = useNavpill();
   return (
     <Box
       id="navpill-overlay"
@@ -36,7 +26,7 @@ export function Navpill() {
         id="flex-container"
         height="full"
         gap={3}
-        p={2}
+        p={4}
         justifyContent="end"
         alignItems="center"
         flexDir="column"
@@ -47,7 +37,7 @@ export function Navpill() {
           py={{ base: 2 }}
           gap={2}
           flexDirection="column"
-          borderRadius={{ base: 16 }}
+          borderRadius={25}
           backdropFilter="blur(1em)"
           transitionProperty="background-color"
           transitionDuration="0.5s"
@@ -65,79 +55,34 @@ export function Navpill() {
               maxHeight: "100%",
               width: "100%",
               display: isExpanded ? "flex" : "none",
+              flexDirection: "column",
             }}
           >
-            <VStack width="full" p={2}>
-              <Flex
-                maxHeight="80vh"
-                flexDir="column"
-                justifyContent="center"
-                alignItems="center"
-                maxW="container.sm"
-                width="full"
-                pointerEvents="auto"
-                gap={2}
-              >
-                <HStack
-                  width="full"
-                  justifyContent={isAuthenticated ? "space-between" : "end"}
-                >
-                  {isAuthenticated && (
-                    <Anchor variant="outline" size="sm" href="/settings">
-                      <IconButton
-                        aria-label="Settings"
-                        borderRadius="50%"
-                        icon={<Cog8ToothIcon width="1em" />}
-                      />
-                    </Anchor>
-                  )}
+            <HStack justify="end">
+              <Settings />
+            </HStack>
 
-                  <IconButton
-                    aria-label="Close menu"
-                    borderRadius="50%"
-                    icon={<XMarkIcon width="1em" />}
-                    onClick={onExpand}
-                    colorScheme="gray"
-                    size="xs"
-                  />
-                </HStack>
-
-                <CategoryList category={category} />
-              </Flex>
-            </VStack>
+            <Menu />
           </SlideFade>
 
           <HStack gap={4} w="full" justifyContent="space-between">
-            <Anchor href="/notifications">
-              <IconButton
-                aria-label=""
-                borderRadius={12}
-                icon={<BellIcon width="1em" />}
-              />
-            </Anchor>
+            {isAuthenticated ? <Bell /> : <Login />}
 
             {isExpanded ? (
-              <Input
-                variant="outline"
-                border="none"
-                placeholder="Search anything..."
-              />
+              <>
+                <Input
+                  variant="outline"
+                  border="none"
+                  placeholder="Search anything..."
+                />
+                <Close onClick={onExpand} />
+              </>
             ) : (
-              <IconButton
-                aria-label="main menu"
-                borderRadius={12}
-                icon={<MenuIcon />}
-                onClick={onExpand}
-              />
+              <>
+                <Create />
+                <Dashboard onClick={onExpand} />
+              </>
             )}
-
-            <Anchor href="/new">
-              <IconButton
-                aria-label=""
-                borderRadius={12}
-                icon={<PlusIcon width="1em" />}
-              />
-            </Anchor>
           </HStack>
         </Flex>
       </Flex>

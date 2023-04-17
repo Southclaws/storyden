@@ -1,19 +1,69 @@
 import { Link, LinkProps } from "@chakra-ui/next-js";
-import { HomeIcon } from "@heroicons/react/24/outline";
-import { BellIcon } from "@heroicons/react/24/outline";
+import { IconButton, IconButtonProps } from "@chakra-ui/react";
+import {
+  AdjustmentsHorizontalIcon,
+  Bars3Icon,
+  BellIcon,
+  HomeIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { LoginIcon } from "../graphics/LoginIcon";
 import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
+import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
-export function Action({ children, ...props }: LinkProps) {
+function useClickHandler(onClick: MouseEventHandler | undefined) {
+  // This allows us to progressively enhance features on the application by
+  // treating important buttons as links to fallback pages. For example, there
+  // may be a button that triggers the opening of a modal dialogue but if the
+  // user has JavaScript disabled due to device constraints or privacy reasons,
+  // the functionality must also be implemented by a normal page.
+  return useCallback(
+    (e: MouseEvent) => {
+      if (onClick) {
+        e.preventDefault();
+        return onClick?.(e);
+      }
+    },
+    [onClick]
+  );
+}
+
+export function Action({ children, onClick, ...props }: LinkProps) {
+  const handleClick = useClickHandler(onClick);
   return (
     <Link
+      width={8}
+      height={8}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
       borderRadius="full"
       p={1}
       _hover={{ bgColor: "blackAlpha.50" }}
+      onClick={handleClick}
       {...props}
     >
       {children}
     </Link>
+  );
+}
+
+export function ActionButton({ children, ...props }: IconButtonProps) {
+  return (
+    <IconButton
+      width={8}
+      height={8}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      borderRadius="full"
+      p={1}
+      bgColor="transparent"
+      _hover={{ bgColor: "blackAlpha.50" }}
+      {...props}
+    >
+      {children}
+    </IconButton>
   );
 }
 
@@ -52,5 +102,37 @@ export function Create({ href = "/new", ...props }: WithOptionalURL) {
     <Action href={href} title="New thread" {...props}>
       <SpeechPlusIcon width="1.25em" />
     </Action>
+  );
+}
+
+export function Dashboard({ href = "/dashboard", ...props }: WithOptionalURL) {
+  return (
+    <Action href={href} title="Dashboard" {...props}>
+      <Bars3Icon width="1.25em" />
+    </Action>
+  );
+}
+
+export function Settings({ href = "/settings", ...props }: WithOptionalURL) {
+  return (
+    <Action href={href} title="Settings" {...props}>
+      <AdjustmentsHorizontalIcon width="1.25em" />
+    </Action>
+  );
+}
+
+type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
+  "aria-label"?: string | undefined;
+};
+
+export function Close({ "aria-label": al, ...props }: WithOptionalARIALabel) {
+  return (
+    <ActionButton
+      size="sm"
+      title="Close"
+      aria-label={al ?? "close"}
+      {...props}
+      icon={<XMarkIcon width="1.4em" />}
+    />
   );
 }
