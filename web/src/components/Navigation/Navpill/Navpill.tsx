@@ -27,7 +27,7 @@ export function Navpill() {
         id="flex-container"
         height="full"
         gap={3}
-        p={4}
+        p="min(3vh, 1em)"
         justifyContent="end"
         alignItems="center"
         flexDir="column"
@@ -35,7 +35,7 @@ export function Navpill() {
       >
         <Flex
           px={{ base: isExpanded ? 2 : 4 }}
-          py={{ base: 2 }}
+          py={2}
           gap={2}
           flexDirection="column"
           borderRadius={25}
