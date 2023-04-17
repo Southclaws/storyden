@@ -4,6 +4,7 @@ import {
   Close,
   Create,
   Dashboard,
+  Home,
   Login,
   Settings,
 } from "src/components/Action/Action";
@@ -58,7 +59,8 @@ export function Navpill() {
               flexDirection: "column",
             }}
           >
-            <HStack justify="end">
+            <HStack justify="space-between">
+              <Home />
               <Settings />
             </HStack>
 
