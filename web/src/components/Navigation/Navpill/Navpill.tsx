@@ -39,7 +39,7 @@ export function Navpill() {
           gap={2}
           flexDirection="column"
           borderRadius={25}
-          backdropFilter="blur(1em)"
+          backdropFilter="blur(4px)"
           transitionProperty="background-color"
           transitionDuration="0.5s"
           backgroundColor="hsla(210, 38.5%, 94.9%, 0.8)"
