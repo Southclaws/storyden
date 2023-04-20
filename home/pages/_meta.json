@@ -1,0 +1,15 @@
+{
+    "index": "Storyden",
+    "docs": {
+        "title": "Introduction"
+    },
+    "blog": {
+        "title": "Articles",
+        "display": "hidden",
+        "type": "page",
+        "theme": {
+            "layout": "full",
+            "typesetting": "article"
+        }
+    }
+}

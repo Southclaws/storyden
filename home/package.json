@@ -15,10 +15,11 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@heroicons/react": "^2.0.10",
-    "@next/font": "^13.1.6",
     "framer-motion": "^10.2.4",
-    "next": "^13.2.4",
+    "next": "^13.3.0",
     "next-seo": "^5.5.0",
+    "nextra": "^2.4.0",
+    "nextra-theme-docs": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.34.2"
