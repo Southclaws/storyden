@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Box,
   Button,
@@ -13,13 +11,9 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { NextSeo } from "next-seo";
 import Image from "next/image";
-import localFont from "@next/font/local";
-
-const monasans = localFont({
-  src: "./mona-sans.woff2",
-  display: "swap",
-});
+import { seo } from "../seo";
 
 function Logo() {
   return (
@@ -424,7 +418,7 @@ function Why() {
       <Box>
         <Heading
           textAlign="right"
-          fontFamily={monasans}
+          fontFamily="mona-sans"
           fontStyle="normal"
           fontWeight="900"
           fontSize={{
@@ -1032,6 +1026,7 @@ function Footer() {
 export default function Home() {
   return (
     <Box>
+      <NextSeo title="Storyden: A forum for the modern age." {...seo} />
       <Hero />
       <Story />
       <Why />
