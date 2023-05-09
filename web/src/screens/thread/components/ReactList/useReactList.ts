@@ -17,12 +17,7 @@ export function useReactList(props: Props) {
 
   async function onSelect(event: { emoji: string }) {
     await postReactAdd(props.id, { emoji: event.emoji });
-
-    const key = getThreadGetKey(props.slug);
-
-    console.log({ key });
-
-    mutate(key);
+    mutate(getThreadGetKey(props.slug));
   }
 
   async function onOpen() {
@@ -37,6 +32,7 @@ export function useReactList(props: Props) {
     const picker = createPicker({
       rootElement,
       renderer: new NativeRenderer(),
+      //   emojiSize: "1.8rem",
     });
 
     picker.addEventListener("emoji:select", onSelect);
