@@ -10,18 +10,18 @@ import (
 type ReactID xid.ID
 
 type React struct {
-	ID     ReactID `json:"id"`
-	Emoji  string  `json:"emoji"`
-	UserID string  `json:"user"`
-	PostID string  `json:"post"`
+	ID     ReactID
+	Emoji  string
+	UserID string
+	PostID string
 }
 
-func FromModel(ent *ent.React) *React {
+func FromModel(in *ent.React) *React {
 	return &React{
-		ID:     ReactID(ent.ID),
-		Emoji:  ent.Emoji,
-		UserID: ent.Edges.Account.ID.String(),
-		PostID: ent.Edges.Post.ID.String(),
+		ID:     ReactID(in.ID),
+		Emoji:  in.Emoji,
+		UserID: in.AccountID.String(),
+		PostID: in.PostID.String(),
 	}
 }
 

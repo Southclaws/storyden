@@ -3,11 +3,17 @@ package seed
 import (
 	"context"
 	"fmt"
+	"html"
+	"math/rand"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -197,7 +203,7 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 	}
 )
 
-func threads(tr thread.Repository, pr post.Repository) {
+func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
@@ -218,7 +224,7 @@ func threads(tr thread.Repository, pr post.Repository) {
 		}
 
 		for _, p := range t.Posts[1:] {
-			_, err = pr.Create(ctx,
+			p, err = pr.Create(ctx,
 				p.Body,
 				p.Author.ID,
 				th.ID,
@@ -231,8 +237,35 @@ func threads(tr thread.Repository, pr post.Repository) {
 				}
 				panic(err)
 			}
+
+			for i := 0; i < rand.Intn(10); i++ {
+
+				acc := Accounts[rand.Intn(len(Accounts))]
+
+				_, err := rr.Add(ctx,
+					acc.ID,
+					xid.ID(p.ID),
+					randomEmoji())
+				if err != nil {
+					panic(err)
+				}
+			}
 		}
 	}
 
 	fmt.Println("created seed threads and posts")
+}
+
+// https://gist.github.com/chiliec/60d815bcbfc56ff62fafe2ff8ce80f6b
+func randomEmoji() string {
+	rand.Seed(time.Now().UnixNano())
+	emoji := [][]int{
+		{128513, 128591},
+		{128640, 128704},
+	}
+	r := emoji[rand.Int()%len(emoji)]
+	min := r[0]
+	max := r[1]
+	n := rand.Intn(max-min+1) + min
+	return html.UnescapeString("&#" + strconv.Itoa(n) + ";")
 }

@@ -15,6 +15,10 @@ const (
 	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldAccountID holds the string denoting the account_id field in the database.
+	FieldAccountID = "account_id"
+	// FieldPostID holds the string denoting the post_id field in the database.
+	FieldPostID = "post_id"
 	// FieldEmoji holds the string denoting the emoji field in the database.
 	FieldEmoji = "emoji"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -29,41 +33,29 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
-	AccountColumn = "react_account"
+	AccountColumn = "account_id"
 	// PostTable is the table that holds the Post relation/edge.
 	PostTable = "reacts"
 	// PostInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostInverseTable = "posts"
 	// PostColumn is the table column denoting the Post relation/edge.
-	PostColumn = "react_post"
+	PostColumn = "post_id"
 )
 
 // Columns holds all SQL columns for react fields.
 var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
+	FieldAccountID,
+	FieldPostID,
 	FieldEmoji,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "reacts"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"account_reacts",
-	"post_reacts",
-	"react_account",
-	"react_post",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

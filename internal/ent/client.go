@@ -1234,7 +1234,7 @@ func (c *ReactClient) QueryAccount(r *React) *AccountQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.AccountTable, react.AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, react.AccountTable, react.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1250,7 +1250,7 @@ func (c *ReactClient) QueryPost(r *React) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.PostTable, react.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, react.PostTable, react.PostColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

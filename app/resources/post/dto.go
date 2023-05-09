@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
-	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -20,17 +20,17 @@ func (u PostID) String() string { return xid.ID(u).String() }
 type Post struct {
 	ID PostID `json:"id"`
 
-	Body       string                    `json:"body"`
-	Short      string                    `json:"short"`
-	Author     Author                    `json:"author"`
-	RootPostID PostID                    `json:"rootPostId"`
-	ReplyTo    optional.Optional[PostID] `json:"replyTo"`
-	Reacts     []react.React             `json:"reacts"`
+	Body       string
+	Short      string
+	Author     Author
+	RootPostID PostID
+	ReplyTo    optional.Optional[PostID]
+	Reacts     []*react.React
 	Meta       map[string]any
 
-	CreatedAt time.Time                    `json:"createdAt"`
-	UpdatedAt time.Time                    `json:"updatedAt"`
-	DeletedAt optional.Optional[time.Time] `json:"deletedAt"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt optional.Optional[time.Time]
 }
 
 const Role = "Post"
@@ -60,13 +60,6 @@ func replyTo(m *ent.Post) optional.Optional[PostID] {
 func FromModel(m *ent.Post) (w *Post) {
 	replyTo := replyTo(m)
 
-	reacts := lo.Map(m.Edges.Reacts, func(t *ent.React, i int) react.React {
-		r := react.FromModel(t)
-		return *r
-	})
-
-	// replyTo := utils.OptionalSlice[xid.ID](m.ReplyToPostID)
-
 	return &Post{
 		ID: PostID(m.ID),
 
@@ -81,7 +74,7 @@ func FromModel(m *ent.Post) (w *Post) {
 		},
 		RootPostID: PostID(m.RootPostID),
 		ReplyTo:    replyTo,
-		Reacts:     reacts,
+		Reacts:     dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:       m.Metadata,
 
 		CreatedAt: m.CreatedAt,

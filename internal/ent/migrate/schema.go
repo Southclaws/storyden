@@ -159,10 +159,8 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "emoji", Type: field.TypeString},
-		{Name: "account_reacts", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "post_reacts", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "react_account", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "react_post", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
 	}
 	// ReactsTable holds the schema information for the "reacts" table.
 	ReactsTable = &schema.Table{
@@ -174,25 +172,13 @@ var (
 				Symbol:     "reacts_accounts_reacts",
 				Columns:    []*schema.Column{ReactsColumns[3]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "reacts_posts_reacts",
 				Columns:    []*schema.Column{ReactsColumns[4]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "reacts_accounts_account",
-				Columns:    []*schema.Column{ReactsColumns[5]},
-				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "reacts_posts_Post",
-				Columns:    []*schema.Column{ReactsColumns[6]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -365,8 +351,6 @@ func init() {
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
-	ReactsTable.ForeignKeys[2].RefTable = AccountsTable
-	ReactsTable.ForeignKeys[3].RefTable = PostsTable
 	SubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
 	SubscriptionsTable.ForeignKeys[1].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable

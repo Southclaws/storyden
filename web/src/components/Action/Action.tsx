@@ -5,6 +5,7 @@ import {
   Bars3Icon,
   BellIcon,
   HomeIcon,
+  PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { LoginIcon } from "../graphics/LoginIcon";
@@ -133,6 +134,18 @@ export function Close({ "aria-label": al, ...props }: WithOptionalARIALabel) {
       aria-label={al ?? "close"}
       {...props}
       icon={<XMarkIcon width="1.4em" />}
+    />
+  );
+}
+
+export function Add({ "aria-label": al, ...props }: WithOptionalARIALabel) {
+  return (
+    <ActionButton
+      size="sm"
+      title="Add"
+      aria-label={al ?? "add"}
+      {...props}
+      icon={<PlusIcon width="1.4em" />}
     />
   );
 }
