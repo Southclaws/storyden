@@ -43,8 +43,7 @@ export function ReactList(props: Props) {
           </PopoverTrigger>
           <PopoverContent>
             <PopoverArrow />
-            <PopoverCloseButton />
-            <PopoverBody>
+            <PopoverBody m={0} p={0}>
               <Box id={`${emojiPickerContainerID}-${props.id}`}>
                 [emoji picker]
               </Box>
