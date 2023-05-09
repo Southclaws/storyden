@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -33,7 +34,13 @@ type Account struct {
 // Name is the role/resource name.
 const Name = "Account"
 
-func (*Account) GetRole() string { return Name }
+func (a *Account) GetRole() string {
+	if a.Admin {
+		return rbac.OwnerRole.ID
+	}
+
+	return rbac.EveryoneRole.ID
+}
 
 func (*Account) GetResourceName() string { return Name }
 
