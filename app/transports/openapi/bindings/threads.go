@@ -44,12 +44,16 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
+	tags := opt.NewPtrMap(request.Body.Tags, func(t []openapi.Tag) []string {
+		return dt.Map(t, func(t openapi.Tag) string { return string(t.Id) })
+	})
+
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		request.Body.Body,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
-		dt.Map(request.Body.Tags, func(t openapi.Tag) string { return string(t.Id) }),
+		tags.OrZero(),
 		meta,
 	)
 	if err != nil {

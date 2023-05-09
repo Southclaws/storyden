@@ -13,6 +13,7 @@ import { SpecialComponents } from "react-markdown/lib/ast-to-react";
 import { NormalComponents } from "react-markdown/lib/complex-types";
 import { Post } from "src/api/openapi/schemas";
 import { Byline } from "./Byline";
+import { ReactList } from "./ReactList/ReactList";
 
 const components: Partial<
   Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
@@ -75,7 +76,12 @@ const components: Partial<
   th: (props) => <th>{props.children}</th>,
   tr: (props) => <tr>{props.children}</tr>,
 };
-export function PostView(props: Post) {
+
+type Props = Post & {
+  slug: string;
+};
+
+export function PostView(props: Props) {
   return (
     <Flex id={props.id} flexDir="column" gap={2}>
       <Byline
@@ -84,6 +90,7 @@ export function PostView(props: Post) {
         time={new Date(props.createdAt)}
       />
       <ReactMarkdown components={components}>{props.body}</ReactMarkdown>
+      <ReactList {...props} />
     </Flex>
   );
 }

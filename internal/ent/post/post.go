@@ -98,7 +98,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "react" package.
 	ReactsInverseTable = "reacts"
 	// ReactsColumn is the table column denoting the reacts relation/edge.
-	ReactsColumn = "post_reacts"
+	ReactsColumn = "post_id"
 )
 
 // Columns holds all SQL columns for post fields.

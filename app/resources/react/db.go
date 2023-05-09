@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -23,7 +24,7 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emojiID string) (*React, error) {
+func (d *database) Add(ctx context.Context, accountID account.AccountID, postID xid.ID, emojiID string) (*React, error) {
 	e, ok := IsValidEmoji(emojiID)
 	if !ok {
 		return nil, fault.Wrap(ErrInvalidEmoji, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
@@ -50,7 +51,7 @@ func (d *database) Add(ctx context.Context, accountID xid.ID, postID xid.ID, emo
 	return FromModel(react), nil
 }
 
-func (d *database) Remove(ctx context.Context, accountID xid.ID, reactID ReactID) (*React, error) {
+func (d *database) Remove(ctx context.Context, accountID account.AccountID, reactID ReactID) (*React, error) {
 	// First, look up the react to check if this account has permissions to remove.
 	p, err := d.db.React.Get(ctx, xid.ID(reactID))
 	if err != nil {

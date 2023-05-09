@@ -70,6 +70,7 @@ type Bindings struct {
 	Categories
 	Threads
 	Posts
+	Reacts
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -87,6 +88,7 @@ func bindingsProviders() fx.Option {
 		NewCategories,
 		NewThreads,
 		NewPosts,
+		NewReacts,
 	)
 }
 

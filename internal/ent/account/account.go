@@ -54,7 +54,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "react" package.
 	ReactsInverseTable = "reacts"
 	// ReactsColumn is the table column denoting the reacts relation/edge.
-	ReactsColumn = "account_reacts"
+	ReactsColumn = "account_id"
 	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
 	RolesTable = "role_accounts"
 	// RolesInverseTable is the table name for the Role entity.

@@ -26,7 +26,6 @@ type ReactQuery struct {
 	predicates  []predicate.React
 	withAccount *AccountQuery
 	withPost    *PostQuery
-	withFKs     bool
 	modifiers   []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -78,7 +77,7 @@ func (rq *ReactQuery) QueryAccount() *AccountQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.AccountTable, react.AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, react.AccountTable, react.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -100,7 +99,7 @@ func (rq *ReactQuery) QueryPost() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(react.Table, react.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, react.PostTable, react.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, react.PostTable, react.PostColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -407,19 +406,12 @@ func (rq *ReactQuery) prepareQuery(ctx context.Context) error {
 func (rq *ReactQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*React, error) {
 	var (
 		nodes       = []*React{}
-		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [2]bool{
 			rq.withAccount != nil,
 			rq.withPost != nil,
 		}
 	)
-	if rq.withAccount != nil || rq.withPost != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, react.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*React).scanValues(nil, columns)
 	}
@@ -460,10 +452,7 @@ func (rq *ReactQuery) loadAccount(ctx context.Context, query *AccountQuery, node
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*React)
 	for i := range nodes {
-		if nodes[i].react_account == nil {
-			continue
-		}
-		fk := *nodes[i].react_account
+		fk := nodes[i].AccountID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -480,7 +469,7 @@ func (rq *ReactQuery) loadAccount(ctx context.Context, query *AccountQuery, node
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "react_account" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -492,10 +481,7 @@ func (rq *ReactQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*R
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*React)
 	for i := range nodes {
-		if nodes[i].react_post == nil {
-			continue
-		}
-		fk := *nodes[i].react_post
+		fk := nodes[i].PostID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -512,7 +498,7 @@ func (rq *ReactQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*R
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "react_post" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "post_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -31,43 +31,27 @@ func (ru *ReactUpdate) Where(ps ...predicate.React) *ReactUpdate {
 	return ru
 }
 
+// SetAccountID sets the "account_id" field.
+func (ru *ReactUpdate) SetAccountID(x xid.ID) *ReactUpdate {
+	ru.mutation.SetAccountID(x)
+	return ru
+}
+
+// SetPostID sets the "post_id" field.
+func (ru *ReactUpdate) SetPostID(x xid.ID) *ReactUpdate {
+	ru.mutation.SetPostID(x)
+	return ru
+}
+
 // SetEmoji sets the "emoji" field.
 func (ru *ReactUpdate) SetEmoji(s string) *ReactUpdate {
 	ru.mutation.SetEmoji(s)
 	return ru
 }
 
-// SetAccountID sets the "account" edge to the Account entity by ID.
-func (ru *ReactUpdate) SetAccountID(id xid.ID) *ReactUpdate {
-	ru.mutation.SetAccountID(id)
-	return ru
-}
-
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ru *ReactUpdate) SetNillableAccountID(id *xid.ID) *ReactUpdate {
-	if id != nil {
-		ru = ru.SetAccountID(*id)
-	}
-	return ru
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (ru *ReactUpdate) SetAccount(a *Account) *ReactUpdate {
 	return ru.SetAccountID(a.ID)
-}
-
-// SetPostID sets the "Post" edge to the Post entity by ID.
-func (ru *ReactUpdate) SetPostID(id xid.ID) *ReactUpdate {
-	ru.mutation.SetPostID(id)
-	return ru
-}
-
-// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (ru *ReactUpdate) SetNillablePostID(id *xid.ID) *ReactUpdate {
-	if id != nil {
-		ru = ru.SetPostID(*id)
-	}
-	return ru
 }
 
 // SetPost sets the "Post" edge to the Post entity.
@@ -119,6 +103,17 @@ func (ru *ReactUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ru *ReactUpdate) check() error {
+	if _, ok := ru.mutation.AccountID(); ru.mutation.AccountCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "React.account"`)
+	}
+	if _, ok := ru.mutation.PostID(); ru.mutation.PostCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "React.Post"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ru *ReactUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdate {
 	ru.modifiers = append(ru.modifiers, modifiers...)
@@ -126,6 +121,9 @@ func (ru *ReactUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpd
 }
 
 func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := ru.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	if ps := ru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -140,7 +138,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.AccountTable,
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
@@ -156,7 +154,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.AccountTable,
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
@@ -175,7 +173,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
@@ -191,7 +189,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
@@ -229,43 +227,27 @@ type ReactUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
+// SetAccountID sets the "account_id" field.
+func (ruo *ReactUpdateOne) SetAccountID(x xid.ID) *ReactUpdateOne {
+	ruo.mutation.SetAccountID(x)
+	return ruo
+}
+
+// SetPostID sets the "post_id" field.
+func (ruo *ReactUpdateOne) SetPostID(x xid.ID) *ReactUpdateOne {
+	ruo.mutation.SetPostID(x)
+	return ruo
+}
+
 // SetEmoji sets the "emoji" field.
 func (ruo *ReactUpdateOne) SetEmoji(s string) *ReactUpdateOne {
 	ruo.mutation.SetEmoji(s)
 	return ruo
 }
 
-// SetAccountID sets the "account" edge to the Account entity by ID.
-func (ruo *ReactUpdateOne) SetAccountID(id xid.ID) *ReactUpdateOne {
-	ruo.mutation.SetAccountID(id)
-	return ruo
-}
-
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableAccountID(id *xid.ID) *ReactUpdateOne {
-	if id != nil {
-		ruo = ruo.SetAccountID(*id)
-	}
-	return ruo
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (ruo *ReactUpdateOne) SetAccount(a *Account) *ReactUpdateOne {
 	return ruo.SetAccountID(a.ID)
-}
-
-// SetPostID sets the "Post" edge to the Post entity by ID.
-func (ruo *ReactUpdateOne) SetPostID(id xid.ID) *ReactUpdateOne {
-	ruo.mutation.SetPostID(id)
-	return ruo
-}
-
-// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillablePostID(id *xid.ID) *ReactUpdateOne {
-	if id != nil {
-		ruo = ruo.SetPostID(*id)
-	}
-	return ruo
 }
 
 // SetPost sets the "Post" edge to the Post entity.
@@ -330,6 +312,17 @@ func (ruo *ReactUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ruo *ReactUpdateOne) check() error {
+	if _, ok := ruo.mutation.AccountID(); ruo.mutation.AccountCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "React.account"`)
+	}
+	if _, ok := ruo.mutation.PostID(); ruo.mutation.PostCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "React.Post"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ruo *ReactUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdateOne {
 	ruo.modifiers = append(ruo.modifiers, modifiers...)
@@ -337,6 +330,9 @@ func (ruo *ReactUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Reac
 }
 
 func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error) {
+	if err := ruo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
 	id, ok := ruo.mutation.ID()
 	if !ok {
@@ -368,7 +364,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 	if ruo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.AccountTable,
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
@@ -384,7 +380,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 	if nodes := ruo.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.AccountTable,
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
@@ -403,7 +399,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 	if ruo.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
@@ -419,7 +415,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 	if nodes := ruo.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
 			Bidi:    false,

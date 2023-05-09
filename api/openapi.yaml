@@ -447,15 +447,18 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostCreateOK" }
 
-  # /v1/threads/{thread_id}/posts/{post_id}:
-  #   get:
-  #     operationId: PostGet
-  #     description: Get the data for a single post.
-  #     tags: [posts]
-  #     responses:
-  #       default: { $ref: "#/components/responses/InternalServerError" }
-  #       "404": { $ref: "#/components/responses/NotFound" }
-  #       "401": { $ref: "#/components/responses/Unauthorised" }
+  /v1/posts/{post_id}/reacts:
+    put:
+      operationId: PostReactAdd
+      description: Add a reaction to a post.
+      tags: [posts]
+      parameters: [$ref: "#/components/parameters/PostIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/PostReactAdd" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PostReactAddOK" }
 
 components:
   #
@@ -486,6 +489,14 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/ThreadMark"
+
+    PostIDParam:
+      description: Unique post ID.
+      name: post_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
 
     OAuthProvider:
       description: The identifier for an OAuth2 provider such as "twitter".
@@ -551,6 +562,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/PostInitialProps" }
+
+    PostReactAdd:
+      description: Add a reaction to a post.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PostReactProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -692,6 +709,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Post"
+
+    PostReactAddOK:
+      description: Post reaction added.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/React"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -1364,9 +1388,7 @@ components:
               description: The number of posts under this thread.
             category: { $ref: "#/components/schemas/CategoryReference" }
             reacts:
-              type: array
-              items: { $ref: "#/components/schemas/React" }
-              description: A list of reactions this post has had from people.
+              $ref: "#/components/schemas/ReactList"
             meta: { $ref: "#/components/schemas/Metadata" }
 
     ThreadList:
@@ -1413,11 +1435,13 @@ components:
 
     PostCommonProps:
       type: object
-      required: [body, author]
+      required: [root_id, body, author, reacts]
       properties:
+        root_id: { $ref: "#/components/schemas/Identifier" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
         author: { $ref: "#/components/schemas/ProfileReference" }
         meta: { $ref: "#/components/schemas/Metadata" }
+        reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
 
     PostInitialProps:
@@ -1428,10 +1452,23 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
 
+    ReactList:
+      description: A list of reactions this post has had from people.
+      type: array
+      items: { $ref: "#/components/schemas/React" }
+
     React:
       type: object
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
+        emoji:
+          type: string
+
+    PostReactProps:
+      description: |
+        Reactions are currently just simple strings but they may improve later.
+      type: object
+      properties:
         emoji:
           type: string
 

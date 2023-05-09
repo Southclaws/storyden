@@ -61,6 +61,16 @@ func CreatedAt(v time.Time) predicate.React {
 	return predicate.React(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
+func AccountID(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldEQ(FieldAccountID, v))
+}
+
+// PostID applies equality check predicate on the "post_id" field. It's identical to PostIDEQ.
+func PostID(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldEQ(FieldPostID, v))
+}
+
 // Emoji applies equality check predicate on the "emoji" field. It's identical to EmojiEQ.
 func Emoji(v string) predicate.React {
 	return predicate.React(sql.FieldEQ(FieldEmoji, v))
@@ -104,6 +114,146 @@ func CreatedAtLT(v time.Time) predicate.React {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.React {
 	return predicate.React(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// AccountIDEQ applies the EQ predicate on the "account_id" field.
+func AccountIDEQ(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldEQ(FieldAccountID, v))
+}
+
+// AccountIDNEQ applies the NEQ predicate on the "account_id" field.
+func AccountIDNEQ(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldNEQ(FieldAccountID, v))
+}
+
+// AccountIDIn applies the In predicate on the "account_id" field.
+func AccountIDIn(vs ...xid.ID) predicate.React {
+	return predicate.React(sql.FieldIn(FieldAccountID, vs...))
+}
+
+// AccountIDNotIn applies the NotIn predicate on the "account_id" field.
+func AccountIDNotIn(vs ...xid.ID) predicate.React {
+	return predicate.React(sql.FieldNotIn(FieldAccountID, vs...))
+}
+
+// AccountIDGT applies the GT predicate on the "account_id" field.
+func AccountIDGT(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldGT(FieldAccountID, v))
+}
+
+// AccountIDGTE applies the GTE predicate on the "account_id" field.
+func AccountIDGTE(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldGTE(FieldAccountID, v))
+}
+
+// AccountIDLT applies the LT predicate on the "account_id" field.
+func AccountIDLT(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldLT(FieldAccountID, v))
+}
+
+// AccountIDLTE applies the LTE predicate on the "account_id" field.
+func AccountIDLTE(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldLTE(FieldAccountID, v))
+}
+
+// AccountIDContains applies the Contains predicate on the "account_id" field.
+func AccountIDContains(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldContains(FieldAccountID, vc))
+}
+
+// AccountIDHasPrefix applies the HasPrefix predicate on the "account_id" field.
+func AccountIDHasPrefix(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldHasPrefix(FieldAccountID, vc))
+}
+
+// AccountIDHasSuffix applies the HasSuffix predicate on the "account_id" field.
+func AccountIDHasSuffix(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldHasSuffix(FieldAccountID, vc))
+}
+
+// AccountIDEqualFold applies the EqualFold predicate on the "account_id" field.
+func AccountIDEqualFold(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldEqualFold(FieldAccountID, vc))
+}
+
+// AccountIDContainsFold applies the ContainsFold predicate on the "account_id" field.
+func AccountIDContainsFold(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldContainsFold(FieldAccountID, vc))
+}
+
+// PostIDEQ applies the EQ predicate on the "post_id" field.
+func PostIDEQ(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldEQ(FieldPostID, v))
+}
+
+// PostIDNEQ applies the NEQ predicate on the "post_id" field.
+func PostIDNEQ(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldNEQ(FieldPostID, v))
+}
+
+// PostIDIn applies the In predicate on the "post_id" field.
+func PostIDIn(vs ...xid.ID) predicate.React {
+	return predicate.React(sql.FieldIn(FieldPostID, vs...))
+}
+
+// PostIDNotIn applies the NotIn predicate on the "post_id" field.
+func PostIDNotIn(vs ...xid.ID) predicate.React {
+	return predicate.React(sql.FieldNotIn(FieldPostID, vs...))
+}
+
+// PostIDGT applies the GT predicate on the "post_id" field.
+func PostIDGT(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldGT(FieldPostID, v))
+}
+
+// PostIDGTE applies the GTE predicate on the "post_id" field.
+func PostIDGTE(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldGTE(FieldPostID, v))
+}
+
+// PostIDLT applies the LT predicate on the "post_id" field.
+func PostIDLT(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldLT(FieldPostID, v))
+}
+
+// PostIDLTE applies the LTE predicate on the "post_id" field.
+func PostIDLTE(v xid.ID) predicate.React {
+	return predicate.React(sql.FieldLTE(FieldPostID, v))
+}
+
+// PostIDContains applies the Contains predicate on the "post_id" field.
+func PostIDContains(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldContains(FieldPostID, vc))
+}
+
+// PostIDHasPrefix applies the HasPrefix predicate on the "post_id" field.
+func PostIDHasPrefix(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldHasPrefix(FieldPostID, vc))
+}
+
+// PostIDHasSuffix applies the HasSuffix predicate on the "post_id" field.
+func PostIDHasSuffix(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldHasSuffix(FieldPostID, vc))
+}
+
+// PostIDEqualFold applies the EqualFold predicate on the "post_id" field.
+func PostIDEqualFold(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldEqualFold(FieldPostID, vc))
+}
+
+// PostIDContainsFold applies the ContainsFold predicate on the "post_id" field.
+func PostIDContainsFold(v xid.ID) predicate.React {
+	vc := v.String()
+	return predicate.React(sql.FieldContainsFold(FieldPostID, vc))
 }
 
 // EmojiEQ applies the EQ predicate on the "emoji" field.
@@ -176,7 +326,7 @@ func HasAccount() predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, AccountTable, AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -188,7 +338,7 @@ func HasAccountWith(preds ...predicate.Account) predicate.React {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(AccountInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, AccountTable, AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -203,7 +353,7 @@ func HasPost() predicate.React {
 	return predicate.React(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, PostTable, PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, PostTable, PostColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -215,7 +365,7 @@ func HasPostWith(preds ...predicate.Post) predicate.React {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(PostInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, PostTable, PostColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, PostTable, PostColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

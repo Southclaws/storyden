@@ -72,8 +72,10 @@ func serialisePost(p *post.Post) openapi.Post {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
+		RootId:    p.RootPostID.String(),
 		Body:      p.Body,
 		Author:    serialiseProfileReference(p.Author),
+		Reacts:    dt.Map(p.Reacts, serialiseReact),
 	}
 }
 

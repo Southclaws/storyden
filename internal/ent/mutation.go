@@ -5124,6 +5124,78 @@ func (m *ReactMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
+// SetAccountID sets the "account_id" field.
+func (m *ReactMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *ReactMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the React entity.
+// If the React object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReactMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *ReactMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetPostID sets the "post_id" field.
+func (m *ReactMutation) SetPostID(x xid.ID) {
+	m._Post = &x
+}
+
+// PostID returns the value of the "post_id" field in the mutation.
+func (m *ReactMutation) PostID() (r xid.ID, exists bool) {
+	v := m._Post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPostID returns the old "post_id" field's value of the React entity.
+// If the React object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReactMutation) OldPostID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPostID: %w", err)
+	}
+	return oldValue.PostID, nil
+}
+
+// ResetPostID resets all changes to the "post_id" field.
+func (m *ReactMutation) ResetPostID() {
+	m._Post = nil
+}
+
 // SetEmoji sets the "emoji" field.
 func (m *ReactMutation) SetEmoji(s string) {
 	m.emoji = &s
@@ -5160,11 +5232,6 @@ func (m *ReactMutation) ResetEmoji() {
 	m.emoji = nil
 }
 
-// SetAccountID sets the "account" edge to the Account entity by id.
-func (m *ReactMutation) SetAccountID(id xid.ID) {
-	m.account = &id
-}
-
 // ClearAccount clears the "account" edge to the Account entity.
 func (m *ReactMutation) ClearAccount() {
 	m.clearedaccount = true
@@ -5173,14 +5240,6 @@ func (m *ReactMutation) ClearAccount() {
 // AccountCleared reports if the "account" edge to the Account entity was cleared.
 func (m *ReactMutation) AccountCleared() bool {
 	return m.clearedaccount
-}
-
-// AccountID returns the "account" edge ID in the mutation.
-func (m *ReactMutation) AccountID() (id xid.ID, exists bool) {
-	if m.account != nil {
-		return *m.account, true
-	}
-	return
 }
 
 // AccountIDs returns the "account" edge IDs in the mutation.
@@ -5199,11 +5258,6 @@ func (m *ReactMutation) ResetAccount() {
 	m.clearedaccount = false
 }
 
-// SetPostID sets the "Post" edge to the Post entity by id.
-func (m *ReactMutation) SetPostID(id xid.ID) {
-	m._Post = &id
-}
-
 // ClearPost clears the "Post" edge to the Post entity.
 func (m *ReactMutation) ClearPost() {
 	m.cleared_Post = true
@@ -5212,14 +5266,6 @@ func (m *ReactMutation) ClearPost() {
 // PostCleared reports if the "Post" edge to the Post entity was cleared.
 func (m *ReactMutation) PostCleared() bool {
 	return m.cleared_Post
-}
-
-// PostID returns the "Post" edge ID in the mutation.
-func (m *ReactMutation) PostID() (id xid.ID, exists bool) {
-	if m._Post != nil {
-		return *m._Post, true
-	}
-	return
 }
 
 // PostIDs returns the "Post" edge IDs in the mutation.
@@ -5272,9 +5318,15 @@ func (m *ReactMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ReactMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.created_at != nil {
 		fields = append(fields, react.FieldCreatedAt)
+	}
+	if m.account != nil {
+		fields = append(fields, react.FieldAccountID)
+	}
+	if m._Post != nil {
+		fields = append(fields, react.FieldPostID)
 	}
 	if m.emoji != nil {
 		fields = append(fields, react.FieldEmoji)
@@ -5289,6 +5341,10 @@ func (m *ReactMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case react.FieldCreatedAt:
 		return m.CreatedAt()
+	case react.FieldAccountID:
+		return m.AccountID()
+	case react.FieldPostID:
+		return m.PostID()
 	case react.FieldEmoji:
 		return m.Emoji()
 	}
@@ -5302,6 +5358,10 @@ func (m *ReactMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case react.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case react.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case react.FieldPostID:
+		return m.OldPostID(ctx)
 	case react.FieldEmoji:
 		return m.OldEmoji(ctx)
 	}
@@ -5319,6 +5379,20 @@ func (m *ReactMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case react.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case react.FieldPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostID(v)
 		return nil
 	case react.FieldEmoji:
 		v, ok := value.(string)
@@ -5378,6 +5452,12 @@ func (m *ReactMutation) ResetField(name string) error {
 	switch name {
 	case react.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case react.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case react.FieldPostID:
+		m.ResetPostID()
 		return nil
 	case react.FieldEmoji:
 		m.ResetEmoji()

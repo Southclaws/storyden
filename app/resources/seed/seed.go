@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/db"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -59,6 +60,7 @@ func New(
 	category_repo category.Repository,
 	thread_repo thread.Repository,
 	post_repo post.Repository,
+	react_repo react.Repository,
 ) (r Ready) {
 	if err := db.Truncate(database); err != nil {
 		panic(err)
@@ -68,7 +70,7 @@ func New(
 
 	accounts(account_repo, auth_repo)
 	categories(category_repo)
-	threads(thread_repo, post_repo)
+	threads(thread_repo, post_repo, react_repo)
 
 	return Ready{}
 }

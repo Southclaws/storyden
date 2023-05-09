@@ -40,6 +40,18 @@ func (rc *ReactCreate) SetNillableCreatedAt(t *time.Time) *ReactCreate {
 	return rc
 }
 
+// SetAccountID sets the "account_id" field.
+func (rc *ReactCreate) SetAccountID(x xid.ID) *ReactCreate {
+	rc.mutation.SetAccountID(x)
+	return rc
+}
+
+// SetPostID sets the "post_id" field.
+func (rc *ReactCreate) SetPostID(x xid.ID) *ReactCreate {
+	rc.mutation.SetPostID(x)
+	return rc
+}
+
 // SetEmoji sets the "emoji" field.
 func (rc *ReactCreate) SetEmoji(s string) *ReactCreate {
 	rc.mutation.SetEmoji(s)
@@ -60,37 +72,9 @@ func (rc *ReactCreate) SetNillableID(x *xid.ID) *ReactCreate {
 	return rc
 }
 
-// SetAccountID sets the "account" edge to the Account entity by ID.
-func (rc *ReactCreate) SetAccountID(id xid.ID) *ReactCreate {
-	rc.mutation.SetAccountID(id)
-	return rc
-}
-
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (rc *ReactCreate) SetNillableAccountID(id *xid.ID) *ReactCreate {
-	if id != nil {
-		rc = rc.SetAccountID(*id)
-	}
-	return rc
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (rc *ReactCreate) SetAccount(a *Account) *ReactCreate {
 	return rc.SetAccountID(a.ID)
-}
-
-// SetPostID sets the "Post" edge to the Post entity by ID.
-func (rc *ReactCreate) SetPostID(id xid.ID) *ReactCreate {
-	rc.mutation.SetPostID(id)
-	return rc
-}
-
-// SetNillablePostID sets the "Post" edge to the Post entity by ID if the given value is not nil.
-func (rc *ReactCreate) SetNillablePostID(id *xid.ID) *ReactCreate {
-	if id != nil {
-		rc = rc.SetPostID(*id)
-	}
-	return rc
 }
 
 // SetPost sets the "Post" edge to the Post entity.
@@ -148,6 +132,12 @@ func (rc *ReactCreate) check() error {
 	if _, ok := rc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "React.created_at"`)}
 	}
+	if _, ok := rc.mutation.AccountID(); !ok {
+		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "React.account_id"`)}
+	}
+	if _, ok := rc.mutation.PostID(); !ok {
+		return &ValidationError{Name: "post_id", err: errors.New(`ent: missing required field "React.post_id"`)}
+	}
 	if _, ok := rc.mutation.Emoji(); !ok {
 		return &ValidationError{Name: "emoji", err: errors.New(`ent: missing required field "React.emoji"`)}
 	}
@@ -155,6 +145,12 @@ func (rc *ReactCreate) check() error {
 		if err := react.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "React.id": %w`, err)}
 		}
+	}
+	if _, ok := rc.mutation.AccountID(); !ok {
+		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "React.account"`)}
+	}
+	if _, ok := rc.mutation.PostID(); !ok {
+		return &ValidationError{Name: "Post", err: errors.New(`ent: missing required edge "React.Post"`)}
 	}
 	return nil
 }
@@ -203,7 +199,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 	if nodes := rc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.AccountTable,
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
@@ -217,13 +213,13 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.react_account = &nodes[0]
+		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   react.PostTable,
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
@@ -237,7 +233,7 @@ func (rc *ReactCreate) createSpec() (*React, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.react_post = &nodes[0]
+		_node.PostID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -291,6 +287,30 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetAccountID sets the "account_id" field.
+func (u *ReactUpsert) SetAccountID(v xid.ID) *ReactUpsert {
+	u.Set(react.FieldAccountID, v)
+	return u
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *ReactUpsert) UpdateAccountID() *ReactUpsert {
+	u.SetExcluded(react.FieldAccountID)
+	return u
+}
+
+// SetPostID sets the "post_id" field.
+func (u *ReactUpsert) SetPostID(v xid.ID) *ReactUpsert {
+	u.Set(react.FieldPostID, v)
+	return u
+}
+
+// UpdatePostID sets the "post_id" field to the value that was provided on create.
+func (u *ReactUpsert) UpdatePostID() *ReactUpsert {
+	u.SetExcluded(react.FieldPostID)
+	return u
+}
 
 // SetEmoji sets the "emoji" field.
 func (u *ReactUpsert) SetEmoji(v string) *ReactUpsert {
@@ -353,6 +373,34 @@ func (u *ReactUpsertOne) Update(set func(*ReactUpsert)) *ReactUpsertOne {
 		set(&ReactUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetAccountID sets the "account_id" field.
+func (u *ReactUpsertOne) SetAccountID(v xid.ID) *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetAccountID(v)
+	})
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *ReactUpsertOne) UpdateAccountID() *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdateAccountID()
+	})
+}
+
+// SetPostID sets the "post_id" field.
+func (u *ReactUpsertOne) SetPostID(v xid.ID) *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetPostID(v)
+	})
+}
+
+// UpdatePostID sets the "post_id" field to the value that was provided on create.
+func (u *ReactUpsertOne) UpdatePostID() *ReactUpsertOne {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdatePostID()
+	})
 }
 
 // SetEmoji sets the "emoji" field.
@@ -581,6 +629,34 @@ func (u *ReactUpsertBulk) Update(set func(*ReactUpsert)) *ReactUpsertBulk {
 		set(&ReactUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetAccountID sets the "account_id" field.
+func (u *ReactUpsertBulk) SetAccountID(v xid.ID) *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetAccountID(v)
+	})
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *ReactUpsertBulk) UpdateAccountID() *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdateAccountID()
+	})
+}
+
+// SetPostID sets the "post_id" field.
+func (u *ReactUpsertBulk) SetPostID(v xid.ID) *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.SetPostID(v)
+	})
+}
+
+// UpdatePostID sets the "post_id" field to the value that was provided on create.
+func (u *ReactUpsertBulk) UpdatePostID() *ReactUpsertBulk {
+	return u.Update(func(s *ReactUpsert) {
+		s.UpdatePostID()
+	})
 }
 
 // SetEmoji sets the "emoji" field.
