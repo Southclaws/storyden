@@ -34,7 +34,7 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 					return err
 				}
 
-				return fault.New(message)
+				return fault.Wrap(err, fmsg.With(message))
 			}
 
 			// Most of the time, these errors contain a more detailed error.
@@ -61,8 +61,18 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 		if errors.As(err, &se) {
 			ctx = fctx.WithMeta(ctx,
 				"schema_error", se.Reason,
+				"schema_field", se.SchemaField,
+				"schema_description", se.Schema.Description,
+				"schema_type", se.Schema.Type,
 				"path", strings.Join(se.JSONPointer(), "."),
 			)
+
+			// These schema errors become nested when the schema is composed of
+			// other schemas using anyOf, allOf, oneOf, etc. This recursion will
+			// make sure the root error is the one that is used for reporting.
+			if se.Origin != nil {
+				return fn(ctx, se.Origin)
+			}
 
 			return fault.Wrap(fault.New("openapi schema validation failure"),
 				fctx.With(ctx),
