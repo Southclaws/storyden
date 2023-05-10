@@ -29,35 +29,43 @@ export function ComposeScreen() {
         w="full"
         gap={2}
       >
-        <HStack width="full" justifyContent="end">
-          <Controller
-            render={({ field: { onChange, ...field } }) => {
-              function onInput(e: FormEvent<HTMLElement>) {
-                // NOTE: not sure which event type to use here...
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onChange((e.target as any).textContent);
-              }
-
-              return (
-                <Input
-                  as="span"
-                  contentEditable
-                  variant="unstyled"
-                  fontSize="3xl"
-                  overflowWrap="break-word"
-                  wordBreak="break-word"
-                  fontWeight="semibold"
-                  placeholder="Thread title"
-                  onInput={onInput}
-                  {...field}
-                />
-              );
-            }}
-            control={control}
-            name="title"
-          />
-
+        <HStack width="full" justifyContent="space-between" alignItems="start">
           <HStack>
+            <Controller
+              render={({ field: { onChange, ...field } }) => {
+                function onInput(e: FormEvent<HTMLElement>) {
+                  // NOTE: not sure which event type to use here...
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onChange((e.target as any).textContent);
+                }
+
+                return (
+                  <Input
+                    as="span"
+                    contentEditable
+                    variant="unstyled"
+                    fontSize="3xl"
+                    overflowWrap="break-word"
+                    wordBreak="break-word"
+                    fontWeight="semibold"
+                    placeholder="Thread title"
+                    onInput={onInput}
+                    {...field}
+                  />
+                );
+              }}
+              control={control}
+              name="title"
+            />
+          </HStack>
+
+          <HStack
+            flex="1 0 auto"
+            maxWidth="min-content"
+            flexDir={{ base: "column-reverse", md: "row" }}
+            gap={2}
+            alignItems="end"
+          >
             <Controller
               render={({ field }) => (
                 <>
