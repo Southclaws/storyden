@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Flex,
   FormErrorMessage,
   HStack,
   Input,
@@ -66,6 +68,19 @@ export function ComposeScreen() {
             gap={2}
             alignItems="end"
           >
+            <Button
+              type="submit"
+              isDisabled={!isValid}
+              isLoading={isSubmitting}
+            >
+              Post
+            </Button>
+          </HStack>
+        </HStack>
+        <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
+
+        <HStack width="full">
+          <Box>
             <Controller
               render={({ field }) => (
                 <>
@@ -78,18 +93,12 @@ export function ComposeScreen() {
               control={control}
               name="category"
             />
+          </Box>
 
-            <Button
-              type="submit"
-              isDisabled={!isValid}
-              isLoading={isSubmitting}
-            >
-              Post
-            </Button>
-          </HStack>
+          <Flex flex="1 1 auto" gap={2} overflow="hidden">
+            {/* TODO: tag select */}
+          </Flex>
         </HStack>
-
-        <FormErrorMessage>{errors.title?.message}</FormErrorMessage>
 
         <Controller
           render={({ field }) => <Editor onChange={field.onChange} />}

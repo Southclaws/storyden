@@ -97,7 +97,7 @@ export function Editor({ onChange }: Props) {
           >
             <Flex flexDir="column" width="full" minHeight="6em">
               <Toolbar>
-                <HStack width="full" justifyContent={["center", "start"]}>
+                <HStack width="full" justifyContent="start">
                   <BasicFormattingButtonGroup />
                   <VerticalDivider />
                   <HeadingLevelButtonGroup />
