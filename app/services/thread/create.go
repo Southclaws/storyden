@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
@@ -29,7 +30,7 @@ func (s *service) Create(ctx context.Context,
 	if err := s.rbac.Authorize(&restrict.AccessRequest{
 		Subject:  acc,
 		Resource: &thread.Thread{},
-		Actions:  []string{"create"},
+		Actions:  []string{rbac.ActionCreate},
 	}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
 	}
