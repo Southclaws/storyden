@@ -6,13 +6,13 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/el-mike/restrict"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 )
 
@@ -26,7 +26,7 @@ func Build() fx.Option {
 
 type service struct {
 	l    *zap.Logger
-	rbac *restrict.AccessManager
+	rbac rbac.AccessManager
 
 	post_repo  post.Repository
 	react_repo react.Repository
@@ -34,7 +34,7 @@ type service struct {
 
 func New(
 	l *zap.Logger,
-	rbac *restrict.AccessManager,
+	rbac rbac.AccessManager,
 
 	post_repo post.Repository,
 	react_repo react.Repository,
