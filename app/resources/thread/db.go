@@ -20,7 +20,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	post_model "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 var (
@@ -44,17 +43,8 @@ func (d *database) Create(
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
-	opts ...option,
+	opts ...Option,
 ) (*Thread, error) {
-	insert := Thread{
-		Short: post.MakeShortBody(body),
-		Title: title,
-	}
-
-	for _, v := range opts {
-		v(&insert)
-	}
-
 	// tagset, err := d.createTags(ctx, tags)
 	// if err != nil {
 	// 	return nil, fault.Wrap(err, "failed to upsert tags for linking to post")
@@ -73,18 +63,22 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	p, err := d.db.Post.
-		Create().
-		SetNillableID(utils.OptionalID(xid.ID(insert.ID))).
-		SetFirst(true).
-		SetShort(insert.Short).
-		SetBody(body).
-		SetAuthorID(xid.ID(authorID)).
-		SetTitle(title).
-		SetCategory(cat).
-		SetMetadata(insert.Meta).
-		// AddTagIDs(tagset).
-		Save(ctx)
+	create := d.db.Post.Create()
+	mutate := create.Mutation()
+
+	for _, fn := range opts {
+		fn(mutate)
+	}
+
+	mutate.SetTitle(title)
+	mutate.SetShort(post.MakeShortBody(body))
+	mutate.SetFirst(true)
+	mutate.SetBody(body)
+	mutate.SetAuthorID(xid.ID(authorID))
+	mutate.SetTitle(title)
+	mutate.SetCategoryID(cat.ID)
+
+	p, err := create.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
@@ -137,6 +131,33 @@ func (d *database) Create(
 // 	}
 // 	return setters, nil
 // }
+
+func (d *database) Update(ctx context.Context, id post.PostID, opts ...Option) (*Thread, error) {
+	update := d.db.Post.UpdateOneID(xid.ID(id))
+	mutate := update.Mutation()
+
+	for _, fn := range opts {
+		fn(mutate)
+	}
+
+	err := update.Exec(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	p, err := d.db.Post.
+		Query().
+		Where(post_model.IDEQ(xid.ID(id))).
+		WithAuthor().
+		WithCategory().
+		WithTags().
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return FromModel(p), nil
+}
 
 func (d *database) List(
 	ctx context.Context,

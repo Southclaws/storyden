@@ -6,6 +6,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -28,6 +30,8 @@ type Service interface {
 		meta map[string]any,
 	) (*thread.Thread, error)
 
+	Update(ctx context.Context, threadID post.PostID, partial Partial) (*thread.Thread, error)
+
 	// ListAll returns all threads.
 	ListAll(
 		ctx context.Context,
@@ -41,6 +45,14 @@ type Service interface {
 		ctx context.Context,
 		threadID post.PostID,
 	) (*thread.Thread, error)
+}
+
+type Partial struct {
+	Title    opt.Optional[string]
+	Body     opt.Optional[string]
+	Tags     opt.Optional[[]xid.ID]
+	Category opt.Optional[xid.ID]
+	Meta     opt.Optional[map[string]any]
 }
 
 func Build() fx.Option {

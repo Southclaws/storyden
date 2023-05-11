@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -33,7 +32,7 @@ type Thread struct {
 	Meta     map[string]any
 }
 
-func (*Thread) GetResourceName() string { return rbac.ResourceThread }
+func (*Thread) GetResourceName() string { return "thread" }
 
 func FromModel(m *ent.Post) *Thread {
 	// Thread data structure will always contain one post: itself in post form.

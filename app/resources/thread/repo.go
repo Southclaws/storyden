@@ -21,8 +21,6 @@ import (
 // separate intuitive APIs that abstract away the detail that a `post` item in
 // the database and a `thread` item use the same underlying table.
 
-type option func(*Thread)
-
 type Repository interface {
 	// Create a new thread. A thread is just a "post" in the underlying data
 	// ent. But a thread is marked as "first" and has a title, catgegory and
@@ -34,8 +32,10 @@ type Repository interface {
 		authorID account_resource.AccountID,
 		categoryID category_resource.CategoryID,
 		tags []string,
-		opts ...option,
+		opts ...Option,
 	) (*Thread, error)
+
+	Update(ctx context.Context, id post_resource.PostID, opts ...Option) (*Thread, error)
 
 	List(
 		ctx context.Context,
@@ -48,38 +48,62 @@ type Repository interface {
 
 	Get(ctx context.Context, threadID post_resource.PostID) (*Thread, error)
 
-	// Update(ctx context.Context, userID user.UserID, id string, title, category *string, pinned *bool) (*post.Post, error)
-
 	// Delete(ctx context.Context, id, authorID user.UserID) (int, error)
 }
 
-func WithID(id post_resource.PostID) option {
-	return func(c *Thread) {
-		c.ID = id
+type Option func(*ent.PostMutation)
+
+func WithID(id post_resource.PostID) Option {
+	return func(m *ent.PostMutation) {
+		m.SetID(xid.ID(id))
 	}
 }
 
-func WithMeta(meta map[string]any) option {
-	return func(t *Thread) {
-		t.Meta = meta
+func WithTitle(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetTitle(v)
+	}
+}
+
+func WithBody(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetBody(v)
+	}
+}
+
+func WithTags(v []xid.ID) Option {
+	return func(pm *ent.PostMutation) {
+		pm.AddTagIDs(v...)
+	}
+}
+
+func WithCategory(v xid.ID) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetCategoryID(v)
+	}
+}
+
+func WithMeta(meta map[string]any) Option {
+	return func(m *ent.PostMutation) {
+		m.SetMetadata(meta)
 	}
 }
 
 type Query func(q *ent.PostQuery)
 
-func WithAuthor(id account_resource.AccountID) Query {
+func HasAuthor(id account_resource.AccountID) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(post.HasAuthorWith(account.ID(xid.ID(id))))
 	}
 }
 
-func WithTags(ids []xid.ID) Query {
+func HasTags(ids []xid.ID) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(post.HasTagsWith(tag.IDIn(ids...)))
 	}
 }
 
-func WithCategories(ids []string) Query {
+func HasCategories(ids []string) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(post.HasCategoryWith(category.NameIn(ids...)))
 	}

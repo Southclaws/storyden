@@ -33,9 +33,7 @@ type Post struct {
 	DeletedAt optional.Optional[time.Time]
 }
 
-const Role = "Post"
-
-func (u *Post) GetRole() string { return Role }
+func (*Post) GetResourceName() string { return "post" }
 
 type Author struct {
 	ID        account.AccountID `json:"id"`

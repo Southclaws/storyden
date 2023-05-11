@@ -28,9 +28,9 @@ func (s *service) ListAll(
 ) ([]*thread.Thread, error) {
 	q := []thread.Query{}
 
-	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.WithAuthor(a)) })
-	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.WithTags(a)) })
-	opts.Categories.Call(func(a []string) { q = append(q, thread.WithCategories(a)) })
+	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.HasAuthor(a)) })
+	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.HasTags(a)) })
+	opts.Categories.Call(func(a []string) { q = append(q, thread.HasCategories(a)) })
 
 	thr, err := s.thread_repo.List(ctx, before, max, q...)
 	if err != nil {

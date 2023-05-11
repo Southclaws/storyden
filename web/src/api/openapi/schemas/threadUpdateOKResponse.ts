@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
+import type { Thread } from "./thread";
 
 /**
- * A list of tags IDs.
+ * Thread updated.
  */
-export type TagListIDs = Identifier[];
+export type ThreadUpdateOKResponse = Thread;

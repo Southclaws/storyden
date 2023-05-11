@@ -16,6 +16,8 @@ import type {
   ThreadListOKResponse,
   ThreadListParams,
   ThreadGetResponse,
+  ThreadUpdateOKResponse,
+  ThreadUpdateBody,
 } from "./schemas";
 import { fetcher } from "../client";
 
@@ -136,4 +138,19 @@ export const useThreadGet = <
     swrKey,
     ...query,
   };
+};
+
+/**
+ * Publish changes to a thread.
+ */
+export const threadUpdate = (
+  threadMark: string,
+  threadUpdateBody: ThreadUpdateBody
+) => {
+  return fetcher<ThreadUpdateOKResponse>({
+    url: `/v1/threads/${threadMark}`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: threadUpdateBody,
+  });
 };

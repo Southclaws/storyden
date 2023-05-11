@@ -7,11 +7,11 @@
  */
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
-import type { TagList } from "./tagList";
+import type { TagListIDs } from "./tagListIDs";
 
 export interface AccountMutableProps {
   handle?: AccountHandle;
   name?: AccountName;
   bio?: string;
-  interests?: TagList;
+  interests?: TagListIDs;
 }

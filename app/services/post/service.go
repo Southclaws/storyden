@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"4d63.com/optional"
+	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -23,6 +24,13 @@ type Service interface {
 		replyToID optional.Optional[post.PostID],
 		meta map[string]any,
 	) (*post.Post, error)
+
+	Update(ctx context.Context, threadID post.PostID, partial Partial) (*post.Post, error)
+}
+
+type Partial struct {
+	Body opt.Optional[string]
+	Meta opt.Optional[map[string]any]
 }
 
 func Build() fx.Option {

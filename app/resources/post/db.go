@@ -90,77 +90,46 @@ func (d *database) Create(
 	return FromModel(p), nil
 }
 
-// func (d *database) EditPost(ctx context.Context, authorID, id string, title *string, body *string) (*Post, error) {
-// 	// This could probably be optimised. I am too lazy to do it rn.
-// 	post, err := d.db.Post.
-// 		FindUnique(
-// 			db.Post.ID.Equals(id),
-// 		).
-// 		With(db.Post.Author.Fetch()).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		if errors.Is(err, db.ErrNotFound) {
-// 			return nil, nil
-// 		}
-// 		return nil, err
-// 	}
-// 	if post.Author().ID != authorID {
-// 		return nil, ErrUnauthorised
-// 	}
+func (d *database) Get(ctx context.Context, id PostID) (*Post, error) {
+	p, err := d.db.Post.
+		Query().
+		Where(post.IDEQ(xid.ID(id))).
+		WithAuthor().
+		WithRoot(func(pq *ent.PostQuery) {
+			pq.WithAuthor()
+		}).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
 
-// 	post, err = d.db.Post.
-// 		FindUnique(
-// 			db.Post.ID.Equals(id),
-// 		).
-// 		With(db.Post.Author.Fetch()).
-// 		Update(
-// 			db.Post.Title.SetIfPresent(title),
-// 			db.Post.Body.SetIfPresent(body),
-// 		).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	return FromModel(p), nil
+}
 
-// 	return FromModel(post), err
-// }
+func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post, error) {
+	update := d.db.Post.UpdateOneID(xid.ID(id))
+	mutate := update.Mutation()
 
-// func (d *database) DeletePost(ctx context.Context, authorID, postID string, force bool) (*Post, error) {
-// 	// This could probably be optimised. I am too lazy to do it rn.
-// 	post, err := d.db.Post.
-// 		FindUnique(
-// 			db.Post.ID.Equals(postID),
-// 		).
-// 		With(
-// 			db.Post.Author.Fetch(),
-// 			db.Post.Tags.Fetch(),
-// 			db.Post.Category.Fetch(),
-// 		).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		if errors.Is(err, db.ErrNotFound) {
-// 			return nil, nil
-// 		}
-// 		return nil, err
-// 	}
-// 	if force == false {
-// 		if post.Author().ID != authorID {
-// 			return nil, ErrUnauthorised
-// 		}
-// 	}
+	for _, fn := range opts {
+		fn(mutate)
+	}
 
-// 	_, err = d.db.Post.
-// 		FindUnique(db.Post.ID.Equals(postID)).
-// 		Update(
-// 			db.Post.DeletedAt.Set(time.Now()),
-// 		).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		if errors.Is(err, db.ErrNotFound) {
-// 			return nil, nil
-// 		}
-// 		return nil, err
-// 	}
+	err := update.Exec(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-// 	return FromModel(post), err
-// }
+	p, err := d.db.Post.
+		Query().
+		Where(post.IDEQ(xid.ID(id))).
+		WithAuthor().
+		WithRoot(func(pq *ent.PostQuery) {
+			pq.WithAuthor()
+		}).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return FromModel(p), nil
+}

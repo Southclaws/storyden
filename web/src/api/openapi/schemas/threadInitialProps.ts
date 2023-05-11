@@ -11,10 +11,10 @@ import type { TagListIDs } from "./tagListIDs";
 import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
 
-export interface ThreadMutableProps {
-  title?: ThreadTitle;
-  body?: PostBodyMarkdown;
+export interface ThreadInitialProps {
+  title: ThreadTitle;
+  body: PostBodyMarkdown;
   tags?: TagListIDs;
   meta?: Metadata;
-  category?: Identifier;
+  category: Identifier;
 }

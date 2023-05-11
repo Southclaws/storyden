@@ -10,7 +10,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	model_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -152,7 +151,7 @@ func (d *database) SetReadState(ctx context.Context, accountID account.AccountID
 	}
 
 	if !ok {
-		return nil, post.ErrUnauthorised
+		return nil, fault.New("permission denied")
 	}
 
 	notif, err := d.db.Notification.
@@ -188,7 +187,7 @@ func (d *database) Delete(ctx context.Context, accountID account.AccountID, noti
 	}
 
 	if !ok {
-		return nil, post.ErrUnauthorised
+		return nil, fault.New("permission denied")
 	}
 
 	n, err := d.db.Notification.Get(ctx, xid.ID(notificationID))

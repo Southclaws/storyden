@@ -44,9 +44,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
-	tags := opt.NewPtrMap(request.Body.Tags, func(t []openapi.Tag) []string {
-		return dt.Map(t, func(t openapi.Tag) string { return string(t.Id) })
-	})
+	tags := opt.NewPtr(request.Body.Tags)
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
@@ -62,6 +60,27 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	return openapi.ThreadCreate200JSONResponse{
 		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread)),
+	}, nil
+}
+
+func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdateRequestObject) (openapi.ThreadUpdateResponseObject, error) {
+	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
+		Title:    opt.NewPtr(request.Body.Title),
+		Body:     opt.NewPtr(request.Body.Body),
+		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
+		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ThreadUpdate200JSONResponse{
+		ThreadUpdateOKJSONResponse: openapi.ThreadUpdateOKJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 
