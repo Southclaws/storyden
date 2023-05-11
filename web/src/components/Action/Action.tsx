@@ -1,16 +1,17 @@
 import { Link, LinkProps } from "@chakra-ui/next-js";
-import { IconButton, IconButtonProps } from "@chakra-ui/react";
+import { IconButton, IconButtonProps, forwardRef } from "@chakra-ui/react";
 import {
   AdjustmentsHorizontalIcon,
   Bars3Icon,
   BellIcon,
+  EllipsisHorizontalIcon,
   HomeIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { MouseEvent, MouseEventHandler, useCallback } from "react";
 import { LoginIcon } from "../graphics/LoginIcon";
 import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
-import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
 function useClickHandler(onClick: MouseEventHandler | undefined) {
   // This allows us to progressively enhance features on the application by
@@ -49,24 +50,27 @@ export function Action({ children, onClick, ...props }: LinkProps) {
   );
 }
 
-export function ActionButton({ children, ...props }: IconButtonProps) {
-  return (
-    <IconButton
-      width={8}
-      height={8}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      borderRadius="full"
-      p={1}
-      bgColor="transparent"
-      _hover={{ bgColor: "blackAlpha.50" }}
-      {...props}
-    >
-      {children}
-    </IconButton>
-  );
-}
+export const ActionButton = forwardRef<IconButtonProps, "button">(
+  ({ children, ...props }, ref) => {
+    return (
+      <IconButton
+        ref={ref}
+        width={8}
+        height={8}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        borderRadius="full"
+        p={1}
+        bgColor="transparent"
+        _hover={{ bgColor: "blackAlpha.50" }}
+        {...props}
+      >
+        {children}
+      </IconButton>
+    );
+  }
+);
 
 // A few actions have default page destinations (partly for consistency and also
 // for accessibility and no-JS modes) so this just redefines `href` as optional.
@@ -149,3 +153,20 @@ export function Add({ "aria-label": al, ...props }: WithOptionalARIALabel) {
     />
   );
 }
+
+// NOTE: this one is forward-ref'd because it's used as a chakra Menu button.
+// https://chakra-ui.com/docs/components/menu#customizing-the-button
+export const More = forwardRef(
+  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+    return (
+      <ActionButton
+        ref={ref}
+        size="sm"
+        title="More"
+        aria-label={al ?? "more"}
+        {...props}
+        icon={<EllipsisHorizontalIcon width="1.4em" />}
+      />
+    );
+  }
+);

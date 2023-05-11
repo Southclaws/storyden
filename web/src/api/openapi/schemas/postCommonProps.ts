@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { Identifier } from "./identifier";
+import type { ThreadMark } from "./threadMark";
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
 import type { ProfileReference } from "./profileReference";
 import type { Metadata } from "./metadata";
@@ -13,6 +14,7 @@ import type { ReactList } from "./reactList";
 
 export interface PostCommonProps {
   root_id: Identifier;
+  root_slug: ThreadMark;
   body: PostBodyMarkdown;
   author: ProfileReference;
   meta?: Metadata;

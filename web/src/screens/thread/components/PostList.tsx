@@ -1,10 +1,10 @@
-import { OrderedList, ListItem, Divider } from "@chakra-ui/react";
-import { Post } from "src/api/openapi/schemas";
-import { PostView } from "./Post";
+import { Divider, ListItem, OrderedList } from "@chakra-ui/react";
+import { PostProps } from "src/api/openapi/schemas";
+import { PostView } from "./PostView/PostView";
 
 type Props = {
   slug: string;
-  posts: Post[];
+  posts: PostProps[];
 };
 
 export function PostListView(props: Props) {

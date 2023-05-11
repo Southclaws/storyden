@@ -1,15 +1,16 @@
-import { useRouter } from "next/router";
-import { useThreadGet } from "src/api/openapi/threads";
 import { Unready } from "src/components/Unready";
 import { ThreadView } from "./components/ThreadView/ThreadView";
+import { ThreadScreenContext } from "./context";
+import { useThreadScreen } from "./useThreadScreen";
 
 export function ThreadScreen() {
-  const router = useRouter();
-  const slug = router.query["slug"] as string;
+  const { state, data, error } = useThreadScreen();
 
-  const thread = useThreadGet(slug);
+  if (!data) return <Unready {...error} />;
 
-  if (!thread.data) return <Unready {...thread.error} />;
-
-  return <ThreadView {...thread.data} />;
+  return (
+    <ThreadScreenContext.Provider value={state}>
+      <ThreadView {...data} />
+    </ThreadScreenContext.Provider>
+  );
 }

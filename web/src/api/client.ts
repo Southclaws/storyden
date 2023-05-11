@@ -18,8 +18,8 @@ export const fetcher = async <T>({
 }: Options): Promise<T> => {
   const req = new Request(`/api${url}${cleanQuery(params)}`, {
     method,
-    mode: "cors",
-    credentials: "include",
+    // mode: "cors",
+    // credentials: "include",
     ...(headers ? { headers } : {}),
     ...(data ? { body: JSON.stringify(data) } : {}),
   });
