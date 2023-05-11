@@ -750,14 +750,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Post"
+            $ref: "#/components/schemas/PostProps"
 
     PostUpdateOK:
       description: Thread post updated successfully.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Post"
+            $ref: "#/components/schemas/PostProps"
 
     PostReactAddOK:
       description: Post reaction added.
@@ -1419,12 +1419,7 @@ components:
               type: string
               example: Hello world!
               description: The title of the thread.
-            slug:
-              type: string
-              readOnly: true
-              description: |
-                A URL friendly slug which is prepended with the post ID
-                for uniqueness and sortability.
+            slug: { $ref: "#/components/schemas/ThreadMark" }
             short:
               type: string
               readOnly: true
@@ -1462,7 +1457,7 @@ components:
           properties:
             posts:
               type: array
-              items: { $ref: "#/components/schemas/Post" }
+              items: { $ref: "#/components/schemas/PostProps" }
 
     #
     # 8888888b.                   888
@@ -1475,7 +1470,7 @@ components:
     # 888        "Y88P"   88888P'  "Y888
     #
 
-    Post:
+    PostProps:
       type: object
       description: |
         A new post within a thread of posts. A post may reply to another post in
@@ -1492,9 +1487,10 @@ components:
 
     PostCommonProps:
       type: object
-      required: [root_id, body, author, reacts]
+      required: [root_id, root_slug, body, author, reacts]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
+        root_slug: { $ref: "#/components/schemas/ThreadMark" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
         author: { $ref: "#/components/schemas/ProfileReference" }
         meta: { $ref: "#/components/schemas/Metadata" }
