@@ -237,6 +237,27 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 	return FromModel(post), nil
 }
 
+func (d *database) Delete(ctx context.Context, id post.PostID) error {
+	err := d.db.Post.
+		UpdateOneID(xid.ID(id)).
+		SetDeletedAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread root post"))
+	}
+
+	err = d.db.Post.
+		Update().
+		Where(post_model.RootPostID(xid.ID(id))).
+		SetDeletedAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread posts"))
+	}
+
+	return nil
+}
+
 // func (d *database) GetPostCounts(ctx context.Context) (map[string]int, error) {
 // 	type PostCount struct {
 // 		PostID string `json:"rootPostId"`

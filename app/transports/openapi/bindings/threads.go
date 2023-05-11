@@ -84,6 +84,20 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 	}, nil
 }
 
+func (i *Threads) ThreadDelete(ctx context.Context, request openapi.ThreadDeleteRequestObject) (openapi.ThreadDeleteResponseObject, error) {
+	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = i.thread_svc.Delete(ctx, postID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ThreadDelete200Response{}, nil
+}
+
 func reacts(reacts []*react.React) []openapi.React {
 	return (dt.Map(reacts, serialiseReact))
 }

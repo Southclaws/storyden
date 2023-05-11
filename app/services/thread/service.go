@@ -32,6 +32,8 @@ type Service interface {
 
 	Update(ctx context.Context, threadID post.PostID, partial Partial) (*thread.Thread, error)
 
+	Delete(ctx context.Context, id post.PostID) error
+
 	// ListAll returns all threads.
 	ListAll(
 		ctx context.Context,

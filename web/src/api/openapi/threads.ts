@@ -154,3 +154,10 @@ export const threadUpdate = (
     data: threadUpdateBody,
   });
 };
+
+/**
+ * Archive a thread using soft-delete.
+ */
+export const threadDelete = (threadMark: string) => {
+  return fetcher<void>({ url: `/v1/threads/${threadMark}`, method: "delete" });
+};

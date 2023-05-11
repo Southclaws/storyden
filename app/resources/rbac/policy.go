@@ -14,18 +14,7 @@ var (
 	permissionRead         = restrict.Permission{Action: ActionRead}
 	permissionUpdateThread = restrict.Permission{Preset: "update_thread"}
 	permissionUpdatePost   = restrict.Permission{Preset: "update_post"}
-	permissionDelete       = restrict.Permission{
-		Action: "delete",
-		Conditions: restrict.Conditions{
-			&restrict.EmptyCondition{
-				ID: "deleteActive",
-				Value: &restrict.ValueDescriptor{
-					Source: restrict.ResourceField,
-					Field:  "Active",
-				},
-			},
-		},
-	}
+	permissionDeleteThread = restrict.Permission{Preset: "delete_thread"}
 )
 
 var defaultGrants = restrict.GrantsMap{
@@ -33,13 +22,13 @@ var defaultGrants = restrict.GrantsMap{
 		&permissionCreate,
 		&permissionRead,
 		&permissionUpdateThread,
-		&permissionDelete,
+		&permissionDeleteThread,
 	},
 	ResourcePost: {
 		&permissionCreate,
 		&permissionRead,
 		&permissionUpdatePost,
-		&permissionDelete,
+		// &permissionDeletePost,
 	},
 }
 
@@ -106,6 +95,13 @@ var updatePost = restrict.Permission{
 	},
 }
 
+var deleteThread = restrict.Permission{
+	Action: ActionDelete,
+	Conditions: restrict.Conditions{
+		&threadAccessCondition{},
+	},
+}
+
 var defaultPolicy = &restrict.PolicyDefinition{
 	Roles: restrict.Roles{
 		EveryoneRole.ID: &EveryoneRole,
@@ -114,5 +110,6 @@ var defaultPolicy = &restrict.PolicyDefinition{
 	PermissionPresets: restrict.PermissionPresets{
 		"update_thread": &updateThread,
 		"update_post":   &updatePost,
+		"delete_thread": &deleteThread,
 	},
 }

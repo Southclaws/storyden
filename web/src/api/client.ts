@@ -40,6 +40,13 @@ export const fetcher = async <T>({
     );
   }
 
+  // NOTE: The API code generator returns empty responses where there is no
+  // response type specified with a content type so this is the easy way to
+  // escape that code path and exit easily.
+  if (response.headers.get("content-length") === "0") {
+    return undefined as T;
+  }
+
   return response.json();
 };
 

@@ -48,7 +48,7 @@ type Repository interface {
 
 	Get(ctx context.Context, threadID post_resource.PostID) (*Thread, error)
 
-	// Delete(ctx context.Context, id, authorID user.UserID) (int, error)
+	Delete(ctx context.Context, id post_resource.PostID) error
 }
 
 type Option func(*ent.PostMutation)
