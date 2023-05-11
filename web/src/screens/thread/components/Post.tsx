@@ -88,6 +88,7 @@ export function PostView(props: Props) {
         href={`#${props.id}`}
         author={props.author.handle}
         time={new Date(props.createdAt)}
+        updated={new Date(props.updatedAt)}
       />
       <ReactMarkdown components={components}>{props.body}</ReactMarkdown>
       <ReactList {...props} />
