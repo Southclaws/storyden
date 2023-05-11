@@ -36,7 +36,7 @@ export function usePostView(props: PostProps) {
       }).then(() => toast({ title: "Post updated" }));
     }
 
-    // setEditingPostID(undefined);
+    setEditingPostID(undefined);
   }
 
   function onCancelEdit() {
