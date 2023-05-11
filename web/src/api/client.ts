@@ -17,9 +17,13 @@ export const fetcher = async <T>({
   data,
 }: Options): Promise<T> => {
   const req = new Request(`/api${url}${cleanQuery(params)}`, {
-    method,
-    // mode: "cors",
-    // credentials: "include",
+    // NOTE: this is forced uppercase due to a bug somewhere in another part of
+    // the code. It might be Orval as it generates all lowercase methods for all
+    // requests, however this seems to work fine with every operation except the
+    // PATCH calls. Not really sure if that's a browser issue or not though...
+    method: method.toUpperCase(),
+    mode: "cors",
+    credentials: "include",
     ...(headers ? { headers } : {}),
     ...(data ? { body: JSON.stringify(data) } : {}),
   });
