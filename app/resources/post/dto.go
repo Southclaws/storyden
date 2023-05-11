@@ -20,13 +20,14 @@ func (u PostID) String() string { return xid.ID(u).String() }
 type Post struct {
 	ID PostID `json:"id"`
 
-	Body       string
-	Short      string
-	Author     Author
-	RootPostID PostID
-	ReplyTo    optional.Optional[PostID]
-	Reacts     []*react.React
-	Meta       map[string]any
+	Body           string
+	Short          string
+	Author         Author
+	RootPostID     PostID
+	RootThreadMark string
+	ReplyTo        optional.Optional[PostID]
+	Reacts         []*react.React
+	Meta           map[string]any
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -70,10 +71,9 @@ func FromModel(m *ent.Post) (w *Post) {
 			Admin:     m.Edges.Author.Admin,
 			CreatedAt: m.Edges.Author.CreatedAt,
 		},
-		RootPostID: PostID(m.RootPostID),
-		ReplyTo:    replyTo,
-		Reacts:     dt.Map(m.Edges.Reacts, react.FromModel),
-		Meta:       m.Metadata,
+		ReplyTo: replyTo,
+		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
+		Meta:    m.Metadata,
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

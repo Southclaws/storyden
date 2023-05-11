@@ -35,13 +35,22 @@ type Thread struct {
 func (*Thread) GetResourceName() string { return "thread" }
 
 func FromModel(m *ent.Post) *Thread {
+	transform := func(v *ent.Post) *post.Post {
+		// hydrate the thread-specific info here. post.FromModel cannot do this
+		// as this info is only available in the context of a thread of posts.
+		dto := post.FromModel(v)
+		dto.RootThreadMark = m.Slug
+		dto.RootPostID = post.PostID(m.ID)
+		return dto
+	}
+
 	// Thread data structure will always contain one post: itself in post form.
 	posts := []*post.Post{
-		post.FromModel(m),
+		transform(m),
 	}
 
 	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
-		posts = append(posts, dt.Map(p, post.FromModel)...)
+		posts = append(posts, dt.Map(p, transform)...)
 	}
 
 	return &Thread{
