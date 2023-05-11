@@ -430,6 +430,16 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadUpdateOK" }
+    delete:
+      operationId: ThreadDelete
+      description: Archive a thread using soft-delete.
+      tags: [threads]
+      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   #
   #                             888

@@ -1,12 +1,16 @@
 import { PostProps } from "src/api/openapi/schemas";
 import { useThreadScreenContext } from "../../context";
 import { useAuthProvider } from "src/auth/useAuthProvider";
-import { useClipboard } from "@chakra-ui/react";
+import { useClipboard, useToast } from "@chakra-ui/react";
 import { getPermalinkForPost } from "../../utils";
+import { threadDelete } from "src/api/openapi/threads";
+import { useRouter } from "next/router";
 
 export function usePostMenu(props: PostProps) {
+  const router = useRouter();
+  const toast = useToast();
   const { account } = useAuthProvider();
-  const { setEditingPostID } = useThreadScreenContext();
+  const { thread, setEditingPostID } = useThreadScreenContext();
   const { onCopy } = useClipboard(
     getPermalinkForPost(props.root_slug, props.id)
   );
@@ -32,7 +36,11 @@ export function usePostMenu(props: PostProps) {
   }
 
   async function onDelete() {
-    console.log("byebye");
+    if (props.id === thread?.id) {
+      await threadDelete(thread.id);
+      toast({ title: "Thread deleted" });
+      router.push("/");
+    }
   }
 
   return {
