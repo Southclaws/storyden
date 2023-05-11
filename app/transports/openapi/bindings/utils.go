@@ -124,11 +124,10 @@ func serialiseTag(t tag.Tag) openapi.Tag {
 	}
 }
 
-func tagID(t openapi.Tag) xid.ID {
-	return openapi.ParseID(t.Id)
+func deserialiseID(t openapi.Identifier) xid.ID {
+	return openapi.ParseID(t)
 }
 
-// tagsIDs just applies tagID to a slice so we get a slice of IDs back.
-func tagsIDs(i []openapi.Tag) []xid.ID {
-	return dt.Map(i, tagID)
+func tagsIDs(i openapi.TagListIDs) []xid.ID {
+	return dt.Map(i, deserialiseID)
 }

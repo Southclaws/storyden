@@ -8,6 +8,8 @@
 import type {
   PostCreateOKResponse,
   PostCreateBody,
+  PostUpdateOKResponse,
+  PostUpdateBody,
   PostReactAddOKResponse,
   PostReactAddBody,
 } from "./schemas";
@@ -25,6 +27,18 @@ export const postCreate = (
     method: "post",
     headers: { "Content-Type": "application/json" },
     data: postCreateBody,
+  });
+};
+
+/**
+ * Publish changes to a single post.
+ */
+export const postUpdate = (postId: string, postUpdateBody: PostUpdateBody) => {
+  return fetcher<PostUpdateOKResponse>({
+    url: `/v1/posts/${postId}`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: postUpdateBody,
   });
 };
 

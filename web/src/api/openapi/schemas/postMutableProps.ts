@@ -5,16 +5,10 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ThreadTitle } from "./threadTitle";
 import type { PostBodyMarkdown } from "./postBodyMarkdown";
-import type { TagListIDs } from "./tagListIDs";
 import type { Metadata } from "./metadata";
-import type { Identifier } from "./identifier";
 
-export interface ThreadMutableProps {
-  title?: ThreadTitle;
+export interface PostMutableProps {
   body?: PostBodyMarkdown;
-  tags?: TagListIDs;
   meta?: Metadata;
-  category?: Identifier;
 }

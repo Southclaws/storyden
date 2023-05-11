@@ -132,8 +132,8 @@ type AccountMutableProps struct {
 	// Handle The unique @ handle of an account.
 	Handle *AccountHandle `json:"handle,omitempty"`
 
-	// Interests A list of tags.
-	Interests *TagList `json:"interests,omitempty"`
+	// Interests A list of tags IDs.
+	Interests *TagListIDs `json:"interests,omitempty"`
 
 	// Name The account owners display name.
 	Name *AccountName `json:"name,omitempty"`
@@ -382,6 +382,15 @@ type PostInitialProps struct {
 // PostMetadata defines model for PostMetadata.
 type PostMetadata = CommonProperties
 
+// PostMutableProps defines model for PostMutableProps.
+type PostMutableProps struct {
+	// Body The body text of a post within a thread.
+	Body *PostBodyMarkdown `json:"body,omitempty"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+}
+
 // PostReactProps Reactions are currently just simple strings but they may improve later.
 type PostReactProps struct {
 	Emoji *string `json:"emoji,omitempty"`
@@ -537,7 +546,7 @@ type Tag struct {
 // TagList A list of tags.
 type TagList = []Tag
 
-// TagListIDs A list of tags.
+// TagListIDs A list of tags IDs.
 type TagListIDs = []Identifier
 
 // TagName The name of a tag.
@@ -591,6 +600,24 @@ type Thread struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// ThreadInitialProps defines model for ThreadInitialProps.
+type ThreadInitialProps struct {
+	// Body The body text of a post within a thread.
+	Body PostBodyMarkdown `json:"body"`
+
+	// Category A unique identifier for this resource.
+	Category Identifier `json:"category"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Tags A list of tags IDs.
+	Tags *TagListIDs `json:"tags,omitempty"`
+
+	// Title The title of a thread.
+	Title ThreadTitle `json:"title"`
+}
+
 // ThreadList defines model for ThreadList.
 type ThreadList = []ThreadReference
 
@@ -607,19 +634,19 @@ type ThreadMark = string
 // ThreadMutableProps defines model for ThreadMutableProps.
 type ThreadMutableProps struct {
 	// Body The body text of a post within a thread.
-	Body PostBodyMarkdown `json:"body"`
+	Body *PostBodyMarkdown `json:"body,omitempty"`
 
 	// Category A unique identifier for this resource.
-	Category Identifier `json:"category"`
+	Category *Identifier `json:"category,omitempty"`
 
 	// Meta Arbitrary metadata for the resource.
 	Meta *Metadata `json:"meta,omitempty"`
 
-	// Tags A list of tags.
-	Tags *TagList `json:"tags,omitempty"`
+	// Tags A list of tags IDs.
+	Tags *TagListIDs `json:"tags,omitempty"`
 
 	// Title The title of a thread.
-	Title ThreadTitle `json:"title"`
+	Title *ThreadTitle `json:"title,omitempty"`
 }
 
 // ThreadReference defines model for ThreadReference.
@@ -732,6 +759,11 @@ type PostCreateOK = Post
 // PostReactAddOK defines model for PostReactAddOK.
 type PostReactAddOK = React
 
+// PostUpdateOK A new post within a thread of posts. A post may reply to another post in
+// the thread by specifying the `reply_to` property. The identifier in the
+// `reply_to` value must be post within the same thread.
+type PostUpdateOK = Post
+
 // ProfileGetOK defines model for ProfileGetOK.
 type ProfileGetOK = PublicProfile
 
@@ -745,6 +777,9 @@ type ThreadGet = Thread
 type ThreadListOK struct {
 	Threads ThreadList `json:"threads"`
 }
+
+// ThreadUpdateOK defines model for ThreadUpdateOK.
+type ThreadUpdateOK = Thread
 
 // WebAuthnGetAssertionOK https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
 type WebAuthnGetAssertionOK = CredentialRequestOptions
@@ -767,8 +802,14 @@ type PostCreate = PostInitialProps
 // PostReactAdd Reactions are currently just simple strings but they may improve later.
 type PostReactAdd = PostReactProps
 
+// PostUpdate defines model for PostUpdate.
+type PostUpdate = PostMutableProps
+
 // ThreadCreate defines model for ThreadCreate.
-type ThreadCreate = ThreadMutableProps
+type ThreadCreate = ThreadInitialProps
+
+// ThreadUpdate defines model for ThreadUpdate.
+type ThreadUpdate = ThreadMutableProps
 
 // WebAuthnMakeAssertion https://www.w3.org/TR/webauthn-2/#iface-pkcredential
 type WebAuthnMakeAssertion = PublicKeyCredential
@@ -806,11 +847,17 @@ type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
 // WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
 type WebAuthnMakeCredentialJSONRequestBody = PublicKeyCredential
 
+// PostUpdateJSONRequestBody defines body for PostUpdate for application/json ContentType.
+type PostUpdateJSONRequestBody = PostMutableProps
+
 // PostReactAddJSONRequestBody defines body for PostReactAdd for application/json ContentType.
 type PostReactAddJSONRequestBody = PostReactProps
 
 // ThreadCreateJSONRequestBody defines body for ThreadCreate for application/json ContentType.
-type ThreadCreateJSONRequestBody = ThreadMutableProps
+type ThreadCreateJSONRequestBody = ThreadInitialProps
+
+// ThreadUpdateJSONRequestBody defines body for ThreadUpdate for application/json ContentType.
+type ThreadUpdateJSONRequestBody = ThreadMutableProps
 
 // PostCreateJSONRequestBody defines body for PostCreate for application/json ContentType.
 type PostCreateJSONRequestBody = PostInitialProps
@@ -948,6 +995,11 @@ type ClientInterface interface {
 	// GetInfo request
 	GetInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PostUpdate request with any body
+	PostUpdateWithBody(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostUpdate(ctx context.Context, postId PostIDParam, body PostUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostReactAdd request with any body
 	PostReactAddWithBody(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -966,6 +1018,11 @@ type ClientInterface interface {
 
 	// ThreadGet request
 	ThreadGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ThreadUpdate request with any body
+	ThreadUpdateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ThreadUpdate(ctx context.Context, threadMark ThreadMarkParam, body ThreadUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostCreate request with any body
 	PostCreateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1240,6 +1297,30 @@ func (c *Client) GetInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 	return c.Client.Do(req)
 }
 
+func (c *Client) PostUpdateWithBody(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUpdateRequestWithBody(c.Server, postId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostUpdate(ctx context.Context, postId PostIDParam, body PostUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostUpdateRequest(c.Server, postId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) PostReactAddWithBody(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostReactAddRequestWithBody(c.Server, postId, contentType, body)
 	if err != nil {
@@ -1314,6 +1395,30 @@ func (c *Client) ThreadCreate(ctx context.Context, body ThreadCreateJSONRequestB
 
 func (c *Client) ThreadGet(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewThreadGetRequest(c.Server, threadMark)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadUpdateWithBody(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadUpdateRequestWithBody(c.Server, threadMark, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ThreadUpdate(ctx context.Context, threadMark ThreadMarkParam, body ThreadUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewThreadUpdateRequest(c.Server, threadMark, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1900,6 +2005,53 @@ func NewGetInfoRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewPostUpdateRequest calls the generic PostUpdate builder with application/json body
+func NewPostUpdateRequest(server string, postId PostIDParam, body PostUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostUpdateRequestWithBody(server, postId, "application/json", bodyReader)
+}
+
+// NewPostUpdateRequestWithBody generates requests for PostUpdate with any type of body
+func NewPostUpdateRequestWithBody(server string, postId PostIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "post_id", runtime.ParamLocationPath, postId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/posts/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewPostReactAddRequest calls the generic PostReactAdd builder with application/json body
 func NewPostReactAddRequest(server string, postId PostIDParam, body PostReactAddJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -2134,6 +2286,53 @@ func NewThreadGetRequest(server string, threadMark ThreadMarkParam) (*http.Reque
 	return req, nil
 }
 
+// NewThreadUpdateRequest calls the generic ThreadUpdate builder with application/json body
+func NewThreadUpdateRequest(server string, threadMark ThreadMarkParam, body ThreadUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewThreadUpdateRequestWithBody(server, threadMark, "application/json", bodyReader)
+}
+
+// NewThreadUpdateRequestWithBody generates requests for ThreadUpdate with any type of body
+func NewThreadUpdateRequestWithBody(server string, threadMark ThreadMarkParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, threadMark)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/threads/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewPostCreateRequest calls the generic PostCreate builder with application/json body
 func NewPostCreateRequest(server string, threadMark ThreadMarkParam, body PostCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -2311,6 +2510,11 @@ type ClientWithResponsesInterface interface {
 	// GetInfo request
 	GetInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetInfoResponse, error)
 
+	// PostUpdate request with any body
+	PostUpdateWithBodyWithResponse(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUpdateResponse, error)
+
+	PostUpdateWithResponse(ctx context.Context, postId PostIDParam, body PostUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUpdateResponse, error)
+
 	// PostReactAdd request with any body
 	PostReactAddWithBodyWithResponse(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReactAddResponse, error)
 
@@ -2329,6 +2533,11 @@ type ClientWithResponsesInterface interface {
 
 	// ThreadGet request
 	ThreadGetWithResponse(ctx context.Context, threadMark ThreadMarkParam, reqEditors ...RequestEditorFn) (*ThreadGetResponse, error)
+
+	// ThreadUpdate request with any body
+	ThreadUpdateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadUpdateResponse, error)
+
+	ThreadUpdateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body ThreadUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadUpdateResponse, error)
 
 	// PostCreate request with any body
 	PostCreateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostCreateResponse, error)
@@ -2704,6 +2913,29 @@ func (r GetInfoResponse) StatusCode() int {
 	return 0
 }
 
+type PostUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Post
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r PostUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type PostReactAddResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2815,6 +3047,29 @@ func (r ThreadGetResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ThreadGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ThreadUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Thread
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r ThreadUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ThreadUpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3057,6 +3312,23 @@ func (c *ClientWithResponses) GetInfoWithResponse(ctx context.Context, reqEditor
 	return ParseGetInfoResponse(rsp)
 }
 
+// PostUpdateWithBodyWithResponse request with arbitrary body returning *PostUpdateResponse
+func (c *ClientWithResponses) PostUpdateWithBodyWithResponse(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostUpdateResponse, error) {
+	rsp, err := c.PostUpdateWithBody(ctx, postId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostUpdateWithResponse(ctx context.Context, postId PostIDParam, body PostUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PostUpdateResponse, error) {
+	rsp, err := c.PostUpdate(ctx, postId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostUpdateResponse(rsp)
+}
+
 // PostReactAddWithBodyWithResponse request with arbitrary body returning *PostReactAddResponse
 func (c *ClientWithResponses) PostReactAddWithBodyWithResponse(ctx context.Context, postId PostIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReactAddResponse, error) {
 	rsp, err := c.PostReactAddWithBody(ctx, postId, contentType, body, reqEditors...)
@@ -3116,6 +3388,23 @@ func (c *ClientWithResponses) ThreadGetWithResponse(ctx context.Context, threadM
 		return nil, err
 	}
 	return ParseThreadGetResponse(rsp)
+}
+
+// ThreadUpdateWithBodyWithResponse request with arbitrary body returning *ThreadUpdateResponse
+func (c *ClientWithResponses) ThreadUpdateWithBodyWithResponse(ctx context.Context, threadMark ThreadMarkParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ThreadUpdateResponse, error) {
+	rsp, err := c.ThreadUpdateWithBody(ctx, threadMark, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) ThreadUpdateWithResponse(ctx context.Context, threadMark ThreadMarkParam, body ThreadUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ThreadUpdateResponse, error) {
+	rsp, err := c.ThreadUpdate(ctx, threadMark, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseThreadUpdateResponse(rsp)
 }
 
 // PostCreateWithBodyWithResponse request with arbitrary body returning *PostCreateResponse
@@ -3636,6 +3925,39 @@ func ParseGetInfoResponse(rsp *http.Response) (*GetInfoResponse, error) {
 	return response, nil
 }
 
+// ParsePostUpdateResponse parses an HTTP response from a PostUpdateWithResponse call
+func ParsePostUpdateResponse(rsp *http.Response) (*PostUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Post
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostReactAddResponse parses an HTTP response from a PostReactAddWithResponse call
 func ParsePostReactAddResponse(rsp *http.Response) (*PostReactAddResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3803,6 +4125,39 @@ func ParseThreadGetResponse(rsp *http.Response) (*ThreadGetResponse, error) {
 	return response, nil
 }
 
+// ParseThreadUpdateResponse parses an HTTP response from a ThreadUpdateWithResponse call
+func ParseThreadUpdateResponse(rsp *http.Response) (*ThreadUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ThreadUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Thread
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostCreateResponse parses an HTTP response from a PostCreateWithResponse call
 func ParsePostCreateResponse(rsp *http.Response) (*PostCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3903,6 +4258,9 @@ type ServerInterface interface {
 	// (GET /v1/info)
 	GetInfo(ctx echo.Context) error
 
+	// (PATCH /v1/posts/{post_id})
+	PostUpdate(ctx echo.Context, postId PostIDParam) error
+
 	// (PUT /v1/posts/{post_id}/reacts)
 	PostReactAdd(ctx echo.Context, postId PostIDParam) error
 
@@ -3917,6 +4275,9 @@ type ServerInterface interface {
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_mark})
 	ThreadGet(ctx echo.Context, threadMark ThreadMarkParam) error
+
+	// (PATCH /v1/threads/{thread_mark})
+	ThreadUpdate(ctx echo.Context, threadMark ThreadMarkParam) error
 
 	// (POST /v1/threads/{thread_mark}/posts)
 	PostCreate(ctx echo.Context, threadMark ThreadMarkParam) error
@@ -4114,6 +4475,24 @@ func (w *ServerInterfaceWrapper) GetInfo(ctx echo.Context) error {
 	return err
 }
 
+// PostUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) PostUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "post_id" -------------
+	var postId PostIDParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "post_id", runtime.ParamLocationPath, ctx.Param("post_id"), &postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter post_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.PostUpdate(ctx, postId)
+	return err
+}
+
 // PostReactAdd converts echo context to params.
 func (w *ServerInterfaceWrapper) PostReactAdd(ctx echo.Context) error {
 	var err error
@@ -4207,6 +4586,24 @@ func (w *ServerInterfaceWrapper) ThreadGet(ctx echo.Context) error {
 	return err
 }
 
+// ThreadUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) ThreadUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "thread_mark" -------------
+	var threadMark ThreadMarkParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "thread_mark", runtime.ParamLocationPath, ctx.Param("thread_mark"), &threadMark)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter thread_mark: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ThreadUpdate(ctx, threadMark)
+	return err
+}
+
 // PostCreate converts echo context to params.
 func (w *ServerInterfaceWrapper) PostCreate(ctx echo.Context) error {
 	var err error
@@ -4278,11 +4675,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
 	router.GET(baseURL+"/v1/categories", wrapper.CategoryList)
 	router.GET(baseURL+"/v1/info", wrapper.GetInfo)
+	router.PATCH(baseURL+"/v1/posts/:post_id", wrapper.PostUpdate)
 	router.PUT(baseURL+"/v1/posts/:post_id/reacts", wrapper.PostReactAdd)
 	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfileGet)
 	router.GET(baseURL+"/v1/threads", wrapper.ThreadList)
 	router.POST(baseURL+"/v1/threads", wrapper.ThreadCreate)
 	router.GET(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadGet)
+	router.PATCH(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadUpdate)
 	router.POST(baseURL+"/v1/threads/:thread_mark/posts", wrapper.PostCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
@@ -4327,6 +4726,8 @@ type PostCreateOKJSONResponse Post
 
 type PostReactAddOKJSONResponse React
 
+type PostUpdateOKJSONResponse Post
+
 type ProfileGetOKJSONResponse PublicProfile
 
 type ThreadCreateOKJSONResponse Thread
@@ -4336,6 +4737,8 @@ type ThreadGetJSONResponse Thread
 type ThreadListOKJSONResponse struct {
 	Threads ThreadList `json:"threads"`
 }
+
+type ThreadUpdateOKJSONResponse Thread
 
 type UnauthorisedResponse struct {
 }
@@ -4977,6 +5380,50 @@ func (response GetInfodefaultJSONResponse) VisitGetInfoResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type PostUpdateRequestObject struct {
+	PostId PostIDParam `json:"post_id"`
+	Body   *PostUpdateJSONRequestBody
+}
+
+type PostUpdateResponseObject interface {
+	VisitPostUpdateResponse(w http.ResponseWriter) error
+}
+
+type PostUpdate200JSONResponse struct{ PostUpdateOKJSONResponse }
+
+func (response PostUpdate200JSONResponse) VisitPostUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostUpdate401Response = UnauthorisedResponse
+
+func (response PostUpdate401Response) VisitPostUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type PostUpdate404Response = NotFoundResponse
+
+func (response PostUpdate404Response) VisitPostUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type PostUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response PostUpdatedefaultJSONResponse) VisitPostUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type PostReactAddRequestObject struct {
 	PostId PostIDParam `json:"post_id"`
 	Body   *PostReactAddJSONRequestBody
@@ -5193,6 +5640,50 @@ func (response ThreadGetdefaultJSONResponse) VisitThreadGetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type ThreadUpdateRequestObject struct {
+	ThreadMark ThreadMarkParam `json:"thread_mark"`
+	Body       *ThreadUpdateJSONRequestBody
+}
+
+type ThreadUpdateResponseObject interface {
+	VisitThreadUpdateResponse(w http.ResponseWriter) error
+}
+
+type ThreadUpdate200JSONResponse struct{ ThreadUpdateOKJSONResponse }
+
+func (response ThreadUpdate200JSONResponse) VisitThreadUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ThreadUpdate401Response = UnauthorisedResponse
+
+func (response ThreadUpdate401Response) VisitThreadUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ThreadUpdate404Response = NotFoundResponse
+
+func (response ThreadUpdate404Response) VisitThreadUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ThreadUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ThreadUpdatedefaultJSONResponse) VisitThreadUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type PostCreateRequestObject struct {
 	ThreadMark ThreadMarkParam `json:"thread_mark"`
 	Body       *PostCreateJSONRequestBody
@@ -5305,6 +5796,9 @@ type StrictServerInterface interface {
 	// (GET /v1/info)
 	GetInfo(ctx context.Context, request GetInfoRequestObject) (GetInfoResponseObject, error)
 
+	// (PATCH /v1/posts/{post_id})
+	PostUpdate(ctx context.Context, request PostUpdateRequestObject) (PostUpdateResponseObject, error)
+
 	// (PUT /v1/posts/{post_id}/reacts)
 	PostReactAdd(ctx context.Context, request PostReactAddRequestObject) (PostReactAddResponseObject, error)
 
@@ -5319,6 +5813,9 @@ type StrictServerInterface interface {
 	// Get information about a thread and the posts within the thread.
 	// (GET /v1/threads/{thread_mark})
 	ThreadGet(ctx context.Context, request ThreadGetRequestObject) (ThreadGetResponseObject, error)
+
+	// (PATCH /v1/threads/{thread_mark})
+	ThreadUpdate(ctx context.Context, request ThreadUpdateRequestObject) (ThreadUpdateResponseObject, error)
 
 	// (POST /v1/threads/{thread_mark}/posts)
 	PostCreate(ctx context.Context, request PostCreateRequestObject) (PostCreateResponseObject, error)
@@ -5754,6 +6251,37 @@ func (sh *strictHandler) GetInfo(ctx echo.Context) error {
 	return nil
 }
 
+// PostUpdate operation middleware
+func (sh *strictHandler) PostUpdate(ctx echo.Context, postId PostIDParam) error {
+	var request PostUpdateRequestObject
+
+	request.PostId = postId
+
+	var body PostUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PostUpdate(ctx.Request().Context(), request.(PostUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(PostUpdateResponseObject); ok {
+		return validResponse.VisitPostUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // PostReactAdd operation middleware
 func (sh *strictHandler) PostReactAdd(ctx echo.Context, postId PostIDParam) error {
 	var request PostReactAddRequestObject
@@ -5889,6 +6417,37 @@ func (sh *strictHandler) ThreadGet(ctx echo.Context, threadMark ThreadMarkParam)
 	return nil
 }
 
+// ThreadUpdate operation middleware
+func (sh *strictHandler) ThreadUpdate(ctx echo.Context, threadMark ThreadMarkParam) error {
+	var request ThreadUpdateRequestObject
+
+	request.ThreadMark = threadMark
+
+	var body ThreadUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ThreadUpdate(ctx.Request().Context(), request.(ThreadUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ThreadUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ThreadUpdateResponseObject); ok {
+		return validResponse.VisitThreadUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // PostCreate operation middleware
 func (sh *strictHandler) PostCreate(ctx echo.Context, threadMark ThreadMarkParam) error {
 	var request PostCreateRequestObject
@@ -5946,99 +6505,101 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

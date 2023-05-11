@@ -1,29 +1,20 @@
 package rbac
 
-import "github.com/el-mike/restrict"
+import (
+	"github.com/Southclaws/fault"
+	"github.com/el-mike/restrict"
 
-type Action = string
-
-const (
-	ActionCreate Action = "create"
-	ActionRead   Action = "read"
-	ActionUpdate Action = "update"
-	ActionDelete Action = "delete"
-)
-
-type Resource = string
-
-const (
-	ResourceAccount Resource = "account"
-	ResourceThread  Resource = "thread"
-	ResourcePost    Resource = "post"
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
 var (
-	permissionCreate      = restrict.Permission{Action: ActionCreate}
-	permissionRead        = restrict.Permission{Action: ActionRead}
-	permissionUpdateOwned = restrict.Permission{Preset: "updateOwned"}
-	permissionDelete      = restrict.Permission{
+	permissionCreate       = restrict.Permission{Action: ActionCreate}
+	permissionRead         = restrict.Permission{Action: ActionRead}
+	permissionUpdateThread = restrict.Permission{Preset: "update_thread"}
+	permissionUpdatePost   = restrict.Permission{Preset: "update_post"}
+	permissionDelete       = restrict.Permission{
 		Action: "delete",
 		Conditions: restrict.Conditions{
 			&restrict.EmptyCondition{
@@ -37,44 +28,81 @@ var (
 	}
 )
 
+var defaultGrants = restrict.GrantsMap{
+	ResourceThread: {
+		&permissionCreate,
+		&permissionRead,
+		&permissionUpdateThread,
+		&permissionDelete,
+	},
+	ResourcePost: {
+		&permissionCreate,
+		&permissionRead,
+		&permissionUpdatePost,
+		&permissionDelete,
+	},
+}
+
 var EveryoneRole = restrict.Role{
 	ID:          "everyone",
 	Description: "This role applies to every person. It cannot be deleted.",
-	Grants: restrict.GrantsMap{
-		ResourceThread: {
-			&permissionCreate,
-			&permissionRead,
-			&permissionUpdateOwned,
-			&permissionDelete,
-		},
-	},
+	Grants:      defaultGrants,
 }
 
 var OwnerRole = restrict.Role{
 	ID:          "owner",
 	Description: "The owner role controls everything. It cannot be deleted",
 	Parents:     []string{EveryoneRole.ID},
-	Grants: restrict.GrantsMap{
-		EveryoneRole.ID: {
-			&restrict.Permission{Action: ActionUpdate},
-		},
+	Grants:      defaultGrants,
+}
+
+type threadAccessCondition struct{}
+
+func (c *threadAccessCondition) Type() string { return "thread_access" }
+func (c *threadAccessCondition) Check(request *restrict.AccessRequest) error {
+	acc := request.Subject.(*account.Account)
+	thr := request.Resource.(*thread.Thread)
+
+	if thr.Author.ID == acc.ID {
+		return nil
+	}
+
+	if thr.Author.Admin {
+		return nil
+	}
+
+	return restrict.NewConditionNotSatisfiedError(c, request, fault.New("Account is not the author of the thread"))
+}
+
+type postAccessCondition struct{}
+
+func (c *postAccessCondition) Type() string { return "post_access" }
+func (c *postAccessCondition) Check(request *restrict.AccessRequest) error {
+	acc := request.Subject.(*account.Account)
+	thr := request.Resource.(*post.Post)
+
+	if thr.Author.ID == acc.ID {
+		return nil
+	}
+
+	if acc.Admin {
+		return nil
+	}
+
+	return restrict.NewConditionNotSatisfiedError(c, request, fault.New("Account is not the author of the post"))
+}
+
+var updateThread = restrict.Permission{
+	Action: ActionUpdate,
+	Conditions: restrict.Conditions{
+		&threadAccessCondition{},
 	},
 }
 
-var updateOwned = restrict.Permission{
+var updatePost = restrict.Permission{
 	Action: ActionUpdate,
 	Conditions: restrict.Conditions{
-		&restrict.EqualCondition{
-			ID: "isOwner",
-			Left: &restrict.ValueDescriptor{
-				Source: restrict.ResourceField,
-				Field:  "CreatedBy",
-			},
-			Right: &restrict.ValueDescriptor{
-				Source: restrict.SubjectField,
-				Field:  "ID",
-			},
-		},
+		&postAccessCondition{},
 	},
 }
 
@@ -84,6 +112,7 @@ var defaultPolicy = &restrict.PolicyDefinition{
 		OwnerRole.ID:    &OwnerRole,
 	},
 	PermissionPresets: restrict.PermissionPresets{
-		"updateOwned": &updateOwned,
+		"update_thread": &updateThread,
+		"update_post":   &updatePost,
 	},
 }

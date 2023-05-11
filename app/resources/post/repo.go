@@ -23,6 +23,9 @@ type Repository interface {
 		opts ...Option,
 	) (*Post, error)
 
+	Get(ctx context.Context, id PostID) (*Post, error)
+
+	Update(ctx context.Context, id PostID, opts ...Option) (*Post, error)
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)
 	// DeletePost(ctx context.Context, authorID, postID string, force bool) (*Post, error)
 }
@@ -30,5 +33,17 @@ type Repository interface {
 func WithID(id PostID) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetID(xid.ID(id))
+	}
+}
+
+func WithBody(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetBody(v)
+	}
+}
+
+func WithMeta(meta map[string]any) Option {
+	return func(m *ent.PostMutation) {
+		m.SetMetadata(meta)
 	}
 }

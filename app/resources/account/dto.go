@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -36,10 +35,10 @@ const Name = "Account"
 
 func (a *Account) GetRole() string {
 	if a.Admin {
-		return rbac.OwnerRole.ID
+		return "everyone"
 	}
 
-	return rbac.EveryoneRole.ID
+	return "owner"
 }
 
 func (*Account) GetResourceName() string { return Name }

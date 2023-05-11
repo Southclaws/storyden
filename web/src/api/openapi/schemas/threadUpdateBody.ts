@@ -5,9 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
+import type { ThreadMutableProps } from "./threadMutableProps";
 
-/**
- * A list of tags IDs.
- */
-export type TagListIDs = Identifier[];
+export type ThreadUpdateBody = ThreadMutableProps;

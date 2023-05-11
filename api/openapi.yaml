@@ -419,6 +419,17 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadGet" }
+    patch:
+      operationId: ThreadUpdate
+      description: Publish changes to a thread.
+      tags: [threads]
+      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
+      requestBody: { $ref: "#/components/requestBodies/ThreadUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ThreadUpdateOK" }
 
   #
   #                             888
@@ -446,6 +457,19 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostCreateOK" }
+
+  /v1/posts/{post_id}:
+    patch:
+      operationId: PostUpdate
+      description: Publish changes to a single post.
+      tags: [posts]
+      parameters: [$ref: "#/components/parameters/PostIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/PostUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PostUpdateOK" }
 
   /v1/posts/{post_id}/reacts:
     put:
@@ -555,6 +579,11 @@ components:
     ThreadCreate:
       content:
         application/json:
+          schema: { $ref: "#/components/schemas/ThreadInitialProps" }
+
+    ThreadUpdate:
+      content:
+        application/json:
           schema: { $ref: "#/components/schemas/ThreadMutableProps" }
 
     PostCreate:
@@ -562,6 +591,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/PostInitialProps" }
+
+    PostUpdate:
+      description: Create a post within a thread.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PostMutableProps" }
 
     PostReactAdd:
       description: Add a reaction to a post.
@@ -687,6 +722,13 @@ components:
           schema:
             $ref: "#/components/schemas/Thread"
 
+    ThreadUpdateOK:
+      description: Thread updated.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Thread"
+
     ThreadListOK:
       description: List of all threads.
       content:
@@ -705,6 +747,13 @@ components:
 
     PostCreateOK:
       description: Thread post created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Post"
+
+    PostUpdateOK:
+      description: Thread post updated successfully.
       content:
         application/json:
           schema:
@@ -872,7 +921,7 @@ components:
 
     TagListIDs:
       type: array
-      description: A list of tags.
+      description: A list of tags IDs.
       items: { $ref: "#/components/schemas/Identifier" }
 
     PostBodyMarkdown:
@@ -1209,7 +1258,7 @@ components:
         bio:
           type: string
         interests:
-          $ref: "#/components/schemas/TagList"
+          $ref: "#/components/schemas/TagListIDs"
 
     #
     # 8888888b.                   .d888 d8b 888
@@ -1324,7 +1373,7 @@ components:
     #     888     888  888 888     "Y8888  "Y888888  "Y88888
     #
 
-    ThreadMutableProps:
+    ThreadInitialProps:
       type: object
       required:
         - title
@@ -1333,10 +1382,18 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
-        tags: { $ref: "#/components/schemas/TagList" }
+        tags: { $ref: "#/components/schemas/TagListIDs" }
         meta: { $ref: "#/components/schemas/Metadata" }
-        category:
-          $ref: "#/components/schemas/Identifier"
+        category: { $ref: "#/components/schemas/Identifier" }
+
+    ThreadMutableProps:
+      type: object
+      properties:
+        title: { $ref: "#/components/schemas/ThreadTitle" }
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        tags: { $ref: "#/components/schemas/TagListIDs" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+        category: { $ref: "#/components/schemas/Identifier" }
 
     ThreadReference:
       description: |
@@ -1451,6 +1508,12 @@ components:
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
         meta: { $ref: "#/components/schemas/Metadata" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
+
+    PostMutableProps:
+      type: object
+      properties:
+        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     ReactList:
       description: A list of reactions this post has had from people.
