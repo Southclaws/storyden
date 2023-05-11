@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Post } from "./post";
+import type { PostProps } from "./postProps";
 
 /**
  * Thread post updated successfully.
  */
-export type PostUpdateOKResponse = Post;
+export type PostUpdateOKResponse = PostProps;

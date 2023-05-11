@@ -1,6 +1,8 @@
 import {
+  Button,
   Code,
   Flex,
+  HStack,
   Heading,
   Link,
   ListItem,
@@ -11,9 +13,12 @@ import {
 import ReactMarkdown from "react-markdown";
 import { SpecialComponents } from "react-markdown/lib/ast-to-react";
 import { NormalComponents } from "react-markdown/lib/complex-types";
-import { Post } from "src/api/openapi/schemas";
-import { Byline } from "./Byline";
-import { ReactList } from "./ReactList/ReactList";
+import { PostProps } from "src/api/openapi/schemas";
+import { Byline } from "../Byline";
+import { ReactList } from "../ReactList/ReactList";
+import { PostMenu } from "../PostMenu/PostMenu";
+import { usePostView } from "./usePostView";
+import { Editor } from "src/components/Editor";
 
 const components: Partial<
   Omit<NormalComponents, keyof SpecialComponents> & SpecialComponents
@@ -77,11 +82,19 @@ const components: Partial<
   tr: (props) => <tr>{props.children}</tr>,
 };
 
-type Props = Post & {
+type Props = PostProps & {
   slug: string;
 };
 
 export function PostView(props: Props) {
+  const {
+    isEditing,
+    editingContent,
+    setEditingContent,
+    onPublishEdit,
+    onCancelEdit,
+  } = usePostView(props);
+
   return (
     <Flex id={props.id} flexDir="column" gap={2}>
       <Byline
@@ -89,8 +102,21 @@ export function PostView(props: Props) {
         author={props.author.handle}
         time={new Date(props.createdAt)}
         updated={new Date(props.updatedAt)}
+        more={<PostMenu {...props} />}
       />
-      <ReactMarkdown components={components}>{props.body}</ReactMarkdown>
+      {isEditing ? (
+        <>
+          <Editor onChange={setEditingContent} value={editingContent} />
+          <HStack>
+            <Button onClick={onPublishEdit}>Update</Button>
+            <Button variant="outline" onClick={onCancelEdit}>
+              Cancel
+            </Button>
+          </HStack>
+        </>
+      ) : (
+        <ReactMarkdown components={components}>{props.body}</ReactMarkdown>
+      )}
       <ReactList {...props} />
     </Flex>
   );

@@ -6,7 +6,7 @@ import { useThreadGet } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { errorToast } from "src/components/ErrorBanner";
 
-export function useThread(thread: Thread) {
+export function useReply(thread: Thread) {
   const account = useSession();
   const toast = useToast();
   const { mutate } = useThreadGet(thread.slug);

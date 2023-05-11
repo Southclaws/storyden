@@ -1,13 +1,13 @@
 import { NativeRenderer, createPicker } from "picmo";
 import { postReactAdd } from "src/api/openapi/posts";
-import { Post } from "src/api/openapi/schemas";
+import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey } from "src/api/openapi/threads";
 import { useAuthProvider } from "src/auth/useAuthProvider";
 import { mutate } from "swr";
 
 export const emojiPickerContainerID = `react-emoji-select`;
 
-export type Props = Post & {
+export type Props = PostProps & {
   slug: string;
 };
 

@@ -3,10 +3,10 @@ import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { Thread } from "src/api/openapi/schemas";
 import { ReplyBox } from "src/components/ReplyBox";
 import { Anchor } from "src/components/site/Anchor";
-import { useThread } from "./ThreadView/useThread";
+import { useReply } from "./useReply";
 
 export function Reply(props: Thread) {
-  const { loggedIn, onReply, isLoading } = useThread(props);
+  const { loggedIn, onReply, isLoading } = useReply(props);
   // NOTE: isLoading is a hack to easily reset the ReplyBox + provide feedback.
 
   if (loggedIn) {

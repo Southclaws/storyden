@@ -14,4 +14,4 @@ the thread by specifying the `reply_to` property. The identifier in the
 `reply_to` value must be post within the same thread.
 
  */
-export type Post = PostMetadata & PostCommonProps;
+export type PostProps = PostMetadata & PostCommonProps;

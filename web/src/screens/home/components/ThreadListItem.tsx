@@ -12,8 +12,6 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
           <Heading size="sm">
             <LinkOverlay href={permalink}>{props.thread.title}</LinkOverlay>
           </Heading>
-
-          {/* <ThreadMenu postID={props.thread.id} /> */}
         </Flex>
 
         <Text noOfLines={3}>{props.thread.short}</Text>
@@ -24,6 +22,7 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
           href={permalink}
           author={props.thread.author.handle}
           time={new Date(props.thread.createdAt)}
+          updated={new Date(props.thread.updatedAt)}
         />
 
         {/* Tags list */}

@@ -60,13 +60,15 @@ const extensions = () => [
 
 type Props = {
   onChange: (md: string) => void;
+  value?: string;
 };
 
-export function Editor({ onChange }: Props) {
+export function Editor({ onChange, value }: Props) {
   const { manager, state, setState, getContext } = useRemirror({
     extensions,
     stringHandler: "markdown",
     selection: "end",
+    content: value,
   });
 
   return (
