@@ -214,6 +214,9 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 		).
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.
+				Where(
+					post_model.DeletedAtIsNil(),
+				).
 				WithReplyTo(func(pq *ent.PostQuery) {
 					pq.WithAuthor()
 				}).

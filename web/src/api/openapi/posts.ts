@@ -43,6 +43,13 @@ export const postUpdate = (postId: string, postUpdateBody: PostUpdateBody) => {
 };
 
 /**
+ * Archive a post using soft-delete.
+ */
+export const postDelete = (postId: string) => {
+  return fetcher<void>({ url: `/v1/posts/${postId}`, method: "delete" });
+};
+
+/**
  * Add a reaction to a post.
  */
 export const postReactAdd = (
