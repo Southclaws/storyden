@@ -27,7 +27,7 @@ type Repository interface {
 
 	Update(ctx context.Context, id PostID, opts ...Option) (*Post, error)
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)
-	// DeletePost(ctx context.Context, authorID, postID string, force bool) (*Post, error)
+	Delete(ctx context.Context, id PostID) error
 }
 
 func WithID(id PostID) Option {

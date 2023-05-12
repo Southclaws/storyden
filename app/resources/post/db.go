@@ -2,6 +2,7 @@ package post
 
 import (
 	"context"
+	"time"
 
 	"4d63.com/optional"
 	"github.com/Southclaws/fault"
@@ -132,4 +133,16 @@ func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post
 	}
 
 	return FromModel(p), nil
+}
+
+func (d *database) Delete(ctx context.Context, id PostID) error {
+	err := d.db.Post.
+		UpdateOneID(xid.ID(id)).
+		SetDeletedAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread root post"))
+	}
+
+	return nil
 }

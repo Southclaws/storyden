@@ -5,6 +5,9 @@ import { useClipboard, useToast } from "@chakra-ui/react";
 import { getPermalinkForPost } from "../../utils";
 import { threadDelete } from "src/api/openapi/threads";
 import { useRouter } from "next/router";
+import { postDelete } from "src/api/openapi/posts";
+import { mutate } from "swr";
+import { getThreadGetKey } from "src/api/openapi/threads";
 
 export function usePostMenu(props: PostProps) {
   const router = useRouter();
@@ -40,6 +43,10 @@ export function usePostMenu(props: PostProps) {
       await threadDelete(thread.id);
       toast({ title: "Thread deleted" });
       router.push("/");
+    } else {
+      await postDelete(props.id);
+      toast({ title: "Post deleted" });
+      mutate(getThreadGetKey(thread?.slug ?? props.id));
     }
   }
 

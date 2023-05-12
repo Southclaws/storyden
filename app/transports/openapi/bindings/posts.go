@@ -80,3 +80,17 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(serialisePost(post)),
 	}, nil
 }
+
+func (p *Posts) PostDelete(ctx context.Context, request openapi.PostDeleteRequestObject) (openapi.PostDeleteResponseObject, error) {
+	postID, err := p.thread_mark_svc.Lookup(ctx, string(request.PostId))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = p.post_svc.Delete(ctx, postID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PostDelete200Response{}, nil
+}

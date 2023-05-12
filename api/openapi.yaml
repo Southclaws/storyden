@@ -480,6 +480,16 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostUpdateOK" }
+    delete:
+      operationId: PostDelete
+      description: Archive a post using soft-delete.
+      tags: [posts]
+      parameters: [$ref: "#/components/parameters/PostIDParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   /v1/posts/{post_id}/reacts:
     put:

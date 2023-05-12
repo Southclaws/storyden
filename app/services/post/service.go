@@ -26,6 +26,8 @@ type Service interface {
 	) (*post.Post, error)
 
 	Update(ctx context.Context, threadID post.PostID, partial Partial) (*post.Post, error)
+
+	Delete(ctx context.Context, postID post.PostID) error
 }
 
 type Partial struct {
