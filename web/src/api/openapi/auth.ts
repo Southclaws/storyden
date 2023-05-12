@@ -20,6 +20,8 @@ import type {
   WebAuthnMakeCredentialBody,
   WebAuthnGetAssertionOKResponse,
   WebAuthnMakeAssertionBody,
+  PhoneRequestCodeBody,
+  PhoneSubmitCodeBody,
 } from "./schemas";
 import { fetcher } from "../client";
 
@@ -240,6 +242,40 @@ export const webAuthnMakeAssertion = (
     method: "post",
     headers: { "Content-Type": "application/json" },
     data: webAuthnMakeAssertionBody,
+  });
+};
+
+/**
+ * Start the authentication flow with a phone number. The handler will send
+a one-time code to the provided phone number which must then be sent to
+the other phone endpoint to verify the number and validate the account.
+
+ */
+export const phoneRequestCode = (
+  phoneRequestCodeBody: PhoneRequestCodeBody
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/phone`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: phoneRequestCodeBody,
+  });
+};
+
+/**
+ * Complete the phone number authentication flow by submitting the one-time
+code that was sent to the user's phone.
+
+ */
+export const phoneSubmitCode = (
+  accountHandle: string,
+  phoneSubmitCodeBody: PhoneSubmitCodeBody
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/phone/${accountHandle}`,
+    method: "put",
+    headers: { "Content-Type": "application/json" },
+    data: phoneSubmitCodeBody,
   });
 };
 

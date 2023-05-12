@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
 )
 
@@ -34,6 +35,7 @@ func Build() fx.Option {
 			webauthn.New,
 			github.New,
 			linkedin.New,
+			phone.New,
 		),
 
 		fx.Provide(New),
@@ -47,6 +49,7 @@ func New(
 	wa *webauthn.Provider,
 	gh *github.GitHubProvider,
 	li *linkedin.LinkedInProvider,
+	pp *phone.Provider,
 ) *Manager {
 	allProviders := []Provider{
 		// (2)
@@ -56,6 +59,7 @@ func New(
 		wa,
 		gh,
 		li,
+		pp,
 	}
 
 	// Filter out disabled providers.
