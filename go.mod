@@ -55,6 +55,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-webauthn/revoke v0.1.9 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
@@ -62,6 +63,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
+	github.com/twilio/twilio-go v1.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

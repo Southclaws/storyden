@@ -111,3 +111,24 @@ func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier
 
 	return r.Token == token, nil
 }
+
+func (d *database) Delete(ctx context.Context, accountID account.AccountID, identifier string, service Service) (bool, error) {
+	n, err := d.db.Authentication.
+		Delete().
+		Where(
+			authentication.HasAccountWith(
+				model_account.ID(xid.ID(accountID)),
+			),
+			authentication.IdentifierEQ(identifier),
+			authentication.ServiceEQ(string(service)),
+		).Exec(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return false, nil
+		}
+
+		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return n > 0, nil
+}

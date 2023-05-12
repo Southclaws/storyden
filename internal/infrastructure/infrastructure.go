@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/internal/logger"
 	"github.com/Southclaws/storyden/internal/object"
 	"github.com/Southclaws/storyden/internal/securecookie"
+	"github.com/Southclaws/storyden/internal/sms"
 	"github.com/Southclaws/storyden/internal/webauthn"
 )
 
@@ -16,6 +17,7 @@ func Build() fx.Option {
 		logger.Build(),
 		db.Build(),
 		securecookie.Build(),
+		sms.Build(),
 		fx.Provide(webauthn.New),
 		fx.Provide(object.NewS3Storer),
 	)

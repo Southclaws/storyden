@@ -307,6 +307,20 @@ type OAuthCallback struct {
 	State string `json:"state"`
 }
 
+// PhoneRequestCodeProps The phone number request payload.
+type PhoneRequestCodeProps struct {
+	// Identifier The desired username to link to the phone number.
+	Identifier string `json:"identifier"`
+
+	// PhoneNumber The phone number to receive the one-time code on.
+	PhoneNumber string `json:"phone_number"`
+}
+
+// PhoneSubmitCodeProps The Phone submit code payload.
+type PhoneSubmitCodeProps struct {
+	Code string `json:"code"`
+}
+
 // PostBodyMarkdown The body text of a post within a thread.
 type PostBodyMarkdown = string
 
@@ -824,6 +838,12 @@ type AuthPassword = AuthPair
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
 
+// PhoneRequestCode The phone number request payload.
+type PhoneRequestCode = PhoneRequestCodeProps
+
+// PhoneSubmitCode The Phone submit code payload.
+type PhoneSubmitCode = PhoneSubmitCodeProps
+
 // PostCreate defines model for PostCreate.
 type PostCreate = PostInitialProps
 
@@ -868,6 +888,12 @@ type AuthPasswordSigninJSONRequestBody = AuthPair
 
 // AuthPasswordSignupJSONRequestBody defines body for AuthPasswordSignup for application/json ContentType.
 type AuthPasswordSignupJSONRequestBody = AuthPair
+
+// PhoneRequestCodeJSONRequestBody defines body for PhoneRequestCode for application/json ContentType.
+type PhoneRequestCodeJSONRequestBody = PhoneRequestCodeProps
+
+// PhoneSubmitCodeJSONRequestBody defines body for PhoneSubmitCode for application/json ContentType.
+type PhoneSubmitCodeJSONRequestBody = PhoneSubmitCodeProps
 
 // WebAuthnMakeAssertionJSONRequestBody defines body for WebAuthnMakeAssertion for application/json ContentType.
 type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
@@ -1000,6 +1026,16 @@ type ClientInterface interface {
 	AuthPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PhoneRequestCode request with any body
+	PhoneRequestCodeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PhoneRequestCode(ctx context.Context, body PhoneRequestCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PhoneSubmitCode request with any body
+	PhoneSubmitCodeWithBody(ctx context.Context, accountHandle AccountHandleParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PhoneSubmitCode(ctx context.Context, accountHandle AccountHandleParam, body PhoneSubmitCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// WebAuthnMakeAssertion request with any body
 	WebAuthnMakeAssertionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1225,6 +1261,54 @@ func (c *Client) AuthPasswordSignupWithBody(ctx context.Context, contentType str
 
 func (c *Client) AuthPasswordSignup(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthPasswordSignupRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PhoneRequestCodeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPhoneRequestCodeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PhoneRequestCode(ctx context.Context, body PhoneRequestCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPhoneRequestCodeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PhoneSubmitCodeWithBody(ctx context.Context, accountHandle AccountHandleParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPhoneSubmitCodeRequestWithBody(c.Server, accountHandle, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PhoneSubmitCode(ctx context.Context, accountHandle AccountHandleParam, body PhoneSubmitCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPhoneSubmitCodeRequest(c.Server, accountHandle, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1852,6 +1936,93 @@ func NewAuthPasswordSignupRequestWithBody(server string, contentType string, bod
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPhoneRequestCodeRequest calls the generic PhoneRequestCode builder with application/json body
+func NewPhoneRequestCodeRequest(server string, body PhoneRequestCodeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPhoneRequestCodeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPhoneRequestCodeRequestWithBody generates requests for PhoneRequestCode with any type of body
+func NewPhoneRequestCodeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/phone")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPhoneSubmitCodeRequest calls the generic PhoneSubmitCode builder with application/json body
+func NewPhoneSubmitCodeRequest(server string, accountHandle AccountHandleParam, body PhoneSubmitCodeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPhoneSubmitCodeRequestWithBody(server, accountHandle, "application/json", bodyReader)
+}
+
+// NewPhoneSubmitCodeRequestWithBody generates requests for PhoneSubmitCode with any type of body
+func NewPhoneSubmitCodeRequestWithBody(server string, accountHandle AccountHandleParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/phone/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -2614,6 +2785,16 @@ type ClientWithResponsesInterface interface {
 
 	AuthPasswordSignupWithResponse(ctx context.Context, body AuthPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthPasswordSignupResponse, error)
 
+	// PhoneRequestCode request with any body
+	PhoneRequestCodeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PhoneRequestCodeResponse, error)
+
+	PhoneRequestCodeWithResponse(ctx context.Context, body PhoneRequestCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*PhoneRequestCodeResponse, error)
+
+	// PhoneSubmitCode request with any body
+	PhoneSubmitCodeWithBodyWithResponse(ctx context.Context, accountHandle AccountHandleParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PhoneSubmitCodeResponse, error)
+
+	PhoneSubmitCodeWithResponse(ctx context.Context, accountHandle AccountHandleParam, body PhoneSubmitCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*PhoneSubmitCodeResponse, error)
+
 	// WebAuthnMakeAssertion request with any body
 	WebAuthnMakeAssertionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error)
 
@@ -2901,6 +3082,52 @@ func (r AuthPasswordSignupResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AuthPasswordSignupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PhoneRequestCodeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r PhoneRequestCodeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PhoneRequestCodeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PhoneSubmitCodeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccess
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r PhoneSubmitCodeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PhoneSubmitCodeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3418,6 +3645,40 @@ func (c *ClientWithResponses) AuthPasswordSignupWithResponse(ctx context.Context
 	return ParseAuthPasswordSignupResponse(rsp)
 }
 
+// PhoneRequestCodeWithBodyWithResponse request with arbitrary body returning *PhoneRequestCodeResponse
+func (c *ClientWithResponses) PhoneRequestCodeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PhoneRequestCodeResponse, error) {
+	rsp, err := c.PhoneRequestCodeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePhoneRequestCodeResponse(rsp)
+}
+
+func (c *ClientWithResponses) PhoneRequestCodeWithResponse(ctx context.Context, body PhoneRequestCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*PhoneRequestCodeResponse, error) {
+	rsp, err := c.PhoneRequestCode(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePhoneRequestCodeResponse(rsp)
+}
+
+// PhoneSubmitCodeWithBodyWithResponse request with arbitrary body returning *PhoneSubmitCodeResponse
+func (c *ClientWithResponses) PhoneSubmitCodeWithBodyWithResponse(ctx context.Context, accountHandle AccountHandleParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PhoneSubmitCodeResponse, error) {
+	rsp, err := c.PhoneSubmitCodeWithBody(ctx, accountHandle, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePhoneSubmitCodeResponse(rsp)
+}
+
+func (c *ClientWithResponses) PhoneSubmitCodeWithResponse(ctx context.Context, accountHandle AccountHandleParam, body PhoneSubmitCodeJSONRequestBody, reqEditors ...RequestEditorFn) (*PhoneSubmitCodeResponse, error) {
+	rsp, err := c.PhoneSubmitCode(ctx, accountHandle, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePhoneSubmitCodeResponse(rsp)
+}
+
 // WebAuthnMakeAssertionWithBodyWithResponse request with arbitrary body returning *WebAuthnMakeAssertionResponse
 func (c *ClientWithResponses) WebAuthnMakeAssertionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*WebAuthnMakeAssertionResponse, error) {
 	rsp, err := c.WebAuthnMakeAssertionWithBody(ctx, contentType, body, reqEditors...)
@@ -3897,6 +4158,72 @@ func ParseAuthPasswordSignupResponse(rsp *http.Response) (*AuthPasswordSignupRes
 	}
 
 	response := &AuthPasswordSignupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePhoneRequestCodeResponse parses an HTTP response from a PhoneRequestCodeWithResponse call
+func ParsePhoneRequestCodeResponse(rsp *http.Response) (*PhoneRequestCodeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PhoneRequestCodeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccess
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePhoneSubmitCodeResponse parses an HTTP response from a PhoneSubmitCodeWithResponse call
+func ParsePhoneSubmitCodeResponse(rsp *http.Response) (*PhoneSubmitCodeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PhoneSubmitCodeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -4486,6 +4813,12 @@ type ServerInterface interface {
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx echo.Context) error
 
+	// (POST /v1/auth/phone)
+	PhoneRequestCode(ctx echo.Context) error
+
+	// (PUT /v1/auth/phone/{account_handle})
+	PhoneSubmitCode(ctx echo.Context, accountHandle AccountHandleParam) error
+
 	// (POST /v1/auth/webauthn/assert)
 	WebAuthnMakeAssertion(ctx echo.Context) error
 
@@ -4652,6 +4985,31 @@ func (w *ServerInterfaceWrapper) AuthPasswordSignup(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.AuthPasswordSignup(ctx)
+	return err
+}
+
+// PhoneRequestCode converts echo context to params.
+func (w *ServerInterfaceWrapper) PhoneRequestCode(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.PhoneRequestCode(ctx)
+	return err
+}
+
+// PhoneSubmitCode converts echo context to params.
+func (w *ServerInterfaceWrapper) PhoneSubmitCode(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_handle" -------------
+	var accountHandle AccountHandleParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, ctx.Param("account_handle"), &accountHandle)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_handle: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.PhoneSubmitCode(ctx, accountHandle)
 	return err
 }
 
@@ -4957,6 +5315,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
 	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
 	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
+	router.POST(baseURL+"/v1/auth/phone", wrapper.PhoneRequestCode)
+	router.PUT(baseURL+"/v1/auth/phone/:account_handle", wrapper.PhoneSubmitCode)
 	router.POST(baseURL+"/v1/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
 	router.GET(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
 	router.POST(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
@@ -5442,6 +5802,81 @@ type AuthPasswordSignupdefaultJSONResponse struct {
 }
 
 func (response AuthPasswordSignupdefaultJSONResponse) VisitAuthPasswordSignupResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type PhoneRequestCodeRequestObject struct {
+	Body *PhoneRequestCodeJSONRequestBody
+}
+
+type PhoneRequestCodeResponseObject interface {
+	VisitPhoneRequestCodeResponse(w http.ResponseWriter) error
+}
+
+type PhoneRequestCode200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response PhoneRequestCode200JSONResponse) VisitPhoneRequestCodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type PhoneRequestCode400Response = BadRequestResponse
+
+func (response PhoneRequestCode400Response) VisitPhoneRequestCodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type PhoneRequestCodedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response PhoneRequestCodedefaultJSONResponse) VisitPhoneRequestCodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type PhoneSubmitCodeRequestObject struct {
+	AccountHandle AccountHandleParam `json:"account_handle"`
+	Body          *PhoneSubmitCodeJSONRequestBody
+}
+
+type PhoneSubmitCodeResponseObject interface {
+	VisitPhoneSubmitCodeResponse(w http.ResponseWriter) error
+}
+
+type PhoneSubmitCode200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response PhoneSubmitCode200JSONResponse) VisitPhoneSubmitCodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type PhoneSubmitCode400Response = BadRequestResponse
+
+func (response PhoneSubmitCode400Response) VisitPhoneSubmitCodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type PhoneSubmitCodedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response PhoneSubmitCodedefaultJSONResponse) VisitPhoneSubmitCodeResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -6152,6 +6587,12 @@ type StrictServerInterface interface {
 	// (POST /v1/auth/password/signup)
 	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) (AuthPasswordSignupResponseObject, error)
 
+	// (POST /v1/auth/phone)
+	PhoneRequestCode(ctx context.Context, request PhoneRequestCodeRequestObject) (PhoneRequestCodeResponseObject, error)
+
+	// (PUT /v1/auth/phone/{account_handle})
+	PhoneSubmitCode(ctx context.Context, request PhoneSubmitCodeRequestObject) (PhoneSubmitCodeResponseObject, error)
+
 	// (POST /v1/auth/webauthn/assert)
 	WebAuthnMakeAssertion(ctx context.Context, request WebAuthnMakeAssertionRequestObject) (WebAuthnMakeAssertionResponseObject, error)
 
@@ -6471,6 +6912,66 @@ func (sh *strictHandler) AuthPasswordSignup(ctx echo.Context) error {
 		return err
 	} else if validResponse, ok := response.(AuthPasswordSignupResponseObject); ok {
 		return validResponse.VisitAuthPasswordSignupResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// PhoneRequestCode operation middleware
+func (sh *strictHandler) PhoneRequestCode(ctx echo.Context) error {
+	var request PhoneRequestCodeRequestObject
+
+	var body PhoneRequestCodeJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PhoneRequestCode(ctx.Request().Context(), request.(PhoneRequestCodeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PhoneRequestCode")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(PhoneRequestCodeResponseObject); ok {
+		return validResponse.VisitPhoneRequestCodeResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// PhoneSubmitCode operation middleware
+func (sh *strictHandler) PhoneSubmitCode(ctx echo.Context, accountHandle AccountHandleParam) error {
+	var request PhoneSubmitCodeRequestObject
+
+	request.AccountHandle = accountHandle
+
+	var body PhoneSubmitCodeJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PhoneSubmitCode(ctx.Request().Context(), request.(PhoneSubmitCodeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PhoneSubmitCode")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(PhoneSubmitCodeResponseObject); ok {
+		return validResponse.VisitPhoneSubmitCodeResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
@@ -6935,102 +7436,106 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"///caS7FZYUAAA==",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

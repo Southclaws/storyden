@@ -233,6 +233,36 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /v1/auth/phone:
+    post:
+      operationId: PhoneRequestCode
+      description: |
+        Start the authentication flow with a phone number. The handler will send
+        a one-time code to the provided phone number which must then be sent to
+        the other phone endpoint to verify the number and validate the account.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/PhoneRequestCode" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /v1/auth/phone/{account_handle}:
+    put:
+      operationId: PhoneSubmitCode
+      description: |
+        Complete the phone number authentication flow by submitting the one-time
+        code that was sent to the user's phone.
+      tags: [auth]
+      security: []
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
+      requestBody: { $ref: "#/components/requestBodies/PhoneSubmitCode" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
   /v1/auth/logout:
     get:
       operationId: AuthProviderLogout
@@ -583,6 +613,16 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/PublicKeyCredential" }
+
+    PhoneRequestCode:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PhoneRequestCodeProps" }
+
+    PhoneSubmitCode:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PhoneSubmitCodeProps" }
 
     AccountUpdate:
       content:
@@ -1241,6 +1281,27 @@ components:
         userVerification:
           type: string
           enum: ["discouraged", "preferred", "required"]
+
+    PhoneRequestCodeProps:
+      description: The phone number request payload.
+      type: object
+      required: [identifier, phone_number]
+      properties:
+        identifier:
+          description: The desired username to link to the phone number.
+          example: "southclaws"
+          type: string
+        phone_number:
+          description: The phone number to receive the one-time code on.
+          type: string
+
+    PhoneSubmitCodeProps:
+      description: The Phone submit code payload.
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
 
     #
     #        d8888                                            888

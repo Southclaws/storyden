@@ -24,4 +24,6 @@ type Repository interface {
 
 	// Checks if the given token is equal to the stored auth method's token.
 	IsEqual(ctx context.Context, userID account.AccountID, identifier string, token string) (bool, error)
+
+	Delete(ctx context.Context, userID account.AccountID, identifier string, service Service) (bool, error)
 }
