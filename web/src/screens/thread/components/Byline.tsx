@@ -19,7 +19,7 @@ export function Byline(props: Props) {
     formatDistanceToNow(props.updated, formatDistanceDefaults);
 
   return (
-    <HStack justifyContent="space-between">
+    <HStack w="full" justifyContent="space-between">
       <Flex
         alignItems={{
           // base: "start",
