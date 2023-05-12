@@ -13,7 +13,7 @@ export function ThreadList(props: Props) {
   ));
 
   return (
-    <List display="flex" flexDirection="column" gap={2}>
+    <List width="full" display="flex" flexDirection="column" gap={2}>
       {children}
     </List>
   );
