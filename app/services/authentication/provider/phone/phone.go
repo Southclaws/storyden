@@ -2,7 +2,9 @@ package phone
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"math"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -106,8 +108,10 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 	// the phone number specified in the request.
 	//
 
-	// TODO: GENERATE AND DO CRYPTO MATH STUFF
-	code := "696969"
+	code, err := generateCode()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to generate code"))
+	}
 
 	_, err = p.auth.Create(ctx, acc.ID, id, phone, code, nil)
 	if err != nil {
@@ -153,4 +157,21 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 	}
 
 	return acc, nil
+}
+
+func generateCode() (string, error) {
+	sum := make([]byte, 6)
+	_, err := rand.Read(sum)
+	if err != nil {
+		return "", fault.Wrap(err)
+	}
+
+	value := int64(((int(sum[0]) & 0x7f) << 24) |
+		((int(sum[1] & 0xff)) << 16) |
+		((int(sum[2] & 0xff)) << 8) |
+		(int(sum[3]) & 0xff))
+
+	mod := int32(value % int64(math.Pow10(6)))
+
+	return fmt.Sprintf("%06d", mod), nil
 }
