@@ -15,7 +15,7 @@ type Sender interface {
 
 func Build() fx.Option {
 	return fx.Provide(func(cfg config.Config, l *zap.Logger) (Sender, error) {
-		if !cfg.Production { // CHANGE
+		if cfg.Production {
 			return newTwilio(l)
 		}
 
