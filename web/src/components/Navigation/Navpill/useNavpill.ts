@@ -26,6 +26,6 @@ export function useNavpill() {
     overlayRef,
     isExpanded,
     onExpand,
-    isAuthenticated: !!account,
+    account,
   };
 }
