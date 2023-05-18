@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Input, SlideFade } from "@chakra-ui/react";
+import { Box, Flex, HStack, Image, Input, SlideFade } from "@chakra-ui/react";
 import {
   Bell,
   Close,
@@ -8,16 +8,17 @@ import {
   Login,
   Settings,
 } from "src/components/Action/Action";
-import { useNavpill } from "./useNavpill";
 import { Menu } from "./components/Menu/Menu";
+import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
-  const { overlayRef, isExpanded, onExpand, isAuthenticated } = useNavpill();
+  const { overlayRef, isExpanded, onExpand, account } = useNavpill();
   return (
     <Box
       id="navpill-overlay"
       position="fixed"
       bottom="env(safe-area-inset-bottom)"
+      pb={2}
       width="100vw"
       height="100vh"
       pointerEvents="none"
@@ -34,17 +35,18 @@ export function Navpill() {
         ref={overlayRef}
       >
         <Flex
-          px={{ base: isExpanded ? 2 : 4 }}
-          py={2}
+          pl={{ base: isExpanded ? 2 : 2 }}
+          pr={{ base: isExpanded ? 2 : 4 }}
+          py={1}
           gap={2}
           flexDirection="column"
-          borderRadius={25}
+          borderRadius={20}
           backdropFilter="blur(4px)"
           transitionProperty="background-color"
           transitionDuration="0.5s"
           backgroundColor="hsla(210, 38.5%, 94.9%, 0.8)"
           border="1px solid hsla(209, 100%, 20%, 0.02)"
-          width={isExpanded ? "100%" : "min-content"}
+          width="full"
           maxW={{ base: "23em", md: "container.sm" }}
           justifyContent="space-between"
           alignItems="center"
@@ -67,25 +69,61 @@ export function Navpill() {
             <Menu />
           </SlideFade>
 
-          <HStack gap={4} w="full" justifyContent="space-between">
-            {isAuthenticated ? <Bell /> : <Login />}
+          {account ? (
+            <HStack gap={4} w="full" justifyContent="space-between">
+              {isExpanded ? (
+                <>
+                  <Image
+                    borderRadius="full"
+                    boxSize={6}
+                    src={`/api/v1/accounts/${account.handle}/avatar`}
+                    alt="pic"
+                  />
 
-            {isExpanded ? (
-              <>
-                <Input
-                  variant="outline"
-                  border="none"
-                  placeholder="Search anything..."
-                />
-                <Close onClick={onExpand} />
-              </>
-            ) : (
-              <>
-                <Create />
-                <Dashboard onClick={onExpand} />
-              </>
-            )}
-          </HStack>
+                  <Input
+                    variant="outline"
+                    border="none"
+                    size="sm"
+                    placeholder="Search anything..."
+                  />
+                  <Close onClick={onExpand} />
+                </>
+              ) : (
+                <>
+                  <Image
+                    borderRadius="full"
+                    boxSize={6}
+                    src={`/api/v1/accounts/${account.handle}/avatar`}
+                    alt="pic"
+                  />
+                  <Home />
+                  <Create />
+                  <Bell />
+                  <Dashboard onClick={onExpand} />
+                </>
+              )}
+            </HStack>
+          ) : (
+            <HStack gap={4} w="full" justifyContent="space-between">
+              <Login />
+
+              {isExpanded ? (
+                <>
+                  <Input
+                    variant="outline"
+                    border="none"
+                    placeholder="Search anything..."
+                  />
+                  <Close onClick={onExpand} />
+                </>
+              ) : (
+                <>
+                  <Create />
+                  <Dashboard onClick={onExpand} />
+                </>
+              )}
+            </HStack>
+          )}
         </Flex>
       </Flex>
     </Box>
