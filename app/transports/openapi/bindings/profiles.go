@@ -40,9 +40,9 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
 			Bio:       utils.Ref(acc.Bio.ElseZero()),
-			Handle:    (*openapi.AccountHandle)(&acc.Handle),
-			Name:      &acc.Name,
-			Interests: &interests,
+			Handle:    acc.Handle,
+			Name:      acc.Name,
+			Interests: interests,
 			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
 		},
 	}, nil

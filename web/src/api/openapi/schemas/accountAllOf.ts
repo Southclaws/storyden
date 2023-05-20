@@ -10,7 +10,7 @@ import type { AccountName } from "./accountName";
 import type { TagList } from "./tagList";
 
 export type AccountAllOf = {
-  handle?: AccountHandle;
+  handle: AccountHandle;
   name?: AccountName;
   bio?: string;
   interests?: TagList;

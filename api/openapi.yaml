@@ -1316,10 +1316,10 @@ components:
 
     Account:
       type: object
-      required: [handle, id]
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - properties:
+        - required: [handle, id]
+          properties:
             handle:
               $ref: "#/components/schemas/AccountHandle"
             name:
@@ -1354,10 +1354,10 @@ components:
 
     PublicProfile:
       type: object
-      required: [id, handle, name, createdAt, interests]
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - properties:
+        - required: [id, handle, name, createdAt, interests]
+          properties:
             handle:
               $ref: "#/components/schemas/AccountHandle"
             name:
