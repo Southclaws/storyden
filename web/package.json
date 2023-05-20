@@ -23,7 +23,6 @@
     "axios": "^0.27.2",
     "date-fns": "^2.29.3",
     "framer-motion": "^7.2.1",
-    "identicon.js": "^2.3.3",
     "lodash": "^4.17.21",
     "next": "^13.4.1",
     "nookies": "^2.5.2",
@@ -39,7 +38,6 @@
   },
   "devDependencies": {
     "@simplewebauthn/typescript-types": "^6.3.0-alpha.1",
-    "@types/identicon.js": "^2.3.1",
     "@types/node": "^18.7.13",
     "@types/react": "^18.0.17",
     "@typescript-eslint/eslint-plugin": "^5.48.2",

@@ -19,11 +19,13 @@ type Config struct {
 	SessionKey       string `envconfig:"SESSION_KEY"            required:"true"`
 	PublicWebAddress string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
 
-	S3Endpoint  string `envconfig:"S3_ENDPOINT"   required:"true"`
-	S3Bucket    string `envconfig:"S3_BUCKET"     required:"true"`
-	S3Region    string `envconfig:"S3_REGION"     required:"true"`
-	S3AccessKey string `envconfig:"S3_ACCESS_KEY" required:"true"`
-	S3SecretKey string `envconfig:"S3_SECRET_KEY" required:"true"`
+	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
+	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`
+	S3Endpoint            string `envconfig:"S3_ENDPOINT"`
+	S3Bucket              string `envconfig:"S3_BUCKET"`
+	S3Region              string `envconfig:"S3_REGION"`
+	S3AccessKey           string `envconfig:"S3_ACCESS_KEY"`
+	S3SecretKey           string `envconfig:"S3_SECRET_KEY"`
 }
 
 func Build() fx.Option {

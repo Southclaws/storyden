@@ -7,15 +7,8 @@ type Props = {
 } & ImageProps;
 
 export function Avatar({ account, ...props }: Props) {
-  const { src, fallback } = useAvatar(account.handle ?? "unknown");
+  const { src } = useAvatar(account.handle ?? "unknown");
   return (
-    <Image
-      borderRadius="full"
-      boxSize={6}
-      src={src}
-      fallbackSrc={fallback}
-      alt="pic"
-      {...props}
-    />
+    <Image borderRadius="full" boxSize={6} src={src} alt="pic" {...props} />
   );
 }
