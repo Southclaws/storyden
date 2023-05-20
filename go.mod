@@ -48,6 +48,7 @@ require (
 )
 
 require (
+	github.com/dave/jennifer v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -59,6 +60,9 @@ require (
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mazznoer/colorgrad v0.9.1 // indirect
+	github.com/mazznoer/csscolorparser v0.1.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
@@ -78,6 +82,7 @@ require (
 )
 
 require (
+	github.com/Southclaws/enumerator v1.2.0
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect

@@ -2,6 +2,7 @@ package avatar
 
 import (
 	"context"
+	"image/png"
 	"io"
 	"path"
 
@@ -35,7 +36,26 @@ func (s *service) Set(ctx context.Context, accountID account.AccountID, stream i
 func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Reader, error) {
 	stream, err := s.storage.Read(ctx, avatarPath(accountID))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		r, w := io.Pipe()
+
+		go func() {
+			defer r.Close()
+
+			i, err := s.avatar_gen.Generate(ctx, accountID.String())
+			if err != nil {
+				r.CloseWithError(err)
+				return
+			}
+
+			if err := png.Encode(w, i); err != nil {
+				r.CloseWithError(err)
+				return
+			}
+
+			return
+		}()
+
+		return r, nil
 	}
 
 	return stream, nil

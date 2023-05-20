@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/internal/object"
 )
 
@@ -25,6 +26,7 @@ type service struct {
 	l *zap.Logger
 
 	account_repo account.Repository
+	avatar_gen   avatar_gen.AvatarGenerator
 	storage      object.Storer
 }
 
@@ -32,11 +34,13 @@ func New(
 	l *zap.Logger,
 
 	account_repo account.Repository,
+	avatar_gen avatar_gen.AvatarGenerator,
 	storage object.Storer,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "avatar")),
 		account_repo: account_repo,
+		avatar_gen:   avatar_gen,
 		storage:      storage,
 	}
 }

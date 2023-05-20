@@ -19,6 +19,6 @@ func Build() fx.Option {
 		securecookie.Build(),
 		sms.Build(),
 		fx.Provide(webauthn.New),
-		fx.Provide(object.NewS3Storer),
+		object.Build(),
 	)
 }
