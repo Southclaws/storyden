@@ -1,14 +1,19 @@
 import { Image, ImageProps } from "@chakra-ui/react";
-import { Account } from "src/api/openapi/schemas";
 import { useAvatar } from "./useAvatar";
 
 type Props = {
-  account: Account;
+  handle: string;
 } & ImageProps;
 
-export function Avatar({ account, ...props }: Props) {
-  const { src } = useAvatar(account.handle ?? "unknown");
+export function Avatar({ handle, ...props }: Props) {
+  const { src } = useAvatar(handle);
   return (
-    <Image borderRadius="full" boxSize={6} src={src} alt="pic" {...props} />
+    <Image
+      borderRadius="full"
+      boxSize={6}
+      src={src}
+      alt={`${handle}'s avatar`}
+      {...props}
+    />
   );
 }

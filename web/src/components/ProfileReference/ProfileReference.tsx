@@ -1,27 +1,26 @@
-import { Flex, Image, Text } from "@chakra-ui/react";
+import { HStack, Text } from "@chakra-ui/react";
 import { Anchor } from "../site/Anchor";
 
-import { useProfileReference } from "./useProfileReference";
+import { Avatar } from "../Avatar/Avatar";
 
 type Props = {
   handle: string;
+  showHandle?: boolean;
 };
 
-export function ProfileReference(props: Props) {
-  const { fallback, src } = useProfileReference(props.handle);
-
+export function ProfileReference({ handle, showHandle = true }: Props) {
   return (
-    <Anchor href={`/p/${props.handle}`}>
-      <Flex gap={1}>
-        <Image
-          borderRadius="full"
-          boxSize={5}
-          src={src}
-          fallbackSrc={fallback}
-          alt="pic"
-        />
-        <Text>@{props.handle}</Text>
-      </Flex>
+    <Anchor
+      href={`/p/${handle}`}
+      _hover={{ backgroundColor: "blackAlpha.100" }}
+      p={1}
+      pr={showHandle ? 2 : 1}
+      borderRadius="full"
+    >
+      <HStack>
+        <Avatar handle={handle} />
+        {showHandle && <Text>@{handle}</Text>}
+      </HStack>
     </Anchor>
   );
 }
