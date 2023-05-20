@@ -10,10 +10,10 @@ import type { AccountName } from "./accountName";
 import type { TagList } from "./tagList";
 
 export type PublicProfileAllOf = {
-  handle?: AccountHandle;
-  name?: AccountName;
+  handle: AccountHandle;
+  name: AccountName;
   bio?: string;
   image?: string;
-  createdAt?: string;
-  interests?: TagList;
+  createdAt: string;
+  interests: TagList;
 };

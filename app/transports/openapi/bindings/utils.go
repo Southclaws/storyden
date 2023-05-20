@@ -17,7 +17,7 @@ import (
 func serialiseAccount(acc *account.Account) openapi.Account {
 	return openapi.Account{
 		Id:        openapi.Identifier(acc.ID.String()),
-		Handle:    (*openapi.AccountHandle)(&acc.Handle),
+		Handle:    acc.Handle,
 		Name:      utils.Ref(acc.Name),
 		Bio:       utils.Ref(acc.Bio.ElseZero()),
 		CreatedAt: acc.CreatedAt,
