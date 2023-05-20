@@ -1,7 +1,7 @@
 import { Flex, HStack, Text } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
-import { Anchor } from "src/components/site/Anchor";
+import { Timestamp } from "src/components/Timestamp";
 import { formatDistanceDefaults } from "src/utils/date";
 
 type Props = {
@@ -15,8 +15,9 @@ type Props = {
 export function Byline(props: Props) {
   const created = formatDistanceToNow(props.time, formatDistanceDefaults);
   const updated =
-    differenceInSeconds(props.time, props.updated) > 0 &&
-    formatDistanceToNow(props.updated, formatDistanceDefaults);
+    differenceInSeconds(props.time, props.updated) > 0
+      ? formatDistanceToNow(props.updated, formatDistanceDefaults)
+      : undefined;
 
   return (
     <HStack w="full" justifyContent="space-between">
@@ -25,10 +26,7 @@ export function Byline(props: Props) {
           // base: "start",
           md: "center",
         }}
-        gap={{
-          base: 1,
-          md: 2,
-        }}
+        gap={1}
         fontSize="sm"
         color="blackAlpha.700"
         flexDir={{
@@ -38,20 +36,13 @@ export function Byline(props: Props) {
       >
         <ProfileReference handle={props.author} />
 
-        <Text
-          as="span"
-          display={{
-            // base: "none",
-            md: "inline",
-          }}
-        >
-          •
-        </Text>
+        <HStack>
+          <Text as="span">•</Text>
+        </HStack>
 
-        <Text>
-          <Anchor href={props.href}>{created} ago</Anchor>
-          {updated && <> (updated {updated} ago)</>}
-        </Text>
+        <HStack>
+          <Timestamp created={created} updated={updated} href={props.href} />
+        </HStack>
       </Flex>
 
       {props.more}

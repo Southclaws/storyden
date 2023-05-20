@@ -10,6 +10,7 @@ import {
 } from "src/components/Action/Action";
 import { Menu } from "./components/Menu/Menu";
 import { useNavpill } from "./useNavpill";
+import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 
 export function Navpill() {
   const { overlayRef, isExpanded, onExpand, account } = useNavpill();
@@ -73,11 +74,9 @@ export function Navpill() {
             <HStack gap={4} w="full" justifyContent="space-between">
               {isExpanded ? (
                 <>
-                  <Image
-                    borderRadius="full"
-                    boxSize={6}
-                    src={`/api/v1/accounts/${account.handle}/avatar`}
-                    alt="pic"
+                  <ProfileReference
+                    handle={account.handle}
+                    showHandle={false}
                   />
 
                   <Input
@@ -90,11 +89,9 @@ export function Navpill() {
                 </>
               ) : (
                 <>
-                  <Image
-                    borderRadius="full"
-                    boxSize={6}
-                    src={`/api/v1/accounts/${account.handle}/avatar`}
-                    alt="pic"
+                  <ProfileReference
+                    handle={account.handle}
+                    showHandle={false}
                   />
                   <Home />
                   <Create />
