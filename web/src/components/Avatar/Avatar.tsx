@@ -1,19 +1,15 @@
-import { Image, ImageProps } from "@chakra-ui/react";
+import { Box, BoxProps, Image } from "@chakra-ui/react";
 import { useAvatar } from "./useAvatar";
 
 type Props = {
   handle: string;
-} & ImageProps;
+} & BoxProps;
 
 export function Avatar({ handle, ...props }: Props) {
   const { src } = useAvatar(handle);
   return (
-    <Image
-      borderRadius="full"
-      boxSize={6}
-      src={src}
-      alt={`${handle}'s avatar`}
-      {...props}
-    />
+    <Box width={6} {...props}>
+      <Image borderRadius="full" src={src} alt={`${handle}'s avatar`} />
+    </Box>
   );
 }
