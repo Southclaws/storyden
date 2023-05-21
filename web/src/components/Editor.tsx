@@ -67,7 +67,6 @@ export function Editor({ onChange, value }: Props) {
   const { manager, state, setState, getContext } = useRemirror({
     extensions,
     stringHandler: "markdown",
-    selection: "end",
     content: value,
   });
 
@@ -76,6 +75,7 @@ export function Editor({ onChange, value }: Props) {
       <AllStyledComponent style={{ width: "100%", minHeight: "6em" }}>
         <ThemeProvider>
           <Remirror
+            placeholder="Write something..."
             manager={manager}
             state={state}
             onChange={(parameter) => {
