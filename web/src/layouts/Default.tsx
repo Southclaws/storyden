@@ -2,15 +2,11 @@ import { Box, Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { Navpill } from "src/components/Navigation/Navpill/Navpill";
 import { Sidebar } from "src/components/Navigation/Sidebar/Sidebar";
+import { SIDEBAR_WIDTH } from "src/components/Navigation/useNavigation";
 
 export function Default(props: PropsWithChildren) {
   return (
-    <Flex
-      width="full"
-      minHeight="100vh"
-      alignItems="stretch"
-      flexDirection="row"
-    >
+    <Flex width="full" flexDirection="row">
       {/* MOBILE */}
       <Box
         id="mobile-nav-container"
@@ -28,13 +24,8 @@ export function Default(props: PropsWithChildren) {
           base: "none",
           md: "flex",
         }}
-        minWidth={{
-          md: "25%",
-          lg: "33%",
-        }}
+        minWidth={SIDEBAR_WIDTH}
         height="100vh"
-        px={4}
-        bgColor="blackAlpha.50"
       >
         <Sidebar />
       </Box>
@@ -42,15 +33,14 @@ export function Default(props: PropsWithChildren) {
       <Box
         as="main"
         width="full"
-        height="100vh"
         maxW={{
           base: "full",
           lg: "container.md",
         }}
-        overflowY="scroll"
         px={4}
       >
         {props.children}
+        <Box height="6rem"></Box>
       </Box>
     </Flex>
   );
