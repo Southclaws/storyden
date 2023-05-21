@@ -5,11 +5,18 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import useSwr from "swr";
+import type { SWRConfiguration, Key } from "swr";
 import type {
   PostCreateOKResponse,
+  UnauthorisedResponse,
+  NotFoundResponse,
+  InternalServerErrorResponse,
   PostCreateBody,
   PostUpdateOKResponse,
   PostUpdateBody,
+  PostSearchOKResponse,
+  PostSearchParams,
   PostReactAddOKResponse,
   PostReactAddBody,
 } from "./schemas";
@@ -47,6 +54,58 @@ export const postUpdate = (postId: string, postUpdateBody: PostUpdateBody) => {
  */
 export const postDelete = (postId: string) => {
   return fetcher<void>({ url: `/v1/posts/${postId}`, method: "delete" });
+};
+
+/**
+ * Search through posts using various queries and filters.
+ */
+export const postSearch = (params?: PostSearchParams) => {
+  return fetcher<PostSearchOKResponse>({
+    url: `/v1/posts/search`,
+    method: "get",
+    params,
+  });
+};
+
+export const getPostSearchKey = (params?: PostSearchParams) =>
+  [`/v1/posts/search`, ...(params ? [params] : [])] as const;
+
+export type PostSearchQueryResult = NonNullable<
+  Awaited<ReturnType<typeof postSearch>>
+>;
+export type PostSearchQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePostSearch = <
+  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+>(
+  params?: PostSearchParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof postSearch>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  }
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getPostSearchKey(params) : null));
+  const swrFn = () => postSearch(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
 };
 
 /**

@@ -6,7 +6,7 @@ import { Metadata } from "./Metadata";
 
 export function Profile(props: PublicProfile) {
   return (
-    <VStack alignItems="start" gap={2}>
+    <VStack width="full" alignItems="start" gap={2}>
       <Header {...props} />
       <Metadata {...props} />
       <Text>{props.bio}</Text>
