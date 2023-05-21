@@ -1,5 +1,5 @@
 import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
-import { useNavigation } from "../useNavigation";
+import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
 import { Authbar } from "./components/Authbar";
 import { CategoryList } from "./components/CategoryList";
 import { Title } from "./components/Title";
@@ -12,9 +12,11 @@ export function Sidebar() {
     <Flex
       id="desktop-nav-container"
       as="header"
+      position="fixed"
       justifyContent="end"
-      width="full"
+      width={SIDEBAR_WIDTH}
       height="full"
+      bgColor="blackAlpha.50"
     >
       <Box
         id="desktop-nav-box"
@@ -24,11 +26,11 @@ export function Sidebar() {
           lg: "3xs",
         }}
         height="full"
+        p={2}
       >
         <VStack
           as="nav"
           height="full"
-          py={4}
           gap={2}
           justifyContent="space-between"
           alignItems="start"
