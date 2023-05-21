@@ -1,9 +1,9 @@
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { PublicProfile } from "src/api/openapi/schemas";
-import { useContent } from "./useContent";
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Box } from "@chakra-ui/react";
-import { ThreadList } from "src/screens/home/components/ThreadList";
 import { Unready } from "src/components/Unready";
-import { PostListView } from "src/screens/thread/components/PostList";
+import { ThreadList } from "src/screens/home/components/ThreadList";
+import { PostList } from "./PostList/PostList";
+import { useContent } from "./useContent";
 
 export function Content(props: PublicProfile) {
   const content = useContent(props);
@@ -22,7 +22,7 @@ export function Content(props: PublicProfile) {
         </TabPanel>
         <TabPanel>
           <Box>
-            <PostListView posts={content.data.posts} />
+            <PostList posts={content.data.posts} />
           </Box>
         </TabPanel>
       </TabPanels>
