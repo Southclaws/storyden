@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -17,6 +18,7 @@ import (
 )
 
 var (
+	errHandleMismatch      = fault.New("phone already linked to different account")
 	errNoPhoneAuth         = fault.New("no phone auth method linked to account")
 	errOneTimeCodeMismatch = fault.New("one time code mismatch")
 )
@@ -63,6 +65,13 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 	var acc *account.Account
 	if exists {
 		acc = &authrecord.Account
+		if acc.Handle != handle {
+			return nil, fault.Wrap(errHandleMismatch,
+				fctx.With(ctx),
+				ftag.With(ftag.PermissionDenied),
+				fmsg.WithDesc("handle mismatch", "Handle already registered with a different authentication method."),
+			)
+		}
 
 		//
 		// STEP 1.5:
@@ -97,6 +106,12 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 		//
 		acc, err = p.account.Create(ctx, handle)
 		if err != nil {
+			if ftag.Get(err) == ftag.AlreadyExists {
+				return nil, fault.Wrap(err,
+					fctx.With(ctx),
+					fmsg.With("failed to create account"),
+					fmsg.WithDesc("already exists", "Handle already registered with a different authentication method."))
+			}
 			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 		}
 	}
@@ -153,7 +168,11 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 	}
 
 	if phoneauth.Token != onetimecode {
-		return nil, fault.Wrap(errOneTimeCodeMismatch)
+		return nil, fault.Wrap(errOneTimeCodeMismatch,
+			fctx.With(ctx),
+			ftag.With(ftag.PermissionDenied),
+			fmsg.WithDesc("mismatch", "The code did not match."),
+		)
 	}
 
 	return acc, nil
