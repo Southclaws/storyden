@@ -1,12 +1,12 @@
 import { HStack } from "@chakra-ui/react";
+import { useSession } from "src/auth";
 import { Bell, Create, Home, Login } from "src/components/Action/Action";
 
-type Props = { isAuthenticated: boolean };
-
-export function Toolbar(props: Props) {
+export function Toolbar() {
+  const account = useSession();
   return (
     <HStack gap={2} pb={2}>
-      {props.isAuthenticated ? (
+      {account ? (
         <>
           <Home />
           <Bell />

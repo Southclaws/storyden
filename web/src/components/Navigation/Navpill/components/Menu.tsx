@@ -1,9 +1,9 @@
 import { Flex, VStack } from "@chakra-ui/react";
-import { CategoryList } from "../CategoryList";
-import { useMenu } from "./useMenu";
+import { useNavigation } from "src/components/Navigation/useNavigation";
+import { CategoryList } from "./CategoryList";
 
 export function Menu() {
-  const { category } = useMenu();
+  const { category } = useNavigation();
 
   return (
     <VStack width="full" p={2}>

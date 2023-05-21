@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useGetInfo } from "src/api/openapi/misc";
-import { useAuthProvider } from "src/auth/useAuthProvider";
 import { z } from "zod";
 
 export const QuerySchema = z.object({
@@ -15,7 +14,6 @@ export type Query = z.infer<typeof QuerySchema>;
 export function useNavigation() {
   const { query } = useRouter();
   const { data: infoResult } = useGetInfo();
-  const { account } = useAuthProvider();
 
   const { category } = QuerySchema.parse(query);
 
@@ -23,7 +21,6 @@ export function useNavigation() {
 
   return {
     title,
-    isAuthenticated: !!account,
     category,
   };
 }
