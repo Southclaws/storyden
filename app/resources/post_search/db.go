@@ -46,8 +46,15 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
 		dto := post.FromModel(v)
-		dto.RootThreadMark = v.Edges.Root.Slug
-		dto.RootPostID = post.PostID(v.Edges.Root.ID)
+
+		if v.First {
+			dto.RootThreadMark = v.Slug
+			dto.RootPostID = post.PostID(v.ID)
+		} else {
+			dto.RootThreadMark = v.Edges.Root.Slug
+			dto.RootPostID = post.PostID(v.Edges.Root.ID)
+		}
+
 		return dto
 	}
 
