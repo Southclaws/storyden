@@ -10,7 +10,7 @@ import {
   Settings,
 } from "src/components/Action/Action";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
-import { Menu } from "./components/Menu/Menu";
+import { Menu } from "./components/Menu";
 import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
