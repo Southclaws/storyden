@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Image, Input, SlideFade } from "@chakra-ui/react";
+import { Box, Flex, HStack, Input, SlideFade } from "@chakra-ui/react";
 import {
   Bell,
   Close,
@@ -8,9 +8,9 @@ import {
   Login,
   Settings,
 } from "src/components/Action/Action";
+import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 import { Menu } from "./components/Menu/Menu";
 import { useNavpill } from "./useNavpill";
-import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 
 export function Navpill() {
   const { overlayRef, isExpanded, onExpand, account } = useNavpill();
@@ -63,7 +63,10 @@ export function Navpill() {
             }}
           >
             <HStack justify="space-between">
-              <Home />
+              <HStack>
+                <Home />
+                <Bell />
+              </HStack>
               <Settings />
             </HStack>
 
