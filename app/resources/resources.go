@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -28,6 +29,7 @@ func Build() fx.Option {
 			thread.New,
 			react.New,
 			notification.New,
+			post_search.New,
 		),
 	)
 }

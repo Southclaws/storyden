@@ -3,7 +3,7 @@ import { PostProps } from "src/api/openapi/schemas";
 import { PostView } from "./PostView/PostView";
 
 type Props = {
-  slug: string;
+  slug?: string;
   posts: PostProps[];
 };
 

@@ -8,7 +8,7 @@ import { mutate } from "swr";
 export const emojiPickerContainerID = `react-emoji-select`;
 
 export type Props = PostProps & {
-  slug: string;
+  slug?: string;
 };
 
 export function useReactList(props: Props) {
@@ -17,7 +17,7 @@ export function useReactList(props: Props) {
 
   async function onSelect(event: { emoji: string }) {
     await postReactAdd(props.id, { emoji: event.emoji });
-    mutate(getThreadGetKey(props.slug));
+    props.slug && mutate(getThreadGetKey(props.slug));
   }
 
   async function onOpen() {

@@ -521,6 +521,34 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
+  /v1/posts/search:
+    get:
+      operationId: PostSearch
+      description: Search through posts using various queries and filters.
+      tags: [posts]
+      security: []
+      parameters:
+        - name: body
+          description: A text query to search for in post content.
+          required: false
+          in: query
+          schema: { type: string }
+        - name: author
+          description: Show only results created by this account.
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/AccountHandle" }
+        - name: kind
+          description: Posts, threads or both.
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/ContentKinds" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PostSearchOK" }
+
   /v1/posts/{post_id}/reacts:
     put:
       operationId: PostReactAdd
@@ -819,6 +847,13 @@ components:
           schema:
             $ref: "#/components/schemas/PostProps"
 
+    PostSearchOK:
+      description: Thread post updated successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PostSearchResults"
+
     PostReactAddOK:
       description: Post reaction added.
       content:
@@ -871,6 +906,14 @@ components:
           type: string
         description:
           type: string
+
+    ContentKind:
+      type: string
+      enum: [post, thread]
+
+    ContentKinds:
+      type: array
+      items: { $ref: "#/components/schemas/ContentKind" }
 
     ThreadMark:
       description: |
@@ -1611,6 +1654,17 @@ components:
       properties:
         emoji:
           type: string
+
+    PostSearchResults:
+      type: object
+      required: [count, results]
+      properties:
+        count:
+          type: number
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostProps"
 
   securitySchemes:
     browser:

@@ -83,7 +83,7 @@ const components: Partial<
 };
 
 type Props = PostProps & {
-  slug: string;
+  slug?: string;
 };
 
 export function PostView(props: Props) {
