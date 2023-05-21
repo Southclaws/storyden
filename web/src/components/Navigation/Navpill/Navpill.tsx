@@ -74,13 +74,7 @@ export function Navpill() {
                   <Settings />
                 </>
               ) : (
-                <>
-                  <HStack>
-                    <Home />
-                    <Login />
-                  </HStack>
-                  <Settings />
-                </>
+                <Login />
               )}
             </HStack>
 
@@ -119,10 +113,9 @@ export function Navpill() {
             </HStack>
           ) : (
             <HStack gap={4} w="full" justifyContent="space-between">
-              <Login />
-
               {isExpanded ? (
                 <>
+                  <Home />
                   <Input
                     variant="outline"
                     border="none"
@@ -132,7 +125,8 @@ export function Navpill() {
                 </>
               ) : (
                 <>
-                  <Create />
+                  <Home />
+                  <Login />
                   <Dashboard onClick={onExpand} />
                 </>
               )}
