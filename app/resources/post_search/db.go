@@ -30,6 +30,7 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		WithAuthor().
 		WithReacts().
 		WithTags().
+		WithRoot().
 		Order(ent.Asc(post_model.FieldCreatedAt))
 
 	for _, fn := range filters {
@@ -41,5 +42,14 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return dt.Map(posts, post.FromModel), nil
+	transform := func(v *ent.Post) *post.Post {
+		// hydrate the thread-specific info here. post.FromModel cannot do this
+		// as this info is only available in the context of a thread of posts.
+		dto := post.FromModel(v)
+		dto.RootThreadMark = v.Edges.Root.Slug
+		dto.RootPostID = post.PostID(v.Edges.Root.ID)
+		return dto
+	}
+
+	return dt.Map(posts, transform), nil
 }
