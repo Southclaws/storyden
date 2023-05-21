@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 import { LoginIcon } from "../graphics/LoginIcon";
+import { LogoutIcon } from "../graphics/LogoutIcon";
 import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
 
 function useClickHandler(onClick: MouseEventHandler | undefined) {
@@ -98,6 +99,14 @@ export function Login({ href = "/auth", ...props }: WithOptionalURL) {
   return (
     <Action href={href} title="Sign up or Log in" {...props}>
       <LoginIcon width="1.5em" />
+    </Action>
+  );
+}
+
+export function Logout({ href = "/logout", ...props }: WithOptionalURL) {
+  return (
+    <Action href={href} title="Log out of your session" {...props}>
+      <LogoutIcon width="1.5em" />
     </Action>
   );
 }

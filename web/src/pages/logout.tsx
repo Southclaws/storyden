@@ -3,16 +3,19 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { destroyCookie } from "nookies";
 import { useEffect } from "react";
+import { getAccountGetKey } from "src/api/openapi/accounts";
 import { useAuthProviderLogout } from "src/api/openapi/auth";
+import { useSWRConfig } from "swr";
 
 export default function Page() {
   const router = useRouter();
-  const logout = useAuthProviderLogout();
+  useAuthProviderLogout();
+  const { mutate } = useSWRConfig();
 
   useEffect(() => {
-    console.log(logout);
+    mutate(getAccountGetKey(), null);
     router.push("/");
-  }, [router, logout]);
+  }, [router, mutate]);
 
   return <Link href="/login">Logged out. Returning to login.</Link>;
 }

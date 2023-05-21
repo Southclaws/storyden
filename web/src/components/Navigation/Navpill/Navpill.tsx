@@ -6,6 +6,7 @@ import {
   Dashboard,
   Home,
   Login,
+  Logout,
   Settings,
 } from "src/components/Action/Action";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
@@ -63,11 +64,24 @@ export function Navpill() {
             }}
           >
             <HStack justify="space-between">
-              <HStack>
-                <Home />
-                <Bell />
-              </HStack>
-              <Settings />
+              {account ? (
+                <>
+                  <HStack>
+                    <Home />
+                    <Bell />
+                    <Logout />
+                  </HStack>
+                  <Settings />
+                </>
+              ) : (
+                <>
+                  <HStack>
+                    <Home />
+                    <Login />
+                  </HStack>
+                  <Settings />
+                </>
+              )}
             </HStack>
 
             <Menu />
