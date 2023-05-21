@@ -11,10 +11,19 @@ import {
 } from "src/components/Action/Action";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 import { Menu } from "./components/Menu";
+import { SearchResults } from "./components/SearchResults";
 import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
-  const { overlayRef, isExpanded, onExpand, account } = useNavpill();
+  const {
+    overlayRef,
+    isExpanded,
+    onExpand,
+    account,
+    searchQuery,
+    onSearch,
+    searchResults,
+  } = useNavpill();
   return (
     <Box
       id="navpill-overlay"
@@ -78,7 +87,11 @@ export function Navpill() {
               )}
             </HStack>
 
-            <Menu />
+            {searchResults.length ? (
+              <SearchResults results={searchResults} />
+            ) : (
+              <Menu />
+            )}
           </SlideFade>
 
           {account ? (
@@ -94,7 +107,10 @@ export function Navpill() {
                     variant="outline"
                     border="none"
                     size="sm"
-                    placeholder="Search anything..."
+                    placeholder="Search disabled..."
+                    isDisabled
+                    value={searchQuery}
+                    onChange={onSearch}
                   />
                   <Close onClick={onExpand} />
                 </>
@@ -119,7 +135,10 @@ export function Navpill() {
                   <Input
                     variant="outline"
                     border="none"
-                    placeholder="Search anything..."
+                    placeholder="Search disabled..."
+                    isDisabled
+                    value={searchQuery}
+                    onChange={onSearch}
                   />
                   <Close onClick={onExpand} />
                 </>
