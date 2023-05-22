@@ -26,7 +26,10 @@ func (s *service) ListAll(
 	max int,
 	opts Params,
 ) ([]*thread.Thread, error) {
-	q := []thread.Query{}
+	q := []thread.Query{
+		// User's drafts are always private so we always filter published only.
+		thread.HasStatus(thread.StatusPublished),
+	}
 
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.HasAuthor(a)) })
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.HasTags(a)) })

@@ -11,11 +11,11 @@ import { FormEvent } from "react";
 import { Controller } from "react-hook-form";
 import { Editor } from "src/components/Editor";
 import { CategorySelect } from "./components/CategorySelect/CategorySelect";
-import { useComposeScreen } from "./useComposeScreen";
+import { Props, useComposeScreen } from "./useComposeScreen";
 
-export function ComposeScreen() {
-  const { onSubmit, handleSubmit, control, isValid, errors, isSubmitting } =
-    useComposeScreen();
+export function ComposeScreen(props: Props) {
+  const { onSave, onPublish, control, isValid, errors, isSubmitting } =
+    useComposeScreen(props);
 
   return (
     <VStack
@@ -26,7 +26,7 @@ export function ComposeScreen() {
     >
       <VStack
         as="form"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={onPublish}
         alignItems="start"
         w="full"
         gap={2}
@@ -68,6 +68,10 @@ export function ComposeScreen() {
             gap={2}
             alignItems="end"
           >
+            <Button variant="outline" isDisabled={!isValid} onClick={onSave}>
+              Save
+            </Button>
+
             <Button
               type="submit"
               isDisabled={!isValid}

@@ -27,6 +27,7 @@ type Thread struct {
 	Author   post.Author
 	Tags     []string
 	Category category.Category
+	Status   Status
 	Posts    []*post.Post
 	Reacts   []*react.React
 	Meta     map[string]any
@@ -70,6 +71,7 @@ func FromModel(m *ent.Post) *Thread {
 		},
 		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
+		Status:   NewStatusFromEnt(m.Status),
 		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:     m.Metadata,
