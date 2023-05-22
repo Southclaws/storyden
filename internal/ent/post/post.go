@@ -3,6 +3,7 @@
 package post
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/rs/xid"
@@ -37,6 +38,8 @@ const (
 	FieldShort = "short"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -116,6 +119,7 @@ var Columns = []string{
 	FieldBody,
 	FieldShort,
 	FieldMetadata,
+	FieldStatus,
 	FieldCategoryID,
 }
 
@@ -160,3 +164,29 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusDraft is the default value of the Status enum.
+const DefaultStatus = StatusDraft
+
+// Status values.
+const (
+	StatusDraft     Status = "draft"
+	StatusPublished Status = "published"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusDraft, StatusPublished:
+		return nil
+	default:
+		return fmt.Errorf("post: invalid enum value for status field: %q", s)
+	}
+}

@@ -26,6 +26,7 @@ type Service interface {
 		body string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
+		status thread.Status,
 		tags []string,
 		meta map[string]any,
 	) (*thread.Thread, error)
@@ -54,6 +55,7 @@ type Partial struct {
 	Body     opt.Optional[string]
 	Tags     opt.Optional[[]xid.ID]
 	Category opt.Optional[xid.ID]
+	Status   opt.Optional[thread.Status]
 	Meta     opt.Optional[map[string]any]
 }
 

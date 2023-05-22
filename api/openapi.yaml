@@ -929,6 +929,13 @@ components:
       format: xid-prefixed-kebab-case-string
       example: "cc5lnd2s1s4652adtu50-top-10-movies-thread"
 
+    ThreadStatus:
+      description:
+        A thread can be in a draft state while the owner makes changes to the
+        content. Once they are happy with it, they can publish the thread.
+      type: string
+      enum: [draft, published]
+
     CommonProperties:
       type: object
       required:
@@ -1503,12 +1510,14 @@ components:
         - title
         - body
         - category
+        - status
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostBodyMarkdown" }
         tags: { $ref: "#/components/schemas/TagListIDs" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
+        status: { $ref: "#/components/schemas/ThreadStatus" }
 
     ThreadMutableProps:
       type: object
@@ -1518,6 +1527,7 @@ components:
         tags: { $ref: "#/components/schemas/TagListIDs" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
+        status: { $ref: "#/components/schemas/ThreadStatus" }
 
     ThreadReference:
       description: |

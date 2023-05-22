@@ -215,7 +215,9 @@ func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 			t.Author.ID,
 			t.Category.ID,
 			t.Tags,
-			thread.WithID(t.ID))
+			thread.WithID(t.ID),
+			thread.WithStatus(thread.StatusPublished),
+		)
 		if err != nil {
 			if ent.IsConstraintError(err) {
 				continue

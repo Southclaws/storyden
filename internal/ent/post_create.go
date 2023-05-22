@@ -164,6 +164,20 @@ func (pc *PostCreate) SetMetadata(m map[string]interface{}) *PostCreate {
 	return pc
 }
 
+// SetStatus sets the "status" field.
+func (pc *PostCreate) SetStatus(po post.Status) *PostCreate {
+	pc.mutation.SetStatus(po)
+	return pc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (pc *PostCreate) SetNillableStatus(po *post.Status) *PostCreate {
+	if po != nil {
+		pc.SetStatus(*po)
+	}
+	return pc
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
 	pc.mutation.SetCategoryID(x)
@@ -353,6 +367,10 @@ func (pc *PostCreate) defaults() {
 		v := post.DefaultPinned
 		pc.mutation.SetPinned(v)
 	}
+	if _, ok := pc.mutation.Status(); !ok {
+		v := post.DefaultStatus
+		pc.mutation.SetStatus(v)
+	}
 	if _, ok := pc.mutation.ID(); !ok {
 		v := post.DefaultID()
 		pc.mutation.SetID(v)
@@ -378,6 +396,14 @@ func (pc *PostCreate) check() error {
 	}
 	if _, ok := pc.mutation.Short(); !ok {
 		return &ValidationError{Name: "short", err: errors.New(`ent: missing required field "Post.short"`)}
+	}
+	if _, ok := pc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Post.status"`)}
+	}
+	if v, ok := pc.mutation.Status(); ok {
+		if err := post.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+		}
 	}
 	if v, ok := pc.mutation.ID(); ok {
 		if err := post.IDValidator(v.String()); err != nil {
@@ -462,6 +488,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
+	}
+	if value, ok := pc.mutation.Status(); ok {
+		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -839,6 +869,18 @@ func (u *PostUpsert) ClearMetadata() *PostUpsert {
 	return u
 }
 
+// SetStatus sets the "status" field.
+func (u *PostUpsert) SetStatus(v post.Status) *PostUpsert {
+	u.Set(post.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *PostUpsert) UpdateStatus() *PostUpsert {
+	u.SetExcluded(post.FieldStatus)
+	return u
+}
+
 // SetCategoryID sets the "category_id" field.
 func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
@@ -1101,6 +1143,20 @@ func (u *PostUpsertOne) UpdateMetadata() *PostUpsertOne {
 func (u *PostUpsertOne) ClearMetadata() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *PostUpsertOne) SetStatus(v post.Status) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateStatus() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateStatus()
 	})
 }
 
@@ -1532,6 +1588,20 @@ func (u *PostUpsertBulk) UpdateMetadata() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearMetadata() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *PostUpsertBulk) SetStatus(v post.Status) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateStatus() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateStatus()
 	})
 }
 

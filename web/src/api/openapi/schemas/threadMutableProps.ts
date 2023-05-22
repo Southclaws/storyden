@@ -10,6 +10,7 @@ import type { PostBodyMarkdown } from "./postBodyMarkdown";
 import type { TagListIDs } from "./tagListIDs";
 import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
+import type { ThreadStatus } from "./threadStatus";
 
 export interface ThreadMutableProps {
   title?: ThreadTitle;
@@ -17,4 +18,5 @@ export interface ThreadMutableProps {
   tags?: TagListIDs;
   meta?: Metadata;
   category?: Identifier;
+  status?: ThreadStatus;
 }

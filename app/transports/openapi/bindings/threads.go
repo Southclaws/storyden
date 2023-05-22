@@ -7,12 +7,14 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -39,6 +41,11 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	status, err := deserialiseThreadStatus(request.Body.Status)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var meta map[string]any
 	if request.Body.Meta != nil {
 		meta = *request.Body.Meta
@@ -51,6 +58,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		request.Body.Body,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
+		status,
 		tags.OrZero(),
 		meta,
 	)
@@ -69,11 +77,17 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	status, err := opt.MapErr(opt.NewPtr(request.Body.Status), deserialiseThreadStatus)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:    opt.NewPtr(request.Body.Title),
 		Body:     opt.NewPtr(request.Body.Body),
 		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
 		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
+		Status:   status,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -148,4 +162,13 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	return openapi.ThreadGet200JSONResponse{
 		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(serialiseThread(thread)),
 	}, nil
+}
+
+func deserialiseThreadStatus(in openapi.ThreadStatus) (thread.Status, error) {
+	s, err := thread.NewStatus(string(in))
+	if err != nil {
+		return thread.Status{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return s, nil
 }

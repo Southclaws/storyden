@@ -45,6 +45,7 @@ func (s *service) Update(ctx context.Context, threadID post.PostID, partial Part
 	partial.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
 	partial.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	partial.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
+	partial.Status.Call(func(v thread.Status) { opts = append(opts, thread.WithStatus(v)) })
 	partial.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)

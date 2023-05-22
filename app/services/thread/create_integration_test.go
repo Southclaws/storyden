@@ -9,6 +9,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/seed"
+	thread_repo "github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/internal/integration"
 )
@@ -22,7 +23,14 @@ func TestThreadCreate(t *testing.T) {
 		r := require.New(t)
 		a := assert.New(t)
 
-		t, err := thread_svc.Create(ctx, "New thread", "hi there", seed.Account_002_Frigg.ID, seed.Category_01_General.ID, []string{"hello"}, nil)
+		t, err := thread_svc.Create(ctx,
+			"New thread",
+			"hi there",
+			seed.Account_002_Frigg.ID,
+			seed.Category_01_General.ID,
+			thread_repo.StatusPublished,
+			[]string{"hello"},
+			nil)
 		r.NoError(err)
 		r.NotNil(t)
 

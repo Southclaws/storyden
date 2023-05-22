@@ -3304,6 +3304,7 @@ type PostMutation struct {
 	body            *string
 	short           *string
 	metadata        *map[string]interface{}
+	status          *post.Status
 	clearedFields   map[string]struct{}
 	author          *xid.ID
 	clearedauthor   bool
@@ -3944,6 +3945,42 @@ func (m *PostMutation) ResetMetadata() {
 	delete(m.clearedFields, post.FieldMetadata)
 }
 
+// SetStatus sets the "status" field.
+func (m *PostMutation) SetStatus(po post.Status) {
+	m.status = &po
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *PostMutation) Status() (r post.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldStatus(ctx context.Context) (v post.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *PostMutation) ResetStatus() {
+	m.status = nil
+}
+
 // SetCategoryID sets the "category_id" field.
 func (m *PostMutation) SetCategoryID(x xid.ID) {
 	m.category = &x
@@ -4386,7 +4423,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -4423,6 +4460,9 @@ func (m *PostMutation) Fields() []string {
 	if m.metadata != nil {
 		fields = append(fields, post.FieldMetadata)
 	}
+	if m.status != nil {
+		fields = append(fields, post.FieldStatus)
+	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -4458,6 +4498,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Short()
 	case post.FieldMetadata:
 		return m.Metadata()
+	case post.FieldStatus:
+		return m.Status()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -4493,6 +4535,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldShort(ctx)
 	case post.FieldMetadata:
 		return m.OldMetadata(ctx)
+	case post.FieldStatus:
+		return m.OldStatus(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -4587,6 +4631,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMetadata(v)
+		return nil
+	case post.FieldStatus:
+		v, ok := value.(post.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
@@ -4724,6 +4775,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldMetadata:
 		m.ResetMetadata()
+		return nil
+	case post.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()

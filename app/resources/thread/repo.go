@@ -83,6 +83,12 @@ func WithCategory(v xid.ID) Option {
 	}
 }
 
+func WithStatus(v Status) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetStatus(v.ToEnt())
+	}
+}
+
 func WithMeta(meta map[string]any) Option {
 	return func(m *ent.PostMutation) {
 		m.SetMetadata(meta)
@@ -106,5 +112,11 @@ func HasTags(ids []xid.ID) Query {
 func HasCategories(ids []string) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(post.HasCategoryWith(category.NameIn(ids...)))
+	}
+}
+
+func HasStatus(status Status) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(post.StatusEQ(status.ToEnt()))
 	}
 }

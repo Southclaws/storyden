@@ -184,6 +184,20 @@ func (pu *PostUpdate) ClearMetadata() *PostUpdate {
 	return pu
 }
 
+// SetStatus sets the "status" field.
+func (pu *PostUpdate) SetStatus(po post.Status) *PostUpdate {
+	pu.mutation.SetStatus(po)
+	return pu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableStatus(po *post.Status) *PostUpdate {
+	if po != nil {
+		pu.SetStatus(*po)
+	}
+	return pu
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
 	pu.mutation.SetCategoryID(x)
@@ -469,6 +483,11 @@ func (pu *PostUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *PostUpdate) check() error {
+	if v, ok := pu.mutation.Status(); ok {
+		if err := post.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+		}
+	}
 	if _, ok := pu.mutation.AuthorID(); pu.mutation.AuthorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
@@ -531,6 +550,9 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
+	}
+	if value, ok := pu.mutation.Status(); ok {
+		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
 	}
 	if pu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1060,6 +1082,20 @@ func (puo *PostUpdateOne) ClearMetadata() *PostUpdateOne {
 	return puo
 }
 
+// SetStatus sets the "status" field.
+func (puo *PostUpdateOne) SetStatus(po post.Status) *PostUpdateOne {
+	puo.mutation.SetStatus(po)
+	return puo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableStatus(po *post.Status) *PostUpdateOne {
+	if po != nil {
+		puo.SetStatus(*po)
+	}
+	return puo
+}
+
 // SetCategoryID sets the "category_id" field.
 func (puo *PostUpdateOne) SetCategoryID(x xid.ID) *PostUpdateOne {
 	puo.mutation.SetCategoryID(x)
@@ -1358,6 +1394,11 @@ func (puo *PostUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *PostUpdateOne) check() error {
+	if v, ok := puo.mutation.Status(); ok {
+		if err := post.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+		}
+	}
 	if _, ok := puo.mutation.AuthorID(); puo.mutation.AuthorCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
@@ -1437,6 +1478,9 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if puo.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
+	}
+	if value, ok := puo.mutation.Status(); ok {
+		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
 	}
 	if puo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
