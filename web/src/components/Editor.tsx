@@ -1,22 +1,16 @@
-import { Box, Flex, HStack } from "@chakra-ui/react";
-
-import { AllStyledComponent } from "@remirror/styles/emotion";
-import { ExtensionPriority } from "remirror";
-
+import { Box, Flex } from "@chakra-ui/react";
 import {
-  BasicFormattingButtonGroup,
   EditorComponent,
   FloatingToolbar,
-  HeadingLevelButtonGroup,
   Remirror,
   TableComponents,
   TableExtension,
   ThemeProvider,
-  Toolbar,
-  VerticalDivider,
   useRemirror,
 } from "@remirror/react";
-
+import { AllStyledComponent } from "@remirror/styles/emotion";
+import { PropsWithChildren } from "react";
+import { ExtensionPriority } from "remirror";
 import {
   BlockquoteExtension,
   BoldExtension,
@@ -63,7 +57,11 @@ type Props = {
   value?: string;
 };
 
-export function Editor({ onChange, value }: Props) {
+export function Editor({
+  children,
+  onChange,
+  value,
+}: PropsWithChildren<Props>) {
   const { manager, state, setState, getContext } = useRemirror({
     extensions,
     stringHandler: "markdown",
@@ -98,13 +96,7 @@ export function Editor({ onChange, value }: Props) {
             }}
           >
             <Flex flexDir="column" width="full" minHeight="6em">
-              <Toolbar>
-                <HStack width="full" justifyContent="start">
-                  <BasicFormattingButtonGroup />
-                  <VerticalDivider />
-                  <HeadingLevelButtonGroup />
-                </HStack>
-              </Toolbar>
+              {children}
 
               <EditorComponent />
 

@@ -9,12 +9,21 @@ import {
 } from "@chakra-ui/react";
 import { FormEvent } from "react";
 import { Controller } from "react-hook-form";
+import {
+  Back,
+  Bold,
+  Italic,
+  Save,
+  Send,
+  Underline,
+} from "src/components/Action/Action";
 import { Editor } from "src/components/Editor";
+import { Toolpill } from "src/components/Toolpill";
 import { CategorySelect } from "./components/CategorySelect/CategorySelect";
 import { Props, useComposeScreen } from "./useComposeScreen";
 
 export function ComposeScreen(props: Props) {
-  const { onSave, onPublish, control, isValid, errors, isSubmitting } =
+  const { onBack, onSave, onPublish, control, isValid, errors, isSubmitting } =
     useComposeScreen(props);
 
   return (
@@ -62,6 +71,7 @@ export function ComposeScreen(props: Props) {
           </HStack>
 
           <HStack
+            display={{ base: "none", md: "flex" }}
             flex="1 0 auto"
             maxWidth="min-content"
             flexDir={{ base: "column-reverse", md: "row" }}
@@ -105,7 +115,30 @@ export function ComposeScreen(props: Props) {
         </HStack>
 
         <Controller
-          render={({ field }) => <Editor onChange={field.onChange} />}
+          render={({ field }) => (
+            <Editor onChange={field.onChange}>
+              <HStack display={{ base: "none", md: "flex" }}>
+                <Bold />
+                <Italic />
+                <Underline />
+              </HStack>
+
+              <Toolpill w="min-content" display={{ base: "flex", md: "none" }}>
+                <VStack>
+                  <HStack>
+                    <Bold />
+                    <Italic />
+                    <Underline />
+                  </HStack>
+                  <HStack>
+                    <Back onClick={onBack} />
+                    <Send onClick={onPublish} />
+                    <Save onClick={onSave} />
+                  </HStack>
+                </VStack>
+              </Toolpill>
+            </Editor>
+          )}
           control={control}
           name="body"
         />

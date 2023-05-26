@@ -2,16 +2,19 @@ import { Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { Byline } from "src/screens/thread/components/Byline";
 import { ThreadMenu } from "./ThreadMenu/ThreadMenu";
+import NextLink from "next/link";
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
   const permalink = `/t/${props.thread.slug}`;
 
   return (
-    <Flex as="section" flexDir="column" py={2} width="full">
-      <LinkBox>
+    <Flex as="section" flexDir="column" py={2} width="full" gap={2}>
+      <LinkBox as="article">
         <Flex justifyContent="space-between">
           <Heading size="sm">
-            <LinkOverlay href={permalink}>{props.thread.title}</LinkOverlay>
+            <LinkOverlay as={NextLink} href={permalink}>
+              {props.thread.title}
+            </LinkOverlay>
           </Heading>
         </Flex>
 

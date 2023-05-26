@@ -1,4 +1,4 @@
-import { Editable, Heading, Input, VStack } from "@chakra-ui/react";
+import { Heading, Input, VStack } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
 import { CategoryPill } from "src/components/CategoryPill";
