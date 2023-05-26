@@ -1,19 +1,28 @@
-import { Box, Flex, Spinner } from "@chakra-ui/react";
+import { Flex, SkeletonText } from "@chakra-ui/react";
+import { PropsWithChildren } from "react";
 import { APIError } from "src/api/openapi/schemas";
 import ErrorBanner from "./ErrorBanner";
 
-export function Unready(props: Partial<APIError>) {
-  if (!props.error)
+export function Unready(props: PropsWithChildren<Partial<APIError>>) {
+  if (!props.error) {
     return (
-      <Flex width="full" justifyContent="center" p={12}>
-        <Spinner
-          thickness="4px"
-          speed="0.65s"
-          color="hsl(0, 0%, 75%)"
-          size="xl"
-        />
+      <Flex
+        flexDirection="column"
+        width="full"
+        justifyContent="center"
+        p={4}
+        gap={4}
+      >
+        {props.children ?? (
+          <>
+            <SkeletonText noOfLines={4} />
+            <SkeletonText noOfLines={4} />
+            <SkeletonText noOfLines={4} />
+          </>
+        )}
       </Flex>
     );
+  }
 
   return <ErrorBanner error={props.error} message={props.message} />;
 }

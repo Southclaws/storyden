@@ -36,6 +36,10 @@ export function useComposeScreen({ editing }: Props) {
     },
   });
 
+  function onBack() {
+    router.back();
+  }
+
   const onSave = handleSubmit(async (props: ThreadCreate) => {
     if (editing) {
       await threadUpdate(editing, {
@@ -90,6 +94,7 @@ export function useComposeScreen({ editing }: Props) {
   );
 
   return {
+    onBack,
     isValid,
     onSave,
     onPublish,
