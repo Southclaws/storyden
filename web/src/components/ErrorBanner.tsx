@@ -1,15 +1,13 @@
-import { Flex, Heading, Box, Text } from "@chakra-ui/layout";
-import React, { FC } from "react";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { CreateToastFnReturn } from "@chakra-ui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { APIError } from "src/api/openapi/schemas";
 
 type Props = {
-  error: string;
   message?: string | undefined;
 };
 
-const ErrorBanner: FC<Props> = ({ error, message, ...rest }) => {
+export default function ErrorBanner({ message, ...rest }: Props) {
   return (
     <Flex width="full" justifyContent="center">
       <Flex flexDir="column" gap={2} bgColor="red.50" borderRadius="xl" p={4}>
@@ -35,9 +33,7 @@ const ErrorBanner: FC<Props> = ({ error, message, ...rest }) => {
       </Flex>
     </Flex>
   );
-};
-
-export default ErrorBanner;
+}
 
 export const errorToast = (toast: CreateToastFnReturn) => (e: APIError) => {
   console.error(e);
