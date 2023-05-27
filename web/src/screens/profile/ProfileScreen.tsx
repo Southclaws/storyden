@@ -1,10 +1,10 @@
 import { Unready } from "src/components/Unready";
-import { useProfileScreen } from "./useProfileScreen";
+import { Props, useProfileScreen } from "./useProfileScreen";
 import { Profile } from "./components/Profile";
 import { Flex } from "@chakra-ui/react";
 
-export function ProfileScreen() {
-  const profile = useProfileScreen();
+export function ProfileScreen(props: Props) {
+  const profile = useProfileScreen(props);
 
   if (!profile.ready) return <Unready {...profile.error} />;
 

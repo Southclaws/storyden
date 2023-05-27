@@ -24,5 +24,5 @@ export function Unready(props: PropsWithChildren<Partial<APIError>>) {
     );
   }
 
-  return <ErrorBanner error={props.error} message={props.message} />;
+  return <ErrorBanner message={props.message} />;
 }
