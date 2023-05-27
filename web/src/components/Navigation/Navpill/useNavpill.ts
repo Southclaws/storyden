@@ -1,15 +1,13 @@
-import { useOutsideClick } from "@chakra-ui/react";
 import { debounce } from "lodash";
 import { useRouter } from "next/router";
-import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { postSearch } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { useAuthProvider } from "src/auth/useAuthProvider";
 
 export function useNavpill() {
   const { asPath } = useRouter();
-  const overlayRef = useRef<HTMLDivElement>() as RefObject<HTMLDivElement>;
-  const [isExpanded, setExpanded] = useState(false);
+  const [isExpanded, setExpanded] = useState(true);
   const { account } = useAuthProvider();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PostProps[]>([]);
@@ -18,14 +16,15 @@ export function useNavpill() {
 
   useEffect(() => setExpanded(false), [asPath]);
 
-  useOutsideClick({
-    ref: overlayRef,
-    handler: () => setExpanded(false),
-  });
+  function onExpand() {
+    console.log("onExpand");
+    setExpanded(true);
+  }
 
-  const onExpand = () => {
-    setExpanded(!isExpanded);
-  };
+  function onClose() {
+    console.log("onClose");
+    setExpanded(false);
+  }
 
   const doSearch = debounce(async (v: string) => {
     postSearch({ body: v })
@@ -49,9 +48,9 @@ export function useNavpill() {
   }
 
   return {
-    overlayRef,
     isExpanded,
     onExpand,
+    onClose,
     account,
     searchQuery,
     onSearch,
