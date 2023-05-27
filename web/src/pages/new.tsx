@@ -1,6 +1,15 @@
 import { useRouter } from "next/router";
-import { ComposeScreen } from "src/screens/compose/ComposeScreen";
 import { z } from "zod";
+import dynamic from "next/dynamic";
+
+// NOTE: Render client side, probably unnecessary but quick fix to react errors.
+const ComposeScreen = dynamic(
+  () =>
+    import("../screens/compose/ComposeScreen").then((mod) => mod.ComposeScreen),
+  {
+    ssr: false,
+  }
+);
 
 export const DraftQuerySchema = z.object({
   id: z.string().optional(),
