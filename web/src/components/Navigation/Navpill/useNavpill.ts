@@ -17,12 +17,10 @@ export function useNavpill() {
   useEffect(() => setExpanded(false), [asPath]);
 
   function onExpand() {
-    console.log("onExpand");
     setExpanded(true);
   }
 
   function onClose() {
-    console.log("onClose");
     setExpanded(false);
   }
 

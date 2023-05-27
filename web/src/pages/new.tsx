@@ -11,7 +11,5 @@ export default function Page() {
   const { query } = useRouter();
   const { id } = DraftQuerySchema.parse(query);
 
-  console.log("EDITING", id);
-
   return <ComposeScreen editing={id} />;
 }
