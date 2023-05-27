@@ -155,7 +155,24 @@ export function Close({ "aria-label": al, ...props }: WithOptionalARIALabel) {
   );
 }
 
-export function Back({ "aria-label": al, ...props }: WithOptionalARIALabel) {
+export function Back({
+  href,
+  "aria-label": al,
+  ...props
+}: WithOptionalARIALabel & WithOptionalURL) {
+  if (href)
+    return (
+      <Action
+        href={href}
+        size="sm"
+        title="Back"
+        aria-label={al ?? "back"}
+        {...props}
+      >
+        <ArrowLeftIcon width="1.4em" />
+      </Action>
+    );
+
   return (
     <ActionButton
       size="sm"

@@ -1,37 +1,27 @@
-import { Box, Heading, List, ListItem, Text, VStack } from "@chakra-ui/react";
-import { KeyIcon } from "@heroicons/react/20/solid";
-import { useAuthProviderList } from "src/api/openapi/auth";
+import { List, ListItem, VStack } from "@chakra-ui/react";
 import { AuthProvider } from "src/api/openapi/schemas";
-import { AuthSelectionOption } from "./AuthSelectionOption";
+import { Unready } from "src/components/Unready";
+import { AuthSelectionOption } from "../AuthSelectionOption";
+import { useAuthSelection } from "./useAuthSelection";
 
 export function AuthSelection() {
-  const { data, error } = useAuthProviderList();
+  const { data, error } = useAuthSelection();
 
-  if (error) throw error;
+  if (!data) <Unready {...error} />;
 
   // sort by alphabetical because lazy
   // TODO: allow the order to be configured by the admin.
   data?.providers?.sort((a, b) => a.provider.localeCompare(b.provider));
 
   return (
-    <VStack gap={4}>
-      <Box>
-        <Heading size="md">
-          Sign up
-          <br />
-        </Heading>
-        <Text size="sm" fontWeight="medium" color="blackAlpha.600">
-          or sign in
-        </Text>
-      </Box>
-
+    <VStack w="full" gap={4}>
       <List display="flex" flexDir="column" gap={4} w="full">
         {data?.providers?.map((v: AuthProvider) => (
           <ListItem key={v.provider}>
             <AuthSelectionOption
               name={v.name}
               method={v.provider}
-              icon={<KeyIcon height="100%" />}
+              icon={v.logo_url}
               link={v.link || undefined}
             />
           </ListItem>
