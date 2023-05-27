@@ -16,20 +16,24 @@ type UseAuthProvider = {
 
 export function useAuthProvider(): UseAuthProvider {
   const { push, pathname } = useRouter();
-  const account = useAccountGet();
+  const { isLoading, data, error } = useAccountGet();
 
-  const loggedIn = Boolean(account.data) && !account.error;
-  const firstTime = account.data === undefined && account.error === undefined;
+  const loggedIn = Boolean(data) && !error;
+  const firstTime = data === undefined && error === undefined;
   const isPrivate = pathname && privatePage(pathname);
 
   useEffect(() => {
+    if (isLoading) return;
+
     if (!loggedIn && isPrivate) {
+      console.log("redirecting to /auth");
       push("/auth");
     }
     if (loggedIn && pathname === "/auth") {
+      console.log("redirecting to /");
       push("/");
     }
-  }, [loggedIn, isPrivate, pathname, push]);
+  }, [isLoading, loggedIn, isPrivate, pathname, push]);
 
-  return { firstTime, account: account.data };
+  return { firstTime, account: data };
 }
