@@ -12,20 +12,21 @@ import {
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";
-import { Toolpill } from "src/components/Toolpill";
+import { Toolpill } from "src/components/Toolpill/Toolpill";
 import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
   const {
     isExpanded,
     onExpand,
+    onClose,
     account,
     searchQuery,
     onSearch,
     searchResults,
   } = useNavpill();
   return (
-    <Toolpill>
+    <Toolpill onClickOutside={onClose}>
       <SlideFade
         in={isExpanded}
         style={{
@@ -72,7 +73,7 @@ export function Navpill() {
                 value={searchQuery}
                 onChange={onSearch}
               />
-              <Close onClick={onExpand} />
+              <Close onClick={onClose} />
             </>
           ) : (
             <>
@@ -97,7 +98,7 @@ export function Navpill() {
                 value={searchQuery}
                 onChange={onSearch}
               />
-              <Close onClick={onExpand} />
+              <Close onClick={onClose} />
             </>
           ) : (
             <>

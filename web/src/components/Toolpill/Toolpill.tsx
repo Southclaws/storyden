@@ -1,7 +1,9 @@
 import { Box, Flex, FlexProps } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+import { Props, useToolpill } from "./useToolpill";
 
-export function Toolpill(props: PropsWithChildren<FlexProps>) {
+export function Toolpill(props: PropsWithChildren<FlexProps & Props>) {
+  const { ref } = useToolpill(props);
   return (
     <Box
       id="toolpill-overlay"
@@ -24,6 +26,7 @@ export function Toolpill(props: PropsWithChildren<FlexProps>) {
         flexDir="column"
       >
         <Flex
+          ref={ref}
           p={1}
           gap={2}
           flexDirection="column"

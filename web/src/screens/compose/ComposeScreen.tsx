@@ -18,7 +18,7 @@ import {
   Underline,
 } from "src/components/Action/Action";
 import { Editor } from "src/components/Editor";
-import { Toolpill } from "src/components/Toolpill";
+import { Toolpill } from "src/components/Toolpill/Toolpill";
 import { CategorySelect } from "./components/CategorySelect/CategorySelect";
 import { Props, useComposeScreen } from "./useComposeScreen";
 
