@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   FormLabel,
-  Heading,
   HStack,
   Input,
   VStack,
@@ -16,7 +15,6 @@ export function Password() {
 
   return (
     <VStack gap={4}>
-      <Heading size="sm">Sign up</Heading>
       <Box as="form" width="full">
         <VStack>
           <Input

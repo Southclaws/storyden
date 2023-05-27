@@ -1,7 +1,7 @@
 import { useAuthProviderList } from "src/api/openapi/auth";
 
 export function useAuthSelection() {
-  const authProviderList = useAuthProviderList();
+  const { data, error } = useAuthProviderList();
 
-  return authProviderList;
+  return { data, error };
 }
