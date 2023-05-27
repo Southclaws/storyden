@@ -11,7 +11,6 @@ export function useToolpill({ onClickOutside }: Props) {
   useOutsideClick({
     ref: ref,
     handler: () => {
-      console.log("click outside toolpill");
       onClickOutside?.();
     },
   });
