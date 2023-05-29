@@ -27,6 +27,8 @@ func Start(ctx context.Context) {
 	app := fx.New(
 		fx.NopLogger,
 
+		fx.Provide(func() context.Context { return ctx }),
+
 		config.Build(),
 		infrastructure.Build(),
 		resources.Build(),

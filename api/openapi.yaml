@@ -900,11 +900,13 @@ components:
     Info:
       description: Basic public information about the Storyden installation.
       type: object
-      required: [title, description]
+      required: [title, description, accent_colour]
       properties:
         title:
           type: string
         description:
+          type: string
+        accent_colour:
           type: string
 
     ContentKind:

@@ -15,9 +15,37 @@ type database struct {
 	db *ent.Client
 }
 
-func New(db *ent.Client) Repository {
-	// TODO: Write defaults to DB
-	return &database{db}
+func New(ctx context.Context, db *ent.Client) (Repository, error) {
+	d := &database{db}
+
+	if err := d.Init(ctx); err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return d, nil
+}
+
+func (d *database) Init(ctx context.Context) error {
+	r, err := d.db.Setting.Query().Count(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if r > 0 {
+		return nil
+	}
+
+	if err := d.SetValue(ctx, "Title", "Storyden"); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := d.SetValue(ctx, "Description", "A forum for the modern age"); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := d.SetValue(ctx, "AccentColour", "hsl(157, 65%, 44%)"); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
 
 func (d *database) Get(ctx context.Context) (*Settings, error) {
