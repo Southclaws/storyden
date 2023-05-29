@@ -12,4 +12,5 @@
 export interface Info {
   title: string;
   description: string;
+  accent_colour: string;
 }

@@ -2,19 +2,23 @@ import { Box, Flex, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 import { AuthMethod } from "./components/AuthMethod/AuthMethod";
 import { AuthSelection } from "./components/AuthSelection/AuthSelection";
 import { Back } from "src/components/Action/Action";
+import { useInfoProvider } from "src/api/InfoProvider/useInfoProvider";
 
 type Props = {
   method?: string | undefined | null;
 };
 export function AuthScreen({ method }: Props) {
+  const info = useInfoProvider();
+
   return (
     <Flex
+      id="AuthScreen"
       height="100vh"
       width="full"
       justifyContent="center"
       flexDirection="column"
       alignItems="center"
-      backgroundColor="green.500"
+      backgroundColor={info?.accent_colour}
       backgroundPosition="center"
       backgroundSize="cover"
       gap={4}
