@@ -26,7 +26,7 @@ export function Sidebar() {
           lg: "3xs",
         }}
         height="full"
-        p={2}
+        p={4}
       >
         <VStack
           as="nav"
