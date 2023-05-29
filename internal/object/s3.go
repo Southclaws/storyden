@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
@@ -49,6 +50,14 @@ func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {
 func (s *s3Storer) Read(ctx context.Context, path string) (io.Reader, error) {
 	obj, err := s.minioClient.GetObject(ctx, s.bucket, path, minio.GetObjectOptions{})
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = obj.Stat()
+	if err != nil {
+		if minio.ToErrorResponse(err).StatusCode == 404 {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
