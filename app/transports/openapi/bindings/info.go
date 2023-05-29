@@ -28,8 +28,9 @@ func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject)
 
 	return openapi.GetInfo200JSONResponse{
 		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse{
-			Title:       settings.Title.Get(),
-			Description: settings.Description.Get(),
+			Title:        settings.Title.Get(),
+			Description:  settings.Description.Get(),
+			AccentColour: settings.AccentColour.Get(),
 		},
 	}, nil
 }

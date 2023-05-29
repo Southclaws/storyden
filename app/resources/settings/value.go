@@ -42,9 +42,11 @@ func (s *Value[T]) Set(ctx context.Context, r Repository, v T) error {
 func fromEnt(raw []*ent.Setting) (*Settings, error) {
 	s := Settings{}
 
-	rawmap := lo.FromEntries(dt.Map(raw, func(in *ent.Setting) lo.Entry[string, *ent.Setting] {
+	entries := dt.Map(raw, func(in *ent.Setting) lo.Entry[string, *ent.Setting] {
 		return lo.Entry[string, *ent.Setting]{Key: in.ID, Value: in}
-	}))
+	})
+
+	rawmap := lo.FromEntries(entries)
 
 	rt := reflect.TypeOf(s)
 	rv := reflect.ValueOf(&s).Elem()

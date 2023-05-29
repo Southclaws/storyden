@@ -5,11 +5,14 @@ import "context"
 type Settings struct {
 	Title        Value[string]
 	Description  Value[string]
-	AccentColour Value[uint32]
+	AccentColour Value[string]
 	Public       Value[bool]
 }
 
 type Repository interface {
+	// Init initialises with defaults if there are no settings.
+	Init(ctx context.Context) error
+
 	// Get returns all the current settings.
 	Get(ctx context.Context) (*Settings, error)
 
