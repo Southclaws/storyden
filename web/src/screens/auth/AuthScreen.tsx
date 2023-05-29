@@ -18,7 +18,7 @@ export function AuthScreen({ method }: Props) {
       justifyContent="center"
       flexDirection="column"
       alignItems="center"
-      backgroundColor={info?.accent_colour}
+      background={info?.accent_colour}
       backgroundPosition="center"
       backgroundSize="cover"
       gap={4}
