@@ -17,15 +17,15 @@ export function Toolpill(props: PropsWithChildren<FlexProps & Props>) {
       zIndex="overlay"
     >
       <Flex
-        id="flex-container"
+        id="toolpill-flex-outer-container"
         height="full"
-        gap={3}
-        p="min(3vh, 1em)"
+        p="min(4vh, 1em)"
         justifyContent="end"
         alignItems="center"
         flexDir="column"
       >
         <Flex
+          id="toolpill-content-container"
           ref={ref}
           p={1}
           gap={2}
@@ -37,7 +37,10 @@ export function Toolpill(props: PropsWithChildren<FlexProps & Props>) {
           backgroundColor="hsla(210, 38.5%, 94.9%, 0.8)"
           border="1px solid hsla(209, 100%, 20%, 0.02)"
           width="full"
-          maxW={{ base: "23em", md: "container.sm" }}
+          maxW={{
+            base: "23em",
+            md: "container.sm",
+          }}
           justifyContent="space-between"
           alignItems="center"
           pointerEvents="auto"
