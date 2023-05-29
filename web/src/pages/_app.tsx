@@ -2,6 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { ReactElement, ReactNode } from "react";
+import { InfoProvider } from "src/api/InfoProvider/InfoProvider";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { Default } from "src/layouts/Default";
 import { extended } from "src/theme";
@@ -20,9 +21,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ChakraProvider theme={extended}>
-      <AuthProvider>
-        <>{withLayout(<Component {...pageProps} />)}</>
-      </AuthProvider>
+      <InfoProvider>
+        <AuthProvider>
+          <>{withLayout(<Component {...pageProps} />)}</>
+        </AuthProvider>
+      </InfoProvider>
     </ChakraProvider>
   );
 }
