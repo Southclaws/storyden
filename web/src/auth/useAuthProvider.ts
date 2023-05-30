@@ -26,11 +26,9 @@ export function useAuthProvider(): UseAuthProvider {
     if (isLoading) return;
 
     if (!loggedIn && isPrivate) {
-      console.log("redirecting to /auth");
       push("/auth");
     }
     if (loggedIn && pathname === "/auth") {
-      console.log("redirecting to /");
       push("/");
     }
   }, [isLoading, loggedIn, isPrivate, pathname, push]);
