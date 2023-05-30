@@ -13,7 +13,5 @@ export function InfoProvider({ children }: PropsWithChildren) {
     return <ErrorBanner {...error} />;
   }
 
-  console.log(data);
-
   return <InfoContext.Provider value={data}>{children}</InfoContext.Provider>;
 }
