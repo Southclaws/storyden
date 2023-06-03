@@ -1,6 +1,6 @@
 import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { authPasswordSignin, authPasswordSignup } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";

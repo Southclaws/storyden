@@ -1,24 +1,27 @@
-import { useRouter } from "next/router";
+"use client";
+
 import { z } from "zod";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 
 // NOTE: Render client side, probably unnecessary but quick fix to react errors.
 const ComposeScreen = dynamic(
   () =>
-    import("../screens/compose/ComposeScreen").then((mod) => mod.ComposeScreen),
+    import("../../../screens/compose/ComposeScreen").then(
+      (mod) => mod.ComposeScreen
+    ),
   {
     ssr: false,
   }
 );
 
-export const DraftQuerySchema = z.object({
+const QuerySchema = z.object({
   id: z.string().optional(),
 });
-export type DraftQuery = z.infer<typeof DraftQuerySchema>;
 
 export default function Page() {
-  const { query } = useRouter();
-  const { id } = DraftQuerySchema.parse(query);
+  const params = useSearchParams();
+  const { id } = QuerySchema.parse(params);
 
   return <ComposeScreen editing={id} />;
 }

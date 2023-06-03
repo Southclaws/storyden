@@ -1,23 +1,27 @@
+"use client";
+
 import { Box, Flex } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { PropsWithChildren } from "react";
+
 import { Navpill } from "src/components/Navigation/Navpill/Navpill";
 import { Sidebar } from "src/components/Navigation/Sidebar/Sidebar";
 import { SIDEBAR_WIDTH } from "src/components/Navigation/useNavigation";
 
 const ROUTES_WITHOUT_NAVPILL = ["/new"];
 
-const isNavpillShown = (path: string) => ROUTES_WITHOUT_NAVPILL.includes(path);
+const isNavpillShown = (path: string | null) =>
+  ROUTES_WITHOUT_NAVPILL.includes(path ?? "");
 
 export function Default(props: PropsWithChildren) {
-  const router = useRouter();
+  const pathname = usePathname();
   return (
     <Flex width="full" flexDirection="row">
       {/* MOBILE */}
       <Box
         id="mobile-nav-container"
         display={{
-          base: isNavpillShown(router.pathname) ? "none" : "unset",
+          base: isNavpillShown(pathname) ? "none" : "unset",
           md: "none",
         }}
       >

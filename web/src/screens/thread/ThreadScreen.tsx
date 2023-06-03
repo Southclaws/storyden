@@ -1,3 +1,5 @@
+"use client";
+
 import { Unready } from "src/components/Unready";
 import { ThreadView } from "./components/ThreadView/ThreadView";
 import { ThreadScreenContext } from "./context";

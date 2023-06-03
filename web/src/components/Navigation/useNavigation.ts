@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { useGetInfo } from "src/api/openapi/misc";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ export type Query = z.infer<typeof QuerySchema>;
 // the navigation so it's a bit more important that we show something always.
 
 export function useNavigation() {
-  const { query } = useRouter();
+  const query = useSearchParams();
   const { data: infoResult } = useGetInfo();
 
   const { category } = QuerySchema.parse(query);
