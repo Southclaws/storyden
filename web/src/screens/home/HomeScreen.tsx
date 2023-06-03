@@ -1,3 +1,5 @@
+"use client";
+
 import { Unready } from "src/components/Unready";
 import { ThreadList } from "./components/ThreadList";
 import { useHomeScreen } from "./useHomeScreen";
