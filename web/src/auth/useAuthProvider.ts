@@ -1,4 +1,6 @@
-import { useRouter } from "next/router";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAccountGet } from "src/api/openapi/accounts";
 import { Account } from "src/api/openapi/schemas";
@@ -15,8 +17,9 @@ type UseAuthProvider = {
 };
 
 export function useAuthProvider(): UseAuthProvider {
-  const { push, pathname } = useRouter();
   const { isLoading, data, error } = useAccountGet();
+  const { push } = useRouter();
+  const pathname = usePathname();
 
   const loggedIn = Boolean(data) && !error;
   const firstTime = data === undefined && error === undefined;
@@ -26,11 +29,9 @@ export function useAuthProvider(): UseAuthProvider {
     if (isLoading) return;
 
     if (!loggedIn && isPrivate) {
-      console.log("redirecting to /auth");
       push("/auth");
     }
     if (loggedIn && pathname === "/auth") {
-      console.log("redirecting to /");
       push("/");
     }
   }, [isLoading, loggedIn, isPrivate, pathname, push]);

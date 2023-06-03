@@ -1,5 +1,11 @@
 import { Link, LinkProps } from "@chakra-ui/next-js";
-import { IconButton, IconButtonProps, forwardRef } from "@chakra-ui/react";
+
+import {
+  IconButton,
+  IconButtonProps,
+  Link as DumbLink,
+  forwardRef,
+} from "@chakra-ui/react";
 import {
   AdjustmentsHorizontalIcon,
   ArrowLeftIcon,
@@ -17,6 +23,17 @@ import { LogoutIcon } from "../graphics/LogoutIcon";
 import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
 import { SendIcon } from "../graphics/SendIcon";
 import { useCommands } from "@remirror/react";
+
+const actionStyles = {
+  width: 8,
+  height: 8,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: "full",
+  p: 1,
+  _hover: { bgColor: "blackAlpha.50" },
+};
 
 function useClickHandler(onClick: MouseEventHandler | undefined) {
   // This allows us to progressively enhance features on the application by
@@ -38,18 +55,7 @@ function useClickHandler(onClick: MouseEventHandler | undefined) {
 export function Action({ children, onClick, ...props }: LinkProps) {
   const handleClick = useClickHandler(onClick);
   return (
-    <Link
-      width={8}
-      height={8}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      borderRadius="full"
-      p={1}
-      _hover={{ bgColor: "blackAlpha.50" }}
-      onClick={handleClick}
-      {...props}
-    >
+    <Link onClick={handleClick} {...actionStyles} {...props}>
       {children}
     </Link>
   );
@@ -108,10 +114,19 @@ export function Login({ href = "/auth", ...props }: WithOptionalURL) {
 }
 
 export function Logout({ href = "/logout", ...props }: WithOptionalURL) {
+  // We need to use a regular link here (Chakra styled anchor tag) because the
+  // anchor tag provided by Next.js is too clever for logouts! Because the Link
+  // component from Next.js pre-loads pages when the user hovers, this results
+  // in unexpected logouts just from hovering over the logout button, not ideal!
   return (
-    <Action href={href} title="Log out of your session" {...props}>
+    <DumbLink
+      href={href}
+      title="Log out of your session"
+      {...actionStyles}
+      {...props}
+    >
       <LogoutIcon width="1.5em" />
-    </Action>
+    </DumbLink>
   );
 }
 

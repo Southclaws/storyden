@@ -1,10 +1,10 @@
 import { LinkProps } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { Anchor } from "src/components/site/Anchor";
 
 export function NavItem(props: LinkProps) {
-  const { asPath } = useRouter();
-  const selected = props.href === asPath;
+  const pathname = usePathname();
+  const selected = props.href === pathname;
 
   return (
     <Anchor

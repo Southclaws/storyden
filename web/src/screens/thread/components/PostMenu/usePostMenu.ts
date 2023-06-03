@@ -4,7 +4,7 @@ import { useAuthProvider } from "src/auth/useAuthProvider";
 import { useClipboard, useToast } from "@chakra-ui/react";
 import { getPermalinkForPost } from "../../utils";
 import { threadDelete } from "src/api/openapi/threads";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { postDelete } from "src/api/openapi/posts";
 import { mutate } from "swr";
 import { getThreadGetKey } from "src/api/openapi/threads";

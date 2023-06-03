@@ -12,7 +12,7 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/ErrorBanner";
 import * as z from "zod";
