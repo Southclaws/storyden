@@ -1,6 +1,6 @@
 import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useCategoryList } from "src/api/openapi/categories";
 import { ThreadCreateOKResponse, ThreadStatus } from "src/api/openapi/schemas";
@@ -58,14 +58,7 @@ export function useComposeScreen({ editing }: Props) {
 
       if (!id) return;
 
-      router.push(
-        {
-          pathname: "/new",
-          query: { id, edit: "true" },
-        },
-        `/new?id=${id}`,
-        { shallow: true }
-      );
+      router.push(`/new?id=${id}`);
     }
   });
 

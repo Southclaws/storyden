@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Flex, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 import { AuthMethod } from "./components/AuthMethod/AuthMethod";
 import { AuthSelection } from "./components/AuthSelection/AuthSelection";

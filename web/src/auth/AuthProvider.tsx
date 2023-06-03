@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, PropsWithChildren } from "react";
 import { Account } from "src/api/openapi/schemas";
 import { useAuthProvider } from "./useAuthProvider";

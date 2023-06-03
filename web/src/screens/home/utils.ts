@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { WEB_ADDRESS } from "src/config";
 import { z } from "zod";
 
@@ -12,9 +12,9 @@ export const QuerySchema = z.object({
 export type Query = z.infer<typeof QuerySchema>;
 
 export function useQueryParameters() {
-  const { query } = useRouter();
+  const params = useParams();
 
-  const { category } = QuerySchema.parse(query);
+  const { category } = QuerySchema.parse(params);
 
   return { category };
 }
