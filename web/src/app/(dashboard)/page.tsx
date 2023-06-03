@@ -6,5 +6,5 @@ export default async function Page() {
 
 export const metadata = {
   title: "Storyden",
-  description: "(Demo) A forum for the modern age.",
+  description: "A forum for the modern age.",
 };
