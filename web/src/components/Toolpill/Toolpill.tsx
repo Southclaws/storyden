@@ -1,9 +1,13 @@
 import { Box, Flex, FlexProps } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
 import { Props, useToolpill } from "./useToolpill";
 
-export function Toolpill(props: PropsWithChildren<FlexProps & Props>) {
-  const { ref } = useToolpill(props);
+export function Toolpill({
+  onClickOutside,
+  ...props
+}: PropsWithChildren<FlexProps & Props>) {
+  const { ref } = useToolpill({ onClickOutside, ...props });
   return (
     <Box
       id="toolpill-overlay"
