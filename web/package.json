@@ -32,6 +32,8 @@
     "react-hook-form": "^7.34.2",
     "react-markdown": "^8.0.4",
     "remirror": "^2.0.23",
+    "slate": "^0.94.1",
+    "slate-react": "^0.95.0",
     "swr": "^2.0.0",
     "zod": "^3.19.0"
   },
