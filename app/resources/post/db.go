@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -29,7 +29,7 @@ func (d *database) Create(
 	body string,
 	authorID account.AccountID,
 	parentID PostID,
-	replyToID optional.Optional[PostID],
+	replyToID opt.Optional[PostID],
 	meta map[string]any,
 	opts ...Option,
 ) (*Post, error) {
@@ -60,7 +60,7 @@ func (d *database) Create(
 		fn(q.Mutation())
 	}
 
-	replyToID.If(func(value PostID) {
+	replyToID.Call(func(value PostID) {
 		q.SetReplyToID(xid.ID(value))
 	})
 

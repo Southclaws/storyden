@@ -3,7 +3,6 @@ module github.com/Southclaws/storyden
 go 1.19
 
 require (
-	4d63.com/optional v0.2.0
 	ariga.io/atlas v0.10.1 // indirect
 	entgo.io/ent v0.11.10
 	github.com/99designs/gqlgen v0.17.26
@@ -33,7 +32,7 @@ require (
 	golang.org/x/oauth2 v0.6.0
 )
 
-require github.com/Southclaws/fault v0.5.1
+require github.com/Southclaws/fault v0.6.0
 
 require (
 	github.com/Southclaws/opt v0.6.0
@@ -51,7 +50,6 @@ require (
 )
 
 require (
-	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe // indirect
 	github.com/dave/jennifer v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
@@ -63,7 +61,6 @@ require (
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
-	github.com/hedwigz/entviz v0.0.0-20221011080911-9d47f6f1d818 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mazznoer/csscolorparser v0.1.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect

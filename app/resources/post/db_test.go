@@ -35,7 +35,7 @@ func TestCreate(t *testing.T) {
 			a.Equal("My cool post in reply to your thread", p.Body)
 			a.WithinDuration(p.CreatedAt, time.Now(), time.Second*5)
 			a.WithinDuration(p.UpdatedAt, time.Now(), time.Second*5)
-			a.False(p.DeletedAt.IsPresent())
+			a.False(p.DeletedAt.Ok())
 		}),
 	)
 }

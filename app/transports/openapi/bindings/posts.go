@@ -3,7 +3,6 @@ package bindings
 import (
 	"context"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -48,11 +47,11 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	var reply optional.Optional[post.PostID]
+	var reply opt.Optional[post.PostID]
 
 	if request.Body.ReplyTo != nil {
 		tm := openapi.ParseID(*request.Body.ReplyTo)
-		reply = optional.Of(post.PostID(tm))
+		reply = opt.New(post.PostID(tm))
 	}
 
 	var meta map[string]any

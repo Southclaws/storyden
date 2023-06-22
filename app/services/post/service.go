@@ -4,7 +4,6 @@ package post
 import (
 	"context"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -21,7 +20,7 @@ type Service interface {
 		body string,
 		authorID account.AccountID,
 		parentID post.PostID,
-		replyToID optional.Optional[post.PostID],
+		replyToID opt.Optional[post.PostID],
 		meta map[string]any,
 	) (*post.Post, error)
 

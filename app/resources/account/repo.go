@@ -3,7 +3,7 @@ package account
 import (
 	"context"
 
-	"4d63.com/optional"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/ent"
@@ -36,7 +36,7 @@ func WithName(name string) option {
 
 func WithBio(bio string) option {
 	return func(a *Account) {
-		a.Bio = optional.Of(bio)
+		a.Bio = opt.New(bio)
 	}
 }
 

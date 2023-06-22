@@ -3,8 +3,8 @@ package thread
 import (
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -18,7 +18,7 @@ type Thread struct {
 	ID        post.PostID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt optional.Optional[time.Time]
+	DeletedAt opt.Optional[time.Time]
 
 	Title    string
 	Slug     string
@@ -58,7 +58,7 @@ func FromModel(m *ent.Post) *Thread {
 		ID:        post.PostID(m.ID),
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: optional.OfPtr(m.DeletedAt),
+		DeletedAt: opt.NewPtr(m.DeletedAt),
 
 		Title:  m.Title,
 		Slug:   m.Slug,

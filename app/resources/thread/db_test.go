@@ -38,7 +38,7 @@ func TestCreate(t *testing.T) {
 			a.Equal(false, p.Pinned)
 			a.WithinDuration(p.CreatedAt, time.Now(), time.Second*5)
 			a.WithinDuration(p.UpdatedAt, time.Now(), time.Second*5)
-			a.False(p.DeletedAt.IsPresent())
+			a.False(p.DeletedAt.Ok())
 			a.Equal(seed.Category_01_General.ID, p.Category.ID)
 			a.Len(p.Posts, 1)
 		}),
@@ -87,7 +87,7 @@ func TestGet(t *testing.T) {
 			a.Equal("Welcome to Storyden!", threads.Title)
 			a.Equal("00000000000000000010-welcome-to-storyden", threads.Slug)
 			a.Equal(false, threads.Pinned)
-			a.False(threads.DeletedAt.IsPresent())
+			a.False(threads.DeletedAt.Ok())
 			a.Equal(seed.Category_01_General.ID, threads.Category.ID)
 
 			r.Len(threads.Posts, 10)
