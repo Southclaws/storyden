@@ -34,7 +34,7 @@ func TestThreadCreate(t *testing.T) {
 		r.NoError(err)
 		r.NotNil(t)
 
-		a.False(t.DeletedAt.IsPresent())
+		a.False(t.DeletedAt.Ok())
 		a.Equal("New thread", t.Title)
 		a.Contains(t.Slug, "new-thread")
 		a.Equal("hi there", t.Short)

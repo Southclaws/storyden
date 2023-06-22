@@ -3,9 +3,9 @@ package post
 import (
 	"context"
 
-	"4d63.com/optional"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -18,7 +18,7 @@ type Repository interface {
 		body string,
 		authorID account.AccountID,
 		parentID PostID,
-		replyToID optional.Optional[PostID],
+		replyToID opt.Optional[PostID],
 		meta map[string]any,
 		opts ...Option,
 	) (*Post, error)

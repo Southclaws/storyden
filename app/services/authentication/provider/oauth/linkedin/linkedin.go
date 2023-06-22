@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/go-resty/resty/v2"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/linkedin"
@@ -148,7 +148,7 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 
 	// TODO: Iterate "elements" and search for the largest avatar instead of
 	// just picking the first item from the list.
-	avatarURL := optional.OfPtr(func() *string {
+	avatarURL := opt.NewPtr(func() *string {
 		if len(profile.ProfilePicture.DisplayImage.Elements) > 0 && len(profile.ProfilePicture.DisplayImage.Elements[0].Identifiers) > 0 {
 			return &profile.ProfilePicture.DisplayImage.Elements[0].Identifiers[0].Identifier
 		}
@@ -199,7 +199,7 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 	return acc, nil
 }
 
-func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, acc *account.Account, avatarURL optional.Optional[string]) error {
+func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, acc *account.Account, avatarURL opt.Optional[string]) error {
 	url, ok := avatarURL.Get()
 	if !ok {
 		return nil

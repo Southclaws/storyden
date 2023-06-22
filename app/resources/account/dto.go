@@ -3,8 +3,8 @@ package account
 import (
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -19,7 +19,7 @@ type Account struct {
 	ID          AccountID
 	Handle      string
 	Name        string
-	Bio         optional.Optional[string]
+	Bio         opt.Optional[string]
 	Admin       bool
 	ThreadCount int
 	PostCount   int
@@ -27,7 +27,7 @@ type Account struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt optional.Optional[time.Time]
+	DeletedAt opt.Optional[time.Time]
 }
 
 // Name is the role/resource name.
@@ -48,7 +48,7 @@ func FromModel(u ent.Account) (o *Account) {
 		ID:     AccountID(u.ID),
 		Handle: u.Handle,
 		Name:   u.Name,
-		Bio:    optional.Of(u.Bio),
+		Bio:    opt.New(u.Bio),
 		Admin:  u.Admin,
 		Interests: dt.Map(u.Edges.Tags, func(t *ent.Tag) tag.Tag {
 			return tag.Tag{
@@ -58,7 +58,7 @@ func FromModel(u ent.Account) (o *Account) {
 		}),
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		DeletedAt: optional.OfPtr(u.DeletedAt),
+		DeletedAt: opt.NewPtr(u.DeletedAt),
 	}
 
 	return &result

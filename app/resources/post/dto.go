@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"4d63.com/optional"
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -25,13 +25,13 @@ type Post struct {
 	Author         Author
 	RootPostID     PostID
 	RootThreadMark string
-	ReplyTo        optional.Optional[PostID]
+	ReplyTo        opt.Optional[PostID]
 	Reacts         []*react.React
 	Meta           map[string]any
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt optional.Optional[time.Time]
+	DeletedAt opt.Optional[time.Time]
 }
 
 func (*Post) GetResourceName() string { return "post" }
@@ -48,12 +48,12 @@ func (p Post) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, MakeShortBody(p.Body))
 }
 
-func replyTo(m *ent.Post) optional.Optional[PostID] {
+func replyTo(m *ent.Post) opt.Optional[PostID] {
 	if m.Edges.ReplyTo != nil {
-		return optional.Of(PostID(m.Edges.ReplyTo.ID))
+		return opt.New(PostID(m.Edges.ReplyTo.ID))
 	}
 
-	return optional.Empty[PostID]()
+	return opt.NewEmpty[PostID]()
 }
 
 func FromModel(m *ent.Post) (w *Post) {
@@ -77,6 +77,6 @@ func FromModel(m *ent.Post) (w *Post) {
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: optional.OfPtr(m.DeletedAt),
+		DeletedAt: opt.NewPtr(m.DeletedAt),
 	}
 }

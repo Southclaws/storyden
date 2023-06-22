@@ -39,7 +39,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
-			Bio:       utils.Ref(acc.Bio.ElseZero()),
+			Bio:       utils.Ref(acc.Bio.OrZero()),
 			Handle:    acc.Handle,
 			Name:      acc.Name,
 			Interests: interests,

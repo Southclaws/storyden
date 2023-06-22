@@ -47,7 +47,7 @@ func accounts(r account.Repository, auth authentication.Repository) {
 		acc, err := r.Create(ctx, v.Handle,
 			account.WithID(v.ID),
 			account.WithName(v.Name),
-			account.WithBio(v.Bio.ElseZero()),
+			account.WithBio(v.Bio.OrZero()),
 		)
 		if err != nil {
 			panic(err)

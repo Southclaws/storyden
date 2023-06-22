@@ -19,7 +19,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Id:        openapi.Identifier(acc.ID.String()),
 		Handle:    acc.Handle,
 		Name:      utils.Ref(acc.Name),
-		Bio:       utils.Ref(acc.Bio.ElseZero()),
+		Bio:       utils.Ref(acc.Bio.OrZero()),
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
