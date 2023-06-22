@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/notification"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/rs/xid"
 )
 
@@ -75,25 +74,6 @@ func (nc *NotificationCreate) SetNillableID(x *xid.ID) *NotificationCreate {
 		nc.SetID(*x)
 	}
 	return nc
-}
-
-// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nc *NotificationCreate) SetSubscriptionID(id xid.ID) *NotificationCreate {
-	nc.mutation.SetSubscriptionID(id)
-	return nc
-}
-
-// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nc *NotificationCreate) SetNillableSubscriptionID(id *xid.ID) *NotificationCreate {
-	if id != nil {
-		nc = nc.SetSubscriptionID(*id)
-	}
-	return nc
-}
-
-// SetSubscription sets the "subscription" edge to the Subscription entity.
-func (nc *NotificationCreate) SetSubscription(s *Subscription) *NotificationCreate {
-	return nc.SetSubscriptionID(s.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -218,26 +198,6 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 	if value, ok := nc.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 		_node.Read = value
-	}
-	if nodes := nc.mutation.SubscriptionIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.notification_subscription = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

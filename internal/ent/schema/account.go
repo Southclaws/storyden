@@ -32,8 +32,6 @@ func (Account) Edges() []ent.Edge {
 		edge.From("roles", Role.Type).
 			Ref("accounts"),
 
-		edge.To("subscriptions", Subscription.Type),
-
 		edge.To("authentication", Authentication.Type),
 
 		edge.To("tags", Tag.Type),

@@ -33,8 +33,6 @@ const (
 	EdgeReacts = "reacts"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
-	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
-	EdgeSubscriptions = "subscriptions"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
 	EdgeAuthentication = "authentication"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
@@ -60,13 +58,6 @@ const (
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "roles"
-	// SubscriptionsTable is the table that holds the subscriptions relation/edge.
-	SubscriptionsTable = "subscriptions"
-	// SubscriptionsInverseTable is the table name for the Subscription entity.
-	// It exists in this package in order to avoid circular dependency with the "subscription" package.
-	SubscriptionsInverseTable = "subscriptions"
-	// SubscriptionsColumn is the table column denoting the subscriptions relation/edge.
-	SubscriptionsColumn = "account_subscriptions"
 	// AuthenticationTable is the table that holds the authentication relation/edge.
 	AuthenticationTable = "authentications"
 	// AuthenticationInverseTable is the table name for the Authentication entity.

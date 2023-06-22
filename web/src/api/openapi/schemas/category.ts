@@ -5,8 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CategoryMetadata } from "./categoryMetadata";
-import type { CategoryCommon } from "./categoryCommon";
 import type { CategoryAdditional } from "./categoryAdditional";
+import type { CategoryCommon } from "./categoryCommon";
+import type { CategoryMetadata } from "./categoryMetadata";
 
 export type Category = CategoryMetadata & CategoryCommon & CategoryAdditional;

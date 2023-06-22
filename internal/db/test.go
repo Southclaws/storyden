@@ -14,14 +14,12 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/setting"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 func Truncate(db *sql.DB) error {
 	tables := []string{
 		notification.Table,
-		subscription.Table,
 		react.Table,
 		account.Table,
 		category.Table,

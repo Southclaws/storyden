@@ -6,21 +6,23 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
+import type { Key, SWRConfiguration } from "swr";
+
+import { fetcher } from "../client";
+
 import type {
-  PostCreateOKResponse,
-  UnauthorisedResponse,
-  NotFoundResponse,
   InternalServerErrorResponse,
+  NotFoundResponse,
   PostCreateBody,
-  PostUpdateOKResponse,
-  PostUpdateBody,
+  PostCreateOKResponse,
+  PostReactAddBody,
+  PostReactAddOKResponse,
   PostSearchOKResponse,
   PostSearchParams,
-  PostReactAddOKResponse,
-  PostReactAddBody,
+  PostUpdateBody,
+  PostUpdateOKResponse,
+  UnauthorisedResponse,
 } from "./schemas";
-import { fetcher } from "../client";
 
 /**
  * Create a new post within a thread.

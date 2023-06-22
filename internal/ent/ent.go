@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/setting"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
@@ -82,7 +81,6 @@ func columnChecker(table string) func(string) error {
 		react.Table:          react.ValidColumn,
 		role.Table:           role.ValidColumn,
 		setting.Table:        setting.ValidColumn,
-		subscription.Table:   subscription.ValidColumn,
 		tag.Table:            tag.ValidColumn,
 	}
 	check, ok := checks[table]
@@ -523,7 +521,7 @@ func withHooks[V Value, M any, PM interface {
 		return exec(ctx)
 	}
 	var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-		mutationT, ok := m.(PM)
+		mutationT, ok := any(m).(PM)
 		if !ok {
 			return nil, fmt.Errorf("unexpected mutation type %T", m)
 		}

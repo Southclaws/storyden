@@ -28,8 +28,6 @@ type Tx struct {
 	Role *RoleClient
 	// Setting is the client for interacting with the Setting builders.
 	Setting *SettingClient
-	// Subscription is the client for interacting with the Subscription builders.
-	Subscription *SubscriptionClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 
@@ -171,7 +169,6 @@ func (tx *Tx) init() {
 	tx.React = NewReactClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
-	tx.Subscription = NewSubscriptionClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 }
 

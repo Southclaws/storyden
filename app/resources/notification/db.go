@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -11,9 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
-	model_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 )
 
 type database struct {
@@ -24,73 +23,15 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Subscribe(ctx context.Context, accountID account.AccountID, refersType NotificationType, refersTo string) (*Subscription, error) {
-	sub, err := d.db.Subscription.Create().
-		SetAccountID(xid.ID(accountID)).
-		SetRefersType(string(refersType)).
-		SetRefersTo(refersTo).
-		Save(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return SubFromModel(sub), nil
-}
-
-func (d *database) Unsubscribe(ctx context.Context, accountID account.AccountID, subID SubscriptionID) (int, error) {
-	i, err := d.db.Subscription.Delete().
-		Where(
-			subscription.IDEQ(xid.ID(subID)),
-			subscription.HasAccountWith(
-				model_account.IDEQ(xid.ID(accountID)),
-			),
-		).Exec(ctx)
-	if err != nil {
-		return 0, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return i, nil
-}
-
-func (d *database) GetSubscriptionsForUser(ctx context.Context, accountID account.AccountID) ([]Subscription, error) {
-	subs, err := d.db.Subscription.Query().
-		Where(
-			subscription.HasAccountWith(
-				model_account.IDEQ(xid.ID(accountID)),
-			),
-		).
-		All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return SubFromModelMany(subs), nil
-}
-
-func (d *database) GetSubscriptionsForItem(ctx context.Context, refersType NotificationType, refersTo string) ([]Subscription, error) {
-	subs, err := d.db.Subscription.Query().
-		Where(
-			subscription.RefersTypeEQ(string(refersType)),
-			subscription.RefersToEQ(refersTo),
-		).
-		All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return SubFromModelMany(subs), nil
-}
-
-func (d *database) GetNotifications(ctx context.Context, accountID account.AccountID, read bool, after time.Time) ([]Notification, error) {
+func (d *database) List(ctx context.Context, accountID account.AccountID, read bool, after time.Time) ([]*Notification, error) {
 	q := d.db.Notification.Query().
 		Where(
-			notification.HasSubscriptionWith(
-				subscription.HasAccountWith(
-					model_account.IDEQ(xid.ID(accountID)),
-				),
-			),
-		).
-		WithSubscription()
+		// notification.HasSubscriptionWith(
+		// 	subscription.HasAccountWith(
+		// 		model_account.IDEQ(xid.ID(accountID)),
+		// 	),
+		// ),
+		)
 
 	// if read is false (default), only return unread notifications, otherwise, all.
 	if !read {
@@ -107,10 +48,10 @@ func (d *database) GetNotifications(ctx context.Context, accountID account.Accou
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return FromModelMany(notifs), nil
+	return dt.Map(notifs, FromModel), nil
 }
 
 func (d *database) Notify(ctx context.Context, refersType NotificationType, refersTo string, title, desc, link string) (int, error) {
@@ -122,82 +63,53 @@ func (d *database) Notify(ctx context.Context, refersType NotificationType, refe
 	//          aren't associated with specific users. Then, when a user queries
 	//          their notifications list, this table is checked for items they
 	//          are subscribed to and notifications are generated.
-	subs, err := d.GetSubscriptionsForItem(ctx, refersType, refersTo)
-	if err != nil {
-		return 0, err
-	}
+	// subs, err := d.db.Subscription.Query().
+	// 	Where(
+	// 		subscription.RefersTypeEQ(string(refersType)),
+	// 		subscription.RefersToEQ(refersTo),
+	// 	).
+	// 	All(ctx)
+	// if err != nil {
+	// 	return 0, fault.Wrap(err, fctx.With(ctx))
+	// }
 
-	for _, sub := range subs {
-		_, err := d.db.Notification.
-			Create().
-			SetTitle(title).
-			SetDescription(desc).
-			SetLink(link).
-			SetRead(false).
-			SetSubscriptionID(xid.ID(sub.ID)).
-			Save(ctx)
-		if err != nil {
-			return 0, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-		}
-	}
+	// for _, sub := range subs {
+	// 	_, err := d.db.Notification.
+	// 		Create().
+	// 		SetTitle(title).
+	// 		SetDescription(desc).
+	// 		SetLink(link).
+	// 		SetRead(false).
+	// 		Save(ctx)
+	// 	if err != nil {
+	// 		return 0, fault.Wrap(err, fctx.With(ctx))
+	// 	}
+	// }
 
-	return len(subs), nil
+	return 0, nil
 }
 
 func (d *database) SetReadState(ctx context.Context, accountID account.AccountID, notificationID NotificationID, read bool) (*Notification, error) {
-	ok, err := d.userHasRightsForNotification(ctx, accountID, notificationID)
-	if err != nil {
-		return nil, err
-	}
-
-	if !ok {
-		return nil, fault.New("permission denied")
-	}
-
 	notif, err := d.db.Notification.
 		UpdateOneID(xid.ID(notificationID)).
 		SetRead(read).
 		Save(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return FromModel(notif), nil
 }
 
-// TODO: Cache these. Or do more clever queries.
-func (d *database) userHasRightsForNotification(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (bool, error) {
-	n, err := d.db.Notification.Query().
-		Where(notification.IDEQ(xid.ID(notificationID))).
-		WithSubscription(func(sq *ent.SubscriptionQuery) {
-			sq.WithAccount()
-		}).
-		Only(ctx)
-	if err != nil {
-		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return account.AccountID(n.Edges.Subscription.Edges.Account.ID) == accountID, nil
-}
-
 func (d *database) Delete(ctx context.Context, accountID account.AccountID, notificationID NotificationID) (*Notification, error) {
-	ok, err := d.userHasRightsForNotification(ctx, accountID, notificationID)
-	if err != nil {
-		return nil, err
-	}
-
-	if !ok {
-		return nil, fault.New("permission denied")
-	}
-
 	n, err := d.db.Notification.Get(ctx, xid.ID(notificationID))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	err = d.db.Notification.DeleteOne(n).Exec(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return FromModel(n), nil

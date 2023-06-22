@@ -5,8 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostMetadata } from "./postMetadata";
 import type { PostCommonProps } from "./postCommonProps";
+import type { PostMetadata } from "./postMetadata";
 
 /**
  * A new post within a thread of posts. A post may reply to another post in

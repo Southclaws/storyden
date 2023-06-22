@@ -12,8 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
-	"github.com/rs/xid"
 )
 
 // NotificationUpdate is the builder for updating Notification entities.
@@ -54,34 +52,9 @@ func (nu *NotificationUpdate) SetRead(b bool) *NotificationUpdate {
 	return nu
 }
 
-// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nu *NotificationUpdate) SetSubscriptionID(id xid.ID) *NotificationUpdate {
-	nu.mutation.SetSubscriptionID(id)
-	return nu
-}
-
-// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableSubscriptionID(id *xid.ID) *NotificationUpdate {
-	if id != nil {
-		nu = nu.SetSubscriptionID(*id)
-	}
-	return nu
-}
-
-// SetSubscription sets the "subscription" edge to the Subscription entity.
-func (nu *NotificationUpdate) SetSubscription(s *Subscription) *NotificationUpdate {
-	return nu.SetSubscriptionID(s.ID)
-}
-
 // Mutation returns the NotificationMutation object of the builder.
 func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 	return nu.mutation
-}
-
-// ClearSubscription clears the "subscription" edge to the Subscription entity.
-func (nu *NotificationUpdate) ClearSubscription() *NotificationUpdate {
-	nu.mutation.ClearSubscription()
-	return nu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -138,41 +111,6 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 	}
-	if nu.mutation.SubscriptionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nu.mutation.SubscriptionIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	_spec.AddModifiers(nu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -219,34 +157,9 @@ func (nuo *NotificationUpdateOne) SetRead(b bool) *NotificationUpdateOne {
 	return nuo
 }
 
-// SetSubscriptionID sets the "subscription" edge to the Subscription entity by ID.
-func (nuo *NotificationUpdateOne) SetSubscriptionID(id xid.ID) *NotificationUpdateOne {
-	nuo.mutation.SetSubscriptionID(id)
-	return nuo
-}
-
-// SetNillableSubscriptionID sets the "subscription" edge to the Subscription entity by ID if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableSubscriptionID(id *xid.ID) *NotificationUpdateOne {
-	if id != nil {
-		nuo = nuo.SetSubscriptionID(*id)
-	}
-	return nuo
-}
-
-// SetSubscription sets the "subscription" edge to the Subscription entity.
-func (nuo *NotificationUpdateOne) SetSubscription(s *Subscription) *NotificationUpdateOne {
-	return nuo.SetSubscriptionID(s.ID)
-}
-
 // Mutation returns the NotificationMutation object of the builder.
 func (nuo *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return nuo.mutation
-}
-
-// ClearSubscription clears the "subscription" edge to the Subscription entity.
-func (nuo *NotificationUpdateOne) ClearSubscription() *NotificationUpdateOne {
-	nuo.mutation.ClearSubscription()
-	return nuo
 }
 
 // Where appends a list predicates to the NotificationUpdate builder.
@@ -332,41 +245,6 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 	}
 	if value, ok := nuo.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
-	}
-	if nuo.mutation.SubscriptionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := nuo.mutation.SubscriptionIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   notification.SubscriptionTable,
-			Columns: []string{notification.SubscriptionColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(nuo.modifiers...)
 	_node = &Notification{config: nuo.config}

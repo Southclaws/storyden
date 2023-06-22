@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1
  */
 import type { AccountHandle } from "./accountHandle";
-import type { TagListIDs } from "./tagListIDs";
 import type { CategoryNameList } from "./categoryNameList";
+import type { TagListIDs } from "./tagListIDs";
 
 export type ThreadListParams = {
   /**

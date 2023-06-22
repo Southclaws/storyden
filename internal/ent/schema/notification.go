@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -23,8 +22,12 @@ func (Notification) Fields() []ent.Field {
 	}
 }
 
-func (Notification) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("subscription", Subscription.Type).Unique(),
-	}
-}
+// func (Notification) Edges() []ent.Edge {
+// 	return []ent.Edge{
+// 		edge.To("subscription", Subscription.Type).
+// 			Annotations(entsql.Annotation{
+// 				OnDelete: entsql.Cascade,
+// 			}).
+// 			Unique(),
+// 	}
+// }

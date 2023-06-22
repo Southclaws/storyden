@@ -30,8 +30,5 @@ type Role func(*sql.Selector)
 // Setting is the predicate function for setting builders.
 type Setting func(*sql.Selector)
 
-// Subscription is the predicate function for subscription builders.
-type Subscription func(*sql.Selector)
-
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)

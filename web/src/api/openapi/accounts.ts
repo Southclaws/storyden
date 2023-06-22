@@ -6,18 +6,20 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
-import type {
-  AccountGetOKResponse,
-  UnauthorisedResponse,
-  NotFoundResponse,
-  InternalServerErrorResponse,
-  AccountUpdateOKResponse,
-  AccountUpdateBody,
-  AccountSetAvatarBody,
-  AccountGetAvatarResponse,
-} from "./schemas";
+import type { Key, SWRConfiguration } from "swr";
+
 import { fetcher } from "../client";
+
+import type {
+  AccountGetAvatarResponse,
+  AccountGetOKResponse,
+  AccountSetAvatarBody,
+  AccountUpdateBody,
+  AccountUpdateOKResponse,
+  InternalServerErrorResponse,
+  NotFoundResponse,
+  UnauthorisedResponse,
+} from "./schemas";
 
 /**
  * Get the information for the currently authenticated account.

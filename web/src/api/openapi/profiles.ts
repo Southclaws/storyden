@@ -6,14 +6,16 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
+import type { Key, SWRConfiguration } from "swr";
+
+import { fetcher } from "../client";
+
 import type {
+  InternalServerErrorResponse,
+  NotFoundResponse,
   ProfileGetOKResponse,
   UnauthorisedResponse,
-  NotFoundResponse,
-  InternalServerErrorResponse,
 } from "./schemas";
-import { fetcher } from "../client";
 
 /**
  * Get a public profile by ID.

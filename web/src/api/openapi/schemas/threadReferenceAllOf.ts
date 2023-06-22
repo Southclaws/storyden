@@ -5,11 +5,11 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ThreadMark } from "./threadMark";
-import type { ProfileReference } from "./profileReference";
 import type { CategoryReference } from "./categoryReference";
-import type { ReactList } from "./reactList";
 import type { Metadata } from "./metadata";
+import type { ProfileReference } from "./profileReference";
+import type { ReactList } from "./reactList";
+import type { ThreadMark } from "./threadMark";
 
 export type ThreadReferenceAllOf = {
   /** The title of the thread. */

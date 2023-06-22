@@ -6,12 +6,14 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
+import type { Key, SWRConfiguration } from "swr";
+
+import { fetcher } from "../client";
+
 import type {
   CategoryListOKResponse,
   InternalServerErrorResponse,
 } from "./schemas";
-import { fetcher } from "../client";
 
 /**
  * Get a list of all categories on the site.

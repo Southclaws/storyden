@@ -81,28 +81,12 @@ var (
 		{Name: "description", Type: field.TypeString},
 		{Name: "link", Type: field.TypeString},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "notification_subscription", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "subscription_notifications", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.
 	NotificationsTable = &schema.Table{
 		Name:       "notifications",
 		Columns:    NotificationsColumns,
 		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "notifications_subscriptions_subscription",
-				Columns:    []*schema.Column{NotificationsColumns[6]},
-				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "notifications_subscriptions_notifications",
-				Columns:    []*schema.Column{NotificationsColumns[7]},
-				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
 	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
@@ -208,35 +192,6 @@ var (
 		Columns:    SettingsColumns,
 		PrimaryKey: []*schema.Column{SettingsColumns[0]},
 	}
-	// SubscriptionsColumns holds the columns for the "subscriptions" table.
-	SubscriptionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "refers_type", Type: field.TypeString},
-		{Name: "refers_to", Type: field.TypeString},
-		{Name: "account_subscriptions", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "subscription_account", Type: field.TypeString, Nullable: true, Size: 20},
-	}
-	// SubscriptionsTable holds the schema information for the "subscriptions" table.
-	SubscriptionsTable = &schema.Table{
-		Name:       "subscriptions",
-		Columns:    SubscriptionsColumns,
-		PrimaryKey: []*schema.Column{SubscriptionsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "subscriptions_accounts_subscriptions",
-				Columns:    []*schema.Column{SubscriptionsColumns[4]},
-				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "subscriptions_accounts_account",
-				Columns:    []*schema.Column{SubscriptionsColumns[5]},
-				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -334,7 +289,6 @@ var (
 		ReactsTable,
 		RolesTable,
 		SettingsTable,
-		SubscriptionsTable,
 		TagsTable,
 		AccountTagsTable,
 		RoleAccountsTable,
@@ -344,16 +298,12 @@ var (
 
 func init() {
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
-	NotificationsTable.ForeignKeys[0].RefTable = SubscriptionsTable
-	NotificationsTable.ForeignKeys[1].RefTable = SubscriptionsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
-	SubscriptionsTable.ForeignKeys[0].RefTable = AccountsTable
-	SubscriptionsTable.ForeignKeys[1].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable

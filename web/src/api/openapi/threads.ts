@@ -6,20 +6,22 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
+import type { Key, SWRConfiguration } from "swr";
+
+import { fetcher } from "../client";
+
 import type {
-  ThreadCreateOKResponse,
-  UnauthorisedResponse,
-  NotFoundResponse,
   InternalServerErrorResponse,
+  NotFoundResponse,
   ThreadCreateBody,
+  ThreadCreateOKResponse,
+  ThreadGetResponse,
   ThreadListOKResponse,
   ThreadListParams,
-  ThreadGetResponse,
-  ThreadUpdateOKResponse,
   ThreadUpdateBody,
+  ThreadUpdateOKResponse,
+  UnauthorisedResponse,
 } from "./schemas";
-import { fetcher } from "../client";
 
 /**
  * Create a new thread within the specified category.

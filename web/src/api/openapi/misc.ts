@@ -6,9 +6,11 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
-import type { GetInfoOKResponse, InternalServerErrorResponse } from "./schemas";
+import type { Key, SWRConfiguration } from "swr";
+
 import { fetcher } from "../client";
+
+import type { GetInfoOKResponse, InternalServerErrorResponse } from "./schemas";
 
 /**
  * The version number includes the date and time of the release build as
