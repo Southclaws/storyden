@@ -5,8 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
 import type { CommonPropertiesMisc } from "./commonPropertiesMisc";
+import type { Identifier } from "./identifier";
 
 export interface CommonProperties {
   id: Identifier;

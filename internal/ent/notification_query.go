@@ -12,20 +12,17 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/rs/xid"
 )
 
 // NotificationQuery is the builder for querying Notification entities.
 type NotificationQuery struct {
 	config
-	ctx              *QueryContext
-	order            []OrderFunc
-	inters           []Interceptor
-	predicates       []predicate.Notification
-	withSubscription *SubscriptionQuery
-	withFKs          bool
-	modifiers        []func(*sql.Selector)
+	ctx        *QueryContext
+	order      []OrderFunc
+	inters     []Interceptor
+	predicates []predicate.Notification
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,28 +57,6 @@ func (nq *NotificationQuery) Unique(unique bool) *NotificationQuery {
 func (nq *NotificationQuery) Order(o ...OrderFunc) *NotificationQuery {
 	nq.order = append(nq.order, o...)
 	return nq
-}
-
-// QuerySubscription chains the current query on the "subscription" edge.
-func (nq *NotificationQuery) QuerySubscription() *SubscriptionQuery {
-	query := (&SubscriptionClient{config: nq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := nq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := nq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(notification.Table, notification.FieldID, selector),
-			sqlgraph.To(subscription.Table, subscription.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, notification.SubscriptionTable, notification.SubscriptionColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Notification entity from the query.
@@ -271,27 +246,15 @@ func (nq *NotificationQuery) Clone() *NotificationQuery {
 		return nil
 	}
 	return &NotificationQuery{
-		config:           nq.config,
-		ctx:              nq.ctx.Clone(),
-		order:            append([]OrderFunc{}, nq.order...),
-		inters:           append([]Interceptor{}, nq.inters...),
-		predicates:       append([]predicate.Notification{}, nq.predicates...),
-		withSubscription: nq.withSubscription.Clone(),
+		config:     nq.config,
+		ctx:        nq.ctx.Clone(),
+		order:      append([]OrderFunc{}, nq.order...),
+		inters:     append([]Interceptor{}, nq.inters...),
+		predicates: append([]predicate.Notification{}, nq.predicates...),
 		// clone intermediate query.
 		sql:  nq.sql.Clone(),
 		path: nq.path,
 	}
-}
-
-// WithSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NotificationQuery) WithSubscription(opts ...func(*SubscriptionQuery)) *NotificationQuery {
-	query := (&SubscriptionClient{config: nq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	nq.withSubscription = query
-	return nq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -370,26 +333,15 @@ func (nq *NotificationQuery) prepareQuery(ctx context.Context) error {
 
 func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Notification, error) {
 	var (
-		nodes       = []*Notification{}
-		withFKs     = nq.withFKs
-		_spec       = nq.querySpec()
-		loadedTypes = [1]bool{
-			nq.withSubscription != nil,
-		}
+		nodes = []*Notification{}
+		_spec = nq.querySpec()
 	)
-	if nq.withSubscription != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, notification.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Notification).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Notification{config: nq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(nq.modifiers) > 0 {
@@ -404,46 +356,7 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := nq.withSubscription; query != nil {
-		if err := nq.loadSubscription(ctx, query, nodes, nil,
-			func(n *Notification, e *Subscription) { n.Edges.Subscription = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (nq *NotificationQuery) loadSubscription(ctx context.Context, query *SubscriptionQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *Subscription)) error {
-	ids := make([]xid.ID, 0, len(nodes))
-	nodeids := make(map[xid.ID][]*Notification)
-	for i := range nodes {
-		if nodes[i].notification_subscription == nil {
-			continue
-		}
-		fk := *nodes[i].notification_subscription
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(subscription.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "notification_subscription" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (nq *NotificationQuery) sqlCount(ctx context.Context) (int, error) {

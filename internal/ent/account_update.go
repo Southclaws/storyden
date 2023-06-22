@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -153,21 +152,6 @@ func (au *AccountUpdate) AddRoles(r ...*Role) *AccountUpdate {
 	return au.AddRoleIDs(ids...)
 }
 
-// AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (au *AccountUpdate) AddSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddSubscriptionIDs(ids...)
-	return au
-}
-
-// AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
-func (au *AccountUpdate) AddSubscriptions(s ...*Subscription) *AccountUpdate {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return au.AddSubscriptionIDs(ids...)
-}
-
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
 func (au *AccountUpdate) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddAuthenticationIDs(ids...)
@@ -264,27 +248,6 @@ func (au *AccountUpdate) RemoveRoles(r ...*Role) *AccountUpdate {
 		ids[i] = r[i].ID
 	}
 	return au.RemoveRoleIDs(ids...)
-}
-
-// ClearSubscriptions clears all "subscriptions" edges to the Subscription entity.
-func (au *AccountUpdate) ClearSubscriptions() *AccountUpdate {
-	au.mutation.ClearSubscriptions()
-	return au
-}
-
-// RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (au *AccountUpdate) RemoveSubscriptionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveSubscriptionIDs(ids...)
-	return au
-}
-
-// RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
-func (au *AccountUpdate) RemoveSubscriptions(s ...*Subscription) *AccountUpdate {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return au.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearAuthentication clears all "authentication" edges to the Authentication entity.
@@ -430,10 +393,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -446,10 +406,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -465,10 +422,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -484,10 +438,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -500,10 +451,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -519,10 +467,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -538,10 +483,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -554,10 +496,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -573,64 +512,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if au.mutation.SubscriptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !au.mutation.SubscriptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.SubscriptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -646,10 +528,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -662,10 +541,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -681,10 +557,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -700,10 +573,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -716,10 +586,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -735,10 +602,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -885,21 +749,6 @@ func (auo *AccountUpdateOne) AddRoles(r ...*Role) *AccountUpdateOne {
 	return auo.AddRoleIDs(ids...)
 }
 
-// AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by IDs.
-func (auo *AccountUpdateOne) AddSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddSubscriptionIDs(ids...)
-	return auo
-}
-
-// AddSubscriptions adds the "subscriptions" edges to the Subscription entity.
-func (auo *AccountUpdateOne) AddSubscriptions(s ...*Subscription) *AccountUpdateOne {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return auo.AddSubscriptionIDs(ids...)
-}
-
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
 func (auo *AccountUpdateOne) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddAuthenticationIDs(ids...)
@@ -996,27 +845,6 @@ func (auo *AccountUpdateOne) RemoveRoles(r ...*Role) *AccountUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return auo.RemoveRoleIDs(ids...)
-}
-
-// ClearSubscriptions clears all "subscriptions" edges to the Subscription entity.
-func (auo *AccountUpdateOne) ClearSubscriptions() *AccountUpdateOne {
-	auo.mutation.ClearSubscriptions()
-	return auo
-}
-
-// RemoveSubscriptionIDs removes the "subscriptions" edge to Subscription entities by IDs.
-func (auo *AccountUpdateOne) RemoveSubscriptionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveSubscriptionIDs(ids...)
-	return auo
-}
-
-// RemoveSubscriptions removes "subscriptions" edges to Subscription entities.
-func (auo *AccountUpdateOne) RemoveSubscriptions(s ...*Subscription) *AccountUpdateOne {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return auo.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearAuthentication clears all "authentication" edges to the Authentication entity.
@@ -1192,10 +1020,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1208,10 +1033,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1227,10 +1049,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1246,10 +1065,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1262,10 +1078,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1281,10 +1094,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.ReactsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: react.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1300,10 +1110,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1316,10 +1123,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1335,64 +1139,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.RolesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: role.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if auo.mutation.SubscriptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !auo.mutation.SubscriptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.SubscriptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SubscriptionsTable,
-			Columns: []string{account.SubscriptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: subscription.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1408,10 +1155,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1424,10 +1168,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1443,10 +1184,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: []string{account.AuthenticationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: authentication.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1462,10 +1200,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1478,10 +1213,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1497,10 +1229,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Columns: account.TagsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: tag.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

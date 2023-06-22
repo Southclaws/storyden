@@ -168,10 +168,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -184,10 +181,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -385,10 +379,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -401,10 +392,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Columns: []string{authentication.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

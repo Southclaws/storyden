@@ -6,24 +6,26 @@
  * OpenAPI spec version: 1
  */
 import useSwr from "swr";
-import type { SWRConfiguration, Key } from "swr";
+import type { Key, SWRConfiguration } from "swr";
+
+import { fetcher } from "../client";
+
 import type {
+  AuthPasswordBody,
   AuthProviderListOKResponse,
+  AuthSuccessOKResponse,
   BadRequestResponse,
   InternalServerErrorResponse,
-  AuthSuccessOKResponse,
-  AuthPasswordBody,
-  UnauthorisedResponse,
   NotFoundResponse,
   OAuthProviderCallbackBody,
-  WebAuthnRequestCredentialOKResponse,
-  WebAuthnMakeCredentialBody,
-  WebAuthnGetAssertionOKResponse,
-  WebAuthnMakeAssertionBody,
   PhoneRequestCodeBody,
   PhoneSubmitCodeBody,
+  UnauthorisedResponse,
+  WebAuthnGetAssertionOKResponse,
+  WebAuthnMakeAssertionBody,
+  WebAuthnMakeCredentialBody,
+  WebAuthnRequestCredentialOKResponse,
 } from "./schemas";
-import { fetcher } from "../client";
 
 /**
  * Retrieve a list of authentication providers. Storyden supports a few 

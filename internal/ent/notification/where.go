@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -324,33 +323,6 @@ func ReadEQ(v bool) predicate.Notification {
 // ReadNEQ applies the NEQ predicate on the "read" field.
 func ReadNEQ(v bool) predicate.Notification {
 	return predicate.Notification(sql.FieldNEQ(FieldRead, v))
-}
-
-// HasSubscription applies the HasEdge predicate on the "subscription" edge.
-func HasSubscription() predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SubscriptionTable, SubscriptionColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubscriptionWith applies the HasEdge predicate on the "subscription" edge with a given conditions (other predicates).
-func HasSubscriptionWith(preds ...predicate.Subscription) predicate.Notification {
-	return predicate.Notification(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(SubscriptionInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SubscriptionTable, SubscriptionColumn),
-		)
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

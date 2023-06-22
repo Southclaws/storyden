@@ -44,15 +44,13 @@ type AccountEdges struct {
 	Reacts []*React `json:"reacts,omitempty"`
 	// Roles holds the value of the roles edge.
 	Roles []*Role `json:"roles,omitempty"`
-	// Subscriptions holds the value of the subscriptions edge.
-	Subscriptions []*Subscription `json:"subscriptions,omitempty"`
 	// Authentication holds the value of the authentication edge.
 	Authentication []*Authentication `json:"authentication,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -82,19 +80,10 @@ func (e AccountEdges) RolesOrErr() ([]*Role, error) {
 	return nil, &NotLoadedError{edge: "roles"}
 }
 
-// SubscriptionsOrErr returns the Subscriptions value or an error if the edge
-// was not loaded in eager-loading.
-func (e AccountEdges) SubscriptionsOrErr() ([]*Subscription, error) {
-	if e.loadedTypes[3] {
-		return e.Subscriptions, nil
-	}
-	return nil, &NotLoadedError{edge: "subscriptions"}
-}
-
 // AuthenticationOrErr returns the Authentication value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
@@ -103,7 +92,7 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -204,11 +193,6 @@ func (a *Account) QueryReacts() *ReactQuery {
 // QueryRoles queries the "roles" edge of the Account entity.
 func (a *Account) QueryRoles() *RoleQuery {
 	return NewAccountClient(a.config).QueryRoles(a)
-}
-
-// QuerySubscriptions queries the "subscriptions" edge of the Account entity.
-func (a *Account) QuerySubscriptions() *SubscriptionQuery {
-	return NewAccountClient(a.config).QuerySubscriptions(a)
 }
 
 // QueryAuthentication queries the "authentication" edge of the Account entity.

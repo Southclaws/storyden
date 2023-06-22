@@ -105,18 +105,6 @@ func (f SettingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SettingMutation", m)
 }
 
-// The SubscriptionFunc type is an adapter to allow the use of ordinary
-// function as Subscription mutator.
-type SubscriptionFunc func(context.Context, *ent.SubscriptionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f SubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.SubscriptionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubscriptionMutation", m)
-}
-
 // The TagFunc type is an adapter to allow the use of ordinary
 // function as Tag mutator.
 type TagFunc func(context.Context, *ent.TagMutation) (ent.Value, error)

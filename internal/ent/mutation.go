@@ -20,7 +20,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/setting"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -42,7 +41,6 @@ const (
 	TypeReact          = "React"
 	TypeRole           = "Role"
 	TypeSetting        = "Setting"
-	TypeSubscription   = "Subscription"
 	TypeTag            = "Tag"
 )
 
@@ -69,9 +67,6 @@ type AccountMutation struct {
 	roles                 map[xid.ID]struct{}
 	removedroles          map[xid.ID]struct{}
 	clearedroles          bool
-	subscriptions         map[xid.ID]struct{}
-	removedsubscriptions  map[xid.ID]struct{}
-	clearedsubscriptions  bool
 	authentication        map[xid.ID]struct{}
 	removedauthentication map[xid.ID]struct{}
 	clearedauthentication bool
@@ -627,60 +622,6 @@ func (m *AccountMutation) ResetRoles() {
 	m.removedroles = nil
 }
 
-// AddSubscriptionIDs adds the "subscriptions" edge to the Subscription entity by ids.
-func (m *AccountMutation) AddSubscriptionIDs(ids ...xid.ID) {
-	if m.subscriptions == nil {
-		m.subscriptions = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.subscriptions[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubscriptions clears the "subscriptions" edge to the Subscription entity.
-func (m *AccountMutation) ClearSubscriptions() {
-	m.clearedsubscriptions = true
-}
-
-// SubscriptionsCleared reports if the "subscriptions" edge to the Subscription entity was cleared.
-func (m *AccountMutation) SubscriptionsCleared() bool {
-	return m.clearedsubscriptions
-}
-
-// RemoveSubscriptionIDs removes the "subscriptions" edge to the Subscription entity by IDs.
-func (m *AccountMutation) RemoveSubscriptionIDs(ids ...xid.ID) {
-	if m.removedsubscriptions == nil {
-		m.removedsubscriptions = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.subscriptions, ids[i])
-		m.removedsubscriptions[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscriptions returns the removed IDs of the "subscriptions" edge to the Subscription entity.
-func (m *AccountMutation) RemovedSubscriptionsIDs() (ids []xid.ID) {
-	for id := range m.removedsubscriptions {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubscriptionsIDs returns the "subscriptions" edge IDs in the mutation.
-func (m *AccountMutation) SubscriptionsIDs() (ids []xid.ID) {
-	for id := range m.subscriptions {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubscriptions resets all changes to the "subscriptions" edge.
-func (m *AccountMutation) ResetSubscriptions() {
-	m.subscriptions = nil
-	m.clearedsubscriptions = false
-	m.removedsubscriptions = nil
-}
-
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by ids.
 func (m *AccountMutation) AddAuthenticationIDs(ids ...xid.ID) {
 	if m.authentication == nil {
@@ -1039,7 +980,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1048,9 +989,6 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.roles != nil {
 		edges = append(edges, account.EdgeRoles)
-	}
-	if m.subscriptions != nil {
-		edges = append(edges, account.EdgeSubscriptions)
 	}
 	if m.authentication != nil {
 		edges = append(edges, account.EdgeAuthentication)
@@ -1083,12 +1021,6 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case account.EdgeSubscriptions:
-		ids := make([]ent.Value, 0, len(m.subscriptions))
-		for id := range m.subscriptions {
-			ids = append(ids, id)
-		}
-		return ids
 	case account.EdgeAuthentication:
 		ids := make([]ent.Value, 0, len(m.authentication))
 		for id := range m.authentication {
@@ -1107,7 +1039,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1116,9 +1048,6 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedroles != nil {
 		edges = append(edges, account.EdgeRoles)
-	}
-	if m.removedsubscriptions != nil {
-		edges = append(edges, account.EdgeSubscriptions)
 	}
 	if m.removedauthentication != nil {
 		edges = append(edges, account.EdgeAuthentication)
@@ -1151,12 +1080,6 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case account.EdgeSubscriptions:
-		ids := make([]ent.Value, 0, len(m.removedsubscriptions))
-		for id := range m.removedsubscriptions {
-			ids = append(ids, id)
-		}
-		return ids
 	case account.EdgeAuthentication:
 		ids := make([]ent.Value, 0, len(m.removedauthentication))
 		for id := range m.removedauthentication {
@@ -1175,7 +1098,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1184,9 +1107,6 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedroles {
 		edges = append(edges, account.EdgeRoles)
-	}
-	if m.clearedsubscriptions {
-		edges = append(edges, account.EdgeSubscriptions)
 	}
 	if m.clearedauthentication {
 		edges = append(edges, account.EdgeAuthentication)
@@ -1207,8 +1127,6 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedreacts
 	case account.EdgeRoles:
 		return m.clearedroles
-	case account.EdgeSubscriptions:
-		return m.clearedsubscriptions
 	case account.EdgeAuthentication:
 		return m.clearedauthentication
 	case account.EdgeTags:
@@ -1237,9 +1155,6 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeRoles:
 		m.ResetRoles()
-		return nil
-	case account.EdgeSubscriptions:
-		m.ResetSubscriptions()
 		return nil
 	case account.EdgeAuthentication:
 		m.ResetAuthentication()
@@ -2676,20 +2591,18 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.
 type NotificationMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *xid.ID
-	created_at          *time.Time
-	title               *string
-	description         *string
-	link                *string
-	read                *bool
-	clearedFields       map[string]struct{}
-	subscription        *xid.ID
-	clearedsubscription bool
-	done                bool
-	oldValue            func(context.Context) (*Notification, error)
-	predicates          []predicate.Notification
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	title         *string
+	description   *string
+	link          *string
+	read          *bool
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Notification, error)
+	predicates    []predicate.Notification
 }
 
 var _ ent.Mutation = (*NotificationMutation)(nil)
@@ -2976,45 +2889,6 @@ func (m *NotificationMutation) ResetRead() {
 	m.read = nil
 }
 
-// SetSubscriptionID sets the "subscription" edge to the Subscription entity by id.
-func (m *NotificationMutation) SetSubscriptionID(id xid.ID) {
-	m.subscription = &id
-}
-
-// ClearSubscription clears the "subscription" edge to the Subscription entity.
-func (m *NotificationMutation) ClearSubscription() {
-	m.clearedsubscription = true
-}
-
-// SubscriptionCleared reports if the "subscription" edge to the Subscription entity was cleared.
-func (m *NotificationMutation) SubscriptionCleared() bool {
-	return m.clearedsubscription
-}
-
-// SubscriptionID returns the "subscription" edge ID in the mutation.
-func (m *NotificationMutation) SubscriptionID() (id xid.ID, exists bool) {
-	if m.subscription != nil {
-		return *m.subscription, true
-	}
-	return
-}
-
-// SubscriptionIDs returns the "subscription" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SubscriptionID instead. It exists only for internal usage by the builders.
-func (m *NotificationMutation) SubscriptionIDs() (ids []xid.ID) {
-	if id := m.subscription; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetSubscription resets all changes to the "subscription" edge.
-func (m *NotificationMutation) ResetSubscription() {
-	m.subscription = nil
-	m.clearedsubscription = false
-}
-
 // Where appends a list predicates to the NotificationMutation builder.
 func (m *NotificationMutation) Where(ps ...predicate.Notification) {
 	m.predicates = append(m.predicates, ps...)
@@ -3216,28 +3090,19 @@ func (m *NotificationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NotificationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.subscription != nil {
-		edges = append(edges, notification.EdgeSubscription)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *NotificationMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case notification.EdgeSubscription:
-		if id := m.subscription; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NotificationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
@@ -3249,42 +3114,25 @@ func (m *NotificationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NotificationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedsubscription {
-		edges = append(edges, notification.EdgeSubscription)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *NotificationMutation) EdgeCleared(name string) bool {
-	switch name {
-	case notification.EdgeSubscription:
-		return m.clearedsubscription
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *NotificationMutation) ClearEdge(name string) error {
-	switch name {
-	case notification.EdgeSubscription:
-		m.ClearSubscription()
-		return nil
-	}
 	return fmt.Errorf("unknown Notification unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *NotificationMutation) ResetEdge(name string) error {
-	switch name {
-	case notification.EdgeSubscription:
-		m.ResetSubscription()
-		return nil
-	}
 	return fmt.Errorf("unknown Notification edge %s", name)
 }
 
@@ -6529,598 +6377,6 @@ func (m *SettingMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *SettingMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Setting edge %s", name)
-}
-
-// SubscriptionMutation represents an operation that mutates the Subscription nodes in the graph.
-type SubscriptionMutation struct {
-	config
-	op                   Op
-	typ                  string
-	id                   *xid.ID
-	created_at           *time.Time
-	refers_type          *string
-	refers_to            *string
-	clearedFields        map[string]struct{}
-	account              *xid.ID
-	clearedaccount       bool
-	notifications        map[xid.ID]struct{}
-	removednotifications map[xid.ID]struct{}
-	clearednotifications bool
-	done                 bool
-	oldValue             func(context.Context) (*Subscription, error)
-	predicates           []predicate.Subscription
-}
-
-var _ ent.Mutation = (*SubscriptionMutation)(nil)
-
-// subscriptionOption allows management of the mutation configuration using functional options.
-type subscriptionOption func(*SubscriptionMutation)
-
-// newSubscriptionMutation creates new mutation for the Subscription entity.
-func newSubscriptionMutation(c config, op Op, opts ...subscriptionOption) *SubscriptionMutation {
-	m := &SubscriptionMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeSubscription,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withSubscriptionID sets the ID field of the mutation.
-func withSubscriptionID(id xid.ID) subscriptionOption {
-	return func(m *SubscriptionMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Subscription
-		)
-		m.oldValue = func(ctx context.Context) (*Subscription, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Subscription.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withSubscription sets the old Subscription of the mutation.
-func withSubscription(node *Subscription) subscriptionOption {
-	return func(m *SubscriptionMutation) {
-		m.oldValue = func(context.Context) (*Subscription, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m SubscriptionMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m SubscriptionMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Subscription entities.
-func (m *SubscriptionMutation) SetID(id xid.ID) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *SubscriptionMutation) ID() (id xid.ID, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *SubscriptionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []xid.ID{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Subscription.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *SubscriptionMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *SubscriptionMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Subscription entity.
-// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *SubscriptionMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetRefersType sets the "refers_type" field.
-func (m *SubscriptionMutation) SetRefersType(s string) {
-	m.refers_type = &s
-}
-
-// RefersType returns the value of the "refers_type" field in the mutation.
-func (m *SubscriptionMutation) RefersType() (r string, exists bool) {
-	v := m.refers_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRefersType returns the old "refers_type" field's value of the Subscription entity.
-// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldRefersType(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRefersType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRefersType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRefersType: %w", err)
-	}
-	return oldValue.RefersType, nil
-}
-
-// ResetRefersType resets all changes to the "refers_type" field.
-func (m *SubscriptionMutation) ResetRefersType() {
-	m.refers_type = nil
-}
-
-// SetRefersTo sets the "refers_to" field.
-func (m *SubscriptionMutation) SetRefersTo(s string) {
-	m.refers_to = &s
-}
-
-// RefersTo returns the value of the "refers_to" field in the mutation.
-func (m *SubscriptionMutation) RefersTo() (r string, exists bool) {
-	v := m.refers_to
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRefersTo returns the old "refers_to" field's value of the Subscription entity.
-// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldRefersTo(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRefersTo is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRefersTo requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRefersTo: %w", err)
-	}
-	return oldValue.RefersTo, nil
-}
-
-// ResetRefersTo resets all changes to the "refers_to" field.
-func (m *SubscriptionMutation) ResetRefersTo() {
-	m.refers_to = nil
-}
-
-// SetAccountID sets the "account" edge to the Account entity by id.
-func (m *SubscriptionMutation) SetAccountID(id xid.ID) {
-	m.account = &id
-}
-
-// ClearAccount clears the "account" edge to the Account entity.
-func (m *SubscriptionMutation) ClearAccount() {
-	m.clearedaccount = true
-}
-
-// AccountCleared reports if the "account" edge to the Account entity was cleared.
-func (m *SubscriptionMutation) AccountCleared() bool {
-	return m.clearedaccount
-}
-
-// AccountID returns the "account" edge ID in the mutation.
-func (m *SubscriptionMutation) AccountID() (id xid.ID, exists bool) {
-	if m.account != nil {
-		return *m.account, true
-	}
-	return
-}
-
-// AccountIDs returns the "account" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// AccountID instead. It exists only for internal usage by the builders.
-func (m *SubscriptionMutation) AccountIDs() (ids []xid.ID) {
-	if id := m.account; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetAccount resets all changes to the "account" edge.
-func (m *SubscriptionMutation) ResetAccount() {
-	m.account = nil
-	m.clearedaccount = false
-}
-
-// AddNotificationIDs adds the "notifications" edge to the Notification entity by ids.
-func (m *SubscriptionMutation) AddNotificationIDs(ids ...xid.ID) {
-	if m.notifications == nil {
-		m.notifications = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.notifications[ids[i]] = struct{}{}
-	}
-}
-
-// ClearNotifications clears the "notifications" edge to the Notification entity.
-func (m *SubscriptionMutation) ClearNotifications() {
-	m.clearednotifications = true
-}
-
-// NotificationsCleared reports if the "notifications" edge to the Notification entity was cleared.
-func (m *SubscriptionMutation) NotificationsCleared() bool {
-	return m.clearednotifications
-}
-
-// RemoveNotificationIDs removes the "notifications" edge to the Notification entity by IDs.
-func (m *SubscriptionMutation) RemoveNotificationIDs(ids ...xid.ID) {
-	if m.removednotifications == nil {
-		m.removednotifications = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.notifications, ids[i])
-		m.removednotifications[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedNotifications returns the removed IDs of the "notifications" edge to the Notification entity.
-func (m *SubscriptionMutation) RemovedNotificationsIDs() (ids []xid.ID) {
-	for id := range m.removednotifications {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// NotificationsIDs returns the "notifications" edge IDs in the mutation.
-func (m *SubscriptionMutation) NotificationsIDs() (ids []xid.ID) {
-	for id := range m.notifications {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetNotifications resets all changes to the "notifications" edge.
-func (m *SubscriptionMutation) ResetNotifications() {
-	m.notifications = nil
-	m.clearednotifications = false
-	m.removednotifications = nil
-}
-
-// Where appends a list predicates to the SubscriptionMutation builder.
-func (m *SubscriptionMutation) Where(ps ...predicate.Subscription) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the SubscriptionMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *SubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Subscription, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *SubscriptionMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *SubscriptionMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Subscription).
-func (m *SubscriptionMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *SubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.created_at != nil {
-		fields = append(fields, subscription.FieldCreatedAt)
-	}
-	if m.refers_type != nil {
-		fields = append(fields, subscription.FieldRefersType)
-	}
-	if m.refers_to != nil {
-		fields = append(fields, subscription.FieldRefersTo)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case subscription.FieldCreatedAt:
-		return m.CreatedAt()
-	case subscription.FieldRefersType:
-		return m.RefersType()
-	case subscription.FieldRefersTo:
-		return m.RefersTo()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case subscription.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case subscription.FieldRefersType:
-		return m.OldRefersType(ctx)
-	case subscription.FieldRefersTo:
-		return m.OldRefersTo(ctx)
-	}
-	return nil, fmt.Errorf("unknown Subscription field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case subscription.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case subscription.FieldRefersType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRefersType(v)
-		return nil
-	case subscription.FieldRefersTo:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRefersTo(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Subscription field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *SubscriptionMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Subscription numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *SubscriptionMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *SubscriptionMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *SubscriptionMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Subscription nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *SubscriptionMutation) ResetField(name string) error {
-	switch name {
-	case subscription.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case subscription.FieldRefersType:
-		m.ResetRefersType()
-		return nil
-	case subscription.FieldRefersTo:
-		m.ResetRefersTo()
-		return nil
-	}
-	return fmt.Errorf("unknown Subscription field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *SubscriptionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.account != nil {
-		edges = append(edges, subscription.EdgeAccount)
-	}
-	if m.notifications != nil {
-		edges = append(edges, subscription.EdgeNotifications)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *SubscriptionMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case subscription.EdgeAccount:
-		if id := m.account; id != nil {
-			return []ent.Value{*id}
-		}
-	case subscription.EdgeNotifications:
-		ids := make([]ent.Value, 0, len(m.notifications))
-		for id := range m.notifications {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *SubscriptionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removednotifications != nil {
-		edges = append(edges, subscription.EdgeNotifications)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *SubscriptionMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case subscription.EdgeNotifications:
-		ids := make([]ent.Value, 0, len(m.removednotifications))
-		for id := range m.removednotifications {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *SubscriptionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedaccount {
-		edges = append(edges, subscription.EdgeAccount)
-	}
-	if m.clearednotifications {
-		edges = append(edges, subscription.EdgeNotifications)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *SubscriptionMutation) EdgeCleared(name string) bool {
-	switch name {
-	case subscription.EdgeAccount:
-		return m.clearedaccount
-	case subscription.EdgeNotifications:
-		return m.clearednotifications
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *SubscriptionMutation) ClearEdge(name string) error {
-	switch name {
-	case subscription.EdgeAccount:
-		m.ClearAccount()
-		return nil
-	}
-	return fmt.Errorf("unknown Subscription unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *SubscriptionMutation) ResetEdge(name string) error {
-	switch name {
-	case subscription.EdgeAccount:
-		m.ResetAccount()
-		return nil
-	case subscription.EdgeNotifications:
-		m.ResetNotifications()
-		return nil
-	}
-	return fmt.Errorf("unknown Subscription edge %s", name)
 }
 
 // TagMutation represents an operation that mutates the Tag nodes in the graph.

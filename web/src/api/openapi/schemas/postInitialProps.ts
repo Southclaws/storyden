@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostBodyMarkdown } from "./postBodyMarkdown";
-import type { Metadata } from "./metadata";
 import type { Identifier } from "./identifier";
+import type { Metadata } from "./metadata";
+import type { PostBodyMarkdown } from "./postBodyMarkdown";
 
 export interface PostInitialProps {
   body: PostBodyMarkdown;

@@ -5,13 +5,13 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PublicKeyCredentialRpEntity } from "./publicKeyCredentialRpEntity";
-import type { PublicKeyCredentialUserEntity } from "./publicKeyCredentialUserEntity";
-import type { PublicKeyCredentialParameters } from "./publicKeyCredentialParameters";
-import type { PublicKeyCredentialDescriptor } from "./publicKeyCredentialDescriptor";
-import type { AuthenticatorSelectionCriteria } from "./authenticatorSelectionCriteria";
 import type { AttestationConveyancePreference } from "./attestationConveyancePreference";
 import type { AuthenticationExtensionsClientInputs } from "./authenticationExtensionsClientInputs";
+import type { AuthenticatorSelectionCriteria } from "./authenticatorSelectionCriteria";
+import type { PublicKeyCredentialDescriptor } from "./publicKeyCredentialDescriptor";
+import type { PublicKeyCredentialParameters } from "./publicKeyCredentialParameters";
+import type { PublicKeyCredentialRpEntity } from "./publicKeyCredentialRpEntity";
+import type { PublicKeyCredentialUserEntity } from "./publicKeyCredentialUserEntity";
 
 /**
  * https://www.w3.org/TR/webautehn-2/#dictdef-publickeycredentialcreationoptions

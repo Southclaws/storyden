@@ -143,10 +143,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -159,10 +156,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -178,10 +172,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -194,10 +185,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -369,10 +357,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -385,10 +370,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Columns: []string{react.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: account.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -404,10 +386,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -420,10 +399,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			Columns: []string{react.PostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeString,
-					Column: post.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

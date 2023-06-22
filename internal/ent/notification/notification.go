@@ -23,17 +23,8 @@ const (
 	FieldLink = "link"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
-	// EdgeSubscription holds the string denoting the subscription edge name in mutations.
-	EdgeSubscription = "subscription"
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
-	// SubscriptionTable is the table that holds the subscription relation/edge.
-	SubscriptionTable = "notifications"
-	// SubscriptionInverseTable is the table name for the Subscription entity.
-	// It exists in this package in order to avoid circular dependency with the "subscription" package.
-	SubscriptionInverseTable = "subscriptions"
-	// SubscriptionColumn is the table column denoting the subscription relation/edge.
-	SubscriptionColumn = "notification_subscription"
 )
 
 // Columns holds all SQL columns for notification fields.
@@ -46,22 +37,10 @@ var Columns = []string{
 	FieldRead,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "notifications"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"notification_subscription",
-	"subscription_notifications",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/setting"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -320,45 +319,6 @@ func init() {
 	setting.DefaultUpdatedAt = settingDescUpdatedAt.Default.(func() time.Time)
 	// setting.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	setting.UpdateDefaultUpdatedAt = settingDescUpdatedAt.UpdateDefault.(func() time.Time)
-	subscriptionMixin := schema.Subscription{}.Mixin()
-	subscriptionMixinFields0 := subscriptionMixin[0].Fields()
-	_ = subscriptionMixinFields0
-	subscriptionMixinFields1 := subscriptionMixin[1].Fields()
-	_ = subscriptionMixinFields1
-	subscriptionFields := schema.Subscription{}.Fields()
-	_ = subscriptionFields
-	// subscriptionDescCreatedAt is the schema descriptor for created_at field.
-	subscriptionDescCreatedAt := subscriptionMixinFields1[0].Descriptor()
-	// subscription.DefaultCreatedAt holds the default value on creation for the created_at field.
-	subscription.DefaultCreatedAt = subscriptionDescCreatedAt.Default.(func() time.Time)
-	// subscriptionDescRefersType is the schema descriptor for refers_type field.
-	subscriptionDescRefersType := subscriptionFields[0].Descriptor()
-	// subscription.RefersTypeValidator is a validator for the "refers_type" field. It is called by the builders before save.
-	subscription.RefersTypeValidator = subscriptionDescRefersType.Validators[0].(func(string) error)
-	// subscriptionDescRefersTo is the schema descriptor for refers_to field.
-	subscriptionDescRefersTo := subscriptionFields[1].Descriptor()
-	// subscription.RefersToValidator is a validator for the "refers_to" field. It is called by the builders before save.
-	subscription.RefersToValidator = subscriptionDescRefersTo.Validators[0].(func(string) error)
-	// subscriptionDescID is the schema descriptor for id field.
-	subscriptionDescID := subscriptionMixinFields0[0].Descriptor()
-	// subscription.DefaultID holds the default value on creation for the id field.
-	subscription.DefaultID = subscriptionDescID.Default.(func() xid.ID)
-	// subscription.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	subscription.IDValidator = func() func(string) error {
-		validators := subscriptionDescID.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(id string) error {
-			for _, fn := range fns {
-				if err := fn(id); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
 	tagMixin := schema.Tag{}.Mixin()
 	tagMixinFields0 := tagMixin[0].Fields()
 	_ = tagMixinFields0

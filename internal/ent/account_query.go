@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
-	"github.com/Southclaws/storyden/internal/ent/subscription"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -32,7 +31,6 @@ type AccountQuery struct {
 	withPosts          *PostQuery
 	withReacts         *ReactQuery
 	withRoles          *RoleQuery
-	withSubscriptions  *SubscriptionQuery
 	withAuthentication *AuthenticationQuery
 	withTags           *TagQuery
 	modifiers          []func(*sql.Selector)
@@ -131,28 +129,6 @@ func (aq *AccountQuery) QueryRoles() *RoleQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, account.RolesTable, account.RolesPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubscriptions chains the current query on the "subscriptions" edge.
-func (aq *AccountQuery) QuerySubscriptions() *SubscriptionQuery {
-	query := (&SubscriptionClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(account.Table, account.FieldID, selector),
-			sqlgraph.To(subscription.Table, subscription.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.SubscriptionsTable, account.SubscriptionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -399,7 +375,6 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withPosts:          aq.withPosts.Clone(),
 		withReacts:         aq.withReacts.Clone(),
 		withRoles:          aq.withRoles.Clone(),
-		withSubscriptions:  aq.withSubscriptions.Clone(),
 		withAuthentication: aq.withAuthentication.Clone(),
 		withTags:           aq.withTags.Clone(),
 		// clone intermediate query.
@@ -438,17 +413,6 @@ func (aq *AccountQuery) WithRoles(opts ...func(*RoleQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withRoles = query
-	return aq
-}
-
-// WithSubscriptions tells the query-builder to eager-load the nodes that are connected to
-// the "subscriptions" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithSubscriptions(opts ...func(*SubscriptionQuery)) *AccountQuery {
-	query := (&SubscriptionClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withSubscriptions = query
 	return aq
 }
 
@@ -552,11 +516,10 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [5]bool{
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withRoles != nil,
-			aq.withSubscriptions != nil,
 			aq.withAuthentication != nil,
 			aq.withTags != nil,
 		}
@@ -600,13 +563,6 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadRoles(ctx, query, nodes,
 			func(n *Account) { n.Edges.Roles = []*Role{} },
 			func(n *Account, e *Role) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := aq.withSubscriptions; query != nil {
-		if err := aq.loadSubscriptions(ctx, query, nodes,
-			func(n *Account) { n.Edges.Subscriptions = []*Subscription{} },
-			func(n *Account, e *Subscription) { n.Edges.Subscriptions = append(n.Edges.Subscriptions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -743,37 +699,6 @@ func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes [
 		for kn := range nodes {
 			assign(kn, n)
 		}
-	}
-	return nil
-}
-func (aq *AccountQuery) loadSubscriptions(ctx context.Context, query *SubscriptionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Subscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[xid.ID]*Account)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Subscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.SubscriptionsColumn, fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.account_subscriptions
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "account_subscriptions" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_subscriptions" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
 	}
 	return nil
 }
