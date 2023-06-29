@@ -1,13 +1,15 @@
-import { PostProps } from "src/api/openapi/schemas";
-import { useThreadScreenContext } from "../../context";
-import { useAuthProvider } from "src/auth/useAuthProvider";
 import { useClipboard, useToast } from "@chakra-ui/react";
-import { getPermalinkForPost } from "../../utils";
-import { threadDelete } from "src/api/openapi/threads";
 import { useRouter } from "next/navigation";
-import { postDelete } from "src/api/openapi/posts";
 import { mutate } from "swr";
+
+import { postDelete } from "src/api/openapi/posts";
+import { PostProps } from "src/api/openapi/schemas";
+import { threadDelete } from "src/api/openapi/threads";
 import { getThreadGetKey } from "src/api/openapi/threads";
+import { useAuthProvider } from "src/auth/useAuthProvider";
+
+import { useThreadScreenContext } from "../../context";
+import { getPermalinkForPost } from "../../utils";
 
 export function usePostMenu(props: PostProps) {
   const router = useRouter();
@@ -30,7 +32,7 @@ export function usePostMenu(props: PostProps) {
     await navigator.share({
       title: `A post by ${props.author.name}`,
       url: `#${props.id}`,
-      text: props.body,
+      text: props.body.value,
     });
   }
 

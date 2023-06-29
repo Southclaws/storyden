@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -47,6 +48,11 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	jsonBody, err := json.Marshal(request.Body.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var reply opt.Optional[post.PostID]
 
 	if request.Body.ReplyTo != nil {
@@ -60,7 +66,7 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 	}
 
 	post, err := p.post_svc.Create(ctx,
-		request.Body.Body,
+		string(jsonBody),
 		accountID,
 		postID,
 		reply,
@@ -70,8 +76,13 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	sp, err := serialisePost(post)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.PostCreate200JSONResponse{
-		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(serialisePost(post)),
+		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(sp),
 	}, nil
 }
 
@@ -81,15 +92,25 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	jsonBody, err := json.Marshal(request.Body.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	post, err := p.post_svc.Update(ctx, postID, post_service.Partial{
-		Body: opt.NewPtr(request.Body.Body),
+		Body: opt.New(string(jsonBody)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	sp, err := serialisePost(post)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.PostUpdate200JSONResponse{
-		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(serialisePost(post)),
+		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(sp),
 	}, nil
 }
 
@@ -124,7 +145,10 @@ func (p *Posts) PostSearch(ctx context.Context, request openapi.PostSearchReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	results := dt.Map(posts, serialisePost)
+	results, err := dt.MapErr(posts, serialisePost)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return openapi.PostSearch200JSONResponse{
 		PostSearchOKJSONResponse: openapi.PostSearchOKJSONResponse{

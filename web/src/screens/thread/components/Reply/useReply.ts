@@ -1,5 +1,6 @@
 import { useToast } from "@chakra-ui/react";
 import { useState } from "react";
+
 import { postCreate } from "src/api/openapi/posts";
 import { Thread } from "src/api/openapi/schemas";
 import { useThreadGet } from "src/api/openapi/threads";
@@ -18,7 +19,12 @@ export function useReply(thread: Thread) {
     if (!loggedIn) return;
 
     setLoading(true);
-    await postCreate(thread.id, { body: md }).catch(errorToast(toast));
+    await postCreate(thread.id, {
+      body: {
+        type: "plain",
+        value: md,
+      },
+    }).catch(errorToast(toast));
     mutate();
     setLoading(false);
   }

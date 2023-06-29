@@ -21,6 +21,7 @@ type Post struct {
 	ID PostID `json:"id"`
 
 	Body           string
+	BodyType       string
 	Short          string
 	Author         Author
 	RootPostID     PostID
@@ -32,6 +33,11 @@ type Post struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
+}
+
+type Content struct {
+	Type  string
+	Value string
 }
 
 func (*Post) GetResourceName() string { return "post" }
@@ -62,8 +68,9 @@ func FromModel(m *ent.Post) (w *Post) {
 	return &Post{
 		ID: PostID(m.ID),
 
-		Body:  m.Body,
-		Short: m.Short,
+		Body:     m.Body,
+		BodyType: opt.NewPtr(m.BodyContentType).Or("text/markdown"),
+		Short:    m.Short,
 		Author: Author{
 			ID:        account.AccountID(m.Edges.Author.ID),
 			Name:      m.Edges.Author.Name,

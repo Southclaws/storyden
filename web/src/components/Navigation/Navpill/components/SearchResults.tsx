@@ -1,4 +1,5 @@
 import { ListItem, OrderedList, Text } from "@chakra-ui/react";
+
 import { PostProps } from "src/api/openapi/schemas";
 
 type Props = {
@@ -9,7 +10,7 @@ export function SearchResults(props: Props) {
     <OrderedList m={0}>
       {props.results.map((v) => (
         <ListItem key={v.id}>
-          <Text>{v.body}</Text>
+          <Text>{v.body.value}</Text>
         </ListItem>
       ))}
     </OrderedList>

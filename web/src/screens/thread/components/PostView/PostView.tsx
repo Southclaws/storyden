@@ -1,10 +1,13 @@
 import { Button, Flex, HStack } from "@chakra-ui/react";
+
 import { PostProps } from "src/api/openapi/schemas";
-import { Markdown } from "src/components/Markdown";
-import { Editor } from "src/components/Editor";
+import { ContentComposer } from "src/components/ContentComposer/ContentComposer";
+import { ContentViewer } from "src/components/ContentViewer/ContentViewer";
+
 import { Byline } from "../Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
 import { ReactList } from "../ReactList/ReactList";
+
 import { usePostView } from "./usePostView";
 
 type Props = PostProps & {
@@ -15,10 +18,10 @@ export function PostView(props: Props) {
   const {
     isEditing,
     editingContent,
-    setEditingContent,
+    onContentChange,
     onPublishEdit,
     onCancelEdit,
-  } = usePostView(props);
+  } = usePostView(props); 
 
   return (
     <Flex id={props.id} flexDir="column" gap={2}>
@@ -31,7 +34,10 @@ export function PostView(props: Props) {
       />
       {isEditing ? (
         <>
-          <Editor onChange={setEditingContent} value={editingContent} />
+          <ContentComposer
+            onChange={onContentChange}
+            initialValue={editingContent}
+          />
           <HStack>
             <Button onClick={onPublishEdit}>Update</Button>
             <Button variant="outline" onClick={onCancelEdit}>
@@ -40,7 +46,7 @@ export function PostView(props: Props) {
           </HStack>
         </>
       ) : (
-        <Markdown>{props.body}</Markdown>
+        <ContentViewer value={props.body} />
       )}
       <ReactList {...props} />
     </Flex>

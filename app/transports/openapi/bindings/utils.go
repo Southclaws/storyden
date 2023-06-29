@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -47,8 +48,13 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 	}
 }
 
-func serialiseThread(t *thread.Thread) openapi.Thread {
-	return openapi.Thread{
+func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
+	posts, err := dt.MapErr(t.Posts, serialisePost)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return &openapi.Thread{
 		Author:    serialiseProfileReference(t.Author),
 		Category:  serialiseCategoryReference(&t.Category),
 		CreatedAt: t.CreatedAt,
@@ -60,13 +66,13 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Short:     &t.Short,
 		Slug:      t.Slug,
 		Tags:      t.Tags,
-		Posts:     dt.Map(t.Posts, serialisePost),
+		Posts:     posts,
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
-	}
+	}, nil
 }
 
-func serialisePost(p *post.Post) openapi.PostProps {
+func serialisePost(p *post.Post) (openapi.PostProps, error) {
 	return openapi.PostProps{
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
@@ -74,9 +80,26 @@ func serialisePost(p *post.Post) openapi.PostProps {
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
 		RootId:    p.RootPostID.String(),
 		RootSlug:  p.RootThreadMark,
-		Body:      p.Body,
-		Author:    serialiseProfileReference(p.Author),
-		Reacts:    dt.Map(p.Reacts, serialiseReact),
+		Body: openapi.PostContent{
+			Type:  p.BodyType,
+			Value: p.Body,
+		},
+		Author: serialiseProfileReference(p.Author),
+		Reacts: dt.Map(p.Reacts, serialiseReact),
+	}, nil
+}
+
+func serialisePostContent(c post.Content) openapi.PostContent {
+	return openapi.PostContent{
+		Type:  c.Type,
+		Value: c.Value,
+	}
+}
+
+func deserialisePostContent(c openapi.PostContent) post.Content {
+	return post.Content{
+		Type:  c.Type,
+		Value: c.Value,
 	}
 }
 

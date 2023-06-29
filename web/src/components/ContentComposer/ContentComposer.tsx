@@ -2,13 +2,13 @@ import { Box, BoxProps } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { Editable, Slate } from "slate-react";
 
-import { Props, useCompose } from "./useCompose";
+import { Props, useContentComposer } from "./useContentComposer";
 
-export function Compose({
+export function ContentComposer({
   children,
   ...props
-}: PropsWithChildren<Props & BoxProps>) {
-  const { editor, initialValue, onChange } = useCompose(props);
+}: PropsWithChildren<Props & Omit<BoxProps, "onChange">>) {
+  const { editor, initialValue, onChange } = useContentComposer(props);
 
   return (
     <Box id="rich-text-editor" w="full">

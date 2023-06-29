@@ -7,14 +7,14 @@
  */
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
-import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { PostContent } from "./postContent";
 import type { TagListIDs } from "./tagListIDs";
 import type { ThreadStatus } from "./threadStatus";
 import type { ThreadTitle } from "./threadTitle";
 
 export interface ThreadInitialProps {
   title: ThreadTitle;
-  body: PostBodyMarkdown;
+  body: PostContent;
   tags?: TagListIDs;
   meta?: Metadata;
   category: Identifier;

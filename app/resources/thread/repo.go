@@ -65,6 +65,13 @@ func WithTitle(v string) Option {
 	}
 }
 
+func WithContent(v post_resource.Content) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetBody(v.Value)
+		pm.SetBodyContentType(v.Type)
+	}
+}
+
 func WithBody(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(v)

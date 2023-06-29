@@ -42,7 +42,7 @@ func (s *service) Update(ctx context.Context, threadID post.PostID, partial Part
 	opts := []thread.Option{}
 
 	partial.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
-	partial.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
+	partial.Body.Call(func(v post.Content) { opts = append(opts, thread.WithContent(v)) })
 	partial.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	partial.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
 	partial.Status.Call(func(v thread.Status) { opts = append(opts, thread.WithStatus(v)) })

@@ -30,6 +30,7 @@ func (Post) Fields() []ent.Field {
 
 		// All posts
 		field.String("body"),
+		field.String("body_content_type").Optional().Nillable(),
 		field.String("short"),
 		field.JSON("metadata", map[string]any{}).
 			Optional().

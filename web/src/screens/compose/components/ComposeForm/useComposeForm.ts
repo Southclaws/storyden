@@ -33,7 +33,7 @@ export function useComposeForm({ draft, editing }: Props) {
     defaultValues: draft
       ? {
           title: draft.title,
-          body: draft.posts[0]?.body,
+          body: draft.posts[0]?.body.value,
           tags: draft.tags,
         }
       : {
@@ -47,18 +47,23 @@ export function useComposeForm({ draft, editing }: Props) {
   }
 
   const onSave = formContext.handleSubmit(async (props: ThreadCreate) => {
+    const payload = {
+      title: props.title,
+      category: props.category,
+      body: {
+        type: "application/json",
+        value: props.body,
+      },
+      tags: [],
+      status: ThreadStatus.draft,
+    };
+
     if (editing) {
-      await threadUpdate(editing, {
-        ...props,
-      })
+      await threadUpdate(editing, payload)
         .then((thread: ThreadCreateOKResponse) => thread.id)
         .catch(errorToast(toast));
     } else {
-      const id = await threadCreate({
-        ...props,
-        status: ThreadStatus.draft,
-        tags: [],
-      })
+      const id = await threadCreate(payload)
         .then((thread: ThreadCreateOKResponse) => thread.id)
         .catch(errorToast(toast));
 
@@ -79,7 +84,10 @@ export function useComposeForm({ draft, editing }: Props) {
       } else {
         await threadCreate({
           title,
-          body,
+          body: {
+            type: "application/json",
+            value: body,
+          },
           category,
           status: ThreadStatus.published,
           tags: [],

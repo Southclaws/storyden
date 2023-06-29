@@ -40,6 +40,8 @@ type Post struct {
 	ReplyToPostID xid.ID `json:"reply_to_post_id,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
+	// BodyContentType holds the value of the "body_content_type" field.
+	BodyContentType *string `json:"body_content_type,omitempty"`
 	// Short holds the value of the "short" field.
 	Short string `json:"short,omitempty"`
 	// Arbitrary metadata used by clients to store domain specific information.
@@ -174,7 +176,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldBodyContentType, post.FieldShort, post.FieldStatus:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -263,6 +265,13 @@ func (po *Post) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
 				po.Body = value.String
+			}
+		case post.FieldBodyContentType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field body_content_type", values[i])
+			} else if value.Valid {
+				po.BodyContentType = new(string)
+				*po.BodyContentType = value.String
 			}
 		case post.FieldShort:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -396,6 +405,11 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("body=")
 	builder.WriteString(po.Body)
+	builder.WriteString(", ")
+	if v := po.BodyContentType; v != nil {
+		builder.WriteString("body_content_type=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("short=")
 	builder.WriteString(po.Short)

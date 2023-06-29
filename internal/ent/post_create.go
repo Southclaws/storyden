@@ -152,6 +152,20 @@ func (pc *PostCreate) SetBody(s string) *PostCreate {
 	return pc
 }
 
+// SetBodyContentType sets the "body_content_type" field.
+func (pc *PostCreate) SetBodyContentType(s string) *PostCreate {
+	pc.mutation.SetBodyContentType(s)
+	return pc
+}
+
+// SetNillableBodyContentType sets the "body_content_type" field if the given value is not nil.
+func (pc *PostCreate) SetNillableBodyContentType(s *string) *PostCreate {
+	if s != nil {
+		pc.SetBodyContentType(*s)
+	}
+	return pc
+}
+
 // SetShort sets the "short" field.
 func (pc *PostCreate) SetShort(s string) *PostCreate {
 	pc.mutation.SetShort(s)
@@ -480,6 +494,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 		_node.Body = value
+	}
+	if value, ok := pc.mutation.BodyContentType(); ok {
+		_spec.SetField(post.FieldBodyContentType, field.TypeString, value)
+		_node.BodyContentType = &value
 	}
 	if value, ok := pc.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
@@ -815,6 +833,24 @@ func (u *PostUpsert) UpdateBody() *PostUpsert {
 	return u
 }
 
+// SetBodyContentType sets the "body_content_type" field.
+func (u *PostUpsert) SetBodyContentType(v string) *PostUpsert {
+	u.Set(post.FieldBodyContentType, v)
+	return u
+}
+
+// UpdateBodyContentType sets the "body_content_type" field to the value that was provided on create.
+func (u *PostUpsert) UpdateBodyContentType() *PostUpsert {
+	u.SetExcluded(post.FieldBodyContentType)
+	return u
+}
+
+// ClearBodyContentType clears the value of the "body_content_type" field.
+func (u *PostUpsert) ClearBodyContentType() *PostUpsert {
+	u.SetNull(post.FieldBodyContentType)
+	return u
+}
+
 // SetShort sets the "short" field.
 func (u *PostUpsert) SetShort(v string) *PostUpsert {
 	u.Set(post.FieldShort, v)
@@ -1084,6 +1120,27 @@ func (u *PostUpsertOne) SetBody(v string) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateBody() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateBody()
+	})
+}
+
+// SetBodyContentType sets the "body_content_type" field.
+func (u *PostUpsertOne) SetBodyContentType(v string) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetBodyContentType(v)
+	})
+}
+
+// UpdateBodyContentType sets the "body_content_type" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateBodyContentType() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateBodyContentType()
+	})
+}
+
+// ClearBodyContentType clears the value of the "body_content_type" field.
+func (u *PostUpsertOne) ClearBodyContentType() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearBodyContentType()
 	})
 }
 
@@ -1529,6 +1586,27 @@ func (u *PostUpsertBulk) SetBody(v string) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateBody() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateBody()
+	})
+}
+
+// SetBodyContentType sets the "body_content_type" field.
+func (u *PostUpsertBulk) SetBodyContentType(v string) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetBodyContentType(v)
+	})
+}
+
+// UpdateBodyContentType sets the "body_content_type" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateBodyContentType() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateBodyContentType()
+	})
+}
+
+// ClearBodyContentType clears the value of the "body_content_type" field.
+func (u *PostUpsertBulk) ClearBodyContentType() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearBodyContentType()
 	})
 }
 

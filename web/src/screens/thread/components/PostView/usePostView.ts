@@ -1,8 +1,10 @@
-import { PostProps } from "src/api/openapi/schemas";
-import { useThreadScreenContext } from "../../context";
-import { threadUpdate } from "src/api/openapi/threads";
-import { postUpdate } from "src/api/openapi/posts";
 import { useToast } from "@chakra-ui/react";
+
+import { postUpdate } from "src/api/openapi/posts";
+import { PostProps } from "src/api/openapi/schemas";
+import { threadUpdate } from "src/api/openapi/threads";
+
+import { useThreadScreenContext } from "../../context";
 
 export function usePostView(props: PostProps) {
   const {
@@ -18,6 +20,10 @@ export function usePostView(props: PostProps) {
   const isEditing = editingPostID === props.id;
   const isEditingThread = thread?.id === editingPostID;
 
+  function onContentChange(value: string) {
+    setEditingContent(value);
+  }
+
   async function onPublishEdit() {
     if (!editingPostID) {
       throw new Error(
@@ -28,11 +34,17 @@ export function usePostView(props: PostProps) {
     if (isEditingThread) {
       await threadUpdate(editingPostID, {
         title: editingTitle,
-        body: editingContent,
+        body: {
+          type: "application/json",
+          value: editingContent ?? "",
+        },
       }).then(() => toast({ title: "Thread updated" }));
     } else {
       await postUpdate(editingPostID, {
-        body: editingContent,
+        body: {
+          type: "application/json",
+          value: editingContent ?? "",
+        },
       }).then(() => toast({ title: "Post updated" }));
     }
 
@@ -46,7 +58,7 @@ export function usePostView(props: PostProps) {
   return {
     isEditing,
     editingContent,
-    setEditingContent,
+    onContentChange,
     onPublishEdit,
     onCancelEdit,
   };

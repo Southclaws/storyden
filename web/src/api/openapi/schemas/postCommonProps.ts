@@ -7,7 +7,7 @@
  */
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
-import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
 import type { ThreadMark } from "./threadMark";
@@ -15,7 +15,7 @@ import type { ThreadMark } from "./threadMark";
 export interface PostCommonProps {
   root_id: Identifier;
   root_slug: ThreadMark;
-  body: PostBodyMarkdown;
+  body: PostContent;
   author: ProfileReference;
   meta?: Metadata;
   reacts: ReactList;
