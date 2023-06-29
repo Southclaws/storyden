@@ -52,7 +52,7 @@ type Service interface {
 
 type Partial struct {
 	Title    opt.Optional[string]
-	Body     opt.Optional[string]
+	Body     opt.Optional[post.Content]
 	Tags     opt.Optional[[]xid.ID]
 	Category opt.Optional[xid.ID]
 	Status   opt.Optional[thread.Status]

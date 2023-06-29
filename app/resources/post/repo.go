@@ -3,9 +3,9 @@ package post
 import (
 	"context"
 
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -39,6 +39,12 @@ func WithID(id PostID) Option {
 func WithBody(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(v)
+	}
+}
+
+func WithBodyType(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetBodyContentType(v)
 	}
 }
 

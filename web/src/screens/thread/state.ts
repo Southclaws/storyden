@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { ThreadScreenContextShape } from "./context";
+
 import { Thread } from "src/api/openapi/schemas";
+
+import { ThreadScreenContextShape } from "./context";
 
 export function useThreadScreenState(
   props: Thread | undefined
@@ -23,7 +25,7 @@ export function useThreadScreenState(
 
     const target = props?.posts.find((p) => p.id === id);
     if (target) {
-      setEditingContent(target.body);
+      setEditingContent(target.body.value);
     }
   }
 

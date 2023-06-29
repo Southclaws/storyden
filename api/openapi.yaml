@@ -1036,13 +1036,20 @@ components:
       description: A list of tags IDs.
       items: { $ref: "#/components/schemas/Identifier" }
 
-    PostBodyMarkdown:
-      type: string
-      description: The body text of a post within a thread.
-      example: |
-        # My post
-
-        This is a _post_ within a _thread_ formatted in *markdown*.
+    PostContent:
+      description: |
+        The body text of a post within a thread. The type is either a string or
+        an object, depending on what was used during creation. Strings can be
+        used for basic plain text or markdown content and objects are used for
+        more complex types such as Slate.js editor documents.
+      required: [type, value]
+      properties:
+        type:
+          description: A MIME-type describing what the content type of value is.
+          type: string
+        value:
+          description: The actual post content.
+          type: string
 
     #
     #        d8888          888    888
@@ -1515,7 +1522,7 @@ components:
         - status
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
-        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagListIDs" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
@@ -1525,7 +1532,7 @@ components:
       type: object
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
-        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagListIDs" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
@@ -1627,7 +1634,7 @@ components:
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
-        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        body: { $ref: "#/components/schemas/PostContent" }
         author: { $ref: "#/components/schemas/ProfileReference" }
         meta: { $ref: "#/components/schemas/Metadata" }
         reacts: { $ref: "#/components/schemas/ReactList" }
@@ -1637,14 +1644,14 @@ components:
       type: object
       required: [body]
       properties:
-        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
 
     PostMutableProps:
       type: object
       properties:
-        body: { $ref: "#/components/schemas/PostBodyMarkdown" }
+        body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     ReactList:

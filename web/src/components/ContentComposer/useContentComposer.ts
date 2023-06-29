@@ -15,33 +15,34 @@ declare module "slate" {
 
 export type Props = {
   initialValue?: string;
-  onChange: (value: unknown) => void;
+  onChange: (value: string) => void;
 };
 
 const defaultValue: Descendant[] = [
   {
     type: "paragraph",
-    children: [{ text: "Write your heart out..." }],
+    children: [{ text: "" }],
   },
 ];
 
-export function useCompose(props: Props) {
+export function useContentComposer(props: Props) {
   const [editor] = useState(() => withReact(createEditor()));
 
-  const initialValue = useMemo(
-    () => (props.initialValue ? JSON.parse(props.initialValue) : defaultValue),
-    [props.initialValue]
-  );
+  const initialValue: Descendant[] = useMemo(() => {
+    if (props.initialValue) {
+      return JSON.parse(props.initialValue);
+    }
 
-  function onChange(value: unknown) {
+    return defaultValue;
+  }, [props.initialValue]);
+
+  function onChange(value: Descendant[]) {
     const isAstChange = editor.operations.some(
       (op) => "set_selection" !== op.type
     );
 
     if (isAstChange) {
-      const content = JSON.stringify(value);
-
-      props.onChange(content);
+      props.onChange(JSON.stringify(value));
     }
   }
 

@@ -55,7 +55,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
-		request.Body.Body,
+		request.Body.Body.Value,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,
@@ -66,8 +66,13 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	sp, err := serialiseThread(thread)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.ThreadCreate200JSONResponse{
-		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread)),
+		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(*sp),
 	}, nil
 }
 
@@ -84,7 +89,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:    opt.NewPtr(request.Body.Title),
-		Body:     opt.NewPtr(request.Body.Body),
+		Body:     opt.Map(opt.NewPtr(request.Body.Body), deserialisePostContent),
 		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
 		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Status:   status,
@@ -93,8 +98,13 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	sp, err := serialiseThread(thread)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.ThreadUpdate200JSONResponse{
-		ThreadUpdateOKJSONResponse: openapi.ThreadUpdateOKJSONResponse(serialiseThread(thread)),
+		ThreadUpdateOKJSONResponse: openapi.ThreadUpdateOKJSONResponse(*sp),
 	}, nil
 }
 
@@ -159,8 +169,13 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	sp, err := serialiseThread(thread)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.ThreadGet200JSONResponse{
-		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(serialiseThread(thread)),
+		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(*sp),
 	}, nil
 }
 

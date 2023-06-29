@@ -6,9 +6,9 @@
  * OpenAPI spec version: 1
  */
 import type { Metadata } from "./metadata";
-import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { PostContent } from "./postContent";
 
 export interface PostMutableProps {
-  body?: PostBodyMarkdown;
+  body?: PostContent;
   meta?: Metadata;
 }

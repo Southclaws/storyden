@@ -166,6 +166,26 @@ func (pu *PostUpdate) SetBody(s string) *PostUpdate {
 	return pu
 }
 
+// SetBodyContentType sets the "body_content_type" field.
+func (pu *PostUpdate) SetBodyContentType(s string) *PostUpdate {
+	pu.mutation.SetBodyContentType(s)
+	return pu
+}
+
+// SetNillableBodyContentType sets the "body_content_type" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableBodyContentType(s *string) *PostUpdate {
+	if s != nil {
+		pu.SetBodyContentType(*s)
+	}
+	return pu
+}
+
+// ClearBodyContentType clears the value of the "body_content_type" field.
+func (pu *PostUpdate) ClearBodyContentType() *PostUpdate {
+	pu.mutation.ClearBodyContentType()
+	return pu
+}
+
 // SetShort sets the "short" field.
 func (pu *PostUpdate) SetShort(s string) *PostUpdate {
 	pu.mutation.SetShort(s)
@@ -541,6 +561,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.BodyContentType(); ok {
+		_spec.SetField(post.FieldBodyContentType, field.TypeString, value)
+	}
+	if pu.mutation.BodyContentTypeCleared() {
+		_spec.ClearField(post.FieldBodyContentType, field.TypeString)
 	}
 	if value, ok := pu.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
@@ -1004,6 +1030,26 @@ func (puo *PostUpdateOne) SetBody(s string) *PostUpdateOne {
 	return puo
 }
 
+// SetBodyContentType sets the "body_content_type" field.
+func (puo *PostUpdateOne) SetBodyContentType(s string) *PostUpdateOne {
+	puo.mutation.SetBodyContentType(s)
+	return puo
+}
+
+// SetNillableBodyContentType sets the "body_content_type" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableBodyContentType(s *string) *PostUpdateOne {
+	if s != nil {
+		puo.SetBodyContentType(*s)
+	}
+	return puo
+}
+
+// ClearBodyContentType clears the value of the "body_content_type" field.
+func (puo *PostUpdateOne) ClearBodyContentType() *PostUpdateOne {
+	puo.mutation.ClearBodyContentType()
+	return puo
+}
+
 // SetShort sets the "short" field.
 func (puo *PostUpdateOne) SetShort(s string) *PostUpdateOne {
 	puo.mutation.SetShort(s)
@@ -1409,6 +1455,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.BodyContentType(); ok {
+		_spec.SetField(post.FieldBodyContentType, field.TypeString, value)
+	}
+	if puo.mutation.BodyContentTypeCleared() {
+		_spec.ClearField(post.FieldBodyContentType, field.TypeString)
 	}
 	if value, ok := puo.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)

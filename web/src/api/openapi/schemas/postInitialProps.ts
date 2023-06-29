@@ -7,10 +7,10 @@
  */
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
-import type { PostBodyMarkdown } from "./postBodyMarkdown";
+import type { PostContent } from "./postContent";
 
 export interface PostInitialProps {
-  body: PostBodyMarkdown;
+  body: PostContent;
   meta?: Metadata;
   reply_to?: Identifier;
 }

@@ -69,14 +69,6 @@ export function ComposeForm(props: Props) {
             </VStack>
           </Toolpill>
         </BodyInput>
-
-        <style jsx global>{`
-          /* Sets placeholder text for the title input. */
-          [contenteditable="true"]:empty:before {
-            content: "Thread title...";
-            color: gray;
-          }
-        `}</style>
       </FormProvider>
     </VStack>
   );
