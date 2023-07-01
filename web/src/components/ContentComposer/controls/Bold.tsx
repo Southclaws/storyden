@@ -11,7 +11,7 @@ export function Bold({ "aria-label": al, ...props }: WithOptionalARIALabel) {
   return (
     <ActionButton
       backgroundColor={isActive ? "blackAlpha.100" : "unset"}
-      onClick={onToggle}
+      onMouseDown={onToggle}
       aria-label={al ?? "Bold"}
       icon={
         <svg
