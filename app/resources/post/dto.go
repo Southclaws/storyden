@@ -18,10 +18,9 @@ type PostID xid.ID
 func (u PostID) String() string { return xid.ID(u).String() }
 
 type Post struct {
-	ID PostID `json:"id"`
+	ID PostID
 
 	Body           string
-	BodyType       string
 	Short          string
 	Author         Author
 	RootPostID     PostID
@@ -35,19 +34,14 @@ type Post struct {
 	DeletedAt opt.Optional[time.Time]
 }
 
-type Content struct {
-	Type  string
-	Value string
-}
-
 func (*Post) GetResourceName() string { return "post" }
 
 type Author struct {
-	ID        account.AccountID `json:"id"`
-	Name      string            `json:"name"`
+	ID        account.AccountID
+	Name      string
 	Handle    string
-	Admin     bool      `json:"admin"`
-	CreatedAt time.Time `json:"createdAt"`
+	Admin     bool
+	CreatedAt time.Time
 }
 
 func (p Post) String() string {
@@ -68,9 +62,8 @@ func FromModel(m *ent.Post) (w *Post) {
 	return &Post{
 		ID: PostID(m.ID),
 
-		Body:     m.Body,
-		BodyType: opt.NewPtr(m.BodyContentType).Or("text/markdown"),
-		Short:    m.Short,
+		Body:  m.Body,
+		Short: m.Short,
 		Author: Author{
 			ID:        account.AccountID(m.Edges.Author.ID),
 			Name:      m.Edges.Author.Name,

@@ -1042,14 +1042,7 @@ components:
         an object, depending on what was used during creation. Strings can be
         used for basic plain text or markdown content and objects are used for
         more complex types such as Slate.js editor documents.
-      required: [type, value]
-      properties:
-        type:
-          description: A MIME-type describing what the content type of value is.
-          type: string
-        value:
-          description: The actual post content.
-          type: string
+      type: string
 
     #
     #        d8888          888    888

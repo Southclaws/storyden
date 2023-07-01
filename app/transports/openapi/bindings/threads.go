@@ -55,7 +55,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
-		deserialisePostContent(request.Body.Body),
+		request.Body.Body,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,
@@ -89,7 +89,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:    opt.NewPtr(request.Body.Title),
-		Body:     opt.Map(opt.NewPtr(request.Body.Body), deserialisePostContent),
+		Body:     opt.NewPtr(request.Body.Body),
 		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
 		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Status:   status,

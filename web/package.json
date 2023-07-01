@@ -27,10 +27,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.34.2",
-    "react-markdown": "^8.0.4",
+    "remark-parse": "^10.0.2",
+    "remark-slate": "^1.8.6",
     "slate": "^0.94.1",
     "slate-react": "^0.95.0",
     "swr": "^2.0.0",
+    "unified": "^10.1.2",
     "zod": "^3.19.0"
   },
   "devDependencies": {

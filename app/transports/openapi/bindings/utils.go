@@ -80,27 +80,10 @@ func serialisePost(p *post.Post) (openapi.PostProps, error) {
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
 		RootId:    p.RootPostID.String(),
 		RootSlug:  p.RootThreadMark,
-		Body: openapi.PostContent{
-			Type:  p.BodyType,
-			Value: p.Body,
-		},
-		Author: serialiseProfileReference(p.Author),
-		Reacts: dt.Map(p.Reacts, serialiseReact),
+		Body:      p.Body,
+		Author:    serialiseProfileReference(p.Author),
+		Reacts:    dt.Map(p.Reacts, serialiseReact),
 	}, nil
-}
-
-func serialisePostContent(c post.Content) openapi.PostContent {
-	return openapi.PostContent{
-		Type:  c.Type,
-		Value: c.Value,
-	}
-}
-
-func deserialisePostContent(c openapi.PostContent) post.Content {
-	return post.Content{
-		Type:  c.Type,
-		Value: c.Value,
-	}
 }
 
 func serialiseProfileReference(a post.Author) openapi.ProfileReference {

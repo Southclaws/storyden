@@ -211,7 +211,7 @@ func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 
 		th, err := tr.Create(ctx,
 			t.Title,
-			post.Content{Value: first.Body},
+			first.Body,
 			t.Author.ID,
 			t.Category.ID,
 			t.Tags,
@@ -227,7 +227,7 @@ func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 
 		for _, p := range t.Posts[1:] {
 			p, err = pr.Create(ctx,
-				post.Content{Value: p.Body},
+				p.Body,
 				p.Author.ID,
 				th.ID,
 				nil,

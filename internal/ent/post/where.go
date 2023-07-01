@@ -106,11 +106,6 @@ func Body(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldBody, v))
 }
 
-// BodyContentType applies equality check predicate on the "body_content_type" field. It's identical to BodyContentTypeEQ.
-func BodyContentType(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldBodyContentType, v))
-}
-
 // Short applies equality check predicate on the "short" field. It's identical to ShortEQ.
 func Short(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldShort, v))
@@ -644,81 +639,6 @@ func BodyEqualFold(v string) predicate.Post {
 // BodyContainsFold applies the ContainsFold predicate on the "body" field.
 func BodyContainsFold(v string) predicate.Post {
 	return predicate.Post(sql.FieldContainsFold(FieldBody, v))
-}
-
-// BodyContentTypeEQ applies the EQ predicate on the "body_content_type" field.
-func BodyContentTypeEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldBodyContentType, v))
-}
-
-// BodyContentTypeNEQ applies the NEQ predicate on the "body_content_type" field.
-func BodyContentTypeNEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldBodyContentType, v))
-}
-
-// BodyContentTypeIn applies the In predicate on the "body_content_type" field.
-func BodyContentTypeIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldBodyContentType, vs...))
-}
-
-// BodyContentTypeNotIn applies the NotIn predicate on the "body_content_type" field.
-func BodyContentTypeNotIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldBodyContentType, vs...))
-}
-
-// BodyContentTypeGT applies the GT predicate on the "body_content_type" field.
-func BodyContentTypeGT(v string) predicate.Post {
-	return predicate.Post(sql.FieldGT(FieldBodyContentType, v))
-}
-
-// BodyContentTypeGTE applies the GTE predicate on the "body_content_type" field.
-func BodyContentTypeGTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldGTE(FieldBodyContentType, v))
-}
-
-// BodyContentTypeLT applies the LT predicate on the "body_content_type" field.
-func BodyContentTypeLT(v string) predicate.Post {
-	return predicate.Post(sql.FieldLT(FieldBodyContentType, v))
-}
-
-// BodyContentTypeLTE applies the LTE predicate on the "body_content_type" field.
-func BodyContentTypeLTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldLTE(FieldBodyContentType, v))
-}
-
-// BodyContentTypeContains applies the Contains predicate on the "body_content_type" field.
-func BodyContentTypeContains(v string) predicate.Post {
-	return predicate.Post(sql.FieldContains(FieldBodyContentType, v))
-}
-
-// BodyContentTypeHasPrefix applies the HasPrefix predicate on the "body_content_type" field.
-func BodyContentTypeHasPrefix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasPrefix(FieldBodyContentType, v))
-}
-
-// BodyContentTypeHasSuffix applies the HasSuffix predicate on the "body_content_type" field.
-func BodyContentTypeHasSuffix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasSuffix(FieldBodyContentType, v))
-}
-
-// BodyContentTypeIsNil applies the IsNil predicate on the "body_content_type" field.
-func BodyContentTypeIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldBodyContentType))
-}
-
-// BodyContentTypeNotNil applies the NotNil predicate on the "body_content_type" field.
-func BodyContentTypeNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldBodyContentType))
-}
-
-// BodyContentTypeEqualFold applies the EqualFold predicate on the "body_content_type" field.
-func BodyContentTypeEqualFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldEqualFold(FieldBodyContentType, v))
-}
-
-// BodyContentTypeContainsFold applies the ContainsFold predicate on the "body_content_type" field.
-func BodyContentTypeContainsFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldContainsFold(FieldBodyContentType, v))
 }
 
 // ShortEQ applies the EQ predicate on the "short" field.

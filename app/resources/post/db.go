@@ -26,14 +26,14 @@ func New(db *ent.Client) Repository {
 
 func (d *database) Create(
 	ctx context.Context,
-	body Content,
+	body string,
 	authorID account.AccountID,
 	parentID PostID,
 	replyToID opt.Optional[PostID],
 	meta map[string]any,
 	opts ...Option,
 ) (*Post, error) {
-	short := MakeShortBody(body.Value)
+	short := MakeShortBody(string(body))
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
@@ -50,8 +50,7 @@ func (d *database) Create(
 
 	q := d.db.Post.
 		Create().
-		SetBody(body.Value).
-		SetBodyContentType(body.Type).
+		SetBody(string(body)).
 		SetShort(short).
 		SetFirst(false).
 		SetRootID(xid.ID(parentID)).
