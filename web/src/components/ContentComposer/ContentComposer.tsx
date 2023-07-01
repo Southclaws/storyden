@@ -1,7 +1,8 @@
 import { Box, BoxProps } from "@chakra-ui/react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useCallback } from "react";
 import { Editable, Slate } from "slate-react";
 
+import { Leaf } from "./render/Leaf";
 import { Props, useContentComposer } from "./useContentComposer";
 
 export function ContentComposer({
@@ -11,11 +12,14 @@ export function ContentComposer({
 }: PropsWithChildren<Props & Omit<BoxProps, "onChange">>) {
   const { editor, initialValue, onChange } = useContentComposer(props);
 
+  const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
+
   return (
     <Box id="rich-text-editor" w="full">
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
         {children}
         <Editable
+          renderLeaf={renderLeaf}
           readOnly={disabled}
           placeholder="Write your heart out..."
           style={{

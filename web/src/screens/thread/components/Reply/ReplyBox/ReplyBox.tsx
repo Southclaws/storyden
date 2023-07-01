@@ -2,6 +2,8 @@ import { Button, HStack, VStack } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/ContentComposer/ContentComposer";
+import { Bold } from "src/components/ContentComposer/controls/Bold";
+import { Italic } from "src/components/ContentComposer/controls/Italic";
 
 import { useReplyBox } from "./useReplyBox";
 
@@ -24,7 +26,10 @@ export function ReplyBox(props: Thread) {
         disabled={isLoading}
         resetKey={resetKey}
       >
-        {/* TODO: bold/italic/etc buttons */}
+        <HStack>
+          <Bold />
+          <Italic />
+        </HStack>
       </ContentComposer>
 
       <HStack mt={4} justifyContent="end">

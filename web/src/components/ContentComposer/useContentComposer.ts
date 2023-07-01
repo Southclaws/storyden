@@ -1,23 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-  BaseEditor,
-  Descendant,
-  Editor,
-  Transforms,
-  createEditor,
-} from "slate";
-import { ReactEditor, withReact } from "slate-react";
-
-type CustomElement = { type: "paragraph"; children: CustomText[] };
-type CustomText = { text: string };
-
-declare module "slate" {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element: CustomElement;
-    Text: CustomText;
-  }
-}
+import { Descendant, Editor, Transforms, createEditor } from "slate";
+import { withReact } from "slate-react";
 
 export type Props = {
   resetKey?: string;

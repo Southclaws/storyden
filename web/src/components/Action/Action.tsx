@@ -153,7 +153,7 @@ export function Settings({ href = "/settings", ...props }: WithOptionalURL) {
   );
 }
 
-type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
+export type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
   "aria-label"?: string | undefined;
 };
 

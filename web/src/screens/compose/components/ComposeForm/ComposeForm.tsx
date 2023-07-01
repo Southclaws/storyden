@@ -3,6 +3,8 @@ import { isValid } from "date-fns";
 import { FormProvider } from "react-hook-form";
 
 import { Back, Save, Send } from "src/components/Action/Action";
+import { Bold } from "src/components/ContentComposer/controls/Bold";
+import { Italic } from "src/components/ContentComposer/controls/Italic";
 import { Toolpill } from "src/components/Toolpill/Toolpill";
 
 import { BodyInput } from "../BodyInput/BodyInput";
@@ -56,10 +58,8 @@ export function ComposeForm(props: Props) {
           <Toolpill w="min-content" display={{ base: "flex", md: "none" }}>
             <VStack>
               <HStack>
-                {/* <Bold />
+                <Bold />
                 <Italic />
-                <Underline /> */}
-                CONTROLS
               </HStack>
               <HStack>
                 <Back onClick={onBack} />
