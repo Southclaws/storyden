@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
-import { BaseEditor, Descendant, createEditor } from "slate";
+import {
+  BaseEditor,
+  Descendant,
+  Editor,
+  Transforms,
+  createEditor,
+} from "slate";
 import { ReactEditor, withReact } from "slate-react";
 
 type CustomElement = { type: "paragraph"; children: CustomText[] };
@@ -14,6 +20,9 @@ declare module "slate" {
 }
 
 export type Props = {
+  resetKey?: string;
+  disabled?: boolean;
+  minHeight?: string;
   initialValue?: string;
   onChange: (value: string) => void;
 };
@@ -35,6 +44,19 @@ export function useContentComposer(props: Props) {
 
     return defaultValue;
   }, [props.initialValue]);
+
+  useMemo(() => {
+    Transforms.delete(editor, {
+      at: {
+        anchor: Editor.start(editor, []),
+        focus: Editor.end(editor, []),
+      },
+    });
+
+    // Disable this error because, despite not using the "resetKey" prop, we're
+    // using the behaviour of useMemo to clear the input when the value changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.resetKey, editor]);
 
   function onChange(value: Descendant[]) {
     const isAstChange = editor.operations.some(
