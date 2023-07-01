@@ -1,22 +1,18 @@
-import { HStack, Spinner, Text, VStack } from "@chakra-ui/react";
+import { HStack, Text } from "@chakra-ui/react";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+
 import { Thread } from "src/api/openapi/schemas";
-import { ReplyBox } from "src/components/ReplyBox";
 import { Anchor } from "src/components/site/Anchor";
+
+import { ReplyBox } from "./ReplyBox/ReplyBox";
 import { useReply } from "./useReply";
 
 export function Reply(props: Thread) {
-  const { loggedIn, onReply, isLoading } = useReply(props);
+  const { loggedIn } = useReply();
   // NOTE: isLoading is a hack to easily reset the ReplyBox + provide feedback.
 
   if (loggedIn) {
-    return isLoading ? (
-      <VStack width="full" py={6}>
-        <Spinner />
-      </VStack>
-    ) : (
-      <ReplyBox onSave={onReply} />
-    );
+    return <ReplyBox {...props} />;
   }
 
   return (
