@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { postCreate } from "src/api/openapi/posts";
 import { Thread } from "src/api/openapi/schemas";
@@ -17,7 +17,7 @@ export function useReplyBox(thread: Thread) {
     setValue(v);
   }
 
-  async function onReply() {
+  async function doReply() {
     setLoading(true);
     await postCreate(thread.id, {
       body: {
@@ -47,9 +47,14 @@ export function useReplyBox(thread: Thread) {
       });
   }
 
+  async function onReply(e: FormEvent) {
+    e.preventDefault();
+    doReply();
+  }
+
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.key == "Enter" && (event.metaKey || event.ctrlKey)) {
-      onReply();
+      doReply();
     }
   }
 
