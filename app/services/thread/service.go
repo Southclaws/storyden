@@ -23,12 +23,13 @@ type Service interface {
 	Create(
 		ctx context.Context,
 		title string,
-		body string,
+		body post.Content,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		status thread.Status,
 		tags []string,
 		meta map[string]any,
+		opts ...thread.Option,
 	) (*thread.Thread, error)
 
 	Update(ctx context.Context, threadID post.PostID, partial Partial) (*thread.Thread, error)

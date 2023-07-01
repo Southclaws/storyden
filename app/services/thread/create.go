@@ -10,18 +10,20 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
 func (s *service) Create(ctx context.Context,
 	title string,
-	body string,
+	body post.Content,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	status thread.Status,
 	tags []string,
 	meta map[string]any,
+	opts ...thread.Option,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
@@ -42,8 +44,10 @@ func (s *service) Create(ctx context.Context,
 		authorID,
 		categoryID,
 		tags,
-		thread.WithStatus(status),
-		thread.WithMeta(meta),
+		append(opts,
+			thread.WithStatus(status),
+			thread.WithMeta(meta),
+		)...,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -26,7 +27,7 @@ func TestCreate(t *testing.T) {
 
 			p, err := repo.Create(ctx,
 				"A Super Nice Thread",
-				"Lorem ipsum",
+				post.Content{Value: "Lorem ipsum"},
 				seed.Account_002_Frigg.ID,
 				seed.Category_01_General.ID,
 				[]string{})

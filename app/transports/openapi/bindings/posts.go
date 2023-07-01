@@ -48,11 +48,6 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	jsonBody, err := json.Marshal(request.Body.Body)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	var reply opt.Optional[post.PostID]
 
 	if request.Body.ReplyTo != nil {
@@ -66,7 +61,7 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 	}
 
 	post, err := p.post_svc.Create(ctx,
-		string(jsonBody),
+		deserialisePostContent(request.Body.Body),
 		accountID,
 		postID,
 		reply,

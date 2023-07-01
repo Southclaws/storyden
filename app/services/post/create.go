@@ -14,13 +14,14 @@ import (
 
 func (s *service) Create(
 	ctx context.Context,
-	body string,
+	body post.Content,
 	authorID account.AccountID,
 	parentID post.PostID,
 	replyToID opt.Optional[post.PostID],
 	meta map[string]any,
+	opts ...post.Option,
 ) (*post.Post, error) {
-	p, err := s.post_repo.Create(ctx, body, authorID, parentID, replyToID, meta)
+	p, err := s.post_repo.Create(ctx, body, authorID, parentID, replyToID, meta, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create post in thread"))
 	}

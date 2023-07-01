@@ -39,7 +39,7 @@ func (s *service) Update(ctx context.Context, threadID post.PostID, partial Part
 
 	opts := []post.Option{}
 
-	partial.Body.Call(func(v string) { opts = append(opts, post.WithBody(v)) })
+	partial.Body.Call(func(v string) { opts = append(opts, post.WithContentValue(v)) })
 	partial.Meta.Call(func(v map[string]any) { opts = append(opts, post.WithMeta(v)) })
 
 	p, err = s.post_repo.Update(ctx, threadID, opts...)
