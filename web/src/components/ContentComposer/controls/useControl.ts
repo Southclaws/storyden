@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { useSlateStatic } from "slate-react";
 
 import { Formats } from "../types";
@@ -9,7 +9,8 @@ export function useControl(format: Formats) {
   const editor = useSlateStatic();
   const [isActive, setIsActive] = useState(isMarkActive(editor, format));
 
-  function onToggle() {
+  function onToggle(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     const active = toggleMark(editor, format);
     setIsActive(active);
   }

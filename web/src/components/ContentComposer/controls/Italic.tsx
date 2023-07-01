@@ -11,7 +11,7 @@ export function Italic({ "aria-label": al, ...props }: WithOptionalARIALabel) {
   return (
     <ActionButton
       backgroundColor={isActive ? "blackAlpha.100" : "unset"}
-      onClick={onToggle}
+      onMouseDown={onToggle}
       aria-label={al ?? "Italic"}
       icon={
         <svg
