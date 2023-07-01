@@ -17,7 +17,7 @@ type Service interface {
 	// Create a new thread in the specified category.
 	Create(
 		ctx context.Context,
-		body post.Content,
+		body string,
 		authorID account.AccountID,
 		parentID post.PostID,
 		replyToID opt.Optional[post.PostID],

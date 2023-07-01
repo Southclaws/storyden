@@ -33,7 +33,7 @@ export function useComposeForm({ draft, editing }: Props) {
     defaultValues: draft
       ? {
           title: draft.title,
-          body: draft.posts[0]?.body.value,
+          body: draft.posts[0]?.body,
           tags: draft.tags,
         }
       : {
@@ -50,10 +50,7 @@ export function useComposeForm({ draft, editing }: Props) {
     const payload = {
       title: props.title,
       category: props.category,
-      body: {
-        type: "application/json",
-        value: props.body,
-      },
+      body: props.body,
       tags: [],
       status: ThreadStatus.draft,
     };
@@ -84,10 +81,7 @@ export function useComposeForm({ draft, editing }: Props) {
       } else {
         await threadCreate({
           title,
-          body: {
-            type: "application/json",
-            value: body,
-          },
+          body,
           category,
           status: ThreadStatus.published,
           tags: [],

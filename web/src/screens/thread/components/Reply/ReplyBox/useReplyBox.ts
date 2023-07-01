@@ -19,12 +19,7 @@ export function useReplyBox(thread: Thread) {
 
   async function doReply() {
     setLoading(true);
-    await postCreate(thread.id, {
-      body: {
-        type: "application/json",
-        value,
-      },
-    })
+    await postCreate(thread.id, { body: value })
       .catch(errorToast(toast))
       .then(async () => {
         await mutate();

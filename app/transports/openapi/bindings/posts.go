@@ -61,7 +61,7 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 	}
 
 	post, err := p.post_svc.Create(ctx,
-		deserialisePostContent(request.Body.Body),
+		request.Body.Body,
 		accountID,
 		postID,
 		reply,

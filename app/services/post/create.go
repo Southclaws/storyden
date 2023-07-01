@@ -14,7 +14,7 @@ import (
 
 func (s *service) Create(
 	ctx context.Context,
-	body post.Content,
+	body string,
 	authorID account.AccountID,
 	parentID post.PostID,
 	replyToID opt.Optional[post.PostID],

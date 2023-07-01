@@ -15,7 +15,7 @@ type Option func(*ent.PostMutation)
 type Repository interface {
 	Create(
 		ctx context.Context,
-		body Content,
+		body string,
 		authorID account.AccountID,
 		parentID PostID,
 		replyToID opt.Optional[PostID],
@@ -36,16 +36,9 @@ func WithID(id PostID) Option {
 	}
 }
 
-func WithContent(v Content) Option {
+func WithBody(v string) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetBody(v.Value)
-		pm.SetBodyContentType(v.Type)
-	}
-}
-
-func WithContentValue(v string) Option {
-	return func(pm *ent.PostMutation) {
-		pm.SetBody(v)
+		pm.SetBody(string(v))
 	}
 }
 

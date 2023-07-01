@@ -10,7 +10,7 @@ export function SearchResults(props: Props) {
     <OrderedList m={0}>
       {props.results.map((v) => (
         <ListItem key={v.id}>
-          <Text>{v.body.value}</Text>
+          <Text>{v.body}</Text>
         </ListItem>
       ))}
     </OrderedList>

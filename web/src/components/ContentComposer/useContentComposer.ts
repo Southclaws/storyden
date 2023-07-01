@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { Descendant, Editor, Transforms, createEditor } from "slate";
 import { withReact } from "slate-react";
 
+import { deserialise, serialise } from "./serialisation";
+
 export type Props = {
   resetKey?: string;
   disabled?: boolean;
@@ -22,7 +24,7 @@ export function useContentComposer(props: Props) {
 
   const initialValue: Descendant[] = useMemo(() => {
     if (props.initialValue) {
-      return JSON.parse(props.initialValue);
+      return deserialise(props.initialValue);
     }
 
     return defaultValue;
@@ -49,7 +51,7 @@ export function useContentComposer(props: Props) {
     );
 
     if (isAstChange) {
-      props.onChange(JSON.stringify(value));
+      props.onChange(serialise(value));
     }
   }
 

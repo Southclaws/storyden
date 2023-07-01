@@ -34,17 +34,11 @@ export function usePostView(props: PostProps) {
     if (isEditingThread) {
       await threadUpdate(editingPostID, {
         title: editingTitle,
-        body: {
-          type: "application/json",
-          value: editingContent ?? "",
-        },
+        body: editingContent,
       }).then(() => toast({ title: "Thread updated" }));
     } else {
       await postUpdate(editingPostID, {
-        body: {
-          type: "application/json",
-          value: editingContent ?? "",
-        },
+        body: editingContent,
       }).then(() => toast({ title: "Post updated" }));
     }
 

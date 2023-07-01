@@ -32,7 +32,7 @@ export function usePostMenu(props: PostProps) {
     await navigator.share({
       title: `A post by ${props.author.name}`,
       url: `#${props.id}`,
-      text: props.body.value,
+      text: props.body,
     });
   }
 

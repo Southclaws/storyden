@@ -23,7 +23,7 @@ type Service interface {
 	Create(
 		ctx context.Context,
 		title string,
-		body post.Content,
+		body string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		status thread.Status,
@@ -53,7 +53,7 @@ type Service interface {
 
 type Partial struct {
 	Title    opt.Optional[string]
-	Body     opt.Optional[post.Content]
+	Body     opt.Optional[string]
 	Tags     opt.Optional[[]xid.ID]
 	Category opt.Optional[xid.ID]
 	Status   opt.Optional[thread.Status]

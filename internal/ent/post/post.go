@@ -34,8 +34,6 @@ const (
 	FieldReplyToPostID = "reply_to_post_id"
 	// FieldBody holds the string denoting the body field in the database.
 	FieldBody = "body"
-	// FieldBodyContentType holds the string denoting the body_content_type field in the database.
-	FieldBodyContentType = "body_content_type"
 	// FieldShort holds the string denoting the short field in the database.
 	FieldShort = "short"
 	// FieldMetadata holds the string denoting the metadata field in the database.
@@ -119,7 +117,6 @@ var Columns = []string{
 	FieldRootPostID,
 	FieldReplyToPostID,
 	FieldBody,
-	FieldBodyContentType,
 	FieldShort,
 	FieldMetadata,
 	FieldStatus,

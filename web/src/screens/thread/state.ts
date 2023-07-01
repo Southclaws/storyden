@@ -25,7 +25,7 @@ export function useThreadScreenState(
 
     const target = props?.posts.find((p) => p.id === id);
     if (target) {
-      setEditingContent(target.body.value);
+      setEditingContent(target.body);
     }
   }
 

@@ -3139,45 +3139,44 @@ func (m *NotificationMutation) ResetEdge(name string) error {
 // PostMutation represents an operation that mutates the Post nodes in the graph.
 type PostMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *xid.ID
-	created_at        *time.Time
-	updated_at        *time.Time
-	deleted_at        *time.Time
-	first             *bool
-	title             *string
-	slug              *string
-	pinned            *bool
-	body              *string
-	body_content_type *string
-	short             *string
-	metadata          *map[string]interface{}
-	status            *post.Status
-	clearedFields     map[string]struct{}
-	author            *xid.ID
-	clearedauthor     bool
-	category          *xid.ID
-	clearedcategory   bool
-	tags              map[xid.ID]struct{}
-	removedtags       map[xid.ID]struct{}
-	clearedtags       bool
-	root              *xid.ID
-	clearedroot       bool
-	posts             map[xid.ID]struct{}
-	removedposts      map[xid.ID]struct{}
-	clearedposts      bool
-	replyTo           *xid.ID
-	clearedreplyTo    bool
-	replies           map[xid.ID]struct{}
-	removedreplies    map[xid.ID]struct{}
-	clearedreplies    bool
-	reacts            map[xid.ID]struct{}
-	removedreacts     map[xid.ID]struct{}
-	clearedreacts     bool
-	done              bool
-	oldValue          func(context.Context) (*Post, error)
-	predicates        []predicate.Post
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	updated_at      *time.Time
+	deleted_at      *time.Time
+	first           *bool
+	title           *string
+	slug            *string
+	pinned          *bool
+	body            *string
+	short           *string
+	metadata        *map[string]interface{}
+	status          *post.Status
+	clearedFields   map[string]struct{}
+	author          *xid.ID
+	clearedauthor   bool
+	category        *xid.ID
+	clearedcategory bool
+	tags            map[xid.ID]struct{}
+	removedtags     map[xid.ID]struct{}
+	clearedtags     bool
+	root            *xid.ID
+	clearedroot     bool
+	posts           map[xid.ID]struct{}
+	removedposts    map[xid.ID]struct{}
+	clearedposts    bool
+	replyTo         *xid.ID
+	clearedreplyTo  bool
+	replies         map[xid.ID]struct{}
+	removedreplies  map[xid.ID]struct{}
+	clearedreplies  bool
+	reacts          map[xid.ID]struct{}
+	removedreacts   map[xid.ID]struct{}
+	clearedreacts   bool
+	done            bool
+	oldValue        func(context.Context) (*Post, error)
+	predicates      []predicate.Post
 }
 
 var _ ent.Mutation = (*PostMutation)(nil)
@@ -3707,55 +3706,6 @@ func (m *PostMutation) OldBody(ctx context.Context) (v string, err error) {
 // ResetBody resets all changes to the "body" field.
 func (m *PostMutation) ResetBody() {
 	m.body = nil
-}
-
-// SetBodyContentType sets the "body_content_type" field.
-func (m *PostMutation) SetBodyContentType(s string) {
-	m.body_content_type = &s
-}
-
-// BodyContentType returns the value of the "body_content_type" field in the mutation.
-func (m *PostMutation) BodyContentType() (r string, exists bool) {
-	v := m.body_content_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBodyContentType returns the old "body_content_type" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldBodyContentType(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBodyContentType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBodyContentType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBodyContentType: %w", err)
-	}
-	return oldValue.BodyContentType, nil
-}
-
-// ClearBodyContentType clears the value of the "body_content_type" field.
-func (m *PostMutation) ClearBodyContentType() {
-	m.body_content_type = nil
-	m.clearedFields[post.FieldBodyContentType] = struct{}{}
-}
-
-// BodyContentTypeCleared returns if the "body_content_type" field was cleared in this mutation.
-func (m *PostMutation) BodyContentTypeCleared() bool {
-	_, ok := m.clearedFields[post.FieldBodyContentType]
-	return ok
-}
-
-// ResetBodyContentType resets all changes to the "body_content_type" field.
-func (m *PostMutation) ResetBodyContentType() {
-	m.body_content_type = nil
-	delete(m.clearedFields, post.FieldBodyContentType)
 }
 
 // SetShort sets the "short" field.
@@ -4321,7 +4271,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -4351,9 +4301,6 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.body != nil {
 		fields = append(fields, post.FieldBody)
-	}
-	if m.body_content_type != nil {
-		fields = append(fields, post.FieldBodyContentType)
 	}
 	if m.short != nil {
 		fields = append(fields, post.FieldShort)
@@ -4395,8 +4342,6 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.ReplyToPostID()
 	case post.FieldBody:
 		return m.Body()
-	case post.FieldBodyContentType:
-		return m.BodyContentType()
 	case post.FieldShort:
 		return m.Short()
 	case post.FieldMetadata:
@@ -4434,8 +4379,6 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldReplyToPostID(ctx)
 	case post.FieldBody:
 		return m.OldBody(ctx)
-	case post.FieldBodyContentType:
-		return m.OldBodyContentType(ctx)
 	case post.FieldShort:
 		return m.OldShort(ctx)
 	case post.FieldMetadata:
@@ -4523,13 +4466,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetBody(v)
 		return nil
-	case post.FieldBodyContentType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBodyContentType(v)
-		return nil
 	case post.FieldShort:
 		v, ok := value.(string)
 		if !ok {
@@ -4603,9 +4539,6 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldReplyToPostID) {
 		fields = append(fields, post.FieldReplyToPostID)
 	}
-	if m.FieldCleared(post.FieldBodyContentType) {
-		fields = append(fields, post.FieldBodyContentType)
-	}
 	if m.FieldCleared(post.FieldMetadata) {
 		fields = append(fields, post.FieldMetadata)
 	}
@@ -4640,9 +4573,6 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldReplyToPostID:
 		m.ClearReplyToPostID()
-		return nil
-	case post.FieldBodyContentType:
-		m.ClearBodyContentType()
 		return nil
 	case post.FieldMetadata:
 		m.ClearMetadata()
@@ -4687,9 +4617,6 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldBody:
 		m.ResetBody()
-		return nil
-	case post.FieldBodyContentType:
-		m.ResetBodyContentType()
 		return nil
 	case post.FieldShort:
 		m.ResetShort()

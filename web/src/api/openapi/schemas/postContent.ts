@@ -13,9 +13,4 @@ used for basic plain text or markdown content and objects are used for
 more complex types such as Slate.js editor documents.
 
  */
-export interface PostContent {
-  /** A MIME-type describing what the content type of value is. */
-  type: string;
-  /** The actual post content. */
-  value: string;
-}
+export type PostContent = string;
