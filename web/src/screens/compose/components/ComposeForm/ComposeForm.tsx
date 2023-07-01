@@ -68,6 +68,10 @@ export function ComposeForm(props: Props) {
               </HStack>
             </VStack>
           </Toolpill>
+          <HStack display={{ base: "none", md: "flex" }}>
+            <Bold />
+            <Italic />
+          </HStack>
         </BodyInput>
       </FormProvider>
     </VStack>
