@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	thread_repo "github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/thread"
@@ -25,7 +26,7 @@ func TestThreadCreate(t *testing.T) {
 
 		t, err := thread_svc.Create(ctx,
 			"New thread",
-			"hi there",
+			post.Content{Value: "hi there"},
 			seed.Account_002_Frigg.ID,
 			seed.Category_01_General.ID,
 			thread_repo.StatusPublished,

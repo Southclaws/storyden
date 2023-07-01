@@ -17,11 +17,12 @@ type Service interface {
 	// Create a new thread in the specified category.
 	Create(
 		ctx context.Context,
-		body string,
+		body post.Content,
 		authorID account.AccountID,
 		parentID post.PostID,
 		replyToID opt.Optional[post.PostID],
 		meta map[string]any,
+		opts ...post.Option,
 	) (*post.Post, error)
 
 	Update(ctx context.Context, threadID post.PostID, partial Partial) (*post.Post, error)

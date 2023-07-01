@@ -28,7 +28,7 @@ type Repository interface {
 	Create(
 		ctx context.Context,
 		title string,
-		body string,
+		body post_resource.Content,
 		authorID account_resource.AccountID,
 		categoryID category_resource.CategoryID,
 		tags []string,
@@ -69,12 +69,6 @@ func WithContent(v post_resource.Content) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(v.Value)
 		pm.SetBodyContentType(v.Type)
-	}
-}
-
-func WithBody(v string) Option {
-	return func(pm *ent.PostMutation) {
-		pm.SetBody(v)
 	}
 }
 

@@ -55,7 +55,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
-		request.Body.Body.Value,
+		deserialisePostContent(request.Body.Body),
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,

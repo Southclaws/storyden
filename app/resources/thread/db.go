@@ -39,7 +39,7 @@ func New(db *ent.Client) Repository {
 func (d *database) Create(
 	ctx context.Context,
 	title string,
-	body string,
+	body post.Content,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
@@ -71,9 +71,10 @@ func (d *database) Create(
 	}
 
 	mutate.SetTitle(title)
-	mutate.SetShort(post.MakeShortBody(body))
+	mutate.SetShort(post.MakeShortBody(body.Value)) // TODO: handle other types
 	mutate.SetFirst(true)
-	mutate.SetBody(body)
+	mutate.SetBody(body.Value)
+	mutate.SetBodyContentType(body.Type)
 	mutate.SetAuthorID(xid.ID(authorID))
 	mutate.SetTitle(title)
 	mutate.SetCategoryID(cat.ID)

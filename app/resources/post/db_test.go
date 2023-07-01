@@ -25,7 +25,10 @@ func TestCreate(t *testing.T) {
 			a := assert.New(t)
 
 			p, err := repo.Create(ctx,
-				"My cool post in reply to your thread",
+				post.Content{
+					Type:  "text/plain",
+					Value: "My cool post in reply to your thread",
+				},
 				seed.Account_002_Frigg.ID,
 				seed.Post_01_Welcome.ID,
 				nil, nil)

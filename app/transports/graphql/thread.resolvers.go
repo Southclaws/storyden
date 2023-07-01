@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/transports/graphql/models"
@@ -22,7 +23,10 @@ func (r *mutationResolver) CreateThread(ctx context.Context, input models.NewThr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thread, err := r.thread_service.Create(ctx, input.Title, input.Body, acc, category.CategoryID{}, thread.Status{}, nil, nil)
+	thread, err := r.thread_service.Create(ctx, input.Title, post.Content{
+		Type:  "text/markdown",
+		Value: input.Body,
+	}, acc, category.CategoryID{}, thread.Status{}, nil, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
