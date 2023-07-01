@@ -46,7 +46,7 @@ export function useContentComposer(props: Props) {
   }, [props.initialValue]);
 
   useMemo(() => {
-    if (props.resetKey === "") return;
+    if (!props.resetKey) return;
 
     Transforms.delete(editor, {
       at: {
