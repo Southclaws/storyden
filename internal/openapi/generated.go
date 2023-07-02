@@ -154,6 +154,16 @@ type AccountMutableProps struct {
 // AccountName The account owners display name.
 type AccountName = string
 
+// Asset defines model for Asset.
+type Asset struct {
+	Url string `json:"url"`
+}
+
+// AssetUploadURL defines model for AssetUploadURL.
+type AssetUploadURL struct {
+	Url string `json:"url"`
+}
+
 // AttestationConveyancePreference https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
 type AttestationConveyancePreference string
 
@@ -808,6 +818,9 @@ type WebAuthnPublicKeyCreationOptions struct {
 // AccountHandleParam The unique @ handle of an account.
 type AccountHandleParam = AccountHandle
 
+// AssetPath defines model for AssetPath.
+type AssetPath = string
+
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
 
@@ -829,6 +842,12 @@ type AccountGetOK = Account
 
 // AccountUpdateOK defines model for AccountUpdateOK.
 type AccountUpdateOK = Account
+
+// AssetGetUploadURLOK defines model for AssetGetUploadURLOK.
+type AssetGetUploadURLOK = AssetUploadURL
+
+// AssetUploadOK defines model for AssetUploadOK.
+type AssetUploadOK = Asset
 
 // AuthProviderListOK defines model for AuthProviderListOK.
 type AuthProviderListOK struct {
@@ -1076,6 +1095,15 @@ type ClientInterface interface {
 	// AccountGetAvatar request
 	AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// AssetGetUploadURL request
+	AssetGetUploadURL(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AssetUpload request with any body
+	AssetUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AssetGet request
+	AssetGet(ctx context.Context, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// AuthProviderList request
 	AuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1238,6 +1266,42 @@ func (c *Client) AccountSetAvatarWithBody(ctx context.Context, contentType strin
 
 func (c *Client) AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAccountGetAvatarRequest(c.Server, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssetGetUploadURL(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssetGetUploadURLRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssetUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssetUploadRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssetGet(ctx context.Context, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssetGetRequest(c.Server, id)
 	if err != nil {
 		return nil, err
 	}
@@ -1832,6 +1896,96 @@ func NewAccountGetAvatarRequest(server string, accountHandle AccountHandleParam)
 	}
 
 	operationPath := fmt.Sprintf("/v1/accounts/%s/avatar", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAssetGetUploadURLRequest generates requests for AssetGetUploadURL
+func NewAssetGetUploadURLRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/assets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAssetUploadRequestWithBody generates requests for AssetUpload with any type of body
+func NewAssetUploadRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/assets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAssetGetRequest generates requests for AssetGet
+func NewAssetGetRequest(server string, id AssetPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/assets/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2928,6 +3082,15 @@ type ClientWithResponsesInterface interface {
 	// AccountGetAvatar request
 	AccountGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountGetAvatarResponse, error)
 
+	// AssetGetUploadURL request
+	AssetGetUploadURLWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AssetGetUploadURLResponse, error)
+
+	// AssetUpload request with any body
+	AssetUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssetUploadResponse, error)
+
+	// AssetGet request
+	AssetGetWithResponse(ctx context.Context, id AssetPath, reqEditors ...RequestEditorFn) (*AssetGetResponse, error)
+
 	// AuthProviderList request
 	AuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderListResponse, error)
 
@@ -3133,6 +3296,74 @@ func (r AccountGetAvatarResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AccountGetAvatarResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AssetGetUploadURLResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AssetUploadURL
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AssetGetUploadURLResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AssetGetUploadURLResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AssetUploadResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Asset
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AssetUploadResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AssetUploadResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AssetGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r AssetGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AssetGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3766,6 +3997,33 @@ func (c *ClientWithResponses) AccountGetAvatarWithResponse(ctx context.Context, 
 	return ParseAccountGetAvatarResponse(rsp)
 }
 
+// AssetGetUploadURLWithResponse request returning *AssetGetUploadURLResponse
+func (c *ClientWithResponses) AssetGetUploadURLWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AssetGetUploadURLResponse, error) {
+	rsp, err := c.AssetGetUploadURL(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssetGetUploadURLResponse(rsp)
+}
+
+// AssetUploadWithBodyWithResponse request with arbitrary body returning *AssetUploadResponse
+func (c *ClientWithResponses) AssetUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssetUploadResponse, error) {
+	rsp, err := c.AssetUploadWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssetUploadResponse(rsp)
+}
+
+// AssetGetWithResponse request returning *AssetGetResponse
+func (c *ClientWithResponses) AssetGetWithResponse(ctx context.Context, id AssetPath, reqEditors ...RequestEditorFn) (*AssetGetResponse, error) {
+	rsp, err := c.AssetGet(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssetGetResponse(rsp)
+}
+
 // AuthProviderListWithResponse request returning *AuthProviderListResponse
 func (c *ClientWithResponses) AuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderListResponse, error) {
 	rsp, err := c.AuthProviderList(ctx, reqEditors...)
@@ -4204,6 +4462,98 @@ func ParseAccountGetAvatarResponse(rsp *http.Response) (*AccountGetAvatarRespons
 	}
 
 	response := &AccountGetAvatarResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAssetGetUploadURLResponse parses an HTTP response from a AssetGetUploadURLWithResponse call
+func ParseAssetGetUploadURLResponse(rsp *http.Response) (*AssetGetUploadURLResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AssetGetUploadURLResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AssetUploadURL
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAssetUploadResponse parses an HTTP response from a AssetUploadWithResponse call
+func ParseAssetUploadResponse(rsp *http.Response) (*AssetUploadResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AssetUploadResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Asset
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAssetGetResponse parses an HTTP response from a AssetGetWithResponse call
+func ParseAssetGetResponse(rsp *http.Response) (*AssetGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AssetGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -5030,6 +5380,15 @@ type ServerInterface interface {
 	// (GET /v1/accounts/{account_handle}/avatar)
 	AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
 
+	// (GET /v1/assets)
+	AssetGetUploadURL(ctx echo.Context) error
+
+	// (POST /v1/assets)
+	AssetUpload(ctx echo.Context) error
+
+	// (GET /v1/assets/{id})
+	AssetGet(ctx echo.Context, id AssetPath) error
+
 	// (GET /v1/auth)
 	AuthProviderList(ctx echo.Context) error
 
@@ -5166,6 +5525,44 @@ func (w *ServerInterfaceWrapper) AccountGetAvatar(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.AccountGetAvatar(ctx, accountHandle)
+	return err
+}
+
+// AssetGetUploadURL converts echo context to params.
+func (w *ServerInterfaceWrapper) AssetGetUploadURL(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.AssetGetUploadURL(ctx)
+	return err
+}
+
+// AssetUpload converts echo context to params.
+func (w *ServerInterfaceWrapper) AssetUpload(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.AssetUpload(ctx)
+	return err
+}
+
+// AssetGet converts echo context to params.
+func (w *ServerInterfaceWrapper) AssetGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id AssetPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.AssetGet(ctx, id)
 	return err
 }
 
@@ -5577,6 +5974,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PATCH(baseURL+"/v1/accounts", wrapper.AccountUpdate)
 	router.POST(baseURL+"/v1/accounts/self/avatar", wrapper.AccountSetAvatar)
 	router.GET(baseURL+"/v1/accounts/:account_handle/avatar", wrapper.AccountGetAvatar)
+	router.GET(baseURL+"/v1/assets", wrapper.AssetGetUploadURL)
+	router.POST(baseURL+"/v1/assets", wrapper.AssetUpload)
+	router.GET(baseURL+"/v1/assets/:id", wrapper.AssetGet)
 	router.GET(baseURL+"/v1/auth", wrapper.AuthProviderList)
 	router.GET(baseURL+"/v1/auth/logout", wrapper.AuthProviderLogout)
 	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
@@ -5614,6 +6014,17 @@ type AccountGetAvatarImagepngResponse struct {
 type AccountGetOKJSONResponse Account
 
 type AccountUpdateOKJSONResponse Account
+
+type AssetGetOKAsteriskResponse struct {
+	Body io.Reader
+
+	ContentType   string
+	ContentLength int64
+}
+
+type AssetGetUploadURLOKJSONResponse AssetUploadURL
+
+type AssetUploadOKJSONResponse Asset
 
 type AuthProviderListOKJSONResponse struct {
 	Providers AuthProviderList `json:"providers"`
@@ -5871,6 +6282,129 @@ type AccountGetAvatardefaultJSONResponse struct {
 }
 
 func (response AccountGetAvatardefaultJSONResponse) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AssetGetUploadURLRequestObject struct {
+}
+
+type AssetGetUploadURLResponseObject interface {
+	VisitAssetGetUploadURLResponse(w http.ResponseWriter) error
+}
+
+type AssetGetUploadURL200JSONResponse struct {
+	AssetGetUploadURLOKJSONResponse
+}
+
+func (response AssetGetUploadURL200JSONResponse) VisitAssetGetUploadURLResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AssetGetUploadURL401Response = UnauthorisedResponse
+
+func (response AssetGetUploadURL401Response) VisitAssetGetUploadURLResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AssetGetUploadURLdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AssetGetUploadURLdefaultJSONResponse) VisitAssetGetUploadURLResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AssetUploadRequestObject struct {
+	Body io.Reader
+}
+
+type AssetUploadResponseObject interface {
+	VisitAssetUploadResponse(w http.ResponseWriter) error
+}
+
+type AssetUpload200JSONResponse struct{ AssetUploadOKJSONResponse }
+
+func (response AssetUpload200JSONResponse) VisitAssetUploadResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AssetUpload401Response = UnauthorisedResponse
+
+func (response AssetUpload401Response) VisitAssetUploadResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AssetUploaddefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AssetUploaddefaultJSONResponse) VisitAssetUploadResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AssetGetRequestObject struct {
+	Id AssetPath `json:"id"`
+}
+
+type AssetGetResponseObject interface {
+	VisitAssetGetResponse(w http.ResponseWriter) error
+}
+
+type AssetGet200AsteriskResponse struct{ AssetGetOKAsteriskResponse }
+
+func (response AssetGet200AsteriskResponse) VisitAssetGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", response.ContentType)
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type AssetGet401Response = UnauthorisedResponse
+
+func (response AssetGet401Response) VisitAssetGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AssetGet404Response = NotFoundResponse
+
+func (response AssetGet404Response) VisitAssetGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AssetGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AssetGetdefaultJSONResponse) VisitAssetGetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -6885,6 +7419,15 @@ type StrictServerInterface interface {
 	// (GET /v1/accounts/{account_handle}/avatar)
 	AccountGetAvatar(ctx context.Context, request AccountGetAvatarRequestObject) (AccountGetAvatarResponseObject, error)
 
+	// (GET /v1/assets)
+	AssetGetUploadURL(ctx context.Context, request AssetGetUploadURLRequestObject) (AssetGetUploadURLResponseObject, error)
+
+	// (POST /v1/assets)
+	AssetUpload(ctx context.Context, request AssetUploadRequestObject) (AssetUploadResponseObject, error)
+
+	// (GET /v1/assets/{id})
+	AssetGet(ctx context.Context, request AssetGetRequestObject) (AssetGetResponseObject, error)
+
 	// (GET /v1/auth)
 	AuthProviderList(ctx context.Context, request AuthProviderListRequestObject) (AuthProviderListResponseObject, error)
 
@@ -7093,6 +7636,79 @@ func (sh *strictHandler) AccountGetAvatar(ctx echo.Context, accountHandle Accoun
 		return err
 	} else if validResponse, ok := response.(AccountGetAvatarResponseObject); ok {
 		return validResponse.VisitAccountGetAvatarResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AssetGetUploadURL operation middleware
+func (sh *strictHandler) AssetGetUploadURL(ctx echo.Context) error {
+	var request AssetGetUploadURLRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AssetGetUploadURL(ctx.Request().Context(), request.(AssetGetUploadURLRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AssetGetUploadURL")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AssetGetUploadURLResponseObject); ok {
+		return validResponse.VisitAssetGetUploadURLResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AssetUpload operation middleware
+func (sh *strictHandler) AssetUpload(ctx echo.Context) error {
+	var request AssetUploadRequestObject
+
+	request.Body = ctx.Request().Body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AssetUpload(ctx.Request().Context(), request.(AssetUploadRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AssetUpload")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AssetUploadResponseObject); ok {
+		return validResponse.VisitAssetUploadResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AssetGet operation middleware
+func (sh *strictHandler) AssetGet(ctx echo.Context, id AssetPath) error {
+	var request AssetGetRequestObject
+
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AssetGet(ctx.Request().Context(), request.(AssetGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AssetGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AssetGetResponseObject); ok {
+		return validResponse.VisitAssetGetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("Unexpected response type: %T", response)
 	}
@@ -7777,112 +8393,118 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -47,6 +47,8 @@ tags:
     description: Forum threads.
   - name: posts
     description: Posts within a specific thread.
+  - name: assets
+    description: File uploads and downloads.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -562,6 +564,51 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostReactAddOK" }
 
+  #
+  #                                     888
+  #                                     888
+  #                                     888
+  #  8888b.  .d8888b  .d8888b   .d88b.  888888 .d8888b
+  #     "88b 88K      88K      d8P  Y8b 888    88K
+  # .d888888 "Y8888b. "Y8888b. 88888888 888    "Y8888b.
+  # 888  888      X88      X88 Y8b.     Y88b.       X88
+  # "Y888888  88888P'  88888P'  "Y8888   "Y888  88888P'
+  #
+
+  /v1/assets:
+    get:
+      operationId: AssetGetUploadURL
+      description: Get an upload URL for a new asset.
+      tags: [assets]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AssetGetUploadURLOK" }
+    post:
+      operationId: AssetUpload
+      description: |
+        If Storyden is not using S3 for file uploads, this is the fallback
+        equivalent of S3's pre-signed upload URL. Files uploaded to this 
+        endpoint will be stored on the local filesystem instead of the cloud.
+      tags: [assets]
+      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AssetUploadOK" }
+  /v1/assets/{id}:
+    get:
+      operationId: AssetGet
+      description: Download an asset by its ID.
+      tags: [assets]
+      security: []
+      parameters: [$ref: "#/components/parameters/AssetPath"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AssetGetOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -606,6 +653,14 @@ components:
       in: path
       required: true
       example: twitter
+      schema:
+        type: string
+
+    AssetPath:
+      description: Asset ID.
+      name: id
+      in: path
+      required: true
       schema:
         type: string
 
@@ -691,6 +746,14 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/PostReactProps" }
+
+    AssetUpload:
+      description: Upload a file.
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -860,6 +923,28 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/React"
+
+    AssetGetUploadURLOK:
+      description: A pre-authorised upload URL.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AssetUploadURL"
+
+    AssetUploadOK:
+      description: The new URL of an uploaded file.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Asset"
+
+    AssetGetOK:
+      description: The new URL of an uploaded file.
+      content:
+        "*/*":
+          schema:
+            type: string
+            format: binary
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -1677,6 +1762,20 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PostProps"
+
+    AssetUploadURL:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+
+    Asset:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
 
   securitySchemes:
     browser:
