@@ -7,9 +7,16 @@ import { ReactEditor } from "slate-react";
 // https://docs.slatejs.org/concepts/12-typescript
 //
 
-type CustomElement = {
+type ParagraphElement = {
   type: "paragraph";
   children: CustomText[];
+};
+
+export type ImageElement = {
+  type: "image";
+  caption: string;
+  link: string;
+  children: EmptyText[];
 };
 
 type CustomText = {
@@ -17,6 +24,8 @@ type CustomText = {
   bold?: boolean;
   italic?: boolean;
 };
+
+type CustomElement = ParagraphElement | ImageElement;
 
 type Formats = "bold" | "italic";
 

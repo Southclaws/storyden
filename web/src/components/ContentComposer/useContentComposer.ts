@@ -1,6 +1,12 @@
-import { useMemo, useState } from "react";
-import { Descendant, Editor, Transforms, createEditor } from "slate";
-import { withReact } from "slate-react";
+import { useMemo, useRef } from "react";
+import {
+  BaseEditor,
+  Descendant,
+  Editor,
+  Transforms,
+  createEditor,
+} from "slate";
+import { ReactEditor, withReact } from "slate-react";
 
 import { deserialise, serialise } from "./serialisation";
 
@@ -20,7 +26,11 @@ const defaultValue: Descendant[] = [
 ];
 
 export function useContentComposer(props: Props) {
-  const [editor] = useState(() => withReact(createEditor()));
+  const editorRef = useRef<BaseEditor & ReactEditor>();
+  if (!editorRef.current) {
+    editorRef.current = withReact(createEditor());
+  }
+  const editor = editorRef.current;
 
   const initialValue: Descendant[] = useMemo(() => {
     if (props.initialValue) {
