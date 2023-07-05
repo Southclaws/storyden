@@ -2,7 +2,7 @@ import { Box, BoxProps } from "@chakra-ui/react";
 import { PropsWithChildren, useCallback } from "react";
 import { Editable, Slate } from "slate-react";
 
-import { FileDrop } from "./components/FileDrop";
+import { FileDrop } from "./components/FileDrop/FileDrop";
 import { Element } from "./render/Element";
 import { Leaf } from "./render/Leaf";
 import { Props, useContentComposer } from "./useContentComposer";
