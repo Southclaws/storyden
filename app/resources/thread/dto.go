@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -31,6 +32,7 @@ type Thread struct {
 	Posts    []*post.Post
 	Reacts   []*react.React
 	Meta     map[string]any
+	Assets   []*asset.Asset
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
@@ -75,5 +77,6 @@ func FromModel(m *ent.Post) *Thread {
 		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:     m.Metadata,
+		Assets:   dt.Map(m.Edges.Assets, asset.FromModel),
 	}
 }

@@ -79,6 +79,7 @@ func (d *database) Create(
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
 		}).
+		WithAssets().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -99,6 +100,7 @@ func (d *database) Get(ctx context.Context, id PostID) (*Post, error) {
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
 		}).
+		WithAssets().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -127,6 +129,7 @@ func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
 		}).
+		WithAssets().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

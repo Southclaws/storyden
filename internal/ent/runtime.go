@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -60,6 +61,45 @@ func init() {
 	// account.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	account.IDValidator = func() func(string) error {
 		validators := accountDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	assetMixin := schema.Asset{}.Mixin()
+	assetMixinFields0 := assetMixin[0].Fields()
+	_ = assetMixinFields0
+	assetMixinFields1 := assetMixin[1].Fields()
+	_ = assetMixinFields1
+	assetMixinFields2 := assetMixin[2].Fields()
+	_ = assetMixinFields2
+	assetFields := schema.Asset{}.Fields()
+	_ = assetFields
+	// assetDescCreatedAt is the schema descriptor for created_at field.
+	assetDescCreatedAt := assetMixinFields1[0].Descriptor()
+	// asset.DefaultCreatedAt holds the default value on creation for the created_at field.
+	asset.DefaultCreatedAt = assetDescCreatedAt.Default.(func() time.Time)
+	// assetDescUpdatedAt is the schema descriptor for updated_at field.
+	assetDescUpdatedAt := assetMixinFields2[0].Descriptor()
+	// asset.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	asset.DefaultUpdatedAt = assetDescUpdatedAt.Default.(func() time.Time)
+	// asset.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	asset.UpdateDefaultUpdatedAt = assetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// assetDescID is the schema descriptor for id field.
+	assetDescID := assetMixinFields0[0].Descriptor()
+	// asset.DefaultID holds the default value on creation for the id field.
+	asset.DefaultID = assetDescID.Default.(func() xid.ID)
+	// asset.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	asset.IDValidator = func() func(string) error {
+		validators := assetDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

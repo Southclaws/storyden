@@ -75,5 +75,7 @@ func (Post) Edges() []ent.Edge {
 			Comment("A many-to-many recursive self reference. The replyTo post is an optional post that this post is in reply to."),
 
 		edge.To("reacts", React.Type),
+
+		edge.To("assets", Asset.Type),
 	}
 }

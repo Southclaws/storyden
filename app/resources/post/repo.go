@@ -47,3 +47,9 @@ func WithMeta(meta map[string]any) Option {
 		m.SetMetadata(meta)
 	}
 }
+
+func WithAssets(ids ...xid.ID) Option {
+	return func(m *ent.PostMutation) {
+		m.AddAssetIDs(ids...)
+	}
+}

@@ -591,6 +591,7 @@ paths:
         equivalent of S3's pre-signed upload URL. Files uploaded to this 
         endpoint will be stored on the local filesystem instead of the cloud.
       tags: [assets]
+      parameters: [$ref: "#/components/parameters/PostIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -643,6 +644,14 @@ components:
       description: Unique post ID.
       name: post_id
       in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    PostIDQueryParam:
+      description: Unique post ID.
+      name: post_id
+      in: query
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
@@ -1635,6 +1644,7 @@ components:
             - category
             - reacts
             - meta
+            - media
           properties:
             title:
               type: string
@@ -1663,6 +1673,7 @@ components:
             reacts:
               $ref: "#/components/schemas/ReactList"
             meta: { $ref: "#/components/schemas/Metadata" }
+            media: { $ref: "#/components/schemas/MediaItemList" }
 
     ThreadList:
       type: array
@@ -1708,7 +1719,7 @@ components:
 
     PostCommonProps:
       type: object
-      required: [root_id, root_slug, body, author, reacts]
+      required: [root_id, root_slug, body, author, reacts, media]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
@@ -1717,6 +1728,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
+        media: { $ref: "#/components/schemas/MediaItemList" }
 
     PostInitialProps:
       type: object
@@ -1770,12 +1782,40 @@ components:
         url:
           type: string
 
+    #
+    # 888b     d888               888 d8b
+    # 8888b   d8888               888 Y8P
+    # 88888b.d88888               888
+    # 888Y88888P888  .d88b.   .d88888 888  8888b.
+    # 888 Y888P 888 d8P  Y8b d88" 888 888     "88b
+    # 888  Y8P  888 88888888 888  888 888 .d888888
+    # 888   "   888 Y8b.     Y88b 888 888 888  888
+    # 888       888  "Y8888   "Y88888 888 "Y888888
+    #
+
     Asset:
       type: object
       required: [url]
       properties:
         url:
           type: string
+
+    MediaItemList:
+      type: array
+      items: { $ref: "#/components/schemas/MediaItem" }
+
+    MediaItem:
+      type: object
+      required: [url, mime_type, width, height]
+      properties:
+        url:
+          type: string
+        mime_type:
+          type: string
+        width:
+          type: number
+        height:
+          type: number
 
   securitySchemes:
     browser:

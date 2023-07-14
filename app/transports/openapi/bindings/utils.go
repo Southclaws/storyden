@@ -6,6 +6,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -69,6 +70,7 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 		Posts:     posts,
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
+		Media:     dt.Map(t.Assets, serialiseAssetReference),
 	}, nil
 }
 
@@ -83,6 +85,8 @@ func serialisePost(p *post.Post) (openapi.PostProps, error) {
 		Body:      p.Body,
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
+		Meta:      (*openapi.Metadata)(&p.Meta),
+		Media:     dt.Map(p.Assets, serialiseAssetReference),
 	}, nil
 }
 
@@ -121,6 +125,15 @@ func serialiseReact(r *react.React) openapi.React {
 	return openapi.React{
 		Id:    openapi.IdentifierFrom(xid.ID(r.ID)),
 		Emoji: &r.Emoji,
+	}
+}
+
+func serialiseAssetReference(a *asset.Asset) openapi.MediaItem {
+	return openapi.MediaItem{
+		Url:      a.URL,
+		MimeType: a.MIMEType,
+		Width:    float32(a.Width),
+		Height:   float32(a.Height),
 	}
 }
 

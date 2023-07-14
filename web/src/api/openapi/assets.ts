@@ -15,6 +15,7 @@ import type {
   AssetGetUploadURLOKResponse,
   AssetUploadBody,
   AssetUploadOKResponse,
+  AssetUploadParams,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
@@ -73,12 +74,16 @@ equivalent of S3's pre-signed upload URL. Files uploaded to this
 endpoint will be stored on the local filesystem instead of the cloud.
 
  */
-export const assetUpload = (assetUploadBody: AssetUploadBody) => {
+export const assetUpload = (
+  assetUploadBody: AssetUploadBody,
+  params: AssetUploadParams
+) => {
   return fetcher<AssetUploadOKResponse>({
     url: `/v1/assets`,
     method: "post",
     headers: { "Content-Type": "application/octet-stream" },
     data: assetUploadBody,
+    params,
   });
 };
 

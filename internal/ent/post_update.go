@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -332,6 +333,21 @@ func (pu *PostUpdate) AddReacts(r ...*React) *PostUpdate {
 	return pu.AddReactIDs(ids...)
 }
 
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (pu *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddAssetIDs(ids...)
+	return pu
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (pu *PostUpdate) AddAssets(a ...*Asset) *PostUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pu.AddAssetIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
@@ -443,6 +459,27 @@ func (pu *PostUpdate) RemoveReacts(r ...*React) *PostUpdate {
 		ids[i] = r[i].ID
 	}
 	return pu.RemoveReactIDs(ids...)
+}
+
+// ClearAssets clears all "assets" edges to the Asset entity.
+func (pu *PostUpdate) ClearAssets() *PostUpdate {
+	pu.mutation.ClearAssets()
+	return pu
+}
+
+// RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
+func (pu *PostUpdate) RemoveAssetIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveAssetIDs(ids...)
+	return pu
+}
+
+// RemoveAssets removes "assets" edges to Asset entities.
+func (pu *PostUpdate) RemoveAssets(a ...*Asset) *PostUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pu.RemoveAssetIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -850,6 +887,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !pu.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1170,6 +1252,21 @@ func (puo *PostUpdateOne) AddReacts(r ...*React) *PostUpdateOne {
 	return puo.AddReactIDs(ids...)
 }
 
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (puo *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddAssetIDs(ids...)
+	return puo
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (puo *PostUpdateOne) AddAssets(a ...*Asset) *PostUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return puo.AddAssetIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
@@ -1281,6 +1378,27 @@ func (puo *PostUpdateOne) RemoveReacts(r ...*React) *PostUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return puo.RemoveReactIDs(ids...)
+}
+
+// ClearAssets clears all "assets" edges to the Asset entity.
+func (puo *PostUpdateOne) ClearAssets() *PostUpdateOne {
+	puo.mutation.ClearAssets()
+	return puo
+}
+
+// RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
+func (puo *PostUpdateOne) RemoveAssetIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveAssetIDs(ids...)
+	return puo
+}
+
+// RemoveAssets removes "assets" edges to Asset entities.
+func (puo *PostUpdateOne) RemoveAssets(a ...*Asset) *PostUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return puo.RemoveAssetIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -1711,6 +1829,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !puo.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -58,6 +58,8 @@ const (
 	EdgeReplies = "replies"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
+	// EdgeAssets holds the string denoting the assets edge name in mutations.
+	EdgeAssets = "assets"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -102,6 +104,13 @@ const (
 	ReactsInverseTable = "reacts"
 	// ReactsColumn is the table column denoting the reacts relation/edge.
 	ReactsColumn = "post_id"
+	// AssetsTable is the table that holds the assets relation/edge.
+	AssetsTable = "assets"
+	// AssetsInverseTable is the table name for the Asset entity.
+	// It exists in this package in order to avoid circular dependency with the "asset" package.
+	AssetsInverseTable = "assets"
+	// AssetsColumn is the table column denoting the assets relation/edge.
+	AssetsColumn = "post_id"
 )
 
 // Columns holds all SQL columns for post fields.
