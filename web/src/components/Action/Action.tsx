@@ -2,6 +2,7 @@ import { Link, LinkProps } from "@chakra-ui/next-js";
 import { IconButton, IconButtonProps, forwardRef } from "@chakra-ui/react";
 import {
   AdjustmentsHorizontalIcon,
+  ArrowLeftIcon,
   Bars3Icon,
   BellIcon,
   EllipsisHorizontalIcon,
@@ -13,6 +14,7 @@ import { MouseEvent, MouseEventHandler, useCallback } from "react";
 import { LoginIcon } from "../graphics/LoginIcon";
 import { LogoutIcon } from "../graphics/LogoutIcon";
 import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
+import { SendIcon } from "../graphics/SendIcon";
 
 function useClickHandler(onClick: MouseEventHandler | undefined) {
   // This allows us to progressively enhance features on the application by
@@ -147,6 +149,30 @@ export function Close({ "aria-label": al, ...props }: WithOptionalARIALabel) {
       aria-label={al ?? "close"}
       {...props}
       icon={<XMarkIcon width="1.4em" />}
+    />
+  );
+}
+
+export function Back({ "aria-label": al, ...props }: WithOptionalARIALabel) {
+  return (
+    <ActionButton
+      size="sm"
+      title="Close"
+      aria-label={al ?? "close"}
+      {...props}
+      icon={<ArrowLeftIcon width="1.4em" />}
+    />
+  );
+}
+
+export function Send({ "aria-label": al, ...props }: WithOptionalARIALabel) {
+  return (
+    <ActionButton
+      size="sm"
+      title="Close"
+      aria-label={al ?? "close"}
+      {...props}
+      icon={<SendIcon width="1.4em" />}
     />
   );
 }

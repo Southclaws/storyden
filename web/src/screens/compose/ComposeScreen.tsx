@@ -9,7 +9,9 @@ import {
 } from "@chakra-ui/react";
 import { FormEvent } from "react";
 import { Controller } from "react-hook-form";
+import { Back, Dashboard, Send } from "src/components/Action/Action";
 import { Editor } from "src/components/Editor";
+import { Toolpill } from "src/components/Toolpill";
 import { CategorySelect } from "./components/CategorySelect/CategorySelect";
 import { Props, useComposeScreen } from "./useComposeScreen";
 
@@ -24,6 +26,17 @@ export function ComposeScreen(props: Props) {
       w="full"
       py={5}
     >
+      <Toolpill w="min-content">
+        <VStack>
+          <HStack>{/* <BasicFormattingButtonGroup /> */}</HStack>
+          <HStack>
+            <Back />
+            <Send />
+            <Dashboard />
+          </HStack>
+        </VStack>
+      </Toolpill>
+
       <VStack
         as="form"
         onSubmit={onPublish}
@@ -62,6 +75,7 @@ export function ComposeScreen(props: Props) {
           </HStack>
 
           <HStack
+            display={{ base: "none", md: "flex" }}
             flex="1 0 auto"
             maxWidth="min-content"
             flexDir={{ base: "column-reverse", md: "row" }}

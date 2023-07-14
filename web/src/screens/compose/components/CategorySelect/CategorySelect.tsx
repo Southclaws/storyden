@@ -15,7 +15,13 @@ export function CategorySelect(props: SelectProps) {
   if (!categories) return <Unready {...error} />;
 
   return (
-    <Select {...props} defaultValue={categories[0]?.id} w="max-content">
+    <Select
+      defaultValue={categories[0]?.id}
+      w="max-content"
+      size="xs"
+      borderRadius="lg"
+      {...props}
+    >
       {mapCategories(categories)}
     </Select>
   );
