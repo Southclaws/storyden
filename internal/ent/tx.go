@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// Asset is the client for interacting with the Asset builders.
+	Asset *AssetClient
 	// Authentication is the client for interacting with the Authentication builders.
 	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
@@ -162,6 +164,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
+	tx.Asset = NewAssetClient(tx.config)
 	tx.Authentication = NewAuthenticationClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)

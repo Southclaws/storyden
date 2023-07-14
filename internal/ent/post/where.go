@@ -1032,6 +1032,33 @@ func HasReactsWith(preds ...predicate.React) predicate.Post {
 	})
 }
 
+// HasAssets applies the HasEdge predicate on the "assets" edge.
+func HasAssets() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAssetsWith applies the HasEdge predicate on the "assets" edge with a given conditions (other predicates).
+func HasAssetsWith(preds ...predicate.Asset) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(AssetsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Post) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {

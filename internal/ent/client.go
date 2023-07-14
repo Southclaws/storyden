@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -33,6 +34,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// Asset is the client for interacting with the Asset builders.
+	Asset *AssetClient
 	// Authentication is the client for interacting with the Authentication builders.
 	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
@@ -63,6 +66,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
+	c.Asset = NewAssetClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
@@ -154,6 +158,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:            ctx,
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
+		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -182,6 +187,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:            ctx,
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
+		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -219,8 +225,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Account, c.Authentication, c.Category, c.Notification, c.Post, c.React,
-		c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Notification, c.Post,
+		c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -230,8 +236,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Account, c.Authentication, c.Category, c.Notification, c.Post, c.React,
-		c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Notification, c.Post,
+		c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -242,6 +248,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AccountMutation:
 		return c.Account.mutate(ctx, m)
+	case *AssetMutation:
+		return c.Asset.mutate(ctx, m)
 	case *AuthenticationMutation:
 		return c.Authentication.mutate(ctx, m)
 	case *CategoryMutation:
@@ -458,6 +466,140 @@ func (c *AccountClient) mutate(ctx context.Context, m *AccountMutation) (Value, 
 		return (&AccountDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Account mutation op: %q", m.Op())
+	}
+}
+
+// AssetClient is a client for the Asset schema.
+type AssetClient struct {
+	config
+}
+
+// NewAssetClient returns a client for the Asset from the given config.
+func NewAssetClient(c config) *AssetClient {
+	return &AssetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `asset.Hooks(f(g(h())))`.
+func (c *AssetClient) Use(hooks ...Hook) {
+	c.hooks.Asset = append(c.hooks.Asset, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `asset.Intercept(f(g(h())))`.
+func (c *AssetClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Asset = append(c.inters.Asset, interceptors...)
+}
+
+// Create returns a builder for creating a Asset entity.
+func (c *AssetClient) Create() *AssetCreate {
+	mutation := newAssetMutation(c.config, OpCreate)
+	return &AssetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Asset entities.
+func (c *AssetClient) CreateBulk(builders ...*AssetCreate) *AssetCreateBulk {
+	return &AssetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Asset.
+func (c *AssetClient) Update() *AssetUpdate {
+	mutation := newAssetMutation(c.config, OpUpdate)
+	return &AssetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AssetClient) UpdateOne(a *Asset) *AssetUpdateOne {
+	mutation := newAssetMutation(c.config, OpUpdateOne, withAsset(a))
+	return &AssetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AssetClient) UpdateOneID(id xid.ID) *AssetUpdateOne {
+	mutation := newAssetMutation(c.config, OpUpdateOne, withAssetID(id))
+	return &AssetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Asset.
+func (c *AssetClient) Delete() *AssetDelete {
+	mutation := newAssetMutation(c.config, OpDelete)
+	return &AssetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AssetClient) DeleteOne(a *Asset) *AssetDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AssetClient) DeleteOneID(id xid.ID) *AssetDeleteOne {
+	builder := c.Delete().Where(asset.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AssetDeleteOne{builder}
+}
+
+// Query returns a query builder for Asset.
+func (c *AssetClient) Query() *AssetQuery {
+	return &AssetQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAsset},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Asset entity by its id.
+func (c *AssetClient) Get(ctx context.Context, id xid.ID) (*Asset, error) {
+	return c.Query().Where(asset.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AssetClient) GetX(ctx context.Context, id xid.ID) *Asset {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPost queries the post edge of a Asset.
+func (c *AssetClient) QueryPost(a *Asset) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, asset.PostTable, asset.PostColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AssetClient) Hooks() []Hook {
+	return c.hooks.Asset
+}
+
+// Interceptors returns the client interceptors.
+func (c *AssetClient) Interceptors() []Interceptor {
+	return c.inters.Asset
+}
+
+func (c *AssetClient) mutate(ctx context.Context, m *AssetMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AssetCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AssetUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AssetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AssetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Asset mutation op: %q", m.Op())
 	}
 }
 
@@ -1068,6 +1210,22 @@ func (c *PostClient) QueryReacts(po *Post) *ReactQuery {
 	return query
 }
 
+// QueryAssets queries the assets edge of a Post.
+func (c *PostClient) QueryAssets(po *Post) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.AssetsTable, post.AssetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *PostClient) Hooks() []Hook {
 	return c.hooks.Post
@@ -1648,11 +1806,11 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, Authentication, Category, Notification, Post, React, Role, Setting,
-		Tag []ent.Hook
+		Account, Asset, Authentication, Category, Notification, Post, React, Role,
+		Setting, Tag []ent.Hook
 	}
 	inters struct {
-		Account, Authentication, Category, Notification, Post, React, Role, Setting,
-		Tag []ent.Interceptor
+		Account, Asset, Authentication, Category, Notification, Post, React, Role,
+		Setting, Tag []ent.Interceptor
 	}
 )

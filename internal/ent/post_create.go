@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -320,6 +321,21 @@ func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
 	return pc.AddReactIDs(ids...)
 }
 
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (pc *PostCreate) AddAssetIDs(ids ...xid.ID) *PostCreate {
+	pc.mutation.AddAssetIDs(ids...)
+	return pc
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (pc *PostCreate) AddAssets(a ...*Asset) *PostCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return pc.AddAssetIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pc *PostCreate) Mutation() *PostMutation {
 	return pc.mutation
@@ -618,6 +634,22 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.AssetsTable,
+			Columns: []string{post.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

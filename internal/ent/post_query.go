@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -35,6 +36,7 @@ type PostQuery struct {
 	withReplyTo  *PostQuery
 	withReplies  *PostQuery
 	withReacts   *ReactQuery
+	withAssets   *AssetQuery
 	withFKs      bool
 	modifiers    []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -249,6 +251,28 @@ func (pq *PostQuery) QueryReacts() *ReactQuery {
 	return query
 }
 
+// QueryAssets chains the current query on the "assets" edge.
+func (pq *PostQuery) QueryAssets() *AssetQuery {
+	query := (&AssetClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.AssetsTable, post.AssetsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Post entity from the query.
 // Returns a *NotFoundError when no Post was found.
 func (pq *PostQuery) First(ctx context.Context) (*Post, error) {
@@ -449,6 +473,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withReplyTo:  pq.withReplyTo.Clone(),
 		withReplies:  pq.withReplies.Clone(),
 		withReacts:   pq.withReacts.Clone(),
+		withAssets:   pq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -543,6 +568,17 @@ func (pq *PostQuery) WithReacts(opts ...func(*ReactQuery)) *PostQuery {
 	return pq
 }
 
+// WithAssets tells the query-builder to eager-load the nodes that are connected to
+// the "assets" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithAssets(opts ...func(*AssetQuery)) *PostQuery {
+	query := (&AssetClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withAssets = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -622,7 +658,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		nodes       = []*Post{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [9]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -631,6 +667,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withReplyTo != nil,
 			pq.withReplies != nil,
 			pq.withReacts != nil,
+			pq.withAssets != nil,
 		}
 	)
 	if pq.withAuthor != nil || pq.withCategory != nil || pq.withRoot != nil || pq.withReplyTo != nil {
@@ -709,6 +746,13 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := pq.loadReacts(ctx, query, nodes,
 			func(n *Post) { n.Edges.Reacts = []*React{} },
 			func(n *Post, e *React) { n.Edges.Reacts = append(n.Edges.Reacts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withAssets; query != nil {
+		if err := pq.loadAssets(ctx, query, nodes,
+			func(n *Post) { n.Edges.Assets = []*Asset{} },
+			func(n *Post, e *Asset) { n.Edges.Assets = append(n.Edges.Assets, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -963,6 +1007,33 @@ func (pq *PostQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []
 	}
 	query.Where(predicate.React(func(s *sql.Selector) {
 		s.Where(sql.InValues(post.ReactsColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.PostID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "post_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (pq *PostQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Post, init func(*Post), assign func(*Post, *Asset)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.Where(predicate.Asset(func(s *sql.Selector) {
+		s.Where(sql.InValues(post.AssetsColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

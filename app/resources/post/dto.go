@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -28,6 +29,7 @@ type Post struct {
 	ReplyTo        opt.Optional[PostID]
 	Reacts         []*react.React
 	Meta           map[string]any
+	Assets         []*asset.Asset
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -74,6 +76,7 @@ func FromModel(m *ent.Post) (w *Post) {
 		ReplyTo: replyTo,
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,
+		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
