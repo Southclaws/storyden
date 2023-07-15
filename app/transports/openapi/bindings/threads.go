@@ -51,6 +51,8 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
+	request.Body.Assets
+
 	tags := opt.NewPtr(request.Body.Tags)
 
 	thread, err := i.thread_svc.Create(ctx,
@@ -86,6 +88,8 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	request.Body.Assets
 
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:    opt.NewPtr(request.Body.Title),

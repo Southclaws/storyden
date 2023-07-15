@@ -8,6 +8,8 @@ import {
 } from "slate";
 import { ReactEditor, withReact } from "slate-react";
 
+import { Asset } from "src/api/openapi/schemas";
+
 import { deserialise, serialise } from "./serialisation";
 
 export type Props = {
@@ -16,6 +18,7 @@ export type Props = {
   minHeight?: string;
   initialValue?: string;
   onChange: (value: string) => void;
+  onAssetUpload: (asset: Asset) => void;
 };
 
 const defaultValue: Descendant[] = [

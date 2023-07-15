@@ -5,6 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { MediaItem } from "./mediaItem";
+import type { Identifier } from "./identifier";
 
-export type MediaItemList = MediaItem[];
+export type AssetID = Identifier;

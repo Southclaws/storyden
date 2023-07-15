@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { useCategoryList } from "src/api/openapi/categories";
 import {
+  Asset,
   Thread,
   ThreadCreateOKResponse,
   ThreadStatus,
@@ -15,20 +16,21 @@ import { errorToast } from "src/components/ErrorBanner";
 
 export type Props = { editing?: string; draft?: Thread };
 
-export const ThreadCreateSchema = z.object({
+export const ThreadMutationSchema = z.object({
   title: z.string().min(1),
   body: z.string().min(1),
   category: z.string(),
   tags: z.string().array().optional(),
+  assets: z.array(z.string()),
 });
-export type ThreadCreate = z.infer<typeof ThreadCreateSchema>;
+export type ThreadMutation = z.infer<typeof ThreadMutationSchema>;
 
 export function useComposeForm({ draft, editing }: Props) {
   const router = useRouter();
   const toast = useToast();
   const { data } = useCategoryList();
-  const formContext = useForm<ThreadCreate>({
-    resolver: zodResolver(ThreadCreateSchema),
+  const formContext = useForm<ThreadMutation>({
+    resolver: zodResolver(ThreadMutationSchema),
     reValidateMode: "onChange",
     defaultValues: draft
       ? {
@@ -46,13 +48,14 @@ export function useComposeForm({ draft, editing }: Props) {
     router.back();
   }
 
-  const onSave = formContext.handleSubmit(async (props: ThreadCreate) => {
+  const doSave = async (props: ThreadMutation) => {
     const payload = {
       title: props.title,
       category: props.category,
       body: props.body,
       tags: [],
       status: ThreadStatus.draft,
+      assets: props.assets,
     };
 
     if (editing) {
@@ -64,14 +67,23 @@ export function useComposeForm({ draft, editing }: Props) {
         .then((thread: ThreadCreateOKResponse) => thread.id)
         .catch(errorToast(toast));
 
-      if (!id) return;
-
       router.push(`/new?id=${id}`);
     }
-  });
+  };
+
+  const onAssetUpload = async (asset: Asset) => {
+    const state: ThreadMutation = formContext.getValues();
+
+    return await doSave({
+      ...state,
+      assets: [...state.assets, asset.id],
+    });
+  };
+
+  const onSave = formContext.handleSubmit(doSave);
 
   const onPublish = formContext.handleSubmit(
-    async ({ title, body, category }: ThreadCreate) => {
+    async ({ title, body, category }: ThreadMutation) => {
       if (editing) {
         threadUpdate(editing, { status: ThreadStatus.published })
           .then((thread: ThreadCreateOKResponse) =>
@@ -98,6 +110,7 @@ export function useComposeForm({ draft, editing }: Props) {
     onBack,
     onSave,
     onPublish,
+    onAssetUpload,
     formContext,
   };
 }

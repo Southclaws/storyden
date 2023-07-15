@@ -4,7 +4,10 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+type AssetID string
+
 type Asset struct {
+	ID       AssetID
 	URL      string
 	MIMEType string
 	Width    int
@@ -13,6 +16,7 @@ type Asset struct {
 
 func FromModel(a *ent.Asset) *Asset {
 	return &Asset{
+		ID:       AssetID(a.ID),
 		URL:      a.URL,
 		MIMEType: a.Mimetype,
 		Width:    a.Width,

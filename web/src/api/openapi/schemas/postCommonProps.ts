@@ -5,8 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AssetList } from "./assetList";
 import type { Identifier } from "./identifier";
-import type { MediaItemList } from "./mediaItemList";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
@@ -21,5 +21,5 @@ export interface PostCommonProps {
   meta?: Metadata;
   reacts: ReactList;
   reply_to?: Identifier;
-  media: MediaItemList;
+  media: AssetList;
 }

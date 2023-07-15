@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -24,6 +25,7 @@ type AssetQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Asset
 	withPost   *PostQuery
+	withOwner  *AccountQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -83,6 +85,28 @@ func (aq *AssetQuery) QueryPost() *PostQuery {
 	return query
 }
 
+// QueryOwner chains the current query on the "owner" edge.
+func (aq *AssetQuery) QueryOwner() *AccountQuery {
+	query := (&AccountClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, selector),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, asset.OwnerTable, asset.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Asset entity from the query.
 // Returns a *NotFoundError when no Asset was found.
 func (aq *AssetQuery) First(ctx context.Context) (*Asset, error) {
@@ -107,8 +131,8 @@ func (aq *AssetQuery) FirstX(ctx context.Context) *Asset {
 
 // FirstID returns the first Asset ID from the query.
 // Returns a *NotFoundError when no Asset ID was found.
-func (aq *AssetQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
-	var ids []xid.ID
+func (aq *AssetQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -120,7 +144,7 @@ func (aq *AssetQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AssetQuery) FirstIDX(ctx context.Context) xid.ID {
+func (aq *AssetQuery) FirstIDX(ctx context.Context) string {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -158,8 +182,8 @@ func (aq *AssetQuery) OnlyX(ctx context.Context) *Asset {
 // OnlyID is like Only, but returns the only Asset ID in the query.
 // Returns a *NotSingularError when more than one Asset ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AssetQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
-	var ids []xid.ID
+func (aq *AssetQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -175,7 +199,7 @@ func (aq *AssetQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AssetQuery) OnlyIDX(ctx context.Context) xid.ID {
+func (aq *AssetQuery) OnlyIDX(ctx context.Context) string {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -203,7 +227,7 @@ func (aq *AssetQuery) AllX(ctx context.Context) []*Asset {
 }
 
 // IDs executes the query and returns a list of Asset IDs.
-func (aq *AssetQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+func (aq *AssetQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
@@ -215,7 +239,7 @@ func (aq *AssetQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AssetQuery) IDsX(ctx context.Context) []xid.ID {
+func (aq *AssetQuery) IDsX(ctx context.Context) []string {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -276,6 +300,7 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 		inters:     append([]Interceptor{}, aq.inters...),
 		predicates: append([]predicate.Asset{}, aq.predicates...),
 		withPost:   aq.withPost.Clone(),
+		withOwner:  aq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -290,6 +315,17 @@ func (aq *AssetQuery) WithPost(opts ...func(*PostQuery)) *AssetQuery {
 		opt(query)
 	}
 	aq.withPost = query
+	return aq
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithOwner(opts ...func(*AccountQuery)) *AssetQuery {
+	query := (&AccountClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withOwner = query
 	return aq
 }
 
@@ -371,8 +407,9 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	var (
 		nodes       = []*Asset{}
 		_spec       = aq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			aq.withPost != nil,
+			aq.withOwner != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -402,6 +439,12 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 			return nil, err
 		}
 	}
+	if query := aq.withOwner; query != nil {
+		if err := aq.loadOwner(ctx, query, nodes, nil,
+			func(n *Asset, e *Account) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -427,6 +470,35 @@ func (aq *AssetQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*A
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "post_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (aq *AssetQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Account)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Asset)
+	for i := range nodes {
+		fk := nodes[i].AccountID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(account.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

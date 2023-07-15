@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AssetID } from "./assetID";
 
-/**
- * Unique post ID.
- */
-export type PostIDQueryParamParameter = string;
+export type AssetReferenceList = AssetID[];

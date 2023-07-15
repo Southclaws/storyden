@@ -4,8 +4,6 @@ package asset
 
 import (
 	"time"
-
-	"github.com/rs/xid"
 )
 
 const (
@@ -27,8 +25,12 @@ const (
 	FieldHeight = "height"
 	// FieldPostID holds the string denoting the post_id field in the database.
 	FieldPostID = "post_id"
+	// FieldAccountID holds the string denoting the account_id field in the database.
+	FieldAccountID = "account_id"
 	// EdgePost holds the string denoting the post edge name in mutations.
 	EdgePost = "post"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// Table holds the table name of the asset in the database.
 	Table = "assets"
 	// PostTable is the table that holds the post relation/edge.
@@ -38,6 +40,13 @@ const (
 	PostInverseTable = "posts"
 	// PostColumn is the table column denoting the post relation/edge.
 	PostColumn = "post_id"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "assets"
+	// OwnerInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	OwnerInverseTable = "accounts"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "account_id"
 )
 
 // Columns holds all SQL columns for asset fields.
@@ -50,6 +59,7 @@ var Columns = []string{
 	FieldWidth,
 	FieldHeight,
 	FieldPostID,
+	FieldAccountID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,8 +79,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )

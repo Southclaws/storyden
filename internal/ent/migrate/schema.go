@@ -27,14 +27,15 @@ var (
 	}
 	// AssetsColumns holds the columns for the "assets" table.
 	AssetsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "url", Type: field.TypeString},
 		{Name: "mimetype", Type: field.TypeString},
 		{Name: "width", Type: field.TypeInt},
 		{Name: "height", Type: field.TypeInt},
-		{Name: "post_id", Type: field.TypeString, Size: 20},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AssetsTable holds the schema information for the "assets" table.
 	AssetsTable = &schema.Table{
@@ -43,10 +44,16 @@ var (
 		PrimaryKey: []*schema.Column{AssetsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "assets_posts_assets",
+				Symbol:     "assets_accounts_assets",
 				Columns:    []*schema.Column{AssetsColumns[7]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "assets_posts_assets",
+				Columns:    []*schema.Column{AssetsColumns[8]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -323,7 +330,8 @@ var (
 )
 
 func init() {
-	AssetsTable.ForeignKeys[0].RefTable = PostsTable
+	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
+	AssetsTable.ForeignKeys[1].RefTable = PostsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable

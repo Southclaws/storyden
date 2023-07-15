@@ -12,61 +12,12 @@ import { fetcher } from "../client";
 
 import type {
   AssetGetOKResponse,
-  AssetGetUploadURLOKResponse,
   AssetUploadBody,
   AssetUploadOKResponse,
-  AssetUploadParams,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
 } from "./schemas";
-
-/**
- * Get an upload URL for a new asset.
- */
-export const assetGetUploadURL = () => {
-  return fetcher<AssetGetUploadURLOKResponse>({
-    url: `/v1/assets`,
-    method: "get",
-  });
-};
-
-export const getAssetGetUploadURLKey = () => [`/v1/assets`] as const;
-
-export type AssetGetUploadURLQueryResult = NonNullable<
-  Awaited<ReturnType<typeof assetGetUploadURL>>
->;
-export type AssetGetUploadURLQueryError =
-  | UnauthorisedResponse
-  | InternalServerErrorResponse;
-
-export const useAssetGetUploadURL = <
-  TError = UnauthorisedResponse | InternalServerErrorResponse
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof assetGetUploadURL>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAssetGetUploadURLKey() : null));
-  const swrFn = () => assetGetUploadURL();
-
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
-    swrKey,
-    swrFn,
-    swrOptions
-  );
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
 
 /**
  * If Storyden is not using S3 for file uploads, this is the fallback
@@ -74,16 +25,12 @@ equivalent of S3's pre-signed upload URL. Files uploaded to this
 endpoint will be stored on the local filesystem instead of the cloud.
 
  */
-export const assetUpload = (
-  assetUploadBody: AssetUploadBody,
-  params: AssetUploadParams
-) => {
+export const assetUpload = (assetUploadBody: AssetUploadBody) => {
   return fetcher<AssetUploadOKResponse>({
     url: `/v1/assets`,
     method: "post",
     headers: { "Content-Type": "application/octet-stream" },
     data: assetUploadBody,
-    params,
   });
 };
 

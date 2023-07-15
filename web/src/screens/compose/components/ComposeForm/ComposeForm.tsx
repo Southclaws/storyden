@@ -14,7 +14,8 @@ import { TitleInput } from "../TitleInput/TitleInput";
 import { Props, useComposeForm } from "./useComposeForm";
 
 export function ComposeForm(props: Props) {
-  const { formContext, onBack, onPublish, onSave } = useComposeForm(props);
+  const { formContext, onBack, onPublish, onSave, onAssetUpload } =
+    useComposeForm(props);
 
   return (
     <VStack as="form" onSubmit={onPublish} alignItems="start" w="full" gap={2}>
@@ -54,7 +55,7 @@ export function ComposeForm(props: Props) {
           </Flex>
         </HStack>
 
-        <BodyInput>
+        <BodyInput onAssetUpload={onAssetUpload}>
           <Toolpill w="min-content" display={{ base: "flex", md: "none" }}>
             <VStack>
               <HStack>
