@@ -444,6 +444,22 @@ func (c *AccountClient) QueryTags(a *Account) *TagQuery {
 	return query
 }
 
+// QueryAssets queries the assets edge of a Account.
+func (c *AccountClient) QueryAssets(a *Account) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.AssetsTable, account.AssetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
@@ -515,7 +531,7 @@ func (c *AssetClient) UpdateOne(a *Asset) *AssetUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AssetClient) UpdateOneID(id xid.ID) *AssetUpdateOne {
+func (c *AssetClient) UpdateOneID(id string) *AssetUpdateOne {
 	mutation := newAssetMutation(c.config, OpUpdateOne, withAssetID(id))
 	return &AssetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -532,7 +548,7 @@ func (c *AssetClient) DeleteOne(a *Asset) *AssetDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AssetClient) DeleteOneID(id xid.ID) *AssetDeleteOne {
+func (c *AssetClient) DeleteOneID(id string) *AssetDeleteOne {
 	builder := c.Delete().Where(asset.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -549,12 +565,12 @@ func (c *AssetClient) Query() *AssetQuery {
 }
 
 // Get returns a Asset entity by its id.
-func (c *AssetClient) Get(ctx context.Context, id xid.ID) (*Asset, error) {
+func (c *AssetClient) Get(ctx context.Context, id string) (*Asset, error) {
 	return c.Query().Where(asset.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AssetClient) GetX(ctx context.Context, id xid.ID) *Asset {
+func (c *AssetClient) GetX(ctx context.Context, id string) *Asset {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -571,6 +587,22 @@ func (c *AssetClient) QueryPost(a *Asset) *PostQuery {
 			sqlgraph.From(asset.Table, asset.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, asset.PostTable, asset.PostColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOwner queries the owner edge of a Asset.
+func (c *AssetClient) QueryOwner(a *Asset) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, asset.OwnerTable, asset.OwnerColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil

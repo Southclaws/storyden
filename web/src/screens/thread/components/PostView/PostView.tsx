@@ -21,7 +21,7 @@ export function PostView(props: Props) {
     onContentChange,
     onPublishEdit,
     onCancelEdit,
-  } = usePostView(props); 
+  } = usePostView(props);
 
   return (
     <Flex id={props.id} flexDir="column" gap={2}>

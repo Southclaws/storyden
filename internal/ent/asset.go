@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
@@ -17,7 +18,7 @@ import (
 type Asset struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID xid.ID `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -32,6 +33,8 @@ type Asset struct {
 	Height int `json:"height,omitempty"`
 	// PostID holds the value of the "post_id" field.
 	PostID xid.ID `json:"post_id,omitempty"`
+	// AccountID holds the value of the "account_id" field.
+	AccountID xid.ID `json:"account_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AssetQuery when eager-loading is set.
 	Edges AssetEdges `json:"edges"`
@@ -41,9 +44,11 @@ type Asset struct {
 type AssetEdges struct {
 	// Post holds the value of the post edge.
 	Post *Post `json:"post,omitempty"`
+	// Owner holds the value of the owner edge.
+	Owner *Account `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // PostOrErr returns the Post value or an error if the edge
@@ -59,6 +64,19 @@ func (e AssetEdges) PostOrErr() (*Post, error) {
 	return nil, &NotLoadedError{edge: "post"}
 }
 
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AssetEdges) OwnerOrErr() (*Account, error) {
+	if e.loadedTypes[1] {
+		if e.Owner == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: account.Label}
+		}
+		return e.Owner, nil
+	}
+	return nil, &NotLoadedError{edge: "owner"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Asset) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -66,11 +84,11 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case asset.FieldWidth, asset.FieldHeight:
 			values[i] = new(sql.NullInt64)
-		case asset.FieldURL, asset.FieldMimetype:
+		case asset.FieldID, asset.FieldURL, asset.FieldMimetype:
 			values[i] = new(sql.NullString)
 		case asset.FieldCreatedAt, asset.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case asset.FieldID, asset.FieldPostID:
+		case asset.FieldPostID, asset.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Asset", columns[i])
@@ -88,10 +106,10 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case asset.FieldID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				a.ID = *value
+			} else if value.Valid {
+				a.ID = value.String
 			}
 		case asset.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -135,6 +153,12 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				a.PostID = *value
 			}
+		case asset.FieldAccountID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field account_id", values[i])
+			} else if value != nil {
+				a.AccountID = *value
+			}
 		}
 	}
 	return nil
@@ -143,6 +167,11 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 // QueryPost queries the "post" edge of the Asset entity.
 func (a *Asset) QueryPost() *PostQuery {
 	return NewAssetClient(a.config).QueryPost(a)
+}
+
+// QueryOwner queries the "owner" edge of the Asset entity.
+func (a *Asset) QueryOwner() *AccountQuery {
+	return NewAssetClient(a.config).QueryOwner(a)
 }
 
 // Update returns a builder for updating this Asset.
@@ -188,6 +217,9 @@ func (a *Asset) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("post_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.PostID))
+	builder.WriteString(", ")
+	builder.WriteString("account_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.AccountID))
 	builder.WriteByte(')')
 	return builder.String()
 }

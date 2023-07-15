@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
@@ -83,23 +84,40 @@ func (ac *AssetCreate) SetPostID(x xid.ID) *AssetCreate {
 	return ac
 }
 
-// SetID sets the "id" field.
-func (ac *AssetCreate) SetID(x xid.ID) *AssetCreate {
-	ac.mutation.SetID(x)
+// SetNillablePostID sets the "post_id" field if the given value is not nil.
+func (ac *AssetCreate) SetNillablePostID(x *xid.ID) *AssetCreate {
+	if x != nil {
+		ac.SetPostID(*x)
+	}
 	return ac
 }
 
-// SetNillableID sets the "id" field if the given value is not nil.
-func (ac *AssetCreate) SetNillableID(x *xid.ID) *AssetCreate {
-	if x != nil {
-		ac.SetID(*x)
-	}
+// SetAccountID sets the "account_id" field.
+func (ac *AssetCreate) SetAccountID(x xid.ID) *AssetCreate {
+	ac.mutation.SetAccountID(x)
+	return ac
+}
+
+// SetID sets the "id" field.
+func (ac *AssetCreate) SetID(s string) *AssetCreate {
+	ac.mutation.SetID(s)
 	return ac
 }
 
 // SetPost sets the "post" edge to the Post entity.
 func (ac *AssetCreate) SetPost(p *Post) *AssetCreate {
 	return ac.SetPostID(p.ID)
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (ac *AssetCreate) SetOwnerID(id xid.ID) *AssetCreate {
+	ac.mutation.SetOwnerID(id)
+	return ac
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (ac *AssetCreate) SetOwner(a *Account) *AssetCreate {
+	return ac.SetOwnerID(a.ID)
 }
 
 // Mutation returns the AssetMutation object of the builder.
@@ -145,10 +163,6 @@ func (ac *AssetCreate) defaults() {
 		v := asset.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := ac.mutation.ID(); !ok {
-		v := asset.DefaultID()
-		ac.mutation.SetID(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -171,16 +185,16 @@ func (ac *AssetCreate) check() error {
 	if _, ok := ac.mutation.Height(); !ok {
 		return &ValidationError{Name: "height", err: errors.New(`ent: missing required field "Asset.height"`)}
 	}
-	if _, ok := ac.mutation.PostID(); !ok {
-		return &ValidationError{Name: "post_id", err: errors.New(`ent: missing required field "Asset.post_id"`)}
+	if _, ok := ac.mutation.AccountID(); !ok {
+		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Asset.account_id"`)}
 	}
 	if v, ok := ac.mutation.ID(); ok {
-		if err := asset.IDValidator(v.String()); err != nil {
+		if err := asset.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Asset.id": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.PostID(); !ok {
-		return &ValidationError{Name: "post", err: errors.New(`ent: missing required edge "Asset.post"`)}
+	if _, ok := ac.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Asset.owner"`)}
 	}
 	return nil
 }
@@ -197,10 +211,10 @@ func (ac *AssetCreate) sqlSave(ctx context.Context) (*Asset, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*xid.ID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Asset.ID type: %T", _spec.ID.Value)
 		}
 	}
 	ac.mutation.id = &_node.ID
@@ -216,7 +230,7 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = ac.conflict
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(asset.FieldCreatedAt, field.TypeTime, value)
@@ -257,6 +271,23 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.PostID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.OwnerTable,
+			Columns: []string{asset.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -392,6 +423,24 @@ func (u *AssetUpsert) SetPostID(v xid.ID) *AssetUpsert {
 // UpdatePostID sets the "post_id" field to the value that was provided on create.
 func (u *AssetUpsert) UpdatePostID() *AssetUpsert {
 	u.SetExcluded(asset.FieldPostID)
+	return u
+}
+
+// ClearPostID clears the value of the "post_id" field.
+func (u *AssetUpsert) ClearPostID() *AssetUpsert {
+	u.SetNull(asset.FieldPostID)
+	return u
+}
+
+// SetAccountID sets the "account_id" field.
+func (u *AssetUpsert) SetAccountID(v xid.ID) *AssetUpsert {
+	u.Set(asset.FieldAccountID, v)
+	return u
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateAccountID() *AssetUpsert {
+	u.SetExcluded(asset.FieldAccountID)
 	return u
 }
 
@@ -544,6 +593,27 @@ func (u *AssetUpsertOne) UpdatePostID() *AssetUpsertOne {
 	})
 }
 
+// ClearPostID clears the value of the "post_id" field.
+func (u *AssetUpsertOne) ClearPostID() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.ClearPostID()
+	})
+}
+
+// SetAccountID sets the "account_id" field.
+func (u *AssetUpsertOne) SetAccountID(v xid.ID) *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetAccountID(v)
+	})
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateAccountID() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateAccountID()
+	})
+}
+
 // Exec executes the query.
 func (u *AssetUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -560,7 +630,7 @@ func (u *AssetUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AssetUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
+func (u *AssetUpsertOne) ID(ctx context.Context) (id string, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -574,7 +644,7 @@ func (u *AssetUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AssetUpsertOne) IDX(ctx context.Context) xid.ID {
+func (u *AssetUpsertOne) IDX(ctx context.Context) string {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -853,6 +923,27 @@ func (u *AssetUpsertBulk) SetPostID(v xid.ID) *AssetUpsertBulk {
 func (u *AssetUpsertBulk) UpdatePostID() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdatePostID()
+	})
+}
+
+// ClearPostID clears the value of the "post_id" field.
+func (u *AssetUpsertBulk) ClearPostID() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.ClearPostID()
+	})
+}
+
+// SetAccountID sets the "account_id" field.
+func (u *AssetUpsertBulk) SetAccountID(v xid.ID) *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetAccountID(v)
+	})
+}
+
+// UpdateAccountID sets the "account_id" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateAccountID() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateAccountID()
 	})
 }
 

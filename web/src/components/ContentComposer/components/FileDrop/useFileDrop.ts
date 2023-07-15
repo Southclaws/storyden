@@ -3,12 +3,16 @@ import { DragEvent, useState } from "react";
 import { Transforms } from "slate";
 import { useSlate } from "slate-react";
 
-import { assetGetUploadURL } from "src/api/openapi/assets";
-import { AssetGetUploadURLOKResponse } from "src/api/openapi/schemas";
+import { assetUpload } from "src/api/openapi/assets";
+import { Asset } from "src/api/openapi/schemas";
 
 import { isSupportedImage } from "./utils";
 
-export function useFileDrop() {
+export type Props = {
+  onComplete: (asset: Asset) => void;
+};
+
+export function useFileDrop(props: Props) {
   const [dragging, setDragging] = useState(false);
   const editor = useSlate();
   const toast = useToast();
@@ -23,23 +27,16 @@ export function useFileDrop() {
   }
 
   async function upload(f: File) {
-    const { url } = await assetGetUploadURL();
-
     // TODO: Upload progress indicator...
-    const response = await fetch(url, {
-      credentials: "include",
-      method: "POST",
-      headers: { "Content-Type": "application/octet-stream" },
-      body: f,
-    });
+    const asset = await assetUpload(f);
 
-    const json = (await response.json()) as AssetGetUploadURLOKResponse;
+    props.onComplete(asset);
 
-    return json.url;
+    return asset;
   }
 
   async function process(f: File) {
-    const url = await upload(f);
+    const { url } = await upload(f);
 
     if (!isSupportedImage(f.type)) {
       throw new Error("Unsupported image format");

@@ -5,8 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AssetList } from "./assetList";
 import type { CategoryReference } from "./categoryReference";
-import type { MediaItemList } from "./mediaItemList";
 import type { Metadata } from "./metadata";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
@@ -29,5 +29,5 @@ export type ThreadReferenceAllOf = {
   category: CategoryReference;
   reacts: ReactList;
   meta: Metadata;
-  media: MediaItemList;
+  media: AssetList;
 };

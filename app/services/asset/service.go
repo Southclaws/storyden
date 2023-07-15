@@ -1,19 +1,24 @@
 package asset
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"io"
+	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/rs/xid"
+	"github.com/gabriel-vasile/mimetype"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -24,7 +29,7 @@ import (
 const assetsSubdirectory = "assets"
 
 type Service interface {
-	Upload(ctx context.Context, pid post.PostID, r io.Reader) (string, error)
+	Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
 	Read(ctx context.Context, path string) (io.Reader, error)
 }
 
@@ -37,8 +42,8 @@ type service struct {
 	rbac rbac.AccessManager
 
 	account_repo account.Repository
+	asset_repo   asset.Repository
 	thread_repo  thread.Repository
-	post_repo    post.Repository
 
 	os object.Storer
 
@@ -50,8 +55,8 @@ func New(
 	rbac rbac.AccessManager,
 
 	account_repo account.Repository,
+	asset_repo asset.Repository,
 	thread_repo thread.Repository,
-	post_repo post.Repository,
 
 	os object.Storer,
 	cfg config.Config,
@@ -60,36 +65,58 @@ func New(
 		l:            l.With(zap.String("service", "post")),
 		rbac:         rbac,
 		account_repo: account_repo,
+		asset_repo:   asset_repo,
 		thread_repo:  thread_repo,
-		post_repo:    post_repo,
 		os:           os,
 		address:      cfg.PublicWebAddress,
 	}
 }
 
-func (s *service) Upload(ctx context.Context, pid post.PostID, r io.Reader) (string, error) {
+func (s *service) Upload(ctx context.Context, r io.Reader) (*asset.Asset, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
-		return "", fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	assetID := fmt.Sprintf("%s-%s", accountID.String(), xid.New().String())
-	path := filepath.Join(assetsSubdirectory, assetID)
+	// NOTE: We load the whole file into memory in order to compute a hash first
+	// which isn't the most optimal route as it means 5 people uploading a 100MB
+	// file to a 512MB server would result in a crash but this can be optimised.
+	// There are a few alternatives, one is to upload the whole file now by just
+	// streaming it to its destination then computing hashes and resizes another
+	// time, another way is by using a rolling hash on the stream during upload.
 
-	if err := s.os.Write(ctx, path, r); err != nil {
-		return "", fault.Wrap(err, fctx.With(ctx))
-	}
-
-	url := fmt.Sprintf("%s/api/v1/assets/%s", s.address, assetID)
-
-	_, err = s.post_repo.Update(ctx, pid, post.WithAssets(
-	// TODO: Insert asset record and append to post.
-	))
+	buf, err := io.ReadAll(r)
 	if err != nil {
-		return "", fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	r = bytes.NewReader(buf)
+
+	mt := mimetype.Detect(buf)
+
+	hash := sha1.Sum(buf)
+	assetID := hex.EncodeToString(hash[:])
+	slug := fmt.Sprintf("%s-%s", assetID, accountID.String())
+	filePath := filepath.Join(assetsSubdirectory, slug)
+
+	if err := s.os.Write(ctx, filePath, r); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return url, nil
+	apiPath := path.Join("api/v1/assets", slug)
+	url := fmt.Sprintf("%s/%s", s.address, apiPath)
+	mime := mt.String()
+
+	if strings.HasPrefix(mime, "image") {
+		// TODO: figure out width and height
+		fmt.Println("IS AN IMAGE")
+	}
+
+	ast, err := s.asset_repo.Add(ctx, accountID, assetID, url, mime, 0, 0)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return ast, nil
 }
 
 func (s *service) Read(ctx context.Context, assetID string) (io.Reader, error) {

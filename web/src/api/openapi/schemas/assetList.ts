@@ -5,10 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { Asset } from "./asset";
 
-export interface MediaItem {
-  url: string;
-  mime_type: string;
-  width: number;
-  height: number;
-}
+export type AssetList = Asset[];

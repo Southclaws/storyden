@@ -23,7 +23,7 @@ export function ContentComposer({
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
         {children}
 
-        <FileDrop>
+        <FileDrop onComplete={props.onAssetUpload}>
           <Editable
             renderLeaf={renderLeaf}
             renderElement={renderElement}

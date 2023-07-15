@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -81,9 +82,40 @@ func (au *AssetUpdate) SetPostID(x xid.ID) *AssetUpdate {
 	return au
 }
 
+// SetNillablePostID sets the "post_id" field if the given value is not nil.
+func (au *AssetUpdate) SetNillablePostID(x *xid.ID) *AssetUpdate {
+	if x != nil {
+		au.SetPostID(*x)
+	}
+	return au
+}
+
+// ClearPostID clears the value of the "post_id" field.
+func (au *AssetUpdate) ClearPostID() *AssetUpdate {
+	au.mutation.ClearPostID()
+	return au
+}
+
+// SetAccountID sets the "account_id" field.
+func (au *AssetUpdate) SetAccountID(x xid.ID) *AssetUpdate {
+	au.mutation.SetAccountID(x)
+	return au
+}
+
 // SetPost sets the "post" edge to the Post entity.
 func (au *AssetUpdate) SetPost(p *Post) *AssetUpdate {
 	return au.SetPostID(p.ID)
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (au *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
+	au.mutation.SetOwnerID(id)
+	return au
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (au *AssetUpdate) SetOwner(a *Account) *AssetUpdate {
+	return au.SetOwnerID(a.ID)
 }
 
 // Mutation returns the AssetMutation object of the builder.
@@ -94,6 +126,12 @@ func (au *AssetUpdate) Mutation() *AssetMutation {
 // ClearPost clears the "post" edge to the Post entity.
 func (au *AssetUpdate) ClearPost() *AssetUpdate {
 	au.mutation.ClearPost()
+	return au
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (au *AssetUpdate) ClearOwner() *AssetUpdate {
+	au.mutation.ClearOwner()
 	return au
 }
 
@@ -135,8 +173,8 @@ func (au *AssetUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (au *AssetUpdate) check() error {
-	if _, ok := au.mutation.PostID(); au.mutation.PostCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Asset.post"`)
+	if _, ok := au.mutation.OwnerID(); au.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Asset.owner"`)
 	}
 	return nil
 }
@@ -202,6 +240,35 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.OwnerTable,
+			Columns: []string{asset.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.OwnerTable,
+			Columns: []string{asset.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -281,9 +348,40 @@ func (auo *AssetUpdateOne) SetPostID(x xid.ID) *AssetUpdateOne {
 	return auo
 }
 
+// SetNillablePostID sets the "post_id" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillablePostID(x *xid.ID) *AssetUpdateOne {
+	if x != nil {
+		auo.SetPostID(*x)
+	}
+	return auo
+}
+
+// ClearPostID clears the value of the "post_id" field.
+func (auo *AssetUpdateOne) ClearPostID() *AssetUpdateOne {
+	auo.mutation.ClearPostID()
+	return auo
+}
+
+// SetAccountID sets the "account_id" field.
+func (auo *AssetUpdateOne) SetAccountID(x xid.ID) *AssetUpdateOne {
+	auo.mutation.SetAccountID(x)
+	return auo
+}
+
 // SetPost sets the "post" edge to the Post entity.
 func (auo *AssetUpdateOne) SetPost(p *Post) *AssetUpdateOne {
 	return auo.SetPostID(p.ID)
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (auo *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
+	auo.mutation.SetOwnerID(id)
+	return auo
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (auo *AssetUpdateOne) SetOwner(a *Account) *AssetUpdateOne {
+	return auo.SetOwnerID(a.ID)
 }
 
 // Mutation returns the AssetMutation object of the builder.
@@ -294,6 +392,12 @@ func (auo *AssetUpdateOne) Mutation() *AssetMutation {
 // ClearPost clears the "post" edge to the Post entity.
 func (auo *AssetUpdateOne) ClearPost() *AssetUpdateOne {
 	auo.mutation.ClearPost()
+	return auo
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (auo *AssetUpdateOne) ClearOwner() *AssetUpdateOne {
+	auo.mutation.ClearOwner()
 	return auo
 }
 
@@ -348,8 +452,8 @@ func (auo *AssetUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *AssetUpdateOne) check() error {
-	if _, ok := auo.mutation.PostID(); auo.mutation.PostCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Asset.post"`)
+	if _, ok := auo.mutation.OwnerID(); auo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Asset.owner"`)
 	}
 	return nil
 }
@@ -432,6 +536,35 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.OwnerTable,
+			Columns: []string{asset.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.OwnerTable,
+			Columns: []string{asset.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -35,5 +35,7 @@ func (Account) Edges() []ent.Edge {
 		edge.To("authentication", Authentication.Type),
 
 		edge.To("tags", Tag.Type),
+
+		edge.To("assets", Asset.Type),
 	}
 }

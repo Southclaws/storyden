@@ -128,8 +128,9 @@ func serialiseReact(r *react.React) openapi.React {
 	}
 }
 
-func serialiseAssetReference(a *asset.Asset) openapi.MediaItem {
-	return openapi.MediaItem{
+func serialiseAssetReference(a *asset.Asset) openapi.Asset {
+	return openapi.Asset{
+		Id:       string(a.ID),
 		Url:      a.URL,
 		MimeType: a.MIMEType,
 		Width:    float32(a.Width),

@@ -1,10 +1,10 @@
 import { Box } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
-import { useFileDrop } from "./useFileDrop";
+import { Props, useFileDrop } from "./useFileDrop";
 
-export function FileDrop({ children }: PropsWithChildren) {
-  const { onDragStart, onDragEnd, onDrop, dragging } = useFileDrop();
+export function FileDrop({ children, ...props }: PropsWithChildren<Props>) {
+  const { onDragStart, onDragEnd, onDrop, dragging } = useFileDrop(props);
 
   return (
     <Box

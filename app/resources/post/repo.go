@@ -48,7 +48,7 @@ func WithMeta(meta map[string]any) Option {
 	}
 }
 
-func WithAssets(ids ...xid.ID) Option {
+func WithAssets(ids ...string) Option {
 	return func(m *ent.PostMutation) {
 		m.AddAssetIDs(ids...)
 	}

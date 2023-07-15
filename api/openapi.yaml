@@ -576,14 +576,6 @@ paths:
   #
 
   /v1/assets:
-    get:
-      operationId: AssetGetUploadURL
-      description: Get an upload URL for a new asset.
-      tags: [assets]
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AssetGetUploadURLOK" }
     post:
       operationId: AssetUpload
       description: |
@@ -591,7 +583,6 @@ paths:
         equivalent of S3's pre-signed upload URL. Files uploaded to this 
         endpoint will be stored on the local filesystem instead of the cloud.
       tags: [assets]
-      parameters: [$ref: "#/components/parameters/PostIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -644,14 +635,6 @@ components:
       description: Unique post ID.
       name: post_id
       in: path
-      required: true
-      schema:
-        $ref: "#/components/schemas/Identifier"
-
-    PostIDQueryParam:
-      description: Unique post ID.
-      name: post_id
-      in: query
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
@@ -932,13 +915,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/React"
-
-    AssetGetUploadURLOK:
-      description: A pre-authorised upload URL.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/AssetUploadURL"
 
     AssetUploadOK:
       description: The new URL of an uploaded file.
@@ -1614,6 +1590,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
+        assets: { $ref: "#/components/schemas/AssetReferenceList" }
 
     ThreadMutableProps:
       type: object
@@ -1624,6 +1601,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
+        assets: { $ref: "#/components/schemas/AssetReferenceList" }
 
     ThreadReference:
       description: |
@@ -1673,7 +1651,7 @@ components:
             reacts:
               $ref: "#/components/schemas/ReactList"
             meta: { $ref: "#/components/schemas/Metadata" }
-            media: { $ref: "#/components/schemas/MediaItemList" }
+            media: { $ref: "#/components/schemas/AssetList" }
 
     ThreadList:
       type: array
@@ -1728,7 +1706,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
-        media: { $ref: "#/components/schemas/MediaItemList" }
+        media: { $ref: "#/components/schemas/AssetList" }
 
     PostInitialProps:
       type: object
@@ -1775,13 +1753,6 @@ components:
           items:
             $ref: "#/components/schemas/PostProps"
 
-    AssetUploadURL:
-      type: object
-      required: [url]
-      properties:
-        url:
-          type: string
-
     #
     # 888b     d888               888 d8b
     # 8888b   d8888               888 Y8P
@@ -1793,21 +1764,23 @@ components:
     # 888       888  "Y8888   "Y88888 888 "Y888888
     #
 
+    AssetID:
+      $ref: "#/components/schemas/Identifier"
+
+    AssetReferenceList:
+      type: array
+      items: { $ref: "#/components/schemas/AssetID" }
+
+    AssetList:
+      type: array
+      items: { $ref: "#/components/schemas/Asset" }
+
     Asset:
       type: object
-      required: [url]
+      required: [id, url, mime_type, width, height]
       properties:
-        url:
-          type: string
-
-    MediaItemList:
-      type: array
-      items: { $ref: "#/components/schemas/MediaItem" }
-
-    MediaItem:
-      type: object
-      required: [url, mime_type, width, height]
-      properties:
+        id:
+          $ref: "#/components/schemas/AssetID"
         url:
           type: string
         mime_type:

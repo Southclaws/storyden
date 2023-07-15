@@ -48,9 +48,11 @@ type AccountEdges struct {
 	Authentication []*Authentication `json:"authentication,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Assets holds the value of the assets edge.
+	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -96,6 +98,15 @@ func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
+}
+
+// AssetsOrErr returns the Assets value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
+	if e.loadedTypes[5] {
+		return e.Assets, nil
+	}
+	return nil, &NotLoadedError{edge: "assets"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -203,6 +214,11 @@ func (a *Account) QueryAuthentication() *AuthenticationQuery {
 // QueryTags queries the "tags" edge of the Account entity.
 func (a *Account) QueryTags() *TagQuery {
 	return NewAccountClient(a.config).QueryTags(a)
+}
+
+// QueryAssets queries the "assets" edge of the Account entity.
+func (a *Account) QueryAssets() *AssetQuery {
+	return NewAccountClient(a.config).QueryAssets(a)
 }
 
 // Update returns a builder for updating this Account.
