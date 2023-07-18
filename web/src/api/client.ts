@@ -25,7 +25,7 @@ export const fetcher = async <T>({
     mode: "cors",
     credentials: "include",
     ...(headers ? { headers } : {}),
-    ...(data ? { body: JSON.stringify(data) } : {}),
+    body: buildPayload(data),
   });
 
   const response = await fetch(req);
@@ -48,6 +48,18 @@ export const fetcher = async <T>({
   }
 
   return response.json();
+};
+
+const buildPayload = (data: unknown) => {
+  if (!data) {
+    return undefined;
+  }
+
+  if (data instanceof File) {
+    return data;
+  }
+
+  return JSON.stringify(data);
 };
 
 export default fetcher;

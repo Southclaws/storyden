@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -24,7 +25,7 @@ type AssetQuery struct {
 	order      []OrderFunc
 	inters     []Interceptor
 	predicates []predicate.Asset
-	withPost   *PostQuery
+	withPosts  *PostQuery
 	withOwner  *AccountQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -63,8 +64,8 @@ func (aq *AssetQuery) Order(o ...OrderFunc) *AssetQuery {
 	return aq
 }
 
-// QueryPost chains the current query on the "post" edge.
-func (aq *AssetQuery) QueryPost() *PostQuery {
+// QueryPosts chains the current query on the "posts" edge.
+func (aq *AssetQuery) QueryPosts() *PostQuery {
 	query := (&PostClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -77,7 +78,7 @@ func (aq *AssetQuery) QueryPost() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(asset.Table, asset.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, asset.PostTable, asset.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, asset.PostsTable, asset.PostsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -299,7 +300,7 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 		order:      append([]OrderFunc{}, aq.order...),
 		inters:     append([]Interceptor{}, aq.inters...),
 		predicates: append([]predicate.Asset{}, aq.predicates...),
-		withPost:   aq.withPost.Clone(),
+		withPosts:  aq.withPosts.Clone(),
 		withOwner:  aq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
@@ -307,14 +308,14 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 	}
 }
 
-// WithPost tells the query-builder to eager-load the nodes that are connected to
-// the "post" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AssetQuery) WithPost(opts ...func(*PostQuery)) *AssetQuery {
+// WithPosts tells the query-builder to eager-load the nodes that are connected to
+// the "posts" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithPosts(opts ...func(*PostQuery)) *AssetQuery {
 	query := (&PostClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withPost = query
+	aq.withPosts = query
 	return aq
 }
 
@@ -408,7 +409,7 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 		nodes       = []*Asset{}
 		_spec       = aq.querySpec()
 		loadedTypes = [2]bool{
-			aq.withPost != nil,
+			aq.withPosts != nil,
 			aq.withOwner != nil,
 		}
 	)
@@ -433,9 +434,10 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := aq.withPost; query != nil {
-		if err := aq.loadPost(ctx, query, nodes, nil,
-			func(n *Asset, e *Post) { n.Edges.Post = e }); err != nil {
+	if query := aq.withPosts; query != nil {
+		if err := aq.loadPosts(ctx, query, nodes,
+			func(n *Asset) { n.Edges.Posts = []*Post{} },
+			func(n *Asset, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -448,31 +450,63 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	return nodes, nil
 }
 
-func (aq *AssetQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Post)) error {
-	ids := make([]xid.ID, 0, len(nodes))
-	nodeids := make(map[xid.ID][]*Asset)
-	for i := range nodes {
-		fk := nodes[i].PostID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
+func (aq *AssetQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Post)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[string]*Asset)
+	nids := make(map[xid.ID]map[*Asset]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(asset.PostsTable)
+		s.Join(joinT).On(s.C(post.FieldID), joinT.C(asset.PostsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(asset.PostsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(asset.PostsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(post.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullString)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := values[0].(*sql.NullString).String
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Asset]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Post](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "post_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "posts" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil

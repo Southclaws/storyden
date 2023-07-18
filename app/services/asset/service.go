@@ -30,7 +30,7 @@ const assetsSubdirectory = "assets"
 
 type Service interface {
 	Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
-	Read(ctx context.Context, path string) (io.Reader, error)
+	Get(ctx context.Context, path string) (*asset.Asset, io.Reader, error)
 }
 
 func Build() fx.Option {
@@ -95,14 +95,13 @@ func (s *service) Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
 
 	hash := sha1.Sum(buf)
 	assetID := hex.EncodeToString(hash[:])
-	slug := fmt.Sprintf("%s-%s", assetID, accountID.String())
-	filePath := filepath.Join(assetsSubdirectory, slug)
+	filePath := filepath.Join(assetsSubdirectory, assetID)
 
 	if err := s.os.Write(ctx, filePath, r); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	apiPath := path.Join("api/v1/assets", slug)
+	apiPath := path.Join("api/v1/assets", assetID)
 	url := fmt.Sprintf("%s/%s", s.address, apiPath)
 	mime := mt.String()
 
@@ -119,12 +118,19 @@ func (s *service) Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
 	return ast, nil
 }
 
-func (s *service) Read(ctx context.Context, assetID string) (io.Reader, error) {
-	path := filepath.Join(assetsSubdirectory, assetID)
-	r, err := s.os.Read(ctx, path)
+func (s *service) Get(ctx context.Context, assetID string) (*asset.Asset, io.Reader, error) {
+	a, err := s.asset_repo.Get(ctx, assetID)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return r, nil
+	path := filepath.Join(assetsSubdirectory, assetID)
+	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", assetID)
+
+	r, err := s.os.Read(ctx, path)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return a, r, nil
 }

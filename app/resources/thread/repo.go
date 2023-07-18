@@ -4,9 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	category_resource "github.com/Southclaws/storyden/app/resources/category"
 	post_resource "github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -92,6 +94,12 @@ func WithStatus(v Status) Option {
 func WithMeta(meta map[string]any) Option {
 	return func(m *ent.PostMutation) {
 		m.SetMetadata(meta)
+	}
+}
+
+func WithAssets(a []asset.AssetID) Option {
+	return func(m *ent.PostMutation) {
+		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
 	}
 }
 

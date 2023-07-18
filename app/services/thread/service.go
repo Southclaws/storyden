@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -58,6 +59,7 @@ type Partial struct {
 	Category opt.Optional[xid.ID]
 	Status   opt.Optional[thread.Status]
 	Meta     opt.Optional[map[string]any]
+	Assets   opt.Optional[[]asset.AssetID]
 }
 
 func Build() fx.Option {

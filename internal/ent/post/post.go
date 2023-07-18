@@ -104,13 +104,11 @@ const (
 	ReactsInverseTable = "reacts"
 	// ReactsColumn is the table column denoting the reacts relation/edge.
 	ReactsColumn = "post_id"
-	// AssetsTable is the table that holds the assets relation/edge.
-	AssetsTable = "assets"
+	// AssetsTable is the table that holds the assets relation/edge. The primary key declared below.
+	AssetsTable = "post_assets"
 	// AssetsInverseTable is the table name for the Asset entity.
 	// It exists in this package in order to avoid circular dependency with the "asset" package.
 	AssetsInverseTable = "assets"
-	// AssetsColumn is the table column denoting the assets relation/edge.
-	AssetsColumn = "post_id"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -142,6 +140,9 @@ var (
 	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
 	// primary key for the tags relation (M2M).
 	TagsPrimaryKey = []string{"tag_id", "post_id"}
+	// AssetsPrimaryKey and AssetsColumn2 are the table columns denoting the
+	// primary key for the assets relation (M2M).
+	AssetsPrimaryKey = []string{"post_id", "asset_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

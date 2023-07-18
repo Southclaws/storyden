@@ -70,7 +70,7 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 		Posts:     posts,
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
-		Media:     dt.Map(t.Assets, serialiseAssetReference),
+		Assets:    dt.Map(t.Assets, serialiseAssetReference),
 	}, nil
 }
 
@@ -86,7 +86,7 @@ func serialisePost(p *post.Post) (openapi.PostProps, error) {
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
-		Media:     dt.Map(p.Assets, serialiseAssetReference),
+		Assets:    dt.Map(p.Assets, serialiseAssetReference),
 	}, nil
 }
 
@@ -143,6 +143,10 @@ func serialiseTag(t tag.Tag) openapi.Tag {
 		Id:   openapi.Identifier(t.ID),
 		Name: t.Name,
 	}
+}
+
+func deserialiseAssetIDs(ids openapi.AssetReferenceList) []asset.AssetID {
+	return dt.Map(ids, func(i string) asset.AssetID { return asset.AssetID(i) })
 }
 
 func deserialiseID(t openapi.Identifier) xid.ID {

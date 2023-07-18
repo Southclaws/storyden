@@ -23,23 +23,19 @@ const (
 	FieldWidth = "width"
 	// FieldHeight holds the string denoting the height field in the database.
 	FieldHeight = "height"
-	// FieldPostID holds the string denoting the post_id field in the database.
-	FieldPostID = "post_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
-	// EdgePost holds the string denoting the post edge name in mutations.
-	EdgePost = "post"
+	// EdgePosts holds the string denoting the posts edge name in mutations.
+	EdgePosts = "posts"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the asset in the database.
 	Table = "assets"
-	// PostTable is the table that holds the post relation/edge.
-	PostTable = "assets"
-	// PostInverseTable is the table name for the Post entity.
+	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
+	PostsTable = "post_assets"
+	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
-	PostInverseTable = "posts"
-	// PostColumn is the table column denoting the post relation/edge.
-	PostColumn = "post_id"
+	PostsInverseTable = "posts"
 	// OwnerTable is the table that holds the owner relation/edge.
 	OwnerTable = "assets"
 	// OwnerInverseTable is the table name for the Account entity.
@@ -58,9 +54,14 @@ var Columns = []string{
 	FieldMimetype,
 	FieldWidth,
 	FieldHeight,
-	FieldPostID,
 	FieldAccountID,
 }
+
+var (
+	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
+	// primary key for the posts relation (M2M).
+	PostsPrimaryKey = []string{"post_id", "asset_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

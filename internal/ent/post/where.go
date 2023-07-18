@@ -1037,7 +1037,7 @@ func HasAssets() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, AssetsTable, AssetsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1049,7 +1049,7 @@ func HasAssetsWith(preds ...predicate.Asset) predicate.Post {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(AssetsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, AssetsTable, AssetsPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

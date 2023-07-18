@@ -96,11 +96,6 @@ func Height(v int) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldHeight, v))
 }
 
-// PostID applies equality check predicate on the "post_id" field. It's identical to PostIDEQ.
-func PostID(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldPostID, v))
-}
-
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
 func AccountID(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldAccountID, v))
@@ -396,86 +391,6 @@ func HeightLTE(v int) predicate.Asset {
 	return predicate.Asset(sql.FieldLTE(FieldHeight, v))
 }
 
-// PostIDEQ applies the EQ predicate on the "post_id" field.
-func PostIDEQ(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldPostID, v))
-}
-
-// PostIDNEQ applies the NEQ predicate on the "post_id" field.
-func PostIDNEQ(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldNEQ(FieldPostID, v))
-}
-
-// PostIDIn applies the In predicate on the "post_id" field.
-func PostIDIn(vs ...xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldIn(FieldPostID, vs...))
-}
-
-// PostIDNotIn applies the NotIn predicate on the "post_id" field.
-func PostIDNotIn(vs ...xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldNotIn(FieldPostID, vs...))
-}
-
-// PostIDGT applies the GT predicate on the "post_id" field.
-func PostIDGT(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldGT(FieldPostID, v))
-}
-
-// PostIDGTE applies the GTE predicate on the "post_id" field.
-func PostIDGTE(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldGTE(FieldPostID, v))
-}
-
-// PostIDLT applies the LT predicate on the "post_id" field.
-func PostIDLT(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldLT(FieldPostID, v))
-}
-
-// PostIDLTE applies the LTE predicate on the "post_id" field.
-func PostIDLTE(v xid.ID) predicate.Asset {
-	return predicate.Asset(sql.FieldLTE(FieldPostID, v))
-}
-
-// PostIDContains applies the Contains predicate on the "post_id" field.
-func PostIDContains(v xid.ID) predicate.Asset {
-	vc := v.String()
-	return predicate.Asset(sql.FieldContains(FieldPostID, vc))
-}
-
-// PostIDHasPrefix applies the HasPrefix predicate on the "post_id" field.
-func PostIDHasPrefix(v xid.ID) predicate.Asset {
-	vc := v.String()
-	return predicate.Asset(sql.FieldHasPrefix(FieldPostID, vc))
-}
-
-// PostIDHasSuffix applies the HasSuffix predicate on the "post_id" field.
-func PostIDHasSuffix(v xid.ID) predicate.Asset {
-	vc := v.String()
-	return predicate.Asset(sql.FieldHasSuffix(FieldPostID, vc))
-}
-
-// PostIDIsNil applies the IsNil predicate on the "post_id" field.
-func PostIDIsNil() predicate.Asset {
-	return predicate.Asset(sql.FieldIsNull(FieldPostID))
-}
-
-// PostIDNotNil applies the NotNil predicate on the "post_id" field.
-func PostIDNotNil() predicate.Asset {
-	return predicate.Asset(sql.FieldNotNull(FieldPostID))
-}
-
-// PostIDEqualFold applies the EqualFold predicate on the "post_id" field.
-func PostIDEqualFold(v xid.ID) predicate.Asset {
-	vc := v.String()
-	return predicate.Asset(sql.FieldEqualFold(FieldPostID, vc))
-}
-
-// PostIDContainsFold applies the ContainsFold predicate on the "post_id" field.
-func PostIDContainsFold(v xid.ID) predicate.Asset {
-	vc := v.String()
-	return predicate.Asset(sql.FieldContainsFold(FieldPostID, vc))
-}
-
 // AccountIDEQ applies the EQ predicate on the "account_id" field.
 func AccountIDEQ(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldAccountID, v))
@@ -546,24 +461,24 @@ func AccountIDContainsFold(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
-// HasPost applies the HasEdge predicate on the "post" edge.
-func HasPost() predicate.Asset {
+// HasPosts applies the HasEdge predicate on the "posts" edge.
+func HasPosts() predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, PostTable, PostColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, PostsTable, PostsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasPostWith applies the HasEdge predicate on the "post" edge with a given conditions (other predicates).
-func HasPostWith(preds ...predicate.Post) predicate.Asset {
+// HasPostsWith applies the HasEdge predicate on the "posts" edge with a given conditions (other predicates).
+func HasPostsWith(preds ...predicate.Post) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PostInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, PostTable, PostColumn),
+			sqlgraph.To(PostsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, PostsTable, PostsPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

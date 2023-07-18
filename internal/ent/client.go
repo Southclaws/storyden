@@ -578,15 +578,15 @@ func (c *AssetClient) GetX(ctx context.Context, id string) *Asset {
 	return obj
 }
 
-// QueryPost queries the post edge of a Asset.
-func (c *AssetClient) QueryPost(a *Asset) *PostQuery {
+// QueryPosts queries the posts edge of a Asset.
+func (c *AssetClient) QueryPosts(a *Asset) *PostQuery {
 	query := (&PostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(asset.Table, asset.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, asset.PostTable, asset.PostColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, asset.PostsTable, asset.PostsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1250,7 +1250,7 @@ func (c *PostClient) QueryAssets(po *Post) *AssetQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(asset.Table, asset.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, post.AssetsTable, post.AssetsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, post.AssetsTable, post.AssetsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil
