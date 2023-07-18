@@ -78,20 +78,6 @@ func (ac *AssetCreate) SetHeight(i int) *AssetCreate {
 	return ac
 }
 
-// SetPostID sets the "post_id" field.
-func (ac *AssetCreate) SetPostID(x xid.ID) *AssetCreate {
-	ac.mutation.SetPostID(x)
-	return ac
-}
-
-// SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (ac *AssetCreate) SetNillablePostID(x *xid.ID) *AssetCreate {
-	if x != nil {
-		ac.SetPostID(*x)
-	}
-	return ac
-}
-
 // SetAccountID sets the "account_id" field.
 func (ac *AssetCreate) SetAccountID(x xid.ID) *AssetCreate {
 	ac.mutation.SetAccountID(x)
@@ -104,9 +90,19 @@ func (ac *AssetCreate) SetID(s string) *AssetCreate {
 	return ac
 }
 
-// SetPost sets the "post" edge to the Post entity.
-func (ac *AssetCreate) SetPost(p *Post) *AssetCreate {
-	return ac.SetPostID(p.ID)
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (ac *AssetCreate) AddPostIDs(ids ...xid.ID) *AssetCreate {
+	ac.mutation.AddPostIDs(ids...)
+	return ac
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (ac *AssetCreate) AddPosts(p ...*Post) *AssetCreate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ac.AddPostIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
@@ -256,12 +252,12 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		_spec.SetField(asset.FieldHeight, field.TypeInt, value)
 		_node.Height = value
 	}
-	if nodes := ac.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.PostTable,
-			Columns: []string{asset.PostColumn},
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -270,7 +266,6 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.PostID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.OwnerIDs(); len(nodes) > 0 {
@@ -411,24 +406,6 @@ func (u *AssetUpsert) UpdateHeight() *AssetUpsert {
 // AddHeight adds v to the "height" field.
 func (u *AssetUpsert) AddHeight(v int) *AssetUpsert {
 	u.Add(asset.FieldHeight, v)
-	return u
-}
-
-// SetPostID sets the "post_id" field.
-func (u *AssetUpsert) SetPostID(v xid.ID) *AssetUpsert {
-	u.Set(asset.FieldPostID, v)
-	return u
-}
-
-// UpdatePostID sets the "post_id" field to the value that was provided on create.
-func (u *AssetUpsert) UpdatePostID() *AssetUpsert {
-	u.SetExcluded(asset.FieldPostID)
-	return u
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (u *AssetUpsert) ClearPostID() *AssetUpsert {
-	u.SetNull(asset.FieldPostID)
 	return u
 }
 
@@ -576,27 +553,6 @@ func (u *AssetUpsertOne) AddHeight(v int) *AssetUpsertOne {
 func (u *AssetUpsertOne) UpdateHeight() *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateHeight()
-	})
-}
-
-// SetPostID sets the "post_id" field.
-func (u *AssetUpsertOne) SetPostID(v xid.ID) *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.SetPostID(v)
-	})
-}
-
-// UpdatePostID sets the "post_id" field to the value that was provided on create.
-func (u *AssetUpsertOne) UpdatePostID() *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdatePostID()
-	})
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (u *AssetUpsertOne) ClearPostID() *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.ClearPostID()
 	})
 }
 
@@ -909,27 +865,6 @@ func (u *AssetUpsertBulk) AddHeight(v int) *AssetUpsertBulk {
 func (u *AssetUpsertBulk) UpdateHeight() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateHeight()
-	})
-}
-
-// SetPostID sets the "post_id" field.
-func (u *AssetUpsertBulk) SetPostID(v xid.ID) *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.SetPostID(v)
-	})
-}
-
-// UpdatePostID sets the "post_id" field to the value that was provided on create.
-func (u *AssetUpsertBulk) UpdatePostID() *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdatePostID()
-	})
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (u *AssetUpsertBulk) ClearPostID() *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.ClearPostID()
 	})
 }
 

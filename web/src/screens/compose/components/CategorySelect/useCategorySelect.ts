@@ -3,10 +3,10 @@ import { useFormContext } from "react-hook-form";
 
 import { useCategoryList } from "src/api/openapi/categories";
 
-import { ThreadCreate } from "../ComposeForm/useComposeForm";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 export function useCategorySelect() {
-  const ctx = useFormContext<ThreadCreate>();
+  const ctx = useFormContext<FormShape>();
   const { data, error } = useCategoryList();
 
   useEffect(() => {

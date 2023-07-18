@@ -1622,7 +1622,7 @@ components:
             - category
             - reacts
             - meta
-            - media
+            - assets
           properties:
             title:
               type: string
@@ -1651,7 +1651,7 @@ components:
             reacts:
               $ref: "#/components/schemas/ReactList"
             meta: { $ref: "#/components/schemas/Metadata" }
-            media: { $ref: "#/components/schemas/AssetList" }
+            assets: { $ref: "#/components/schemas/AssetList" }
 
     ThreadList:
       type: array
@@ -1697,7 +1697,7 @@ components:
 
     PostCommonProps:
       type: object
-      required: [root_id, root_slug, body, author, reacts, media]
+      required: [root_id, root_slug, body, author, reacts, assets]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
@@ -1706,7 +1706,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
-        media: { $ref: "#/components/schemas/AssetList" }
+        assets: { $ref: "#/components/schemas/AssetList" }
 
     PostInitialProps:
       type: object

@@ -21,5 +21,5 @@ export interface PostCommonProps {
   meta?: Metadata;
   reacts: ReactList;
   reply_to?: Identifier;
-  media: AssetList;
+  assets: AssetList;
 }

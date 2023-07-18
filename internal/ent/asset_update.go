@@ -76,35 +76,25 @@ func (au *AssetUpdate) AddHeight(i int) *AssetUpdate {
 	return au
 }
 
-// SetPostID sets the "post_id" field.
-func (au *AssetUpdate) SetPostID(x xid.ID) *AssetUpdate {
-	au.mutation.SetPostID(x)
-	return au
-}
-
-// SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (au *AssetUpdate) SetNillablePostID(x *xid.ID) *AssetUpdate {
-	if x != nil {
-		au.SetPostID(*x)
-	}
-	return au
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (au *AssetUpdate) ClearPostID() *AssetUpdate {
-	au.mutation.ClearPostID()
-	return au
-}
-
 // SetAccountID sets the "account_id" field.
 func (au *AssetUpdate) SetAccountID(x xid.ID) *AssetUpdate {
 	au.mutation.SetAccountID(x)
 	return au
 }
 
-// SetPost sets the "post" edge to the Post entity.
-func (au *AssetUpdate) SetPost(p *Post) *AssetUpdate {
-	return au.SetPostID(p.ID)
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (au *AssetUpdate) AddPostIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.AddPostIDs(ids...)
+	return au
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (au *AssetUpdate) AddPosts(p ...*Post) *AssetUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.AddPostIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
@@ -123,10 +113,25 @@ func (au *AssetUpdate) Mutation() *AssetMutation {
 	return au.mutation
 }
 
-// ClearPost clears the "post" edge to the Post entity.
-func (au *AssetUpdate) ClearPost() *AssetUpdate {
-	au.mutation.ClearPost()
+// ClearPosts clears all "posts" edges to the Post entity.
+func (au *AssetUpdate) ClearPosts() *AssetUpdate {
+	au.mutation.ClearPosts()
 	return au
+}
+
+// RemovePostIDs removes the "posts" edge to Post entities by IDs.
+func (au *AssetUpdate) RemovePostIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.RemovePostIDs(ids...)
+	return au
+}
+
+// RemovePosts removes "posts" edges to Post entities.
+func (au *AssetUpdate) RemovePosts(p ...*Post) *AssetUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.RemovePostIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -218,12 +223,12 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.AddedHeight(); ok {
 		_spec.AddField(asset.FieldHeight, field.TypeInt, value)
 	}
-	if au.mutation.PostCleared() {
+	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.PostTable,
-			Columns: []string{asset.PostColumn},
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -231,12 +236,28 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.RemovedPostsIDs(); len(nodes) > 0 && !au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.PostTable,
-			Columns: []string{asset.PostColumn},
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -342,35 +363,25 @@ func (auo *AssetUpdateOne) AddHeight(i int) *AssetUpdateOne {
 	return auo
 }
 
-// SetPostID sets the "post_id" field.
-func (auo *AssetUpdateOne) SetPostID(x xid.ID) *AssetUpdateOne {
-	auo.mutation.SetPostID(x)
-	return auo
-}
-
-// SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillablePostID(x *xid.ID) *AssetUpdateOne {
-	if x != nil {
-		auo.SetPostID(*x)
-	}
-	return auo
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (auo *AssetUpdateOne) ClearPostID() *AssetUpdateOne {
-	auo.mutation.ClearPostID()
-	return auo
-}
-
 // SetAccountID sets the "account_id" field.
 func (auo *AssetUpdateOne) SetAccountID(x xid.ID) *AssetUpdateOne {
 	auo.mutation.SetAccountID(x)
 	return auo
 }
 
-// SetPost sets the "post" edge to the Post entity.
-func (auo *AssetUpdateOne) SetPost(p *Post) *AssetUpdateOne {
-	return auo.SetPostID(p.ID)
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (auo *AssetUpdateOne) AddPostIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.AddPostIDs(ids...)
+	return auo
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (auo *AssetUpdateOne) AddPosts(p ...*Post) *AssetUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.AddPostIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
@@ -389,10 +400,25 @@ func (auo *AssetUpdateOne) Mutation() *AssetMutation {
 	return auo.mutation
 }
 
-// ClearPost clears the "post" edge to the Post entity.
-func (auo *AssetUpdateOne) ClearPost() *AssetUpdateOne {
-	auo.mutation.ClearPost()
+// ClearPosts clears all "posts" edges to the Post entity.
+func (auo *AssetUpdateOne) ClearPosts() *AssetUpdateOne {
+	auo.mutation.ClearPosts()
 	return auo
+}
+
+// RemovePostIDs removes the "posts" edge to Post entities by IDs.
+func (auo *AssetUpdateOne) RemovePostIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.RemovePostIDs(ids...)
+	return auo
+}
+
+// RemovePosts removes "posts" edges to Post entities.
+func (auo *AssetUpdateOne) RemovePosts(p ...*Post) *AssetUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.RemovePostIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -514,12 +540,12 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 	if value, ok := auo.mutation.AddedHeight(); ok {
 		_spec.AddField(asset.FieldHeight, field.TypeInt, value)
 	}
-	if auo.mutation.PostCleared() {
+	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.PostTable,
-			Columns: []string{asset.PostColumn},
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -527,12 +553,28 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.PostTable,
-			Columns: []string{asset.PostColumn},
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.PostsTable,
+			Columns: asset.PostsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),

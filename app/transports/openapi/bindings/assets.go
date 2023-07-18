@@ -19,14 +19,16 @@ func NewAssets(a asset.Service) Assets {
 }
 
 func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestObject) (openapi.AssetGetResponseObject, error) {
-	r, err := i.a.Read(ctx, request.Id)
+	a, r, err := i.a.Get(ctx, request.Id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AssetGet200AsteriskResponse{
 		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
-			Body: r,
+			Body:        r,
+			ContentType: a.MIMEType,
+			// ContentLength: ,
 		},
 	}, nil
 }

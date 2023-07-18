@@ -35,7 +35,6 @@ var (
 		{Name: "width", Type: field.TypeInt},
 		{Name: "height", Type: field.TypeInt},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
-		{Name: "post_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AssetsTable holds the schema information for the "assets" table.
 	AssetsTable = &schema.Table{
@@ -48,12 +47,6 @@ var (
 				Columns:    []*schema.Column{AssetsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "assets_posts_assets",
-				Columns:    []*schema.Column{AssetsColumns[8]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -261,6 +254,31 @@ var (
 			},
 		},
 	}
+	// PostAssetsColumns holds the columns for the "post_assets" table.
+	PostAssetsColumns = []*schema.Column{
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+		{Name: "asset_id", Type: field.TypeString},
+	}
+	// PostAssetsTable holds the schema information for the "post_assets" table.
+	PostAssetsTable = &schema.Table{
+		Name:       "post_assets",
+		Columns:    PostAssetsColumns,
+		PrimaryKey: []*schema.Column{PostAssetsColumns[0], PostAssetsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "post_assets_post_id",
+				Columns:    []*schema.Column{PostAssetsColumns[0]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "post_assets_asset_id",
+				Columns:    []*schema.Column{PostAssetsColumns[1]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// RoleAccountsColumns holds the columns for the "role_accounts" table.
 	RoleAccountsColumns = []*schema.Column{
 		{Name: "role_id", Type: field.TypeString, Size: 20},
@@ -324,6 +342,7 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
+		PostAssetsTable,
 		RoleAccountsTable,
 		TagPostsTable,
 	}
@@ -331,7 +350,6 @@ var (
 
 func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
-	AssetsTable.ForeignKeys[1].RefTable = PostsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
@@ -341,6 +359,8 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
+	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
+	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
 	RoleAccountsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable

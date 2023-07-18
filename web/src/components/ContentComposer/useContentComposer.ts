@@ -52,10 +52,6 @@ export function useContentComposer(props: Props) {
         focus: Editor.end(editor, []),
       },
     });
-
-    // Disable this error because, despite not using the "resetKey" prop, we're
-    // using the behaviour of useMemo to clear the input when the value changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.resetKey, editor]);
 
   function onChange(value: Descendant[]) {

@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
 
@@ -31,8 +30,6 @@ type Asset struct {
 	Width int `json:"width,omitempty"`
 	// Height holds the value of the "height" field.
 	Height int `json:"height,omitempty"`
-	// PostID holds the value of the "post_id" field.
-	PostID xid.ID `json:"post_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -42,8 +39,8 @@ type Asset struct {
 
 // AssetEdges holds the relations/edges for other nodes in the graph.
 type AssetEdges struct {
-	// Post holds the value of the post edge.
-	Post *Post `json:"post,omitempty"`
+	// Posts holds the value of the posts edge.
+	Posts []*Post `json:"posts,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -51,17 +48,13 @@ type AssetEdges struct {
 	loadedTypes [2]bool
 }
 
-// PostOrErr returns the Post value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e AssetEdges) PostOrErr() (*Post, error) {
+// PostsOrErr returns the Posts value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) PostsOrErr() ([]*Post, error) {
 	if e.loadedTypes[0] {
-		if e.Post == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: post.Label}
-		}
-		return e.Post, nil
+		return e.Posts, nil
 	}
-	return nil, &NotLoadedError{edge: "post"}
+	return nil, &NotLoadedError{edge: "posts"}
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -88,7 +81,7 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case asset.FieldCreatedAt, asset.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case asset.FieldPostID, asset.FieldAccountID:
+		case asset.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Asset", columns[i])
@@ -147,12 +140,6 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Height = int(value.Int64)
 			}
-		case asset.FieldPostID:
-			if value, ok := values[i].(*xid.ID); !ok {
-				return fmt.Errorf("unexpected type %T for field post_id", values[i])
-			} else if value != nil {
-				a.PostID = *value
-			}
 		case asset.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
@@ -164,9 +151,9 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// QueryPost queries the "post" edge of the Asset entity.
-func (a *Asset) QueryPost() *PostQuery {
-	return NewAssetClient(a.config).QueryPost(a)
+// QueryPosts queries the "posts" edge of the Asset entity.
+func (a *Asset) QueryPosts() *PostQuery {
+	return NewAssetClient(a.config).QueryPosts(a)
 }
 
 // QueryOwner queries the "owner" edge of the Asset entity.
@@ -214,9 +201,6 @@ func (a *Asset) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("height=")
 	builder.WriteString(fmt.Sprintf("%v", a.Height))
-	builder.WriteString(", ")
-	builder.WriteString("post_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.PostID))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.AccountID))

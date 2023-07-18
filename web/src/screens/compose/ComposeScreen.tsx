@@ -18,7 +18,7 @@ export function ComposeScreen(props: Props) {
 
   return (
     <VStack alignItems="start" gap={2} w="full" h="full" py={5}>
-      <ComposeForm {...props} draft={draft} />
+      <ComposeForm {...props} initialDraft={draft} />
     </VStack>
   );
 }

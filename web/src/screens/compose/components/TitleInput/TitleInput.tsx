@@ -43,7 +43,7 @@ export function TitleInput() {
                 onInput={onInput}
                 {...field}
               >
-                {formState.defaultValues?.title}
+                {formState.defaultValues?.["title"]}
               </Input>
             );
           }}
@@ -51,7 +51,7 @@ export function TitleInput() {
           name="title"
         />
 
-        <FormErrorMessage>{fieldError?.message}</FormErrorMessage>
+        <FormErrorMessage>{fieldError?.message?.toString()}</FormErrorMessage>
       </FormControl>
 
       <style jsx global>{`

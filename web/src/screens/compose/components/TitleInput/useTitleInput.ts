@@ -1,12 +1,12 @@
 import { useFormContext } from "react-hook-form";
 
-import { ThreadCreate } from "../ComposeForm/useComposeForm";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 export function useTitleInput() {
-  const ctx = useFormContext<ThreadCreate>();
+  const ctx = useFormContext<FormShape>();
 
   return {
     control: ctx.control,
-    fieldError: ctx.formState.errors.title,
+    fieldError: ctx.formState.errors["title"],
   };
 }

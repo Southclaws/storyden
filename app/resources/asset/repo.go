@@ -13,5 +13,7 @@ type Repository interface {
 		width, height int,
 	) (*Asset, error)
 
+	Get(ctx context.Context, id string) (*Asset, error)
+
 	Remove(ctx context.Context, owner account.AccountID, id AssetID) error
 }

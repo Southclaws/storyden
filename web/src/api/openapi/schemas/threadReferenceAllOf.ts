@@ -29,5 +29,5 @@ export type ThreadReferenceAllOf = {
   category: CategoryReference;
   reacts: ReactList;
   meta: Metadata;
-  media: AssetList;
+  assets: AssetList;
 };

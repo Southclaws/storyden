@@ -1,9 +1,9 @@
 import { useFormContext } from "react-hook-form";
 
-import { ThreadCreate } from "../ComposeForm/useComposeForm";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 export function useBodyInput() {
-  const ctx = useFormContext<ThreadCreate>();
+  const ctx = useFormContext<FormShape>();
 
   return {
     control: ctx.control,

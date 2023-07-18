@@ -48,6 +48,18 @@ func (d *database) Add(ctx context.Context,
 	return FromModel(asset), nil
 }
 
+func (d *database) Get(ctx context.Context, id string) (*Asset, error) {
+	asset, err := d.db.Asset.Get(ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return FromModel(asset), nil
+}
+
 func (d *database) Remove(ctx context.Context, accountID account.AccountID, id AssetID) error {
 	q := d.db.Asset.
 		DeleteOneID(string(id))

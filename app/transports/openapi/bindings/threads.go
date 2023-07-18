@@ -51,7 +51,11 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
-	request.Body.Assets
+	opts := []thread.Option{}
+
+	if request.Body.Assets != nil {
+		opts = append(opts, thread.WithAssets(deserialiseAssetIDs(*request.Body.Assets)))
+	}
 
 	tags := opt.NewPtr(request.Body.Tags)
 
@@ -63,6 +67,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		status,
 		tags.OrZero(),
 		meta,
+		opts...,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -89,14 +94,13 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	request.Body.Assets
-
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:    opt.NewPtr(request.Body.Title),
 		Body:     opt.NewPtr(request.Body.Body),
 		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
 		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Status:   status,
+		Assets:   opt.NewPtrMap(request.Body.Assets, deserialiseAssetIDs),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

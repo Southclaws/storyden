@@ -1266,8 +1266,9 @@ type AssetMutation struct {
 	height        *int
 	addheight     *int
 	clearedFields map[string]struct{}
-	post          *xid.ID
-	clearedpost   bool
+	posts         map[xid.ID]struct{}
+	removedposts  map[xid.ID]struct{}
+	clearedposts  bool
 	owner         *xid.ID
 	clearedowner  bool
 	done          bool
@@ -1635,55 +1636,6 @@ func (m *AssetMutation) ResetHeight() {
 	m.addheight = nil
 }
 
-// SetPostID sets the "post_id" field.
-func (m *AssetMutation) SetPostID(x xid.ID) {
-	m.post = &x
-}
-
-// PostID returns the value of the "post_id" field in the mutation.
-func (m *AssetMutation) PostID() (r xid.ID, exists bool) {
-	v := m.post
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPostID returns the old "post_id" field's value of the Asset entity.
-// If the Asset object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldPostID(ctx context.Context) (v xid.ID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPostID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPostID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPostID: %w", err)
-	}
-	return oldValue.PostID, nil
-}
-
-// ClearPostID clears the value of the "post_id" field.
-func (m *AssetMutation) ClearPostID() {
-	m.post = nil
-	m.clearedFields[asset.FieldPostID] = struct{}{}
-}
-
-// PostIDCleared returns if the "post_id" field was cleared in this mutation.
-func (m *AssetMutation) PostIDCleared() bool {
-	_, ok := m.clearedFields[asset.FieldPostID]
-	return ok
-}
-
-// ResetPostID resets all changes to the "post_id" field.
-func (m *AssetMutation) ResetPostID() {
-	m.post = nil
-	delete(m.clearedFields, asset.FieldPostID)
-}
-
 // SetAccountID sets the "account_id" field.
 func (m *AssetMutation) SetAccountID(x xid.ID) {
 	m.owner = &x
@@ -1720,30 +1672,58 @@ func (m *AssetMutation) ResetAccountID() {
 	m.owner = nil
 }
 
-// ClearPost clears the "post" edge to the Post entity.
-func (m *AssetMutation) ClearPost() {
-	m.clearedpost = true
+// AddPostIDs adds the "posts" edge to the Post entity by ids.
+func (m *AssetMutation) AddPostIDs(ids ...xid.ID) {
+	if m.posts == nil {
+		m.posts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.posts[ids[i]] = struct{}{}
+	}
 }
 
-// PostCleared reports if the "post" edge to the Post entity was cleared.
-func (m *AssetMutation) PostCleared() bool {
-	return m.PostIDCleared() || m.clearedpost
+// ClearPosts clears the "posts" edge to the Post entity.
+func (m *AssetMutation) ClearPosts() {
+	m.clearedposts = true
 }
 
-// PostIDs returns the "post" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// PostID instead. It exists only for internal usage by the builders.
-func (m *AssetMutation) PostIDs() (ids []xid.ID) {
-	if id := m.post; id != nil {
-		ids = append(ids, *id)
+// PostsCleared reports if the "posts" edge to the Post entity was cleared.
+func (m *AssetMutation) PostsCleared() bool {
+	return m.clearedposts
+}
+
+// RemovePostIDs removes the "posts" edge to the Post entity by IDs.
+func (m *AssetMutation) RemovePostIDs(ids ...xid.ID) {
+	if m.removedposts == nil {
+		m.removedposts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.posts, ids[i])
+		m.removedposts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
+func (m *AssetMutation) RemovedPostsIDs() (ids []xid.ID) {
+	for id := range m.removedposts {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetPost resets all changes to the "post" edge.
-func (m *AssetMutation) ResetPost() {
-	m.post = nil
-	m.clearedpost = false
+// PostsIDs returns the "posts" edge IDs in the mutation.
+func (m *AssetMutation) PostsIDs() (ids []xid.ID) {
+	for id := range m.posts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPosts resets all changes to the "posts" edge.
+func (m *AssetMutation) ResetPosts() {
+	m.posts = nil
+	m.clearedposts = false
+	m.removedposts = nil
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by id.
@@ -1819,7 +1799,7 @@ func (m *AssetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AssetMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, asset.FieldCreatedAt)
 	}
@@ -1837,9 +1817,6 @@ func (m *AssetMutation) Fields() []string {
 	}
 	if m.height != nil {
 		fields = append(fields, asset.FieldHeight)
-	}
-	if m.post != nil {
-		fields = append(fields, asset.FieldPostID)
 	}
 	if m.owner != nil {
 		fields = append(fields, asset.FieldAccountID)
@@ -1864,8 +1841,6 @@ func (m *AssetMutation) Field(name string) (ent.Value, bool) {
 		return m.Width()
 	case asset.FieldHeight:
 		return m.Height()
-	case asset.FieldPostID:
-		return m.PostID()
 	case asset.FieldAccountID:
 		return m.AccountID()
 	}
@@ -1889,8 +1864,6 @@ func (m *AssetMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldWidth(ctx)
 	case asset.FieldHeight:
 		return m.OldHeight(ctx)
-	case asset.FieldPostID:
-		return m.OldPostID(ctx)
 	case asset.FieldAccountID:
 		return m.OldAccountID(ctx)
 	}
@@ -1943,13 +1916,6 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetHeight(v)
-		return nil
-	case asset.FieldPostID:
-		v, ok := value.(xid.ID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPostID(v)
 		return nil
 	case asset.FieldAccountID:
 		v, ok := value.(xid.ID)
@@ -2014,11 +1980,7 @@ func (m *AssetMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AssetMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(asset.FieldPostID) {
-		fields = append(fields, asset.FieldPostID)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2031,11 +1993,6 @@ func (m *AssetMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AssetMutation) ClearField(name string) error {
-	switch name {
-	case asset.FieldPostID:
-		m.ClearPostID()
-		return nil
-	}
 	return fmt.Errorf("unknown Asset nullable field %s", name)
 }
 
@@ -2061,9 +2018,6 @@ func (m *AssetMutation) ResetField(name string) error {
 	case asset.FieldHeight:
 		m.ResetHeight()
 		return nil
-	case asset.FieldPostID:
-		m.ResetPostID()
-		return nil
 	case asset.FieldAccountID:
 		m.ResetAccountID()
 		return nil
@@ -2074,8 +2028,8 @@ func (m *AssetMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.post != nil {
-		edges = append(edges, asset.EdgePost)
+	if m.posts != nil {
+		edges = append(edges, asset.EdgePosts)
 	}
 	if m.owner != nil {
 		edges = append(edges, asset.EdgeOwner)
@@ -2087,10 +2041,12 @@ func (m *AssetMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case asset.EdgePost:
-		if id := m.post; id != nil {
-			return []ent.Value{*id}
+	case asset.EdgePosts:
+		ids := make([]ent.Value, 0, len(m.posts))
+		for id := range m.posts {
+			ids = append(ids, id)
 		}
+		return ids
 	case asset.EdgeOwner:
 		if id := m.owner; id != nil {
 			return []ent.Value{*id}
@@ -2102,20 +2058,31 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
+	if m.removedposts != nil {
+		edges = append(edges, asset.EdgePosts)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case asset.EdgePosts:
+		ids := make([]ent.Value, 0, len(m.removedposts))
+		for id := range m.removedposts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedpost {
-		edges = append(edges, asset.EdgePost)
+	if m.clearedposts {
+		edges = append(edges, asset.EdgePosts)
 	}
 	if m.clearedowner {
 		edges = append(edges, asset.EdgeOwner)
@@ -2127,8 +2094,8 @@ func (m *AssetMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *AssetMutation) EdgeCleared(name string) bool {
 	switch name {
-	case asset.EdgePost:
-		return m.clearedpost
+	case asset.EdgePosts:
+		return m.clearedposts
 	case asset.EdgeOwner:
 		return m.clearedowner
 	}
@@ -2139,9 +2106,6 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *AssetMutation) ClearEdge(name string) error {
 	switch name {
-	case asset.EdgePost:
-		m.ClearPost()
-		return nil
 	case asset.EdgeOwner:
 		m.ClearOwner()
 		return nil
@@ -2153,8 +2117,8 @@ func (m *AssetMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AssetMutation) ResetEdge(name string) error {
 	switch name {
-	case asset.EdgePost:
-		m.ResetPost()
+	case asset.EdgePosts:
+		m.ResetPosts()
 		return nil
 	case asset.EdgeOwner:
 		m.ResetOwner()

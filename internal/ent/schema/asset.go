@@ -28,18 +28,14 @@ func (Asset) Fields() []ent.Field {
 		field.Int("height"),
 
 		// Edges
-		field.String("post_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
 	}
 }
 
-// Edges of Asset.
 func (Asset) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("post", Post.Type).
-			Field("post_id").
-			Ref("assets").
-			Unique(),
+		edge.From("posts", Post.Type).
+			Ref("assets"),
 
 		edge.From("owner", Account.Type).
 			Field("account_id").
