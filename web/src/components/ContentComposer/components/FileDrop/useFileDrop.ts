@@ -9,7 +9,7 @@ import { Asset } from "src/api/openapi/schemas";
 import { isSupportedImage } from "./utils";
 
 export type Props = {
-  onComplete: (asset: Asset) => void;
+  onComplete?: (asset: Asset) => void;
 };
 
 export function useFileDrop(props: Props) {
@@ -30,7 +30,7 @@ export function useFileDrop(props: Props) {
     // TODO: Upload progress indicator...
     const asset = await assetUpload(f);
 
-    props.onComplete(asset);
+    props.onComplete?.(asset);
 
     return asset;
   }

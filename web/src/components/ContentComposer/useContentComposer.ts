@@ -18,7 +18,7 @@ export type Props = {
   minHeight?: string;
   initialValue?: string;
   onChange: (value: string) => void;
-  onAssetUpload: (asset: Asset) => void;
+  onAssetUpload?: (asset: Asset) => void;
 };
 
 const defaultValue: Descendant[] = [
