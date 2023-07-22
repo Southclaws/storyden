@@ -5,7 +5,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useCategoryList } from "src/api/openapi/categories";
-import { Asset, Thread, ThreadStatus } from "src/api/openapi/schemas";
+import {
+  Asset,
+  Thread,
+  ThreadInitialProps,
+  ThreadStatus,
+} from "src/api/openapi/schemas";
 import { threadCreate, threadUpdate } from "src/api/openapi/threads";
 import { errorToast } from "src/components/ErrorBanner";
 
@@ -42,8 +47,13 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   });
 
   const doSave = async (data: FormShape) => {
-    const payload = {
+    const payload: ThreadInitialProps = {
       ...data,
+
+      // When saving a new draft, these are optional but must be explicitly set.
+      title: data.title ?? "",
+      body: data.body ?? "",
+
       status: ThreadStatus.draft,
     };
 
@@ -85,7 +95,20 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     };
 
     await doSave(newState).catch(errorToast(toast));
+    formContext.setValue("assets", newAssets);
+  };
 
+  const onAssetDelete = async (asset: Asset) => {
+    const state: FormShape = formContext.getValues();
+
+    const newAssets = state.assets.filter((a) => a !== asset.id);
+
+    const newState = {
+      ...state,
+      assets: newAssets,
+    };
+
+    await doSave(newState).catch(errorToast(toast));
     formContext.setValue("assets", newAssets);
   };
 
@@ -106,6 +129,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     onSave,
     onPublish,
     onAssetUpload,
+    onAssetDelete,
     formContext,
   };
 }

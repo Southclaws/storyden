@@ -151,6 +151,7 @@ func (d *database) Update(ctx context.Context, id post.PostID, opts ...Option) (
 		WithAuthor().
 		WithCategory().
 		WithTags().
+		WithAssets().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -186,7 +187,8 @@ func (d *database) List(
 		Where(filters...).
 		Limit(max).
 		WithCategory().
-		WithAuthor()
+		WithAuthor().
+		WithAssets()
 
 	for _, fn := range opts {
 		fn(query)
@@ -222,12 +224,14 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 				}).
 				WithReacts().
 				WithAuthor().
+				WithAssets().
 				Order(ent.Asc(post_model.FieldCreatedAt))
 		}).
 		WithAuthor().
 		WithCategory().
 		WithTags().
 		WithReacts().
+		WithAssets().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
