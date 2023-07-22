@@ -46,6 +46,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		PostCount: utils.Ref(len(t.Posts)),
 		Reacts:    reacts(t.Reacts),
 		Tags:      t.Tags,
+		Assets:    dt.Map(t.Assets, serialiseAssetReference),
 	}
 }
 
