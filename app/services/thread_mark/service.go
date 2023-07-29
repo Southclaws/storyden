@@ -18,7 +18,7 @@ var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not p
 const xidEncodedLength = 20
 
 type Service interface {
-	Lookup(ctx context.Context, threadmark string) (post.PostID, error)
+	Lookup(ctx context.Context, threadmark string) (post.ID, error)
 }
 
 func Build() fx.Option {
@@ -39,19 +39,19 @@ func New(
 	}
 }
 
-func (s *service) Lookup(ctx context.Context, threadmark string) (post.PostID, error) {
+func (s *service) Lookup(ctx context.Context, threadmark string) (post.ID, error) {
 	// input is too short to be anything useful
 	if len(threadmark) < xidEncodedLength {
-		return post.PostID(xid.NilID()), ErrInvalidThreadMark
+		return post.ID(xid.NilID()), ErrInvalidThreadMark
 	}
 
 	if cv, ok := s.cache.Get(threadmark); ok {
-		return post.PostID(cv), nil
+		return post.ID(cv), nil
 	}
 
 	// the input is in the format "<xid>-<thread-slug>"
 	if id, err := xid.FromString(threadmark[:xidEncodedLength]); err == nil {
-		return post.PostID(id), nil
+		return post.ID(id), nil
 	}
 
 	// doesn't currently support any other clever thread mark lookups.
@@ -59,5 +59,5 @@ func (s *service) Lookup(ctx context.Context, threadmark string) (post.PostID, e
 	// potential future support if the desire exists:
 	// - lookup by only the slug
 	// - slug normalisation, like Wordpress
-	return post.PostID(xid.NilID()), ErrInvalidThreadMark
+	return post.ID(xid.NilID()), ErrInvalidThreadMark
 }

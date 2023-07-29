@@ -1,4 +1,4 @@
-package post
+package reply
 
 import (
 	"context"
@@ -10,20 +10,21 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/reply"
 )
 
 func (s *service) Create(
 	ctx context.Context,
 	body string,
 	authorID account.AccountID,
-	parentID post.PostID,
-	replyToID opt.Optional[post.PostID],
+	parentID post.ID,
+	replyToID opt.Optional[post.ID],
 	meta map[string]any,
-	opts ...post.Option,
-) (*post.Post, error) {
+	opts ...reply.Option,
+) (*reply.Reply, error) {
 	p, err := s.post_repo.Create(ctx, body, authorID, parentID, replyToID, meta, opts...)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create post in thread"))
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
 	return p, nil

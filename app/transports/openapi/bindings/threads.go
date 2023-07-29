@@ -13,6 +13,7 @@ import (
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -182,10 +183,10 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}, nil
 }
 
-func deserialiseThreadStatus(in openapi.ThreadStatus) (thread.Status, error) {
-	s, err := thread.NewStatus(string(in))
+func deserialiseThreadStatus(in openapi.ThreadStatus) (post.Status, error) {
+	s, err := post.NewStatus(string(in))
 	if err != nil {
-		return thread.Status{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		return post.Status{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 
 	return s, nil

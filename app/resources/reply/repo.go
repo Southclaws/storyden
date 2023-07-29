@@ -1,4 +1,4 @@
-package post
+package reply
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -17,20 +18,20 @@ type Repository interface {
 		ctx context.Context,
 		body string,
 		authorID account.AccountID,
-		parentID PostID,
-		replyToID opt.Optional[PostID],
+		parentID post.ID,
+		replyToID opt.Optional[post.ID],
 		meta map[string]any,
 		opts ...Option,
-	) (*Post, error)
+	) (*Reply, error)
 
-	Get(ctx context.Context, id PostID) (*Post, error)
+	Get(ctx context.Context, id post.ID) (*Reply, error)
 
-	Update(ctx context.Context, id PostID, opts ...Option) (*Post, error)
+	Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error)
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)
-	Delete(ctx context.Context, id PostID) error
+	Delete(ctx context.Context, id post.ID) error
 }
 
-func WithID(id PostID) Option {
+func WithID(id post.ID) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetID(xid.ID(id))
 	}

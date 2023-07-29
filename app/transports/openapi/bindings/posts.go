@@ -13,25 +13,25 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/services/authentication"
-	post_service "github.com/Southclaws/storyden/app/services/post"
+	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Posts struct {
-	post_svc        post_service.Service
+	reply_svc       reply_service.Service
 	thread_mark_svc thread_mark.Service
 	search_svc      search.Service
 }
 
 func NewPosts(
-	post_svc post_service.Service,
+	reply_svc reply_service.Service,
 	thread_mark_svc thread_mark.Service,
 	search_svc search.Service,
 ) Posts {
 	return Posts{
-		post_svc:        post_svc,
+		reply_svc:       reply_svc,
 		thread_mark_svc: thread_mark_svc,
 		search_svc:      search_svc,
 	}
@@ -48,11 +48,11 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	var reply opt.Optional[post.PostID]
+	var mentionReply opt.Optional[post.ID]
 
 	if request.Body.ReplyTo != nil {
 		tm := openapi.ParseID(*request.Body.ReplyTo)
-		reply = opt.New(post.PostID(tm))
+		mentionReply = opt.New(post.ID(tm))
 	}
 
 	var meta map[string]any
@@ -60,11 +60,11 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		meta = *request.Body.Meta
 	}
 
-	post, err := p.post_svc.Create(ctx,
+	post, err := p.reply_svc.Create(ctx,
 		request.Body.Body,
 		accountID,
 		postID,
-		reply,
+		mentionReply,
 		meta,
 	)
 	if err != nil {
@@ -92,7 +92,7 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	post, err := p.post_svc.Update(ctx, postID, post_service.Partial{
+	post, err := p.reply_svc.Update(ctx, postID, reply_service.Partial{
 		Body: opt.New(string(jsonBody)),
 	})
 	if err != nil {
@@ -115,7 +115,7 @@ func (p *Posts) PostDelete(ctx context.Context, request openapi.PostDeleteReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = p.post_svc.Delete(ctx, postID)
+	err = p.reply_svc.Delete(ctx, postID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -1,4 +1,4 @@
-package post
+package reply
 
 import (
 	"fmt"
@@ -6,27 +6,23 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type PostID xid.ID
-
-func (u PostID) String() string { return xid.ID(u).String() }
-
-type Post struct {
-	ID PostID
+type Reply struct {
+	ID post.ID
 
 	Body           string
 	Short          string
-	Author         Author
-	RootPostID     PostID
+	Author         post.Author
+	RootPostID     post.ID
 	RootThreadMark string
-	ReplyTo        opt.Optional[PostID]
+	ReplyTo        opt.Optional[post.ID]
 	Reacts         []*react.React
 	Meta           map[string]any
 	Assets         []*asset.Asset
@@ -36,37 +32,29 @@ type Post struct {
 	DeletedAt opt.Optional[time.Time]
 }
 
-func (*Post) GetResourceName() string { return "post" }
+func (*Reply) GetResourceName() string { return "post" }
 
-type Author struct {
-	ID        account.AccountID
-	Name      string
-	Handle    string
-	Admin     bool
-	CreatedAt time.Time
+func (p Reply) String() string {
+	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, post.MakeShortBody(p.Body))
 }
 
-func (p Post) String() string {
-	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, MakeShortBody(p.Body))
-}
-
-func replyTo(m *ent.Post) opt.Optional[PostID] {
+func replyTo(m *ent.Post) opt.Optional[post.ID] {
 	if m.Edges.ReplyTo != nil {
-		return opt.New(PostID(m.Edges.ReplyTo.ID))
+		return opt.New(post.ID(m.Edges.ReplyTo.ID))
 	}
 
-	return opt.NewEmpty[PostID]()
+	return opt.NewEmpty[post.ID]()
 }
 
-func FromModel(m *ent.Post) (w *Post) {
+func FromModel(m *ent.Post) (w *Reply) {
 	replyTo := replyTo(m)
 
-	return &Post{
-		ID: PostID(m.ID),
+	return &Reply{
+		ID: post.ID(m.ID),
 
 		Body:  m.Body,
 		Short: m.Short,
-		Author: Author{
+		Author: post.Author{
 			ID:        account.AccountID(m.Edges.Author.ID),
 			Name:      m.Edges.Author.Name,
 			Handle:    m.Edges.Author.Handle,

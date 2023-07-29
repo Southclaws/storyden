@@ -62,7 +62,7 @@ func New(
 	cfg config.Config,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "post")),
+		l:            l.With(zap.String("service", "asset")),
 		rbac:         rbac,
 		account_repo: account_repo,
 		asset_repo:   asset_repo,

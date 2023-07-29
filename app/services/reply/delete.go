@@ -1,4 +1,4 @@
-package post
+package reply
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 )
 
-func (s *service) Delete(ctx context.Context, postID post.PostID) error {
+func (s *service) Delete(ctx context.Context, postID post.ID) error {
 	aid, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

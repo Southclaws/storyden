@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
@@ -19,7 +20,7 @@ func (s *service) Create(ctx context.Context,
 	body string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
-	status thread.Status,
+	status post.Status,
 	tags []string,
 	meta map[string]any,
 	opts ...thread.Option,

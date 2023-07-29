@@ -11,12 +11,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type Thread struct {
-	ID        post.PostID
+	ID        post.ID
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
@@ -28,8 +29,8 @@ type Thread struct {
 	Author   post.Author
 	Tags     []string
 	Category category.Category
-	Status   Status
-	Posts    []*post.Post
+	Status   post.Status
+	Posts    []*reply.Reply
 	Reacts   []*react.React
 	Meta     map[string]any
 	Assets   []*asset.Asset
@@ -38,17 +39,17 @@ type Thread struct {
 func (*Thread) GetResourceName() string { return "thread" }
 
 func FromModel(m *ent.Post) *Thread {
-	transform := func(v *ent.Post) *post.Post {
+	transform := func(v *ent.Post) *reply.Reply {
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
-		dto := post.FromModel(v)
+		dto := reply.FromModel(v)
 		dto.RootThreadMark = m.Slug
-		dto.RootPostID = post.PostID(m.ID)
+		dto.RootPostID = post.ID(m.ID)
 		return dto
 	}
 
 	// Thread data structure will always contain one post: itself in post form.
-	posts := []*post.Post{
+	posts := []*reply.Reply{
 		transform(m),
 	}
 
@@ -57,7 +58,7 @@ func FromModel(m *ent.Post) *Thread {
 	}
 
 	return &Thread{
-		ID:        post.PostID(m.ID),
+		ID:        post.ID(m.ID),
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 		DeletedAt: opt.NewPtr(m.DeletedAt),
@@ -73,7 +74,7 @@ func FromModel(m *ent.Post) *Thread {
 		},
 		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
-		Status:   NewStatusFromEnt(m.Status),
+		Status:   post.NewStatusFromEnt(m.Status),
 		Posts:    posts,
 		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:     m.Metadata,

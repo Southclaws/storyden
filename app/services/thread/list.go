@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
@@ -28,7 +29,7 @@ func (s *service) ListAll(
 ) ([]*thread.Thread, error) {
 	q := []thread.Query{
 		// User's drafts are always private so we always filter published only.
-		thread.HasStatus(thread.StatusPublished),
+		thread.HasStatus(post.StatusPublished),
 	}
 
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.HasAuthor(a)) })

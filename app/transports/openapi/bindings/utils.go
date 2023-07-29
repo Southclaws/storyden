@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/openapi"
@@ -75,7 +76,7 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 	}, nil
 }
 
-func serialisePost(p *post.Post) (openapi.PostProps, error) {
+func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
 	return openapi.PostProps{
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
