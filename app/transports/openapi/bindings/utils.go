@@ -146,10 +146,6 @@ func serialiseTag(t tag.Tag) openapi.Tag {
 	}
 }
 
-func deserialiseAssetIDs(ids openapi.AssetReferenceList) []asset.AssetID {
-	return dt.Map(ids, func(i string) asset.AssetID { return asset.AssetID(i) })
-}
-
 func deserialiseID(t openapi.Identifier) xid.ID {
 	return openapi.ParseID(t)
 }

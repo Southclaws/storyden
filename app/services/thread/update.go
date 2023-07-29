@@ -9,7 +9,6 @@ import (
 	"github.com/el-mike/restrict"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
@@ -48,7 +47,6 @@ func (s *service) Update(ctx context.Context, threadID post.PostID, partial Part
 	partial.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
 	partial.Status.Call(func(v thread.Status) { opts = append(opts, thread.WithStatus(v)) })
 	partial.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
-	partial.Assets.Call(func(v []asset.AssetID) { opts = append(opts, thread.WithAssets(v)) })
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)
 	if err != nil {
