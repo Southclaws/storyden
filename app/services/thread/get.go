@@ -13,7 +13,7 @@ import (
 
 func (s *service) Get(
 	ctx context.Context,
-	threadID post.PostID,
+	threadID post.ID,
 ) (*thread.Thread, error) {
 	thr, err := s.thread_repo.Get(ctx, threadID)
 	if err != nil {

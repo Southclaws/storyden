@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	post_model "github.com/Southclaws/storyden/internal/ent/post"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 )
 
@@ -101,7 +101,7 @@ func (d *database) Create(
 
 	p, err = d.db.Post.
 		Query().
-		Where(post_model.IDEQ(p.ID)).
+		Where(ent_post.IDEQ(p.ID)).
 		WithAuthor().
 		WithCategory().
 		WithTags().
@@ -132,7 +132,7 @@ func (d *database) Create(
 // 	return setters, nil
 // }
 
-func (d *database) Update(ctx context.Context, id post.PostID, opts ...Option) (*Thread, error) {
+func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error) {
 	update := d.db.Post.UpdateOneID(xid.ID(id))
 	mutate := update.Mutation()
 
@@ -147,7 +147,7 @@ func (d *database) Update(ctx context.Context, id post.PostID, opts ...Option) (
 
 	p, err := d.db.Post.
 		Query().
-		Where(post_model.IDEQ(xid.ID(id))).
+		Where(ent_post.IDEQ(xid.ID(id))).
 		WithAuthor().
 		WithCategory().
 		WithTags().
@@ -167,12 +167,12 @@ func (d *database) List(
 	opts ...Query,
 ) ([]*Thread, error) {
 	filters := []predicate.Post{
-		post_model.DeletedAtIsNil(),
-		post_model.First(true),
+		ent_post.DeletedAtIsNil(),
+		ent_post.First(true),
 	}
 
 	if !before.IsZero() {
-		filters = append(filters, post_model.CreatedAtLT(before))
+		filters = append(filters, ent_post.CreatedAtLT(before))
 	}
 
 	if max < 1 {
@@ -207,17 +207,17 @@ func (d *database) List(
 	return dt.Map(result, FromModel), nil
 }
 
-func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, error) {
+func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 	post, err := d.db.Post.
 		Query().
 		Where(
-			post_model.First(true),
-			post_model.ID(xid.ID(threadID)),
+			ent_post.First(true),
+			ent_post.ID(xid.ID(threadID)),
 		).
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.
 				Where(
-					post_model.DeletedAtIsNil(),
+					ent_post.DeletedAtIsNil(),
 				).
 				WithReplyTo(func(pq *ent.PostQuery) {
 					pq.WithAuthor()
@@ -225,7 +225,7 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 				WithReacts().
 				WithAuthor().
 				WithAssets().
-				Order(ent.Asc(post_model.FieldCreatedAt))
+				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
 		WithAuthor().
 		WithCategory().
@@ -244,7 +244,7 @@ func (d *database) Get(ctx context.Context, threadID post.PostID) (*Thread, erro
 	return FromModel(post), nil
 }
 
-func (d *database) Delete(ctx context.Context, id post.PostID) error {
+func (d *database) Delete(ctx context.Context, id post.ID) error {
 	err := d.db.Post.
 		UpdateOneID(xid.ID(id)).
 		SetDeletedAt(time.Now()).
@@ -255,7 +255,7 @@ func (d *database) Delete(ctx context.Context, id post.PostID) error {
 
 	err = d.db.Post.
 		Update().
-		Where(post_model.RootPostID(xid.ID(id))).
+		Where(ent_post.RootPostID(xid.ID(id))).
 		SetDeletedAt(time.Now()).
 		Exec(ctx)
 	if err != nil {

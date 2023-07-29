@@ -14,17 +14,18 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
 var (
 	Post_01_Welcome = thread.Thread{
-		ID:       post.PostID(id("00000000000000000010")),
+		ID:       post.ID(id("00000000000000000010")),
 		Title:    "Welcome to Storyden!",
 		Author:   post.Author{ID: Account_001_Odin.ID},
 		Category: Category_01_General,
-		Posts: []*post.Post{
+		Posts: []*reply.Reply{
 			{
 				Body: `Storyden is a platform for building communities.
 
@@ -60,73 +61,73 @@ Storyden is still in development so please give the repository a watch if you're
 `,
 			},
 			{
-				ID:         post.PostID(id("00000000000000001010")),
+				ID:         post.ID(id("00000000000000001010")),
 				Body:       "first 😁",
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_004_Loki.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000002010")),
+				ID:         post.ID(id("00000000000000002010")),
 				Body:       "Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?",
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_002_Frigg.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000003010")),
+				ID:         post.ID(id("00000000000000003010")),
 				Body:       "Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.",
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_001_Odin.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000004010")),
+				ID:         post.ID(id("00000000000000004010")),
 				Body:       "What about images and stuff?",
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_008_Heimdallr.ID},
 			},
 			{
-				ID: post.PostID(id("00000000000000005010")),
+				ID: post.ID(id("00000000000000005010")),
 				Body: `oh you can do that like this:
 
 ![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
 `,
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_004_Loki.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000006010")),
+				ID:         post.ID(id("00000000000000006010")),
 				Body:       `how did you do that??`,
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_005_Þórr.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000007010")),
+				ID:         post.ID(id("00000000000000007010")),
 				Body:       `haha secret 😉`,
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_004_Loki.ID},
 			},
 			{
-				ID: post.PostID(id("00000000000000008010")),
+				ID: post.ID(id("00000000000000008010")),
 				Body: `It was mentioned above, use markdown:
 
 https://daringfireball.net/markdown
 `,
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_002_Frigg.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000009010")),
+				ID:         post.ID(id("00000000000000009010")),
 				Body:       "Thanks guys!",
-				RootPostID: post.PostID(id("00000000000000000010")),
+				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     post.Author{ID: Account_008_Heimdallr.ID},
 			},
 		},
 	}
 	Post_02_HowToContribute = thread.Thread{
-		ID:       post.PostID(id("00000000000000000020")),
+		ID:       post.ID(id("00000000000000000020")),
 		Title:    "How to contribute",
 		Author:   post.Author{ID: Account_001_Odin.ID},
 		Category: Category_01_General,
-		Posts: []*post.Post{
+		Posts: []*reply.Reply{
 			{
 				Body: `This post contains a list of resources for those of you who wish to contribute to Storyden.
 
@@ -150,47 +151,47 @@ If I've missed anything, post in this thread and I'll add it here 😃
 `,
 			},
 			{
-				ID:         post.PostID(id("00000000000000001020")),
+				ID:         post.ID(id("00000000000000001020")),
 				Body:       "Is there a wiki?",
-				RootPostID: post.PostID(id("00000000000000000020")),
+				RootPostID: post.ID(id("00000000000000000020")),
 				Author:     post.Author{ID: Account_006_Freyja.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000002020")),
+				ID:         post.ID(id("00000000000000002020")),
 				Body:       "Not yet but they're working on it!",
-				RootPostID: post.PostID(id("00000000000000000020")),
+				RootPostID: post.ID(id("00000000000000000020")),
 				Author:     post.Author{ID: Account_002_Frigg.ID},
 			},
 		},
 	}
 
 	Post_03_LoremIpsum = thread.Thread{
-		ID:       post.PostID(id("00000000000000000030")),
+		ID:       post.ID(id("00000000000000000030")),
 		Title:    "The lorem ipsum thread",
 		Author:   post.Author{ID: Account_005_Þórr.ID},
 		Category: Category_01_General,
-		Posts: []*post.Post{
+		Posts: []*reply.Reply{
 			{
 				Body: `In this thread:
 
 Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 			},
 			{
-				ID:         post.PostID(id("00000000000000001030")),
+				ID:         post.ID(id("00000000000000001030")),
 				Body:       "ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01,
-				RootPostID: post.PostID(id("00000000000000000030")),
+				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     post.Author{ID: Account_006_Freyja.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000002030")),
+				ID:         post.ID(id("00000000000000002030")),
 				Body:       "That's pretty useful, here's mine:\n\n" + markdownTest02,
-				RootPostID: post.PostID(id("00000000000000000030")),
+				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     post.Author{ID: Account_007_Freyr.ID},
 			},
 			{
-				ID:         post.PostID(id("00000000000000003030")),
+				ID:         post.ID(id("00000000000000003030")),
 				Body:       "nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"),
-				RootPostID: post.PostID(id("00000000000000000030")),
+				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     post.Author{ID: Account_004_Loki.ID},
 			},
 		},
@@ -203,7 +204,7 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 	}
 )
 
-func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
+func threads(tr thread.Repository, pr reply.Repository, rr react.Repository) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
@@ -216,7 +217,7 @@ func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 			t.Category.ID,
 			t.Tags,
 			thread.WithID(t.ID),
-			thread.WithStatus(thread.StatusPublished),
+			thread.WithStatus(post.StatusPublished),
 		)
 		if err != nil {
 			if ent.IsConstraintError(err) {
@@ -232,7 +233,7 @@ func threads(tr thread.Repository, pr post.Repository, rr react.Repository) {
 				th.ID,
 				nil,
 				nil,
-				post.WithID(p.ID))
+				reply.WithID(p.ID))
 			if err != nil {
 				if ent.IsConstraintError(err) {
 					continue

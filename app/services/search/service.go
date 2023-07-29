@@ -10,13 +10,13 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/reply"
 )
 
 type Service interface {
-	Search(ctx context.Context, q Query) ([]*post.Post, error)
+	Search(ctx context.Context, q Query) ([]*reply.Reply, error)
 }
 
 type Query struct {
@@ -44,13 +44,13 @@ func New(
 	post_search_repo post_search.Repository,
 ) Service {
 	return &service{
-		l:                l.With(zap.String("service", "post")),
+		l:                l.With(zap.String("service", "search")),
 		rbac:             rbac,
 		post_search_repo: post_search_repo,
 	}
 }
 
-func (s *service) Search(ctx context.Context, q Query) ([]*post.Post, error) {
+func (s *service) Search(ctx context.Context, q Query) ([]*reply.Reply, error) {
 	filters := []post_search.Filter{}
 
 	q.Body.Call(func(v string) {

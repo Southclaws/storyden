@@ -1,5 +1,5 @@
-// Package post provides APIs for managing posts within a thread.
-package post
+// Package reply provides APIs for managing posts within a thread.
+package reply
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/reply"
 )
 
 type Service interface {
@@ -19,15 +20,15 @@ type Service interface {
 		ctx context.Context,
 		body string,
 		authorID account.AccountID,
-		parentID post.PostID,
-		replyToID opt.Optional[post.PostID],
+		parentID post.ID,
+		replyToID opt.Optional[post.ID],
 		meta map[string]any,
-		opts ...post.Option,
-	) (*post.Post, error)
+		opts ...reply.Option,
+	) (*reply.Reply, error)
 
-	Update(ctx context.Context, threadID post.PostID, partial Partial) (*post.Post, error)
+	Update(ctx context.Context, threadID post.ID, partial Partial) (*reply.Reply, error)
 
-	Delete(ctx context.Context, postID post.PostID) error
+	Delete(ctx context.Context, postID post.ID) error
 }
 
 type Partial struct {
@@ -44,7 +45,7 @@ type service struct {
 	rbac rbac.AccessManager
 
 	account_repo account.Repository
-	post_repo    post.Repository
+	post_repo    reply.Repository
 }
 
 func New(
@@ -52,10 +53,10 @@ func New(
 	rbac rbac.AccessManager,
 
 	account_repo account.Repository,
-	post_repo post.Repository,
+	post_repo reply.Repository,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "post")),
+		l:            l.With(zap.String("service", "reply")),
 		rbac:         rbac,
 		account_repo: account_repo,
 		post_repo:    post_repo,

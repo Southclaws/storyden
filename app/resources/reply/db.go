@@ -1,4 +1,4 @@
-package post
+package reply
 
 import (
 	"context"
@@ -12,8 +12,9 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/post"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
 type database struct {
@@ -28,12 +29,12 @@ func (d *database) Create(
 	ctx context.Context,
 	body string,
 	authorID account.AccountID,
-	parentID PostID,
-	replyToID opt.Optional[PostID],
+	parentID post.ID,
+	replyToID opt.Optional[post.ID],
 	meta map[string]any,
 	opts ...Option,
-) (*Post, error) {
-	short := MakeShortBody(string(body))
+) (*Reply, error) {
+	short := post.MakeShortBody(string(body))
 
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
@@ -60,7 +61,7 @@ func (d *database) Create(
 		fn(q.Mutation())
 	}
 
-	replyToID.Call(func(value PostID) {
+	replyToID.Call(func(value post.ID) {
 		q.SetReplyToID(xid.ID(value))
 	})
 
@@ -74,7 +75,7 @@ func (d *database) Create(
 	}
 
 	p, err = d.db.Post.Query().
-		Where(post.IDEQ(p.ID)).
+		Where(ent_post.IDEQ(p.ID)).
 		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
@@ -92,10 +93,10 @@ func (d *database) Create(
 	return FromModel(p), nil
 }
 
-func (d *database) Get(ctx context.Context, id PostID) (*Post, error) {
+func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 	p, err := d.db.Post.
 		Query().
-		Where(post.IDEQ(xid.ID(id))).
+		Where(ent_post.IDEQ(xid.ID(id))).
 		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
@@ -109,7 +110,7 @@ func (d *database) Get(ctx context.Context, id PostID) (*Post, error) {
 	return FromModel(p), nil
 }
 
-func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post, error) {
+func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error) {
 	update := d.db.Post.UpdateOneID(xid.ID(id))
 	mutate := update.Mutation()
 
@@ -124,7 +125,7 @@ func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post
 
 	p, err := d.db.Post.
 		Query().
-		Where(post.IDEQ(xid.ID(id))).
+		Where(ent_post.IDEQ(xid.ID(id))).
 		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
@@ -138,7 +139,7 @@ func (d *database) Update(ctx context.Context, id PostID, opts ...Option) (*Post
 	return FromModel(p), nil
 }
 
-func (d *database) Delete(ctx context.Context, id PostID) error {
+func (d *database) Delete(ctx context.Context, id post.ID) error {
 	err := d.db.Post.
 		UpdateOneID(xid.ID(id)).
 		SetDeletedAt(time.Now()).

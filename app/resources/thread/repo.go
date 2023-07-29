@@ -7,15 +7,15 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
-	account_resource "github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	category_resource "github.com/Southclaws/storyden/app/resources/category"
-	post_resource "github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/category"
-	"github.com/Southclaws/storyden/internal/ent/post"
-	"github.com/Southclaws/storyden/internal/ent/tag"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
+	ent_category "github.com/Southclaws/storyden/internal/ent/category"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
+	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 // Note: The resources thread and post both map to the same underlying database
@@ -31,13 +31,13 @@ type Repository interface {
 		ctx context.Context,
 		title string,
 		body string,
-		authorID account_resource.AccountID,
-		categoryID category_resource.CategoryID,
+		authorID account.AccountID,
+		categoryID category.CategoryID,
 		tags []string,
 		opts ...Option,
 	) (*Thread, error)
 
-	Update(ctx context.Context, id post_resource.PostID, opts ...Option) (*Thread, error)
+	Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error)
 
 	List(
 		ctx context.Context,
@@ -48,14 +48,14 @@ type Repository interface {
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	Get(ctx context.Context, threadID post_resource.PostID) (*Thread, error)
+	Get(ctx context.Context, threadID post.ID) (*Thread, error)
 
-	Delete(ctx context.Context, id post_resource.PostID) error
+	Delete(ctx context.Context, id post.ID) error
 }
 
 type Option func(*ent.PostMutation)
 
-func WithID(id post_resource.PostID) Option {
+func WithID(id post.ID) Option {
 	return func(m *ent.PostMutation) {
 		m.SetID(xid.ID(id))
 	}
@@ -85,7 +85,7 @@ func WithCategory(v xid.ID) Option {
 	}
 }
 
-func WithStatus(v Status) Option {
+func WithStatus(v post.Status) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetStatus(v.ToEnt())
 	}
@@ -105,26 +105,26 @@ func WithAssets(a []asset.AssetID) Option {
 
 type Query func(q *ent.PostQuery)
 
-func HasAuthor(id account_resource.AccountID) Query {
+func HasAuthor(id account.AccountID) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(post.HasAuthorWith(account.ID(xid.ID(id))))
+		q.Where(ent_post.HasAuthorWith(ent_account.ID(xid.ID(id))))
 	}
 }
 
 func HasTags(ids []xid.ID) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(post.HasTagsWith(tag.IDIn(ids...)))
+		q.Where(ent_post.HasTagsWith(ent_tag.IDIn(ids...)))
 	}
 }
 
 func HasCategories(ids []string) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(post.HasCategoryWith(category.NameIn(ids...)))
+		q.Where(ent_post.HasCategoryWith(ent_category.NameIn(ids...)))
 	}
 }
 
-func HasStatus(status Status) Query {
+func HasStatus(status post.Status) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(post.StatusEQ(status.ToEnt()))
+		q.Where(ent_post.StatusEQ(status.ToEnt()))
 	}
 }

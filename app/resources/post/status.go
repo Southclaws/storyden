@@ -1,4 +1,4 @@
-package thread
+package post
 
 import "github.com/Southclaws/storyden/internal/ent/post"
 

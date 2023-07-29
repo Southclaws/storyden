@@ -26,15 +26,15 @@ type Service interface {
 		body string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
-		status thread.Status,
+		status post.Status,
 		tags []string,
 		meta map[string]any,
 		opts ...thread.Option,
 	) (*thread.Thread, error)
 
-	Update(ctx context.Context, threadID post.PostID, partial Partial) (*thread.Thread, error)
+	Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error)
 
-	Delete(ctx context.Context, id post.PostID) error
+	Delete(ctx context.Context, id post.ID) error
 
 	// ListAll returns all threads.
 	ListAll(
@@ -47,7 +47,7 @@ type Service interface {
 	// Get one thread and the posts within it.
 	Get(
 		ctx context.Context,
-		threadID post.PostID,
+		threadID post.ID,
 	) (*thread.Thread, error)
 }
 
@@ -56,7 +56,7 @@ type Partial struct {
 	Body     opt.Optional[string]
 	Tags     opt.Optional[[]xid.ID]
 	Category opt.Optional[xid.ID]
-	Status   opt.Optional[thread.Status]
+	Status   opt.Optional[post.Status]
 	Meta     opt.Optional[map[string]any]
 }
 

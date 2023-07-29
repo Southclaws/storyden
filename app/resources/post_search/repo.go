@@ -5,7 +5,7 @@ import (
 
 	"github.com/Southclaws/dt"
 
-	post_resource "github.com/Southclaws/storyden/app/resources/post"
+	post_resource "github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -24,7 +24,7 @@ const (
 type Filter func(*ent.PostQuery)
 
 type Repository interface {
-	Search(ctx context.Context, opts ...Filter) ([]*post_resource.Post, error)
+	Search(ctx context.Context, opts ...Filter) ([]*post_resource.Reply, error)
 }
 
 func WithKinds(ks ...Kind) Filter {

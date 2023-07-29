@@ -1,4 +1,4 @@
-package post_test
+package reply_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/internal/integration"
 )
@@ -19,7 +19,7 @@ func TestCreate(t *testing.T) {
 		func(
 			_ seed.Ready,
 			ctx context.Context,
-			repo post.Repository,
+			repo reply.Repository,
 		) {
 			r := require.New(t)
 			a := assert.New(t)

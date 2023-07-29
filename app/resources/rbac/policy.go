@@ -5,7 +5,7 @@ import (
 	"github.com/el-mike/restrict"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
@@ -69,7 +69,7 @@ type postAccessCondition struct{}
 func (c *postAccessCondition) Type() string { return "post_access" }
 func (c *postAccessCondition) Check(request *restrict.AccessRequest) error {
 	acc := request.Subject.(*account.Account)
-	thr := request.Resource.(*post.Post)
+	thr := request.Resource.(*reply.Reply)
 
 	if thr.Author.ID == acc.ID {
 		return nil

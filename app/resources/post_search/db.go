@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	post_model "github.com/Southclaws/storyden/internal/ent/post"
 )
@@ -20,9 +21,9 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post, error) {
+func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Reply, error) {
 	if len(filters) == 0 {
-		return []*post.Post{}, nil
+		return []*reply.Reply{}, nil
 	}
 
 	q := d.db.Post.
@@ -42,17 +43,17 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	transform := func(v *ent.Post) *post.Post {
+	transform := func(v *ent.Post) *reply.Reply {
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
-		dto := post.FromModel(v)
+		dto := reply.FromModel(v)
 
 		if v.First {
 			dto.RootThreadMark = v.Slug
-			dto.RootPostID = post.PostID(v.ID)
+			dto.RootPostID = post.ID(v.ID)
 		} else {
 			dto.RootThreadMark = v.Edges.Root.Slug
-			dto.RootPostID = post.PostID(v.Edges.Root.ID)
+			dto.RootPostID = post.ID(v.Edges.Root.ID)
 		}
 
 		return dto
