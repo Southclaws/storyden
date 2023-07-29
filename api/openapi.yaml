@@ -1590,7 +1590,6 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
-        assets: { $ref: "#/components/schemas/AssetReferenceList" }
 
     ThreadMutableProps:
       type: object
@@ -1601,7 +1600,6 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
-        assets: { $ref: "#/components/schemas/AssetReferenceList" }
 
     ThreadReference:
       description: |
@@ -1766,10 +1764,6 @@ components:
 
     AssetID:
       $ref: "#/components/schemas/Identifier"
-
-    AssetReferenceList:
-      type: array
-      items: { $ref: "#/components/schemas/AssetID" }
 
     AssetList:
       type: array

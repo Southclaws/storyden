@@ -22,7 +22,6 @@ export * from "./asset";
 export * from "./assetGetOKResponse";
 export * from "./assetID";
 export * from "./assetList";
-export * from "./assetReferenceList";
 export * from "./assetUploadBody";
 export * from "./assetUploadOKResponse";
 export * from "./attestationConveyancePreference";

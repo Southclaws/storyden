@@ -6,7 +6,6 @@ import { z } from "zod";
 
 import { useCategoryList } from "src/api/openapi/categories";
 import {
-  Asset,
   Thread,
   ThreadInitialProps,
   ThreadStatus,
@@ -21,7 +20,6 @@ export const FormShapeSchema = z.object({
   body: z.string().min(1),
   category: z.string(),
   tags: z.string().array().optional(),
-  assets: z.array(z.string()),
 });
 export type FormShape = z.infer<typeof FormShapeSchema>;
 
@@ -37,12 +35,10 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           title: initialDraft.title,
           body: initialDraft.posts[0]?.body,
           tags: initialDraft.tags,
-          assets: initialDraft.assets.map((v) => v.id),
         }
       : {
           // hack: the underlying category list select component can't do this.
           category: data?.categories[0]?.id,
-          assets: [],
         },
   });
 
@@ -84,32 +80,14 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     }
   };
 
-  const onAssetUpload = async (asset: Asset) => {
-    const state: FormShape = formContext.getValues();
-
-    const newAssets = [...state.assets, asset.id];
-
-    const newState = {
-      ...state,
-      assets: newAssets,
-    };
-
-    await doSave(newState).catch(errorToast(toast));
-    formContext.setValue("assets", newAssets);
+  const onAssetUpload = async () => {
+    const state = formContext.getValues();
+    await doSave(state).catch(errorToast(toast));
   };
 
-  const onAssetDelete = async (asset: Asset) => {
-    const state: FormShape = formContext.getValues();
-
-    const newAssets = state.assets.filter((a) => a !== asset.id);
-
-    const newState = {
-      ...state,
-      assets: newAssets,
-    };
-
-    await doSave(newState).catch(errorToast(toast));
-    formContext.setValue("assets", newAssets);
+  const onAssetDelete = async () => {
+    const state = formContext.getValues();
+    await doSave(state).catch(errorToast(toast));
   };
 
   function onBack() {
