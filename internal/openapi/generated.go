@@ -294,6 +294,77 @@ type CategoryReference struct {
 	Sort int          `json:"sort"`
 }
 
+// Collection defines model for Collection.
+type Collection struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt   *time.Time `json:"deletedAt,omitempty"`
+	Description string     `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name string                  `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// CollectionCommonProps A reference to the collection
+type CollectionCommonProps struct {
+	Description string `json:"description"`
+	Name        string `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+}
+
+// CollectionInitialProps defines model for CollectionInitialProps.
+type CollectionInitialProps struct {
+	Description string `json:"description"`
+	Name        string `json:"name"`
+}
+
+// CollectionList defines model for CollectionList.
+type CollectionList = []Collection
+
+// CollectionMutableProps defines model for CollectionMutableProps.
+type CollectionMutableProps struct {
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+}
+
+// CollectionWithItems defines model for CollectionWithItems.
+type CollectionWithItems struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt   *time.Time `json:"deletedAt,omitempty"`
+	Description string     `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id    Identifier `json:"id"`
+	Items ThreadList `json:"items"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name string                  `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
 // CommonProperties defines model for CommonProperties.
 type CommonProperties struct {
 	// CreatedAt The time the resource was created.
@@ -836,6 +907,9 @@ type AccountHandleParam = AccountHandle
 // AssetPath defines model for AssetPath.
 type AssetPath = string
 
+// CollectionIDParam A unique identifier for this resource.
+type CollectionIDParam = Identifier
+
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
 
@@ -871,6 +945,30 @@ type AuthSuccessOK = AuthSuccess
 
 // CategoryListOK defines model for CategoryListOK.
 type CategoryListOK = CategoryList
+
+// CollectionAddPostOK A collection is a group of threads owned by a user. It allows users to
+// curate their own lists of content from the site. Collections can only
+// contain root level posts (threads) with titles and slugs to link to.
+type CollectionAddPostOK = Collection
+
+// CollectionCreateOK A collection is a group of threads owned by a user. It allows users to
+// curate their own lists of content from the site. Collections can only
+// contain root level posts (threads) with titles and slugs to link to.
+type CollectionCreateOK = Collection
+
+// CollectionGetOK The full properties of a collection, for rendering a single collection
+// somewhere where you can afford to show all the items in the collection.
+type CollectionGetOK = CollectionWithItems
+
+// CollectionListOK defines model for CollectionListOK.
+type CollectionListOK struct {
+	Collections *CollectionList `json:"collections,omitempty"`
+}
+
+// CollectionUpdateOK A collection is a group of threads owned by a user. It allows users to
+// curate their own lists of content from the site. Collections can only
+// contain root level posts (threads) with titles and slugs to link to.
+type CollectionUpdateOK = Collection
 
 // GetInfoOK Basic public information about the Storyden installation.
 type GetInfoOK = Info
@@ -923,6 +1021,12 @@ type AccountUpdate = AccountMutableProps
 
 // AuthPassword defines model for AuthPassword.
 type AuthPassword = AuthPair
+
+// CollectionCreate defines model for CollectionCreate.
+type CollectionCreate = CollectionInitialProps
+
+// CollectionUpdate defines model for CollectionUpdate.
+type CollectionUpdate = CollectionMutableProps
 
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
@@ -1001,6 +1105,12 @@ type WebAuthnMakeAssertionJSONRequestBody = PublicKeyCredential
 
 // WebAuthnMakeCredentialJSONRequestBody defines body for WebAuthnMakeCredential for application/json ContentType.
 type WebAuthnMakeCredentialJSONRequestBody = PublicKeyCredential
+
+// CollectionCreateJSONRequestBody defines body for CollectionCreate for application/json ContentType.
+type CollectionCreateJSONRequestBody = CollectionInitialProps
+
+// CollectionUpdateJSONRequestBody defines body for CollectionUpdate for application/json ContentType.
+type CollectionUpdateJSONRequestBody = CollectionMutableProps
 
 // PostUpdateJSONRequestBody defines body for PostUpdate for application/json ContentType.
 type PostUpdateJSONRequestBody = PostMutableProps
@@ -1162,6 +1272,25 @@ type ClientInterface interface {
 
 	// CategoryList request
 	CategoryList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CollectionList request
+	CollectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CollectionCreate request with any body
+	CollectionCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CollectionCreate(ctx context.Context, body CollectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CollectionGet request
+	CollectionGet(ctx context.Context, collectionId CollectionIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CollectionUpdate request with any body
+	CollectionUpdateWithBody(ctx context.Context, collectionId CollectionIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CollectionUpdate(ctx context.Context, collectionId CollectionIDParam, body CollectionUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CollectionAddPost request
+	CollectionAddPost(ctx context.Context, collectionId CollectionIDParam, postId PostIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetInfo request
 	GetInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1527,6 +1656,90 @@ func (c *Client) WebAuthnRequestCredential(ctx context.Context, accountHandle Ac
 
 func (c *Client) CategoryList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCategoryListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionCreate(ctx context.Context, body CollectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionGet(ctx context.Context, collectionId CollectionIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionGetRequest(c.Server, collectionId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionUpdateWithBody(ctx context.Context, collectionId CollectionIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionUpdateRequestWithBody(c.Server, collectionId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionUpdate(ctx context.Context, collectionId CollectionIDParam, body CollectionUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionUpdateRequest(c.Server, collectionId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CollectionAddPost(ctx context.Context, collectionId CollectionIDParam, postId PostIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCollectionAddPostRequest(c.Server, collectionId, postId)
 	if err != nil {
 		return nil, err
 	}
@@ -2416,6 +2629,195 @@ func NewCategoryListRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewCollectionListRequest generates requests for CollectionList
+func NewCollectionListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/collections")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCollectionCreateRequest calls the generic CollectionCreate builder with application/json body
+func NewCollectionCreateRequest(server string, body CollectionCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCollectionCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCollectionCreateRequestWithBody generates requests for CollectionCreate with any type of body
+func NewCollectionCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/collections")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCollectionGetRequest generates requests for CollectionGet
+func NewCollectionGetRequest(server string, collectionId CollectionIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, collectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/collections/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCollectionUpdateRequest calls the generic CollectionUpdate builder with application/json body
+func NewCollectionUpdateRequest(server string, collectionId CollectionIDParam, body CollectionUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCollectionUpdateRequestWithBody(server, collectionId, "application/json", bodyReader)
+}
+
+// NewCollectionUpdateRequestWithBody generates requests for CollectionUpdate with any type of body
+func NewCollectionUpdateRequestWithBody(server string, collectionId CollectionIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, collectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/collections/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCollectionAddPostRequest generates requests for CollectionAddPost
+func NewCollectionAddPostRequest(server string, collectionId CollectionIDParam, postId PostIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, collectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "post_id", runtime.ParamLocationPath, postId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/collections/%s/items/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetInfoRequest generates requests for GetInfo
 func NewGetInfoRequest(server string) (*http.Request, error) {
 	var err error
@@ -3108,6 +3510,25 @@ type ClientWithResponsesInterface interface {
 	// CategoryList request
 	CategoryListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CategoryListResponse, error)
 
+	// CollectionList request
+	CollectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CollectionListResponse, error)
+
+	// CollectionCreate request with any body
+	CollectionCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CollectionCreateResponse, error)
+
+	CollectionCreateWithResponse(ctx context.Context, body CollectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CollectionCreateResponse, error)
+
+	// CollectionGet request
+	CollectionGetWithResponse(ctx context.Context, collectionId CollectionIDParam, reqEditors ...RequestEditorFn) (*CollectionGetResponse, error)
+
+	// CollectionUpdate request with any body
+	CollectionUpdateWithBodyWithResponse(ctx context.Context, collectionId CollectionIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CollectionUpdateResponse, error)
+
+	CollectionUpdateWithResponse(ctx context.Context, collectionId CollectionIDParam, body CollectionUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CollectionUpdateResponse, error)
+
+	// CollectionAddPost request
+	CollectionAddPostWithResponse(ctx context.Context, collectionId CollectionIDParam, postId PostIDParam, reqEditors ...RequestEditorFn) (*CollectionAddPostResponse, error)
+
 	// GetInfo request
 	GetInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetInfoResponse, error)
 
@@ -3585,6 +4006,123 @@ func (r CategoryListResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CategoryListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CollectionListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Collections *CollectionList `json:"collections,omitempty"`
+	}
+	JSONDefault *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r CollectionListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CollectionListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CollectionCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Collection
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r CollectionCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CollectionCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CollectionGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *CollectionWithItems
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r CollectionGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CollectionGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CollectionUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Collection
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r CollectionUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CollectionUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CollectionAddPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Collection
+	JSONDefault  *APIError
+}
+
+// Status returns HTTPResponse.Status
+func (r CollectionAddPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CollectionAddPostResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4121,6 +4659,67 @@ func (c *ClientWithResponses) CategoryListWithResponse(ctx context.Context, reqE
 		return nil, err
 	}
 	return ParseCategoryListResponse(rsp)
+}
+
+// CollectionListWithResponse request returning *CollectionListResponse
+func (c *ClientWithResponses) CollectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CollectionListResponse, error) {
+	rsp, err := c.CollectionList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionListResponse(rsp)
+}
+
+// CollectionCreateWithBodyWithResponse request with arbitrary body returning *CollectionCreateResponse
+func (c *ClientWithResponses) CollectionCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CollectionCreateResponse, error) {
+	rsp, err := c.CollectionCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) CollectionCreateWithResponse(ctx context.Context, body CollectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CollectionCreateResponse, error) {
+	rsp, err := c.CollectionCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionCreateResponse(rsp)
+}
+
+// CollectionGetWithResponse request returning *CollectionGetResponse
+func (c *ClientWithResponses) CollectionGetWithResponse(ctx context.Context, collectionId CollectionIDParam, reqEditors ...RequestEditorFn) (*CollectionGetResponse, error) {
+	rsp, err := c.CollectionGet(ctx, collectionId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionGetResponse(rsp)
+}
+
+// CollectionUpdateWithBodyWithResponse request with arbitrary body returning *CollectionUpdateResponse
+func (c *ClientWithResponses) CollectionUpdateWithBodyWithResponse(ctx context.Context, collectionId CollectionIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CollectionUpdateResponse, error) {
+	rsp, err := c.CollectionUpdateWithBody(ctx, collectionId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) CollectionUpdateWithResponse(ctx context.Context, collectionId CollectionIDParam, body CollectionUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CollectionUpdateResponse, error) {
+	rsp, err := c.CollectionUpdate(ctx, collectionId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionUpdateResponse(rsp)
+}
+
+// CollectionAddPostWithResponse request returning *CollectionAddPostResponse
+func (c *ClientWithResponses) CollectionAddPostWithResponse(ctx context.Context, collectionId CollectionIDParam, postId PostIDParam, reqEditors ...RequestEditorFn) (*CollectionAddPostResponse, error) {
+	rsp, err := c.CollectionAddPost(ctx, collectionId, postId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCollectionAddPostResponse(rsp)
 }
 
 // GetInfoWithResponse request returning *GetInfoResponse
@@ -4864,6 +5463,173 @@ func ParseCategoryListResponse(rsp *http.Response) (*CategoryListResponse, error
 	return response, nil
 }
 
+// ParseCollectionListResponse parses an HTTP response from a CollectionListWithResponse call
+func ParseCollectionListResponse(rsp *http.Response) (*CollectionListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CollectionListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Collections *CollectionList `json:"collections,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCollectionCreateResponse parses an HTTP response from a CollectionCreateWithResponse call
+func ParseCollectionCreateResponse(rsp *http.Response) (*CollectionCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CollectionCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Collection
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCollectionGetResponse parses an HTTP response from a CollectionGetWithResponse call
+func ParseCollectionGetResponse(rsp *http.Response) (*CollectionGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CollectionGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CollectionWithItems
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCollectionUpdateResponse parses an HTTP response from a CollectionUpdateWithResponse call
+func ParseCollectionUpdateResponse(rsp *http.Response) (*CollectionUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CollectionUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Collection
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCollectionAddPostResponse parses an HTTP response from a CollectionAddPostWithResponse call
+func ParseCollectionAddPostResponse(rsp *http.Response) (*CollectionAddPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CollectionAddPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Collection
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest APIError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetInfoResponse parses an HTTP response from a GetInfoWithResponse call
 func ParseGetInfoResponse(rsp *http.Response) (*GetInfoResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5324,6 +6090,21 @@ type ServerInterface interface {
 	// (GET /v1/categories)
 	CategoryList(ctx echo.Context) error
 
+	// (GET /v1/collections)
+	CollectionList(ctx echo.Context) error
+
+	// (POST /v1/collections)
+	CollectionCreate(ctx echo.Context) error
+
+	// (GET /v1/collections/{collection_id})
+	CollectionGet(ctx echo.Context, collectionId CollectionIDParam) error
+
+	// (PATCH /v1/collections/{collection_id})
+	CollectionUpdate(ctx echo.Context, collectionId CollectionIDParam) error
+
+	// (PUT /v1/collections/{collection_id}/items/{post_id})
+	CollectionAddPost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error
+
 	// (GET /v1/info)
 	GetInfo(ctx echo.Context) error
 
@@ -5593,6 +6374,86 @@ func (w *ServerInterfaceWrapper) CategoryList(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.CategoryList(ctx)
+	return err
+}
+
+// CollectionList converts echo context to params.
+func (w *ServerInterfaceWrapper) CollectionList(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CollectionList(ctx)
+	return err
+}
+
+// CollectionCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) CollectionCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CollectionCreate(ctx)
+	return err
+}
+
+// CollectionGet converts echo context to params.
+func (w *ServerInterfaceWrapper) CollectionGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "collection_id" -------------
+	var collectionId CollectionIDParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, ctx.Param("collection_id"), &collectionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter collection_id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CollectionGet(ctx, collectionId)
+	return err
+}
+
+// CollectionUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) CollectionUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "collection_id" -------------
+	var collectionId CollectionIDParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, ctx.Param("collection_id"), &collectionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter collection_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CollectionUpdate(ctx, collectionId)
+	return err
+}
+
+// CollectionAddPost converts echo context to params.
+func (w *ServerInterfaceWrapper) CollectionAddPost(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "collection_id" -------------
+	var collectionId CollectionIDParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "collection_id", runtime.ParamLocationPath, ctx.Param("collection_id"), &collectionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter collection_id: %s", err))
+	}
+
+	// ------------- Path parameter "post_id" -------------
+	var postId PostIDParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "post_id", runtime.ParamLocationPath, ctx.Param("post_id"), &postId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter post_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{""})
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CollectionAddPost(ctx, collectionId, postId)
 	return err
 }
 
@@ -5876,6 +6737,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
 	router.GET(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
 	router.GET(baseURL+"/v1/categories", wrapper.CategoryList)
+	router.GET(baseURL+"/v1/collections", wrapper.CollectionList)
+	router.POST(baseURL+"/v1/collections", wrapper.CollectionCreate)
+	router.GET(baseURL+"/v1/collections/:collection_id", wrapper.CollectionGet)
+	router.PATCH(baseURL+"/v1/collections/:collection_id", wrapper.CollectionUpdate)
+	router.PUT(baseURL+"/v1/collections/:collection_id/items/:post_id", wrapper.CollectionAddPost)
 	router.GET(baseURL+"/v1/info", wrapper.GetInfo)
 	router.GET(baseURL+"/v1/posts/search", wrapper.PostSearch)
 	router.DELETE(baseURL+"/v1/posts/:post_id", wrapper.PostDelete)
@@ -5928,6 +6794,18 @@ type BadRequestResponse struct {
 }
 
 type CategoryListOKJSONResponse CategoryList
+
+type CollectionAddPostOKJSONResponse Collection
+
+type CollectionCreateOKJSONResponse Collection
+
+type CollectionGetOKJSONResponse CollectionWithItems
+
+type CollectionListOKJSONResponse struct {
+	Collections *CollectionList `json:"collections,omitempty"`
+}
+
+type CollectionUpdateOKJSONResponse Collection
 
 type GetInfoOKJSONResponse Info
 
@@ -6729,6 +7607,210 @@ func (response CategoryListdefaultJSONResponse) VisitCategoryListResponse(w http
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type CollectionListRequestObject struct {
+}
+
+type CollectionListResponseObject interface {
+	VisitCollectionListResponse(w http.ResponseWriter) error
+}
+
+type CollectionList200JSONResponse struct{ CollectionListOKJSONResponse }
+
+func (response CollectionList200JSONResponse) VisitCollectionListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CollectionList404Response = NotFoundResponse
+
+func (response CollectionList404Response) VisitCollectionListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type CollectionListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response CollectionListdefaultJSONResponse) VisitCollectionListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CollectionCreateRequestObject struct {
+	Body *CollectionCreateJSONRequestBody
+}
+
+type CollectionCreateResponseObject interface {
+	VisitCollectionCreateResponse(w http.ResponseWriter) error
+}
+
+type CollectionCreate200JSONResponse struct{ CollectionCreateOKJSONResponse }
+
+func (response CollectionCreate200JSONResponse) VisitCollectionCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CollectionCreate401Response = UnauthorisedResponse
+
+func (response CollectionCreate401Response) VisitCollectionCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type CollectionCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response CollectionCreatedefaultJSONResponse) VisitCollectionCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CollectionGetRequestObject struct {
+	CollectionId CollectionIDParam `json:"collection_id"`
+}
+
+type CollectionGetResponseObject interface {
+	VisitCollectionGetResponse(w http.ResponseWriter) error
+}
+
+type CollectionGet200JSONResponse struct{ CollectionGetOKJSONResponse }
+
+func (response CollectionGet200JSONResponse) VisitCollectionGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CollectionGet401Response = UnauthorisedResponse
+
+func (response CollectionGet401Response) VisitCollectionGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type CollectionGet404Response = NotFoundResponse
+
+func (response CollectionGet404Response) VisitCollectionGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type CollectionGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response CollectionGetdefaultJSONResponse) VisitCollectionGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CollectionUpdateRequestObject struct {
+	CollectionId CollectionIDParam `json:"collection_id"`
+	Body         *CollectionUpdateJSONRequestBody
+}
+
+type CollectionUpdateResponseObject interface {
+	VisitCollectionUpdateResponse(w http.ResponseWriter) error
+}
+
+type CollectionUpdate200JSONResponse struct{ CollectionUpdateOKJSONResponse }
+
+func (response CollectionUpdate200JSONResponse) VisitCollectionUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CollectionUpdate401Response = UnauthorisedResponse
+
+func (response CollectionUpdate401Response) VisitCollectionUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type CollectionUpdate404Response = NotFoundResponse
+
+func (response CollectionUpdate404Response) VisitCollectionUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type CollectionUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response CollectionUpdatedefaultJSONResponse) VisitCollectionUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CollectionAddPostRequestObject struct {
+	CollectionId CollectionIDParam `json:"collection_id"`
+	PostId       PostIDParam       `json:"post_id"`
+}
+
+type CollectionAddPostResponseObject interface {
+	VisitCollectionAddPostResponse(w http.ResponseWriter) error
+}
+
+type CollectionAddPost200JSONResponse struct {
+	CollectionAddPostOKJSONResponse
+}
+
+func (response CollectionAddPost200JSONResponse) VisitCollectionAddPostResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CollectionAddPost401Response = UnauthorisedResponse
+
+func (response CollectionAddPost401Response) VisitCollectionAddPostResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type CollectionAddPost404Response = NotFoundResponse
+
+func (response CollectionAddPost404Response) VisitCollectionAddPostResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type CollectionAddPostdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response CollectionAddPostdefaultJSONResponse) VisitCollectionAddPostResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type GetInfoRequestObject struct {
 }
 
@@ -7309,6 +8391,21 @@ type StrictServerInterface interface {
 	// (GET /v1/categories)
 	CategoryList(ctx context.Context, request CategoryListRequestObject) (CategoryListResponseObject, error)
 
+	// (GET /v1/collections)
+	CollectionList(ctx context.Context, request CollectionListRequestObject) (CollectionListResponseObject, error)
+
+	// (POST /v1/collections)
+	CollectionCreate(ctx context.Context, request CollectionCreateRequestObject) (CollectionCreateResponseObject, error)
+
+	// (GET /v1/collections/{collection_id})
+	CollectionGet(ctx context.Context, request CollectionGetRequestObject) (CollectionGetResponseObject, error)
+
+	// (PATCH /v1/collections/{collection_id})
+	CollectionUpdate(ctx context.Context, request CollectionUpdateRequestObject) (CollectionUpdateResponseObject, error)
+
+	// (PUT /v1/collections/{collection_id}/items/{post_id})
+	CollectionAddPost(ctx context.Context, request CollectionAddPostRequestObject) (CollectionAddPostResponseObject, error)
+
 	// (GET /v1/info)
 	GetInfo(ctx context.Context, request GetInfoRequestObject) (GetInfoResponseObject, error)
 
@@ -7863,6 +8960,140 @@ func (sh *strictHandler) CategoryList(ctx echo.Context) error {
 	return nil
 }
 
+// CollectionList operation middleware
+func (sh *strictHandler) CollectionList(ctx echo.Context) error {
+	var request CollectionListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CollectionList(ctx.Request().Context(), request.(CollectionListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CollectionList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(CollectionListResponseObject); ok {
+		return validResponse.VisitCollectionListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// CollectionCreate operation middleware
+func (sh *strictHandler) CollectionCreate(ctx echo.Context) error {
+	var request CollectionCreateRequestObject
+
+	var body CollectionCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CollectionCreate(ctx.Request().Context(), request.(CollectionCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CollectionCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(CollectionCreateResponseObject); ok {
+		return validResponse.VisitCollectionCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// CollectionGet operation middleware
+func (sh *strictHandler) CollectionGet(ctx echo.Context, collectionId CollectionIDParam) error {
+	var request CollectionGetRequestObject
+
+	request.CollectionId = collectionId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CollectionGet(ctx.Request().Context(), request.(CollectionGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CollectionGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(CollectionGetResponseObject); ok {
+		return validResponse.VisitCollectionGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// CollectionUpdate operation middleware
+func (sh *strictHandler) CollectionUpdate(ctx echo.Context, collectionId CollectionIDParam) error {
+	var request CollectionUpdateRequestObject
+
+	request.CollectionId = collectionId
+
+	var body CollectionUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CollectionUpdate(ctx.Request().Context(), request.(CollectionUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CollectionUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(CollectionUpdateResponseObject); ok {
+		return validResponse.VisitCollectionUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// CollectionAddPost operation middleware
+func (sh *strictHandler) CollectionAddPost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error {
+	var request CollectionAddPostRequestObject
+
+	request.CollectionId = collectionId
+	request.PostId = postId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CollectionAddPost(ctx.Request().Context(), request.(CollectionAddPostRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CollectionAddPost")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(CollectionAddPostResponseObject); ok {
+		return validResponse.VisitCollectionAddPostResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("Unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // GetInfo operation middleware
 func (sh *strictHandler) GetInfo(ctx echo.Context) error {
 	var request GetInfoRequestObject
@@ -8215,118 +9446,128 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

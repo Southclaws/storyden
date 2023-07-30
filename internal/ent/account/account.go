@@ -37,6 +37,8 @@ const (
 	EdgeAuthentication = "authentication"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
+	// EdgeCollections holds the string denoting the collections edge name in mutations.
+	EdgeCollections = "collections"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the account in the database.
@@ -72,6 +74,13 @@ const (
 	// TagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	TagsInverseTable = "tags"
+	// CollectionsTable is the table that holds the collections relation/edge.
+	CollectionsTable = "collections"
+	// CollectionsInverseTable is the table name for the Collection entity.
+	// It exists in this package in order to avoid circular dependency with the "collection" package.
+	CollectionsInverseTable = "collections"
+	// CollectionsColumn is the table column denoting the collections relation/edge.
+	CollectionsColumn = "account_collections"
 	// AssetsTable is the table that holds the assets relation/edge.
 	AssetsTable = "assets"
 	// AssetsInverseTable is the table name for the Asset entity.

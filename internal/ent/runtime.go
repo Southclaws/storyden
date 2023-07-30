@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -176,6 +177,45 @@ func init() {
 	// category.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	category.IDValidator = func() func(string) error {
 		validators := categoryDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	collectionMixin := schema.Collection{}.Mixin()
+	collectionMixinFields0 := collectionMixin[0].Fields()
+	_ = collectionMixinFields0
+	collectionMixinFields1 := collectionMixin[1].Fields()
+	_ = collectionMixinFields1
+	collectionMixinFields2 := collectionMixin[2].Fields()
+	_ = collectionMixinFields2
+	collectionFields := schema.Collection{}.Fields()
+	_ = collectionFields
+	// collectionDescCreatedAt is the schema descriptor for created_at field.
+	collectionDescCreatedAt := collectionMixinFields1[0].Descriptor()
+	// collection.DefaultCreatedAt holds the default value on creation for the created_at field.
+	collection.DefaultCreatedAt = collectionDescCreatedAt.Default.(func() time.Time)
+	// collectionDescUpdatedAt is the schema descriptor for updated_at field.
+	collectionDescUpdatedAt := collectionMixinFields2[0].Descriptor()
+	// collection.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	collection.DefaultUpdatedAt = collectionDescUpdatedAt.Default.(func() time.Time)
+	// collection.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	collection.UpdateDefaultUpdatedAt = collectionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// collectionDescID is the schema descriptor for id field.
+	collectionDescID := collectionMixinFields0[0].Descriptor()
+	// collection.DefaultID holds the default value on creation for the id field.
+	collection.DefaultID = collectionDescID.Default.(func() xid.ID)
+	// collection.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	collection.IDValidator = func() func(string) error {
+		validators := collectionDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

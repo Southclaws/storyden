@@ -77,5 +77,8 @@ func (Post) Edges() []ent.Edge {
 		edge.To("reacts", React.Type),
 
 		edge.To("assets", Asset.Type),
+
+		edge.From("collections", Collection.Type).
+			Ref("posts"),
 	}
 }

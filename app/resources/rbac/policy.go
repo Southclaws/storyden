@@ -5,17 +5,20 @@ import (
 	"github.com/el-mike/restrict"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
 var (
-	permissionCreate       = restrict.Permission{Action: ActionCreate}
-	permissionRead         = restrict.Permission{Action: ActionRead}
-	permissionUpdateThread = restrict.Permission{Preset: "update_thread"}
-	permissionUpdatePost   = restrict.Permission{Preset: "update_post"}
-	permissionDeleteThread = restrict.Permission{Preset: "delete_thread"}
-	permissionDeletePost   = restrict.Permission{Preset: "delete_post"}
+	permissionCreate           = restrict.Permission{Action: ActionCreate}
+	permissionRead             = restrict.Permission{Action: ActionRead}
+	permissionUpdateThread     = restrict.Permission{Preset: "update_thread"}
+	permissionUpdatePost       = restrict.Permission{Preset: "update_post"}
+	permissionDeleteThread     = restrict.Permission{Preset: "delete_thread"}
+	permissionDeletePost       = restrict.Permission{Preset: "delete_post"}
+	permissionUpdateCollection = restrict.Permission{Preset: "update_collection"}
+	permissionDeleteCollection = restrict.Permission{Preset: "delete_collection"}
 )
 
 var defaultGrants = restrict.GrantsMap{
@@ -30,6 +33,12 @@ var defaultGrants = restrict.GrantsMap{
 		&permissionRead,
 		&permissionUpdatePost,
 		&permissionDeletePost,
+	},
+	ResourceCollection: {
+		&permissionCreate,
+		&permissionRead,
+		&permissionUpdateCollection,
+		&permissionDeleteCollection,
 	},
 }
 
@@ -110,15 +119,49 @@ var deletePost = restrict.Permission{
 	},
 }
 
+type collectionAccessCondition struct{}
+
+func (c *collectionAccessCondition) Type() string { return "collection_access" }
+func (c *collectionAccessCondition) Check(request *restrict.AccessRequest) error {
+	acc := request.Subject.(*account.Account)
+	col := request.Resource.(*collection.Collection)
+
+	if col.Owner.ID == acc.ID {
+		return nil
+	}
+
+	if acc.Admin {
+		return nil
+	}
+
+	return restrict.NewConditionNotSatisfiedError(c, request, fault.New("Account is not the owner of the collection"))
+}
+
+var updateCollection = restrict.Permission{
+	Action: ActionUpdate,
+	Conditions: restrict.Conditions{
+		&collectionAccessCondition{},
+	},
+}
+
+var deleteCollection = restrict.Permission{
+	Action: ActionDelete,
+	Conditions: restrict.Conditions{
+		&collectionAccessCondition{},
+	},
+}
+
 var defaultPolicy = &restrict.PolicyDefinition{
 	Roles: restrict.Roles{
 		EveryoneRole.ID: &EveryoneRole,
 		OwnerRole.ID:    &OwnerRole,
 	},
 	PermissionPresets: restrict.PermissionPresets{
-		"update_thread": &updateThread,
-		"update_post":   &updatePost,
-		"delete_thread": &deleteThread,
-		"delete_post":   &deletePost,
+		"update_thread":     &updateThread,
+		"update_post":       &updatePost,
+		"delete_thread":     &deleteThread,
+		"delete_post":       &deletePost,
+		"update_collection": &updateCollection,
+		"delete_collection": &deleteCollection,
 	},
 }

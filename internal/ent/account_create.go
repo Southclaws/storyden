@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -199,6 +200,21 @@ func (ac *AccountCreate) AddTags(t ...*Tag) *AccountCreate {
 		ids[i] = t[i].ID
 	}
 	return ac.AddTagIDs(ids...)
+}
+
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (ac *AccountCreate) AddCollectionIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddCollectionIDs(ids...)
+	return ac
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (ac *AccountCreate) AddCollections(c ...*Collection) *AccountCreate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ac.AddCollectionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -438,6 +454,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

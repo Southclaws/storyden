@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -92,7 +91,7 @@ func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
 	}, nil
 }
 
-func serialiseProfileReference(a post.Author) openapi.ProfileReference {
+func serialiseProfileReference(a account.Account) openapi.ProfileReference {
 	return openapi.ProfileReference{
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),

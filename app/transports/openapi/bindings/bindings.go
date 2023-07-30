@@ -73,6 +73,7 @@ type Bindings struct {
 	Posts
 	Reacts
 	Assets
+	Collections
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -93,6 +94,7 @@ func bindingsProviders() fx.Option {
 		NewPosts,
 		NewReacts,
 		NewAssets,
+		NewCollections,
 	)
 }
 

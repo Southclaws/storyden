@@ -19,7 +19,7 @@ type Reply struct {
 
 	Body           string
 	Short          string
-	Author         post.Author
+	Author         account.Account
 	RootPostID     post.ID
 	RootThreadMark string
 	ReplyTo        opt.Optional[post.ID]
@@ -52,15 +52,9 @@ func FromModel(m *ent.Post) (w *Reply) {
 	return &Reply{
 		ID: post.ID(m.ID),
 
-		Body:  m.Body,
-		Short: m.Short,
-		Author: post.Author{
-			ID:        account.AccountID(m.Edges.Author.ID),
-			Name:      m.Edges.Author.Name,
-			Handle:    m.Edges.Author.Handle,
-			Admin:     m.Edges.Author.Admin,
-			CreatedAt: m.Edges.Author.CreatedAt,
-		},
+		Body:    m.Body,
+		Short:   m.Short,
+		Author:  *account.FromModel(*m.Edges.Author),
 		ReplyTo: replyTo,
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,

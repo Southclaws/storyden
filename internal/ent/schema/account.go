@@ -36,6 +36,8 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("tags", Tag.Type),
 
+		edge.To("collections", Collection.Type),
+
 		edge.To("assets", Asset.Type),
 	}
 }

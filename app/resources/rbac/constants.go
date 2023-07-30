@@ -12,7 +12,8 @@ const (
 type Resource = string
 
 const (
-	ResourceAccount Resource = "account"
-	ResourceThread  Resource = "thread"
-	ResourcePost    Resource = "post"
+	ResourceAccount    Resource = "account"
+	ResourceThread     Resource = "thread"
+	ResourcePost       Resource = "post"
+	ResourceCollection Resource = "collection"
 )

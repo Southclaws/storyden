@@ -60,6 +60,8 @@ const (
 	EdgeReacts = "reacts"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
+	// EdgeCollections holds the string denoting the collections edge name in mutations.
+	EdgeCollections = "collections"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -109,6 +111,11 @@ const (
 	// AssetsInverseTable is the table name for the Asset entity.
 	// It exists in this package in order to avoid circular dependency with the "asset" package.
 	AssetsInverseTable = "assets"
+	// CollectionsTable is the table that holds the collections relation/edge. The primary key declared below.
+	CollectionsTable = "collection_posts"
+	// CollectionsInverseTable is the table name for the Collection entity.
+	// It exists in this package in order to avoid circular dependency with the "collection" package.
+	CollectionsInverseTable = "collections"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -143,6 +150,9 @@ var (
 	// AssetsPrimaryKey and AssetsColumn2 are the table columns denoting the
 	// primary key for the assets relation (M2M).
 	AssetsPrimaryKey = []string{"post_id", "asset_id"}
+	// CollectionsPrimaryKey and CollectionsColumn2 are the table columns denoting the
+	// primary key for the collections relation (M2M).
+	CollectionsPrimaryKey = []string{"collection_id", "post_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

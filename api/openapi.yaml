@@ -49,6 +49,8 @@ tags:
     description: Posts within a specific thread.
   - name: assets
     description: File uploads and downloads.
+  - name: collections
+    description: User curated collections of posts.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -578,10 +580,7 @@ paths:
   /v1/assets:
     post:
       operationId: AssetUpload
-      description: |
-        If Storyden is not using S3 for file uploads, this is the fallback
-        equivalent of S3's pre-signed upload URL. Files uploaded to this 
-        endpoint will be stored on the local filesystem instead of the cloud.
+      description: Upload and process a media file.
       tags: [assets]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
       responses:
@@ -601,6 +600,79 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AssetGetOK" }
 
+  #
+  #                  888 888                   888    d8b
+  #                  888 888                   888    Y8P
+  #                  888 888                   888
+  #  .d8888b .d88b.  888 888  .d88b.   .d8888b 888888 888  .d88b.  88888b.  .d8888b
+  # d88P"   d88""88b 888 888 d8P  Y8b d88P"    888    888 d88""88b 888 "88b 88K
+  # 888     888  888 888 888 88888888 888      888    888 888  888 888  888 "Y8888b.
+  # Y88b.   Y88..88P 888 888 Y8b.     Y88b.    Y88b.  888 Y88..88P 888  888      X88
+  #  "Y8888P "Y88P"  888 888  "Y8888   "Y8888P  "Y888 888  "Y88P"  888  888  88888P'
+  #
+
+  /v1/collections:
+    post:
+      operationId: CollectionCreate
+      description: |
+        Create a collection for curating posts under the authenticated account.
+      tags: [collections]
+      requestBody: { $ref: "#/components/requestBodies/CollectionCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionCreateOK" }
+    get:
+      operationId: CollectionList
+      description: List all collections using the filtering options.
+      tags: [collections]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CollectionListOK" }
+
+  /v1/collections/{collection_id}:
+    get:
+      operationId: CollectionGet
+      description: |
+        Get a collection by its ID. Collections can be public or private so the
+        response will depend on which account is making the request and if the
+        target collection is public, private, owned or not owned by the account.
+      tags: [collections]
+      security: []
+      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionGetOK" }
+    patch:
+      operationId: CollectionUpdate
+      description: Update a collection owned by the authenticated account.
+      tags: [collections]
+      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/CollectionUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionUpdateOK" }
+  /v1/collections/{collection_id}/items/{post_id}:
+    put:
+      operationId: CollectionAddPost
+      description: |
+        Add a post to a collection. The collection must be owned by the account
+        making the request. The post can be any published post of any kind.
+      tags: [collections]
+      parameters:
+        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionAddPostOK" }
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -655,6 +727,14 @@ components:
       required: true
       schema:
         type: string
+
+    CollectionIDParam:
+      description: Unique collection ID.
+      name: collection_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
 
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
@@ -746,6 +826,16 @@ components:
           schema:
             type: string
             format: binary
+
+    CollectionCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CollectionInitialProps" }
+
+    CollectionUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CollectionMutableProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -930,6 +1020,44 @@ components:
           schema:
             type: string
             format: binary
+
+    CollectionCreateOK:
+      description: Collection created.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+
+    CollectionListOK:
+      description: Collection list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [threads]
+            properties:
+              collections: { $ref: "#/components/schemas/CollectionList" }
+
+    CollectionGetOK:
+      description: Collection information and content.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CollectionWithItems"
+
+    CollectionUpdateOK:
+      description: Collection updated.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+
+    CollectionAddPostOK:
+      description: Collection content added.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -1783,6 +1911,71 @@ components:
           type: number
         height:
           type: number
+    #
+    #  .d8888b.           888 888                   888    d8b
+    # d88P  Y88b          888 888                   888    Y8P
+    # 888    888          888 888                   888
+    # 888         .d88b.  888 888  .d88b.   .d8888b 888888 888  .d88b.  88888b.
+    # 888        d88""88b 888 888 d8P  Y8b d88P"    888    888 d88""88b 888 "88b
+    # 888    888 888  888 888 888 88888888 888      888    888 888  888 888  888
+    # Y88b  d88P Y88..88P 888 888 Y8b.     Y88b.    Y88b.  888 Y88..88P 888  888
+    #  "Y8888P"   "Y88P"  888 888  "Y8888   "Y8888P  "Y888 888  "Y88P"  888  888
+    #
+
+    Collection:
+      description: |
+        A collection is a group of threads owned by a user. It allows users to
+        curate their own lists of content from the site. Collections can only
+        contain root level posts (threads) with titles and slugs to link to.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/CollectionCommonProps"
+
+    CollectionWithItems:
+      description: |
+        The full properties of a collection, for rendering a single collection
+        somewhere where you can afford to show all the items in the collection.
+      type: object
+      required: [items]
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/CollectionCommonProps"
+        - required: [items]
+          properties:
+            items: { $ref: "#/components/schemas/ThreadList" }
+
+    CollectionCommonProps:
+      description: A reference to the collection
+      type: object
+      required: [name, description, owner]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        owner: { $ref: "#/components/schemas/ProfileReference" }
+
+    CollectionList:
+      type: array
+      items: { $ref: "#/components/schemas/Collection" }
+
+    CollectionInitialProps:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    CollectionMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
 
   securitySchemes:
     browser:
