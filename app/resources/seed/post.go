@@ -23,7 +23,7 @@ var (
 	Post_01_Welcome = thread.Thread{
 		ID:       post.ID(id("00000000000000000010")),
 		Title:    "Welcome to Storyden!",
-		Author:   post.Author{ID: Account_001_Odin.ID},
+		Author:   Account_001_Odin,
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -64,25 +64,25 @@ Storyden is still in development so please give the repository a watch if you're
 				ID:         post.ID(id("00000000000000001010")),
 				Body:       "first 😁",
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_004_Loki.ID},
+				Author:     Account_004_Loki,
 			},
 			{
 				ID:         post.ID(id("00000000000000002010")),
 				Body:       "Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?",
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_002_Frigg.ID},
+				Author:     Account_002_Frigg,
 			},
 			{
 				ID:         post.ID(id("00000000000000003010")),
 				Body:       "Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.",
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_001_Odin.ID},
+				Author:     Account_001_Odin,
 			},
 			{
 				ID:         post.ID(id("00000000000000004010")),
 				Body:       "What about images and stuff?",
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_008_Heimdallr.ID},
+				Author:     Account_008_Heimdallr,
 			},
 			{
 				ID: post.ID(id("00000000000000005010")),
@@ -91,19 +91,19 @@ Storyden is still in development so please give the repository a watch if you're
 ![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
 `,
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_004_Loki.ID},
+				Author:     Account_004_Loki,
 			},
 			{
 				ID:         post.ID(id("00000000000000006010")),
 				Body:       `how did you do that??`,
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_005_Þórr.ID},
+				Author:     Account_005_Þórr,
 			},
 			{
 				ID:         post.ID(id("00000000000000007010")),
 				Body:       `haha secret 😉`,
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_004_Loki.ID},
+				Author:     Account_004_Loki,
 			},
 			{
 				ID: post.ID(id("00000000000000008010")),
@@ -112,20 +112,20 @@ Storyden is still in development so please give the repository a watch if you're
 https://daringfireball.net/markdown
 `,
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_002_Frigg.ID},
+				Author:     Account_002_Frigg,
 			},
 			{
 				ID:         post.ID(id("00000000000000009010")),
 				Body:       "Thanks guys!",
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     post.Author{ID: Account_008_Heimdallr.ID},
+				Author:     Account_008_Heimdallr,
 			},
 		},
 	}
 	Post_02_HowToContribute = thread.Thread{
 		ID:       post.ID(id("00000000000000000020")),
 		Title:    "How to contribute",
-		Author:   post.Author{ID: Account_001_Odin.ID},
+		Author:   Account_001_Odin,
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -154,13 +154,13 @@ If I've missed anything, post in this thread and I'll add it here 😃
 				ID:         post.ID(id("00000000000000001020")),
 				Body:       "Is there a wiki?",
 				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     post.Author{ID: Account_006_Freyja.ID},
+				Author:     Account_006_Freyja,
 			},
 			{
 				ID:         post.ID(id("00000000000000002020")),
 				Body:       "Not yet but they're working on it!",
 				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     post.Author{ID: Account_002_Frigg.ID},
+				Author:     Account_002_Frigg,
 			},
 		},
 	}
@@ -168,7 +168,7 @@ If I've missed anything, post in this thread and I'll add it here 😃
 	Post_03_LoremIpsum = thread.Thread{
 		ID:       post.ID(id("00000000000000000030")),
 		Title:    "The lorem ipsum thread",
-		Author:   post.Author{ID: Account_005_Þórr.ID},
+		Author:   Account_005_Þórr,
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -180,19 +180,19 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 				ID:         post.ID(id("00000000000000001030")),
 				Body:       "ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01,
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     post.Author{ID: Account_006_Freyja.ID},
+				Author:     Account_006_Freyja,
 			},
 			{
 				ID:         post.ID(id("00000000000000002030")),
 				Body:       "That's pretty useful, here's mine:\n\n" + markdownTest02,
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     post.Author{ID: Account_007_Freyr.ID},
+				Author:     Account_007_Freyr,
 			},
 			{
 				ID:         post.ID(id("00000000000000003030")),
 				Body:       "nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"),
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     post.Author{ID: Account_004_Loki.ID},
+				Author:     Account_004_Loki,
 			},
 		},
 	}

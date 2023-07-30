@@ -74,9 +74,11 @@ type PostEdges struct {
 	Reacts []*React `json:"reacts,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
+	// Collections holds the value of the collections edge.
+	Collections []*Collection `json:"collections,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [10]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -174,6 +176,15 @@ func (e PostEdges) AssetsOrErr() ([]*Asset, error) {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
+}
+
+// CollectionsOrErr returns the Collections value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) CollectionsOrErr() ([]*Collection, error) {
+	if e.loadedTypes[9] {
+		return e.Collections, nil
+	}
+	return nil, &NotLoadedError{edge: "collections"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -356,6 +367,11 @@ func (po *Post) QueryReacts() *ReactQuery {
 // QueryAssets queries the "assets" edge of the Post entity.
 func (po *Post) QueryAssets() *AssetQuery {
 	return NewPostClient(po.config).QueryAssets(po)
+}
+
+// QueryCollections queries the "collections" edge of the Post entity.
+func (po *Post) QueryCollections() *CollectionQuery {
+	return NewPostClient(po.config).QueryCollections(po)
 }
 
 // Update returns a builder for updating this Post.

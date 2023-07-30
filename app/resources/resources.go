@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -32,6 +33,7 @@ func Build() fx.Option {
 			react.New,
 			notification.New,
 			post_search.New,
+			collection.New,
 		),
 	)
 }

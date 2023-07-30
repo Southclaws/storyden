@@ -26,7 +26,7 @@ type Thread struct {
 	Slug     string
 	Short    string
 	Pinned   bool
-	Author   post.Author
+	Author   account.Account
 	Tags     []string
 	Category category.Category
 	Status   post.Status
@@ -63,15 +63,11 @@ func FromModel(m *ent.Post) *Thread {
 		UpdatedAt: m.UpdatedAt,
 		DeletedAt: opt.NewPtr(m.DeletedAt),
 
-		Title:  m.Title,
-		Slug:   m.Slug,
-		Short:  m.Short,
-		Pinned: m.Pinned,
-		Author: post.Author{
-			ID:     account.AccountID(m.Edges.Author.ID),
-			Handle: m.Edges.Author.Handle,
-			Name:   m.Edges.Author.Name,
-		},
+		Title:    m.Title,
+		Slug:     m.Slug,
+		Short:    m.Short,
+		Pinned:   m.Pinned,
+		Author:   *account.FromModel(*m.Edges.Author),
 		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category: utils.Deref(category.FromModel(m.Edges.Category)),
 		Status:   post.NewStatusFromEnt(m.Status),

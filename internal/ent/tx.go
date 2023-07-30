@@ -20,6 +20,8 @@ type Tx struct {
 	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
+	// Collection is the client for interacting with the Collection builders.
+	Collection *CollectionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
@@ -167,6 +169,7 @@ func (tx *Tx) init() {
 	tx.Asset = NewAssetClient(tx.config)
 	tx.Authentication = NewAuthenticationClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
+	tx.Collection = NewCollectionClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.React = NewReactClient(tx.config)

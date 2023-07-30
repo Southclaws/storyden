@@ -20,10 +20,7 @@ import type {
 } from "./schemas";
 
 /**
- * If Storyden is not using S3 for file uploads, this is the fallback
-equivalent of S3's pre-signed upload URL. Files uploaded to this 
-endpoint will be stored on the local filesystem instead of the cloud.
-
+ * Upload and process a media file.
  */
 export const assetUpload = (assetUploadBody: AssetUploadBody) => {
   return fetcher<AssetUploadOKResponse>({

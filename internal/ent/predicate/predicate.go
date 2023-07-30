@@ -18,6 +18,9 @@ type Authentication func(*sql.Selector)
 // Category is the predicate function for category builders.
 type Category func(*sql.Selector)
 
+// Collection is the predicate function for collection builders.
+type Collection func(*sql.Selector)
+
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)
 

@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -348,6 +349,21 @@ func (pu *PostUpdate) AddAssets(a ...*Asset) *PostUpdate {
 	return pu.AddAssetIDs(ids...)
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (pu *PostUpdate) AddCollectionIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddCollectionIDs(ids...)
+	return pu
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (pu *PostUpdate) AddCollections(c ...*Collection) *PostUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pu.AddCollectionIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
@@ -480,6 +496,27 @@ func (pu *PostUpdate) RemoveAssets(a ...*Asset) *PostUpdate {
 		ids[i] = a[i].ID
 	}
 	return pu.RemoveAssetIDs(ids...)
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (pu *PostUpdate) ClearCollections() *PostUpdate {
+	pu.mutation.ClearCollections()
+	return pu
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (pu *PostUpdate) RemoveCollectionIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveCollectionIDs(ids...)
+	return pu
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (pu *PostUpdate) RemoveCollections(c ...*Collection) *PostUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pu.RemoveCollectionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -932,6 +969,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !pu.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1267,6 +1349,21 @@ func (puo *PostUpdateOne) AddAssets(a ...*Asset) *PostUpdateOne {
 	return puo.AddAssetIDs(ids...)
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (puo *PostUpdateOne) AddCollectionIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddCollectionIDs(ids...)
+	return puo
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (puo *PostUpdateOne) AddCollections(c ...*Collection) *PostUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return puo.AddCollectionIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
@@ -1399,6 +1496,27 @@ func (puo *PostUpdateOne) RemoveAssets(a ...*Asset) *PostUpdateOne {
 		ids[i] = a[i].ID
 	}
 	return puo.RemoveAssetIDs(ids...)
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (puo *PostUpdateOne) ClearCollections() *PostUpdateOne {
+	puo.mutation.ClearCollections()
+	return puo
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (puo *PostUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveCollectionIDs(ids...)
+	return puo
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (puo *PostUpdateOne) RemoveCollections(c ...*Collection) *PostUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return puo.RemoveCollectionIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -1874,6 +1992,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !puo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.CollectionsTable,
+			Columns: post.CollectionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

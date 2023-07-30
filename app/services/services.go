@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
+	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
@@ -26,6 +27,7 @@ func Build() fx.Option {
 		avatar.Build(),
 		asset.Build(),
 		thread_mark.Build(),
+		collection.Build(),
 		fx.Provide(avatar_gen.New),
 	)
 }

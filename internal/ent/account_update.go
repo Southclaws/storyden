@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -183,6 +184,21 @@ func (au *AccountUpdate) AddTags(t ...*Tag) *AccountUpdate {
 	return au.AddTagIDs(ids...)
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (au *AccountUpdate) AddCollectionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddCollectionIDs(ids...)
+	return au
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (au *AccountUpdate) AddCollections(c ...*Collection) *AccountUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.AddCollectionIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (au *AccountUpdate) AddAssetIDs(ids ...string) *AccountUpdate {
 	au.mutation.AddAssetIDs(ids...)
@@ -306,6 +322,27 @@ func (au *AccountUpdate) RemoveTags(t ...*Tag) *AccountUpdate {
 		ids[i] = t[i].ID
 	}
 	return au.RemoveTagIDs(ids...)
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (au *AccountUpdate) ClearCollections() *AccountUpdate {
+	au.mutation.ClearCollections()
+	return au
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (au *AccountUpdate) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveCollectionIDs(ids...)
+	return au
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (au *AccountUpdate) RemoveCollections(c ...*Collection) *AccountUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.RemoveCollectionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -647,6 +684,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !au.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -861,6 +943,21 @@ func (auo *AccountUpdateOne) AddTags(t ...*Tag) *AccountUpdateOne {
 	return auo.AddTagIDs(ids...)
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (auo *AccountUpdateOne) AddCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddCollectionIDs(ids...)
+	return auo
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (auo *AccountUpdateOne) AddCollections(c ...*Collection) *AccountUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.AddCollectionIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (auo *AccountUpdateOne) AddAssetIDs(ids ...string) *AccountUpdateOne {
 	auo.mutation.AddAssetIDs(ids...)
@@ -984,6 +1081,27 @@ func (auo *AccountUpdateOne) RemoveTags(t ...*Tag) *AccountUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return auo.RemoveTagIDs(ids...)
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (auo *AccountUpdateOne) ClearCollections() *AccountUpdateOne {
+	auo.mutation.ClearCollections()
+	return auo
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (auo *AccountUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveCollectionIDs(ids...)
+	return auo
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (auo *AccountUpdateOne) RemoveCollections(c ...*Collection) *AccountUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.RemoveCollectionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1348,6 +1466,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !auo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.CollectionsTable,
+			Columns: []string{account.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

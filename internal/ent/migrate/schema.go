@@ -98,6 +98,29 @@ var (
 		Columns:    CategoriesColumns,
 		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
 	}
+	// CollectionsColumns holds the columns for the "collections" table.
+	CollectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "account_collections", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// CollectionsTable holds the schema information for the "collections" table.
+	CollectionsTable = &schema.Table{
+		Name:       "collections",
+		Columns:    CollectionsColumns,
+		PrimaryKey: []*schema.Column{CollectionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collections_accounts_collections",
+				Columns:    []*schema.Column{CollectionsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// NotificationsColumns holds the columns for the "notifications" table.
 	NotificationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -254,6 +277,31 @@ var (
 			},
 		},
 	}
+	// CollectionPostsColumns holds the columns for the "collection_posts" table.
+	CollectionPostsColumns = []*schema.Column{
+		{Name: "collection_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// CollectionPostsTable holds the schema information for the "collection_posts" table.
+	CollectionPostsTable = &schema.Table{
+		Name:       "collection_posts",
+		Columns:    CollectionPostsColumns,
+		PrimaryKey: []*schema.Column{CollectionPostsColumns[0], CollectionPostsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collection_posts_collection_id",
+				Columns:    []*schema.Column{CollectionPostsColumns[0]},
+				RefColumns: []*schema.Column{CollectionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "collection_posts_post_id",
+				Columns:    []*schema.Column{CollectionPostsColumns[1]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// PostAssetsColumns holds the columns for the "post_assets" table.
 	PostAssetsColumns = []*schema.Column{
 		{Name: "post_id", Type: field.TypeString, Size: 20},
@@ -335,6 +383,7 @@ var (
 		AssetsTable,
 		AuthenticationsTable,
 		CategoriesTable,
+		CollectionsTable,
 		NotificationsTable,
 		PostsTable,
 		ReactsTable,
@@ -342,6 +391,7 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
+		CollectionPostsTable,
 		PostAssetsTable,
 		RoleAccountsTable,
 		TagPostsTable,
@@ -351,6 +401,7 @@ var (
 func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
+	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
@@ -359,6 +410,8 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
+	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
+	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
