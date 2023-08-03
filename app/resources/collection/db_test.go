@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/integration"
 )
 
-func TestGetCategories(t *testing.T) {
+func TestCollections(t *testing.T) {
 	defer integration.Test(t, nil, fx.Invoke(
 		func(
 			_ seed.Ready,
@@ -63,20 +63,20 @@ func TestGetCategories(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(got)
 
-			a.Len(got.Items, 2)
-			a.Equal(acc.Name, got.Items[0].Author)
+			r.Len(got.Items, 2)
+			a.Equal(acc.Name, got.Items[0].Author.Name)
 
 			got, err = repo.Update(ctx, coll.ID, collection.WithPostAdd(p2.ID))
 			r.NoError(err)
 
 			r.NotNil(got)
-			a.Len(got.Items, 3)
+			r.Len(got.Items, 3)
 
 			got, err = repo.Update(ctx, coll.ID, collection.WithPostRemove(p0.ID))
 			r.NoError(err)
 
 			r.NotNil(got)
-			a.Len(got.Items, 2)
+			r.Len(got.Items, 2)
 
 			err = repo.Delete(ctx, coll.ID)
 			r.NoError(err)

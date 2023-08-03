@@ -120,6 +120,18 @@ func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionW
 		Owner:       serialiseProfileReference(in.Owner),
 		Name:        in.Name,
 		Description: in.Description,
-		Items:       dt.Map(in.Items, serialiseThreadReference),
+		Items:       dt.Map(in.Items, serialiseCollectionItem),
+	}
+}
+
+func serialiseCollectionItem(in *collection.Item) openapi.CollectionItem {
+	return openapi.CollectionItem{
+		Id:        in.ID.String(),
+		CreatedAt: in.CreatedAt,
+		UpdatedAt: in.UpdatedAt,
+		Slug:      in.Slug,
+		Author:    serialiseProfileReference(in.Author),
+		Title:     in.Title,
+		Short:     in.Short,
 	}
 }

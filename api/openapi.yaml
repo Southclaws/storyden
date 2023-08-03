@@ -1943,7 +1943,7 @@ components:
         - $ref: "#/components/schemas/CollectionCommonProps"
         - required: [items]
           properties:
-            items: { $ref: "#/components/schemas/ThreadList" }
+            items: { $ref: "#/components/schemas/CollectionItemList" }
 
     CollectionCommonProps:
       description: A reference to the collection
@@ -1976,6 +1976,30 @@ components:
           type: string
         description:
           type: string
+
+    CollectionItemList:
+      type: array
+      items: { $ref: "#/components/schemas/CollectionItem" }
+
+    CollectionItem:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/CollectionItemCommonProps"
+
+    CollectionItemCommonProps:
+      type: object
+      required: [author, slug, title, short]
+      properties:
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        slug: { $ref: "#/components/schemas/ThreadMark" }
+        title:
+          type: string
+          example: Hello world!
+          description: The title of the thread.
+        short:
+          type: string
+          description: |
+            A short version of the thread's body text for use in previews.
 
   securitySchemes:
     browser:

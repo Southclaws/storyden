@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 )
@@ -27,4 +28,12 @@ func GetAccountID(ctx context.Context) (account.AccountID, error) {
 	}
 
 	return account.AccountID{}, fault.Wrap(ErrNoAccountInContext, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
+}
+
+func GetOptAccountID(ctx context.Context) opt.Optional[account.AccountID] {
+	if auth, ok := ctx.Value(contextKey).(account.AccountID); ok {
+		return opt.New(auth)
+	}
+
+	return opt.NewEmpty[account.AccountID]()
 }

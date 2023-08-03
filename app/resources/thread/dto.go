@@ -4,11 +4,13 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
@@ -22,23 +24,24 @@ type Thread struct {
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
 
-	Title    string
-	Slug     string
-	Short    string
-	Pinned   bool
-	Author   account.Account
-	Tags     []string
-	Category category.Category
-	Status   post.Status
-	Posts    []*reply.Reply
-	Reacts   []*react.React
-	Meta     map[string]any
-	Assets   []*asset.Asset
+	Title       string
+	Slug        string
+	Short       string
+	Pinned      bool
+	Author      account.Account
+	Tags        []string
+	Category    category.Category
+	Status      post.Status
+	Posts       []*reply.Reply
+	Reacts      []*react.React
+	Meta        map[string]any
+	Assets      []*asset.Asset
+	Collections []*collection.Collection
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func FromModel(m *ent.Post) *Thread {
+func FromModel(m *ent.Post) (*Thread, error) {
 	transform := func(v *ent.Post) *reply.Reply {
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
@@ -57,23 +60,33 @@ func FromModel(m *ent.Post) *Thread {
 		posts = append(posts, dt.Map(p, transform)...)
 	}
 
+	collectionsEdge := opt.NewIf(m.Edges.Collections, func(c []*ent.Collection) bool { return c != nil })
+
+	collections, err := opt.MapErr(collectionsEdge, func(c []*ent.Collection) ([]*collection.Collection, error) {
+		return dt.MapErr(c, collection.FromModel)
+	})
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	return &Thread{
 		ID:        post.ID(m.ID),
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 		DeletedAt: opt.NewPtr(m.DeletedAt),
 
-		Title:    m.Title,
-		Slug:     m.Slug,
-		Short:    m.Short,
-		Pinned:   m.Pinned,
-		Author:   *account.FromModel(*m.Edges.Author),
-		Tags:     dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
-		Category: utils.Deref(category.FromModel(m.Edges.Category)),
-		Status:   post.NewStatusFromEnt(m.Status),
-		Posts:    posts,
-		Reacts:   dt.Map(m.Edges.Reacts, react.FromModel),
-		Meta:     m.Metadata,
-		Assets:   dt.Map(m.Edges.Assets, asset.FromModel),
-	}
+		Title:       m.Title,
+		Slug:        m.Slug,
+		Short:       m.Short,
+		Pinned:      m.Pinned,
+		Author:      *account.FromModel(*m.Edges.Author),
+		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
+		Category:    utils.Deref(category.FromModel(m.Edges.Category)),
+		Status:      post.NewStatusFromEnt(m.Status),
+		Posts:       posts,
+		Reacts:      dt.Map(m.Edges.Reacts, react.FromModel),
+		Meta:        m.Metadata,
+		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
+		Collections: collections.OrZero(),
+	}, nil
 }

@@ -5,11 +5,11 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -24,18 +24,10 @@ type Collection struct {
 	Owner       account.Account
 	Name        string
 	Description string
-	Items       []*thread.Thread
+	Items       []*Item
 }
 
 func (*Collection) GetResourceName() string { return "collection" }
-
-type Item struct {
-	ID     post.ID
-	Slug   string
-	Author string
-	Title  string
-	Short  string
-}
 
 func FromModel(c *ent.Collection) (*Collection, error) {
 	acc, err := c.Edges.OwnerOrErr()
@@ -43,15 +35,11 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	posts, err := c.Edges.PostsOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
+	posts := opt.NewIf(c.Edges.Posts, func(p []*ent.Post) bool { return p != nil })
 
-	items := dt.Map(posts, thread.FromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
+	items := opt.Map[[]*ent.Post, []*Item](posts, func(p []*ent.Post) []*Item {
+		return dt.Map(p, ItemFromModel)
+	})
 
 	return &Collection{
 		ID:          CollectionID(c.ID),
@@ -60,6 +48,28 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		Owner:       *account.FromModel(*acc),
 		Name:        c.Name,
 		Description: c.Description,
-		Items:       items,
+		Items:       items.Or([]*Item{}),
 	}, nil
+}
+
+type Item struct {
+	ID        post.ID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Slug      string
+	Author    account.Account
+	Title     string
+	Short     string
+}
+
+func ItemFromModel(p *ent.Post) *Item {
+	return &Item{
+		ID:        post.ID(p.ID),
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+		Slug:      p.Slug,
+		Author:    *account.FromModel(*p.Edges.Author),
+		Title:     p.Title,
+		Short:     p.Short,
+	}
 }
