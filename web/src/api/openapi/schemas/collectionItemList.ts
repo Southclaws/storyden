@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CollectionItemList } from "./collectionItemList";
+import type { CollectionItem } from "./collectionItem";
 
-export type CollectionWithItemsAllOf = {
-  items: CollectionItemList;
-};
+export type CollectionItemList = CollectionItem[];

@@ -110,7 +110,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(p), nil
+	return FromModel(p)
 }
 
 // func (d *database) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
@@ -157,7 +157,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(p), nil
+	return FromModel(p)
 }
 
 func (d *database) List(
@@ -188,7 +188,10 @@ func (d *database) List(
 		Limit(max).
 		WithCategory().
 		WithAuthor().
-		WithAssets()
+		WithAssets().
+		WithCollections(func(cq *ent.CollectionQuery) {
+			cq.WithOwner()
+		})
 
 	for _, fn := range opts {
 		fn(query)
@@ -204,7 +207,12 @@ func (d *database) List(
 	// 	return nil, err
 	// }
 
-	return dt.Map(result, FromModel), nil
+	threads, err := dt.MapErr(result, FromModel)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return threads, nil
 }
 
 func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
@@ -241,7 +249,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(post), nil
+	return FromModel(post)
 }
 
 func (d *database) Delete(ctx context.Context, id post.ID) error {
