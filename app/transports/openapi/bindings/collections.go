@@ -56,7 +56,7 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 
 	return openapi.CollectionList200JSONResponse{
 		CollectionListOKJSONResponse: openapi.CollectionListOKJSONResponse{
-			Collections: &list,
+			Collections: list,
 		},
 	}, nil
 }

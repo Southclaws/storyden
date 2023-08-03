@@ -1034,7 +1034,7 @@ components:
         application/json:
           schema:
             type: object
-            required: [threads]
+            required: [collections]
             properties:
               collections: { $ref: "#/components/schemas/CollectionList" }
 

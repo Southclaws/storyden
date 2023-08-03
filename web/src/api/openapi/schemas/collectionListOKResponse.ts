@@ -8,5 +8,5 @@
 import type { CollectionList } from "./collectionList";
 
 export type CollectionListOKResponse = {
-  collections?: CollectionList;
+  collections: CollectionList;
 };
