@@ -1,5 +1,3 @@
-import { VStack } from "@chakra-ui/react";
-
 import { Unready } from "src/components/Unready";
 
 import { Collection } from "./components/Collection";
@@ -10,9 +8,5 @@ export function CollectionScreen(props: Props) {
 
   if (!data) return <Unready {...error} />;
 
-  return (
-    <VStack alignItems="start">
-      <Collection {...data} />
-    </VStack>
-  );
+  return <Collection {...data} />;
 }

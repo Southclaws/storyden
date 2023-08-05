@@ -1,8 +1,9 @@
 import { HStack, Text } from "@chakra-ui/react";
-import { Anchor } from "../site/Anchor";
+
+import { useSession } from "src/auth";
 
 import { Avatar } from "../Avatar/Avatar";
-import { useSession } from "src/auth";
+import { Anchor } from "../site/Anchor";
 
 type Props = {
   handle: string;

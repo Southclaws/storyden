@@ -1,4 +1,4 @@
-import { Flex, HStack, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
@@ -21,28 +21,12 @@ export function Byline(props: Props) {
       : undefined;
 
   return (
-    <Flex
-      alignItems={{
-        // base: "start",
-        md: "center",
-      }}
-      gap={1}
-      fontSize="sm"
-      color="blackAlpha.700"
-      flexDir={{
-        // base: "column",
-        md: "row",
-      }}
-    >
+    <Flex alignItems="center" fontSize="sm" color="gray.500" gap={0}>
       <ProfileReference handle={props.author} />
-
-      <HStack>
-        <Text as="span">•</Text>
-      </HStack>
-
-      <HStack>
-        <Timestamp created={created} updated={updated} href={props.href} />
-      </HStack>
+      <Text as="span" pr={2}>
+        •
+      </Text>
+      <Timestamp created={created} updated={updated} href={props.href} />
     </Flex>
   );
 }

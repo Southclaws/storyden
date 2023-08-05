@@ -1,7 +1,8 @@
 import { Unready } from "src/components/Unready";
+
+import { Content } from "./components/Content/Content";
+import { ProfileContext } from "./context";
 import { Props, useProfileScreen } from "./useProfileScreen";
-import { Profile } from "./components/Profile";
-import { Flex } from "@chakra-ui/react";
 
 export function ProfileScreen(props: Props) {
   const profile = useProfileScreen(props);
@@ -9,8 +10,8 @@ export function ProfileScreen(props: Props) {
   if (!profile.ready) return <Unready {...profile.error} />;
 
   return (
-    <Flex py={4}>
-      <Profile {...profile.data} />
-    </Flex>
+    <ProfileContext.Provider value={profile.state}>
+      <Content {...profile.data} />
+    </ProfileContext.Provider>
   );
 }
