@@ -97,6 +97,7 @@ func serialiseProfileReference(a account.Account) openapi.ProfileReference {
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),
 		Name:   a.Name,
+		Admin:  a.Admin,
 	}
 }
 

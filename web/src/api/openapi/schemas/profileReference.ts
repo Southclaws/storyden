@@ -16,4 +16,5 @@ export interface ProfileReference {
   id: Identifier;
   handle: AccountHandle;
   name: AccountName;
+  admin: boolean;
 }

@@ -1222,11 +1222,13 @@ components:
     ProfileReference:
       type: object
       description: A minimal reference to an account.
-      required: [id, handle, name]
+      required: [id, handle, name, admin]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
+        admin:
+          type: boolean
 
     ThreadTitle:
       type: string
