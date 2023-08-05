@@ -59,6 +59,7 @@ export * from "./collectionItemList";
 export * from "./collectionList";
 export * from "./collectionListOKResponse";
 export * from "./collectionMutableProps";
+export * from "./collectionRemovePostOKResponse";
 export * from "./collectionUpdateBody";
 export * from "./collectionUpdateOKResponse";
 export * from "./collectionWithItems";

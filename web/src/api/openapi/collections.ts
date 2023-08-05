@@ -16,6 +16,7 @@ import type {
   CollectionCreateOKResponse,
   CollectionGetOKResponse,
   CollectionListOKResponse,
+  CollectionRemovePostOKResponse,
   CollectionUpdateBody,
   CollectionUpdateOKResponse,
   InternalServerErrorResponse,
@@ -163,5 +164,17 @@ export const collectionAddPost = (collectionId: string, postId: string) => {
   return fetcher<CollectionAddPostOKResponse>({
     url: `/v1/collections/${collectionId}/items/${postId}`,
     method: "put",
+  });
+};
+
+/**
+ * Remove a post from a collection. The collection must be owned by the
+account making the request.
+
+ */
+export const collectionRemovePost = (collectionId: string, postId: string) => {
+  return fetcher<CollectionRemovePostOKResponse>({
+    url: `/v1/collections/${collectionId}/items/${postId}`,
+    method: "delete",
   });
 };

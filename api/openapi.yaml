@@ -673,6 +673,21 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionAddPostOK" }
+    delete:
+      operationId: CollectionRemovePost
+      description: |
+        Remove a post from a collection. The collection must be owned by the
+        account making the request.
+      tags: [collections]
+      parameters:
+        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -1053,6 +1068,13 @@ components:
             $ref: "#/components/schemas/Collection"
 
     CollectionAddPostOK:
+      description: Collection content added.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+
+    CollectionRemovePostOK:
       description: Collection content added.
       content:
         application/json:
@@ -1749,6 +1771,7 @@ components:
             - reacts
             - meta
             - assets
+            - collections
           properties:
             title:
               type: string
@@ -1778,6 +1801,7 @@ components:
               $ref: "#/components/schemas/ReactList"
             meta: { $ref: "#/components/schemas/Metadata" }
             assets: { $ref: "#/components/schemas/AssetList" }
+            collections: { $ref: "#/components/schemas/CollectionList" }
 
     ThreadList:
       type: array

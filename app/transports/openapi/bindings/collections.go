@@ -101,6 +101,19 @@ func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.Col
 	}, nil
 }
 
+func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.CollectionRemovePostRequestObject) (openapi.CollectionRemovePostResponseObject, error) {
+	c, err := i.collection_svc.Remove(ctx,
+		collection.CollectionID(deserialiseID(request.CollectionId)),
+		post.ID(deserialiseID(request.PostId)))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.CollectionRemovePost200JSONResponse{
+		CollectionRemovePostOKJSONResponse: openapi.CollectionRemovePostOKJSONResponse(serialiseCollection(c)),
+	}, nil
+}
+
 func serialiseCollection(in *collection.Collection) openapi.Collection {
 	return openapi.Collection{
 		Id:          in.ID.String(),

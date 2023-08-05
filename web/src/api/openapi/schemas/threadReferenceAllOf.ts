@@ -7,6 +7,7 @@
  */
 import type { AssetList } from "./assetList";
 import type { CategoryReference } from "./categoryReference";
+import type { CollectionList } from "./collectionList";
 import type { Metadata } from "./metadata";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
@@ -30,4 +31,5 @@ export type ThreadReferenceAllOf = {
   reacts: ReactList;
   meta: Metadata;
   assets: AssetList;
+  collections: CollectionList;
 };
