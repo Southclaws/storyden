@@ -11,7 +11,7 @@ import type { TagList } from "./tagList";
 
 export type AccountAllOf = {
   handle: AccountHandle;
-  name?: AccountName;
+  name: AccountName;
   bio?: string;
   interests?: TagList;
 };
