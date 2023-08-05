@@ -8,12 +8,18 @@ import { Anchor } from "../site/Anchor";
 type Props = {
   handle: string;
   showHandle?: boolean;
+  size?: "sm" | "lg";
 };
 
-export function ProfileReference({ handle, showHandle = true }: Props) {
+export function ProfileReference({
+  handle,
+  showHandle = true,
+  size = "sm",
+}: Props) {
   const account = useSession();
   const self = account?.handle === handle;
   const title = self ? `Your profile` : `${handle}'s profile`;
+  const large = size === "lg";
 
   return (
     <Anchor
@@ -25,8 +31,8 @@ export function ProfileReference({ handle, showHandle = true }: Props) {
       title={title}
     >
       <HStack>
-        <Avatar handle={handle} />
-        {showHandle && <Text>@{handle}</Text>}
+        <Avatar handle={handle} width={large ? 8 : 6} />
+        {showHandle && <Text fontSize={large ? "md" : "sm"}>@{handle}</Text>}
       </HStack>
     </Anchor>
   );
