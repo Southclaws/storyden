@@ -24,7 +24,7 @@ export function CollectionItem(props: { item: CollectionItem }) {
       <Flex justifyContent="space-between">
         <Byline
           href={permalink}
-          author={props.item.author.handle}
+          author={props.item.author}
           time={new Date(props.item.createdAt)}
           updated={new Date(props.item.updatedAt)}
           //   more={<ThreadMenu {...props.item} />}

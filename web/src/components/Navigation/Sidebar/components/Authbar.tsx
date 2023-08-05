@@ -12,7 +12,7 @@ export function Authbar() {
   return (
     <HStack alignItems="center">
       <VStack alignItems="start">
-        <ProfileReference handle={account.handle} size="lg" />
+        <ProfileReference profileReference={account} size="lg" />
         <HStack>
           <Logout />
           <Settings />

@@ -27,7 +27,7 @@ export function PostView(props: Props) {
     <Flex id={props.id} flexDir="column" gap={2}>
       <Byline
         href={`#${props.id}`}
-        author={props.author.handle}
+        author={props.author}
         time={new Date(props.createdAt)}
         updated={new Date(props.updatedAt)}
         more={<PostMenu {...props} />}

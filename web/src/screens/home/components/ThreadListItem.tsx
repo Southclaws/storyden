@@ -36,7 +36,7 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
       <Flex justifyContent="space-between">
         <Byline
           href={permalink}
-          author={props.thread.author.handle}
+          author={props.thread.author}
           time={new Date(props.thread.createdAt)}
           updated={new Date(props.thread.updatedAt)}
         />

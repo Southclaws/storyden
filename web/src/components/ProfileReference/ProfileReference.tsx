@@ -1,24 +1,26 @@
-import { HStack, Text } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 
 import { useSession } from "src/auth";
 
+import { ProfileReference } from "src/api/openapi/schemas";
 import { Avatar } from "../Avatar/Avatar";
 import { Anchor } from "../site/Anchor";
+import { Handle } from "./Handle";
 
-type Props = {
-  handle: string;
+type Props =  {
+  profileReference: ProfileReference;
   showHandle?: boolean;
   size?: "sm" | "lg";
 };
 
 export function ProfileReference({
-  handle,
+  profileReference,
   showHandle = true,
   size = "sm",
 }: Props) {
   const account = useSession();
-  const self = account?.handle === handle;
-  const title = self ? `Your profile` : `${handle}'s profile`;
+  const self = account?.id === profileReference.id;
+  const title = self ? `Your profile` : `${profileReference.handle}'s profile`;
   const large = size === "lg";
 
   return (
@@ -27,12 +29,12 @@ export function ProfileReference({
       pr={showHandle ? 2 : 1}
       borderRadius="full"
       _hover={{ backgroundColor: "blackAlpha.100" }}
-      href={`/p/${handle}`}
+      href={`/p/${profileReference.handle}`}
       title={title}
     >
       <HStack>
-        <Avatar handle={handle} width={large ? 8 : 6} />
-        {showHandle && <Text fontSize={large ? "md" : "sm"}>@{handle}</Text>}
+        <Avatar handle={profileReference.handle} width={large ? 8 : 6} />
+        {showHandle && <Handle profileReference={profileReference} size={size} />}
       </HStack>
     </Anchor>
   );
