@@ -9,12 +9,14 @@ import {
 import NextLink from "next/link";
 
 import { ThreadReference } from "src/api/openapi/schemas";
+import { useSession } from "src/auth";
 import { CollectionMenu } from "src/components/CollectionMenu/CollectionMenu";
 import { Byline } from "src/screens/thread/components/Byline";
 
 import { ThreadMenu } from "./ThreadMenu/ThreadMenu";
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
+  const session = useSession();
   const permalink = `/t/${props.thread.slug}`;
 
   return (
@@ -42,7 +44,7 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
         {/* Tags list */}
 
         <HStack>
-          <CollectionMenu thread={props.thread} />
+          {session && <CollectionMenu thread={props.thread} />}
           <ThreadMenu {...props.thread} />
         </HStack>
       </Flex>
