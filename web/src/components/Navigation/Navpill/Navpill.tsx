@@ -1,4 +1,5 @@
 import { HStack, Input, SlideFade } from "@chakra-ui/react";
+
 import {
   Bell,
   Close,
@@ -10,9 +11,10 @@ import {
   Settings,
 } from "src/components/Action/Action";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
+import { Toolpill } from "src/components/Toolpill/Toolpill";
+
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";
-import { Toolpill } from "src/components/Toolpill/Toolpill";
 import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
@@ -62,7 +64,7 @@ export function Navpill() {
         <HStack gap={4} w="full" justifyContent="space-between">
           {isExpanded ? (
             <>
-              <ProfileReference handle={account.handle} showHandle={false} />
+              <ProfileReference profileReference={account} showHandle={false} />
 
               <Input
                 variant="outline"
@@ -77,7 +79,7 @@ export function Navpill() {
             </>
           ) : (
             <>
-              <ProfileReference handle={account.handle} showHandle={false} />
+              <ProfileReference profileReference={account} showHandle={false} />
               <Home />
               <Create />
               <Bell />

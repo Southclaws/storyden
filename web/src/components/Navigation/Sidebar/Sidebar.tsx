@@ -1,5 +1,7 @@
 import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
+
 import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
+
 import { Authbar } from "./components/Authbar";
 import { CategoryList } from "./components/CategoryList";
 import { Title } from "./components/Title";
@@ -46,8 +48,6 @@ export function Sidebar() {
               <CategoryList />
             </Box>
           </VStack>
-
-          <Divider />
 
           <VStack alignItems="start">
             <Authbar />
