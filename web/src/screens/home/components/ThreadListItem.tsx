@@ -1,8 +1,18 @@
-import { Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react";
-import { ThreadReference } from "src/api/openapi/schemas";
-import { Byline } from "src/screens/thread/components/Byline";
-import { ThreadMenu } from "./ThreadMenu/ThreadMenu";
+import {
+  Flex,
+  HStack,
+  Heading,
+  LinkBox,
+  LinkOverlay,
+  Text,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
+
+import { ThreadReference } from "src/api/openapi/schemas";
+import { CollectionMenu } from "src/components/CollectionMenu/CollectionMenu";
+import { Byline } from "src/screens/thread/components/Byline";
+
+import { ThreadMenu } from "./ThreadMenu/ThreadMenu";
 
 export function ThreadListItem(props: { thread: ThreadReference }) {
   const permalink = `/t/${props.thread.slug}`;
@@ -27,10 +37,14 @@ export function ThreadListItem(props: { thread: ThreadReference }) {
           author={props.thread.author.handle}
           time={new Date(props.thread.createdAt)}
           updated={new Date(props.thread.updatedAt)}
-          more={<ThreadMenu {...props.thread} />}
         />
 
         {/* Tags list */}
+
+        <HStack>
+          <CollectionMenu thread={props.thread} />
+          <ThreadMenu {...props.thread} />
+        </HStack>
       </Flex>
     </Flex>
   );

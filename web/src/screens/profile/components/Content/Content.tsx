@@ -26,8 +26,8 @@ export function Content(props: PublicProfile) {
     <VStack alignItems="start" w="full">
       <Tabs width="full" variant="soft-rounded">
         <TabList>
-          <Tab>Threads</Tab>
           <Tab>Posts</Tab>
+          <Tab>Replies</Tab>
           <Tab>Collections</Tab>
         </TabList>
         <TabPanels>
