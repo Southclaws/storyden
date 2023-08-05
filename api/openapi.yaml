@@ -1590,7 +1590,7 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [handle, id]
+        - required: [handle, name]
           properties:
             handle:
               $ref: "#/components/schemas/AccountHandle"
