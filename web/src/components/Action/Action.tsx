@@ -10,12 +10,14 @@ import {
   ArrowLeftIcon,
   Bars3Icon,
   BellIcon,
+  BookmarkIcon,
   CloudArrowUpIcon,
   EllipsisHorizontalIcon,
   HomeIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
 import { LoginIcon } from "../graphics/LoginIcon";
@@ -246,6 +248,36 @@ export const More = forwardRef(
         aria-label={al ?? "more"}
         {...props}
         icon={<EllipsisHorizontalIcon width="1.4em" />}
+      />
+    );
+  }
+);
+
+export const Bookmark = forwardRef(
+  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+    return (
+      <ActionButton
+        ref={ref}
+        size="sm"
+        title="Save to collection"
+        aria-label={al ?? "save"}
+        {...props}
+        icon={<BookmarkIcon width="1.4em" />}
+      />
+    );
+  }
+);
+
+export const BookmarkSolid = forwardRef(
+  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+    return (
+      <ActionButton
+        ref={ref}
+        size="sm"
+        title="Save to collection"
+        aria-label={al ?? "save"}
+        {...props}
+        icon={<BookmarkSolidIcon width="1.4em" />}
       />
     );
   }

@@ -1,5 +1,6 @@
 import { Flex, HStack, Text } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
+
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 import { Timestamp } from "src/components/Timestamp";
 import { formatDistanceDefaults } from "src/utils/date";
@@ -20,32 +21,28 @@ export function Byline(props: Props) {
       : undefined;
 
   return (
-    <HStack w="full" justifyContent="space-between">
-      <Flex
-        alignItems={{
-          // base: "start",
-          md: "center",
-        }}
-        gap={1}
-        fontSize="sm"
-        color="blackAlpha.700"
-        flexDir={{
-          // base: "column",
-          md: "row",
-        }}
-      >
-        <ProfileReference handle={props.author} />
+    <Flex
+      alignItems={{
+        // base: "start",
+        md: "center",
+      }}
+      gap={1}
+      fontSize="sm"
+      color="blackAlpha.700"
+      flexDir={{
+        // base: "column",
+        md: "row",
+      }}
+    >
+      <ProfileReference handle={props.author} />
 
-        <HStack>
-          <Text as="span">•</Text>
-        </HStack>
+      <HStack>
+        <Text as="span">•</Text>
+      </HStack>
 
-        <HStack>
-          <Timestamp created={created} updated={updated} href={props.href} />
-        </HStack>
-      </Flex>
-
-      {props.more}
-    </HStack>
+      <HStack>
+        <Timestamp created={created} updated={updated} href={props.href} />
+      </HStack>
+    </Flex>
   );
 }
