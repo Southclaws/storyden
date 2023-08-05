@@ -1,4 +1,5 @@
-import { useToast } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
+import { KeyboardEvent, MouseEvent, useState } from "react";
 import { mutate } from "swr";
 
 import {
@@ -22,8 +23,19 @@ type CollectionState = {
 
 export function useCollectionMenu(props: Props) {
   const account = useSession();
-  const toast = useToast();
   const collectionList = useCollectionList();
+  const [multiSelect, setMultiSelect] = useState(false);
+  const [selected, setSelected] = useState(0);
+
+  // called when we want to reset the menu's state.
+  const onReset = () => {
+    setMultiSelect(false);
+    setSelected(0);
+  };
+
+  const { isOpen, onOpen, onClose, onToggle } = useDisclosure({
+    onClose: onReset,
+  });
 
   const postCollections = new Set(props.thread.collections.map((c) => c.id));
   const isAlreadySaved = Boolean(
@@ -37,16 +49,32 @@ export function useCollectionMenu(props: Props) {
       hasPost: postCollections.has(c.id),
     })) ?? [];
 
-  const onSelect = (c: CollectionState) => async () => {
-    if (postCollections.has(c.id)) {
-      await collectionRemovePost(c.id, props.thread.id);
-      toast({ title: `Removed from ${c.name}` });
-    } else {
-      await collectionAddPost(c.id, props.thread.id);
-      toast({ title: `Added to ${c.name}` });
+  const onSelect =
+    (c: CollectionState) => async (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.shiftKey) {
+        setMultiSelect(true);
+      }
+
+      if (postCollections.has(c.id)) {
+        await collectionRemovePost(c.id, props.thread.id);
+      } else {
+        await collectionAddPost(c.id, props.thread.id);
+      }
+      await mutate(getThreadListKey({}));
+
+      setSelected(selected + 1);
+    };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.shiftKey) setMultiSelect(true);
+  };
+  const onKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!e.shiftKey && multiSelect) {
+      setMultiSelect(false);
+      if (selected > 0) {
+        onToggle();
+      }
     }
-    console.log(getThreadListKey());
-    await mutate(getThreadListKey({}));
   };
 
   return {
@@ -54,5 +82,11 @@ export function useCollectionMenu(props: Props) {
     collections: collections,
     isAlreadySaved,
     onSelect,
+    onKeyDown,
+    onKeyUp,
+    multiSelect,
+    isOpen,
+    onOpen,
+    onClose,
   };
 }
