@@ -1,45 +1,30 @@
-import {
-  Box,
-  Divider,
-  Flex,
-  Heading,
-  LinkBox,
-  LinkOverlay,
-  ListItem,
-  OrderedList,
-  VStack,
-} from "@chakra-ui/react";
-import Link from "next/link";
+import { Divider, OrderedList, VStack } from "@chakra-ui/react";
+import { Fragment } from "react";
 
 import { Collection } from "src/api/openapi/schemas";
-import { ContentViewer } from "src/components/ContentViewer/ContentViewer";
+
+import { useProfileContext } from "../../context";
 
 import { CollectionCreate } from "./CollectionCreate/CollectionCreate";
+import { CollectionListItem } from "./CollectionListItem";
 
 type Props = {
   collections: Collection[];
 };
 export function CollectionList(props: Props) {
+  const { isSelf } = useProfileContext();
+
   return (
-    <VStack alignItems="end">
-      <CollectionCreate />
+    <VStack alignItems="start">
+      {/* TODO: Actually design this lol */}
+      {isSelf && <CollectionCreate />}
 
       <OrderedList gap={4} display="flex" flexDir="column" width="full" m={0}>
         {props.collections.map((c) => (
-          <LinkBox key={c.id} as="article">
+          <Fragment key={c.id}>
             <Divider />
-            <ListItem key={c.id} listStyleType="none">
-              <Flex id={c.id} flexDir="column" gap={1}>
-                <LinkOverlay
-                  as={Link}
-                  href={`/p/${c.owner.handle}/collections/${c.id}`}
-                >
-                  <Heading size="md">{c.name}</Heading>
-                </LinkOverlay>
-                <ContentViewer value={c.description} />
-              </Flex>
-            </ListItem>
-          </LinkBox>
+            <CollectionListItem {...c} />
+          </Fragment>
         ))}
       </OrderedList>
     </VStack>

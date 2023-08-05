@@ -1,17 +1,18 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { PropsWithChildren } from "react";
 
 import { Unready } from "src/components/Unready";
-import { ProfileScreen } from "src/screens/profile/ProfileScreen";
+import { ProfileLayout } from "src/screens/profile/ProfileLayout";
 
 import { ParamSchema } from "./utils";
 
-export default function Page() {
+export default function Layout({ children }: PropsWithChildren) {
   const params = useParams();
   const { handle } = ParamSchema.parse(params);
 
   if (!handle) return <Unready />;
 
-  return <ProfileScreen handle={handle} />;
+  return <ProfileLayout handle={handle}>{children}</ProfileLayout>;
 }
