@@ -147,13 +147,21 @@ export function Dashboard({ href = "/dashboard", ...props }: WithOptionalURL) {
   );
 }
 
-export function Settings({ href = "/settings", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} title="Settings" {...props}>
-      <AdjustmentsHorizontalIcon width="1.25em" />
-    </Action>
-  );
-}
+export const Settings = forwardRef(
+  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+    return (
+      <ActionButton
+        ref={ref}
+        title="Settings"
+        size="sm"
+        aria-label={al ?? "settings"}
+        width="1.4em"
+        {...props}
+        icon={<AdjustmentsHorizontalIcon width="1.4em" />}
+      />
+    );
+  }
+);
 
 export type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
   "aria-label"?: string | undefined;
