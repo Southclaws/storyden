@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@chakra-ui/react";
 
 import { useSession } from "src/auth";
-import { Logout, Settings } from "src/components/Action/Action";
+import { Logout } from "src/components/Action/Action";
 import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 
 export function Authbar() {
@@ -15,7 +15,8 @@ export function Authbar() {
         <ProfileReference profileReference={account} size="lg" />
         <HStack>
           <Logout />
-          <Settings />
+          {/* NOTE: no settings yet lol */}
+          {/* <SettingsMenu /> */}
         </HStack>
       </VStack>
     </HStack>

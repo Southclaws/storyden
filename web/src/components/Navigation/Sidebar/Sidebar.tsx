@@ -3,7 +3,7 @@ import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
 import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
 
 import { Authbar } from "./components/Authbar";
-import { CategoryList } from "./components/CategoryList";
+import { CategoryList } from "./components/CategoryList/CategoryList";
 import { Title } from "./components/Title";
 import { Toolbar } from "./components/Toolbar";
 

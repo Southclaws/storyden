@@ -1,6 +1,7 @@
 import { useSearchParams } from "next/navigation";
-import { useGetInfo } from "src/api/openapi/misc";
 import { z } from "zod";
+
+import { useGetInfo } from "src/api/openapi/misc";
 
 // The sidebar width is shared between two components which must use the exact
 // same values. The reason for this is the sidebar is position: fixed, which
