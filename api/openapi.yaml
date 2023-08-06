@@ -387,6 +387,15 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/CategoryListOK" }
+    patch:
+      operationId: CategoryUpdateOrder
+      description: Update the sort order of categories.
+      security: []
+      tags: [categories]
+      requestBody: { $ref: "#/components/requestBodies/CategoryUpdateOrder" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/CategoryListOK" }
 
   #
   # 888    888                                    888
@@ -805,6 +814,11 @@ components:
           schema:
             type: string
             format: binary
+
+    CategoryUpdateOrder:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryIdentifierList" }
 
     ThreadCreate:
       content:
@@ -1592,7 +1606,7 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [handle, name]
+        - required: [handle, name, admin]
           properties:
             handle:
               $ref: "#/components/schemas/AccountHandle"
@@ -1602,6 +1616,8 @@ components:
               type: string
             interests:
               $ref: "#/components/schemas/TagList"
+            admin:
+              type: boolean
 
     AccountMutableProps:
       type: object
@@ -1662,20 +1678,15 @@ components:
     Category:
       type: object
       allOf:
-        - $ref: "#/components/schemas/CategoryMetadata"
+        - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/CategoryCommon"
         - $ref: "#/components/schemas/CategoryAdditional"
 
     CategoryReference:
       type: object
       allOf:
-        - $ref: "#/components/schemas/CategoryMetadata"
+        - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/CategoryCommon"
-
-    CategoryMetadata:
-      type: object
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
 
     CategoryCommon:
       type: object
@@ -1716,6 +1727,10 @@ components:
         categories:
           type: array
           items: { $ref: "#/components/schemas/Category" }
+
+    CategoryIdentifierList:
+      type: array
+      items: { $ref: "#/components/schemas/Identifier" }
 
     #
     # 88888888888 888                                    888

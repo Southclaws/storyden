@@ -7,6 +7,6 @@
  */
 import type { CategoryAdditional } from "./categoryAdditional";
 import type { CategoryCommon } from "./categoryCommon";
-import type { CategoryMetadata } from "./categoryMetadata";
+import type { CommonProperties } from "./commonProperties";
 
-export type Category = CategoryMetadata & CategoryCommon & CategoryAdditional;
+export type Category = CommonProperties & CategoryCommon & CategoryAdditional;
