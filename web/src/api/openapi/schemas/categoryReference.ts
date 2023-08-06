@@ -6,6 +6,6 @@
  * OpenAPI spec version: 1
  */
 import type { CategoryCommon } from "./categoryCommon";
-import type { CategoryMetadata } from "./categoryMetadata";
+import type { CommonProperties } from "./commonProperties";
 
-export type CategoryReference = CategoryMetadata & CategoryCommon;
+export type CategoryReference = CommonProperties & CategoryCommon;

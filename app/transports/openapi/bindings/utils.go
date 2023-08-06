@@ -25,6 +25,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
+		Admin:     acc.Admin,
 	}
 }
 
@@ -103,7 +104,7 @@ func serialiseProfileReference(a account.Account) openapi.ProfileReference {
 
 func serialiseCategory(c *category.Category) openapi.Category {
 	return openapi.Category{
-		Id:          openapi.IdentifierFrom(xid.ID(c.ID)),
+		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
 		Admin:       &c.Admin,
 		Colour:      &c.Colour,
 		Description: &c.Description,
@@ -115,7 +116,7 @@ func serialiseCategory(c *category.Category) openapi.Category {
 
 func serialiseCategoryReference(c *category.Category) openapi.CategoryReference {
 	return openapi.CategoryReference{
-		Id:          openapi.IdentifierFrom(xid.ID(c.ID)),
+		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
 		Admin:       &c.Admin,
 		Colour:      &c.Colour,
 		Description: &c.Description,

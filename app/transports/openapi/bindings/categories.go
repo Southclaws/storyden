@@ -33,3 +33,20 @@ func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryLi
 		},
 	}, nil
 }
+
+func (c Categories) CategoryUpdateOrder(ctx context.Context, request openapi.CategoryUpdateOrderRequestObject) (openapi.CategoryUpdateOrderResponseObject, error) {
+	ids := dt.Map(*request.Body, func(in openapi.Identifier) category.CategoryID {
+		return category.CategoryID(openapi.ParseID(in))
+	})
+
+	cats, err := c.category_repo.Reorder(ctx, ids)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.CategoryUpdateOrder200JSONResponse{
+		CategoryListOKJSONResponse: openapi.CategoryListOKJSONResponse{
+			Categories: dt.Map(cats, serialiseCategory),
+		},
+	}, nil
+}

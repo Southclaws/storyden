@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
+	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -134,6 +135,43 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, 
 		category.PostCount = categoryPosts[in.ID]
 		return category
 	}), nil
+}
+
+func (d *database) Reorder(ctx context.Context, ids []CategoryID) ([]*Category, error) {
+	cats, err := d.db.Category.Query().Where(category.Admin(false)).All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(ids) != len(cats) {
+		return nil, fault.Newf("cannot reorder %d categories with %d ids, id list mismatch", len(cats), len(ids))
+	}
+
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	newcats := []*Category{}
+
+	for order, id := range ids {
+		cat, err := tx.Category.UpdateOneID(xid.ID(id)).SetSort(order).Save(ctx)
+		if err != nil {
+			if rerr := tx.Rollback(); rerr != nil {
+				return nil, fault.Wrap(multierr.Combine(err, rerr))
+			}
+			return nil, fault.Wrap(err)
+		}
+
+		newcats = append(newcats, FromModel(cat))
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return newcats, nil
 }
 
 func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {

@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Identifier } from "./identifier";
+import type { CategoryIdentifierList } from "./categoryIdentifierList";
 
-export interface CategoryMetadata {
-  id?: Identifier;
-}
+export type CategoryUpdateOrderBody = CategoryIdentifierList;

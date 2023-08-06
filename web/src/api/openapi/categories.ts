@@ -12,6 +12,7 @@ import { fetcher } from "../client";
 
 import type {
   CategoryListOKResponse,
+  CategoryUpdateOrderBody,
   InternalServerErrorResponse,
 } from "./schemas";
 
@@ -57,4 +58,18 @@ export const useCategoryList = <
     swrKey,
     ...query,
   };
+};
+
+/**
+ * Update the sort order of categories.
+ */
+export const categoryUpdateOrder = (
+  categoryUpdateOrderBody: CategoryUpdateOrderBody
+) => {
+  return fetcher<CategoryListOKResponse>({
+    url: `/v1/categories`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: categoryUpdateOrderBody,
+  });
 };

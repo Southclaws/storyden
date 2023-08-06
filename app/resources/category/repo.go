@@ -16,6 +16,7 @@ type Repository interface {
 		opts ...option) (*Category, error)
 
 	GetCategories(ctx context.Context, admin bool) ([]*Category, error)
+	Reorder(ctx context.Context, ids []CategoryID) ([]*Category, error)
 	UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error)
 	DeleteCategory(ctx context.Context, id CategoryID, moveto CategoryID) (*Category, error)
 }

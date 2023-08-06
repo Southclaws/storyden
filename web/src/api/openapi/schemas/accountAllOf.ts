@@ -14,4 +14,5 @@ export type AccountAllOf = {
   name: AccountName;
   bio?: string;
   interests?: TagList;
+  admin: boolean;
 };
