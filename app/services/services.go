@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
+	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -20,6 +21,7 @@ func Build() fx.Option {
 	return fx.Options(
 		account.Build(),
 		authentication.Build(),
+		category.Build(),
 		thread.Build(),
 		reply.Build(),
 		react.Build(),

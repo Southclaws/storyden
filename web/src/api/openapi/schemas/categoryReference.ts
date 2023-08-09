@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CategoryCommon } from "./categoryCommon";
+import type { CategoryCommonProps } from "./categoryCommonProps";
 import type { CommonProperties } from "./commonProperties";
 
-export type CategoryReference = CommonProperties & CategoryCommon;
+export type CategoryReference = CommonProperties & CategoryCommonProps;

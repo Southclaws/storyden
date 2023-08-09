@@ -7,10 +7,9 @@
  */
 import type { CategoryName } from "./categoryName";
 
-export interface CategoryCommon {
+export interface CategoryInitialProps {
   name: CategoryName;
-  description?: string;
-  colour?: string;
-  sort: number;
-  admin?: boolean;
+  description: string;
+  colour: string;
+  admin: boolean;
 }

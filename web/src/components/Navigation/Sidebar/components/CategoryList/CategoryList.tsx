@@ -12,12 +12,14 @@ import { Unready } from "src/components/Unready";
 import { CategoryListItem } from "./CategoryListItem";
 import { useCategoryList } from "./useCategoryList";
 
-const mapCategories = map((c: Category) => (
-  <CategoryListItem key={c.id} {...c} />
-));
+const mapCategories = (isAdmin: boolean) =>
+  map((c: Category) => (
+    <CategoryListItem key={c.id} {...c} isAdmin={isAdmin} />
+  ));
 
 export function CategoryList() {
-  const { categories, items, sensors, handleDragEnd } = useCategoryList();
+  const { isAdmin, categories, items, sensors, handleDragEnd } =
+    useCategoryList();
 
   if (!categories) return <Unready />;
 
@@ -36,7 +38,7 @@ export function CategoryList() {
         width="full"
       >
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {mapCategories(categories)}
+          {mapCategories(isAdmin)(categories)}
         </SortableContext>
       </List>
     </DndContext>

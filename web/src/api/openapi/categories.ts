@@ -11,10 +11,24 @@ import type { Key, SWRConfiguration } from "swr";
 import { fetcher } from "../client";
 
 import type {
+  CategoryCreateBody,
+  CategoryCreateOKResponse,
   CategoryListOKResponse,
   CategoryUpdateOrderBody,
   InternalServerErrorResponse,
 } from "./schemas";
+
+/**
+ * Create a category for organising posts.
+ */
+export const categoryCreate = (categoryCreateBody: CategoryCreateBody) => {
+  return fetcher<CategoryCreateOKResponse>({
+    url: `/v1/categories`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: categoryCreateBody,
+  });
+};
 
 /**
  * Get a list of all categories on the site.
