@@ -63,7 +63,11 @@ func FromModel(m *ent.Post) (*Thread, error) {
 	collectionsEdge := opt.NewIf(m.Edges.Collections, func(c []*ent.Collection) bool { return c != nil })
 
 	collections, err := opt.MapErr(collectionsEdge, func(c []*ent.Collection) ([]*collection.Collection, error) {
-		return dt.MapErr(c, collection.FromModel)
+		out, err := dt.MapErr(c, collection.FromModel)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+		return out, nil
 	})
 	if err != nil {
 		return nil, fault.Wrap(err)
