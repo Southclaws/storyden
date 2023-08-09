@@ -13,8 +13,10 @@ import {
   useCategoryList as useGetCategoryList,
 } from "src/api/openapi/categories";
 import { Category } from "src/api/openapi/schemas";
+import { useSession } from "src/auth";
 
 export function useCategoryList() {
+  const session = useSession();
   const categoryListResponse = useGetCategoryList();
   const [items, setItems] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -62,6 +64,7 @@ export function useCategoryList() {
   }
 
   return {
+    isAdmin: session?.admin ?? false,
     // always use the items array as the source of truth for ordering.
     categories: reorder(items)(categories),
     items,

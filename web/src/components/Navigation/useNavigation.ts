@@ -2,6 +2,7 @@ import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 
 import { useGetInfo } from "src/api/openapi/misc";
+import { useSession } from "src/auth";
 
 // The sidebar width is shared between two components which must use the exact
 // same values. The reason for this is the sidebar is position: fixed, which
@@ -26,12 +27,14 @@ export type Query = z.infer<typeof QuerySchema>;
 export function useNavigation() {
   const query = useSearchParams();
   const { data: infoResult } = useGetInfo();
+  const session = useSession();
 
   const { category } = QuerySchema.parse(query);
 
   const title = infoResult?.title ?? "Storyden";
 
   return {
+    isAdmin: session?.admin ?? false,
     title,
     category,
   };

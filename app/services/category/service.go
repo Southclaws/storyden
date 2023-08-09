@@ -16,6 +16,7 @@ import (
 )
 
 type Service interface {
+	Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error)
 	Reorder(ctx context.Context, ids []category.CategoryID) ([]*category.Category, error)
 }
 
@@ -51,6 +52,19 @@ func New(
 		account_repo:  account_repo,
 		category_repo: category_repo,
 	}
+}
+
+func (s *service) Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error) {
+	if err := s.authorise(ctx); err != nil {
+		return nil, err
+	}
+
+	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, admin)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return cat, nil
 }
 
 func (s *service) Reorder(ctx context.Context, ids []category.CategoryID) ([]*category.Category, error) {

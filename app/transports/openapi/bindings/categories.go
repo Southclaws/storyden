@@ -8,17 +8,31 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/category"
+	category_svc "github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Categories struct {
 	category_repo category.Repository
+	category_svc  category_svc.Service
 }
 
 func NewCategories(
 	category_repo category.Repository,
+	category_svc category_svc.Service,
 ) Categories {
-	return Categories{category_repo}
+	return Categories{category_repo, category_svc}
+}
+
+func (c Categories) CategoryCreate(ctx context.Context, request openapi.CategoryCreateRequestObject) (openapi.CategoryCreateResponseObject, error) {
+	cat, err := c.category_svc.Create(ctx, request.Body.Name, request.Body.Description, request.Body.Colour, request.Body.Admin)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.CategoryCreate200JSONResponse{
+		CategoryCreateOKJSONResponse: openapi.CategoryCreateOKJSONResponse(serialiseCategory(cat)),
+	}, nil
 }
 
 func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryListRequestObject) (openapi.CategoryListResponseObject, error) {
@@ -39,7 +53,7 @@ func (c Categories) CategoryUpdateOrder(ctx context.Context, request openapi.Cat
 		return category.CategoryID(openapi.ParseID(in))
 	})
 
-	cats, err := c.category_repo.Reorder(ctx, ids)
+	cats, err := c.category_svc.Reorder(ctx, ids)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

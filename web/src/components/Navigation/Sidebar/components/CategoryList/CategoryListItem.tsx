@@ -7,7 +7,7 @@ import { Category } from "src/api/openapi/schemas";
 import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
 import { Anchor } from "src/components/site/Anchor";
 
-export function CategoryListItem(props: Category) {
+export function CategoryListItem(props: Category & { isAdmin: boolean }) {
   const {
     attributes,
     listeners,
@@ -46,13 +46,15 @@ export function CategoryListItem(props: Category) {
           </Heading>
         </Anchor>
 
-        <Box
-          {...attributes}
-          {...listeners}
-          cursor={isDragging ? "grabbing" : "grab"}
-        >
-          <DragHandleIcon />
-        </Box>
+        {props.isAdmin && (
+          <Box
+            {...attributes}
+            {...listeners}
+            cursor={isDragging ? "grabbing" : "grab"}
+          >
+            <DragHandleIcon />
+          </Box>
+        )}
       </HStack>
     </Box>
   );

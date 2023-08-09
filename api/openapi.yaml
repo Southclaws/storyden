@@ -379,6 +379,16 @@ paths:
   #
 
   /v1/categories:
+    post:
+      operationId: CategoryCreate
+      description: Create a category for organising posts.
+      tags: [categories]
+      requestBody: { $ref: "#/components/requestBodies/CategoryCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CategoryCreateOK" }
     get:
       operationId: CategoryList
       description: Get a list of all categories on the site.
@@ -815,6 +825,11 @@ components:
             type: string
             format: binary
 
+    CategoryCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryInitialProps" }
+
     CategoryUpdateOrder:
       content:
         application/json:
@@ -969,6 +984,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/PublicProfile"
+
+    CategoryCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
 
     CategoryListOK:
       description: OK
@@ -1679,16 +1701,16 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/CategoryCommon"
+        - $ref: "#/components/schemas/CategoryCommonProps"
         - $ref: "#/components/schemas/CategoryAdditional"
 
     CategoryReference:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/CategoryCommon"
+        - $ref: "#/components/schemas/CategoryCommonProps"
 
-    CategoryCommon:
+    CategoryCommonProps:
       type: object
       required: [name, sort]
       properties:
@@ -1700,6 +1722,19 @@ components:
           type: string
         sort:
           type: integer
+        admin:
+          type: boolean
+
+    CategoryInitialProps:
+      type: object
+      required: [name, description, colour, admin]
+      properties:
+        name:
+          $ref: "#/components/schemas/CategoryName"
+        description:
+          type: string
+        colour:
+          type: string
         admin:
           type: boolean
 

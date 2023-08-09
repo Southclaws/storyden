@@ -6,7 +6,9 @@
  * OpenAPI spec version: 1
  */
 import type { CategoryAdditional } from "./categoryAdditional";
-import type { CategoryCommon } from "./categoryCommon";
+import type { CategoryCommonProps } from "./categoryCommonProps";
 import type { CommonProperties } from "./commonProperties";
 
-export type Category = CommonProperties & CategoryCommon & CategoryAdditional;
+export type Category = CommonProperties &
+  CategoryCommonProps &
+  CategoryAdditional;

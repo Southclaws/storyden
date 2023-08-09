@@ -3,12 +3,13 @@ import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
 import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
 
 import { Authbar } from "./components/Authbar";
+import { CategoryCreate } from "./components/CategoryCreate/CategoryCreate";
 import { CategoryList } from "./components/CategoryList/CategoryList";
 import { Title } from "./components/Title";
 import { Toolbar } from "./components/Toolbar";
 
 export function Sidebar() {
-  const { title } = useNavigation();
+  const { isAdmin, title } = useNavigation();
 
   return (
     <Flex
@@ -47,6 +48,8 @@ export function Sidebar() {
             <Box overflowY="scroll" width="full">
               <CategoryList />
             </Box>
+
+            {isAdmin && <CategoryCreate />}
           </VStack>
 
           <VStack alignItems="start">
