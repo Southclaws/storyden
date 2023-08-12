@@ -7,11 +7,11 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -28,7 +28,7 @@ type Thread struct {
 	Slug        string
 	Short       string
 	Pinned      bool
-	Author      account.Account
+	Author      profile.Profile
 	Tags        []string
 	Category    category.Category
 	Status      post.Status
@@ -44,10 +44,10 @@ func (*Thread) GetResourceName() string { return "thread" }
 func FromModel(m *ent.Post) (*Thread, error) {
 	authorEdge, err := m.Edges.AuthorOrErr()
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err)
 	}
 
-	acc, err := account.FromModel(authorEdge)
+	pro, err := profile.FromModel(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -57,7 +57,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		// as this info is only available in the context of a thread of posts.
 		dto, err := reply.FromModel(v)
 		if err != nil {
-			return nil, err
+			return nil, fault.Wrap(err)
 		}
 		dto.RootThreadMark = m.Slug
 		dto.RootPostID = post.ID(m.ID)
@@ -74,7 +74,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
 		transformed, err := dt.MapErr(p, transform)
 		if err != nil {
-			return nil, err
+			return nil, fault.Wrap(err)
 		}
 		posts = append(posts, transformed...)
 	}
@@ -102,7 +102,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Slug:        m.Slug,
 		Short:       m.Short,
 		Pinned:      m.Pinned,
-		Author:      *acc,
+		Author:      *pro,
 		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category:    utils.Deref(category.FromModel(m.Edges.Category)),
 		Status:      post.NewStatusFromEnt(m.Status),

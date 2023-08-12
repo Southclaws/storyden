@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -21,7 +21,7 @@ type Collection struct {
 	ID          CollectionID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Owner       account.Account
+	Owner       profile.Profile
 	Name        string
 	Description string
 	Items       []*Item
@@ -35,7 +35,7 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	acc, err := account.FromModel(accEdge)
+	pro, err := profile.FromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -43,7 +43,11 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 	posts := opt.NewIf(c.Edges.Posts, func(p []*ent.Post) bool { return p != nil })
 
 	items, err := opt.MapErr[[]*ent.Post, []*Item](posts, func(p []*ent.Post) ([]*Item, error) {
-		return dt.MapErr(p, ItemFromModel)
+		ps, err := dt.MapErr(p, ItemFromModel)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+		return ps, nil
 	})
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -53,7 +57,7 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		ID:          CollectionID(c.ID),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
-		Owner:       *acc,
+		Owner:       *pro,
 		Name:        c.Name,
 		Description: c.Description,
 		Items:       items.Or([]*Item{}),
@@ -65,7 +69,7 @@ type Item struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Slug      string
-	Author    account.Account
+	Author    profile.Profile
 	Title     string
 	Short     string
 }
@@ -73,12 +77,12 @@ type Item struct {
 func ItemFromModel(p *ent.Post) (*Item, error) {
 	accEdge, err := p.Edges.AuthorOrErr()
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err)
 	}
 
-	acc, err := account.FromModel(accEdge)
+	pro, err := profile.FromModel(accEdge)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err)
 	}
 
 	return &Item{
@@ -86,7 +90,7 @@ func ItemFromModel(p *ent.Post) (*Item, error) {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Slug:      p.Slug,
-		Author:    *acc,
+		Author:    *pro,
 		Title:     p.Title,
 		Short:     p.Short,
 	}, nil

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -42,12 +41,7 @@ func (a *Account) GetRole() string {
 func (*Account) GetResourceName() string { return Name }
 
 func FromModel(a *ent.Account) (*Account, error) {
-	authEdges, err := a.Edges.AuthenticationOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	auths := dt.Map(authEdges, func(a *ent.Authentication) string {
+	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
 		return a.Service
 	})
 

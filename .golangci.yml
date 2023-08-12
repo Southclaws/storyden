@@ -6,6 +6,7 @@ run:
   issues-exit-code: 0
   skip-files:
     - "graphql/.+\\.resolvers\\.go"
+    - "tools.go"
 
 severity:
   default-severity: warn

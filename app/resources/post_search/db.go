@@ -62,5 +62,10 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Repl
 		return dto, nil
 	}
 
-	return dt.MapErr(posts, transform)
+	replies, err := dt.MapErr(posts, transform)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return replies, nil
 }

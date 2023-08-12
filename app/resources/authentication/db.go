@@ -96,7 +96,12 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return dt.MapErr(r, FromModel)
+	auths, err := dt.MapErr(r, FromModel)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return auths, nil
 }
 
 func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier string, token string) (bool, error) {
