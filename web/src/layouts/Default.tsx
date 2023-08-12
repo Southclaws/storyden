@@ -16,7 +16,12 @@ const isNavpillShown = (path: string | null) =>
 export function Default(props: PropsWithChildren) {
   const pathname = usePathname();
   return (
-    <Flex width="full" flexDirection="row">
+    <Flex
+      width="full"
+      flexDirection="row"
+      bgColor="white"
+      vaul-drawer-wrapper=""
+    >
       {/* MOBILE */}
       <Box
         id="mobile-nav-container"
@@ -48,6 +53,7 @@ export function Default(props: PropsWithChildren) {
           lg: "container.md",
         }}
         px={4}
+        backgroundColor="white"
       >
         {props.children}
         <Box height="6rem"></Box>
