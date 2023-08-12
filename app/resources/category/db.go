@@ -144,7 +144,11 @@ func (d *database) Reorder(ctx context.Context, ids []CategoryID) ([]*Category, 
 	}
 
 	if len(ids) != len(cats) {
-		return nil, fault.Newf("cannot reorder %d categories with %d ids, id list mismatch", len(cats), len(ids))
+		return nil, fault.Wrap(
+			fault.Newf("cannot reorder %d categories with %d ids, id list mismatch", len(cats), len(ids)),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
 	}
 
 	tx, err := d.db.Tx(ctx)
