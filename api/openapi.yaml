@@ -312,6 +312,19 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
+  /v1/accounts/self/auth-methods:
+    get:
+      operationId: AccountAuthProviderList
+      description: |
+        Retrieve a list of authentication providers with a flag indicating which
+        ones are active for the currently authenticated account.
+      tags: [accounts]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
+
   /v1/accounts/self/avatar:
     post:
       operationId: AccountSetAvatar
@@ -970,6 +983,13 @@ components:
           schema:
             $ref: "#/components/schemas/Account"
 
+    AccountAuthProviderListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountAuthMethods"
+
     AccountGetAvatar:
       description: OK
       content:
@@ -1340,7 +1360,7 @@ components:
       required: [identifier, token]
       properties:
         identifier:
-          example: "southclaws@storyden.org"
+          example: "odin"
           type: string
         token:
           example: "password"
@@ -1628,18 +1648,21 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [handle, name, admin]
-          properties:
-            handle:
-              $ref: "#/components/schemas/AccountHandle"
-            name:
-              $ref: "#/components/schemas/AccountName"
-            bio:
-              type: string
-            interests:
-              $ref: "#/components/schemas/TagList"
-            admin:
-              type: boolean
+        - $ref: "#/components/schemas/AccountCommonProps"
+
+    AccountCommonProps:
+      required: [handle, name, admin]
+      properties:
+        handle:
+          $ref: "#/components/schemas/AccountHandle"
+        name:
+          $ref: "#/components/schemas/AccountName"
+        bio:
+          type: string
+        interests:
+          $ref: "#/components/schemas/TagList"
+        admin:
+          type: boolean
 
     AccountMutableProps:
       type: object
@@ -1652,6 +1675,30 @@ components:
           type: string
         interests:
           $ref: "#/components/schemas/TagListIDs"
+
+    AccountAuthMethods:
+      type: object
+      required: [auth_methods]
+      properties:
+        auth_methods: { $ref: "#/components/schemas/AccountAuthMethodList" }
+
+    AccountAuthMethodList:
+      type: array
+      items: { $ref: "#/components/schemas/AccountAuthMethod" }
+
+    AccountAuthMethod:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AuthProvider"
+        - $ref: "#/components/schemas/AccountAuthMethodProps"
+
+    AccountAuthMethodProps:
+      type: object
+      required: [active]
+      properties:
+        active:
+          description: True if the account is using this auth method.
+          type: boolean
 
     #
     # 8888888b.                   .d888 d8b 888

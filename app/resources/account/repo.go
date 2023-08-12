@@ -17,8 +17,6 @@ type Repository interface {
 	GetByID(ctx context.Context, id AccountID) (*Account, error)
 	GetByHandle(ctx context.Context, handle string) (*Account, error)
 
-	List(ctx context.Context, sort string, max, skip int) ([]*Account, error)
-
 	Update(ctx context.Context, id AccountID, opts ...Mutation) (*Account, error)
 }
 

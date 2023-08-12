@@ -90,7 +90,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 		// If there's already a phone auth associated with the account, deleted it
 		// and start fresh with the new request.
 		// NOTE: This could result in a DoS for the account holder...
-		if _, exists = lo.Find(auths, func(a authentication.Authentication) bool {
+		if _, exists = lo.Find(auths, func(a *authentication.Authentication) bool {
 			return a.Service == id
 		}); exists {
 			_, err = p.auth.Delete(ctx, acc.ID, phone, id)
@@ -160,7 +160,7 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	phoneauth, exists := lo.Find(auths, func(a authentication.Authentication) bool {
+	phoneauth, exists := lo.Find(auths, func(a *authentication.Authentication) bool {
 		return a.Service == id
 	})
 	if !exists {

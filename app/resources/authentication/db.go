@@ -3,6 +3,7 @@ package authentication
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -57,7 +58,7 @@ func (d *database) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(r), nil
+	return FromModel(r)
 }
 
 func (d *database) LookupByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, bool, error) {
@@ -77,10 +78,15 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(r), true, nil
+	auth, err := FromModel(r)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return auth, true, nil
 }
 
-func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]Authentication, error) {
+func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*Authentication, error) {
 	r, err := d.db.Authentication.
 		Query().
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
@@ -90,7 +96,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModelMany(r), nil
+	return dt.MapErr(r, FromModel)
 }
 
 func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier string, token string) (bool, error) {

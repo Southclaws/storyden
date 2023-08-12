@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
@@ -61,6 +62,24 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 	}, nil
 }
 
+func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.AccountAuthProviderListRequestObject) (openapi.AccountAuthProviderListResponseObject, error) {
+	accountID, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	authmethods, err := i.as.GetAuthMethods(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountAuthProviderList200JSONResponse{
+		AccountAuthProviderListOKJSONResponse: openapi.AccountAuthProviderListOKJSONResponse{
+			AuthMethods: dt.Map(authmethods, serialiseAuthMethod),
+		},
+	}, nil
+}
+
 func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.AccountGetAvatarRequestObject) (openapi.AccountGetAvatarResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
 	if err != nil {
@@ -90,4 +109,14 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 	}
 
 	return openapi.AccountSetAvatar200Response{}, nil
+}
+
+func serialiseAuthMethod(in *account.AuthMethod) openapi.AccountAuthMethod {
+	return openapi.AccountAuthMethod{
+		Provider: in.ID(),
+		Name:     in.Name(),
+		LogoUrl:  in.LogoURL(),
+		Link:     in.Link(),
+		Active:   in.Active,
+	}
 }

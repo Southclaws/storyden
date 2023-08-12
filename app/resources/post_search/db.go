@@ -43,10 +43,13 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Repl
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	transform := func(v *ent.Post) *reply.Reply {
+	transform := func(v *ent.Post) (*reply.Reply, error) {
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
-		dto := reply.FromModel(v)
+		dto, err := reply.FromModel(v)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 
 		if v.First {
 			dto.RootThreadMark = v.Slug
@@ -56,8 +59,8 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Repl
 			dto.RootPostID = post.ID(v.Edges.Root.ID)
 		}
 
-		return dto
+		return dto, nil
 	}
 
-	return dt.Map(posts, transform), nil
+	return dt.MapErr(posts, transform)
 }

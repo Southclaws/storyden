@@ -30,22 +30,30 @@ type Collection struct {
 func (*Collection) GetResourceName() string { return "collection" }
 
 func FromModel(c *ent.Collection) (*Collection, error) {
-	acc, err := c.Edges.OwnerOrErr()
+	accEdge, err := c.Edges.OwnerOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	acc, err := account.FromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
 	posts := opt.NewIf(c.Edges.Posts, func(p []*ent.Post) bool { return p != nil })
 
-	items := opt.Map[[]*ent.Post, []*Item](posts, func(p []*ent.Post) []*Item {
-		return dt.Map(p, ItemFromModel)
+	items, err := opt.MapErr[[]*ent.Post, []*Item](posts, func(p []*ent.Post) ([]*Item, error) {
+		return dt.MapErr(p, ItemFromModel)
 	})
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
 
 	return &Collection{
 		ID:          CollectionID(c.ID),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
-		Owner:       *account.FromModel(*acc),
+		Owner:       *acc,
 		Name:        c.Name,
 		Description: c.Description,
 		Items:       items.Or([]*Item{}),
@@ -62,14 +70,24 @@ type Item struct {
 	Short     string
 }
 
-func ItemFromModel(p *ent.Post) *Item {
+func ItemFromModel(p *ent.Post) (*Item, error) {
+	accEdge, err := p.Edges.AuthorOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	acc, err := account.FromModel(accEdge)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Item{
 		ID:        post.ID(p.ID),
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Slug:      p.Slug,
-		Author:    *account.FromModel(*p.Edges.Author),
+		Author:    *acc,
 		Title:     p.Title,
 		Short:     p.Short,
-	}
+	}, nil
 }
