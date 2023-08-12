@@ -53,6 +53,7 @@ export function Default(props: PropsWithChildren) {
           lg: "container.md",
         }}
         px={4}
+        py={2}
         backgroundColor="white"
       >
         {props.children}

@@ -53,14 +53,16 @@ function useClickHandler(onClick: MouseEventHandler | undefined) {
   );
 }
 
-export function Action({ children, onClick, ...props }: LinkProps) {
-  const handleClick = useClickHandler(onClick);
-  return (
-    <Link onClick={handleClick} {...actionStyles} {...props}>
-      {children}
-    </Link>
-  );
-}
+export const Action = forwardRef(
+  ({ children, onClick, ...props }: LinkProps, ref) => {
+    const handleClick = useClickHandler(onClick);
+    return (
+      <Link ref={ref} onClick={handleClick} {...actionStyles} {...props}>
+        {children}
+      </Link>
+    );
+  }
+);
 
 export const ActionButton = forwardRef<IconButtonProps, "button">(
   ({ children, ...props }, ref) => {
@@ -148,17 +150,20 @@ export function Dashboard({ href = "/dashboard", ...props }: WithOptionalURL) {
 }
 
 export const Settings = forwardRef(
-  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+  (
+    { "aria-label": al, href = "/settings", ...props }: WithOptionalURL,
+    ref
+  ) => {
     return (
-      <ActionButton
+      <Action
         ref={ref}
         title="Settings"
-        size="sm"
         aria-label={al ?? "settings"}
-        width="1.4em"
+        href={href}
         {...props}
-        icon={<AdjustmentsHorizontalIcon width="1.4em" />}
-      />
+      >
+        <AdjustmentsHorizontalIcon width="1.25em" />
+      </Action>
     );
   }
 );

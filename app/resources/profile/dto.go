@@ -2,7 +2,6 @@ package profile
 
 import (
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -10,18 +9,17 @@ import (
 )
 
 type Profile struct {
-	AccountID account.AccountID
+	ID account.AccountID
 
+	Handle    string
+	Name      string
+	Bio       string
+	Admin     bool
 	Interests []*tag.Tag
 }
 
 func FromModel(a *ent.Account) (*Profile, error) {
-	tags, err := a.Edges.TagsOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	interests := dt.Map(tags, func(t *ent.Tag) *tag.Tag {
+	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {
 		return &tag.Tag{
 			ID:   t.ID.String(),
 			Name: t.Name,
@@ -29,6 +27,11 @@ func FromModel(a *ent.Account) (*Profile, error) {
 	})
 
 	return &Profile{
+		ID:        account.AccountID(a.ID),
+		Handle:    a.Handle,
+		Name:      a.Name,
+		Bio:       a.Bio,
+		Admin:     a.Admin,
 		Interests: interests,
 	}, nil
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -20,7 +20,7 @@ type Reply struct {
 
 	Body           string
 	Short          string
-	Author         account.Account
+	Author         profile.Profile
 	RootPostID     post.ID
 	RootThreadMark string
 	ReplyTo        opt.Optional[post.ID]
@@ -53,7 +53,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	acc, err := account.FromModel(authorEdge)
+	pro, err := profile.FromModel(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -65,7 +65,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 
 		Body:    m.Body,
 		Short:   m.Short,
-		Author:  *acc,
+		Author:  *pro,
 		ReplyTo: replyTo,
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,
