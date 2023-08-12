@@ -19,7 +19,7 @@ export function Sidebar() {
       justifyContent="end"
       width={SIDEBAR_WIDTH}
       height="full"
-      bgColor="blackAlpha.50"
+      bgColor="gray.100"
     >
       <Box
         id="desktop-nav-box"
