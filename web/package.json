@@ -35,6 +35,7 @@
     "slate-react": "^0.95.0",
     "swr": "^2.0.0",
     "unified": "^10.1.2",
+    "vaul": "^0.2.3",
     "zod": "^3.19.0"
   },
   "devDependencies": {
