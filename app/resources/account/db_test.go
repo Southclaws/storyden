@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -49,25 +48,4 @@ func TestGetByID(t *testing.T) {
 
 		a.Equal(seed.Account_001_Odin.Name, acc.Name)
 	}))
-}
-
-func TestGetAll(t *testing.T) {
-	defer integration.Test(t, nil, fx.Invoke(
-		func(
-			_ seed.Ready,
-			ctx context.Context,
-			repo account.Repository,
-		) {
-			r := require.New(t)
-			a := assert.New(t)
-
-			u, err := repo.List(ctx, "asc", 10, 0)
-			r.NoError(err)
-			a.NotNil(u)
-
-			handles := lo.Map(u, func(t *account.Account, i int) string { return t.Handle })
-
-			a.Contains(handles, seed.Account_001_Odin.Handle)
-			a.Contains(handles, seed.Account_002_Frigg.Handle)
-		}))
 }

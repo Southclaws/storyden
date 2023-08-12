@@ -26,7 +26,7 @@ func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.Cre
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ams = dt.Filter(ams, func(a authentication.Authentication) bool { return a.Service == id })
+	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == id })
 	if len(ams) == 0 {
 		return nil, nil, fault.Wrap(ErrNoAuthRecord,
 			fctx.With(ctx),
@@ -34,7 +34,7 @@ func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.Cre
 		)
 	}
 
-	credentials, err := dt.MapErr(ams, func(a authentication.Authentication) (webauthn.Credential, error) {
+	credentials, err := dt.MapErr(ams, func(a *authentication.Authentication) (webauthn.Credential, error) {
 		var wac webauthn.Credential
 		if err := json.Unmarshal([]byte(a.Token), &wac); err != nil {
 			return wac, fault.Wrap(err, fmsg.With("malformed credential from auth storage"))
@@ -71,7 +71,7 @@ func (p *Provider) FinishLogin(ctx context.Context,
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ams = dt.Filter(ams, func(a authentication.Authentication) bool { return a.Service == id })
+	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == id })
 	if len(ams) == 0 {
 		return nil, nil, fault.Wrap(ErrNoAuthRecord,
 			fctx.With(ctx),
@@ -79,7 +79,7 @@ func (p *Provider) FinishLogin(ctx context.Context,
 		)
 	}
 
-	credentials, err := dt.MapErr(ams, func(a authentication.Authentication) (webauthn.Credential, error) {
+	credentials, err := dt.MapErr(ams, func(a *authentication.Authentication) (webauthn.Credential, error) {
 		var wac webauthn.Credential
 		if err := json.Unmarshal([]byte(a.Token), &wac); err != nil {
 			return wac, fault.Wrap(err, fmsg.With("malformed credential from auth storage"))

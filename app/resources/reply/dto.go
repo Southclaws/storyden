@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -46,7 +47,17 @@ func replyTo(m *ent.Post) opt.Optional[post.ID] {
 	return opt.NewEmpty[post.ID]()
 }
 
-func FromModel(m *ent.Post) (w *Reply) {
+func FromModel(m *ent.Post) (*Reply, error) {
+	authorEdge, err := m.Edges.AuthorOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	acc, err := account.FromModel(authorEdge)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	replyTo := replyTo(m)
 
 	return &Reply{
@@ -54,7 +65,7 @@ func FromModel(m *ent.Post) (w *Reply) {
 
 		Body:    m.Body,
 		Short:   m.Short,
-		Author:  *account.FromModel(*m.Edges.Author),
+		Author:  *acc,
 		ReplyTo: replyTo,
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,
@@ -63,5 +74,5 @@ func FromModel(m *ent.Post) (w *Reply) {
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 		DeletedAt: opt.NewPtr(m.DeletedAt),
-	}
+	}, nil
 }

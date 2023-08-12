@@ -20,7 +20,7 @@ type Repository interface {
 	LookupByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, bool, error)
 
 	// Gets all auth methods that a account has.
-	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]Authentication, error)
+	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]*Authentication, error)
 
 	// Checks if the given token is equal to the stored auth method's token.
 	IsEqual(ctx context.Context, userID account.AccountID, identifier string, token string) (bool, error)

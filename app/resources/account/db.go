@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -32,7 +31,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		v(&withrequired)
 	}
 
-	u, err := d.db.Account.
+	a, err := d.db.Account.
 		Create().
 		SetHandle(withrequired.Handle).
 		SetName(withrequired.Name).
@@ -47,11 +46,17 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(*u), nil
+	return FromModel(a)
 }
 
 func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) {
-	account, err := d.db.Account.Get(ctx, xid.ID(id))
+	q := d.db.Account.
+		Query().
+		Where(account.ID(xid.ID(id))).
+		WithTags().
+		WithAuthentication()
+
+	account, err := q.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
@@ -60,22 +65,16 @@ func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	// threads, posts, err := d.getPostCounts(ctx, account.ID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	acc := FromModel(*account)
-
-	// u.ThreadCount = threads
-	// u.PostCount = posts
-
-	return acc, nil
+	return FromModel(account)
 }
 
 func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, error) {
-	account, err := d.db.Account.Query().Where(
-		account.Handle(handle),
-	).Only(ctx)
+	q := d.db.Account.
+		Query().
+		Where(account.Handle(handle)).
+		WithAuthentication()
+
+	account, err := q.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
@@ -88,12 +87,12 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 	// if err != nil {
 	// 	return nil, err
 	// }
-	acc := FromModel(*account)
+	acc, err := FromModel(account)
 
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
-	return acc, nil
+	return acc, err
 }
 
 // func (d *database) getPostCounts(ctx context.Context, id string) (int, int, error) {
@@ -125,23 +124,6 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 // 	return count[0].Threads, count[0].Posts, nil
 // }
 
-func (d *database) List(ctx context.Context, sort string, limit, offset int) ([]*Account, error) {
-	users, err := d.db.Account.
-		Query().
-		Limit(limit).
-		Offset(offset).
-		Order(ent.Asc(account.FieldCreatedAt)).
-		All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	return dt.Map(
-		dt.Map(users, utils.Deref[ent.Account]),
-		utils.ToMap(FromModel),
-	), nil
-}
-
 func (d *database) Update(ctx context.Context, id AccountID, opts ...Mutation) (*Account, error) {
 	update := d.db.Account.UpdateOneID(xid.ID(id))
 
@@ -154,5 +136,5 @@ func (d *database) Update(ctx context.Context, id AccountID, opts ...Mutation) (
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return FromModel(*acc), nil
+	return FromModel(acc)
 }

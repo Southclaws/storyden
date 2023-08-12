@@ -42,22 +42,41 @@ type Thread struct {
 func (*Thread) GetResourceName() string { return "thread" }
 
 func FromModel(m *ent.Post) (*Thread, error) {
-	transform := func(v *ent.Post) *reply.Reply {
+	authorEdge, err := m.Edges.AuthorOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	acc, err := account.FromModel(authorEdge)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	transform := func(v *ent.Post) (*reply.Reply, error) {
 		// hydrate the thread-specific info here. post.FromModel cannot do this
 		// as this info is only available in the context of a thread of posts.
-		dto := reply.FromModel(v)
+		dto, err := reply.FromModel(v)
+		if err != nil {
+			return nil, err
+		}
 		dto.RootThreadMark = m.Slug
 		dto.RootPostID = post.ID(m.ID)
-		return dto
+		return dto, nil
 	}
 
 	// Thread data structure will always contain one post: itself in post form.
-	posts := []*reply.Reply{
-		transform(m),
+	first, err := transform(m)
+	if err != nil {
+		return nil, err
 	}
+	posts := []*reply.Reply{first}
 
 	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
-		posts = append(posts, dt.Map(p, transform)...)
+		transformed, err := dt.MapErr(p, transform)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, transformed...)
 	}
 
 	collectionsEdge := opt.NewIf(m.Edges.Collections, func(c []*ent.Collection) bool { return c != nil })
@@ -83,7 +102,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Slug:        m.Slug,
 		Short:       m.Short,
 		Pinned:      m.Pinned,
-		Author:      *account.FromModel(*m.Edges.Author),
+		Author:      *acc,
 		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category:    utils.Deref(category.FromModel(m.Edges.Category)),
 		Status:      post.NewStatusFromEnt(m.Status),
