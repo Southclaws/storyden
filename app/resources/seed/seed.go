@@ -40,6 +40,8 @@ var id = func(s string) xid.ID { return utils.Must(xid.FromString(s)) }
 //	        ... your test code
 type Ready struct{}
 
+type Empty struct{}
+
 // Seed provides a type to the application which, when present in a component's
 // dependency tree, will seed the database with all resource seed data.
 func Create() fx.Option {
@@ -73,4 +75,12 @@ func New(
 	threads(thread_repo, post_repo, react_repo)
 
 	return Ready{}
+}
+
+func NewEmpty(database *sql.DB) Empty {
+	if err := db.Truncate(database); err != nil {
+		panic(err)
+	}
+
+	return Empty{}
 }
