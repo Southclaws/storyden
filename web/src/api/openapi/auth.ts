@@ -11,7 +11,6 @@ import type { Key, SWRConfiguration } from "swr";
 import { fetcher } from "../client";
 
 import type {
-  AccountAuthProviderListOKResponse,
   AuthPasswordBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
@@ -313,56 +312,6 @@ export const useAuthProviderLogout = <
     swrOptions?.swrKey ??
     (() => (isEnabled ? getAuthProviderLogoutKey() : null));
   const swrFn = () => authProviderLogout();
-
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
-    swrKey,
-    swrFn,
-    swrOptions
-  );
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-
-/**
- * Retrieve a list of authentication providers with a flag indicating which
-ones are active for the currently authenticated account.
-
- */
-export const accountAuthProviderList = () => {
-  return fetcher<AccountAuthProviderListOKResponse>({
-    url: `/v1/accounts/self/auth-methods`,
-    method: "get",
-  });
-};
-
-export const getAccountAuthProviderListKey = () =>
-  [`/v1/accounts/self/auth-methods`] as const;
-
-export type AccountAuthProviderListQueryResult = NonNullable<
-  Awaited<ReturnType<typeof accountAuthProviderList>>
->;
-export type AccountAuthProviderListQueryError =
-  | BadRequestResponse
-  | InternalServerErrorResponse;
-
-export const useAccountAuthProviderList = <
-  TError = BadRequestResponse | InternalServerErrorResponse
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof accountAuthProviderList>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccountAuthProviderListKey() : null));
-  const swrFn = () => accountAuthProviderList();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

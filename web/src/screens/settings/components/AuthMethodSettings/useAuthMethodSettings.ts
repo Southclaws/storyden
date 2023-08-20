@@ -1,7 +1,7 @@
 import { partition } from "lodash/fp";
 import { SWRResponse } from "swr";
 
-import { useAccountAuthProviderList } from "src/api/openapi/auth";
+import { useAccountAuthProviderList } from "src/api/openapi/accounts";
 import {
   APIError,
   AccountAuthMethod,
