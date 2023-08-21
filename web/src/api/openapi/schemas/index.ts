@@ -86,6 +86,7 @@ export * from "./metadata";
 export * from "./notFoundResponse";
 export * from "./oAuthCallback";
 export * from "./oAuthProviderCallbackBody";
+export * from "./onboardingStatus";
 export * from "./phoneRequestCodeBody";
 export * from "./phoneRequestCodeProps";
 export * from "./phoneSubmitCodeBody";

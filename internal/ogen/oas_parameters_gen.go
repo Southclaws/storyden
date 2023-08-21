@@ -84,6 +84,458 @@ func decodeAccountGetAvatarParams(args [1]string, r *http.Request) (params Accou
 	return params, nil
 }
 
+// AssetGetParams is parameters of AssetGet operation.
+type AssetGetParams struct {
+	// Asset ID.
+	ID string
+}
+
+func unpackAssetGetParams(packed middleware.Parameters) (params AssetGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "path",
+		}
+		params.ID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeAssetGetParams(args [1]string, r *http.Request) (params AssetGetParams, _ error) {
+	// Decode path: id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// CollectionAddPostParams is parameters of CollectionAddPost operation.
+type CollectionAddPostParams struct {
+	// Unique collection ID.
+	CollectionID Identifier
+	// Unique post ID.
+	PostID Identifier
+}
+
+func unpackCollectionAddPostParams(packed middleware.Parameters) (params CollectionAddPostParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "collection_id",
+			In:   "path",
+		}
+		params.CollectionID = packed[key].(Identifier)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "post_id",
+			In:   "path",
+		}
+		params.PostID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodeCollectionAddPostParams(args [2]string, r *http.Request) (params CollectionAddPostParams, _ error) {
+	// Decode path: collection_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "collection_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotCollectionIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCollectionIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.CollectionID = Identifier(paramsDotCollectionIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collection_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: post_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[1])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "post_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotPostIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostID = Identifier(paramsDotPostIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "post_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// CollectionGetParams is parameters of CollectionGet operation.
+type CollectionGetParams struct {
+	// Unique collection ID.
+	CollectionID Identifier
+}
+
+func unpackCollectionGetParams(packed middleware.Parameters) (params CollectionGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "collection_id",
+			In:   "path",
+		}
+		params.CollectionID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodeCollectionGetParams(args [1]string, r *http.Request) (params CollectionGetParams, _ error) {
+	// Decode path: collection_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "collection_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotCollectionIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCollectionIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.CollectionID = Identifier(paramsDotCollectionIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collection_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// CollectionRemovePostParams is parameters of CollectionRemovePost operation.
+type CollectionRemovePostParams struct {
+	// Unique collection ID.
+	CollectionID Identifier
+	// Unique post ID.
+	PostID Identifier
+}
+
+func unpackCollectionRemovePostParams(packed middleware.Parameters) (params CollectionRemovePostParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "collection_id",
+			In:   "path",
+		}
+		params.CollectionID = packed[key].(Identifier)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "post_id",
+			In:   "path",
+		}
+		params.PostID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodeCollectionRemovePostParams(args [2]string, r *http.Request) (params CollectionRemovePostParams, _ error) {
+	// Decode path: collection_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "collection_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotCollectionIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCollectionIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.CollectionID = Identifier(paramsDotCollectionIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collection_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: post_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[1])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "post_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotPostIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostID = Identifier(paramsDotPostIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "post_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// CollectionUpdateParams is parameters of CollectionUpdate operation.
+type CollectionUpdateParams struct {
+	// Unique collection ID.
+	CollectionID Identifier
+}
+
+func unpackCollectionUpdateParams(packed middleware.Parameters) (params CollectionUpdateParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "collection_id",
+			In:   "path",
+		}
+		params.CollectionID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodeCollectionUpdateParams(args [1]string, r *http.Request) (params CollectionUpdateParams, _ error) {
+	// Decode path: collection_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "collection_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotCollectionIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCollectionIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.CollectionID = Identifier(paramsDotCollectionIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collection_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // OAuthProviderCallbackParams is parameters of OAuthProviderCallback operation.
 type OAuthProviderCallbackParams struct {
 	// The identifier for an OAuth2 provider such as "twitter".
@@ -146,13 +598,82 @@ func decodeOAuthProviderCallbackParams(args [1]string, r *http.Request) (params 
 	return params, nil
 }
 
-// PostsCreateParams is parameters of PostsCreate operation.
-type PostsCreateParams struct {
+// PhoneSubmitCodeParams is parameters of PhoneSubmitCode operation.
+type PhoneSubmitCodeParams struct {
+	// Account handle.
+	AccountHandle AccountHandle
+}
+
+func unpackPhoneSubmitCodeParams(packed middleware.Parameters) (params PhoneSubmitCodeParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "account_handle",
+			In:   "path",
+		}
+		params.AccountHandle = packed[key].(AccountHandle)
+	}
+	return params
+}
+
+func decodePhoneSubmitCodeParams(args [1]string, r *http.Request) (params PhoneSubmitCodeParams, _ error) {
+	// Decode path: account_handle.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "account_handle",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotAccountHandleVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotAccountHandleVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.AccountHandle = AccountHandle(paramsDotAccountHandleVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "account_handle",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostCreateParams is parameters of PostCreate operation.
+type PostCreateParams struct {
 	// Thread unique and permanent identifier.
 	ThreadMark ThreadMark
 }
 
-func unpackPostsCreateParams(packed middleware.Parameters) (params PostsCreateParams) {
+func unpackPostCreateParams(packed middleware.Parameters) (params PostCreateParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "thread_mark",
@@ -163,7 +684,7 @@ func unpackPostsCreateParams(packed middleware.Parameters) (params PostsCreatePa
 	return params
 }
 
-func decodePostsCreateParams(args [1]string, r *http.Request) (params PostsCreateParams, _ error) {
+func decodePostCreateParams(args [1]string, r *http.Request) (params PostCreateParams, _ error) {
 	// Decode path: thread_mark.
 	if err := func() error {
 		param, err := url.PathUnescape(args[0])
@@ -208,6 +729,421 @@ func decodePostsCreateParams(args [1]string, r *http.Request) (params PostsCreat
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "thread_mark",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostDeleteParams is parameters of PostDelete operation.
+type PostDeleteParams struct {
+	// Unique post ID.
+	PostID Identifier
+}
+
+func unpackPostDeleteParams(packed middleware.Parameters) (params PostDeleteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "post_id",
+			In:   "path",
+		}
+		params.PostID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodePostDeleteParams(args [1]string, r *http.Request) (params PostDeleteParams, _ error) {
+	// Decode path: post_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "post_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotPostIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostID = Identifier(paramsDotPostIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "post_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostReactAddParams is parameters of PostReactAdd operation.
+type PostReactAddParams struct {
+	// Unique post ID.
+	PostID Identifier
+}
+
+func unpackPostReactAddParams(packed middleware.Parameters) (params PostReactAddParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "post_id",
+			In:   "path",
+		}
+		params.PostID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodePostReactAddParams(args [1]string, r *http.Request) (params PostReactAddParams, _ error) {
+	// Decode path: post_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "post_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotPostIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostID = Identifier(paramsDotPostIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "post_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostSearchParams is parameters of PostSearch operation.
+type PostSearchParams struct {
+	// A text query to search for in post content.
+	Body OptString
+	// Show only results created by this account.
+	Author OptAccountHandle
+	// Posts, threads or both.
+	Kind *ContentKinds
+}
+
+func unpackPostSearchParams(packed middleware.Parameters) (params PostSearchParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "body",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Body = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "author",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Author = v.(OptAccountHandle)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "kind",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Kind = v.(*ContentKinds)
+		}
+	}
+	return params
+}
+
+func decodePostSearchParams(args [0]string, r *http.Request) (params PostSearchParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: body.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "body",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotBodyVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotBodyVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Body.SetTo(paramsDotBodyVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "body",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: author.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "author",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotAuthorVal AccountHandle
+				if err := func() error {
+					var paramsDotAuthorValVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotAuthorValVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					paramsDotAuthorVal = AccountHandle(paramsDotAuthorValVal)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Author.SetTo(paramsDotAuthorVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "author",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: kind.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "kind",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotKindVal ContentKinds
+				if err := func() error {
+					var paramsDotKindValVal []ContentKind
+					if err := func() error {
+						return d.DecodeArray(func(d uri.Decoder) error {
+							var paramsDotKindValValVal ContentKind
+							if err := func() error {
+								val, err := d.DecodeValue()
+								if err != nil {
+									return err
+								}
+
+								c, err := conv.ToString(val)
+								if err != nil {
+									return err
+								}
+
+								paramsDotKindValValVal = ContentKind(c)
+								return nil
+							}(); err != nil {
+								return err
+							}
+							paramsDotKindValVal = append(paramsDotKindValVal, paramsDotKindValValVal)
+							return nil
+						})
+					}(); err != nil {
+						return err
+					}
+					paramsDotKindVal = ContentKinds(paramsDotKindValVal)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Kind = &paramsDotKindVal
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if params.Kind == nil {
+					return nil // optional
+				}
+				if err := func() error {
+					if err := params.Kind.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					return errors.Wrap(err, "pointer")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "kind",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostUpdateParams is parameters of PostUpdate operation.
+type PostUpdateParams struct {
+	// Unique post ID.
+	PostID Identifier
+}
+
+func unpackPostUpdateParams(packed middleware.Parameters) (params PostUpdateParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "post_id",
+			In:   "path",
+		}
+		params.PostID = packed[key].(Identifier)
+	}
+	return params
+}
+
+func decodePostUpdateParams(args [1]string, r *http.Request) (params PostUpdateParams, _ error) {
+	// Decode path: post_id.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "post_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotPostIDVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostIDVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostID = Identifier(paramsDotPostIDVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "post_id",
 			In:   "path",
 			Err:  err,
 		}
@@ -284,13 +1220,13 @@ func decodeProfileGetParams(args [1]string, r *http.Request) (params ProfileGetP
 	return params, nil
 }
 
-// ThreadsGetParams is parameters of ThreadsGet operation.
-type ThreadsGetParams struct {
+// ThreadDeleteParams is parameters of ThreadDelete operation.
+type ThreadDeleteParams struct {
 	// Thread unique and permanent identifier.
 	ThreadMark ThreadMark
 }
 
-func unpackThreadsGetParams(packed middleware.Parameters) (params ThreadsGetParams) {
+func unpackThreadDeleteParams(packed middleware.Parameters) (params ThreadDeleteParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "thread_mark",
@@ -301,7 +1237,7 @@ func unpackThreadsGetParams(packed middleware.Parameters) (params ThreadsGetPara
 	return params
 }
 
-func decodeThreadsGetParams(args [1]string, r *http.Request) (params ThreadsGetParams, _ error) {
+func decodeThreadDeleteParams(args [1]string, r *http.Request) (params ThreadDeleteParams, _ error) {
 	// Decode path: thread_mark.
 	if err := func() error {
 		param, err := url.PathUnescape(args[0])
@@ -353,15 +1289,86 @@ func decodeThreadsGetParams(args [1]string, r *http.Request) (params ThreadsGetP
 	return params, nil
 }
 
-// ThreadsListParams is parameters of ThreadsList operation.
-type ThreadsListParams struct {
+// ThreadGetParams is parameters of ThreadGet operation.
+type ThreadGetParams struct {
+	// Thread unique and permanent identifier.
+	ThreadMark ThreadMark
+}
+
+func unpackThreadGetParams(packed middleware.Parameters) (params ThreadGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "thread_mark",
+			In:   "path",
+		}
+		params.ThreadMark = packed[key].(ThreadMark)
+	}
+	return params
+}
+
+func decodeThreadGetParams(args [1]string, r *http.Request) (params ThreadGetParams, _ error) {
+	// Decode path: thread_mark.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "thread_mark",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotThreadMarkVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotThreadMarkVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ThreadMark = ThreadMark(paramsDotThreadMarkVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "thread_mark",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// ThreadListParams is parameters of ThreadList operation.
+type ThreadListParams struct {
 	// Show only results creeated by this user.
 	Author OptAccountHandle
 	// Show only results with these tags.
 	Tags *TagListIDs
+	// Show only results with these categories.
+	Categories *CategoryNameList
 }
 
-func unpackThreadsListParams(packed middleware.Parameters) (params ThreadsListParams) {
+func unpackThreadListParams(packed middleware.Parameters) (params ThreadListParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "author",
@@ -380,10 +1387,19 @@ func unpackThreadsListParams(packed middleware.Parameters) (params ThreadsListPa
 			params.Tags = v.(*TagListIDs)
 		}
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "categories",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Categories = v.(*CategoryNameList)
+		}
+	}
 	return params
 }
 
-func decodeThreadsListParams(args [0]string, r *http.Request) (params ThreadsListParams, _ error) {
+func decodeThreadListParams(args [0]string, r *http.Request) (params ThreadListParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: author.
 	if err := func() error {
@@ -510,6 +1526,155 @@ func decodeThreadsListParams(args [0]string, r *http.Request) (params ThreadsLis
 		return params, &ogenerrors.DecodeParamError{
 			Name: "tags",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: categories.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "categories",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotCategoriesVal CategoryNameList
+				if err := func() error {
+					var paramsDotCategoriesValVal []CategoryName
+					if err := func() error {
+						return d.DecodeArray(func(d uri.Decoder) error {
+							var paramsDotCategoriesValValVal CategoryName
+							if err := func() error {
+								var paramsDotCategoriesValValValVal string
+								if err := func() error {
+									val, err := d.DecodeValue()
+									if err != nil {
+										return err
+									}
+
+									c, err := conv.ToString(val)
+									if err != nil {
+										return err
+									}
+
+									paramsDotCategoriesValValValVal = c
+									return nil
+								}(); err != nil {
+									return err
+								}
+								paramsDotCategoriesValValVal = CategoryName(paramsDotCategoriesValValValVal)
+								return nil
+							}(); err != nil {
+								return err
+							}
+							paramsDotCategoriesValVal = append(paramsDotCategoriesValVal, paramsDotCategoriesValValVal)
+							return nil
+						})
+					}(); err != nil {
+						return err
+					}
+					paramsDotCategoriesVal = CategoryNameList(paramsDotCategoriesValVal)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Categories = &paramsDotCategoriesVal
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if params.Categories == nil {
+					return nil // optional
+				}
+				if err := func() error {
+					if err := params.Categories.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					return errors.Wrap(err, "pointer")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "categories",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// ThreadUpdateParams is parameters of ThreadUpdate operation.
+type ThreadUpdateParams struct {
+	// Thread unique and permanent identifier.
+	ThreadMark ThreadMark
+}
+
+func unpackThreadUpdateParams(packed middleware.Parameters) (params ThreadUpdateParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "thread_mark",
+			In:   "path",
+		}
+		params.ThreadMark = packed[key].(ThreadMark)
+	}
+	return params
+}
+
+func decodeThreadUpdateParams(args [1]string, r *http.Request) (params ThreadUpdateParams, _ error) {
+	// Decode path: thread_mark.
+	if err := func() error {
+		param, err := url.PathUnescape(args[0])
+		if err != nil {
+			return errors.Wrap(err, "unescape path")
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "thread_mark",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				var paramsDotThreadMarkVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotThreadMarkVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ThreadMark = ThreadMark(paramsDotThreadMarkVal)
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "thread_mark",
+			In:   "path",
 			Err:  err,
 		}
 	}

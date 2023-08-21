@@ -36,6 +36,30 @@ func (s *Account) Validate() error {
 	}
 	return nil
 }
+func (s AccountAuthMethodList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+func (s *AccountAuthMethods) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.AuthMethods.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "auth_methods",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
 func (s *AccountMutableProps) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
@@ -56,6 +80,58 @@ func (s *AccountMutableProps) Validate() error {
 			Name:  "interests",
 			Error: err,
 		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s *Asset) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Width)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "width",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Height)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "height",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s AssetList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range s {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
@@ -157,6 +233,12 @@ func (s *AuthenticatorSelectionCriteria) Validate() error {
 	}
 	return nil
 }
+func (s CategoryIdentifierList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
 func (s *CategoryList) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
@@ -169,6 +251,93 @@ func (s *CategoryList) Validate() error {
 			Name:  "categories",
 			Error: err,
 		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s CategoryNameList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+func (s CollectionItemList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+func (s CollectionList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+func (s *CollectionListOK) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Collections.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "collections",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s *CollectionWithItems) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Items.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "items",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s ContentKind) Validate() error {
+	switch s {
+	case "post":
+		return nil
+	case "thread":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+func (s ContentKinds) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range s {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
@@ -211,7 +380,116 @@ func (s *CredentialRequestOptionsHeaders) Validate() error {
 	}
 	return nil
 }
+func (s *Info) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.OnboardingStatus.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "onboarding_status",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s OnboardingStatus) Validate() error {
+	switch s {
+	case "requires_first_account":
+		return nil
+	case "requires_category":
+		return nil
+	case "requires_more_accounts":
+		return nil
+	case "requires_first_post":
+		return nil
+	case "complete":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
 
+func (s *PostProps) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Reacts.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "reacts",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Assets.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "assets",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s *PostSearchResults) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Count)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "count",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "results",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
 func (s *PublicKeyCredentialCreationOptions) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
@@ -474,16 +752,8 @@ func (s PublicKeyCredentialType) Validate() error {
 func (s *PublicProfile) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Interests == nil {
-			return nil // optional
-		}
-		if err := func() error {
-			if err := s.Interests.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return errors.Wrap(err, "pointer")
+		if err := s.Interests.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -494,6 +764,12 @@ func (s *PublicProfile) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s ReactList) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
 	}
 	return nil
 }
@@ -527,10 +803,64 @@ func (s *Thread) Validate() error {
 		if s.Posts == nil {
 			return errors.New("nil is invalid value")
 		}
+		var failures []validate.FieldError
+		for i, elem := range s.Posts {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "posts",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s *ThreadInitialProps) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Tags == nil {
+			return nil // optional
+		}
+		if err := func() error {
+			if err := s.Tags.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "tags",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Status.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "status",
 			Error: err,
 		})
 	}
@@ -562,16 +892,60 @@ func (s ThreadList) Validate() error {
 	}
 	return nil
 }
-func (s *ThreadMutableProps) Validate() error {
+func (s *ThreadListOK) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.Tags.Validate(); err != nil {
+		if err := s.Threads.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
+			Name:  "threads",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s *ThreadMutableProps) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Tags == nil {
+			return nil // optional
+		}
+		if err := func() error {
+			if err := s.Tags.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
 			Name:  "tags",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Status.Set {
+			if err := func() error {
+				if err := s.Status.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "status",
 			Error: err,
 		})
 	}
@@ -594,8 +968,8 @@ func (s *ThreadReference) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Reacts == nil {
-			return errors.New("nil is invalid value")
+		if err := s.Reacts.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -604,21 +978,25 @@ func (s *ThreadReference) Validate() error {
 			Error: err,
 		})
 	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-func (s *ThreadsListOK) Validate() error {
-	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.Threads.Validate(); err != nil {
+		if err := s.Assets.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "threads",
+			Name:  "assets",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.Collections.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "collections",
 			Error: err,
 		})
 	}
@@ -626,6 +1004,16 @@ func (s *ThreadsListOK) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+func (s ThreadStatus) Validate() error {
+	switch s {
+	case "draft":
+		return nil
+	case "published":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 func (s UserVerificationRequirement) Validate() error {
 	switch s {

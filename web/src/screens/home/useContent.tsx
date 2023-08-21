@@ -2,7 +2,7 @@ import { useThreadList } from "src/api/openapi/threads";
 
 import { useQueryParameters } from "./utils";
 
-export function useHomeScreen() {
+export function useContent() {
   const { category } = useQueryParameters();
 
   const threads = useThreadList({

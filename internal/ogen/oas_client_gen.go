@@ -62,6 +62,75 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
+// AccountAuthProviderList invokes AccountAuthProviderList operation.
+//
+// Retrieve a list of authentication providers with a flag indicating which
+// ones are active for the currently authenticated account.
+//
+// GET /v1/accounts/self/auth-methods
+func (c *Client) AccountAuthProviderList(ctx context.Context) (AccountAuthProviderListRes, error) {
+	res, err := c.sendAccountAuthProviderList(ctx)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendAccountAuthProviderList(ctx context.Context) (res AccountAuthProviderListRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AccountAuthProviderList"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "AccountAuthProviderList",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/accounts/self/auth-methods"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAccountAuthProviderListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // AccountGet invokes AccountGet operation.
 //
 // Get the information for the currently authenticated account.
@@ -473,6 +542,192 @@ func (c *Client) sendAccountUpdate(ctx context.Context, request OptAccountMutabl
 	return result, nil
 }
 
+// AssetGet invokes AssetGet operation.
+//
+// Download an asset by its ID.
+//
+// GET /v1/assets/{id}
+func (c *Client) AssetGet(ctx context.Context, params AssetGetParams) (AssetGetRes, error) {
+	res, err := c.sendAssetGet(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendAssetGet(ctx context.Context, params AssetGetParams) (res AssetGetRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AssetGet"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "AssetGet",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/assets/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAssetGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// AssetUpload invokes AssetUpload operation.
+//
+// Upload and process a media file.
+//
+// POST /v1/assets
+func (c *Client) AssetUpload(ctx context.Context, request AssetUploadReq) (AssetUploadRes, error) {
+	res, err := c.sendAssetUpload(ctx, request)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendAssetUpload(ctx context.Context, request AssetUploadReq) (res AssetUploadRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AssetUpload"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "AssetUpload",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/assets"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeAssetUploadRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "AssetUpload", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAssetUploadResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // AuthPasswordSignin invokes AuthPasswordSignin operation.
 //
 // Sign in to an existing account with a username and password.
@@ -786,20 +1041,20 @@ func (c *Client) sendAuthProviderLogout(ctx context.Context) (res AuthProviderLo
 	return result, nil
 }
 
-// CategoriesList invokes CategoriesList operation.
+// CategoryCreate invokes CategoryCreate operation.
 //
-// Get a list of all categories on the site.
+// Create a category for organising posts.
 //
-// GET /v1/categories
-func (c *Client) CategoriesList(ctx context.Context) (CategoriesListRes, error) {
-	res, err := c.sendCategoriesList(ctx)
+// POST /v1/categories
+func (c *Client) CategoryCreate(ctx context.Context, request OptCategoryInitialProps) (CategoryCreateRes, error) {
+	res, err := c.sendCategoryCreate(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendCategoriesList(ctx context.Context) (res CategoriesListRes, err error) {
+func (c *Client) sendCategoryCreate(ctx context.Context, request OptCategoryInitialProps) (res CategoryCreateRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("CategoriesList"),
+		otelogen.OperationID("CategoryCreate"),
 	}
 
 	// Run stopwatch.
@@ -813,7 +1068,111 @@ func (c *Client) sendCategoriesList(ctx context.Context) (res CategoriesListRes,
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "CategoriesList",
+	ctx, span := c.cfg.Tracer.Start(ctx, "CategoryCreate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/categories"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCategoryCreateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "CategoryCreate", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCategoryCreateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CategoryList invokes CategoryList operation.
+//
+// Get a list of all categories on the site.
+//
+// GET /v1/categories
+func (c *Client) CategoryList(ctx context.Context) (CategoryListRes, error) {
+	res, err := c.sendCategoryList(ctx)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCategoryList(ctx context.Context) (res CategoryListRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CategoryList"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CategoryList",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -846,7 +1205,817 @@ func (c *Client) sendCategoriesList(ctx context.Context) (res CategoriesListRes,
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeCategoriesListResponse(resp)
+	result, err := decodeCategoryListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CategoryUpdateOrder invokes CategoryUpdateOrder operation.
+//
+// Update the sort order of categories.
+//
+// PATCH /v1/categories
+func (c *Client) CategoryUpdateOrder(ctx context.Context, request *CategoryIdentifierList) (CategoryUpdateOrderRes, error) {
+	res, err := c.sendCategoryUpdateOrder(ctx, request)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCategoryUpdateOrder(ctx context.Context, request *CategoryIdentifierList) (res CategoryUpdateOrderRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CategoryUpdateOrder"),
+	}
+	// Validate request before sending.
+	if err := func() error {
+		if request == nil {
+			return nil // optional
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CategoryUpdateOrder",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/categories"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCategoryUpdateOrderRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCategoryUpdateOrderResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionAddPost invokes CollectionAddPost operation.
+//
+// Add a post to a collection. The collection must be owned by the account
+// making the request. The post can be any published post of any kind.
+//
+// PUT /v1/collections/{collection_id}/items/{post_id}
+func (c *Client) CollectionAddPost(ctx context.Context, params CollectionAddPostParams) (CollectionAddPostRes, error) {
+	res, err := c.sendCollectionAddPost(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionAddPost(ctx context.Context, params CollectionAddPostParams) (res CollectionAddPostRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionAddPost"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionAddPost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections/"
+	{
+		// Encode "collection_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "collection_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.CollectionID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+	u.Path += "/items/"
+	{
+		// Encode "post_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "post_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.PostID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "CollectionAddPost", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionAddPostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionCreate invokes CollectionCreate operation.
+//
+// Create a collection for curating posts under the authenticated account.
+//
+// POST /v1/collections
+func (c *Client) CollectionCreate(ctx context.Context, request OptCollectionInitialProps) (CollectionCreateRes, error) {
+	res, err := c.sendCollectionCreate(ctx, request)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionCreate(ctx context.Context, request OptCollectionInitialProps) (res CollectionCreateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionCreate"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionCreate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCollectionCreateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "CollectionCreate", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionCreateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionGet invokes CollectionGet operation.
+//
+// Get a collection by its ID. Collections can be public or private so the
+// response will depend on which account is making the request and if the
+// target collection is public, private, owned or not owned by the account.
+//
+// GET /v1/collections/{collection_id}
+func (c *Client) CollectionGet(ctx context.Context, params CollectionGetParams) (CollectionGetRes, error) {
+	res, err := c.sendCollectionGet(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionGet(ctx context.Context, params CollectionGetParams) (res CollectionGetRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionGet"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionGet",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections/"
+	{
+		// Encode "collection_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "collection_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.CollectionID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionList invokes CollectionList operation.
+//
+// List all collections using the filtering options.
+//
+// GET /v1/collections
+func (c *Client) CollectionList(ctx context.Context) (CollectionListRes, error) {
+	res, err := c.sendCollectionList(ctx)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionList(ctx context.Context) (res CollectionListRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionList"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionList",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionRemovePost invokes CollectionRemovePost operation.
+//
+// Remove a post from a collection. The collection must be owned by the
+// account making the request.
+//
+// DELETE /v1/collections/{collection_id}/items/{post_id}
+func (c *Client) CollectionRemovePost(ctx context.Context, params CollectionRemovePostParams) (CollectionRemovePostRes, error) {
+	res, err := c.sendCollectionRemovePost(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionRemovePost(ctx context.Context, params CollectionRemovePostParams) (res CollectionRemovePostRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionRemovePost"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionRemovePost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections/"
+	{
+		// Encode "collection_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "collection_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.CollectionID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+	u.Path += "/items/"
+	{
+		// Encode "post_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "post_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.PostID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "CollectionRemovePost", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionRemovePostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// CollectionUpdate invokes CollectionUpdate operation.
+//
+// Update a collection owned by the authenticated account.
+//
+// PATCH /v1/collections/{collection_id}
+func (c *Client) CollectionUpdate(ctx context.Context, request OptCollectionMutableProps, params CollectionUpdateParams) (CollectionUpdateRes, error) {
+	res, err := c.sendCollectionUpdate(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendCollectionUpdate(ctx context.Context, request OptCollectionMutableProps, params CollectionUpdateParams) (res CollectionUpdateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionUpdate"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "CollectionUpdate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/collections/"
+	{
+		// Encode "collection_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "collection_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.CollectionID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeCollectionUpdateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "CollectionUpdate", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeCollectionUpdateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GetInfo invokes GetInfo operation.
+//
+// Get the basic forum installation info such as title, description, etc.
+//
+// GET /v1/info
+func (c *Client) GetInfo(ctx context.Context) (GetInfoRes, error) {
+	res, err := c.sendGetInfo(ctx)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendGetInfo(ctx context.Context) (res GetInfoRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("GetInfo"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "GetInfo",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/info"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGetInfoResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1078,20 +2247,22 @@ func (c *Client) sendOAuthProviderCallback(ctx context.Context, request OptOAuth
 	return result, nil
 }
 
-// PostsCreate invokes PostsCreate operation.
+// PhoneRequestCode invokes PhoneRequestCode operation.
 //
-// Create a new post within a thread.
+// Start the authentication flow with a phone number. The handler will send
+// a one-time code to the provided phone number which must then be sent to
+// the other phone endpoint to verify the number and validate the account.
 //
-// POST /v1/threads/{thread_mark}/posts
-func (c *Client) PostsCreate(ctx context.Context, request OptPostInitialProps, params PostsCreateParams) (PostsCreateRes, error) {
-	res, err := c.sendPostsCreate(ctx, request, params)
+// POST /v1/auth/phone
+func (c *Client) PhoneRequestCode(ctx context.Context, request OptPhoneRequestCodeProps) (PhoneRequestCodeRes, error) {
+	res, err := c.sendPhoneRequestCode(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendPostsCreate(ctx context.Context, request OptPostInitialProps, params PostsCreateParams) (res PostsCreateRes, err error) {
+func (c *Client) sendPhoneRequestCode(ctx context.Context, request OptPhoneRequestCodeProps) (res PhoneRequestCodeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("PostsCreate"),
+		otelogen.OperationID("PhoneRequestCode"),
 	}
 
 	// Run stopwatch.
@@ -1105,7 +2276,167 @@ func (c *Client) sendPostsCreate(ctx context.Context, request OptPostInitialProp
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "PostsCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, "PhoneRequestCode",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/auth/phone"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePhoneRequestCodeRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePhoneRequestCodeResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PhoneSubmitCode invokes PhoneSubmitCode operation.
+//
+// Complete the phone number authentication flow by submitting the one-time
+// code that was sent to the user's phone.
+//
+// PUT /v1/auth/phone/{account_handle}
+func (c *Client) PhoneSubmitCode(ctx context.Context, request OptPhoneSubmitCodeProps, params PhoneSubmitCodeParams) (PhoneSubmitCodeRes, error) {
+	res, err := c.sendPhoneSubmitCode(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPhoneSubmitCode(ctx context.Context, request OptPhoneSubmitCodeProps, params PhoneSubmitCodeParams) (res PhoneSubmitCodeRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PhoneSubmitCode"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PhoneSubmitCode",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/auth/phone/"
+	{
+		// Encode "account_handle" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "account_handle",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.AccountHandle); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePhoneSubmitCodeRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePhoneSubmitCodeResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PostCreate invokes PostCreate operation.
+//
+// Create a new post within a thread.
+//
+// POST /v1/threads/{thread_mark}/posts
+func (c *Client) PostCreate(ctx context.Context, request OptPostInitialProps, params PostCreateParams) (PostCreateRes, error) {
+	res, err := c.sendPostCreate(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPostCreate(ctx context.Context, request OptPostInitialProps, params PostCreateParams) (res PostCreateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostCreate"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PostCreate",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1147,7 +2478,7 @@ func (c *Client) sendPostsCreate(ctx context.Context, request OptPostInitialProp
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodePostsCreateRequest(request, r); err != nil {
+	if err := encodePostCreateRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -1156,7 +2487,7 @@ func (c *Client) sendPostsCreate(ctx context.Context, request OptPostInitialProp
 		var satisfied bitset
 		{
 			stage = "Security:Browser"
-			switch err := c.securityBrowser(ctx, "PostsCreate", r); err {
+			switch err := c.securityBrowser(ctx, "PostCreate", r); err {
 			case nil:
 				satisfied[0] |= 1 << 0
 			case ogenerrors.ErrSkipClientSecurity:
@@ -1192,7 +2523,506 @@ func (c *Client) sendPostsCreate(ctx context.Context, request OptPostInitialProp
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodePostsCreateResponse(resp)
+	result, err := decodePostCreateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PostDelete invokes PostDelete operation.
+//
+// Archive a post using soft-delete.
+//
+// DELETE /v1/posts/{post_id}
+func (c *Client) PostDelete(ctx context.Context, params PostDeleteParams) (PostDeleteRes, error) {
+	res, err := c.sendPostDelete(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPostDelete(ctx context.Context, params PostDeleteParams) (res PostDeleteRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostDelete"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PostDelete",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/posts/"
+	{
+		// Encode "post_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "post_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.PostID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "PostDelete", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePostDeleteResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PostReactAdd invokes PostReactAdd operation.
+//
+// Add a reaction to a post.
+//
+// PUT /v1/posts/{post_id}/reacts
+func (c *Client) PostReactAdd(ctx context.Context, request OptPostReactProps, params PostReactAddParams) (PostReactAddRes, error) {
+	res, err := c.sendPostReactAdd(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPostReactAdd(ctx context.Context, request OptPostReactProps, params PostReactAddParams) (res PostReactAddRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostReactAdd"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PostReactAdd",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/posts/"
+	{
+		// Encode "post_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "post_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.PostID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+	u.Path += "/reacts"
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PUT", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePostReactAddRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "PostReactAdd", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePostReactAddResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PostSearch invokes PostSearch operation.
+//
+// Search through posts using various queries and filters.
+//
+// GET /v1/posts/search
+func (c *Client) PostSearch(ctx context.Context, params PostSearchParams) (PostSearchRes, error) {
+	res, err := c.sendPostSearch(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPostSearch(ctx context.Context, params PostSearchParams) (res PostSearchRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostSearch"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PostSearch",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/posts/search"
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "body" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "body",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Body.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "author" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "author",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Author.Get(); ok {
+				if unwrapped := string(val); true {
+					return e.EncodeValue(conv.StringToString(unwrapped))
+				}
+				return nil
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "kind" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "kind",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if v := params.Kind; v != nil {
+				if unwrapped := []ContentKind((*v)); true {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range unwrapped {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(string(item)))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}
+				return nil
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePostSearchResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PostUpdate invokes PostUpdate operation.
+//
+// Publish changes to a single post.
+//
+// PATCH /v1/posts/{post_id}
+func (c *Client) PostUpdate(ctx context.Context, request OptPostMutableProps, params PostUpdateParams) (PostUpdateRes, error) {
+	res, err := c.sendPostUpdate(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendPostUpdate(ctx context.Context, request OptPostMutableProps, params PostUpdateParams) (res PostUpdateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostUpdate"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PostUpdate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/posts/"
+	{
+		// Encode "post_id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "post_id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.PostID); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePostUpdateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "PostUpdate", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodePostUpdateResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1285,20 +3115,20 @@ func (c *Client) sendProfileGet(ctx context.Context, params ProfileGetParams) (r
 	return result, nil
 }
 
-// ThreadsCreate invokes ThreadsCreate operation.
+// ThreadCreate invokes ThreadCreate operation.
 //
 // Create a new thread within the specified category.
 //
 // POST /v1/threads
-func (c *Client) ThreadsCreate(ctx context.Context, request OptThreadMutableProps) (ThreadsCreateRes, error) {
-	res, err := c.sendThreadsCreate(ctx, request)
+func (c *Client) ThreadCreate(ctx context.Context, request OptThreadInitialProps) (ThreadCreateRes, error) {
+	res, err := c.sendThreadCreate(ctx, request)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutableProps) (res ThreadsCreateRes, err error) {
+func (c *Client) sendThreadCreate(ctx context.Context, request OptThreadInitialProps) (res ThreadCreateRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsCreate"),
+		otelogen.OperationID("ThreadCreate"),
 	}
 	// Validate request before sending.
 	if err := func() error {
@@ -1328,7 +3158,7 @@ func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutable
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadsCreate",
+	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadCreate",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1352,7 +3182,7 @@ func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutable
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeThreadsCreateRequest(request, r); err != nil {
+	if err := encodeThreadCreateRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -1361,7 +3191,7 @@ func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutable
 		var satisfied bitset
 		{
 			stage = "Security:Browser"
-			switch err := c.securityBrowser(ctx, "ThreadsCreate", r); err {
+			switch err := c.securityBrowser(ctx, "ThreadCreate", r); err {
 			case nil:
 				satisfied[0] |= 1 << 0
 			case ogenerrors.ErrSkipClientSecurity:
@@ -1397,7 +3227,7 @@ func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutable
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeThreadsCreateResponse(resp)
+	result, err := decodeThreadCreateResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1405,21 +3235,20 @@ func (c *Client) sendThreadsCreate(ctx context.Context, request OptThreadMutable
 	return result, nil
 }
 
-// ThreadsGet invokes ThreadsGet operation.
+// ThreadDelete invokes ThreadDelete operation.
 //
-// Get information about a thread such as its title, author, when it was
-// created as well as a list of the posts within the thread.
+// Archive a thread using soft-delete.
 //
-// GET /v1/threads/{thread_mark}
-func (c *Client) ThreadsGet(ctx context.Context, params ThreadsGetParams) (ThreadsGetRes, error) {
-	res, err := c.sendThreadsGet(ctx, params)
+// DELETE /v1/threads/{thread_mark}
+func (c *Client) ThreadDelete(ctx context.Context, params ThreadDeleteParams) (ThreadDeleteRes, error) {
+	res, err := c.sendThreadDelete(ctx, params)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendThreadsGet(ctx context.Context, params ThreadsGetParams) (res ThreadsGetRes, err error) {
+func (c *Client) sendThreadDelete(ctx context.Context, params ThreadDeleteParams) (res ThreadDeleteRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsGet"),
+		otelogen.OperationID("ThreadDelete"),
 	}
 
 	// Run stopwatch.
@@ -1433,7 +3262,126 @@ func (c *Client) sendThreadsGet(ctx context.Context, params ThreadsGetParams) (r
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadsGet",
+	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadDelete",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/threads/"
+	{
+		// Encode "thread_mark" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "thread_mark",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.ThreadMark); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "ThreadDelete", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeThreadDeleteResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ThreadGet invokes ThreadGet operation.
+//
+// Get information about a thread such as its title, author, when it was
+// created as well as a list of the posts within the thread.
+//
+// GET /v1/threads/{thread_mark}
+func (c *Client) ThreadGet(ctx context.Context, params ThreadGetParams) (ThreadGetRes, error) {
+	res, err := c.sendThreadGet(ctx, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res ThreadGetRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ThreadGet"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1483,7 +3431,7 @@ func (c *Client) sendThreadsGet(ctx context.Context, params ThreadsGetParams) (r
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeThreadsGetResponse(resp)
+	result, err := decodeThreadGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1491,20 +3439,20 @@ func (c *Client) sendThreadsGet(ctx context.Context, params ThreadsGetParams) (r
 	return result, nil
 }
 
-// ThreadsList invokes ThreadsList operation.
+// ThreadList invokes ThreadList operation.
 //
 // Get a list of all threads.
 //
 // GET /v1/threads
-func (c *Client) ThreadsList(ctx context.Context, params ThreadsListParams) (ThreadsListRes, error) {
-	res, err := c.sendThreadsList(ctx, params)
+func (c *Client) ThreadList(ctx context.Context, params ThreadListParams) (ThreadListRes, error) {
+	res, err := c.sendThreadList(ctx, params)
 	_ = res
 	return res, err
 }
 
-func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) (res ThreadsListRes, err error) {
+func (c *Client) sendThreadList(ctx context.Context, params ThreadListParams) (res ThreadListRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsList"),
+		otelogen.OperationID("ThreadList"),
 	}
 
 	// Run stopwatch.
@@ -1518,7 +3466,7 @@ func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) 
 	c.requests.Add(ctx, 1, otelAttrs...)
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadsList",
+	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadList",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -1591,6 +3539,38 @@ func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) 
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "categories" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "categories",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if v := params.Categories; v != nil {
+				if unwrapped := []CategoryName((*v)); true {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range unwrapped {
+							if err := func() error {
+								if unwrapped := string(item); true {
+									return e.EncodeValue(conv.StringToString(unwrapped))
+								}
+								return nil
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}
+				return nil
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -1607,7 +3587,144 @@ func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) 
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeThreadsListResponse(resp)
+	result, err := decodeThreadListResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ThreadUpdate invokes ThreadUpdate operation.
+//
+// Publish changes to a thread.
+//
+// PATCH /v1/threads/{thread_mark}
+func (c *Client) ThreadUpdate(ctx context.Context, request OptThreadMutableProps, params ThreadUpdateParams) (ThreadUpdateRes, error) {
+	res, err := c.sendThreadUpdate(ctx, request, params)
+	_ = res
+	return res, err
+}
+
+func (c *Client) sendThreadUpdate(ctx context.Context, request OptThreadMutableProps, params ThreadUpdateParams) (res ThreadUpdateRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ThreadUpdate"),
+	}
+	// Validate request before sending.
+	if err := func() error {
+		if request.Set {
+			if err := func() error {
+				if err := request.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "ThreadUpdate",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	u.Path += "/v1/threads/"
+	{
+		// Encode "thread_mark" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "thread_mark",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			if unwrapped := string(params.ThreadMark); true {
+				return e.EncodeValue(conv.StringToString(unwrapped))
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		u.Path += e.Result()
+	}
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeThreadUpdateRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:Browser"
+			switch err := c.securityBrowser(ctx, "ThreadUpdate", r); err {
+			case nil:
+				satisfied[0] |= 1 << 0
+			case ogenerrors.ErrSkipClientSecurity:
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"Browser\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, errors.New("no security requirement satisfied")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeThreadUpdateResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

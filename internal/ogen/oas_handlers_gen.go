@@ -17,6 +17,90 @@ import (
 	"github.com/ogen-go/ogen/otelogen"
 )
 
+// handleAccountAuthProviderListRequest handles AccountAuthProviderList operation.
+//
+// Retrieve a list of authentication providers with a flag indicating which
+// ones are active for the currently authenticated account.
+//
+// GET /v1/accounts/self/auth-methods
+func (s *Server) handleAccountAuthProviderListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AccountAuthProviderList"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/accounts/self/auth-methods"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "AccountAuthProviderList",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err error
+	)
+
+	var response AccountAuthProviderListRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "AccountAuthProviderList",
+			OperationID:   "AccountAuthProviderList",
+			Body:          nil,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = AccountAuthProviderListRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.AccountAuthProviderList(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.AccountAuthProviderList(ctx)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeAccountAuthProviderListResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
 // handleAccountGetRequest handles AccountGet operation.
 //
 // Get the information for the currently authenticated account.
@@ -542,6 +626,254 @@ func (s *Server) handleAccountUpdateRequest(args [0]string, w http.ResponseWrite
 	}
 }
 
+// handleAssetGetRequest handles AssetGet operation.
+//
+// Download an asset by its ID.
+//
+// GET /v1/assets/{id}
+func (s *Server) handleAssetGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AssetGet"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/assets/{id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "AssetGet",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "AssetGet",
+			ID:   "AssetGet",
+		}
+	)
+	params, err := decodeAssetGetParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response AssetGetRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "AssetGet",
+			OperationID:   "AssetGet",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "id",
+					In:   "path",
+				}: params.ID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = AssetGetParams
+			Response = AssetGetRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackAssetGetParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.AssetGet(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.AssetGet(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeAssetGetResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleAssetUploadRequest handles AssetUpload operation.
+//
+// Upload and process a media file.
+//
+// POST /v1/assets
+func (s *Server) handleAssetUploadRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("AssetUpload"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/v1/assets"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "AssetUpload",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "AssetUpload",
+			ID:   "AssetUpload",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "AssetUpload", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	request, close, err := s.decodeAssetUploadRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response AssetUploadRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "AssetUpload",
+			OperationID:   "AssetUpload",
+			Body:          request,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = AssetUploadReq
+			Params   = struct{}
+			Response = AssetUploadRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.AssetUpload(ctx, request)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.AssetUpload(ctx, request)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeAssetUploadResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
 // handleAuthPasswordSigninRequest handles AuthPasswordSignin operation.
 //
 // Sign in to an existing account with a username and password.
@@ -962,20 +1294,166 @@ func (s *Server) handleAuthProviderLogoutRequest(args [0]string, w http.Response
 	}
 }
 
-// handleCategoriesListRequest handles CategoriesList operation.
+// handleCategoryCreateRequest handles CategoryCreate operation.
+//
+// Create a category for organising posts.
+//
+// POST /v1/categories
+func (s *Server) handleCategoryCreateRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CategoryCreate"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/v1/categories"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CategoryCreate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CategoryCreate",
+			ID:   "CategoryCreate",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "CategoryCreate", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	request, close, err := s.decodeCategoryCreateRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CategoryCreateRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CategoryCreate",
+			OperationID:   "CategoryCreate",
+			Body:          request,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = OptCategoryInitialProps
+			Params   = struct{}
+			Response = CategoryCreateRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CategoryCreate(ctx, request)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CategoryCreate(ctx, request)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCategoryCreateResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCategoryListRequest handles CategoryList operation.
 //
 // Get a list of all categories on the site.
 //
 // GET /v1/categories
-func (s *Server) handleCategoriesListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleCategoryListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("CategoriesList"),
+		otelogen.OperationID("CategoryList"),
 		semconv.HTTPMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/categories"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "CategoriesList",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CategoryList",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1000,12 +1478,12 @@ func (s *Server) handleCategoriesListRequest(args [0]string, w http.ResponseWrit
 		err error
 	)
 
-	var response CategoriesListRes
+	var response CategoryListRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
-			OperationName: "CategoriesList",
-			OperationID:   "CategoriesList",
+			OperationName: "CategoryList",
+			OperationID:   "CategoryList",
 			Body:          nil,
 			Params:        middleware.Parameters{},
 			Raw:           r,
@@ -1014,7 +1492,7 @@ func (s *Server) handleCategoriesListRequest(args [0]string, w http.ResponseWrit
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = CategoriesListRes
+			Response = CategoryListRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1025,12 +1503,12 @@ func (s *Server) handleCategoriesListRequest(args [0]string, w http.ResponseWrit
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.CategoriesList(ctx)
+				response, err = s.h.CategoryList(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.CategoriesList(ctx)
+		response, err = s.h.CategoryList(ctx)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -1038,7 +1516,988 @@ func (s *Server) handleCategoriesListRequest(args [0]string, w http.ResponseWrit
 		return
 	}
 
-	if err := encodeCategoriesListResponse(response, w, span); err != nil {
+	if err := encodeCategoryListResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCategoryUpdateOrderRequest handles CategoryUpdateOrder operation.
+//
+// Update the sort order of categories.
+//
+// PATCH /v1/categories
+func (s *Server) handleCategoryUpdateOrderRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CategoryUpdateOrder"),
+		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/v1/categories"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CategoryUpdateOrder",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CategoryUpdateOrder",
+			ID:   "CategoryUpdateOrder",
+		}
+	)
+	request, close, err := s.decodeCategoryUpdateOrderRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CategoryUpdateOrderRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CategoryUpdateOrder",
+			OperationID:   "CategoryUpdateOrder",
+			Body:          request,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = *CategoryIdentifierList
+			Params   = struct{}
+			Response = CategoryUpdateOrderRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CategoryUpdateOrder(ctx, request)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CategoryUpdateOrder(ctx, request)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCategoryUpdateOrderResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionAddPostRequest handles CollectionAddPost operation.
+//
+// Add a post to a collection. The collection must be owned by the account
+// making the request. The post can be any published post of any kind.
+//
+// PUT /v1/collections/{collection_id}/items/{post_id}
+func (s *Server) handleCollectionAddPostRequest(args [2]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionAddPost"),
+		semconv.HTTPMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/v1/collections/{collection_id}/items/{post_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionAddPost",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CollectionAddPost",
+			ID:   "CollectionAddPost",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "CollectionAddPost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCollectionAddPostParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response CollectionAddPostRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionAddPost",
+			OperationID:   "CollectionAddPost",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "collection_id",
+					In:   "path",
+				}: params.CollectionID,
+				{
+					Name: "post_id",
+					In:   "path",
+				}: params.PostID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = CollectionAddPostParams
+			Response = CollectionAddPostRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCollectionAddPostParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionAddPost(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionAddPost(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionAddPostResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionCreateRequest handles CollectionCreate operation.
+//
+// Create a collection for curating posts under the authenticated account.
+//
+// POST /v1/collections
+func (s *Server) handleCollectionCreateRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionCreate"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/v1/collections"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionCreate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CollectionCreate",
+			ID:   "CollectionCreate",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "CollectionCreate", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	request, close, err := s.decodeCollectionCreateRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CollectionCreateRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionCreate",
+			OperationID:   "CollectionCreate",
+			Body:          request,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = OptCollectionInitialProps
+			Params   = struct{}
+			Response = CollectionCreateRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionCreate(ctx, request)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionCreate(ctx, request)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionCreateResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionGetRequest handles CollectionGet operation.
+//
+// Get a collection by its ID. Collections can be public or private so the
+// response will depend on which account is making the request and if the
+// target collection is public, private, owned or not owned by the account.
+//
+// GET /v1/collections/{collection_id}
+func (s *Server) handleCollectionGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionGet"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/collections/{collection_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionGet",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CollectionGet",
+			ID:   "CollectionGet",
+		}
+	)
+	params, err := decodeCollectionGetParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response CollectionGetRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionGet",
+			OperationID:   "CollectionGet",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "collection_id",
+					In:   "path",
+				}: params.CollectionID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = CollectionGetParams
+			Response = CollectionGetRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCollectionGetParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionGet(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionGet(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionGetResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionListRequest handles CollectionList operation.
+//
+// List all collections using the filtering options.
+//
+// GET /v1/collections
+func (s *Server) handleCollectionListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionList"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/collections"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionList",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err error
+	)
+
+	var response CollectionListRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionList",
+			OperationID:   "CollectionList",
+			Body:          nil,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = CollectionListRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionList(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionList(ctx)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionListResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionRemovePostRequest handles CollectionRemovePost operation.
+//
+// Remove a post from a collection. The collection must be owned by the
+// account making the request.
+//
+// DELETE /v1/collections/{collection_id}/items/{post_id}
+func (s *Server) handleCollectionRemovePostRequest(args [2]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionRemovePost"),
+		semconv.HTTPMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/v1/collections/{collection_id}/items/{post_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionRemovePost",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CollectionRemovePost",
+			ID:   "CollectionRemovePost",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "CollectionRemovePost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCollectionRemovePostParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response CollectionRemovePostRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionRemovePost",
+			OperationID:   "CollectionRemovePost",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "collection_id",
+					In:   "path",
+				}: params.CollectionID,
+				{
+					Name: "post_id",
+					In:   "path",
+				}: params.PostID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = CollectionRemovePostParams
+			Response = CollectionRemovePostRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCollectionRemovePostParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionRemovePost(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionRemovePost(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionRemovePostResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleCollectionUpdateRequest handles CollectionUpdate operation.
+//
+// Update a collection owned by the authenticated account.
+//
+// PATCH /v1/collections/{collection_id}
+func (s *Server) handleCollectionUpdateRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("CollectionUpdate"),
+		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/v1/collections/{collection_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "CollectionUpdate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CollectionUpdate",
+			ID:   "CollectionUpdate",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "CollectionUpdate", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeCollectionUpdateParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodeCollectionUpdateRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response CollectionUpdateRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "CollectionUpdate",
+			OperationID:   "CollectionUpdate",
+			Body:          request,
+			Params: middleware.Parameters{
+				{
+					Name: "collection_id",
+					In:   "path",
+				}: params.CollectionID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptCollectionMutableProps
+			Params   = CollectionUpdateParams
+			Response = CollectionUpdateRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackCollectionUpdateParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CollectionUpdate(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CollectionUpdate(ctx, request, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCollectionUpdateResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleGetInfoRequest handles GetInfo operation.
+//
+// Get the basic forum installation info such as title, description, etc.
+//
+// GET /v1/info
+func (s *Server) handleGetInfoRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("GetInfo"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/info"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetInfo",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err error
+	)
+
+	var response GetInfoRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "GetInfo",
+			OperationID:   "GetInfo",
+			Body:          nil,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = GetInfoRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetInfo(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetInfo(ctx)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetInfoResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
@@ -1330,20 +2789,22 @@ func (s *Server) handleOAuthProviderCallbackRequest(args [1]string, w http.Respo
 	}
 }
 
-// handlePostsCreateRequest handles PostsCreate operation.
+// handlePhoneRequestCodeRequest handles PhoneRequestCode operation.
 //
-// Create a new post within a thread.
+// Start the authentication flow with a phone number. The handler will send
+// a one-time code to the provided phone number which must then be sent to
+// the other phone endpoint to verify the number and validate the account.
 //
-// POST /v1/threads/{thread_mark}/posts
-func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+// POST /v1/auth/phone
+func (s *Server) handlePhoneRequestCodeRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("PostsCreate"),
+		otelogen.OperationID("PhoneRequestCode"),
 		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/v1/threads/{thread_mark}/posts"),
+		semconv.HTTPRouteKey.String("/v1/auth/phone"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostsCreate",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PhoneRequestCode",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1367,15 +2828,235 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "PostsCreate",
-			ID:   "PostsCreate",
+			Name: "PhoneRequestCode",
+			ID:   "PhoneRequestCode",
+		}
+	)
+	request, close, err := s.decodePhoneRequestCodeRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response PhoneRequestCodeRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PhoneRequestCode",
+			OperationID:   "PhoneRequestCode",
+			Body:          request,
+			Params:        middleware.Parameters{},
+			Raw:           r,
+		}
+
+		type (
+			Request  = OptPhoneRequestCodeProps
+			Params   = struct{}
+			Response = PhoneRequestCodeRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PhoneRequestCode(ctx, request)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PhoneRequestCode(ctx, request)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePhoneRequestCodeResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePhoneSubmitCodeRequest handles PhoneSubmitCode operation.
+//
+// Complete the phone number authentication flow by submitting the one-time
+// code that was sent to the user's phone.
+//
+// PUT /v1/auth/phone/{account_handle}
+func (s *Server) handlePhoneSubmitCodeRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PhoneSubmitCode"),
+		semconv.HTTPMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/v1/auth/phone/{account_handle}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PhoneSubmitCode",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PhoneSubmitCode",
+			ID:   "PhoneSubmitCode",
+		}
+	)
+	params, err := decodePhoneSubmitCodeParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodePhoneSubmitCodeRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response PhoneSubmitCodeRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PhoneSubmitCode",
+			OperationID:   "PhoneSubmitCode",
+			Body:          request,
+			Params: middleware.Parameters{
+				{
+					Name: "account_handle",
+					In:   "path",
+				}: params.AccountHandle,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptPhoneSubmitCodeProps
+			Params   = PhoneSubmitCodeParams
+			Response = PhoneSubmitCodeRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPhoneSubmitCodeParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PhoneSubmitCode(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PhoneSubmitCode(ctx, request, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePhoneSubmitCodeResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePostCreateRequest handles PostCreate operation.
+//
+// Create a new post within a thread.
+//
+// POST /v1/threads/{thread_mark}/posts
+func (s *Server) handlePostCreateRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostCreate"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/v1/threads/{thread_mark}/posts"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostCreate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PostCreate",
+			ID:   "PostCreate",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityBrowser(ctx, "PostsCreate", r)
+			sctx, ok, err := s.securityBrowser(ctx, "PostCreate", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -1415,7 +3096,7 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 			return
 		}
 	}
-	params, err := decodePostsCreateParams(args, r)
+	params, err := decodePostCreateParams(args, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1425,7 +3106,7 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodePostsCreateRequest(r)
+	request, close, err := s.decodePostCreateRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1441,12 +3122,12 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 		}
 	}()
 
-	var response PostsCreateRes
+	var response PostCreateRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
-			OperationName: "PostsCreate",
-			OperationID:   "PostsCreate",
+			OperationName: "PostCreate",
+			OperationID:   "PostCreate",
 			Body:          request,
 			Params: middleware.Parameters{
 				{
@@ -1459,8 +3140,8 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 
 		type (
 			Request  = OptPostInitialProps
-			Params   = PostsCreateParams
-			Response = PostsCreateRes
+			Params   = PostCreateParams
+			Response = PostCreateRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1469,14 +3150,14 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 		](
 			m,
 			mreq,
-			unpackPostsCreateParams,
+			unpackPostCreateParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostsCreate(ctx, request, params)
+				response, err = s.h.PostCreate(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PostsCreate(ctx, request, params)
+		response, err = s.h.PostCreate(ctx, request, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -1484,7 +3165,585 @@ func (s *Server) handlePostsCreateRequest(args [1]string, w http.ResponseWriter,
 		return
 	}
 
-	if err := encodePostsCreateResponse(response, w, span); err != nil {
+	if err := encodePostCreateResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePostDeleteRequest handles PostDelete operation.
+//
+// Archive a post using soft-delete.
+//
+// DELETE /v1/posts/{post_id}
+func (s *Server) handlePostDeleteRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostDelete"),
+		semconv.HTTPMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/v1/posts/{post_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostDelete",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PostDelete",
+			ID:   "PostDelete",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "PostDelete", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodePostDeleteParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response PostDeleteRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PostDelete",
+			OperationID:   "PostDelete",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "post_id",
+					In:   "path",
+				}: params.PostID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = PostDeleteParams
+			Response = PostDeleteRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPostDeleteParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PostDelete(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PostDelete(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePostDeleteResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePostReactAddRequest handles PostReactAdd operation.
+//
+// Add a reaction to a post.
+//
+// PUT /v1/posts/{post_id}/reacts
+func (s *Server) handlePostReactAddRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostReactAdd"),
+		semconv.HTTPMethodKey.String("PUT"),
+		semconv.HTTPRouteKey.String("/v1/posts/{post_id}/reacts"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostReactAdd",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PostReactAdd",
+			ID:   "PostReactAdd",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "PostReactAdd", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodePostReactAddParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodePostReactAddRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response PostReactAddRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PostReactAdd",
+			OperationID:   "PostReactAdd",
+			Body:          request,
+			Params: middleware.Parameters{
+				{
+					Name: "post_id",
+					In:   "path",
+				}: params.PostID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptPostReactProps
+			Params   = PostReactAddParams
+			Response = PostReactAddRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPostReactAddParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PostReactAdd(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PostReactAdd(ctx, request, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePostReactAddResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePostSearchRequest handles PostSearch operation.
+//
+// Search through posts using various queries and filters.
+//
+// GET /v1/posts/search
+func (s *Server) handlePostSearchRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostSearch"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/posts/search"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostSearch",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PostSearch",
+			ID:   "PostSearch",
+		}
+	)
+	params, err := decodePostSearchParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response PostSearchRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PostSearch",
+			OperationID:   "PostSearch",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "body",
+					In:   "query",
+				}: params.Body,
+				{
+					Name: "author",
+					In:   "query",
+				}: params.Author,
+				{
+					Name: "kind",
+					In:   "query",
+				}: params.Kind,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = PostSearchParams
+			Response = PostSearchRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPostSearchParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PostSearch(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PostSearch(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePostSearchResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handlePostUpdateRequest handles PostUpdate operation.
+//
+// Publish changes to a single post.
+//
+// PATCH /v1/posts/{post_id}
+func (s *Server) handlePostUpdateRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("PostUpdate"),
+		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/v1/posts/{post_id}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostUpdate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "PostUpdate",
+			ID:   "PostUpdate",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "PostUpdate", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodePostUpdateParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodePostUpdateRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response PostUpdateRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "PostUpdate",
+			OperationID:   "PostUpdate",
+			Body:          request,
+			Params: middleware.Parameters{
+				{
+					Name: "post_id",
+					In:   "path",
+				}: params.PostID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptPostMutableProps
+			Params   = PostUpdateParams
+			Response = PostUpdateRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackPostUpdateParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.PostUpdate(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.PostUpdate(ctx, request, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodePostUpdateResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
@@ -1593,20 +3852,20 @@ func (s *Server) handleProfileGetRequest(args [1]string, w http.ResponseWriter, 
 	}
 }
 
-// handleThreadsCreateRequest handles ThreadsCreate operation.
+// handleThreadCreateRequest handles ThreadCreate operation.
 //
 // Create a new thread within the specified category.
 //
 // POST /v1/threads
-func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleThreadCreateRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsCreate"),
+		otelogen.OperationID("ThreadCreate"),
 		semconv.HTTPMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/threads"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadsCreate",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadCreate",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1630,15 +3889,15 @@ func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWrite
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "ThreadsCreate",
-			ID:   "ThreadsCreate",
+			Name: "ThreadCreate",
+			ID:   "ThreadCreate",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityBrowser(ctx, "ThreadsCreate", r)
+			sctx, ok, err := s.securityBrowser(ctx, "ThreadCreate", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -1678,7 +3937,7 @@ func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWrite
 			return
 		}
 	}
-	request, close, err := s.decodeThreadsCreateRequest(r)
+	request, close, err := s.decodeThreadCreateRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1694,21 +3953,21 @@ func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWrite
 		}
 	}()
 
-	var response ThreadsCreateRes
+	var response ThreadCreateRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
-			OperationName: "ThreadsCreate",
-			OperationID:   "ThreadsCreate",
+			OperationName: "ThreadCreate",
+			OperationID:   "ThreadCreate",
 			Body:          request,
 			Params:        middleware.Parameters{},
 			Raw:           r,
 		}
 
 		type (
-			Request  = OptThreadMutableProps
+			Request  = OptThreadInitialProps
 			Params   = struct{}
-			Response = ThreadsCreateRes
+			Response = ThreadCreateRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1719,12 +3978,12 @@ func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWrite
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadsCreate(ctx, request)
+				response, err = s.h.ThreadCreate(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadsCreate(ctx, request)
+		response, err = s.h.ThreadCreate(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -1732,28 +3991,27 @@ func (s *Server) handleThreadsCreateRequest(args [0]string, w http.ResponseWrite
 		return
 	}
 
-	if err := encodeThreadsCreateResponse(response, w, span); err != nil {
+	if err := encodeThreadCreateResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
 }
 
-// handleThreadsGetRequest handles ThreadsGet operation.
+// handleThreadDeleteRequest handles ThreadDelete operation.
 //
-// Get information about a thread such as its title, author, when it was
-// created as well as a list of the posts within the thread.
+// Archive a thread using soft-delete.
 //
-// GET /v1/threads/{thread_mark}
-func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+// DELETE /v1/threads/{thread_mark}
+func (s *Server) handleThreadDeleteRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsGet"),
-		semconv.HTTPMethodKey.String("GET"),
+		otelogen.OperationID("ThreadDelete"),
+		semconv.HTTPMethodKey.String("DELETE"),
 		semconv.HTTPRouteKey.String("/v1/threads/{thread_mark}"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadsGet",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadDelete",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1777,11 +4035,55 @@ func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, 
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "ThreadsGet",
-			ID:   "ThreadsGet",
+			Name: "ThreadDelete",
+			ID:   "ThreadDelete",
 		}
 	)
-	params, err := decodeThreadsGetParams(args, r)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "ThreadDelete", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeThreadDeleteParams(args, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1792,12 +4094,12 @@ func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, 
 		return
 	}
 
-	var response ThreadsGetRes
+	var response ThreadDeleteRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
-			OperationName: "ThreadsGet",
-			OperationID:   "ThreadsGet",
+			OperationName: "ThreadDelete",
+			OperationID:   "ThreadDelete",
 			Body:          nil,
 			Params: middleware.Parameters{
 				{
@@ -1810,8 +4112,8 @@ func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, 
 
 		type (
 			Request  = struct{}
-			Params   = ThreadsGetParams
-			Response = ThreadsGetRes
+			Params   = ThreadDeleteParams
+			Response = ThreadDeleteRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1820,14 +4122,14 @@ func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, 
 		](
 			m,
 			mreq,
-			unpackThreadsGetParams,
+			unpackThreadDeleteParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadsGet(ctx, params)
+				response, err = s.h.ThreadDelete(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadsGet(ctx, params)
+		response, err = s.h.ThreadDelete(ctx, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -1835,27 +4137,28 @@ func (s *Server) handleThreadsGetRequest(args [1]string, w http.ResponseWriter, 
 		return
 	}
 
-	if err := encodeThreadsGetResponse(response, w, span); err != nil {
+	if err := encodeThreadDeleteResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
 }
 
-// handleThreadsListRequest handles ThreadsList operation.
+// handleThreadGetRequest handles ThreadGet operation.
 //
-// Get a list of all threads.
+// Get information about a thread such as its title, author, when it was
+// created as well as a list of the posts within the thread.
 //
-// GET /v1/threads
-func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+// GET /v1/threads/{thread_mark}
+func (s *Server) handleThreadGetRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("ThreadsList"),
+		otelogen.OperationID("ThreadGet"),
 		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/v1/threads"),
+		semconv.HTTPRouteKey.String("/v1/threads/{thread_mark}"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadsList",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadGet",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1879,11 +4182,11 @@ func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter,
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "ThreadsList",
-			ID:   "ThreadsList",
+			Name: "ThreadGet",
+			ID:   "ThreadGet",
 		}
 	)
-	params, err := decodeThreadsListParams(args, r)
+	params, err := decodeThreadGetParams(args, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1894,12 +4197,114 @@ func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter,
 		return
 	}
 
-	var response ThreadsListRes
+	var response ThreadGetRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:       ctx,
-			OperationName: "ThreadsList",
-			OperationID:   "ThreadsList",
+			OperationName: "ThreadGet",
+			OperationID:   "ThreadGet",
+			Body:          nil,
+			Params: middleware.Parameters{
+				{
+					Name: "thread_mark",
+					In:   "path",
+				}: params.ThreadMark,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = ThreadGetParams
+			Response = ThreadGetRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackThreadGetParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.ThreadGet(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.ThreadGet(ctx, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeThreadGetResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleThreadListRequest handles ThreadList operation.
+//
+// Get a list of all threads.
+//
+// GET /v1/threads
+func (s *Server) handleThreadListRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ThreadList"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/v1/threads"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadList",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "ThreadList",
+			ID:   "ThreadList",
+		}
+	)
+	params, err := decodeThreadListParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response ThreadListRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "ThreadList",
+			OperationID:   "ThreadList",
 			Body:          nil,
 			Params: middleware.Parameters{
 				{
@@ -1910,14 +4315,18 @@ func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter,
 					Name: "tags",
 					In:   "query",
 				}: params.Tags,
+				{
+					Name: "categories",
+					In:   "query",
+				}: params.Categories,
 			},
 			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = ThreadsListParams
-			Response = ThreadsListRes
+			Params   = ThreadListParams
+			Response = ThreadListRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1926,14 +4335,14 @@ func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter,
 		](
 			m,
 			mreq,
-			unpackThreadsListParams,
+			unpackThreadListParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadsList(ctx, params)
+				response, err = s.h.ThreadList(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadsList(ctx, params)
+		response, err = s.h.ThreadList(ctx, params)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -1941,7 +4350,168 @@ func (s *Server) handleThreadsListRequest(args [0]string, w http.ResponseWriter,
 		return
 	}
 
-	if err := encodeThreadsListResponse(response, w, span); err != nil {
+	if err := encodeThreadListResponse(response, w, span); err != nil {
+		recordError("EncodeResponse", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+}
+
+// handleThreadUpdateRequest handles ThreadUpdate operation.
+//
+// Publish changes to a thread.
+//
+// PATCH /v1/threads/{thread_mark}
+func (s *Server) handleThreadUpdateRequest(args [1]string, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ThreadUpdate"),
+		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/v1/threads/{thread_mark}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ThreadUpdate",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		s.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	s.requests.Add(ctx, 1, otelAttrs...)
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, otelAttrs...)
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "ThreadUpdate",
+			ID:   "ThreadUpdate",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityBrowser(ctx, "ThreadUpdate", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "Browser",
+					Err:              err,
+				}
+				recordError("Security:Browser", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeThreadUpdateParams(args, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	request, close, err := s.decodeThreadUpdateRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
+
+	var response ThreadUpdateRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:       ctx,
+			OperationName: "ThreadUpdate",
+			OperationID:   "ThreadUpdate",
+			Body:          request,
+			Params: middleware.Parameters{
+				{
+					Name: "thread_mark",
+					In:   "path",
+				}: params.ThreadMark,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = OptThreadMutableProps
+			Params   = ThreadUpdateParams
+			Response = ThreadUpdateRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackThreadUpdateParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.ThreadUpdate(ctx, request, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.ThreadUpdate(ctx, request, params)
+	}
+	if err != nil {
+		recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeThreadUpdateResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return

@@ -8,6 +8,13 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// AccountAuthProviderList implements AccountAuthProviderList operation.
+	//
+	// Retrieve a list of authentication providers with a flag indicating which
+	// ones are active for the currently authenticated account.
+	//
+	// GET /v1/accounts/self/auth-methods
+	AccountAuthProviderList(ctx context.Context) (AccountAuthProviderListRes, error)
 	// AccountGet implements AccountGet operation.
 	//
 	// Get the information for the currently authenticated account.
@@ -32,6 +39,18 @@ type Handler interface {
 	//
 	// PATCH /v1/accounts
 	AccountUpdate(ctx context.Context, req OptAccountMutableProps) (AccountUpdateRes, error)
+	// AssetGet implements AssetGet operation.
+	//
+	// Download an asset by its ID.
+	//
+	// GET /v1/assets/{id}
+	AssetGet(ctx context.Context, params AssetGetParams) (AssetGetRes, error)
+	// AssetUpload implements AssetUpload operation.
+	//
+	// Upload and process a media file.
+	//
+	// POST /v1/assets
+	AssetUpload(ctx context.Context, req AssetUploadReq) (AssetUploadRes, error)
 	// AuthPasswordSignin implements AuthPasswordSignin operation.
 	//
 	// Sign in to an existing account with a username and password.
@@ -58,12 +77,70 @@ type Handler interface {
 	//
 	// GET /v1/auth/logout
 	AuthProviderLogout(ctx context.Context) (AuthProviderLogoutRes, error)
-	// CategoriesList implements CategoriesList operation.
+	// CategoryCreate implements CategoryCreate operation.
+	//
+	// Create a category for organising posts.
+	//
+	// POST /v1/categories
+	CategoryCreate(ctx context.Context, req OptCategoryInitialProps) (CategoryCreateRes, error)
+	// CategoryList implements CategoryList operation.
 	//
 	// Get a list of all categories on the site.
 	//
 	// GET /v1/categories
-	CategoriesList(ctx context.Context) (CategoriesListRes, error)
+	CategoryList(ctx context.Context) (CategoryListRes, error)
+	// CategoryUpdateOrder implements CategoryUpdateOrder operation.
+	//
+	// Update the sort order of categories.
+	//
+	// PATCH /v1/categories
+	CategoryUpdateOrder(ctx context.Context, req *CategoryIdentifierList) (CategoryUpdateOrderRes, error)
+	// CollectionAddPost implements CollectionAddPost operation.
+	//
+	// Add a post to a collection. The collection must be owned by the account
+	// making the request. The post can be any published post of any kind.
+	//
+	// PUT /v1/collections/{collection_id}/items/{post_id}
+	CollectionAddPost(ctx context.Context, params CollectionAddPostParams) (CollectionAddPostRes, error)
+	// CollectionCreate implements CollectionCreate operation.
+	//
+	// Create a collection for curating posts under the authenticated account.
+	//
+	// POST /v1/collections
+	CollectionCreate(ctx context.Context, req OptCollectionInitialProps) (CollectionCreateRes, error)
+	// CollectionGet implements CollectionGet operation.
+	//
+	// Get a collection by its ID. Collections can be public or private so the
+	// response will depend on which account is making the request and if the
+	// target collection is public, private, owned or not owned by the account.
+	//
+	// GET /v1/collections/{collection_id}
+	CollectionGet(ctx context.Context, params CollectionGetParams) (CollectionGetRes, error)
+	// CollectionList implements CollectionList operation.
+	//
+	// List all collections using the filtering options.
+	//
+	// GET /v1/collections
+	CollectionList(ctx context.Context) (CollectionListRes, error)
+	// CollectionRemovePost implements CollectionRemovePost operation.
+	//
+	// Remove a post from a collection. The collection must be owned by the
+	// account making the request.
+	//
+	// DELETE /v1/collections/{collection_id}/items/{post_id}
+	CollectionRemovePost(ctx context.Context, params CollectionRemovePostParams) (CollectionRemovePostRes, error)
+	// CollectionUpdate implements CollectionUpdate operation.
+	//
+	// Update a collection owned by the authenticated account.
+	//
+	// PATCH /v1/collections/{collection_id}
+	CollectionUpdate(ctx context.Context, req OptCollectionMutableProps, params CollectionUpdateParams) (CollectionUpdateRes, error)
+	// GetInfo implements GetInfo operation.
+	//
+	// Get the basic forum installation info such as title, description, etc.
+	//
+	// GET /v1/info
+	GetInfo(ctx context.Context) (GetInfoRes, error)
 	// GetSpec implements GetSpec operation.
 	//
 	// Note: the generator creates a `map[string]interface{}` if this is set to
@@ -84,37 +161,88 @@ type Handler interface {
 	//
 	// POST /v1/auth/oauth/{oauth_provider}/callback
 	OAuthProviderCallback(ctx context.Context, req OptOAuthCallback, params OAuthProviderCallbackParams) (OAuthProviderCallbackRes, error)
-	// PostsCreate implements PostsCreate operation.
+	// PhoneRequestCode implements PhoneRequestCode operation.
+	//
+	// Start the authentication flow with a phone number. The handler will send
+	// a one-time code to the provided phone number which must then be sent to
+	// the other phone endpoint to verify the number and validate the account.
+	//
+	// POST /v1/auth/phone
+	PhoneRequestCode(ctx context.Context, req OptPhoneRequestCodeProps) (PhoneRequestCodeRes, error)
+	// PhoneSubmitCode implements PhoneSubmitCode operation.
+	//
+	// Complete the phone number authentication flow by submitting the one-time
+	// code that was sent to the user's phone.
+	//
+	// PUT /v1/auth/phone/{account_handle}
+	PhoneSubmitCode(ctx context.Context, req OptPhoneSubmitCodeProps, params PhoneSubmitCodeParams) (PhoneSubmitCodeRes, error)
+	// PostCreate implements PostCreate operation.
 	//
 	// Create a new post within a thread.
 	//
 	// POST /v1/threads/{thread_mark}/posts
-	PostsCreate(ctx context.Context, req OptPostInitialProps, params PostsCreateParams) (PostsCreateRes, error)
+	PostCreate(ctx context.Context, req OptPostInitialProps, params PostCreateParams) (PostCreateRes, error)
+	// PostDelete implements PostDelete operation.
+	//
+	// Archive a post using soft-delete.
+	//
+	// DELETE /v1/posts/{post_id}
+	PostDelete(ctx context.Context, params PostDeleteParams) (PostDeleteRes, error)
+	// PostReactAdd implements PostReactAdd operation.
+	//
+	// Add a reaction to a post.
+	//
+	// PUT /v1/posts/{post_id}/reacts
+	PostReactAdd(ctx context.Context, req OptPostReactProps, params PostReactAddParams) (PostReactAddRes, error)
+	// PostSearch implements PostSearch operation.
+	//
+	// Search through posts using various queries and filters.
+	//
+	// GET /v1/posts/search
+	PostSearch(ctx context.Context, params PostSearchParams) (PostSearchRes, error)
+	// PostUpdate implements PostUpdate operation.
+	//
+	// Publish changes to a single post.
+	//
+	// PATCH /v1/posts/{post_id}
+	PostUpdate(ctx context.Context, req OptPostMutableProps, params PostUpdateParams) (PostUpdateRes, error)
 	// ProfileGet implements ProfileGet operation.
 	//
 	// Get a public profile by ID.
 	//
 	// GET /v1/profiles/{account_handle}
 	ProfileGet(ctx context.Context, params ProfileGetParams) (ProfileGetRes, error)
-	// ThreadsCreate implements ThreadsCreate operation.
+	// ThreadCreate implements ThreadCreate operation.
 	//
 	// Create a new thread within the specified category.
 	//
 	// POST /v1/threads
-	ThreadsCreate(ctx context.Context, req OptThreadMutableProps) (ThreadsCreateRes, error)
-	// ThreadsGet implements ThreadsGet operation.
+	ThreadCreate(ctx context.Context, req OptThreadInitialProps) (ThreadCreateRes, error)
+	// ThreadDelete implements ThreadDelete operation.
+	//
+	// Archive a thread using soft-delete.
+	//
+	// DELETE /v1/threads/{thread_mark}
+	ThreadDelete(ctx context.Context, params ThreadDeleteParams) (ThreadDeleteRes, error)
+	// ThreadGet implements ThreadGet operation.
 	//
 	// Get information about a thread such as its title, author, when it was
 	// created as well as a list of the posts within the thread.
 	//
 	// GET /v1/threads/{thread_mark}
-	ThreadsGet(ctx context.Context, params ThreadsGetParams) (ThreadsGetRes, error)
-	// ThreadsList implements ThreadsList operation.
+	ThreadGet(ctx context.Context, params ThreadGetParams) (ThreadGetRes, error)
+	// ThreadList implements ThreadList operation.
 	//
 	// Get a list of all threads.
 	//
 	// GET /v1/threads
-	ThreadsList(ctx context.Context, params ThreadsListParams) (ThreadsListRes, error)
+	ThreadList(ctx context.Context, params ThreadListParams) (ThreadListRes, error)
+	// ThreadUpdate implements ThreadUpdate operation.
+	//
+	// Publish changes to a thread.
+	//
+	// PATCH /v1/threads/{thread_mark}
+	ThreadUpdate(ctx context.Context, req OptThreadMutableProps, params ThreadUpdateParams) (ThreadUpdateRes, error)
 	// WebAuthnGetAssertion implements WebAuthnGetAssertion operation.
 	//
 	// Start the WebAuthn assertion for an existing account.

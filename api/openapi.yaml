@@ -1176,7 +1176,7 @@ components:
     Info:
       description: Basic public information about the Storyden installation.
       type: object
-      required: [title, description, accent_colour]
+      required: [title, description, accent_colour, onboarding_status]
       properties:
         title:
           type: string
@@ -1184,6 +1184,20 @@ components:
           type: string
         accent_colour:
           type: string
+        onboarding_status:
+          $ref: "#/components/schemas/OnboardingStatus"
+
+    OnboardingStatus:
+      description: |
+        Derived from data state, indicates what stage in the onboarding process
+        the Storyden installation is in for directing first-time setup steps.
+      type: string
+      enum:
+        - requires_first_account
+        - requires_category
+        - requires_more_accounts
+        - requires_first_post
+        - complete
 
     ContentKind:
       type: string

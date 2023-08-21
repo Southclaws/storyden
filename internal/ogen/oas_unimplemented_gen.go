@@ -13,6 +13,16 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AccountAuthProviderList implements AccountAuthProviderList operation.
+//
+// Retrieve a list of authentication providers with a flag indicating which
+// ones are active for the currently authenticated account.
+//
+// GET /v1/accounts/self/auth-methods
+func (UnimplementedHandler) AccountAuthProviderList(ctx context.Context) (r AccountAuthProviderListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // AccountGet implements AccountGet operation.
 //
 // Get the information for the currently authenticated account.
@@ -46,6 +56,24 @@ func (UnimplementedHandler) AccountSetAvatar(ctx context.Context, req AccountSet
 //
 // PATCH /v1/accounts
 func (UnimplementedHandler) AccountUpdate(ctx context.Context, req OptAccountMutableProps) (r AccountUpdateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// AssetGet implements AssetGet operation.
+//
+// Download an asset by its ID.
+//
+// GET /v1/assets/{id}
+func (UnimplementedHandler) AssetGet(ctx context.Context, params AssetGetParams) (r AssetGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// AssetUpload implements AssetUpload operation.
+//
+// Upload and process a media file.
+//
+// POST /v1/assets
+func (UnimplementedHandler) AssetUpload(ctx context.Context, req AssetUploadReq) (r AssetUploadRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -87,12 +115,97 @@ func (UnimplementedHandler) AuthProviderLogout(ctx context.Context) (r AuthProvi
 	return r, ht.ErrNotImplemented
 }
 
-// CategoriesList implements CategoriesList operation.
+// CategoryCreate implements CategoryCreate operation.
+//
+// Create a category for organising posts.
+//
+// POST /v1/categories
+func (UnimplementedHandler) CategoryCreate(ctx context.Context, req OptCategoryInitialProps) (r CategoryCreateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CategoryList implements CategoryList operation.
 //
 // Get a list of all categories on the site.
 //
 // GET /v1/categories
-func (UnimplementedHandler) CategoriesList(ctx context.Context) (r CategoriesListRes, _ error) {
+func (UnimplementedHandler) CategoryList(ctx context.Context) (r CategoryListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CategoryUpdateOrder implements CategoryUpdateOrder operation.
+//
+// Update the sort order of categories.
+//
+// PATCH /v1/categories
+func (UnimplementedHandler) CategoryUpdateOrder(ctx context.Context, req *CategoryIdentifierList) (r CategoryUpdateOrderRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionAddPost implements CollectionAddPost operation.
+//
+// Add a post to a collection. The collection must be owned by the account
+// making the request. The post can be any published post of any kind.
+//
+// PUT /v1/collections/{collection_id}/items/{post_id}
+func (UnimplementedHandler) CollectionAddPost(ctx context.Context, params CollectionAddPostParams) (r CollectionAddPostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionCreate implements CollectionCreate operation.
+//
+// Create a collection for curating posts under the authenticated account.
+//
+// POST /v1/collections
+func (UnimplementedHandler) CollectionCreate(ctx context.Context, req OptCollectionInitialProps) (r CollectionCreateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionGet implements CollectionGet operation.
+//
+// Get a collection by its ID. Collections can be public or private so the
+// response will depend on which account is making the request and if the
+// target collection is public, private, owned or not owned by the account.
+//
+// GET /v1/collections/{collection_id}
+func (UnimplementedHandler) CollectionGet(ctx context.Context, params CollectionGetParams) (r CollectionGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionList implements CollectionList operation.
+//
+// List all collections using the filtering options.
+//
+// GET /v1/collections
+func (UnimplementedHandler) CollectionList(ctx context.Context) (r CollectionListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionRemovePost implements CollectionRemovePost operation.
+//
+// Remove a post from a collection. The collection must be owned by the
+// account making the request.
+//
+// DELETE /v1/collections/{collection_id}/items/{post_id}
+func (UnimplementedHandler) CollectionRemovePost(ctx context.Context, params CollectionRemovePostParams) (r CollectionRemovePostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CollectionUpdate implements CollectionUpdate operation.
+//
+// Update a collection owned by the authenticated account.
+//
+// PATCH /v1/collections/{collection_id}
+func (UnimplementedHandler) CollectionUpdate(ctx context.Context, req OptCollectionMutableProps, params CollectionUpdateParams) (r CollectionUpdateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetInfo implements GetInfo operation.
+//
+// Get the basic forum installation info such as title, description, etc.
+//
+// GET /v1/info
+func (UnimplementedHandler) GetInfo(ctx context.Context) (r GetInfoRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -125,12 +238,69 @@ func (UnimplementedHandler) OAuthProviderCallback(ctx context.Context, req OptOA
 	return r, ht.ErrNotImplemented
 }
 
-// PostsCreate implements PostsCreate operation.
+// PhoneRequestCode implements PhoneRequestCode operation.
+//
+// Start the authentication flow with a phone number. The handler will send
+// a one-time code to the provided phone number which must then be sent to
+// the other phone endpoint to verify the number and validate the account.
+//
+// POST /v1/auth/phone
+func (UnimplementedHandler) PhoneRequestCode(ctx context.Context, req OptPhoneRequestCodeProps) (r PhoneRequestCodeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PhoneSubmitCode implements PhoneSubmitCode operation.
+//
+// Complete the phone number authentication flow by submitting the one-time
+// code that was sent to the user's phone.
+//
+// PUT /v1/auth/phone/{account_handle}
+func (UnimplementedHandler) PhoneSubmitCode(ctx context.Context, req OptPhoneSubmitCodeProps, params PhoneSubmitCodeParams) (r PhoneSubmitCodeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostCreate implements PostCreate operation.
 //
 // Create a new post within a thread.
 //
 // POST /v1/threads/{thread_mark}/posts
-func (UnimplementedHandler) PostsCreate(ctx context.Context, req OptPostInitialProps, params PostsCreateParams) (r PostsCreateRes, _ error) {
+func (UnimplementedHandler) PostCreate(ctx context.Context, req OptPostInitialProps, params PostCreateParams) (r PostCreateRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostDelete implements PostDelete operation.
+//
+// Archive a post using soft-delete.
+//
+// DELETE /v1/posts/{post_id}
+func (UnimplementedHandler) PostDelete(ctx context.Context, params PostDeleteParams) (r PostDeleteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostReactAdd implements PostReactAdd operation.
+//
+// Add a reaction to a post.
+//
+// PUT /v1/posts/{post_id}/reacts
+func (UnimplementedHandler) PostReactAdd(ctx context.Context, req OptPostReactProps, params PostReactAddParams) (r PostReactAddRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostSearch implements PostSearch operation.
+//
+// Search through posts using various queries and filters.
+//
+// GET /v1/posts/search
+func (UnimplementedHandler) PostSearch(ctx context.Context, params PostSearchParams) (r PostSearchRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostUpdate implements PostUpdate operation.
+//
+// Publish changes to a single post.
+//
+// PATCH /v1/posts/{post_id}
+func (UnimplementedHandler) PostUpdate(ctx context.Context, req OptPostMutableProps, params PostUpdateParams) (r PostUpdateRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -143,31 +313,49 @@ func (UnimplementedHandler) ProfileGet(ctx context.Context, params ProfileGetPar
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadsCreate implements ThreadsCreate operation.
+// ThreadCreate implements ThreadCreate operation.
 //
 // Create a new thread within the specified category.
 //
 // POST /v1/threads
-func (UnimplementedHandler) ThreadsCreate(ctx context.Context, req OptThreadMutableProps) (r ThreadsCreateRes, _ error) {
+func (UnimplementedHandler) ThreadCreate(ctx context.Context, req OptThreadInitialProps) (r ThreadCreateRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadsGet implements ThreadsGet operation.
+// ThreadDelete implements ThreadDelete operation.
+//
+// Archive a thread using soft-delete.
+//
+// DELETE /v1/threads/{thread_mark}
+func (UnimplementedHandler) ThreadDelete(ctx context.Context, params ThreadDeleteParams) (r ThreadDeleteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ThreadGet implements ThreadGet operation.
 //
 // Get information about a thread such as its title, author, when it was
 // created as well as a list of the posts within the thread.
 //
 // GET /v1/threads/{thread_mark}
-func (UnimplementedHandler) ThreadsGet(ctx context.Context, params ThreadsGetParams) (r ThreadsGetRes, _ error) {
+func (UnimplementedHandler) ThreadGet(ctx context.Context, params ThreadGetParams) (r ThreadGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadsList implements ThreadsList operation.
+// ThreadList implements ThreadList operation.
 //
 // Get a list of all threads.
 //
 // GET /v1/threads
-func (UnimplementedHandler) ThreadsList(ctx context.Context, params ThreadsListParams) (r ThreadsListRes, _ error) {
+func (UnimplementedHandler) ThreadList(ctx context.Context, params ThreadListParams) (r ThreadListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ThreadUpdate implements ThreadUpdate operation.
+//
+// Publish changes to a thread.
+//
+// PATCH /v1/threads/{thread_mark}
+func (UnimplementedHandler) ThreadUpdate(ctx context.Context, req OptThreadMutableProps, params ThreadUpdateParams) (r ThreadUpdateRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

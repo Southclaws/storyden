@@ -16,17 +16,17 @@ var (
 	KindPost   = Kind{kindPost}
 )
 
-func (r Kind) String() string {
-	switch r {
-	case KindThread:
-		return "kindThread"
-	case KindPost:
-		return "kindPost"
+func (r Kind) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
 	default:
-		return ""
+		fmt.Fprint(f, r.v)
 	}
 }
-func (r Kind) GoString() string {
+func (r Kind) String() string {
 	return string(r.v)
 }
 func (r Kind) MarshalText() ([]byte, error) {
