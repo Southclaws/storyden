@@ -17,6 +17,7 @@ export function Default(props: PropsWithChildren) {
   const pathname = usePathname();
   return (
     <Flex
+      minHeight="100vh"
       width="full"
       flexDirection="row"
       bgColor="white"

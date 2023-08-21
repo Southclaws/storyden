@@ -102,21 +102,41 @@ func (s *APIErrorStatusCode) SetResponse(val APIError) {
 	s.Response = val
 }
 
+func (*APIErrorStatusCode) accountAuthProviderListRes()   {}
 func (*APIErrorStatusCode) accountGetAvatarRes()          {}
 func (*APIErrorStatusCode) accountGetRes()                {}
 func (*APIErrorStatusCode) accountSetAvatarRes()          {}
 func (*APIErrorStatusCode) accountUpdateRes()             {}
+func (*APIErrorStatusCode) assetGetRes()                  {}
+func (*APIErrorStatusCode) assetUploadRes()               {}
 func (*APIErrorStatusCode) authPasswordSigninRes()        {}
 func (*APIErrorStatusCode) authPasswordSignupRes()        {}
 func (*APIErrorStatusCode) authProviderListRes()          {}
 func (*APIErrorStatusCode) authProviderLogoutRes()        {}
-func (*APIErrorStatusCode) categoriesListRes()            {}
+func (*APIErrorStatusCode) categoryCreateRes()            {}
+func (*APIErrorStatusCode) categoryListRes()              {}
+func (*APIErrorStatusCode) categoryUpdateOrderRes()       {}
+func (*APIErrorStatusCode) collectionAddPostRes()         {}
+func (*APIErrorStatusCode) collectionCreateRes()          {}
+func (*APIErrorStatusCode) collectionGetRes()             {}
+func (*APIErrorStatusCode) collectionListRes()            {}
+func (*APIErrorStatusCode) collectionRemovePostRes()      {}
+func (*APIErrorStatusCode) collectionUpdateRes()          {}
+func (*APIErrorStatusCode) getInfoRes()                   {}
 func (*APIErrorStatusCode) oAuthProviderCallbackRes()     {}
-func (*APIErrorStatusCode) postsCreateRes()               {}
+func (*APIErrorStatusCode) phoneRequestCodeRes()          {}
+func (*APIErrorStatusCode) phoneSubmitCodeRes()           {}
+func (*APIErrorStatusCode) postCreateRes()                {}
+func (*APIErrorStatusCode) postDeleteRes()                {}
+func (*APIErrorStatusCode) postReactAddRes()              {}
+func (*APIErrorStatusCode) postSearchRes()                {}
+func (*APIErrorStatusCode) postUpdateRes()                {}
 func (*APIErrorStatusCode) profileGetRes()                {}
-func (*APIErrorStatusCode) threadsCreateRes()             {}
-func (*APIErrorStatusCode) threadsGetRes()                {}
-func (*APIErrorStatusCode) threadsListRes()               {}
+func (*APIErrorStatusCode) threadCreateRes()              {}
+func (*APIErrorStatusCode) threadDeleteRes()              {}
+func (*APIErrorStatusCode) threadGetRes()                 {}
+func (*APIErrorStatusCode) threadListRes()                {}
+func (*APIErrorStatusCode) threadUpdateRes()              {}
 func (*APIErrorStatusCode) webAuthnGetAssertionRes()      {}
 func (*APIErrorStatusCode) webAuthnMakeAssertionRes()     {}
 func (*APIErrorStatusCode) webAuthnMakeCredentialRes()    {}
@@ -133,11 +153,12 @@ type Account struct {
 	// The time the resource was soft-deleted.
 	DeletedAt OptDateTime `json:"deletedAt"`
 	// Arbitrary extra data stored with the resource.
-	Misc      *AccountMisc     `json:"misc"`
-	Handle    OptAccountHandle `json:"handle"`
-	Name      OptAccountName   `json:"name"`
-	Bio       OptString        `json:"bio"`
-	Interests *TagList         `json:"interests"`
+	Misc      *AccountMisc  `json:"misc"`
+	Handle    AccountHandle `json:"handle"`
+	Name      AccountName   `json:"name"`
+	Bio       OptString     `json:"bio"`
+	Interests *TagList      `json:"interests"`
+	Admin     bool          `json:"admin"`
 }
 
 // GetID returns the value of ID.
@@ -166,12 +187,12 @@ func (s *Account) GetMisc() *AccountMisc {
 }
 
 // GetHandle returns the value of Handle.
-func (s *Account) GetHandle() OptAccountHandle {
+func (s *Account) GetHandle() AccountHandle {
 	return s.Handle
 }
 
 // GetName returns the value of Name.
-func (s *Account) GetName() OptAccountName {
+func (s *Account) GetName() AccountName {
 	return s.Name
 }
 
@@ -183,6 +204,11 @@ func (s *Account) GetBio() OptString {
 // GetInterests returns the value of Interests.
 func (s *Account) GetInterests() *TagList {
 	return s.Interests
+}
+
+// GetAdmin returns the value of Admin.
+func (s *Account) GetAdmin() bool {
+	return s.Admin
 }
 
 // SetID sets the value of ID.
@@ -211,12 +237,12 @@ func (s *Account) SetMisc(val *AccountMisc) {
 }
 
 // SetHandle sets the value of Handle.
-func (s *Account) SetHandle(val OptAccountHandle) {
+func (s *Account) SetHandle(val AccountHandle) {
 	s.Handle = val
 }
 
 // SetName sets the value of Name.
-func (s *Account) SetName(val OptAccountName) {
+func (s *Account) SetName(val AccountName) {
 	s.Name = val
 }
 
@@ -230,8 +256,97 @@ func (s *Account) SetInterests(val *TagList) {
 	s.Interests = val
 }
 
+// SetAdmin sets the value of Admin.
+func (s *Account) SetAdmin(val bool) {
+	s.Admin = val
+}
+
 func (*Account) accountGetRes()    {}
 func (*Account) accountUpdateRes() {}
+
+// Merged schema.
+// Ref: #/components/schemas/AccountAuthMethod
+type AccountAuthMethod struct {
+	// The slug name of the provider.
+	Provider string `json:"provider"`
+	// The human-readable name of the provider.
+	Name string `json:"name"`
+	// The logo to display for the provider.
+	LogoURL string `json:"logo_url"`
+	// The hyperlink to render for the user.
+	Link string `json:"link"`
+	// True if the account is using this auth method.
+	Active bool `json:"active"`
+}
+
+// GetProvider returns the value of Provider.
+func (s *AccountAuthMethod) GetProvider() string {
+	return s.Provider
+}
+
+// GetName returns the value of Name.
+func (s *AccountAuthMethod) GetName() string {
+	return s.Name
+}
+
+// GetLogoURL returns the value of LogoURL.
+func (s *AccountAuthMethod) GetLogoURL() string {
+	return s.LogoURL
+}
+
+// GetLink returns the value of Link.
+func (s *AccountAuthMethod) GetLink() string {
+	return s.Link
+}
+
+// GetActive returns the value of Active.
+func (s *AccountAuthMethod) GetActive() bool {
+	return s.Active
+}
+
+// SetProvider sets the value of Provider.
+func (s *AccountAuthMethod) SetProvider(val string) {
+	s.Provider = val
+}
+
+// SetName sets the value of Name.
+func (s *AccountAuthMethod) SetName(val string) {
+	s.Name = val
+}
+
+// SetLogoURL sets the value of LogoURL.
+func (s *AccountAuthMethod) SetLogoURL(val string) {
+	s.LogoURL = val
+}
+
+// SetLink sets the value of Link.
+func (s *AccountAuthMethod) SetLink(val string) {
+	s.Link = val
+}
+
+// SetActive sets the value of Active.
+func (s *AccountAuthMethod) SetActive(val bool) {
+	s.Active = val
+}
+
+type AccountAuthMethodList []AccountAuthMethod
+
+// Ref: #/components/schemas/AccountAuthMethods
+type AccountAuthMethods struct {
+	AuthMethods AccountAuthMethodList `json:"auth_methods"`
+}
+
+// GetAuthMethods returns the value of AuthMethods.
+func (s *AccountAuthMethods) GetAuthMethods() AccountAuthMethodList {
+	return s.AuthMethods
+}
+
+// SetAuthMethods sets the value of AuthMethods.
+func (s *AccountAuthMethods) SetAuthMethods(val AccountAuthMethodList) {
+	s.AuthMethods = val
+}
+
+func (*AccountAuthMethods) accountAuthProviderListRes() {}
 
 type AccountGetAvatar struct {
 	Data io.Reader
@@ -256,7 +371,7 @@ type AccountMutableProps struct {
 	Handle    OptAccountHandle `json:"handle"`
 	Name      OptAccountName   `json:"name"`
 	Bio       OptString        `json:"bio"`
-	Interests *TagList         `json:"interests"`
+	Interests *TagListIDs      `json:"interests"`
 }
 
 // GetHandle returns the value of Handle.
@@ -275,7 +390,7 @@ func (s *AccountMutableProps) GetBio() OptString {
 }
 
 // GetInterests returns the value of Interests.
-func (s *AccountMutableProps) GetInterests() *TagList {
+func (s *AccountMutableProps) GetInterests() *TagListIDs {
 	return s.Interests
 }
 
@@ -295,7 +410,7 @@ func (s *AccountMutableProps) SetBio(val OptString) {
 }
 
 // SetInterests sets the value of Interests.
-func (s *AccountMutableProps) SetInterests(val *TagList) {
+func (s *AccountMutableProps) SetInterests(val *TagListIDs) {
 	s.Interests = val
 }
 
@@ -314,6 +429,93 @@ type AccountSetAvatarReq struct {
 //
 // Kept to satisfy the io.Reader interface.
 func (s AccountSetAvatarReq) Read(p []byte) (n int, err error) {
+	return s.Data.Read(p)
+}
+
+// Ref: #/components/schemas/Asset
+type Asset struct {
+	ID       Identifier `json:"id"`
+	URL      string     `json:"url"`
+	MimeType string     `json:"mime_type"`
+	Width    float64    `json:"width"`
+	Height   float64    `json:"height"`
+}
+
+// GetID returns the value of ID.
+func (s *Asset) GetID() Identifier {
+	return s.ID
+}
+
+// GetURL returns the value of URL.
+func (s *Asset) GetURL() string {
+	return s.URL
+}
+
+// GetMimeType returns the value of MimeType.
+func (s *Asset) GetMimeType() string {
+	return s.MimeType
+}
+
+// GetWidth returns the value of Width.
+func (s *Asset) GetWidth() float64 {
+	return s.Width
+}
+
+// GetHeight returns the value of Height.
+func (s *Asset) GetHeight() float64 {
+	return s.Height
+}
+
+// SetID sets the value of ID.
+func (s *Asset) SetID(val Identifier) {
+	s.ID = val
+}
+
+// SetURL sets the value of URL.
+func (s *Asset) SetURL(val string) {
+	s.URL = val
+}
+
+// SetMimeType sets the value of MimeType.
+func (s *Asset) SetMimeType(val string) {
+	s.MimeType = val
+}
+
+// SetWidth sets the value of Width.
+func (s *Asset) SetWidth(val float64) {
+	s.Width = val
+}
+
+// SetHeight sets the value of Height.
+func (s *Asset) SetHeight(val float64) {
+	s.Height = val
+}
+
+func (*Asset) assetUploadRes() {}
+
+type AssetGetOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s AssetGetOK) Read(p []byte) (n int, err error) {
+	return s.Data.Read(p)
+}
+
+func (*AssetGetOK) assetGetRes() {}
+
+type AssetList []Asset
+
+type AssetUploadReq struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s AssetUploadReq) Read(p []byte) (n int, err error) {
 	return s.Data.Read(p)
 }
 
@@ -521,6 +723,8 @@ func (s *AuthSuccessHeaders) SetResponse(val AuthSuccess) {
 func (*AuthSuccessHeaders) authPasswordSigninRes()     {}
 func (*AuthSuccessHeaders) authPasswordSignupRes()     {}
 func (*AuthSuccessHeaders) oAuthProviderCallbackRes()  {}
+func (*AuthSuccessHeaders) phoneRequestCodeRes()       {}
+func (*AuthSuccessHeaders) phoneSubmitCodeRes()        {}
 func (*AuthSuccessHeaders) webAuthnMakeAssertionRes()  {}
 func (*AuthSuccessHeaders) webAuthnMakeCredentialRes() {}
 
@@ -695,9 +899,13 @@ func (s *AuthenticatorSelectionCriteria) SetUserVerification(val OptUserVerifica
 // Ref: #/components/responses/BadRequest
 type BadRequest struct{}
 
+func (*BadRequest) accountAuthProviderListRes()   {}
 func (*BadRequest) authPasswordSignupRes()        {}
 func (*BadRequest) authProviderListRes()          {}
 func (*BadRequest) authProviderLogoutRes()        {}
+func (*BadRequest) categoryCreateRes()            {}
+func (*BadRequest) phoneRequestCodeRes()          {}
+func (*BadRequest) phoneSubmitCodeRes()           {}
 func (*BadRequest) webAuthnMakeCredentialRes()    {}
 func (*BadRequest) webAuthnRequestCredentialRes() {}
 
@@ -718,8 +926,16 @@ func (s *Browser) SetAPIKey(val string) {
 // Merged schema.
 // Ref: #/components/schemas/Category
 type Category struct {
-	ID          OptIdentifier `json:"id"`
-	Name        string        `json:"name"`
+	ID Identifier `json:"id"`
+	// The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The time the resource was soft-deleted.
+	DeletedAt OptDateTime `json:"deletedAt"`
+	// Arbitrary extra data stored with the resource.
+	Misc        *CategoryMisc `json:"misc"`
+	Name        CategoryName  `json:"name"`
 	Description OptString     `json:"description"`
 	Colour      OptString     `json:"colour"`
 	Sort        int           `json:"sort"`
@@ -728,12 +944,32 @@ type Category struct {
 }
 
 // GetID returns the value of ID.
-func (s *Category) GetID() OptIdentifier {
+func (s *Category) GetID() Identifier {
 	return s.ID
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *Category) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Category) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetDeletedAt returns the value of DeletedAt.
+func (s *Category) GetDeletedAt() OptDateTime {
+	return s.DeletedAt
+}
+
+// GetMisc returns the value of Misc.
+func (s *Category) GetMisc() *CategoryMisc {
+	return s.Misc
+}
+
 // GetName returns the value of Name.
-func (s *Category) GetName() string {
+func (s *Category) GetName() CategoryName {
 	return s.Name
 }
 
@@ -763,12 +999,32 @@ func (s *Category) GetPostCount() int {
 }
 
 // SetID sets the value of ID.
-func (s *Category) SetID(val OptIdentifier) {
+func (s *Category) SetID(val Identifier) {
 	s.ID = val
 }
 
+// SetCreatedAt sets the value of CreatedAt.
+func (s *Category) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Category) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetDeletedAt sets the value of DeletedAt.
+func (s *Category) SetDeletedAt(val OptDateTime) {
+	s.DeletedAt = val
+}
+
+// SetMisc sets the value of Misc.
+func (s *Category) SetMisc(val *CategoryMisc) {
+	s.Misc = val
+}
+
 // SetName sets the value of Name.
-func (s *Category) SetName(val string) {
+func (s *Category) SetName(val CategoryName) {
 	s.Name = val
 }
 
@@ -797,6 +1053,58 @@ func (s *Category) SetPostCount(val int) {
 	s.PostCount = val
 }
 
+func (*Category) categoryCreateRes() {}
+
+type CategoryIdentifierList []Identifier
+
+// Ref: #/components/schemas/CategoryInitialProps
+type CategoryInitialProps struct {
+	Name        CategoryName `json:"name"`
+	Description string       `json:"description"`
+	Colour      string       `json:"colour"`
+	Admin       bool         `json:"admin"`
+}
+
+// GetName returns the value of Name.
+func (s *CategoryInitialProps) GetName() CategoryName {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CategoryInitialProps) GetDescription() string {
+	return s.Description
+}
+
+// GetColour returns the value of Colour.
+func (s *CategoryInitialProps) GetColour() string {
+	return s.Colour
+}
+
+// GetAdmin returns the value of Admin.
+func (s *CategoryInitialProps) GetAdmin() bool {
+	return s.Admin
+}
+
+// SetName sets the value of Name.
+func (s *CategoryInitialProps) SetName(val CategoryName) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CategoryInitialProps) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetColour sets the value of Colour.
+func (s *CategoryInitialProps) SetColour(val string) {
+	s.Colour = val
+}
+
+// SetAdmin sets the value of Admin.
+func (s *CategoryInitialProps) SetAdmin(val bool) {
+	s.Admin = val
+}
+
 // Ref: #/components/schemas/CategoryList
 type CategoryList struct {
 	Categories []Category `json:"categories"`
@@ -812,26 +1120,62 @@ func (s *CategoryList) SetCategories(val []Category) {
 	s.Categories = val
 }
 
-func (*CategoryList) categoriesListRes() {}
+func (*CategoryList) categoryListRes()        {}
+func (*CategoryList) categoryUpdateOrderRes() {}
+
+// Arbitrary extra data stored with the resource.
+type CategoryMisc struct{}
+
+type CategoryName string
+
+type CategoryNameList []CategoryName
 
 // Merged schema.
 // Ref: #/components/schemas/CategoryReference
 type CategoryReference struct {
-	ID          OptIdentifier `json:"id"`
-	Name        string        `json:"name"`
-	Description OptString     `json:"description"`
-	Colour      OptString     `json:"colour"`
-	Sort        int           `json:"sort"`
-	Admin       OptBool       `json:"admin"`
+	ID Identifier `json:"id"`
+	// The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The time the resource was soft-deleted.
+	DeletedAt OptDateTime `json:"deletedAt"`
+	// Arbitrary extra data stored with the resource.
+	Misc        *CategoryReferenceMisc `json:"misc"`
+	Name        CategoryName           `json:"name"`
+	Description OptString              `json:"description"`
+	Colour      OptString              `json:"colour"`
+	Sort        int                    `json:"sort"`
+	Admin       OptBool                `json:"admin"`
 }
 
 // GetID returns the value of ID.
-func (s *CategoryReference) GetID() OptIdentifier {
+func (s *CategoryReference) GetID() Identifier {
 	return s.ID
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *CategoryReference) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *CategoryReference) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetDeletedAt returns the value of DeletedAt.
+func (s *CategoryReference) GetDeletedAt() OptDateTime {
+	return s.DeletedAt
+}
+
+// GetMisc returns the value of Misc.
+func (s *CategoryReference) GetMisc() *CategoryReferenceMisc {
+	return s.Misc
+}
+
 // GetName returns the value of Name.
-func (s *CategoryReference) GetName() string {
+func (s *CategoryReference) GetName() CategoryName {
 	return s.Name
 }
 
@@ -856,12 +1200,32 @@ func (s *CategoryReference) GetAdmin() OptBool {
 }
 
 // SetID sets the value of ID.
-func (s *CategoryReference) SetID(val OptIdentifier) {
+func (s *CategoryReference) SetID(val Identifier) {
 	s.ID = val
 }
 
+// SetCreatedAt sets the value of CreatedAt.
+func (s *CategoryReference) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *CategoryReference) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetDeletedAt sets the value of DeletedAt.
+func (s *CategoryReference) SetDeletedAt(val OptDateTime) {
+	s.DeletedAt = val
+}
+
+// SetMisc sets the value of Misc.
+func (s *CategoryReference) SetMisc(val *CategoryReferenceMisc) {
+	s.Misc = val
+}
+
 // SetName sets the value of Name.
-func (s *CategoryReference) SetName(val string) {
+func (s *CategoryReference) SetName(val CategoryName) {
 	s.Name = val
 }
 
@@ -884,6 +1248,448 @@ func (s *CategoryReference) SetSort(val int) {
 func (s *CategoryReference) SetAdmin(val OptBool) {
 	s.Admin = val
 }
+
+// Arbitrary extra data stored with the resource.
+type CategoryReferenceMisc struct{}
+
+// Merged schema.
+// Ref: #/components/schemas/Collection
+type Collection struct {
+	ID Identifier `json:"id"`
+	// The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The time the resource was soft-deleted.
+	DeletedAt OptDateTime `json:"deletedAt"`
+	// Arbitrary extra data stored with the resource.
+	Misc        *CollectionMisc  `json:"misc"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Owner       ProfileReference `json:"owner"`
+}
+
+// GetID returns the value of ID.
+func (s *Collection) GetID() Identifier {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *Collection) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Collection) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetDeletedAt returns the value of DeletedAt.
+func (s *Collection) GetDeletedAt() OptDateTime {
+	return s.DeletedAt
+}
+
+// GetMisc returns the value of Misc.
+func (s *Collection) GetMisc() *CollectionMisc {
+	return s.Misc
+}
+
+// GetName returns the value of Name.
+func (s *Collection) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *Collection) GetDescription() string {
+	return s.Description
+}
+
+// GetOwner returns the value of Owner.
+func (s *Collection) GetOwner() ProfileReference {
+	return s.Owner
+}
+
+// SetID sets the value of ID.
+func (s *Collection) SetID(val Identifier) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *Collection) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Collection) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetDeletedAt sets the value of DeletedAt.
+func (s *Collection) SetDeletedAt(val OptDateTime) {
+	s.DeletedAt = val
+}
+
+// SetMisc sets the value of Misc.
+func (s *Collection) SetMisc(val *CollectionMisc) {
+	s.Misc = val
+}
+
+// SetName sets the value of Name.
+func (s *Collection) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *Collection) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *Collection) SetOwner(val ProfileReference) {
+	s.Owner = val
+}
+
+func (*Collection) collectionAddPostRes()    {}
+func (*Collection) collectionCreateRes()     {}
+func (*Collection) collectionRemovePostRes() {}
+func (*Collection) collectionUpdateRes()     {}
+
+// Ref: #/components/schemas/CollectionInitialProps
+type CollectionInitialProps struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+// GetName returns the value of Name.
+func (s *CollectionInitialProps) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CollectionInitialProps) GetDescription() string {
+	return s.Description
+}
+
+// SetName sets the value of Name.
+func (s *CollectionInitialProps) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CollectionInitialProps) SetDescription(val string) {
+	s.Description = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/CollectionItem
+type CollectionItem struct {
+	ID Identifier `json:"id"`
+	// The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The time the resource was soft-deleted.
+	DeletedAt OptDateTime `json:"deletedAt"`
+	// Arbitrary extra data stored with the resource.
+	Misc   *CollectionItemMisc `json:"misc"`
+	Author ProfileReference    `json:"author"`
+	Slug   ThreadMark          `json:"slug"`
+	// The title of the thread.
+	Title string `json:"title"`
+	// A short version of the thread's body text for use in previews.
+	Short string `json:"short"`
+}
+
+// GetID returns the value of ID.
+func (s *CollectionItem) GetID() Identifier {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *CollectionItem) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *CollectionItem) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetDeletedAt returns the value of DeletedAt.
+func (s *CollectionItem) GetDeletedAt() OptDateTime {
+	return s.DeletedAt
+}
+
+// GetMisc returns the value of Misc.
+func (s *CollectionItem) GetMisc() *CollectionItemMisc {
+	return s.Misc
+}
+
+// GetAuthor returns the value of Author.
+func (s *CollectionItem) GetAuthor() ProfileReference {
+	return s.Author
+}
+
+// GetSlug returns the value of Slug.
+func (s *CollectionItem) GetSlug() ThreadMark {
+	return s.Slug
+}
+
+// GetTitle returns the value of Title.
+func (s *CollectionItem) GetTitle() string {
+	return s.Title
+}
+
+// GetShort returns the value of Short.
+func (s *CollectionItem) GetShort() string {
+	return s.Short
+}
+
+// SetID sets the value of ID.
+func (s *CollectionItem) SetID(val Identifier) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *CollectionItem) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *CollectionItem) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetDeletedAt sets the value of DeletedAt.
+func (s *CollectionItem) SetDeletedAt(val OptDateTime) {
+	s.DeletedAt = val
+}
+
+// SetMisc sets the value of Misc.
+func (s *CollectionItem) SetMisc(val *CollectionItemMisc) {
+	s.Misc = val
+}
+
+// SetAuthor sets the value of Author.
+func (s *CollectionItem) SetAuthor(val ProfileReference) {
+	s.Author = val
+}
+
+// SetSlug sets the value of Slug.
+func (s *CollectionItem) SetSlug(val ThreadMark) {
+	s.Slug = val
+}
+
+// SetTitle sets the value of Title.
+func (s *CollectionItem) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetShort sets the value of Short.
+func (s *CollectionItem) SetShort(val string) {
+	s.Short = val
+}
+
+type CollectionItemList []CollectionItem
+
+// Arbitrary extra data stored with the resource.
+type CollectionItemMisc struct{}
+
+type CollectionList []Collection
+
+type CollectionListOK struct {
+	Collections CollectionList `json:"collections"`
+}
+
+// GetCollections returns the value of Collections.
+func (s *CollectionListOK) GetCollections() CollectionList {
+	return s.Collections
+}
+
+// SetCollections sets the value of Collections.
+func (s *CollectionListOK) SetCollections(val CollectionList) {
+	s.Collections = val
+}
+
+func (*CollectionListOK) collectionListRes() {}
+
+// Arbitrary extra data stored with the resource.
+type CollectionMisc struct{}
+
+// Ref: #/components/schemas/CollectionMutableProps
+type CollectionMutableProps struct {
+	Name        OptString `json:"name"`
+	Description OptString `json:"description"`
+}
+
+// GetName returns the value of Name.
+func (s *CollectionMutableProps) GetName() OptString {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CollectionMutableProps) GetDescription() OptString {
+	return s.Description
+}
+
+// SetName sets the value of Name.
+func (s *CollectionMutableProps) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CollectionMutableProps) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/CollectionWithItems
+type CollectionWithItems struct {
+	ID Identifier `json:"id"`
+	// The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The time the resource was soft-deleted.
+	DeletedAt OptDateTime `json:"deletedAt"`
+	// Arbitrary extra data stored with the resource.
+	Misc        *CollectionWithItemsMisc `json:"misc"`
+	Name        string                   `json:"name"`
+	Description string                   `json:"description"`
+	Owner       ProfileReference         `json:"owner"`
+	Items       CollectionItemList       `json:"items"`
+}
+
+// GetID returns the value of ID.
+func (s *CollectionWithItems) GetID() Identifier {
+	return s.ID
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *CollectionWithItems) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *CollectionWithItems) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetDeletedAt returns the value of DeletedAt.
+func (s *CollectionWithItems) GetDeletedAt() OptDateTime {
+	return s.DeletedAt
+}
+
+// GetMisc returns the value of Misc.
+func (s *CollectionWithItems) GetMisc() *CollectionWithItemsMisc {
+	return s.Misc
+}
+
+// GetName returns the value of Name.
+func (s *CollectionWithItems) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *CollectionWithItems) GetDescription() string {
+	return s.Description
+}
+
+// GetOwner returns the value of Owner.
+func (s *CollectionWithItems) GetOwner() ProfileReference {
+	return s.Owner
+}
+
+// GetItems returns the value of Items.
+func (s *CollectionWithItems) GetItems() CollectionItemList {
+	return s.Items
+}
+
+// SetID sets the value of ID.
+func (s *CollectionWithItems) SetID(val Identifier) {
+	s.ID = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *CollectionWithItems) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *CollectionWithItems) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetDeletedAt sets the value of DeletedAt.
+func (s *CollectionWithItems) SetDeletedAt(val OptDateTime) {
+	s.DeletedAt = val
+}
+
+// SetMisc sets the value of Misc.
+func (s *CollectionWithItems) SetMisc(val *CollectionWithItemsMisc) {
+	s.Misc = val
+}
+
+// SetName sets the value of Name.
+func (s *CollectionWithItems) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CollectionWithItems) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *CollectionWithItems) SetOwner(val ProfileReference) {
+	s.Owner = val
+}
+
+// SetItems sets the value of Items.
+func (s *CollectionWithItems) SetItems(val CollectionItemList) {
+	s.Items = val
+}
+
+func (*CollectionWithItems) collectionGetRes() {}
+
+// Arbitrary extra data stored with the resource.
+type CollectionWithItemsMisc struct{}
+
+// Ref: #/components/schemas/ContentKind
+type ContentKind string
+
+const (
+	ContentKindPost   ContentKind = "post"
+	ContentKindThread ContentKind = "thread"
+)
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ContentKind) MarshalText() ([]byte, error) {
+	switch s {
+	case ContentKindPost:
+		return []byte(s), nil
+	case ContentKindThread:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ContentKind) UnmarshalText(data []byte) error {
+	switch ContentKind(data) {
+	case ContentKindPost:
+		*s = ContentKindPost
+		return nil
+	case ContentKindThread:
+		*s = ContentKindThread
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type ContentKinds []ContentKind
 
 // Https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension.
 // Ref: #/components/schemas/CredentialRequestOptions
@@ -953,6 +1759,57 @@ func (s GetVersionOK) Read(p []byte) (n int, err error) {
 
 type Identifier string
 
+// Basic public information about the Storyden installation.
+// Ref: #/components/schemas/Info
+type Info struct {
+	Title            string           `json:"title"`
+	Description      string           `json:"description"`
+	AccentColour     string           `json:"accent_colour"`
+	OnboardingStatus OnboardingStatus `json:"onboarding_status"`
+}
+
+// GetTitle returns the value of Title.
+func (s *Info) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *Info) GetDescription() string {
+	return s.Description
+}
+
+// GetAccentColour returns the value of AccentColour.
+func (s *Info) GetAccentColour() string {
+	return s.AccentColour
+}
+
+// GetOnboardingStatus returns the value of OnboardingStatus.
+func (s *Info) GetOnboardingStatus() OnboardingStatus {
+	return s.OnboardingStatus
+}
+
+// SetTitle sets the value of Title.
+func (s *Info) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *Info) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetAccentColour sets the value of AccentColour.
+func (s *Info) SetAccentColour(val string) {
+	s.AccentColour = val
+}
+
+// SetOnboardingStatus sets the value of OnboardingStatus.
+func (s *Info) SetOnboardingStatus(val OnboardingStatus) {
+	s.OnboardingStatus = val
+}
+
+func (*Info) getInfoRes() {}
+
 // Arbitrary metadata for the resource.
 // Ref: #/components/schemas/Metadata
 type Metadata map[string]jx.Raw
@@ -973,13 +1830,25 @@ func (*NotFound) accountGetAvatarRes()      {}
 func (*NotFound) accountGetRes()            {}
 func (*NotFound) accountSetAvatarRes()      {}
 func (*NotFound) accountUpdateRes()         {}
+func (*NotFound) assetGetRes()              {}
 func (*NotFound) authPasswordSigninRes()    {}
+func (*NotFound) collectionAddPostRes()     {}
+func (*NotFound) collectionGetRes()         {}
+func (*NotFound) collectionListRes()        {}
+func (*NotFound) collectionRemovePostRes()  {}
+func (*NotFound) collectionUpdateRes()      {}
 func (*NotFound) oAuthProviderCallbackRes() {}
-func (*NotFound) postsCreateRes()           {}
+func (*NotFound) postCreateRes()            {}
+func (*NotFound) postDeleteRes()            {}
+func (*NotFound) postReactAddRes()          {}
+func (*NotFound) postSearchRes()            {}
+func (*NotFound) postUpdateRes()            {}
 func (*NotFound) profileGetRes()            {}
-func (*NotFound) threadsCreateRes()         {}
-func (*NotFound) threadsGetRes()            {}
-func (*NotFound) threadsListRes()           {}
+func (*NotFound) threadCreateRes()          {}
+func (*NotFound) threadDeleteRes()          {}
+func (*NotFound) threadGetRes()             {}
+func (*NotFound) threadListRes()            {}
+func (*NotFound) threadUpdateRes()          {}
 func (*NotFound) webAuthnGetAssertionRes()  {}
 func (*NotFound) webAuthnMakeAssertionRes() {}
 
@@ -1007,6 +1876,60 @@ func (s *OAuthCallback) SetState(val string) {
 // SetCode sets the value of Code.
 func (s *OAuthCallback) SetCode(val string) {
 	s.Code = val
+}
+
+// Derived from data state, indicates what stage in the onboarding process
+// the Storyden installation is in for directing first-time setup steps.
+// Ref: #/components/schemas/OnboardingStatus
+type OnboardingStatus string
+
+const (
+	OnboardingStatusRequiresFirstAccount OnboardingStatus = "requires_first_account"
+	OnboardingStatusRequiresCategory     OnboardingStatus = "requires_category"
+	OnboardingStatusRequiresMoreAccounts OnboardingStatus = "requires_more_accounts"
+	OnboardingStatusRequiresFirstPost    OnboardingStatus = "requires_first_post"
+	OnboardingStatusComplete             OnboardingStatus = "complete"
+)
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OnboardingStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case OnboardingStatusRequiresFirstAccount:
+		return []byte(s), nil
+	case OnboardingStatusRequiresCategory:
+		return []byte(s), nil
+	case OnboardingStatusRequiresMoreAccounts:
+		return []byte(s), nil
+	case OnboardingStatusRequiresFirstPost:
+		return []byte(s), nil
+	case OnboardingStatusComplete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OnboardingStatus) UnmarshalText(data []byte) error {
+	switch OnboardingStatus(data) {
+	case OnboardingStatusRequiresFirstAccount:
+		*s = OnboardingStatusRequiresFirstAccount
+		return nil
+	case OnboardingStatusRequiresCategory:
+		*s = OnboardingStatusRequiresCategory
+		return nil
+	case OnboardingStatusRequiresMoreAccounts:
+		*s = OnboardingStatusRequiresMoreAccounts
+		return nil
+	case OnboardingStatusRequiresFirstPost:
+		*s = OnboardingStatusRequiresFirstPost
+		return nil
+	case OnboardingStatusComplete:
+		*s = OnboardingStatusComplete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // NewOptAPIErrorMetadata returns new OptAPIErrorMetadata with value set to v.
@@ -1423,6 +2346,144 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
+// NewOptCategoryInitialProps returns new OptCategoryInitialProps with value set to v.
+func NewOptCategoryInitialProps(v CategoryInitialProps) OptCategoryInitialProps {
+	return OptCategoryInitialProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCategoryInitialProps is optional CategoryInitialProps.
+type OptCategoryInitialProps struct {
+	Value CategoryInitialProps
+	Set   bool
+}
+
+// IsSet returns true if OptCategoryInitialProps was set.
+func (o OptCategoryInitialProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCategoryInitialProps) Reset() {
+	var v CategoryInitialProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCategoryInitialProps) SetTo(v CategoryInitialProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCategoryInitialProps) Get() (v CategoryInitialProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCategoryInitialProps) Or(d CategoryInitialProps) CategoryInitialProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCollectionInitialProps returns new OptCollectionInitialProps with value set to v.
+func NewOptCollectionInitialProps(v CollectionInitialProps) OptCollectionInitialProps {
+	return OptCollectionInitialProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCollectionInitialProps is optional CollectionInitialProps.
+type OptCollectionInitialProps struct {
+	Value CollectionInitialProps
+	Set   bool
+}
+
+// IsSet returns true if OptCollectionInitialProps was set.
+func (o OptCollectionInitialProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCollectionInitialProps) Reset() {
+	var v CollectionInitialProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCollectionInitialProps) SetTo(v CollectionInitialProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCollectionInitialProps) Get() (v CollectionInitialProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCollectionInitialProps) Or(d CollectionInitialProps) CollectionInitialProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCollectionMutableProps returns new OptCollectionMutableProps with value set to v.
+func NewOptCollectionMutableProps(v CollectionMutableProps) OptCollectionMutableProps {
+	return OptCollectionMutableProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCollectionMutableProps is optional CollectionMutableProps.
+type OptCollectionMutableProps struct {
+	Value CollectionMutableProps
+	Set   bool
+}
+
+// IsSet returns true if OptCollectionMutableProps was set.
+func (o OptCollectionMutableProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCollectionMutableProps) Reset() {
+	var v CollectionMutableProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCollectionMutableProps) SetTo(v CollectionMutableProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCollectionMutableProps) Get() (v CollectionMutableProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCollectionMutableProps) Or(d CollectionMutableProps) CollectionMutableProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptDateTime returns new OptDateTime with value set to v.
 func NewOptDateTime(v time.Time) OptDateTime {
 	return OptDateTime{
@@ -1653,6 +2714,144 @@ func (o OptOAuthCallback) Or(d OAuthCallback) OAuthCallback {
 	return d
 }
 
+// NewOptPhoneRequestCodeProps returns new OptPhoneRequestCodeProps with value set to v.
+func NewOptPhoneRequestCodeProps(v PhoneRequestCodeProps) OptPhoneRequestCodeProps {
+	return OptPhoneRequestCodeProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPhoneRequestCodeProps is optional PhoneRequestCodeProps.
+type OptPhoneRequestCodeProps struct {
+	Value PhoneRequestCodeProps
+	Set   bool
+}
+
+// IsSet returns true if OptPhoneRequestCodeProps was set.
+func (o OptPhoneRequestCodeProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPhoneRequestCodeProps) Reset() {
+	var v PhoneRequestCodeProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPhoneRequestCodeProps) SetTo(v PhoneRequestCodeProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPhoneRequestCodeProps) Get() (v PhoneRequestCodeProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPhoneRequestCodeProps) Or(d PhoneRequestCodeProps) PhoneRequestCodeProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPhoneSubmitCodeProps returns new OptPhoneSubmitCodeProps with value set to v.
+func NewOptPhoneSubmitCodeProps(v PhoneSubmitCodeProps) OptPhoneSubmitCodeProps {
+	return OptPhoneSubmitCodeProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPhoneSubmitCodeProps is optional PhoneSubmitCodeProps.
+type OptPhoneSubmitCodeProps struct {
+	Value PhoneSubmitCodeProps
+	Set   bool
+}
+
+// IsSet returns true if OptPhoneSubmitCodeProps was set.
+func (o OptPhoneSubmitCodeProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPhoneSubmitCodeProps) Reset() {
+	var v PhoneSubmitCodeProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPhoneSubmitCodeProps) SetTo(v PhoneSubmitCodeProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPhoneSubmitCodeProps) Get() (v PhoneSubmitCodeProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPhoneSubmitCodeProps) Or(d PhoneSubmitCodeProps) PhoneSubmitCodeProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPostContent returns new OptPostContent with value set to v.
+func NewOptPostContent(v PostContent) OptPostContent {
+	return OptPostContent{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostContent is optional PostContent.
+type OptPostContent struct {
+	Value PostContent
+	Set   bool
+}
+
+// IsSet returns true if OptPostContent was set.
+func (o OptPostContent) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostContent) Reset() {
+	var v PostContent
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostContent) SetTo(v PostContent) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostContent) Get() (v PostContent, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostContent) Or(d PostContent) PostContent {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostInitialProps returns new OptPostInitialProps with value set to v.
 func NewOptPostInitialProps(v PostInitialProps) OptPostInitialProps {
 	return OptPostInitialProps{
@@ -1693,6 +2892,98 @@ func (o OptPostInitialProps) Get() (v PostInitialProps, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptPostInitialProps) Or(d PostInitialProps) PostInitialProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPostMutableProps returns new OptPostMutableProps with value set to v.
+func NewOptPostMutableProps(v PostMutableProps) OptPostMutableProps {
+	return OptPostMutableProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostMutableProps is optional PostMutableProps.
+type OptPostMutableProps struct {
+	Value PostMutableProps
+	Set   bool
+}
+
+// IsSet returns true if OptPostMutableProps was set.
+func (o OptPostMutableProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostMutableProps) Reset() {
+	var v PostMutableProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostMutableProps) SetTo(v PostMutableProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostMutableProps) Get() (v PostMutableProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostMutableProps) Or(d PostMutableProps) PostMutableProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPostReactProps returns new OptPostReactProps with value set to v.
+func NewOptPostReactProps(v PostReactProps) OptPostReactProps {
+	return OptPostReactProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostReactProps is optional PostReactProps.
+type OptPostReactProps struct {
+	Value PostReactProps
+	Set   bool
+}
+
+// IsSet returns true if OptPostReactProps was set.
+func (o OptPostReactProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostReactProps) Reset() {
+	var v PostReactProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostReactProps) SetTo(v PostReactProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostReactProps) Get() (v PostReactProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostReactProps) Or(d PostReactProps) PostReactProps {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1837,6 +3128,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptThreadInitialProps returns new OptThreadInitialProps with value set to v.
+func NewOptThreadInitialProps(v ThreadInitialProps) OptThreadInitialProps {
+	return OptThreadInitialProps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptThreadInitialProps is optional ThreadInitialProps.
+type OptThreadInitialProps struct {
+	Value ThreadInitialProps
+	Set   bool
+}
+
+// IsSet returns true if OptThreadInitialProps was set.
+func (o OptThreadInitialProps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptThreadInitialProps) Reset() {
+	var v ThreadInitialProps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptThreadInitialProps) SetTo(v ThreadInitialProps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptThreadInitialProps) Get() (v ThreadInitialProps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptThreadInitialProps) Or(d ThreadInitialProps) ThreadInitialProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptThreadMutableProps returns new OptThreadMutableProps with value set to v.
 func NewOptThreadMutableProps(v ThreadMutableProps) OptThreadMutableProps {
 	return OptThreadMutableProps{
@@ -1877,6 +3214,98 @@ func (o OptThreadMutableProps) Get() (v ThreadMutableProps, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptThreadMutableProps) Or(d ThreadMutableProps) ThreadMutableProps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptThreadStatus returns new OptThreadStatus with value set to v.
+func NewOptThreadStatus(v ThreadStatus) OptThreadStatus {
+	return OptThreadStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptThreadStatus is optional ThreadStatus.
+type OptThreadStatus struct {
+	Value ThreadStatus
+	Set   bool
+}
+
+// IsSet returns true if OptThreadStatus was set.
+func (o OptThreadStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptThreadStatus) Reset() {
+	var v ThreadStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptThreadStatus) SetTo(v ThreadStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptThreadStatus) Get() (v ThreadStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptThreadStatus) Or(d ThreadStatus) ThreadStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptThreadTitle returns new OptThreadTitle with value set to v.
+func NewOptThreadTitle(v ThreadTitle) OptThreadTitle {
+	return OptThreadTitle{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptThreadTitle is optional ThreadTitle.
+type OptThreadTitle struct {
+	Value ThreadTitle
+	Set   bool
+}
+
+// IsSet returns true if OptThreadTitle was set.
+func (o OptThreadTitle) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptThreadTitle) Reset() {
+	var v ThreadTitle
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptThreadTitle) SetTo(v ThreadTitle) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptThreadTitle) Get() (v ThreadTitle, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptThreadTitle) Or(d ThreadTitle) ThreadTitle {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1929,68 +3358,67 @@ func (o OptUserVerificationRequirement) Or(d UserVerificationRequirement) UserVe
 	return d
 }
 
-// Merged schema.
-// Ref: #/components/schemas/Post
-type Post struct {
-	Body    PostBodyMarkdown `json:"body"`
-	Author  ProfileReference `json:"author"`
-	Meta    OptMetadata      `json:"meta"`
-	ReplyTo OptIdentifier    `json:"reply_to"`
+// The phone number request payload.
+// Ref: #/components/schemas/PhoneRequestCodeProps
+type PhoneRequestCodeProps struct {
+	// The desired username to link to the phone number.
+	Identifier string `json:"identifier"`
+	// The phone number to receive the one-time code on.
+	PhoneNumber string `json:"phone_number"`
 }
 
-// GetBody returns the value of Body.
-func (s *Post) GetBody() PostBodyMarkdown {
-	return s.Body
+// GetIdentifier returns the value of Identifier.
+func (s *PhoneRequestCodeProps) GetIdentifier() string {
+	return s.Identifier
 }
 
-// GetAuthor returns the value of Author.
-func (s *Post) GetAuthor() ProfileReference {
-	return s.Author
+// GetPhoneNumber returns the value of PhoneNumber.
+func (s *PhoneRequestCodeProps) GetPhoneNumber() string {
+	return s.PhoneNumber
 }
 
-// GetMeta returns the value of Meta.
-func (s *Post) GetMeta() OptMetadata {
-	return s.Meta
+// SetIdentifier sets the value of Identifier.
+func (s *PhoneRequestCodeProps) SetIdentifier(val string) {
+	s.Identifier = val
 }
 
-// GetReplyTo returns the value of ReplyTo.
-func (s *Post) GetReplyTo() OptIdentifier {
-	return s.ReplyTo
+// SetPhoneNumber sets the value of PhoneNumber.
+func (s *PhoneRequestCodeProps) SetPhoneNumber(val string) {
+	s.PhoneNumber = val
 }
 
-// SetBody sets the value of Body.
-func (s *Post) SetBody(val PostBodyMarkdown) {
-	s.Body = val
+// The Phone submit code payload.
+// Ref: #/components/schemas/PhoneSubmitCodeProps
+type PhoneSubmitCodeProps struct {
+	Code string `json:"code"`
 }
 
-// SetAuthor sets the value of Author.
-func (s *Post) SetAuthor(val ProfileReference) {
-	s.Author = val
+// GetCode returns the value of Code.
+func (s *PhoneSubmitCodeProps) GetCode() string {
+	return s.Code
 }
 
-// SetMeta sets the value of Meta.
-func (s *Post) SetMeta(val OptMetadata) {
-	s.Meta = val
+// SetCode sets the value of Code.
+func (s *PhoneSubmitCodeProps) SetCode(val string) {
+	s.Code = val
 }
 
-// SetReplyTo sets the value of ReplyTo.
-func (s *Post) SetReplyTo(val OptIdentifier) {
-	s.ReplyTo = val
-}
+type PostContent string
 
-func (*Post) postsCreateRes() {}
+// PostDeleteOK is response for PostDelete operation.
+type PostDeleteOK struct{}
 
-type PostBodyMarkdown string
+func (*PostDeleteOK) postDeleteRes() {}
 
 // Ref: #/components/schemas/PostInitialProps
 type PostInitialProps struct {
-	Body    PostBodyMarkdown `json:"body"`
-	Meta    OptMetadata      `json:"meta"`
-	ReplyTo OptIdentifier    `json:"reply_to"`
+	Body    PostContent   `json:"body"`
+	Meta    OptMetadata   `json:"meta"`
+	ReplyTo OptIdentifier `json:"reply_to"`
 }
 
 // GetBody returns the value of Body.
-func (s *PostInitialProps) GetBody() PostBodyMarkdown {
+func (s *PostInitialProps) GetBody() PostContent {
 	return s.Body
 }
 
@@ -2005,7 +3433,7 @@ func (s *PostInitialProps) GetReplyTo() OptIdentifier {
 }
 
 // SetBody sets the value of Body.
-func (s *PostInitialProps) SetBody(val PostBodyMarkdown) {
+func (s *PostInitialProps) SetBody(val PostContent) {
 	s.Body = val
 }
 
@@ -2019,12 +3447,179 @@ func (s *PostInitialProps) SetReplyTo(val OptIdentifier) {
 	s.ReplyTo = val
 }
 
+// Ref: #/components/schemas/PostMutableProps
+type PostMutableProps struct {
+	Body OptPostContent `json:"body"`
+	Meta OptMetadata    `json:"meta"`
+}
+
+// GetBody returns the value of Body.
+func (s *PostMutableProps) GetBody() OptPostContent {
+	return s.Body
+}
+
+// GetMeta returns the value of Meta.
+func (s *PostMutableProps) GetMeta() OptMetadata {
+	return s.Meta
+}
+
+// SetBody sets the value of Body.
+func (s *PostMutableProps) SetBody(val OptPostContent) {
+	s.Body = val
+}
+
+// SetMeta sets the value of Meta.
+func (s *PostMutableProps) SetMeta(val OptMetadata) {
+	s.Meta = val
+}
+
+// Merged schema.
+// Ref: #/components/schemas/PostProps
+type PostProps struct {
+	RootID   Identifier       `json:"root_id"`
+	RootSlug ThreadMark       `json:"root_slug"`
+	Body     PostContent      `json:"body"`
+	Author   ProfileReference `json:"author"`
+	Meta     OptMetadata      `json:"meta"`
+	Reacts   ReactList        `json:"reacts"`
+	ReplyTo  OptIdentifier    `json:"reply_to"`
+	Assets   AssetList        `json:"assets"`
+}
+
+// GetRootID returns the value of RootID.
+func (s *PostProps) GetRootID() Identifier {
+	return s.RootID
+}
+
+// GetRootSlug returns the value of RootSlug.
+func (s *PostProps) GetRootSlug() ThreadMark {
+	return s.RootSlug
+}
+
+// GetBody returns the value of Body.
+func (s *PostProps) GetBody() PostContent {
+	return s.Body
+}
+
+// GetAuthor returns the value of Author.
+func (s *PostProps) GetAuthor() ProfileReference {
+	return s.Author
+}
+
+// GetMeta returns the value of Meta.
+func (s *PostProps) GetMeta() OptMetadata {
+	return s.Meta
+}
+
+// GetReacts returns the value of Reacts.
+func (s *PostProps) GetReacts() ReactList {
+	return s.Reacts
+}
+
+// GetReplyTo returns the value of ReplyTo.
+func (s *PostProps) GetReplyTo() OptIdentifier {
+	return s.ReplyTo
+}
+
+// GetAssets returns the value of Assets.
+func (s *PostProps) GetAssets() AssetList {
+	return s.Assets
+}
+
+// SetRootID sets the value of RootID.
+func (s *PostProps) SetRootID(val Identifier) {
+	s.RootID = val
+}
+
+// SetRootSlug sets the value of RootSlug.
+func (s *PostProps) SetRootSlug(val ThreadMark) {
+	s.RootSlug = val
+}
+
+// SetBody sets the value of Body.
+func (s *PostProps) SetBody(val PostContent) {
+	s.Body = val
+}
+
+// SetAuthor sets the value of Author.
+func (s *PostProps) SetAuthor(val ProfileReference) {
+	s.Author = val
+}
+
+// SetMeta sets the value of Meta.
+func (s *PostProps) SetMeta(val OptMetadata) {
+	s.Meta = val
+}
+
+// SetReacts sets the value of Reacts.
+func (s *PostProps) SetReacts(val ReactList) {
+	s.Reacts = val
+}
+
+// SetReplyTo sets the value of ReplyTo.
+func (s *PostProps) SetReplyTo(val OptIdentifier) {
+	s.ReplyTo = val
+}
+
+// SetAssets sets the value of Assets.
+func (s *PostProps) SetAssets(val AssetList) {
+	s.Assets = val
+}
+
+func (*PostProps) postCreateRes() {}
+func (*PostProps) postUpdateRes() {}
+
+// Reactions are currently just simple strings but they may improve later.
+// Ref: #/components/schemas/PostReactProps
+type PostReactProps struct {
+	Emoji OptString `json:"emoji"`
+}
+
+// GetEmoji returns the value of Emoji.
+func (s *PostReactProps) GetEmoji() OptString {
+	return s.Emoji
+}
+
+// SetEmoji sets the value of Emoji.
+func (s *PostReactProps) SetEmoji(val OptString) {
+	s.Emoji = val
+}
+
+// Ref: #/components/schemas/PostSearchResults
+type PostSearchResults struct {
+	Count   float64     `json:"count"`
+	Results []PostProps `json:"results"`
+}
+
+// GetCount returns the value of Count.
+func (s *PostSearchResults) GetCount() float64 {
+	return s.Count
+}
+
+// GetResults returns the value of Results.
+func (s *PostSearchResults) GetResults() []PostProps {
+	return s.Results
+}
+
+// SetCount sets the value of Count.
+func (s *PostSearchResults) SetCount(val float64) {
+	s.Count = val
+}
+
+// SetResults sets the value of Results.
+func (s *PostSearchResults) SetResults(val []PostProps) {
+	s.Results = val
+}
+
+func (*PostSearchResults) postSearchRes() {}
+
 // A minimal reference to an account.
 // Ref: #/components/schemas/ProfileReference
 type ProfileReference struct {
 	ID     Identifier    `json:"id"`
 	Handle AccountHandle `json:"handle"`
 	Name   AccountName   `json:"name"`
+	Admin  bool          `json:"admin"`
 }
 
 // GetID returns the value of ID.
@@ -2042,6 +3637,11 @@ func (s *ProfileReference) GetName() AccountName {
 	return s.Name
 }
 
+// GetAdmin returns the value of Admin.
+func (s *ProfileReference) GetAdmin() bool {
+	return s.Admin
+}
+
 // SetID sets the value of ID.
 func (s *ProfileReference) SetID(val Identifier) {
 	s.ID = val
@@ -2055,6 +3655,11 @@ func (s *ProfileReference) SetHandle(val AccountHandle) {
 // SetName sets the value of Name.
 func (s *ProfileReference) SetName(val AccountName) {
 	s.Name = val
+}
+
+// SetAdmin sets the value of Admin.
+func (s *ProfileReference) SetAdmin(val bool) {
+	s.Admin = val
 }
 
 // Https://www.w3.org/TR/webauthn-2/#iface-pkcredential.
@@ -2561,11 +4166,11 @@ type PublicProfile struct {
 	DeletedAt OptDateTime `json:"deletedAt"`
 	// Arbitrary extra data stored with the resource.
 	Misc      *PublicProfileMisc `json:"misc"`
-	Handle    OptAccountHandle   `json:"handle"`
-	Name      OptAccountName     `json:"name"`
+	Handle    AccountHandle      `json:"handle"`
+	Name      AccountName        `json:"name"`
 	Bio       OptString          `json:"bio"`
 	Image     OptString          `json:"image"`
-	Interests *TagList           `json:"interests"`
+	Interests TagList            `json:"interests"`
 }
 
 // GetID returns the value of ID.
@@ -2594,12 +4199,12 @@ func (s *PublicProfile) GetMisc() *PublicProfileMisc {
 }
 
 // GetHandle returns the value of Handle.
-func (s *PublicProfile) GetHandle() OptAccountHandle {
+func (s *PublicProfile) GetHandle() AccountHandle {
 	return s.Handle
 }
 
 // GetName returns the value of Name.
-func (s *PublicProfile) GetName() OptAccountName {
+func (s *PublicProfile) GetName() AccountName {
 	return s.Name
 }
 
@@ -2614,7 +4219,7 @@ func (s *PublicProfile) GetImage() OptString {
 }
 
 // GetInterests returns the value of Interests.
-func (s *PublicProfile) GetInterests() *TagList {
+func (s *PublicProfile) GetInterests() TagList {
 	return s.Interests
 }
 
@@ -2644,12 +4249,12 @@ func (s *PublicProfile) SetMisc(val *PublicProfileMisc) {
 }
 
 // SetHandle sets the value of Handle.
-func (s *PublicProfile) SetHandle(val OptAccountHandle) {
+func (s *PublicProfile) SetHandle(val AccountHandle) {
 	s.Handle = val
 }
 
 // SetName sets the value of Name.
-func (s *PublicProfile) SetName(val OptAccountName) {
+func (s *PublicProfile) SetName(val AccountName) {
 	s.Name = val
 }
 
@@ -2664,7 +4269,7 @@ func (s *PublicProfile) SetImage(val OptString) {
 }
 
 // SetInterests sets the value of Interests.
-func (s *PublicProfile) SetInterests(val *TagList) {
+func (s *PublicProfile) SetInterests(val TagList) {
 	s.Interests = val
 }
 
@@ -2698,6 +4303,10 @@ func (s *React) SetID(val OptIdentifier) {
 func (s *React) SetEmoji(val OptString) {
 	s.Emoji = val
 }
+
+func (*React) postReactAddRes() {}
+
+type ReactList []React
 
 // Https://www.w3.org/TR/webauthn-2/#enumdef-residentkeyrequirement.
 // Ref: #/components/schemas/ResidentKeyRequirement
@@ -2787,47 +4396,140 @@ type TagName string
 // Merged schema.
 // Ref: #/components/schemas/Thread
 type Thread struct {
-	Posts []Post `json:"posts"`
+	Posts []PostProps `json:"posts"`
 }
 
 // GetPosts returns the value of Posts.
-func (s *Thread) GetPosts() []Post {
+func (s *Thread) GetPosts() []PostProps {
 	return s.Posts
 }
 
 // SetPosts sets the value of Posts.
-func (s *Thread) SetPosts(val []Post) {
+func (s *Thread) SetPosts(val []PostProps) {
 	s.Posts = val
 }
 
-func (*Thread) threadsCreateRes() {}
-func (*Thread) threadsGetRes()    {}
+func (*Thread) threadCreateRes() {}
+func (*Thread) threadGetRes()    {}
+func (*Thread) threadUpdateRes() {}
+
+// ThreadDeleteOK is response for ThreadDelete operation.
+type ThreadDeleteOK struct{}
+
+func (*ThreadDeleteOK) threadDeleteRes() {}
+
+// Ref: #/components/schemas/ThreadInitialProps
+type ThreadInitialProps struct {
+	Title    ThreadTitle  `json:"title"`
+	Body     PostContent  `json:"body"`
+	Tags     *TagListIDs  `json:"tags"`
+	Meta     OptMetadata  `json:"meta"`
+	Category Identifier   `json:"category"`
+	Status   ThreadStatus `json:"status"`
+}
+
+// GetTitle returns the value of Title.
+func (s *ThreadInitialProps) GetTitle() ThreadTitle {
+	return s.Title
+}
+
+// GetBody returns the value of Body.
+func (s *ThreadInitialProps) GetBody() PostContent {
+	return s.Body
+}
+
+// GetTags returns the value of Tags.
+func (s *ThreadInitialProps) GetTags() *TagListIDs {
+	return s.Tags
+}
+
+// GetMeta returns the value of Meta.
+func (s *ThreadInitialProps) GetMeta() OptMetadata {
+	return s.Meta
+}
+
+// GetCategory returns the value of Category.
+func (s *ThreadInitialProps) GetCategory() Identifier {
+	return s.Category
+}
+
+// GetStatus returns the value of Status.
+func (s *ThreadInitialProps) GetStatus() ThreadStatus {
+	return s.Status
+}
+
+// SetTitle sets the value of Title.
+func (s *ThreadInitialProps) SetTitle(val ThreadTitle) {
+	s.Title = val
+}
+
+// SetBody sets the value of Body.
+func (s *ThreadInitialProps) SetBody(val PostContent) {
+	s.Body = val
+}
+
+// SetTags sets the value of Tags.
+func (s *ThreadInitialProps) SetTags(val *TagListIDs) {
+	s.Tags = val
+}
+
+// SetMeta sets the value of Meta.
+func (s *ThreadInitialProps) SetMeta(val OptMetadata) {
+	s.Meta = val
+}
+
+// SetCategory sets the value of Category.
+func (s *ThreadInitialProps) SetCategory(val Identifier) {
+	s.Category = val
+}
+
+// SetStatus sets the value of Status.
+func (s *ThreadInitialProps) SetStatus(val ThreadStatus) {
+	s.Status = val
+}
 
 type ThreadList []ThreadReference
+
+type ThreadListOK struct {
+	Threads ThreadList `json:"threads"`
+}
+
+// GetThreads returns the value of Threads.
+func (s *ThreadListOK) GetThreads() ThreadList {
+	return s.Threads
+}
+
+// SetThreads sets the value of Threads.
+func (s *ThreadListOK) SetThreads(val ThreadList) {
+	s.Threads = val
+}
+
+func (*ThreadListOK) threadListRes() {}
 
 type ThreadMark string
 
 // Ref: #/components/schemas/ThreadMutableProps
 type ThreadMutableProps struct {
-	Title    ThreadTitle      `json:"title"`
-	Body     PostBodyMarkdown `json:"body"`
-	Tags     TagList          `json:"tags"`
-	Meta     OptMetadata      `json:"meta"`
-	Category Identifier       `json:"category"`
+	Title    OptThreadTitle  `json:"title"`
+	Body     OptPostContent  `json:"body"`
+	Tags     *TagListIDs     `json:"tags"`
+	Meta     OptMetadata     `json:"meta"`
+	Category OptIdentifier   `json:"category"`
+	Status   OptThreadStatus `json:"status"`
 }
 
 // GetTitle returns the value of Title.
-func (s *ThreadMutableProps) GetTitle() ThreadTitle {
+func (s *ThreadMutableProps) GetTitle() OptThreadTitle {
 	return s.Title
 }
 
 // GetBody returns the value of Body.
-func (s *ThreadMutableProps) GetBody() PostBodyMarkdown {
+func (s *ThreadMutableProps) GetBody() OptPostContent {
 	return s.Body
 }
 
 // GetTags returns the value of Tags.
-func (s *ThreadMutableProps) GetTags() TagList {
+func (s *ThreadMutableProps) GetTags() *TagListIDs {
 	return s.Tags
 }
 
@@ -2837,22 +4539,27 @@ func (s *ThreadMutableProps) GetMeta() OptMetadata {
 }
 
 // GetCategory returns the value of Category.
-func (s *ThreadMutableProps) GetCategory() Identifier {
+func (s *ThreadMutableProps) GetCategory() OptIdentifier {
 	return s.Category
 }
 
+// GetStatus returns the value of Status.
+func (s *ThreadMutableProps) GetStatus() OptThreadStatus {
+	return s.Status
+}
+
 // SetTitle sets the value of Title.
-func (s *ThreadMutableProps) SetTitle(val ThreadTitle) {
+func (s *ThreadMutableProps) SetTitle(val OptThreadTitle) {
 	s.Title = val
 }
 
 // SetBody sets the value of Body.
-func (s *ThreadMutableProps) SetBody(val PostBodyMarkdown) {
+func (s *ThreadMutableProps) SetBody(val OptPostContent) {
 	s.Body = val
 }
 
 // SetTags sets the value of Tags.
-func (s *ThreadMutableProps) SetTags(val TagList) {
+func (s *ThreadMutableProps) SetTags(val *TagListIDs) {
 	s.Tags = val
 }
 
@@ -2862,8 +4569,13 @@ func (s *ThreadMutableProps) SetMeta(val OptMetadata) {
 }
 
 // SetCategory sets the value of Category.
-func (s *ThreadMutableProps) SetCategory(val Identifier) {
+func (s *ThreadMutableProps) SetCategory(val OptIdentifier) {
 	s.Category = val
+}
+
+// SetStatus sets the value of Status.
+func (s *ThreadMutableProps) SetStatus(val OptThreadStatus) {
+	s.Status = val
 }
 
 // Merged schema.
@@ -2879,10 +4591,8 @@ type ThreadReference struct {
 	// Arbitrary extra data stored with the resource.
 	Misc *ThreadReferenceMisc `json:"misc"`
 	// The title of the thread.
-	Title string `json:"title"`
-	// A URL friendly slug which is prepended with the post ID
-	// for uniqueness and sortability.
-	Slug string `json:"slug"`
+	Title string     `json:"title"`
+	Slug  ThreadMark `json:"slug"`
 	// A short version of the thread's body text for use in previews.
 	Short string `json:"short"`
 	// Whether the thread is pinned in this category.
@@ -2891,11 +4601,12 @@ type ThreadReference struct {
 	// A list of tags associated with the thread.
 	Tags []string `json:"tags"`
 	// The number of posts under this thread.
-	PostCount int               `json:"post_count"`
-	Category  CategoryReference `json:"category"`
-	// A list of reactions this post has had from people.
-	Reacts []React  `json:"reacts"`
-	Meta   Metadata `json:"meta"`
+	PostCount   int               `json:"post_count"`
+	Category    CategoryReference `json:"category"`
+	Reacts      ReactList         `json:"reacts"`
+	Meta        Metadata          `json:"meta"`
+	Assets      AssetList         `json:"assets"`
+	Collections CollectionList    `json:"collections"`
 }
 
 // GetID returns the value of ID.
@@ -2929,7 +4640,7 @@ func (s *ThreadReference) GetTitle() string {
 }
 
 // GetSlug returns the value of Slug.
-func (s *ThreadReference) GetSlug() string {
+func (s *ThreadReference) GetSlug() ThreadMark {
 	return s.Slug
 }
 
@@ -2964,13 +4675,23 @@ func (s *ThreadReference) GetCategory() CategoryReference {
 }
 
 // GetReacts returns the value of Reacts.
-func (s *ThreadReference) GetReacts() []React {
+func (s *ThreadReference) GetReacts() ReactList {
 	return s.Reacts
 }
 
 // GetMeta returns the value of Meta.
 func (s *ThreadReference) GetMeta() Metadata {
 	return s.Meta
+}
+
+// GetAssets returns the value of Assets.
+func (s *ThreadReference) GetAssets() AssetList {
+	return s.Assets
+}
+
+// GetCollections returns the value of Collections.
+func (s *ThreadReference) GetCollections() CollectionList {
+	return s.Collections
 }
 
 // SetID sets the value of ID.
@@ -3004,7 +4725,7 @@ func (s *ThreadReference) SetTitle(val string) {
 }
 
 // SetSlug sets the value of Slug.
-func (s *ThreadReference) SetSlug(val string) {
+func (s *ThreadReference) SetSlug(val ThreadMark) {
 	s.Slug = val
 }
 
@@ -3039,7 +4760,7 @@ func (s *ThreadReference) SetCategory(val CategoryReference) {
 }
 
 // SetReacts sets the value of Reacts.
-func (s *ThreadReference) SetReacts(val []React) {
+func (s *ThreadReference) SetReacts(val ReactList) {
 	s.Reacts = val
 }
 
@@ -3048,26 +4769,56 @@ func (s *ThreadReference) SetMeta(val Metadata) {
 	s.Meta = val
 }
 
+// SetAssets sets the value of Assets.
+func (s *ThreadReference) SetAssets(val AssetList) {
+	s.Assets = val
+}
+
+// SetCollections sets the value of Collections.
+func (s *ThreadReference) SetCollections(val CollectionList) {
+	s.Collections = val
+}
+
 // Arbitrary extra data stored with the resource.
 type ThreadReferenceMisc struct{}
 
+// A thread can be in a draft state while the owner makes changes to the content. Once they are happy
+// with it, they can publish the thread.
+// Ref: #/components/schemas/ThreadStatus
+type ThreadStatus string
+
+const (
+	ThreadStatusDraft     ThreadStatus = "draft"
+	ThreadStatusPublished ThreadStatus = "published"
+)
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ThreadStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case ThreadStatusDraft:
+		return []byte(s), nil
+	case ThreadStatusPublished:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ThreadStatus) UnmarshalText(data []byte) error {
+	switch ThreadStatus(data) {
+	case ThreadStatusDraft:
+		*s = ThreadStatusDraft
+		return nil
+	case ThreadStatusPublished:
+		*s = ThreadStatusPublished
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type ThreadTitle string
-
-type ThreadsListOK struct {
-	Threads ThreadList `json:"threads"`
-}
-
-// GetThreads returns the value of Threads.
-func (s *ThreadsListOK) GetThreads() ThreadList {
-	return s.Threads
-}
-
-// SetThreads sets the value of Threads.
-func (s *ThreadsListOK) SetThreads(val ThreadList) {
-	s.Threads = val
-}
-
-func (*ThreadsListOK) threadsListRes() {}
 
 // Ref: #/components/responses/Unauthorised
 type Unauthorised struct{}
@@ -3076,13 +4827,27 @@ func (*Unauthorised) accountGetAvatarRes()      {}
 func (*Unauthorised) accountGetRes()            {}
 func (*Unauthorised) accountSetAvatarRes()      {}
 func (*Unauthorised) accountUpdateRes()         {}
+func (*Unauthorised) assetGetRes()              {}
+func (*Unauthorised) assetUploadRes()           {}
 func (*Unauthorised) authPasswordSigninRes()    {}
+func (*Unauthorised) categoryCreateRes()        {}
+func (*Unauthorised) collectionAddPostRes()     {}
+func (*Unauthorised) collectionCreateRes()      {}
+func (*Unauthorised) collectionGetRes()         {}
+func (*Unauthorised) collectionRemovePostRes()  {}
+func (*Unauthorised) collectionUpdateRes()      {}
 func (*Unauthorised) oAuthProviderCallbackRes() {}
-func (*Unauthorised) postsCreateRes()           {}
+func (*Unauthorised) postCreateRes()            {}
+func (*Unauthorised) postDeleteRes()            {}
+func (*Unauthorised) postReactAddRes()          {}
+func (*Unauthorised) postSearchRes()            {}
+func (*Unauthorised) postUpdateRes()            {}
 func (*Unauthorised) profileGetRes()            {}
-func (*Unauthorised) threadsCreateRes()         {}
-func (*Unauthorised) threadsGetRes()            {}
-func (*Unauthorised) threadsListRes()           {}
+func (*Unauthorised) threadCreateRes()          {}
+func (*Unauthorised) threadDeleteRes()          {}
+func (*Unauthorised) threadGetRes()             {}
+func (*Unauthorised) threadListRes()            {}
+func (*Unauthorised) threadUpdateRes()          {}
 func (*Unauthorised) webAuthnGetAssertionRes()  {}
 func (*Unauthorised) webAuthnMakeAssertionRes() {}
 

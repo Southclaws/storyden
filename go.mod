@@ -24,7 +24,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.4.0
 	github.com/samber/lo v1.37.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.uber.org/dig v1.16.1
 	go.uber.org/fx v1.19.2
@@ -82,7 +82,7 @@ require (
 )
 
 require (
-	github.com/Southclaws/enumerator v1.2.0
+	github.com/Southclaws/enumerator v1.3.0
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect

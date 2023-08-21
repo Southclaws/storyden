@@ -5,6 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { OnboardingStatus } from "./onboardingStatus";
 
 /**
  * Basic public information about the Storyden installation.
@@ -13,4 +14,5 @@ export interface Info {
   title: string;
   description: string;
   accent_colour: string;
+  onboarding_status: OnboardingStatus;
 }

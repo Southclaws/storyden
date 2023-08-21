@@ -33,7 +33,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
-	args := [1]string{}
+	args := [2]string{}
 
 	// Static code generated router with unwrapped path search.
 	switch {
@@ -135,23 +135,53 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									break
 								}
 								switch elem[0] {
-								case 's': // Prefix: "self/avatar"
-									if l := len("self/avatar"); len(elem) >= l && elem[0:l] == "self/avatar" {
+								case 's': // Prefix: "self/a"
+									if l := len("self/a"); len(elem) >= l && elem[0:l] == "self/a" {
 										elem = elem[l:]
 									} else {
 										break
 									}
 
 									if len(elem) == 0 {
-										// Leaf node.
-										switch r.Method {
-										case "POST":
-											s.handleAccountSetAvatarRequest([0]string{}, w, r)
-										default:
-											s.notAllowed(w, r, "POST")
+										break
+									}
+									switch elem[0] {
+									case 'u': // Prefix: "uth-methods"
+										if l := len("uth-methods"); len(elem) >= l && elem[0:l] == "uth-methods" {
+											elem = elem[l:]
+										} else {
+											break
 										}
 
-										return
+										if len(elem) == 0 {
+											// Leaf node.
+											switch r.Method {
+											case "GET":
+												s.handleAccountAuthProviderListRequest([0]string{}, w, r)
+											default:
+												s.notAllowed(w, r, "GET")
+											}
+
+											return
+										}
+									case 'v': // Prefix: "vatar"
+										if l := len("vatar"); len(elem) >= l && elem[0:l] == "vatar" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											// Leaf node.
+											switch r.Method {
+											case "POST":
+												s.handleAccountSetAvatarRequest([0]string{}, w, r)
+											default:
+												s.notAllowed(w, r, "POST")
+											}
+
+											return
+										}
 									}
 								}
 								// Param: "account_handle"
@@ -187,6 +217,50 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 										return
 									}
+								}
+							}
+						case 's': // Prefix: "ssets"
+							if l := len("ssets"); len(elem) >= l && elem[0:l] == "ssets" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch r.Method {
+								case "POST":
+									s.handleAssetUploadRequest([0]string{}, w, r)
+								default:
+									s.notAllowed(w, r, "POST")
+								}
+
+								return
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "id"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleAssetGetRequest([1]string{
+											args[0],
+										}, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
 								}
 							}
 						case 'u': // Prefix: "uth"
@@ -277,8 +351,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											return
 										}
 									}
-								case 'p': // Prefix: "password/sign"
-									if l := len("password/sign"); len(elem) >= l && elem[0:l] == "password/sign" {
+								case 'p': // Prefix: "p"
+									if l := len("p"); len(elem) >= l && elem[0:l] == "p" {
 										elem = elem[l:]
 									} else {
 										break
@@ -288,41 +362,97 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										break
 									}
 									switch elem[0] {
-									case 'i': // Prefix: "in"
-										if l := len("in"); len(elem) >= l && elem[0:l] == "in" {
+									case 'a': // Prefix: "assword/sign"
+										if l := len("assword/sign"); len(elem) >= l && elem[0:l] == "assword/sign" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
 										if len(elem) == 0 {
-											// Leaf node.
-											switch r.Method {
-											case "POST":
-												s.handleAuthPasswordSigninRequest([0]string{}, w, r)
-											default:
-												s.notAllowed(w, r, "POST")
+											break
+										}
+										switch elem[0] {
+										case 'i': // Prefix: "in"
+											if l := len("in"); len(elem) >= l && elem[0:l] == "in" {
+												elem = elem[l:]
+											} else {
+												break
 											}
 
-											return
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "POST":
+													s.handleAuthPasswordSigninRequest([0]string{}, w, r)
+												default:
+													s.notAllowed(w, r, "POST")
+												}
+
+												return
+											}
+										case 'u': // Prefix: "up"
+											if l := len("up"); len(elem) >= l && elem[0:l] == "up" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "POST":
+													s.handleAuthPasswordSignupRequest([0]string{}, w, r)
+												default:
+													s.notAllowed(w, r, "POST")
+												}
+
+												return
+											}
 										}
-									case 'u': // Prefix: "up"
-										if l := len("up"); len(elem) >= l && elem[0:l] == "up" {
+									case 'h': // Prefix: "hone"
+										if l := len("hone"); len(elem) >= l && elem[0:l] == "hone" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
 										if len(elem) == 0 {
-											// Leaf node.
 											switch r.Method {
 											case "POST":
-												s.handleAuthPasswordSignupRequest([0]string{}, w, r)
+												s.handlePhoneRequestCodeRequest([0]string{}, w, r)
 											default:
 												s.notAllowed(w, r, "POST")
 											}
 
 											return
+										}
+										switch elem[0] {
+										case '/': // Prefix: "/"
+											if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											// Param: "account_handle"
+											// Leaf parameter
+											args[0] = elem
+											elem = ""
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "PUT":
+													s.handlePhoneSubmitCodeRequest([1]string{
+														args[0],
+													}, w, r)
+												default:
+													s.notAllowed(w, r, "PUT")
+												}
+
+												return
+											}
 										}
 									}
 								case 'w': // Prefix: "webauthn/"
@@ -428,8 +558,128 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 							}
 						}
-					case 'c': // Prefix: "categories"
-						if l := len("categories"); len(elem) >= l && elem[0:l] == "categories" {
+					case 'c': // Prefix: "c"
+						if l := len("c"); len(elem) >= l && elem[0:l] == "c" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'a': // Prefix: "ategories"
+							if l := len("ategories"); len(elem) >= l && elem[0:l] == "ategories" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleCategoryListRequest([0]string{}, w, r)
+								case "PATCH":
+									s.handleCategoryUpdateOrderRequest([0]string{}, w, r)
+								case "POST":
+									s.handleCategoryCreateRequest([0]string{}, w, r)
+								default:
+									s.notAllowed(w, r, "GET,PATCH,POST")
+								}
+
+								return
+							}
+						case 'o': // Prefix: "ollections"
+							if l := len("ollections"); len(elem) >= l && elem[0:l] == "ollections" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch r.Method {
+								case "GET":
+									s.handleCollectionListRequest([0]string{}, w, r)
+								case "POST":
+									s.handleCollectionCreateRequest([0]string{}, w, r)
+								default:
+									s.notAllowed(w, r, "GET,POST")
+								}
+
+								return
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "collection_id"
+								// Match until "/"
+								idx := strings.IndexByte(elem, '/')
+								if idx < 0 {
+									idx = len(elem)
+								}
+								args[0] = elem[:idx]
+								elem = elem[idx:]
+
+								if len(elem) == 0 {
+									switch r.Method {
+									case "GET":
+										s.handleCollectionGetRequest([1]string{
+											args[0],
+										}, w, r)
+									case "PATCH":
+										s.handleCollectionUpdateRequest([1]string{
+											args[0],
+										}, w, r)
+									default:
+										s.notAllowed(w, r, "GET,PATCH")
+									}
+
+									return
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/items/"
+									if l := len("/items/"); len(elem) >= l && elem[0:l] == "/items/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "post_id"
+									// Leaf parameter
+									args[1] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "DELETE":
+											s.handleCollectionRemovePostRequest([2]string{
+												args[0],
+												args[1],
+											}, w, r)
+										case "PUT":
+											s.handleCollectionAddPostRequest([2]string{
+												args[0],
+												args[1],
+											}, w, r)
+										default:
+											s.notAllowed(w, r, "DELETE,PUT")
+										}
+
+										return
+									}
+								}
+							}
+						}
+					case 'i': // Prefix: "info"
+						if l := len("info"); len(elem) >= l && elem[0:l] == "info" {
 							elem = elem[l:]
 						} else {
 							break
@@ -439,37 +689,126 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleCategoriesListRequest([0]string{}, w, r)
+								s.handleGetInfoRequest([0]string{}, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
 
 							return
 						}
-					case 'p': // Prefix: "profiles/"
-						if l := len("profiles/"); len(elem) >= l && elem[0:l] == "profiles/" {
+					case 'p': // Prefix: "p"
+						if l := len("p"); len(elem) >= l && elem[0:l] == "p" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
-						// Param: "account_handle"
-						// Leaf parameter
-						args[0] = elem
-						elem = ""
-
 						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "GET":
-								s.handleProfileGetRequest([1]string{
-									args[0],
-								}, w, r)
-							default:
-								s.notAllowed(w, r, "GET")
+							break
+						}
+						switch elem[0] {
+						case 'o': // Prefix: "osts/"
+							if l := len("osts/"); len(elem) >= l && elem[0:l] == "osts/" {
+								elem = elem[l:]
+							} else {
+								break
 							}
 
-							return
+							if len(elem) == 0 {
+								break
+							}
+							switch elem[0] {
+							case 's': // Prefix: "search"
+								if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handlePostSearchRequest([0]string{}, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+							}
+							// Param: "post_id"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								switch r.Method {
+								case "DELETE":
+									s.handlePostDeleteRequest([1]string{
+										args[0],
+									}, w, r)
+								case "PATCH":
+									s.handlePostUpdateRequest([1]string{
+										args[0],
+									}, w, r)
+								default:
+									s.notAllowed(w, r, "DELETE,PATCH")
+								}
+
+								return
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/reacts"
+								if l := len("/reacts"); len(elem) >= l && elem[0:l] == "/reacts" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "PUT":
+										s.handlePostReactAddRequest([1]string{
+											args[0],
+										}, w, r)
+									default:
+										s.notAllowed(w, r, "PUT")
+									}
+
+									return
+								}
+							}
+						case 'r': // Prefix: "rofiles/"
+							if l := len("rofiles/"); len(elem) >= l && elem[0:l] == "rofiles/" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							// Param: "account_handle"
+							// Leaf parameter
+							args[0] = elem
+							elem = ""
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleProfileGetRequest([1]string{
+										args[0],
+									}, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
 						}
 					case 't': // Prefix: "threads"
 						if l := len("threads"); len(elem) >= l && elem[0:l] == "threads" {
@@ -481,9 +820,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleThreadsListRequest([0]string{}, w, r)
+								s.handleThreadListRequest([0]string{}, w, r)
 							case "POST":
-								s.handleThreadsCreateRequest([0]string{}, w, r)
+								s.handleThreadCreateRequest([0]string{}, w, r)
 							default:
 								s.notAllowed(w, r, "GET,POST")
 							}
@@ -509,12 +848,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 							if len(elem) == 0 {
 								switch r.Method {
+								case "DELETE":
+									s.handleThreadDeleteRequest([1]string{
+										args[0],
+									}, w, r)
 								case "GET":
-									s.handleThreadsGetRequest([1]string{
+									s.handleThreadGetRequest([1]string{
+										args[0],
+									}, w, r)
+								case "PATCH":
+									s.handleThreadUpdateRequest([1]string{
 										args[0],
 									}, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, "DELETE,GET,PATCH")
 								}
 
 								return
@@ -531,7 +878,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "POST":
-										s.handlePostsCreateRequest([1]string{
+										s.handlePostCreateRequest([1]string{
 											args[0],
 										}, w, r)
 									default:
@@ -574,7 +921,7 @@ type Route struct {
 	operationID string
 	pathPattern string
 	count       int
-	args        [1]string
+	args        [2]string
 }
 
 // Name returns ogen operation name.
@@ -736,25 +1083,58 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									break
 								}
 								switch elem[0] {
-								case 's': // Prefix: "self/avatar"
-									if l := len("self/avatar"); len(elem) >= l && elem[0:l] == "self/avatar" {
+								case 's': // Prefix: "self/a"
+									if l := len("self/a"); len(elem) >= l && elem[0:l] == "self/a" {
 										elem = elem[l:]
 									} else {
 										break
 									}
 
 									if len(elem) == 0 {
-										switch method {
-										case "POST":
-											// Leaf: AccountSetAvatar
-											r.name = "AccountSetAvatar"
-											r.operationID = "AccountSetAvatar"
-											r.pathPattern = "/v1/accounts/self/avatar"
-											r.args = args
-											r.count = 0
-											return r, true
-										default:
-											return
+										break
+									}
+									switch elem[0] {
+									case 'u': // Prefix: "uth-methods"
+										if l := len("uth-methods"); len(elem) >= l && elem[0:l] == "uth-methods" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											switch method {
+											case "GET":
+												// Leaf: AccountAuthProviderList
+												r.name = "AccountAuthProviderList"
+												r.operationID = "AccountAuthProviderList"
+												r.pathPattern = "/v1/accounts/self/auth-methods"
+												r.args = args
+												r.count = 0
+												return r, true
+											default:
+												return
+											}
+										}
+									case 'v': // Prefix: "vatar"
+										if l := len("vatar"); len(elem) >= l && elem[0:l] == "vatar" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											switch method {
+											case "POST":
+												// Leaf: AccountSetAvatar
+												r.name = "AccountSetAvatar"
+												r.operationID = "AccountSetAvatar"
+												r.pathPattern = "/v1/accounts/self/avatar"
+												r.args = args
+												r.count = 0
+												return r, true
+											default:
+												return
+											}
 										}
 									}
 								}
@@ -791,6 +1171,54 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										default:
 											return
 										}
+									}
+								}
+							}
+						case 's': // Prefix: "ssets"
+							if l := len("ssets"); len(elem) >= l && elem[0:l] == "ssets" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch method {
+								case "POST":
+									r.name = "AssetUpload"
+									r.operationID = "AssetUpload"
+									r.pathPattern = "/v1/assets"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "id"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									switch method {
+									case "GET":
+										// Leaf: AssetGet
+										r.name = "AssetGet"
+										r.operationID = "AssetGet"
+										r.pathPattern = "/v1/assets/{id}"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
 									}
 								}
 							}
@@ -889,8 +1317,8 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											}
 										}
 									}
-								case 'p': // Prefix: "password/sign"
-									if l := len("password/sign"); len(elem) >= l && elem[0:l] == "password/sign" {
+								case 'p': // Prefix: "p"
+									if l := len("p"); len(elem) >= l && elem[0:l] == "p" {
 										elem = elem[l:]
 									} else {
 										break
@@ -900,8 +1328,62 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										break
 									}
 									switch elem[0] {
-									case 'i': // Prefix: "in"
-										if l := len("in"); len(elem) >= l && elem[0:l] == "in" {
+									case 'a': // Prefix: "assword/sign"
+										if l := len("assword/sign"); len(elem) >= l && elem[0:l] == "assword/sign" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											break
+										}
+										switch elem[0] {
+										case 'i': // Prefix: "in"
+											if l := len("in"); len(elem) >= l && elem[0:l] == "in" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												switch method {
+												case "POST":
+													// Leaf: AuthPasswordSignin
+													r.name = "AuthPasswordSignin"
+													r.operationID = "AuthPasswordSignin"
+													r.pathPattern = "/v1/auth/password/signin"
+													r.args = args
+													r.count = 0
+													return r, true
+												default:
+													return
+												}
+											}
+										case 'u': // Prefix: "up"
+											if l := len("up"); len(elem) >= l && elem[0:l] == "up" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												switch method {
+												case "POST":
+													// Leaf: AuthPasswordSignup
+													r.name = "AuthPasswordSignup"
+													r.operationID = "AuthPasswordSignup"
+													r.pathPattern = "/v1/auth/password/signup"
+													r.args = args
+													r.count = 0
+													return r, true
+												default:
+													return
+												}
+											}
+										}
+									case 'h': // Prefix: "hone"
+										if l := len("hone"); len(elem) >= l && elem[0:l] == "hone" {
 											elem = elem[l:]
 										} else {
 											break
@@ -910,10 +1392,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										if len(elem) == 0 {
 											switch method {
 											case "POST":
-												// Leaf: AuthPasswordSignin
-												r.name = "AuthPasswordSignin"
-												r.operationID = "AuthPasswordSignin"
-												r.pathPattern = "/v1/auth/password/signin"
+												r.name = "PhoneRequestCode"
+												r.operationID = "PhoneRequestCode"
+												r.pathPattern = "/v1/auth/phone"
 												r.args = args
 												r.count = 0
 												return r, true
@@ -921,25 +1402,32 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												return
 											}
 										}
-									case 'u': // Prefix: "up"
-										if l := len("up"); len(elem) >= l && elem[0:l] == "up" {
-											elem = elem[l:]
-										} else {
-											break
-										}
+										switch elem[0] {
+										case '/': // Prefix: "/"
+											if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+												elem = elem[l:]
+											} else {
+												break
+											}
 
-										if len(elem) == 0 {
-											switch method {
-											case "POST":
-												// Leaf: AuthPasswordSignup
-												r.name = "AuthPasswordSignup"
-												r.operationID = "AuthPasswordSignup"
-												r.pathPattern = "/v1/auth/password/signup"
-												r.args = args
-												r.count = 0
-												return r, true
-											default:
-												return
+											// Param: "account_handle"
+											// Leaf parameter
+											args[0] = elem
+											elem = ""
+
+											if len(elem) == 0 {
+												switch method {
+												case "PUT":
+													// Leaf: PhoneSubmitCode
+													r.name = "PhoneSubmitCode"
+													r.operationID = "PhoneSubmitCode"
+													r.pathPattern = "/v1/auth/phone/{account_handle}"
+													r.args = args
+													r.count = 1
+													return r, true
+												default:
+													return
+												}
 											}
 										}
 									}
@@ -1054,8 +1542,158 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 							}
 						}
-					case 'c': // Prefix: "categories"
-						if l := len("categories"); len(elem) >= l && elem[0:l] == "categories" {
+					case 'c': // Prefix: "c"
+						if l := len("c"); len(elem) >= l && elem[0:l] == "c" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'a': // Prefix: "ategories"
+							if l := len("ategories"); len(elem) >= l && elem[0:l] == "ategories" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch method {
+								case "GET":
+									// Leaf: CategoryList
+									r.name = "CategoryList"
+									r.operationID = "CategoryList"
+									r.pathPattern = "/v1/categories"
+									r.args = args
+									r.count = 0
+									return r, true
+								case "PATCH":
+									// Leaf: CategoryUpdateOrder
+									r.name = "CategoryUpdateOrder"
+									r.operationID = "CategoryUpdateOrder"
+									r.pathPattern = "/v1/categories"
+									r.args = args
+									r.count = 0
+									return r, true
+								case "POST":
+									// Leaf: CategoryCreate
+									r.name = "CategoryCreate"
+									r.operationID = "CategoryCreate"
+									r.pathPattern = "/v1/categories"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+						case 'o': // Prefix: "ollections"
+							if l := len("ollections"); len(elem) >= l && elem[0:l] == "ollections" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch method {
+								case "GET":
+									r.name = "CollectionList"
+									r.operationID = "CollectionList"
+									r.pathPattern = "/v1/collections"
+									r.args = args
+									r.count = 0
+									return r, true
+								case "POST":
+									r.name = "CollectionCreate"
+									r.operationID = "CollectionCreate"
+									r.pathPattern = "/v1/collections"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "collection_id"
+								// Match until "/"
+								idx := strings.IndexByte(elem, '/')
+								if idx < 0 {
+									idx = len(elem)
+								}
+								args[0] = elem[:idx]
+								elem = elem[idx:]
+
+								if len(elem) == 0 {
+									switch method {
+									case "GET":
+										r.name = "CollectionGet"
+										r.operationID = "CollectionGet"
+										r.pathPattern = "/v1/collections/{collection_id}"
+										r.args = args
+										r.count = 1
+										return r, true
+									case "PATCH":
+										r.name = "CollectionUpdate"
+										r.operationID = "CollectionUpdate"
+										r.pathPattern = "/v1/collections/{collection_id}"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/items/"
+									if l := len("/items/"); len(elem) >= l && elem[0:l] == "/items/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "post_id"
+									// Leaf parameter
+									args[1] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										switch method {
+										case "DELETE":
+											// Leaf: CollectionRemovePost
+											r.name = "CollectionRemovePost"
+											r.operationID = "CollectionRemovePost"
+											r.pathPattern = "/v1/collections/{collection_id}/items/{post_id}"
+											r.args = args
+											r.count = 2
+											return r, true
+										case "PUT":
+											// Leaf: CollectionAddPost
+											r.name = "CollectionAddPost"
+											r.operationID = "CollectionAddPost"
+											r.pathPattern = "/v1/collections/{collection_id}/items/{post_id}"
+											r.args = args
+											r.count = 2
+											return r, true
+										default:
+											return
+										}
+									}
+								}
+							}
+						}
+					case 'i': // Prefix: "info"
+						if l := len("info"); len(elem) >= l && elem[0:l] == "info" {
 							elem = elem[l:]
 						} else {
 							break
@@ -1064,10 +1702,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								// Leaf: CategoriesList
-								r.name = "CategoriesList"
-								r.operationID = "CategoriesList"
-								r.pathPattern = "/v1/categories"
+								// Leaf: GetInfo
+								r.name = "GetInfo"
+								r.operationID = "GetInfo"
+								r.pathPattern = "/v1/info"
 								r.args = args
 								r.count = 0
 								return r, true
@@ -1075,30 +1713,127 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								return
 							}
 						}
-					case 'p': // Prefix: "profiles/"
-						if l := len("profiles/"); len(elem) >= l && elem[0:l] == "profiles/" {
+					case 'p': // Prefix: "p"
+						if l := len("p"); len(elem) >= l && elem[0:l] == "p" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
-						// Param: "account_handle"
-						// Leaf parameter
-						args[0] = elem
-						elem = ""
-
 						if len(elem) == 0 {
-							switch method {
-							case "GET":
-								// Leaf: ProfileGet
-								r.name = "ProfileGet"
-								r.operationID = "ProfileGet"
-								r.pathPattern = "/v1/profiles/{account_handle}"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
+							break
+						}
+						switch elem[0] {
+						case 'o': // Prefix: "osts/"
+							if l := len("osts/"); len(elem) >= l && elem[0:l] == "osts/" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								break
+							}
+							switch elem[0] {
+							case 's': // Prefix: "search"
+								if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									switch method {
+									case "GET":
+										// Leaf: PostSearch
+										r.name = "PostSearch"
+										r.operationID = "PostSearch"
+										r.pathPattern = "/v1/posts/search"
+										r.args = args
+										r.count = 0
+										return r, true
+									default:
+										return
+									}
+								}
+							}
+							// Param: "post_id"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								switch method {
+								case "DELETE":
+									r.name = "PostDelete"
+									r.operationID = "PostDelete"
+									r.pathPattern = "/v1/posts/{post_id}"
+									r.args = args
+									r.count = 1
+									return r, true
+								case "PATCH":
+									r.name = "PostUpdate"
+									r.operationID = "PostUpdate"
+									r.pathPattern = "/v1/posts/{post_id}"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/reacts"
+								if l := len("/reacts"); len(elem) >= l && elem[0:l] == "/reacts" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									switch method {
+									case "PUT":
+										// Leaf: PostReactAdd
+										r.name = "PostReactAdd"
+										r.operationID = "PostReactAdd"
+										r.pathPattern = "/v1/posts/{post_id}/reacts"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+							}
+						case 'r': // Prefix: "rofiles/"
+							if l := len("rofiles/"); len(elem) >= l && elem[0:l] == "rofiles/" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							// Param: "account_handle"
+							// Leaf parameter
+							args[0] = elem
+							elem = ""
+
+							if len(elem) == 0 {
+								switch method {
+								case "GET":
+									// Leaf: ProfileGet
+									r.name = "ProfileGet"
+									r.operationID = "ProfileGet"
+									r.pathPattern = "/v1/profiles/{account_handle}"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
 							}
 						}
 					case 't': // Prefix: "threads"
@@ -1111,15 +1846,15 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = "ThreadsList"
-								r.operationID = "ThreadsList"
+								r.name = "ThreadList"
+								r.operationID = "ThreadList"
 								r.pathPattern = "/v1/threads"
 								r.args = args
 								r.count = 0
 								return r, true
 							case "POST":
-								r.name = "ThreadsCreate"
-								r.operationID = "ThreadsCreate"
+								r.name = "ThreadCreate"
+								r.operationID = "ThreadCreate"
 								r.pathPattern = "/v1/threads"
 								r.args = args
 								r.count = 0
@@ -1147,9 +1882,23 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 							if len(elem) == 0 {
 								switch method {
+								case "DELETE":
+									r.name = "ThreadDelete"
+									r.operationID = "ThreadDelete"
+									r.pathPattern = "/v1/threads/{thread_mark}"
+									r.args = args
+									r.count = 1
+									return r, true
 								case "GET":
-									r.name = "ThreadsGet"
-									r.operationID = "ThreadsGet"
+									r.name = "ThreadGet"
+									r.operationID = "ThreadGet"
+									r.pathPattern = "/v1/threads/{thread_mark}"
+									r.args = args
+									r.count = 1
+									return r, true
+								case "PATCH":
+									r.name = "ThreadUpdate"
+									r.operationID = "ThreadUpdate"
 									r.pathPattern = "/v1/threads/{thread_mark}"
 									r.args = args
 									r.count = 1
@@ -1169,9 +1918,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								if len(elem) == 0 {
 									switch method {
 									case "POST":
-										// Leaf: PostsCreate
-										r.name = "PostsCreate"
-										r.operationID = "PostsCreate"
+										// Leaf: PostCreate
+										r.name = "PostCreate"
+										r.operationID = "PostCreate"
 										r.pathPattern = "/v1/threads/{thread_mark}/posts"
 										r.args = args
 										r.count = 1
