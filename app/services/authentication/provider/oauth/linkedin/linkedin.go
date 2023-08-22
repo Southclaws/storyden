@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
+	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -32,26 +33,26 @@ const (
 )
 
 type LinkedInProvider struct {
-	auth_repo    authentication.Repository
-	account_repo account.Repository
-	avatar_svc   avatar.Service
+	auth_repo  authentication.Repository
+	register   register.Service
+	avatar_svc avatar.Service
 
 	callback string
 	config   all.Configuration
 }
 
-func New(cfg config.Config, auth_repo authentication.Repository, account_repo account.Repository, avatar_svc avatar.Service) (*LinkedInProvider, error) {
+func New(cfg config.Config, auth_repo authentication.Repository, register register.Service, avatar_svc avatar.Service) (*LinkedInProvider, error) {
 	config, err := all.LoadProvider(id)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
 	return &LinkedInProvider{
-		auth_repo:    auth_repo,
-		account_repo: account_repo,
-		avatar_svc:   avatar_svc,
-		config:       config,
-		callback:     all.Redirect(cfg, id),
+		auth_repo:  auth_repo,
+		register:   register,
+		avatar_svc: avatar_svc,
+		config:     config,
+		callback:   all.Redirect(cfg, id),
 	}, nil
 }
 
@@ -185,7 +186,7 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 		return &authmethod.Account, nil
 	}
 
-	acc, err := p.account_repo.Create(ctx, handle,
+	acc, err := p.register.Create(ctx, handle,
 		account.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))

@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/register"
 )
 
 var (
@@ -27,12 +28,12 @@ const (
 )
 
 type Provider struct {
-	auth    authentication.Repository
-	account account.Repository
+	auth     authentication.Repository
+	register register.Service
 }
 
-func New(auth authentication.Repository, account account.Repository) *Provider {
-	return &Provider{auth, account}
+func New(auth authentication.Repository, register register.Service) *Provider {
+	return &Provider{auth, register}
 }
 
 func (p *Provider) Enabled() bool   { return true } // TODO: Allow disabling.
@@ -50,7 +51,7 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 		return nil, fault.Wrap(ErrAccountAlreadyExists, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 	}
 
-	account, err := b.account.Create(ctx, identifier)
+	account, err := b.register.Create(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}

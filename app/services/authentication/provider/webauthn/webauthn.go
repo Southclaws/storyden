@@ -13,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -31,6 +32,7 @@ const (
 type Provider struct {
 	auth_repo    authentication.Repository
 	account_repo account.Repository
+	reg          register.Service
 
 	wa *webauthn.WebAuthn
 }
@@ -38,12 +40,14 @@ type Provider struct {
 func New(
 	auth_repo authentication.Repository,
 	account_repo account.Repository,
+	reg register.Service,
 
 	wa *webauthn.WebAuthn,
 ) (*Provider, error) {
 	return &Provider{
 		auth_repo:    auth_repo,
 		account_repo: account_repo,
+		reg:          reg,
 		wa:           wa,
 	}, nil
 }
@@ -84,7 +88,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 		)
 	}
 
-	acc, err = p.account_repo.Create(ctx, handle)
+	acc, err = p.reg.Create(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

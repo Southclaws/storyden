@@ -21,7 +21,7 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Create(ctx context.Context, handle string, opts ...option) (*Account, error) {
+func (d *database) Create(ctx context.Context, handle string, opts ...Option) (*Account, error) {
 	withrequired := Account{
 		Handle: handle,
 		Name:   handle, // default display name is just the handle
@@ -37,6 +37,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...option) (*
 		SetName(withrequired.Name).
 		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
 		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
+		SetAdmin(withrequired.Admin).
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
