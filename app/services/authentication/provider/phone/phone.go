@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/sms"
 )
 
@@ -32,14 +33,15 @@ const (
 const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
-	auth    authentication.Repository
-	account account.Repository
+	auth     authentication.Repository
+	account  account.Repository
+	register register.Service
 
 	sms sms.Sender
 }
 
-func New(auth authentication.Repository, account account.Repository, sms sms.Sender) *Provider {
-	return &Provider{auth, account, sms}
+func New(auth authentication.Repository, account account.Repository, register register.Service, sms sms.Sender) *Provider {
+	return &Provider{auth, account, register, sms}
 }
 
 func (p *Provider) Enabled() bool   { return p.sms != nil }
@@ -104,7 +106,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 		// If there isn't an account already with this phone number, we create
 		// a new one using the @handle specified in the request.
 		//
-		acc, err = p.account.Create(ctx, handle)
+		acc, err = p.register.Create(ctx, handle)
 		if err != nil {
 			if ftag.Get(err) == ftag.AlreadyExists {
 				return nil, fault.Wrap(err,

@@ -9,10 +9,10 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type option func(*Account)
+type Option func(*Account)
 
 type Repository interface {
-	Create(ctx context.Context, handle string, opts ...option) (*Account, error)
+	Create(ctx context.Context, handle string, opts ...Option) (*Account, error)
 
 	GetByID(ctx context.Context, id AccountID) (*Account, error)
 	GetByHandle(ctx context.Context, handle string) (*Account, error)
@@ -20,19 +20,25 @@ type Repository interface {
 	Update(ctx context.Context, id AccountID, opts ...Mutation) (*Account, error)
 }
 
-func WithID(id AccountID) option {
+func WithID(id AccountID) Option {
 	return func(a *Account) {
 		a.ID = AccountID(id)
 	}
 }
 
-func WithName(name string) option {
+func WithAdmin(admin bool) Option {
+	return func(a *Account) {
+		a.Admin = true
+	}
+}
+
+func WithName(name string) Option {
 	return func(a *Account) {
 		a.Name = name
 	}
 }
 
-func WithBio(bio string) option {
+func WithBio(bio string) Option {
 	return func(a *Account) {
 		a.Bio = opt.New(bio)
 	}
