@@ -57,6 +57,10 @@ func Build() fx.Option {
 }
 
 func (s *service) GetOnboardingStatus(ctx context.Context) (*Status, error) {
+	if s.cachedStatus == StatusComplete {
+		return &StatusComplete, nil
+	}
+
 	accounts, err := s.ec.Account.Query().Count(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
