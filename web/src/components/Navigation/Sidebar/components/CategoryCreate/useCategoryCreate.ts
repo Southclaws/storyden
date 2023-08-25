@@ -1,11 +1,10 @@
-import { useDisclosure, useToast } from "@chakra-ui/react";
+import { UseDisclosureProps, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { mutate } from "swr";
 import { z } from "zod";
 
-import { categoryCreate } from "src/api/openapi/categories";
-import { getCollectionListKey } from "src/api/openapi/collections";
+import { categoryCreate, useCategoryList } from "src/api/openapi/categories";
+import { useGetInfo } from "src/api/openapi/misc";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/ErrorBanner";
 
@@ -17,8 +16,7 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useCategoryCreate() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export function useCategoryCreate(props: UseDisclosureProps) {
   const toast = useToast();
   const {
     register,
@@ -27,12 +25,21 @@ export function useCategoryCreate() {
   } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
+  const { mutate, data: existing } = useCategoryList();
+  const { mutate: mutateInfoStatus } = useGetInfo();
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       const collection = await categoryCreate(data);
-      onClose();
-      mutate(getCollectionListKey());
+      const updated = [...(existing?.categories ?? []), collection];
+
+      mutateInfoStatus();
+      mutate(
+        { categories: updated },
+        { populateCache: true, rollbackOnError: true }
+      );
+
+      props.onClose?.();
       toast({
         title: "Collection created",
         description: `${collection.name} is now ready to be filled with stuff!`,
@@ -43,9 +50,6 @@ export function useCategoryCreate() {
   });
 
   return {
-    isOpen,
-    onOpen,
-    onClose,
     onSubmit,
     register,
     errors,
