@@ -14,8 +14,8 @@ type Status struct {
 var (
 	StatusRequiresFirstAccount = Status{statusRequiresFirstAccount}
 	StatusRequiresCategory     = Status{statusRequiresCategory}
-	StatusRequiresMoreAccounts = Status{statusRequiresMoreAccounts}
 	StatusRequiresFirstPost    = Status{statusRequiresFirstPost}
+	StatusRequiresMoreAccounts = Status{statusRequiresMoreAccounts}
 	StatusComplete             = Status{statusComplete}
 )
 
@@ -60,10 +60,10 @@ func NewStatus(in string) (Status, error) {
 		return StatusRequiresFirstAccount, nil
 	case string(statusRequiresCategory):
 		return StatusRequiresCategory, nil
-	case string(statusRequiresMoreAccounts):
-		return StatusRequiresMoreAccounts, nil
 	case string(statusRequiresFirstPost):
 		return StatusRequiresFirstPost, nil
+	case string(statusRequiresMoreAccounts):
+		return StatusRequiresMoreAccounts, nil
 	case string(statusComplete):
 		return StatusComplete, nil
 	default:

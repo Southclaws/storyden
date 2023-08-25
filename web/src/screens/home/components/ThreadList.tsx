@@ -1,11 +1,21 @@
 import { Divider, List } from "@chakra-ui/react";
-import { ThreadReference } from "src/api/openapi/schemas";
-import { ThreadListItem } from "./ThreadListItem";
 import { Fragment } from "react";
 
-type Props = { threads: ThreadReference[] };
+import { ThreadReference } from "src/api/openapi/schemas";
+
+import { EmptyState } from "./EmptyState";
+import { ThreadListItem } from "./ThreadListItem";
+
+type Props = {
+  threads: ThreadReference[];
+  showEmptyState: boolean;
+};
 
 export function ThreadList(props: Props) {
+  if (props.showEmptyState && props.threads.length === 0) {
+    return <EmptyState />;
+  }
+
   return (
     <List width="full" display="flex" flexDirection="column">
       {props.threads.map((t) => (
