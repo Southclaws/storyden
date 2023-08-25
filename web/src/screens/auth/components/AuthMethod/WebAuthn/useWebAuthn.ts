@@ -1,11 +1,3 @@
-import { useForm } from "react-hook-form";
-import {
-  webAuthnGetAssertion,
-  webAuthnMakeAssertion,
-  webAuthnMakeCredential,
-  webAuthnRequestCredential,
-} from "src/api/openapi/auth";
-
 import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,9 +5,18 @@ import {
   startRegistration,
 } from "@simplewebauthn/browser";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+import { useAccountGet } from "src/api/openapi/accounts";
+import {
+  webAuthnGetAssertion,
+  webAuthnMakeAssertion,
+  webAuthnMakeCredential,
+  webAuthnRequestCredential,
+} from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/ErrorBanner";
-import * as z from "zod";
 
 export const FormSchema = z.object({
   username: z.string(),
@@ -32,6 +33,7 @@ export function useWebAuthn() {
   } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
+  const { mutate } = useAccountGet();
 
   async function signin({ username }: Form) {
     try {
@@ -46,6 +48,7 @@ export function useWebAuthn() {
       await webAuthnMakeAssertion(credential);
 
       router.push("/");
+      mutate();
     } catch (error) {
       errorToast(toast)(error as APIError);
     }
@@ -62,6 +65,7 @@ export function useWebAuthn() {
       await webAuthnMakeCredential(credential);
 
       router.push("/");
+      mutate();
     } catch (error) {
       errorToast(toast)(error as APIError);
     }
