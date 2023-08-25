@@ -32,7 +32,7 @@ export function Content(props: PublicProfile) {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <ThreadList threads={content.data.threads} />
+            <ThreadList threads={content.data.threads} showEmptyState={false} />
           </TabPanel>
           <TabPanel>
             <Box>
