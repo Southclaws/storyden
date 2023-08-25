@@ -1,5 +1,7 @@
 import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
 
+import { Onboarding } from "src/screens/home/components/Onboarding/Onboarding";
+
 import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
 
 import { Authbar } from "./components/Authbar";

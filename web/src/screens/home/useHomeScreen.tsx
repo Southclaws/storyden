@@ -1,13 +1,27 @@
-import { useThreadList } from "src/api/openapi/threads";
+import { useEffect, useState } from "react";
 
-import { useQueryParameters } from "./utils";
+import { useInfoProvider } from "src/api/InfoProvider/useInfoProvider";
+import { OnboardingStatus } from "src/api/openapi/schemas";
 
 export function useHomeScreen() {
-  const { category } = useQueryParameters();
+  const info = useInfoProvider();
+  const [localStatus, setlocalStatus] = useState<string | null>(null);
 
-  const threads = useThreadList({
-    categories: category ? [category] : undefined,
-  });
+  // NOTE: local onboarding status value takes priority.
+  useEffect(() => {
+    setlocalStatus(localStorage.getItem("onboarding-status"));
+  }, [info]);
 
-  return threads;
+  function onFinish() {
+    localStorage.setItem("onboarding-status", "complete");
+    setlocalStatus("complete");
+  }
+
+  const onboardingStatus: OnboardingStatus =
+    (localStatus as OnboardingStatus) ?? info?.onboarding_status ?? "complete";
+
+  return {
+    onboardingStatus,
+    onFinish,
+  };
 }

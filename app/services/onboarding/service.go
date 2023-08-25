@@ -21,8 +21,8 @@ type statusEnum string
 const (
 	statusRequiresFirstAccount statusEnum = `requires_first_account`
 	statusRequiresCategory     statusEnum = `requires_category`
-	statusRequiresMoreAccounts statusEnum = `requires_more_accounts`
 	statusRequiresFirstPost    statusEnum = `requires_first_post`
+	statusRequiresMoreAccounts statusEnum = `requires_more_accounts`
 	statusComplete             statusEnum = `complete`
 )
 
@@ -79,10 +79,6 @@ func (s *service) GetOnboardingStatus(ctx context.Context) (*Status, error) {
 		return &StatusRequiresCategory, nil
 	}
 
-	if accounts == 1 {
-		return &StatusRequiresMoreAccounts, nil
-	}
-
 	posts, err := s.ec.Post.Query().Count(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -90,6 +86,10 @@ func (s *service) GetOnboardingStatus(ctx context.Context) (*Status, error) {
 
 	if posts == 0 {
 		return &StatusRequiresFirstPost, nil
+	}
+
+	if accounts == 1 {
+		return &StatusRequiresMoreAccounts, nil
 	}
 
 	return &StatusComplete, nil
