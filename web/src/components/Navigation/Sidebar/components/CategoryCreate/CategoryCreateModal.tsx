@@ -14,7 +14,7 @@ import { ModalDrawer } from "src/components/Modaldrawer/Modaldrawer";
 import { useCategoryCreate } from "./useCategoryCreate";
 
 export function CategoryCreateModal(props: UseDisclosureProps) {
-  const { register, onSubmit, errors } = useCategoryCreate();
+  const { register, onSubmit, errors } = useCategoryCreate(props);
 
   return (
     <ModalDrawer isOpen={props.isOpen} onClose={props.onClose}>
