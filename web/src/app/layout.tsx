@@ -11,3 +11,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     </html>
   );
 }
+
+export const metadata = {
+  manifest: "/manifest.json",
+};
