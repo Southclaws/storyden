@@ -1,18 +1,10 @@
 import { Manifest } from "next/dist/lib/metadata/types/manifest-types";
 import { NextResponse } from "next/server";
 
-import { GetInfoOKResponse } from "src/api/openapi/schemas";
-import { API_ADDRESS } from "src/config";
+import { getInfo } from "src/utils/info";
 
 export async function GET() {
-  const res = await fetch(`${API_ADDRESS}/api/v1/info`);
-  if (!res.ok) {
-    throw new Error(
-      `failed to fetch API info endpoint: ${res.status} ${res.statusText}`
-    );
-  }
-
-  const info = (await res.json()) as GetInfoOKResponse;
+  const info = await getInfo();
 
   const manifest: Manifest = {
     id: "/",
