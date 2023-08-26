@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prepare": "panda codegen",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -39,6 +40,7 @@
     "zod": "^3.19.0"
   },
   "devDependencies": {
+    "@pandacss/dev": "^0.12.2",
     "@simplewebauthn/typescript-types": "^6.3.0-alpha.1",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/node": "^18.7.13",
@@ -56,6 +58,7 @@
       "^src/(.*)$",
       "^.*\\.css$",
       "^\\.\\.",
+      "^@[./]",
       "^[./]"
     ],
     "importOrderSeparation": true,

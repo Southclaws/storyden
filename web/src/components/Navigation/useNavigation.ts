@@ -1,4 +1,7 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
+import { PropertyValue } from "styled-system/types/prop-type";
 import { z } from "zod";
 
 import { useGetInfo } from "src/api/openapi/misc";
@@ -10,9 +13,9 @@ import { useSession } from "src/auth";
 // the viewport. To get around this, the default layout positions an empty box
 // to the left of the viewport to push the content right and then the actual
 // sidebar is rendered on top of this with the same width configuration.
-export const SIDEBAR_WIDTH = {
-  md: "25%",
-  lg: "33%",
+export const SIDEBAR_WIDTH: PropertyValue<"width"> = {
+  md: "1/4",
+  lg: "1/3",
 };
 
 export const QuerySchema = z.object({

@@ -1,3 +1,5 @@
+"use client";
+
 import { useOutsideClick } from "@chakra-ui/react";
 import { RefObject, useRef } from "react";
 

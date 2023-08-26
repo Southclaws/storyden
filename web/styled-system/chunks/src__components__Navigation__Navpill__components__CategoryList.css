@@ -1,0 +1,38 @@
+@layer utilities {
+
+  .bg_blackAlpha\.200 {
+    background-color: blackAlpha.200
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_start {
+    align-items: start
+    }
+
+  .justify_space-between {
+    justify-content: space-between
+    }
+
+  .h_full {
+    height: var(--sizes-full)
+    }
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+
+  .gap_2 {
+    gap: var(--spacing-2)
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .overflow-y_scroll {
+    overflow-y: scroll
+    }
+}

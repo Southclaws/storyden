@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { AuthContext } from "./AuthProvider";
+import { useAccountGet } from "src/api/openapi/accounts";
 
 export function useSession() {
-  return useContext(AuthContext);
+  const { data } = useAccountGet();
+  return data;
 }

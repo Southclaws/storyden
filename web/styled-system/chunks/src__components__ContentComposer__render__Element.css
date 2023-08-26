@@ -1,0 +1,6 @@
+@layer utilities {
+
+  .mb_3 {
+    margin-bottom: var(--spacing-3)
+    }
+}

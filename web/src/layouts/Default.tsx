@@ -1,65 +1,42 @@
-"use client";
-
-import { Box, Flex } from "@chakra-ui/react";
-import { usePathname } from "next/navigation";
 import { PropsWithChildren } from "react";
 
-import { Navpill } from "src/components/Navigation/Navpill/Navpill";
-import { Sidebar } from "src/components/Navigation/Sidebar/Sidebar";
-import { SIDEBAR_WIDTH } from "src/components/Navigation/useNavigation";
+import { Navigation } from "src/components/Navigation/Navigation";
 
-const ROUTES_WITHOUT_NAVPILL = ["/new"];
-
-const isNavpillShown = (path: string | null) =>
-  ROUTES_WITHOUT_NAVPILL.includes(path ?? "");
+import { css } from "@/styled-system/css";
 
 export function Default(props: PropsWithChildren) {
-  const pathname = usePathname();
   return (
-    <Flex
-      minHeight="100vh"
-      width="full"
-      flexDirection="row"
-      bgColor="white"
+    <div
+      className={css({
+        display: "flex",
+        minHeight: "100vh",
+        width: "full",
+        flexDirection: "row",
+        bgColor: "white",
+      })}
       vaul-drawer-wrapper=""
     >
-      {/* MOBILE */}
-      <Box
-        id="mobile-nav-container"
-        display={{
-          base: isNavpillShown(pathname) ? "none" : "unset",
-          md: "none",
-        }}
-      >
-        <Navpill />
-      </Box>
+      <Navigation />
 
-      {/* DESKTOP */}
-      <Box
-        display={{
-          base: "none",
-          md: "flex",
-        }}
-        minWidth={SIDEBAR_WIDTH}
-        height="100vh"
-      >
-        <Sidebar />
-      </Box>
-
-      <Box
-        as="main"
-        width="full"
-        maxW={{
-          base: "full",
-          lg: "container.md",
-        }}
-        px={4}
-        py={2}
-        backgroundColor="white"
+      <main
+        className={css({
+          width: "full",
+          maxW: {
+            base: "full",
+            lg: "container.md",
+          },
+          px: 4,
+          py: 2,
+          backgroundColor: "white",
+        })}
       >
         {props.children}
-        <Box height="6rem"></Box>
-      </Box>
-    </Flex>
+        <div
+          className={css({
+            height: "6rem",
+          })}
+        ></div>
+      </main>
+    </div>
   );
 }

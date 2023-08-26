@@ -1,0 +1,74 @@
+@layer utilities {
+
+  .hover\:text-decor_none {
+    &:is(:hover, [data-hover]) {
+      text-decor: none
+        }
+    }
+
+  .hover\:text-decor_none {
+    &:is(:hover, [data-hover]) {
+      text-decor: none
+        }
+    }
+
+  .hover\:bg_blackAlpha\.50 {
+    &:is(:hover, [data-hover]) {
+      background-color: blackAlpha.50
+        }
+    }
+
+  .size_sm {
+    size: sm
+    }
+
+  .bg_blackAlpha\.100 {
+    background-color: blackAlpha.100
+    }
+
+  .rounded_md {
+    border-radius: var(--radii-md)
+    }
+
+  .p_2 {
+    padding: var(--spacing-2)
+    }
+
+  .hover\:bg_blackAlpha\.50 {
+    &:is(:hover, [data-hover]) {
+      background-color: blackAlpha.50
+        }
+    }
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+
+  .cursor_grabbing {
+    cursor: grabbing
+    }
+
+  .cursor_grab {
+    cursor: grab
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .justify_space-between {
+    justify-content: space-between
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+}

@@ -1,7 +1,8 @@
-"use client";
-
-import { Box, Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
+import { Flex } from "src/components/scaffolding/Box";
+
+import { styled } from "@/styled-system/jsx";
 
 export function Fullpage(props: PropsWithChildren) {
   return (
@@ -13,9 +14,9 @@ export function Fullpage(props: PropsWithChildren) {
       alignItems="center"
       flexDirection="column"
     >
-      <Box as="main" flexGrow={1} width="full" height="full">
+      <styled.main flexGrow={1} width="full" height="full">
         {props.children}
-      </Box>
+      </styled.main>
     </Flex>
   );
 }

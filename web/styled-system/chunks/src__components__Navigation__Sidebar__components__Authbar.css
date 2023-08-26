@@ -1,0 +1,30 @@
+@layer utilities {
+
+  .size_lg {
+    size: lg
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_start {
+    align-items: start
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+}

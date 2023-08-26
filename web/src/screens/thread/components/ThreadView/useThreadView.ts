@@ -1,5 +1,9 @@
+"use client";
+
 import { ChangeEvent } from "react";
+
 import { Thread } from "src/api/openapi/schemas";
+
 import { useThreadScreenContext } from "../../context";
 
 export function useThreadView(thread: Thread) {
