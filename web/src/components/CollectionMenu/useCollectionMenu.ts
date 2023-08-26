@@ -1,3 +1,5 @@
+"use client";
+
 import { useDisclosure } from "@chakra-ui/react";
 import { KeyboardEvent, MouseEvent, useState } from "react";
 import { mutate } from "swr";

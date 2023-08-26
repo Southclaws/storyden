@@ -1,0 +1,38 @@
+@layer utilities {
+
+  .d_unset {
+    display: unset
+    }
+
+  .d_none {
+    display: none
+    }
+
+  .h_100vh {
+    height: 100vh
+    }
+
+  .md\:d_none {
+    @media screen and (min-width: 768px) {
+      display: none
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+
+  .md\:d_none {
+    @media screen and (min-width: 768px) {
+      display: none
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+}

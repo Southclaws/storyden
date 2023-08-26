@@ -1,7 +1,9 @@
-import { useThreadGet } from "src/api/openapi/threads";
-import { useThreadScreenState } from "./state";
 import { useParams } from "next/navigation";
 import { z } from "zod";
+
+import { useThreadGet } from "src/api/openapi/threads";
+
+import { useThreadScreenState } from "./state";
 
 export const ParamSchema = z.object({
   slug: z.string(),

@@ -1,0 +1,14 @@
+@layer utilities {
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+
+  .size_xs {
+    size: xs
+    }
+
+  .w_1\.125em {
+    width: 1.125em
+    }
+}

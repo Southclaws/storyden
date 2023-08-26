@@ -1,0 +1,10 @@
+@layer utilities {
+
+  .rounded_full {
+    border-radius: var(--radii-full)
+    }
+
+  .w_6 {
+    width: var(--sizes-6)
+    }
+}

@@ -1,0 +1,18 @@
+@layer utilities {
+
+  .w_4em {
+    width: 4em
+    }
+
+  .h_auto {
+    height: auto
+    }
+
+  .size_sm {
+    size: sm
+    }
+
+  .p_4 {
+    padding: var(--spacing-4)
+    }
+}

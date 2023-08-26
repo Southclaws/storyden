@@ -1,3 +1,5 @@
+"use client";
+
 import { HStack, Input, SlideFade } from "@chakra-ui/react";
 
 import {
