@@ -1,4 +1,4 @@
-import { styled } from "@/styled-system/jsx";
+import { styled, Box, Flex } from "@/styled-system/jsx";
 
 export const Box = styled("div");
 
