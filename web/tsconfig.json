@@ -33,8 +33,17 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/styled-system/*": ["styled-system/*"]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "styled-system",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

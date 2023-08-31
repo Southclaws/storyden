@@ -1,0 +1,10 @@
+@layer utilities {
+
+  .min-h_24em {
+    min-height: 24em
+    }
+
+  .h_full {
+    height: var(--sizes-full)
+    }
+}

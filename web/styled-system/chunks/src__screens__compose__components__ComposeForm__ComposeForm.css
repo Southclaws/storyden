@@ -1,0 +1,118 @@
+@layer utilities {
+
+  .w_min-content {
+    width: min-content
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .items_start {
+    align-items: start
+    }
+
+  .justify_space-between {
+    justify-content: space-between
+    }
+
+  .items_end {
+    align-items: end
+    }
+
+  .flex_column-reverse {
+    flex-direction: column-reverse
+    }
+
+  .flex_1_0_auto {
+    flex: 1 0 auto
+    }
+
+  .max-w_min-content {
+    max-width: min-content
+    }
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+
+  .d_none {
+    display: none
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .flex_1_1_auto {
+    flex: 1 1 auto
+    }
+
+  .gap_2 {
+    gap: var(--spacing-2)
+    }
+
+  .overflow_hidden {
+    overflow: hidden
+    }
+
+  .md\:d_none {
+    @media screen and (min-width: 768px) {
+      display: none
+        }
+    }
+
+  .md\:d_none {
+    @media screen and (min-width: 768px) {
+      display: none
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+
+  .md\:flex_row {
+    @media screen and (min-width: 768px) {
+      flex-direction: row
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+
+  .md\:flex_row {
+    @media screen and (min-width: 768px) {
+      flex-direction: row
+        }
+    }
+
+  .md\:d_flex {
+    @media screen and (min-width: 768px) {
+      display: flex
+        }
+    }
+}

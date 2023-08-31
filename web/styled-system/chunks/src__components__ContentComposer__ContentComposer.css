@@ -1,0 +1,6 @@
+@layer utilities {
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+}

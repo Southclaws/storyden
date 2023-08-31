@@ -1,0 +1,26 @@
+@layer utilities {
+
+  .overflow_hidden {
+    overflow: hidden
+    }
+
+  .m_0 {
+    margin: var(--spacing-0)
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .gap_2 {
+    gap: var(--spacing-2)
+    }
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+}

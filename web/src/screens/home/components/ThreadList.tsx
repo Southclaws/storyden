@@ -1,3 +1,5 @@
+"use client";
+
 import { Divider, List } from "@chakra-ui/react";
 import { Fragment } from "react";
 

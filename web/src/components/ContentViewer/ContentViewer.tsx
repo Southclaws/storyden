@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useState } from "react";
 import { createEditor } from "slate";
 import { Editable, Slate, withReact } from "slate-react";

@@ -1,6 +1,10 @@
+"use client";
+
 import { Flex, SkeletonText } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
 import { APIError } from "src/api/openapi/schemas";
+
 import ErrorBanner from "./ErrorBanner";
 
 export function Unready(props: PropsWithChildren<Partial<APIError>>) {

@@ -1,0 +1,14 @@
+@layer utilities {
+
+  .w_max-content {
+    width: max-content
+    }
+
+  .size_xs {
+    size: xs
+    }
+
+  .rounded_lg {
+    border-radius: var(--radii-lg)
+    }
+}
