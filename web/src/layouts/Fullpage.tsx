@@ -1,8 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { Flex } from "src/components/scaffolding/Box";
-
-import { styled } from "@/styled-system/jsx";
+import { Flex, styled } from "@/styled-system/jsx";
 
 export function Fullpage(props: PropsWithChildren) {
   return (

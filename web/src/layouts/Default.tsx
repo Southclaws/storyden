@@ -2,41 +2,32 @@ import { PropsWithChildren } from "react";
 
 import { Navigation } from "src/components/Navigation/Navigation";
 
-import { css } from "@/styled-system/css";
+import { Box, Flex, styled } from "@/styled-system/jsx";
 
 export function Default(props: PropsWithChildren) {
   return (
-    <div
-      className={css({
-        display: "flex",
-        minHeight: "100vh",
-        width: "full",
-        flexDirection: "row",
-        bgColor: "white",
-      })}
+    <Flex
+      minHeight="100vh"
+      width="full"
+      flexDirection="row"
+      bgColor="white"
       vaul-drawer-wrapper=""
     >
       <Navigation />
 
-      <main
-        className={css({
-          width: "full",
-          maxW: {
-            base: "full",
-            lg: "container.md",
-          },
-          px: 4,
-          py: 2,
-          backgroundColor: "white",
-        })}
+      <styled.main
+        width="full"
+        maxW={{
+          base: "full",
+          lg: "4xl",
+        }}
+        px={4}
+        py={2}
+        backgroundColor="white"
       >
         {props.children}
-        <div
-          className={css({
-            height: "6rem",
-          })}
-        ></div>
-      </main>
-    </div>
+        <Box height="6rem"></Box>
+      </styled.main>
+    </Flex>
   );
 }
