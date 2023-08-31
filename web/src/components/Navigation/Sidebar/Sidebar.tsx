@@ -2,9 +2,8 @@
 
 import { Box, Divider, VStack } from "@chakra-ui/react";
 
-import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
+import { useNavigation } from "../useNavigation";
 
-import { css } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 
 import { Authbar } from "./components/Authbar";
@@ -18,14 +17,15 @@ export function Sidebar() {
 
   return (
     <styled.header
-      className={css({
-        display: "flex",
-        position: "fixed",
-        width: SIDEBAR_WIDTH,
-        height: "full",
-        justifyContent: "end",
-        bgColor: "gray.100",
-      })}
+      display="flex"
+      position="fixed"
+      width={{
+        md: "1/4",
+        lg: "1/3",
+      }}
+      height="full"
+      justifyContent="end"
+      bgColor="gray.100"
     >
       <Box
         id="desktop-nav-box"
