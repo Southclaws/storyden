@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { HStack } from "@/styled-system/jsx";
 
 import { useSession } from "src/auth";
 
@@ -18,9 +18,9 @@ export function ProfileReference({
   showHandle = true,
   size = "sm",
 }: Props) {
-  const account = useSession();
-  const self = account?.id === profileReference.id;
-  const title = self ? `Your profile` : `${profileReference.handle}'s profile`;
+  // const account = useSession();
+  // const self = account?.id === profileReference.id;
+  // const title = self ? `Your profile` : `${profileReference.handle}'s profile`;
   const large = size === "lg";
 
   return (
@@ -30,7 +30,7 @@ export function ProfileReference({
       borderRadius="full"
       _hover={{ backgroundColor: "blackAlpha.100" }}
       href={`/p/${profileReference.handle}`}
-      title={title}
+      // title={title}
     >
       <HStack>
         <Avatar handle={profileReference.handle} width={large ? 8 : 6} />

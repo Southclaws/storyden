@@ -1,3 +1,5 @@
+"use client";
+
 import { useClipboard, useToast } from "@chakra-ui/react";
 import { mutate } from "swr";
 

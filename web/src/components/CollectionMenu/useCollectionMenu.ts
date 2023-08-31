@@ -82,6 +82,7 @@ export function useCollectionMenu(props: Props) {
   return {
     error: collectionList.error,
     collections: collections,
+    isAuthenticated: Boolean(account),
     isAlreadySaved,
     onSelect,
     onKeyDown,

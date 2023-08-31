@@ -1,39 +1,10 @@
-"use client";
+import { Content } from "./Content/Content";
 
-import { OnboardingStatus } from "src/api/openapi/schemas";
-
-import { Content } from "./Content";
-import { Onboarding } from "./components/Onboarding/Onboarding";
-import { useHomeScreen } from "./useHomeScreen";
-
-export function HomeScreen() {
-  const { onboardingStatus, onFinish } = useHomeScreen();
-
-  const showOnboarding = isOnboarding(onboardingStatus) && onboardingStatus;
-
+export async function HomeScreen() {
   return (
     <>
-      <Content showEmptyState={!showOnboarding} />
-
-      {showOnboarding && (
-        <Onboarding status={onboardingStatus} onFinish={onFinish} />
-      )}
+      {/* @ts-expect-error Server Component */}
+      <Content showEmptyState />
     </>
   );
-}
-
-function isOnboarding(status?: OnboardingStatus) {
-  switch (status) {
-    // NOTE: explicit exhaustivity here because we want to default to content
-    // if something went wrong with the info data. Last resort: show content!
-    case "requires_first_account":
-    case "requires_category":
-    case "requires_more_accounts":
-    case "requires_first_post":
-      return true;
-
-    case "complete":
-    default:
-      return false;
-  }
 }

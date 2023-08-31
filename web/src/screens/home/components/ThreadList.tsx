@@ -1,9 +1,8 @@
-"use client";
-
-import { Divider, List } from "@chakra-ui/react";
 import { Fragment } from "react";
 
 import { ThreadReference } from "src/api/openapi/schemas";
+
+import { Divider, styled } from "@/styled-system/jsx";
 
 import { EmptyState } from "./EmptyState";
 import { ThreadListItem } from "./ThreadListItem";
@@ -19,13 +18,13 @@ export function ThreadList(props: Props) {
   }
 
   return (
-    <List width="full" display="flex" flexDirection="column">
+    <styled.ul width="full" display="flex" flexDirection="column">
       {props.threads.map((t) => (
         <Fragment key={t.id}>
           <Divider />
           <ThreadListItem key={t.id} thread={t} />
         </Fragment>
       ))}
-    </List>
+    </styled.ul>
   );
 }

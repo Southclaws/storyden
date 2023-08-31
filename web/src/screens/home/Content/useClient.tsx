@@ -1,8 +1,8 @@
 import { useThreadList } from "src/api/openapi/threads";
 
-import { useQueryParameters } from "./utils";
+import { useQueryParameters } from "../utils";
 
-export function useContent() {
+export function useClient() {
   const { category } = useQueryParameters();
 
   const threads = useThreadList({

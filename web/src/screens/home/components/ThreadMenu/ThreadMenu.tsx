@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Menu,
   MenuButton,
@@ -9,8 +11,10 @@ import {
 import { LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import format from "date-fns/format";
+
 import { ThreadReference } from "src/api/openapi/schemas";
 import { More } from "src/components/Action/Action";
+
 import { useThreadMenu } from "./useThreadMenu";
 
 export function ThreadMenu(props: ThreadReference) {

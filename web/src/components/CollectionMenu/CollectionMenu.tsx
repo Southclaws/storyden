@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Checkbox,
@@ -17,6 +19,7 @@ import { Props, useCollectionMenu } from "./useCollectionMenu";
 export function CollectionMenu(props: Props) {
   const {
     collections,
+    isAuthenticated,
     isAlreadySaved,
     onSelect,
     multiSelect,
@@ -27,6 +30,7 @@ export function CollectionMenu(props: Props) {
     onClose,
   } = useCollectionMenu(props);
 
+  if (!isAuthenticated) return null;
   if (!collections) return null;
 
   return (

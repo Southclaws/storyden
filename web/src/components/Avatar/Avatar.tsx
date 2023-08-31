@@ -1,4 +1,7 @@
+"use client";
+
 import { Box, BoxProps, Image } from "@chakra-ui/react";
+
 import { useAvatar } from "./useAvatar";
 
 type Props = {
