@@ -1,0 +1,10 @@
+@layer utilities {
+
+  .size_sm {
+    size: sm
+    }
+
+  .break_keep-all {
+    word-break: keep-all
+    }
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import { useToast } from "@chakra-ui/react";
 import { DragEvent, useState } from "react";
 import { Transforms } from "slate";

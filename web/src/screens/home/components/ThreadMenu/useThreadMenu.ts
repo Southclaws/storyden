@@ -1,16 +1,17 @@
 import { useClipboard, useToast } from "@chakra-ui/react";
+import { mutate } from "swr";
+
 import { ThreadReference } from "src/api/openapi/schemas";
 import { getThreadListKey, threadDelete } from "src/api/openapi/threads";
-import { useAuthProvider } from "src/auth/useAuthProvider";
+import { useSession } from "src/auth";
 import {
   getPermalinkForThread,
   useQueryParameters,
 } from "src/screens/home/utils";
-import { mutate } from "swr";
 
 export function useThreadMenu(props: ThreadReference) {
   const toast = useToast();
-  const { account } = useAuthProvider();
+  const account = useSession();
   const { onCopy } = useClipboard(getPermalinkForThread(props.slug));
   const { category } = useQueryParameters();
 

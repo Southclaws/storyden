@@ -1,0 +1,14 @@
+@layer utilities {
+
+  .d_flex {
+    display: flex
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .gap_2 {
+    gap: var(--spacing-2)
+    }
+}

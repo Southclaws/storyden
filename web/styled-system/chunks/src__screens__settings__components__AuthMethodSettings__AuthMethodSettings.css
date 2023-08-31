@@ -1,0 +1,46 @@
+@layer utilities {
+
+  .size_sm {
+    size: sm
+    }
+
+  .size_xs {
+    size: xs
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .gap_2 {
+    gap: var(--spacing-2)
+    }
+
+  .w_full {
+    width: var(--sizes-full)
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+
+  .overflow_clip {
+    overflow: clip
+    }
+
+  .h_1rem {
+    height: 1rem
+    }
+}

@@ -1,19 +1,10 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import { z } from "zod";
 
 import { useGetInfo } from "src/api/openapi/misc";
 import { useSession } from "src/auth";
-
-// The sidebar width is shared between two components which must use the exact
-// same values. The reason for this is the sidebar is position: fixed, which
-// means it cannot inherit the width from the parent since its true parent is
-// the viewport. To get around this, the default layout positions an empty box
-// to the left of the viewport to push the content right and then the actual
-// sidebar is rendered on top of this with the same width configuration.
-export const SIDEBAR_WIDTH = {
-  md: "25%",
-  lg: "33%",
-};
 
 export const QuerySchema = z.object({
   category: z.string().optional(),

@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Heading, Text } from "@chakra-ui/react";
+
 import { Mailbox } from "src/components/graphics/Mailbox";
 
 export function NotificationScreen() {

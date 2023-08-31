@@ -1,10 +1,14 @@
 "use client";
 
+import { Skeleton, SkeletonText } from "@chakra-ui/react";
+
 import { Unready } from "src/components/Unready";
+
 import { ThreadView } from "./components/ThreadView/ThreadView";
 import { ThreadScreenContext } from "./context";
 import { useThreadScreen } from "./useThreadScreen";
-import { Skeleton, SkeletonText } from "@chakra-ui/react";
+
+// TODO: Make thread view SSR and remove use client from this screen root.
 
 export function ThreadScreen() {
   const { state, data, error } = useThreadScreen();

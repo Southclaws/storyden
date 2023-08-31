@@ -1,14 +1,17 @@
+"use client";
+
 import { debounce } from "lodash";
 import { usePathname } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+
 import { postSearch } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
-import { useAuthProvider } from "src/auth/useAuthProvider";
+import { useSession } from "src/auth";
 
 export function useNavpill() {
   const pathname = usePathname();
   const [isExpanded, setExpanded] = useState(true);
-  const { account } = useAuthProvider();
+  const account = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PostProps[]>([]);
 

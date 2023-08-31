@@ -1,0 +1,58 @@
+@layer utilities {
+
+  .pr_2 {
+    padding-right: var(--spacing-2)
+    }
+
+  .hover\:bg_blackAlpha\.100 {
+    &:is(:hover, [data-hover]) {
+      background-color: blackAlpha.100
+        }
+    }
+
+  .pr_1 {
+    padding-right: var(--spacing-1)
+    }
+
+  .p_1 {
+    padding: var(--spacing-1)
+    }
+
+  .rounded_full {
+    border-radius: var(--radii-full)
+    }
+
+  .hover\:bg_blackAlpha\.100 {
+    &:is(:hover, [data-hover]) {
+      background-color: blackAlpha.100
+        }
+    }
+
+  .w_8 {
+    width: var(--sizes-8)
+    }
+
+  .w_6 {
+    width: var(--sizes-6)
+    }
+
+  .size_sm {
+    size: sm
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+}

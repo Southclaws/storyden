@@ -1,20 +1,10 @@
-"use client";
-
-import { Box, Flex } from "@chakra-ui/react";
-import { usePathname } from "next/navigation";
 import { PropsWithChildren } from "react";
 
-import { Navpill } from "src/components/Navigation/Navpill/Navpill";
-import { Sidebar } from "src/components/Navigation/Sidebar/Sidebar";
-import { SIDEBAR_WIDTH } from "src/components/Navigation/useNavigation";
+import { Navigation } from "src/components/Navigation/Navigation";
 
-const ROUTES_WITHOUT_NAVPILL = ["/new"];
-
-const isNavpillShown = (path: string | null) =>
-  ROUTES_WITHOUT_NAVPILL.includes(path ?? "");
+import { Box, Flex, styled } from "@/styled-system/jsx";
 
 export function Default(props: PropsWithChildren) {
-  const pathname = usePathname();
   return (
     <Flex
       minHeight="100vh"
@@ -23,35 +13,13 @@ export function Default(props: PropsWithChildren) {
       bgColor="white"
       vaul-drawer-wrapper=""
     >
-      {/* MOBILE */}
-      <Box
-        id="mobile-nav-container"
-        display={{
-          base: isNavpillShown(pathname) ? "none" : "unset",
-          md: "none",
-        }}
-      >
-        <Navpill />
-      </Box>
+      <Navigation />
 
-      {/* DESKTOP */}
-      <Box
-        display={{
-          base: "none",
-          md: "flex",
-        }}
-        minWidth={SIDEBAR_WIDTH}
-        height="100vh"
-      >
-        <Sidebar />
-      </Box>
-
-      <Box
-        as="main"
+      <styled.main
         width="full"
         maxW={{
           base: "full",
-          lg: "container.md",
+          lg: "4xl",
         }}
         px={4}
         py={2}
@@ -59,7 +27,7 @@ export function Default(props: PropsWithChildren) {
       >
         {props.children}
         <Box height="6rem"></Box>
-      </Box>
+      </styled.main>
     </Flex>
   );
 }

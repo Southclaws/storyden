@@ -1,3 +1,5 @@
+"use client";
+
 import {
   KeyboardSensor,
   PointerSensor,

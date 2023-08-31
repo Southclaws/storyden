@@ -1,8 +1,10 @@
-import { Box, Divider, Flex, VStack } from "@chakra-ui/react";
+"use client";
 
-import { Onboarding } from "src/screens/home/components/Onboarding/Onboarding";
+import { Box, Divider, VStack } from "@chakra-ui/react";
 
-import { SIDEBAR_WIDTH, useNavigation } from "../useNavigation";
+import { useNavigation } from "../useNavigation";
+
+import { styled } from "@/styled-system/jsx";
 
 import { Authbar } from "./components/Authbar";
 import { CategoryCreate } from "./components/CategoryCreate/CategoryCreate";
@@ -14,13 +16,15 @@ export function Sidebar() {
   const { isAdmin, title } = useNavigation();
 
   return (
-    <Flex
-      id="desktop-nav-container"
-      as="header"
+    <styled.header
+      display="flex"
       position="fixed"
-      justifyContent="end"
-      width={SIDEBAR_WIDTH}
+      width={{
+        md: "1/4",
+        lg: "1/3",
+      }}
       height="full"
+      justifyContent="end"
       bgColor="gray.100"
     >
       <Box
@@ -59,6 +63,6 @@ export function Sidebar() {
           </VStack>
         </VStack>
       </Box>
-    </Flex>
+    </styled.header>
   );
 }

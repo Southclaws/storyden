@@ -1,0 +1,10 @@
+@layer utilities {
+
+  .size_md {
+    size: md
+    }
+
+  .text_gray\.500 {
+    color: var(--colors-gray-500)
+    }
+}

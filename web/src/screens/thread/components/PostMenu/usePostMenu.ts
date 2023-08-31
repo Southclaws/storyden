@@ -4,9 +4,8 @@ import { mutate } from "swr";
 
 import { postDelete } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
-import { threadDelete } from "src/api/openapi/threads";
-import { getThreadGetKey } from "src/api/openapi/threads";
-import { useAuthProvider } from "src/auth/useAuthProvider";
+import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
+import { useSession } from "src/auth";
 
 import { useThreadScreenContext } from "../../context";
 import { getPermalinkForPost } from "../../utils";
@@ -14,7 +13,7 @@ import { getPermalinkForPost } from "../../utils";
 export function usePostMenu(props: PostProps) {
   const router = useRouter();
   const toast = useToast();
-  const { account } = useAuthProvider();
+  const account = useSession();
   const { thread, setEditingPostID } = useThreadScreenContext();
   const { onCopy } = useClipboard(
     getPermalinkForPost(props.root_slug, props.id)

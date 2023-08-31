@@ -1,0 +1,54 @@
+@layer utilities {
+
+  .w_4rem {
+    width: 4rem
+    }
+
+  .size_md {
+    size: md
+    }
+
+  .text_gray\.500 {
+    color: var(--colors-gray-500)
+    }
+
+  .items_start {
+    align-items: start
+    }
+
+  .flex_column {
+    flex-direction: column
+    }
+
+  .d_flex {
+    display: flex
+    }
+
+  .items_center {
+    align-items: center
+    }
+
+  .justify_start {
+    justify-content: start
+    }
+
+  .gap_10px {
+    gap: 10px
+    }
+
+  .flex_row {
+    flex-direction: row
+    }
+
+  .md\:w_6rem {
+    @media screen and (min-width: 768px) {
+      width: 6rem
+        }
+    }
+
+  .md\:w_6rem {
+    @media screen and (min-width: 768px) {
+      width: 6rem
+        }
+    }
+}

@@ -1,9 +1,10 @@
 import { NativeRenderer, createPicker } from "picmo";
+import { mutate } from "swr";
+
 import { postReactAdd } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey } from "src/api/openapi/threads";
-import { useAuthProvider } from "src/auth/useAuthProvider";
-import { mutate } from "swr";
+import { useSession } from "src/auth";
 
 export const emojiPickerContainerID = `react-emoji-select`;
 
@@ -12,7 +13,7 @@ export type Props = PostProps & {
 };
 
 export function useReactList(props: Props) {
-  const { account } = useAuthProvider();
+  const account = useSession();
   const authenticated = !!account;
 
   async function onSelect(event: { emoji: string }) {
