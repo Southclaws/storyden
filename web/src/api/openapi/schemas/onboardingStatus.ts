@@ -12,7 +12,7 @@ the Storyden installation is in for directing first-time setup steps.
 
  */
 export type OnboardingStatus =
-  typeof OnboardingStatus[keyof typeof OnboardingStatus];
+  (typeof OnboardingStatus)[keyof typeof OnboardingStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const OnboardingStatus = {

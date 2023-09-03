@@ -58,7 +58,10 @@ export type ThreadListQueryError =
   | InternalServerErrorResponse;
 
 export const useThreadList = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: ThreadListParams,
   options?: {
@@ -66,7 +69,7 @@ export const useThreadList = <
       swrKey?: Key;
       enabled?: boolean;
     };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -78,7 +81,7 @@ export const useThreadList = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -112,7 +115,10 @@ export type ThreadGetQueryError =
   | InternalServerErrorResponse;
 
 export const useThreadGet = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   threadMark: string,
   options?: {
@@ -120,7 +126,7 @@ export const useThreadGet = <
       swrKey?: Key;
       enabled?: boolean;
     };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -133,7 +139,7 @@ export const useThreadGet = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -147,7 +153,7 @@ export const useThreadGet = <
  */
 export const threadUpdate = (
   threadMark: string,
-  threadUpdateBody: ThreadUpdateBody
+  threadUpdateBody: ThreadUpdateBody,
 ) => {
   return fetcher<ThreadUpdateOKResponse>({
     url: `/v1/threads/${threadMark}`,

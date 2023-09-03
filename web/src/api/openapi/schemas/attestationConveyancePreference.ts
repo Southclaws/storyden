@@ -11,7 +11,7 @@
 
  */
 export type AttestationConveyancePreference =
-  typeof AttestationConveyancePreference[keyof typeof AttestationConveyancePreference];
+  (typeof AttestationConveyancePreference)[keyof typeof AttestationConveyancePreference];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AttestationConveyancePreference = {

@@ -11,7 +11,7 @@
 
  */
 export type UserVerificationRequirement =
-  typeof UserVerificationRequirement[keyof typeof UserVerificationRequirement];
+  (typeof UserVerificationRequirement)[keyof typeof UserVerificationRequirement];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UserVerificationRequirement = {

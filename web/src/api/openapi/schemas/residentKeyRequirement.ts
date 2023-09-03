@@ -11,7 +11,7 @@
 
  */
 export type ResidentKeyRequirement =
-  typeof ResidentKeyRequirement[keyof typeof ResidentKeyRequirement];
+  (typeof ResidentKeyRequirement)[keyof typeof ResidentKeyRequirement];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ResidentKeyRequirement = {

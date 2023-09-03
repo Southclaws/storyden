@@ -50,7 +50,7 @@ export type AuthProviderListQueryError =
   | InternalServerErrorResponse;
 
 export const useAuthProviderList = <
-  TError = BadRequestResponse | InternalServerErrorResponse
+  TError = BadRequestResponse | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof authProviderList>>,
@@ -67,7 +67,7 @@ export const useAuthProviderList = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -105,7 +105,7 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
  */
 export const oAuthProviderCallback = (
   oauthProvider: string,
-  oAuthProviderCallbackBody: OAuthProviderCallbackBody
+  oAuthProviderCallbackBody: OAuthProviderCallbackBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/oauth/${oauthProvider}/callback`,
@@ -137,7 +137,7 @@ export type WebAuthnRequestCredentialQueryError =
   | InternalServerErrorResponse;
 
 export const useWebAuthnRequestCredential = <
-  TError = BadRequestResponse | InternalServerErrorResponse
+  TError = BadRequestResponse | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -145,7 +145,7 @@ export const useWebAuthnRequestCredential = <
       Awaited<ReturnType<typeof webAuthnRequestCredential>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -158,7 +158,7 @@ export const useWebAuthnRequestCredential = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -171,7 +171,7 @@ export const useWebAuthnRequestCredential = <
  * Complete WebAuthn registration by creating a new credential.
  */
 export const webAuthnMakeCredential = (
-  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody
+  webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/webauthn/make`,
@@ -203,7 +203,10 @@ export type WebAuthnGetAssertionQueryError =
   | InternalServerErrorResponse;
 
 export const useWebAuthnGetAssertion = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -211,7 +214,7 @@ export const useWebAuthnGetAssertion = <
       Awaited<ReturnType<typeof webAuthnGetAssertion>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -224,7 +227,7 @@ export const useWebAuthnGetAssertion = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -237,7 +240,7 @@ export const useWebAuthnGetAssertion = <
  * Complete the credential assertion and sign in to an account.
  */
 export const webAuthnMakeAssertion = (
-  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody
+  webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/webauthn/assert`,
@@ -254,7 +257,7 @@ the other phone endpoint to verify the number and validate the account.
 
  */
 export const phoneRequestCode = (
-  phoneRequestCodeBody: PhoneRequestCodeBody
+  phoneRequestCodeBody: PhoneRequestCodeBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/phone`,
@@ -271,7 +274,7 @@ code that was sent to the user's phone.
  */
 export const phoneSubmitCode = (
   accountHandle: string,
-  phoneSubmitCodeBody: PhoneSubmitCodeBody
+  phoneSubmitCodeBody: PhoneSubmitCodeBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/v1/auth/phone/${accountHandle}`,
@@ -298,7 +301,7 @@ export type AuthProviderLogoutQueryError =
   | InternalServerErrorResponse;
 
 export const useAuthProviderLogout = <
-  TError = BadRequestResponse | InternalServerErrorResponse
+  TError = BadRequestResponse | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof authProviderLogout>>,
@@ -316,7 +319,7 @@ export const useAuthProviderLogout = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {

@@ -29,7 +29,7 @@ import type {
  */
 export const postCreate = (
   threadMark: string,
-  postCreateBody: PostCreateBody
+  postCreateBody: PostCreateBody,
 ) => {
   return fetcher<PostCreateOKResponse>({
     url: `/v1/threads/${threadMark}/posts`,
@@ -81,7 +81,10 @@ export type PostSearchQueryError =
   | InternalServerErrorResponse;
 
 export const usePostSearch = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   params?: PostSearchParams,
   options?: {
@@ -89,7 +92,7 @@ export const usePostSearch = <
       swrKey?: Key;
       enabled?: boolean;
     };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -101,7 +104,7 @@ export const usePostSearch = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -115,7 +118,7 @@ export const usePostSearch = <
  */
 export const postReactAdd = (
   postId: string,
-  postReactAddBody: PostReactAddBody
+  postReactAddBody: PostReactAddBody,
 ) => {
   return fetcher<PostReactAddOKResponse>({
     url: `/v1/posts/${postId}/reacts`,

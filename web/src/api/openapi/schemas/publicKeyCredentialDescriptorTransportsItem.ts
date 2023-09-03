@@ -7,7 +7,7 @@
  */
 
 export type PublicKeyCredentialDescriptorTransportsItem =
-  typeof PublicKeyCredentialDescriptorTransportsItem[keyof typeof PublicKeyCredentialDescriptorTransportsItem];
+  (typeof PublicKeyCredentialDescriptorTransportsItem)[keyof typeof PublicKeyCredentialDescriptorTransportsItem];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PublicKeyCredentialDescriptorTransportsItem = {
