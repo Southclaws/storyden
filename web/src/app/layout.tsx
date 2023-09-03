@@ -1,4 +1,7 @@
+import { Metadata } from "next";
 import { PropsWithChildren } from "react";
+
+import { getInfo } from "src/utils/info";
 
 import "./global.css";
 
@@ -24,6 +27,13 @@ export default function RootLayout({ children }: PropsWithChildren) {
   );
 }
 
-export const metadata = {
-  manifest: "/manifest.json",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const info = await getInfo();
+
+  return {
+    title: info.title,
+    description: info.description,
+    themeColor: info.accent_colour,
+    manifest: "/manifest.json",
+  };
+}
