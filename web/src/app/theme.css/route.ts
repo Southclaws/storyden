@@ -1,6 +1,7 @@
 import { flatten, zip } from "lodash";
 import { NextResponse } from "next/server";
 
+import { getColourVariants } from "src/utils/colour";
 import { getInfo } from "src/utils/info";
 
 /**
@@ -12,9 +13,15 @@ import { getInfo } from "src/utils/info";
 export async function GET() {
   const info = await getInfo();
 
+  const cv = getColourVariants(info.accent_colour);
+
   const document = css`
     :root {
-      --accent-colour: ${info.accent_colour};
+      --accent-colour: ${cv["--accent-colour-fallback"]};
+      --accent-colour-muted: ${cv["--accent-colour-muted-fallback"]};
+
+      --accent-colour: ${cv["--accent-colour"]};
+      --accent-colour-muted: ${cv["--accent-colour-muted"]};
     }
   `;
 

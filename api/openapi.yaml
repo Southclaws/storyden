@@ -35,6 +35,8 @@ security:
 tags:
   - name: misc
     description: Non-business logic stuff.
+  - name: admin
+    description: Administration and configuration settings.
   - name: auth
     description: Authentication resources.
   - name: accounts
@@ -120,6 +122,29 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/GetInfoOK" }
+
+  #
+  #               888               d8b
+  #               888               Y8P
+  #               888
+  #  8888b.   .d88888 88888b.d88b.  888 88888b.
+  #     "88b d88" 888 888 "888 "88b 888 888 "88b
+  # .d888888 888  888 888  888  888 888 888  888
+  # 888  888 Y88b 888 888  888  888 888 888  888
+  # "Y888888  "Y88888 888  888  888 888 888  888
+  #
+
+  /v1/admin:
+    patch:
+      operationId: AdminSettingsUpdate
+      description: Update non-env configuration settings for installation.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/AdminSettingsUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
 
   #
   #                   888    888
@@ -796,6 +821,11 @@ components:
   #
 
   requestBodies:
+    AdminSettingsUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AdminSettingsMutableProps" }
+
     AuthPassword:
       content:
         application/json:
@@ -925,6 +955,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Info"
+
+    AdminSettingsUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AdminSettingsProps"
 
     AuthSuccessOK:
       description: OK
@@ -1335,6 +1372,39 @@ components:
         used for basic plain text or markdown content and objects are used for
         more complex types such as Slate.js editor documents.
       type: string
+
+    #
+    #        d8888      888               d8b
+    #       d88888      888               Y8P
+    #      d88P888      888
+    #     d88P 888  .d88888 88888b.d88b.  888 88888b.
+    #    d88P  888 d88" 888 888 "888 "88b 888 888 "88b
+    #   d88P   888 888  888 888  888  888 888 888  888
+    #  d8888888888 Y88b 888 888  888  888 888 888  888
+    # d88P     888  "Y88888 888  888  888 888 888  888
+    #
+
+    AdminSettingsProps:
+      description: Storyden installation and administration settings.
+      type: object
+      required: [title, description, accent_colour]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        accent_colour:
+          type: string
+
+    AdminSettingsMutableProps:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        accent_colour:
+          type: string
 
     #
     #        d8888          888    888
