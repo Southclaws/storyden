@@ -39,7 +39,10 @@ export type ProfileGetQueryError =
   | InternalServerErrorResponse;
 
 export const useProfileGet = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -47,7 +50,7 @@ export const useProfileGet = <
       swrKey?: Key;
       enabled?: boolean;
     };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -60,7 +63,7 @@ export const useProfileGet = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {

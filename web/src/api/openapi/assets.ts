@@ -52,7 +52,10 @@ export type AssetGetQueryError =
   | InternalServerErrorResponse;
 
 export const useAssetGet = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   id: string,
   options?: {
@@ -60,7 +63,7 @@ export const useAssetGet = <
       swrKey?: Key;
       enabled?: boolean;
     };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -72,7 +75,7 @@ export const useAssetGet = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {

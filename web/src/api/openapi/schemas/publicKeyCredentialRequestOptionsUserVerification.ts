@@ -7,7 +7,7 @@
  */
 
 export type PublicKeyCredentialRequestOptionsUserVerification =
-  typeof PublicKeyCredentialRequestOptionsUserVerification[keyof typeof PublicKeyCredentialRequestOptionsUserVerification];
+  (typeof PublicKeyCredentialRequestOptionsUserVerification)[keyof typeof PublicKeyCredentialRequestOptionsUserVerification];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PublicKeyCredentialRequestOptionsUserVerification = {

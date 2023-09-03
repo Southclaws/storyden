@@ -9,7 +9,7 @@
 /**
  * A thread can be in a draft state while the owner makes changes to the content. Once they are happy with it, they can publish the thread.
  */
-export type ThreadStatus = typeof ThreadStatus[keyof typeof ThreadStatus];
+export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ThreadStatus = {

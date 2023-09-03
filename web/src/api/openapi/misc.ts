@@ -45,7 +45,7 @@ export const useGetVersion = <TError = unknown>(options?: {
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -87,7 +87,7 @@ export const useGetSpec = <TError = unknown>(options?: {
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -127,7 +127,7 @@ export const useGetInfo = <TError = InternalServerErrorResponse>(options?: {
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {

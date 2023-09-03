@@ -41,7 +41,10 @@ export type AccountGetQueryError =
   | InternalServerErrorResponse;
 
 export const useAccountGet = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof accountGet>>, TError> & {
     swrKey?: Key;
@@ -58,7 +61,7 @@ export const useAccountGet = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -102,7 +105,7 @@ export type AccountAuthProviderListQueryError =
   | InternalServerErrorResponse;
 
 export const useAccountAuthProviderList = <
-  TError = BadRequestResponse | InternalServerErrorResponse
+  TError = BadRequestResponse | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<
     Awaited<ReturnType<typeof accountAuthProviderList>>,
@@ -120,7 +123,7 @@ export const useAccountAuthProviderList = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -133,7 +136,7 @@ export const useAccountAuthProviderList = <
  * Upload an avatar for the authenticated account.
  */
 export const accountSetAvatar = (
-  accountSetAvatarBody: AccountSetAvatarBody
+  accountSetAvatarBody: AccountSetAvatarBody,
 ) => {
   return fetcher<void>({
     url: `/v1/accounts/self/avatar`,
@@ -165,7 +168,10 @@ export type AccountGetAvatarQueryError =
   | InternalServerErrorResponse;
 
 export const useAccountGetAvatar = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   accountHandle: string,
   options?: {
@@ -173,7 +179,7 @@ export const useAccountGetAvatar = <
       Awaited<ReturnType<typeof accountGetAvatar>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -186,7 +192,7 @@ export const useAccountGetAvatar = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {

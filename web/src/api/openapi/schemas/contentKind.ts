@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 
-export type ContentKind = typeof ContentKind[keyof typeof ContentKind];
+export type ContentKind = (typeof ContentKind)[keyof typeof ContentKind];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ContentKind = {

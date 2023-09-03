@@ -29,7 +29,7 @@ import type {
 
  */
 export const collectionCreate = (
-  collectionCreateBody: CollectionCreateBody
+  collectionCreateBody: CollectionCreateBody,
 ) => {
   return fetcher<CollectionCreateOKResponse>({
     url: `/v1/collections`,
@@ -59,7 +59,7 @@ export type CollectionListQueryError =
   | InternalServerErrorResponse;
 
 export const useCollectionList = <
-  TError = NotFoundResponse | InternalServerErrorResponse
+  TError = NotFoundResponse | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof collectionList>>, TError> & {
     swrKey?: Key;
@@ -76,7 +76,7 @@ export const useCollectionList = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -110,7 +110,10 @@ export type CollectionGetQueryError =
   | InternalServerErrorResponse;
 
 export const useCollectionGet = <
-  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
 >(
   collectionId: string,
   options?: {
@@ -118,7 +121,7 @@ export const useCollectionGet = <
       Awaited<ReturnType<typeof collectionGet>>,
       TError
     > & { swrKey?: Key; enabled?: boolean };
-  }
+  },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
@@ -131,7 +134,7 @@ export const useCollectionGet = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -145,7 +148,7 @@ export const useCollectionGet = <
  */
 export const collectionUpdate = (
   collectionId: string,
-  collectionUpdateBody: CollectionUpdateBody
+  collectionUpdateBody: CollectionUpdateBody,
 ) => {
   return fetcher<CollectionUpdateOKResponse>({
     url: `/v1/collections/${collectionId}`,

@@ -48,7 +48,7 @@ export type CategoryListQueryResult = NonNullable<
 export type CategoryListQueryError = InternalServerErrorResponse;
 
 export const useCategoryList = <
-  TError = InternalServerErrorResponse
+  TError = InternalServerErrorResponse,
 >(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof categoryList>>, TError> & {
     swrKey?: Key;
@@ -65,7 +65,7 @@ export const useCategoryList = <
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
     swrFn,
-    swrOptions
+    swrOptions,
   );
 
   return {
@@ -78,7 +78,7 @@ export const useCategoryList = <
  * Update the sort order of categories.
  */
 export const categoryUpdateOrder = (
-  categoryUpdateOrderBody: CategoryUpdateOrderBody
+  categoryUpdateOrderBody: CategoryUpdateOrderBody,
 ) => {
   return fetcher<CategoryListOKResponse>({
     url: `/v1/categories`,

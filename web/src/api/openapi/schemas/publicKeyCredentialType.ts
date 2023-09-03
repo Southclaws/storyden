@@ -11,7 +11,7 @@
 
  */
 export type PublicKeyCredentialType =
-  typeof PublicKeyCredentialType[keyof typeof PublicKeyCredentialType];
+  (typeof PublicKeyCredentialType)[keyof typeof PublicKeyCredentialType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PublicKeyCredentialType = {

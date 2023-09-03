@@ -11,7 +11,7 @@
 
  */
 export type AuthenticatorAttachment =
-  typeof AuthenticatorAttachment[keyof typeof AuthenticatorAttachment];
+  (typeof AuthenticatorAttachment)[keyof typeof AuthenticatorAttachment];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AuthenticatorAttachment = {
