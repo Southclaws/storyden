@@ -24,6 +24,7 @@ export function ColourInput(props: Props) {
 
   return (
     <Box
+      width="min-content"
       style={styles}
       borderWidth={1}
       borderStyle="solid"
@@ -98,7 +99,7 @@ type FieldProps = {
 
 export function ColourField(props: FieldProps) {
   return (
-    <FormControl width="full">
+    <FormControl>
       <Controller
         defaultValue={props.defaultValue}
         render={({ field: { onChange, ...field } }) => {
