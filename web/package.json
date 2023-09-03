@@ -52,17 +52,7 @@
     "eslint-config-next": "^13.4.4",
     "openapi-typescript": "^5.4.1",
     "orval": "^6.15.0",
+    "prettier": "^3.0.3",
     "typescript": "^4.9.4"
-  },
-  "prettier": {
-    "importOrder": [
-      "^src/(.*)$",
-      "^.*\\.css$",
-      "^\\.\\.",
-      "^@[./]",
-      "^[./]"
-    ],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
   }
 }
