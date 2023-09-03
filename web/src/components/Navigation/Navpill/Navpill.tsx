@@ -49,8 +49,10 @@ export function Navpill() {
                 <Bell />
                 <Logout />
               </HStack>
-              <Settings />
-              {account.admin && <Admin />}
+              <HStack>
+                {account.admin && <Admin />}
+                <Settings />
+              </HStack>
             </>
           ) : (
             <Login />
