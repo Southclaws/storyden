@@ -12,8 +12,10 @@ import {
   BellIcon,
   BookmarkIcon,
   CloudArrowUpIcon,
+  Cog6ToothIcon,
   EllipsisHorizontalIcon,
   HomeIcon,
+  KeyIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -162,7 +164,23 @@ export const Settings = forwardRef(
         href={href}
         {...props}
       >
-        <AdjustmentsHorizontalIcon width="1.25em" />
+        <Cog6ToothIcon width="1.25em" />
+      </Action>
+    );
+  }
+);
+
+export const Admin = forwardRef(
+  ({ "aria-label": al, href = "/admin", ...props }: WithOptionalURL, ref) => {
+    return (
+      <Action
+        ref={ref}
+        title="Administration"
+        aria-label={al ?? "administration"}
+        href={href}
+        {...props}
+      >
+        <KeyIcon width="1.25em" />
       </Action>
     );
   }

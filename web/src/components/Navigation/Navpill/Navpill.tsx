@@ -3,6 +3,7 @@
 import { HStack, Input, SlideFade } from "@chakra-ui/react";
 
 import {
+  Admin,
   Bell,
   Close,
   Create,
@@ -49,6 +50,7 @@ export function Navpill() {
                 <Logout />
               </HStack>
               <Settings />
+              {account.admin && <Admin />}
             </>
           ) : (
             <Login />
