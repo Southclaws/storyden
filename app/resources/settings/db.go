@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -55,6 +56,28 @@ func (d *database) Get(ctx context.Context) (*Settings, error) {
 	}
 
 	return fromEnt(r)
+}
+
+func (d *database) Set(ctx context.Context, s Partial) (*Settings, error) {
+	var err error
+
+	if v, ok := s.Title.Get(); ok {
+		err = multierr.Append(err, d.SetValue(ctx, "Title", v))
+	}
+
+	if v, ok := s.Description.Get(); ok {
+		err = multierr.Append(err, d.SetValue(ctx, "Description", v))
+	}
+
+	if v, ok := s.AccentColour.Get(); ok {
+		err = multierr.Append(err, d.SetValue(ctx, "AccentColour", v))
+	}
+
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return d.Get(ctx)
 }
 
 func (d *database) SetValue(ctx context.Context, key, value string) error {

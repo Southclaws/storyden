@@ -18,7 +18,8 @@ import { SettingsSection } from "../SettingsSection/SettingsSection";
 import { Props, useBrandSettings } from "./useBrandSettings";
 
 function BrandSettingsForm(props: Props) {
-  const { register, control, onSubmit } = useBrandSettings(props);
+  const { register, control, onSubmit, onColourChangePreview } =
+    useBrandSettings(props);
 
   return (
     <SettingsSection>
@@ -48,6 +49,7 @@ function BrandSettingsForm(props: Props) {
           <ColourField
             defaultValue={props.accent_colour}
             control={control}
+            onUpdate={onColourChangePreview}
             {...register("accentColour")}
           />
           <FormHelperText>

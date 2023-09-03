@@ -63,6 +63,7 @@ type Bindings struct {
 	Version
 	Spec
 	Info
+	Admin
 	Authentication
 	WebAuthn
 	PhoneAuth
@@ -84,6 +85,7 @@ func bindingsProviders() fx.Option {
 		NewVersion,
 		NewSpec,
 		NewInfo,
+		NewAdmin,
 		NewAuthentication,
 		NewWebAuthn,
 		NewPhoneAuth,
