@@ -14,13 +14,13 @@ import {
   Cog6ToothIcon,
   EllipsisHorizontalIcon,
   HomeIcon,
-  KeyIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
+import { CrownIcon } from "../graphics/CrownIcon";
 import { LoginIcon } from "../graphics/LoginIcon";
 import { LogoutIcon } from "../graphics/LogoutIcon";
 import { SendIcon } from "../graphics/SendIcon";
@@ -179,7 +179,7 @@ export const Admin = forwardRef(
         href={href}
         {...props}
       >
-        <KeyIcon width="1.25em" />
+        <CrownIcon width="1.25em" />
       </Action>
     );
   }
