@@ -3,6 +3,7 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
+  HStack,
   Heading,
   Input,
   VStack,
@@ -23,17 +24,23 @@ function BrandSettingsForm(props: Props) {
     <SettingsSection>
       <Heading size="sm">Brand settings</Heading>
 
-      <VStack as="form" gap={2} align="start" onSubmit={onSubmit}>
+      <VStack as="form" width="full" gap={2} align="start" onSubmit={onSubmit}>
         <FormControl gap={2}>
           <FormLabel>Title</FormLabel>
-          <Input {...register("title")} />
-          <FormHelperText>The name of your forum</FormHelperText>
+          <Input {...register("title")} maxW="20em" />
+          <FormHelperText>
+            The name of your community. This appears in the sidebar, Google
+            indexing and tab titles.
+          </FormHelperText>
         </FormControl>
 
         <FormControl>
           <FormLabel>Description</FormLabel>
           <Input {...register("description")} />
-          <FormHelperText>The description of your forum</FormHelperText>
+          <FormHelperText>
+            Describe your community with a few words here. This will be used for
+            Google indexing, social previews and the PWA manifest.
+          </FormHelperText>
         </FormControl>
 
         <FormControl>
@@ -43,10 +50,16 @@ function BrandSettingsForm(props: Props) {
             control={control}
             {...register("accentColour")}
           />
-          <FormHelperText>Your brand&apos;s colour</FormHelperText>
+          <FormHelperText>
+            Pick a colour that best represents your community or brand. It will
+            be used throughout the site for accenting certain elements such as
+            buttons, mobile browser borders, PWA theme, etc.
+          </FormHelperText>
         </FormControl>
 
-        <Button type="submit">Save</Button>
+        <HStack justify="end">
+          <Button type="submit">Save</Button>
+        </HStack>
       </VStack>
     </SettingsSection>
   );
