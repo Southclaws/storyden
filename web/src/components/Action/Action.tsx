@@ -6,7 +6,6 @@ import {
   forwardRef,
 } from "@chakra-ui/react";
 import {
-  AdjustmentsHorizontalIcon,
   ArrowLeftIcon,
   Bars3Icon,
   BellIcon,
