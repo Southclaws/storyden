@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type Props = {
   onChange: (value: string) => void;
+  onUpdate: (value: string) => void;
   value: string;
 };
 
@@ -75,6 +76,7 @@ export function useColourInput(props: Props) {
     const angleTo = (Math.atan2(my - cy, mx - cx) * 180) / Math.PI;
 
     setAngle(angleTo);
+    props.onUpdate(`oklch(${L} ${C} ${hueToAngle(angleTo)}deg)`);
   }
 
   function onCleanup() {
