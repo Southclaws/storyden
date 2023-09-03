@@ -1,4 +1,4 @@
-import { Box, FormControl } from "@chakra-ui/react";
+import { Box, FormControl, forwardRef } from "@chakra-ui/react";
 import { CSSProperties } from "react";
 import { Control, Controller } from "react-hook-form";
 
@@ -97,9 +97,9 @@ type FieldProps = {
   defaultValue: string;
 };
 
-export function ColourField(props: FieldProps) {
+export const ColourField = forwardRef((props: FieldProps, ref) => {
   return (
-    <FormControl>
+    <FormControl ref={ref}>
       <Controller
         defaultValue={props.defaultValue}
         render={({ field: { onChange, ...field } }) => {
@@ -110,4 +110,4 @@ export function ColourField(props: FieldProps) {
       />
     </FormControl>
   );
-}
+});
