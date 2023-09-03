@@ -95,6 +95,7 @@ type FieldProps = {
   control: Control<any>;
   name: string;
   defaultValue: string;
+  onUpdate: (v: string) => void;
 };
 
 export const ColourField = forwardRef((props: FieldProps, ref) => {
@@ -103,7 +104,13 @@ export const ColourField = forwardRef((props: FieldProps, ref) => {
       <Controller
         defaultValue={props.defaultValue}
         render={({ field: { onChange, ...field } }) => {
-          return <ColourInput onChange={onChange} value={field.value} />;
+          return (
+            <ColourInput
+              onChange={onChange}
+              onUpdate={props.onUpdate}
+              value={field.value}
+            />
+          );
         }}
         control={props.control}
         name={props.name}
