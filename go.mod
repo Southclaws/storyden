@@ -52,6 +52,7 @@ require (
 
 require (
 	github.com/dave/jennifer v1.6.0 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -68,6 +69,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
+	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

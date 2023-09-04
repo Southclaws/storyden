@@ -10,7 +10,12 @@ import type { Key, SWRConfiguration } from "swr";
 
 import { fetcher } from "../client";
 
-import type { GetInfoOKResponse, InternalServerErrorResponse } from "./schemas";
+import type {
+  AssetGetOKResponse,
+  AssetUploadBody,
+  GetInfoOKResponse,
+  InternalServerErrorResponse,
+} from "./schemas";
 
 /**
  * The version number includes the date and time of the release build as
@@ -134,4 +139,65 @@ export const useGetInfo = <TError = InternalServerErrorResponse>(options?: {
     swrKey,
     ...query,
   };
+};
+
+/**
+ * Get the logo icon image.
+ */
+export const iconGet = (
+  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+) => {
+  return fetcher<AssetGetOKResponse>({
+    url: `/v1/info/icon/${iconSize}`,
+    method: "get",
+  });
+};
+
+export const getIconGetKey = (
+  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+) => [`/v1/info/icon/${iconSize}`] as const;
+
+export type IconGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof iconGet>>
+>;
+export type IconGetQueryError = InternalServerErrorResponse;
+
+export const useIconGet = <TError = InternalServerErrorResponse>(
+  iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof iconGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!iconSize;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getIconGetKey(iconSize) : null));
+  const swrFn = () => iconGet(iconSize);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+
+/**
+ * Upload and process the installation's logo image.
+ */
+export const iconUpload = (assetUploadBody: AssetUploadBody) => {
+  return fetcher<void>({
+    url: `/v1/info/icon`,
+    method: "post",
+    headers: { "Content-Type": "application/octet-stream" },
+    data: assetUploadBody,
+  });
 };

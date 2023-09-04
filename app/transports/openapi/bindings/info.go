@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -14,12 +15,14 @@ import (
 type Info struct {
 	sr settings.Repository
 	os onboarding.Service
+	is icon.Service
 }
 
-func NewInfo(sr settings.Repository, os onboarding.Service) Info {
+func NewInfo(sr settings.Repository, os onboarding.Service, is icon.Service) Info {
 	return Info{
 		sr: sr,
 		os: os,
+		is: is,
 	}
 }
 
@@ -42,4 +45,28 @@ func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject)
 			OnboardingStatus: openapi.OnboardingStatus(status.String()),
 		},
 	}, nil
+}
+
+func (i Info) IconGet(ctx context.Context, request openapi.IconGetRequestObject) (openapi.IconGetResponseObject, error) {
+	a, r, err := i.is.Get(ctx, string(request.IconSize))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.IconGet200AsteriskResponse{
+		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
+			Body:        r,
+			ContentType: a.MIMEType,
+			// ContentLength: a.Size,
+		},
+	}, nil
+}
+
+func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestObject) (openapi.IconUploadResponseObject, error) {
+	err := i.is.Upload(ctx, request.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.IconUpload200Response{}, nil
 }

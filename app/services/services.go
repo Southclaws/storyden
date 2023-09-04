@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -20,6 +21,7 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
+		icon.Build(),
 		onboarding.Build(),
 		account.Build(),
 		authentication.Build(),
