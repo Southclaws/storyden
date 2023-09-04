@@ -123,6 +123,28 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/GetInfoOK" }
 
+  /v1/info/icon/{icon_size}:
+    get:
+      operationId: IconGet
+      description: Get the logo icon image.
+      security: []
+      tags: [misc]
+      parameters: [{ $ref: "#/components/parameters/IconSize" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/AssetGetOK" }
+  /v1/info/icon:
+    post:
+      operationId: IconUpload
+      description: Upload and process the installation's logo image.
+      tags: [misc]
+      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200":
+          description: OK
+
   #
   #               888               d8b
   #               888               Y8P
@@ -758,6 +780,22 @@ components:
   #
 
   parameters:
+    IconSize:
+      description: Icon sizes.
+      example: "512x512"
+      name: icon_size
+      in: path
+      required: true
+      schema:
+        type: string
+        enum:
+          - 512x512 # Generic big icon
+          - 32x32 # Generic small icon
+          - 180x180 # iOS high DPI
+          - 120x120 # iOS low DPI
+          - 167x167 # iPad OS
+          - 152x152 # iPad Mini
+
     AccountHandleParam:
       description: Account handle.
       example: southclaws

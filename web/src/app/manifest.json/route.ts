@@ -18,26 +18,12 @@ export async function GET() {
     // TODO: make sure this makes sense.
     background_color: info.accent_colour,
     icons: [
-      {
-        src: "/icon-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        src: "/icon-256x256.png",
-        sizes: "256x256",
-        type: "image/png",
-      },
-      {
-        src: "/icon-384x384.png",
-        sizes: "384x384",
-        type: "image/png",
-      },
-      {
-        src: "/icon-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-      },
+      { src: "/api/v1/info/icon/512x512", sizes: "512x512", type: "image/png" },
+      { src: "/api/v1/info/icon/32x32", sizes: "32x32", type: "image/png" },
+      { src: "/api/v1/info/icon/180x180", sizes: "180x180", type: "image/png" },
+      { src: "/api/v1/info/icon/120x120", sizes: "120x120", type: "image/png" },
+      { src: "/api/v1/info/icon/167x167", sizes: "167x167", type: "image/png" },
+      { src: "/api/v1/info/icon/152x152", sizes: "152x152", type: "image/png" },
     ],
   };
 
