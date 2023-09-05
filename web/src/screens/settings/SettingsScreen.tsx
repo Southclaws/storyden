@@ -1,3 +1,5 @@
+"use client";
+
 import { Heading, VStack } from "@chakra-ui/react";
 
 import { AuthMethodSettings } from "./components/AuthMethodSettings/AuthMethodSettings";
