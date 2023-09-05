@@ -1,4 +1,4 @@
-import { Badge, Icon, Text } from "@chakra-ui/react";
+import { Icon, Text } from "@chakra-ui/react";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 import { ProfileReference } from "src/api/openapi/schemas";

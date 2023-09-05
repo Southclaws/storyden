@@ -1,5 +1,7 @@
 import { Flex, VStack } from "@chakra-ui/react";
+
 import { useNavigation } from "src/components/Navigation/useNavigation";
+
 import { CategoryList } from "./CategoryList";
 
 export function Menu() {
@@ -12,7 +14,7 @@ export function Menu() {
         flexDir="column"
         justifyContent="center"
         alignItems="center"
-        maxW="container.sm"
+        maxW="768px"
         width="full"
         pointerEvents="auto"
         gap={2}
