@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 
 import { getInfo } from "src/utils/info";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const info = await getInfo();
 

@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { getColourVariants } from "src/utils/colour";
 import { getInfo } from "src/utils/info";
 
+export const dynamic = "force-dynamic";
+
 /**
  *
  * @returns A fully static server-side-rendered CSS document that uses the
