@@ -1,9 +1,9 @@
 /* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types'
-import type { Properties } from '../types/csstype'
-import type { PropertyValue } from '../types/prop-type'
-import type { DistributiveOmit } from '../types/system-types'
-import type { Tokens } from '../tokens'
+import type { SystemStyleObject, ConditionalValue } from '../types/index';
+import type { Properties } from '../types/csstype';
+import type { PropertyValue } from '../types/prop-type';
+import type { DistributiveOmit } from '../types/system-types';
+import type { Tokens } from '../tokens/index';
 
 export type VisuallyHiddenProperties = {
    
@@ -14,7 +14,7 @@ type VisuallyHiddenStyles = VisuallyHiddenProperties & DistributiveOmit<SystemSt
 
 interface VisuallyHiddenPatternFn {
   (styles?: VisuallyHiddenStyles): string
-  raw: (styles: VisuallyHiddenStyles) => SystemStyleObject
+  raw: (styles?: VisuallyHiddenStyles) => SystemStyleObject
 }
 
 
