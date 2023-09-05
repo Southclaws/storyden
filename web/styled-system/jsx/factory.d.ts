@@ -1,3 +1,3 @@
 /* eslint-disable */
-import { Styled } from '../types/jsx'
+import type { Styled } from '../types/jsx';
 export declare const styled: Styled

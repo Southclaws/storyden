@@ -1,8 +1,8 @@
 /* eslint-disable */
 import type { FunctionComponent } from 'react'
-import type { SpacerProperties } from '../patterns/spacer'
-import type { HTMLStyledProps } from '../types/jsx'
-import type { DistributiveOmit } from '../types/system-types'
+import type { SpacerProperties } from '../patterns/spacer';
+import type { HTMLStyledProps } from '../types/jsx';
+import type { DistributiveOmit } from '../types/system-types';
 
 export type SpacerProps = SpacerProperties & DistributiveOmit<HTMLStyledProps<'div'>, keyof SpacerProperties >
 
