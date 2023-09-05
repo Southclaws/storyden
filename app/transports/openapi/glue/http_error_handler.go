@@ -32,17 +32,17 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 		case ftag.Internal:
 			return l.Error
 		case ftag.Cancelled:
-			return l.Info
+			return nil
 		case ftag.InvalidArgument:
-			return l.Warn
+			return nil
 		case ftag.NotFound:
-			return l.Warn
+			return nil
 		case ftag.AlreadyExists:
-			return l.Warn
+			return nil
 		case ftag.PermissionDenied:
-			return l.Warn
+			return nil
 		case ftag.Unauthenticated:
-			return l.Warn
+			return nil
 		default:
 			return l.Debug
 		}
