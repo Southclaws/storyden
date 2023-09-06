@@ -50,12 +50,16 @@ export function useColourInput(props: Props) {
   useEffect(() => {
     if (!props.value) return;
 
-    const colour = new Color(props.value);
+    try {
+      const colour = new Color(props.value);
 
-    const hue = angleToHue(colour.lch["h"] ?? 0);
+      const hue = angleToHue(colour.lch["h"] ?? 0);
 
-    if (hue) {
-      setAngle(hue);
+      if (hue) {
+        setAngle(hue);
+      }
+    } catch (_) {
+      setAngle(Math.random() * 359);
     }
   }, [props.value]);
 
