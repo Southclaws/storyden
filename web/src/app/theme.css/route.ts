@@ -15,23 +15,28 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const info = await getInfo();
 
-  const cv = getColourVariants(info.accent_colour);
+  try {
+    const cv = getColourVariants(info.accent_colour);
 
-  const document = css`
-    :root {
-      --accent-colour: ${cv["--accent-colour-fallback"]};
-      --accent-colour-muted: ${cv["--accent-colour-muted-fallback"]};
+    const document = css`
+      :root {
+        --accent-colour: ${cv["--accent-colour-fallback"]};
+        --accent-colour-muted: ${cv["--accent-colour-muted-fallback"]};
 
-      --accent-colour: ${cv["--accent-colour"]};
-      --accent-colour-muted: ${cv["--accent-colour-muted"]};
-    }
-  `;
+        --accent-colour: ${cv["--accent-colour"]};
+        --accent-colour-muted: ${cv["--accent-colour-muted"]};
+      }
+    `;
 
-  return new NextResponse(document, {
-    headers: {
-      "Content-Type": "text/css",
-    },
-  });
+    return new NextResponse(document, {
+      headers: {
+        "Content-Type": "text/css",
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    return new NextResponse();
+  }
 }
 
 // NOTE: literally just so we get syntax highlighting above...
