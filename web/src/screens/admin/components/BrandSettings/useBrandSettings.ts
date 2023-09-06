@@ -33,7 +33,7 @@ export function useBrandSettings(props: Props) {
     const cv = getColourVariants(colour);
 
     Object.entries(cv).forEach((property) =>
-      document.documentElement.style.setProperty(property[0], property[1])
+      document.documentElement.style.setProperty(property[0], property[1]),
     );
   };
 
@@ -49,7 +49,12 @@ export function useBrandSettings(props: Props) {
   });
 
   const onColourChangePreview = (colour: string) => {
-    updateColour(colour);
+    try {
+      updateColour(colour);
+    } catch (e) {
+      // NOTE: do nothing on invalid colours.
+      console.warn("failed to update colour variable for previews", e);
+    }
   };
 
   return {
