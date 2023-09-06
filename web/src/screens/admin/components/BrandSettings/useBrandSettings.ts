@@ -30,11 +30,16 @@ export function useBrandSettings(props: Props) {
   });
 
   const updateColour = (colour: string) => {
-    const cv = getColourVariants(colour);
+    try {
+      const cv = getColourVariants(colour);
 
-    Object.entries(cv).forEach((property) =>
-      document.documentElement.style.setProperty(property[0], property[1]),
-    );
+      Object.entries(cv).forEach((property) =>
+        document.documentElement.style.setProperty(property[0], property[1]),
+      );
+    } catch (e) {
+      // NOTE: do nothing on invalid colours.
+      console.warn("failed to update colour variable for previews", e);
+    }
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
@@ -49,12 +54,7 @@ export function useBrandSettings(props: Props) {
   });
 
   const onColourChangePreview = (colour: string) => {
-    try {
-      updateColour(colour);
-    } catch (e) {
-      // NOTE: do nothing on invalid colours.
-      console.warn("failed to update colour variable for previews", e);
-    }
+    updateColour(colour);
   };
 
   return {
