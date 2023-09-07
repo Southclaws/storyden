@@ -6,6 +6,7 @@ import {
   HStack,
   Heading,
   Input,
+  Stack,
   VStack,
 } from "@chakra-ui/react";
 
@@ -15,25 +16,52 @@ import { Unready } from "src/components/Unready";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
+import { IconEditor } from "./IconEditor/IconEditor";
 import { Props, useBrandSettings } from "./useBrandSettings";
 
 function BrandSettingsForm(props: Props) {
-  const { register, control, onSubmit, onColourChangePreview } =
-    useBrandSettings(props);
+  const {
+    register,
+    control,
+    onSubmit,
+    currentIcon,
+    onSaveIcon,
+    onColourChangePreview,
+  } = useBrandSettings(props);
 
   return (
     <SettingsSection>
-      <Heading size="sm">Brand settings</Heading>
+      <Heading size="md">Brand settings</Heading>
 
-      <VStack as="form" width="full" gap={2} align="start" onSubmit={onSubmit}>
-        <FormControl gap={2}>
-          <FormLabel>Title</FormLabel>
-          <Input {...register("title")} maxW="20em" />
-          <FormHelperText>
-            The name of your community. This appears in the sidebar, Google
-            indexing and tab titles.
-          </FormHelperText>
-        </FormControl>
+      <VStack as="form" width="full" gap={4} align="start" onSubmit={onSubmit}>
+        <Stack
+          gap={4}
+          direction={{
+            base: "column",
+            lg: "row",
+          }}
+        >
+          <FormControl display="flex" flexDirection="column">
+            <FormLabel>Community name</FormLabel>
+            <Input {...register("title")} />
+            <FormHelperText>
+              The name of your community. This appears in the sidebar, Google
+              indexing and tab titles.
+            </FormHelperText>
+
+            <FormHelperText>
+              Your icon will be automatically resized and optimised for various
+              devices. It is used for the website favicon and a PWA app icon for
+              iOS and Android devices.
+            </FormHelperText>
+          </FormControl>
+
+          <FormControl display="flex" flexDirection="column">
+            <FormLabel>Icon</FormLabel>
+
+            <IconEditor initialValue={currentIcon} onSave={onSaveIcon} />
+          </FormControl>
+        </Stack>
 
         <FormControl>
           <FormLabel>Description</FormLabel>
