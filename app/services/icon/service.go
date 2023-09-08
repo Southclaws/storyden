@@ -121,6 +121,15 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 		return fault.Wrap(errNotAuthorised, fctx.With(ctx))
 	}
 
+	return s.uploadSizes(ctx, r, sizes)
+}
+
+func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) error {
+	accountID, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	// NOTE: We load the whole file into memory in order to compute a hash first
 	// which isn't the most optimal route as it means 5 people uploading a 100MB
 	// file to a 512MB server would result in a crash but this can be optimised.
@@ -133,6 +142,9 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// we read r already, but image.Decode needs a reader, so make a new one
+	bufferReader := bytes.NewReader(buf)
+
 	mt := mimetype.Detect(buf)
 	mime := mt.String()
 	ctx = fctx.WithMeta(ctx, "mimetype", mime)
@@ -141,10 +153,41 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 		return fault.Wrap(errBadFormat, fctx.With(ctx))
 	}
 
+	source, t, err := image.Decode(bufferReader)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	ctx = fctx.WithMeta(ctx, "type", t)
+
+	// re-used across each size
+	resizeBuffer := bytes.NewBuffer(buf)
+
 	for _, size := range sizes {
-		if err := s.uploadSize(ctx, buf, size); err != nil {
+		px := sizeMap[size]
+		filename := fmt.Sprintf(iconFileTemplate, size)
+		filepath := path.Join(iconStoragePath, filename)
+
+		resized := imaging.Resize(source, px, px, imaging.Lanczos)
+
+		resizeBuffer.Reset()
+
+		if err := png.Encode(resizeBuffer, resized); err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
+
+		if err := s.os.Write(ctx, filepath, resizeBuffer); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		apiPath := path.Join(iconRoute)
+		url := fmt.Sprintf("%s/%s", s.address, apiPath)
+
+		_, err = s.asset_repo.Add(ctx, accountID, filename, url, "image/png", 0, 0)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
 	}
 
 	return nil
@@ -167,45 +210,4 @@ func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader
 	}
 
 	return a, r, nil
-}
-
-func (s *service) uploadSize(ctx context.Context, buf []byte, size Size) error {
-	accountID, err := authentication.GetAccountID(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	px := sizeMap[size]
-
-	filename := fmt.Sprintf(iconFileTemplate, size)
-	filepath := path.Join(iconStoragePath, filename)
-
-	source, t, err := image.Decode(bytes.NewReader(buf))
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	resized := imaging.Resize(source, px, px, imaging.Lanczos)
-
-	ctx = fctx.WithMeta(ctx, "type", t)
-
-	out := bytes.NewBuffer(nil)
-
-	if err := png.Encode(out, resized); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := s.os.Write(ctx, filepath, out); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	apiPath := path.Join(iconRoute)
-	url := fmt.Sprintf("%s/%s", s.address, apiPath)
-
-	_, err = s.asset_repo.Add(ctx, accountID, filename, url, "image/png", 0, 0)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
 }
