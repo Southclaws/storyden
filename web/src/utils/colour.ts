@@ -19,9 +19,7 @@ export function getColourVariants(colour: string): Colours {
 
   const hue = c.oklch["h"];
 
-  const rgb = c.to("srgb").toString({ format: "rgb" });
-
-  console.log({ FALLBACK_COLOUR, colour, c, hue, rgb });
+  const rgb = c.to("srgb").toString({ format: "hex" });
 
   const textColour = readableColor(rgb, "#E8ECEA", "#303030", false);
 
