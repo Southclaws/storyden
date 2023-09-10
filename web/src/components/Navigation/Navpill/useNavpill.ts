@@ -10,7 +10,7 @@ import { useSession } from "src/auth";
 
 export function useNavpill() {
   const pathname = usePathname();
-  const [isExpanded, setExpanded] = useState(true);
+  const [isExpanded, setExpanded] = useState(false);
   const account = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PostProps[]>([]);
