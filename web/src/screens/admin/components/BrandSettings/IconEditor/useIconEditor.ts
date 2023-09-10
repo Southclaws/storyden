@@ -1,15 +1,20 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import AvatarEditor from "react-avatar-editor";
 
 export type Props = {
   initialValue: File | undefined;
-  onSave: (f: File) => void;
+  onSave: (f: Blob | null) => void;
 };
 
 export function useIconEditor(props: Props) {
+  const ref = useRef<AvatarEditor>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [file, setFile] = useState<File | undefined>(props.initialValue);
+  const [file, setFile] = useState<File | string>(props.initialValue ?? "");
 
-  useEffect(() => setFile(props.initialValue), [props.initialValue]);
+  useEffect(
+    () => props.initialValue && setFile(props.initialValue),
+    [props.initialValue],
+  );
 
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -22,8 +27,13 @@ export function useIconEditor(props: Props) {
   }
 
   function onSave() {
-    if (file) props.onSave(file);
+    if (!ref || !ref.current) {
+      return;
+    }
+
+    const canvasScaled = ref.current.getImageScaledToCanvas();
+    canvasScaled.toBlob(props.onSave);
   }
 
-  return { position, setPosition, onFileChange, onSave, file };
+  return { ref, position, setPosition, onFileChange, onSave, file };
 }
