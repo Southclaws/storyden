@@ -3,13 +3,14 @@ import AvatarEditor from "react-avatar-editor";
 
 export type Props = {
   initialValue: File | undefined;
-  onSave: (f: Blob | null) => void;
+  onSave: (f: Blob | null) => Promise<void>;
 };
 
 export function useIconEditor(props: Props) {
   const ref = useRef<AvatarEditor>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [file, setFile] = useState<File | string>(props.initialValue ?? "");
+  const [saving, setSaving] = useState(false);
 
   useEffect(
     () => props.initialValue && setFile(props.initialValue),
@@ -31,9 +32,14 @@ export function useIconEditor(props: Props) {
       return;
     }
 
+    setSaving(true);
+
     const canvasScaled = ref.current.getImageScaledToCanvas();
-    canvasScaled.toBlob(props.onSave);
+    canvasScaled.toBlob(async (f: Blob | null) => {
+      await props.onSave(f);
+      setSaving(false);
+    });
   }
 
-  return { ref, position, setPosition, onFileChange, onSave, file };
+  return { ref, position, setPosition, onFileChange, onSave, saving, file };
 }

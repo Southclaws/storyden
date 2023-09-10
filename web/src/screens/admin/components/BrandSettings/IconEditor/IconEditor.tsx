@@ -8,7 +8,7 @@ import { Props, useIconEditor } from "./useIconEditor";
 const editorStyle = { backgroundColor: "var(--chakra-colors-gray-100)" };
 
 export function IconEditor(props: Props) {
-  const { ref, position, setPosition, onFileChange, onSave, file } =
+  const { ref, position, setPosition, onFileChange, onSave, saving, file } =
     useIconEditor(props);
 
   return (
@@ -25,7 +25,7 @@ export function IconEditor(props: Props) {
           color={[255, 255, 255, 1]}
           scale={1}
           position={position}
-          onPositionChange={setPosition}
+          onPositionChange={saving ? undefined : setPosition}
         />
         <VStack align="start">
           <HStack>
@@ -78,10 +78,17 @@ export function IconEditor(props: Props) {
           onChange={onFileChange}
         />
         <HStack>
-          <Button as="label" htmlFor="file-input" variant="outline">
+          <Button
+            as="label"
+            htmlFor="file-input"
+            isDisabled={saving}
+            variant="outline"
+          >
             Edit icon
           </Button>
-          <Button onClick={onSave}>Save icon</Button>
+          <Button onClick={onSave} isLoading={saving}>
+            Save icon
+          </Button>
         </HStack>
       </>
     </VStack>
