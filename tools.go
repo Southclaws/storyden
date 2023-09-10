@@ -1,6 +1,7 @@
-package storyden
+//go:build tools
+// +build tools
 
-// build+ tools
+package storyden
 
 import (
 	_ "entgo.io/ent"
