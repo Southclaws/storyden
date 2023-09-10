@@ -37,6 +37,7 @@ require github.com/Southclaws/fault v0.6.0
 require (
 	github.com/Southclaws/opt v0.6.0
 	github.com/dboslee/lru v0.0.1
+	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.0
@@ -52,7 +53,6 @@ require (
 
 require (
 	github.com/dave/jennifer v1.6.0 // indirect
-	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
