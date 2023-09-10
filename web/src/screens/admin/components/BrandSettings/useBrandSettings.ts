@@ -76,8 +76,6 @@ export function useBrandSettings(props: Props) {
       return;
     }
 
-    console.log(file);
-
     await iconUpload(file);
     mutate(getGetInfoKey());
     toast({ title: "Icon updated!" });
