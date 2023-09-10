@@ -36,7 +36,7 @@ export const fetcher = async <T>({
       .catch(() => ({ error: "Failed to parse API response" }));
     console.warn(data);
     throw new Error(
-      data.message ?? `An unexpected error occurred: ${response.statusText}`
+      data.message ?? `An unexpected error occurred: ${response.statusText}`,
     );
   }
 
@@ -55,7 +55,7 @@ const buildPayload = (data: unknown) => {
     return undefined;
   }
 
-  if (data instanceof File) {
+  if (data instanceof File || data instanceof Blob) {
     return data;
   }
 
