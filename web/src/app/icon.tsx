@@ -2,7 +2,7 @@ import { ImageResponse } from "next/server";
 
 import { API_ADDRESS } from "src/config";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export const size = {
   width: 512,
