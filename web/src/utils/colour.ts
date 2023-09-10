@@ -1,7 +1,7 @@
 import Color from "colorjs.io";
 import { readableColor } from "polished";
 
-export const FALLBACK_COLOUR = `hsl(157, 65%, 44%)`;
+export const FALLBACK_COLOUR = `hsl(157 65% 44%)`;
 
 type Colours = {
   "--text-colour": string;
