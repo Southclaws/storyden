@@ -21,6 +21,8 @@ export function getColourVariants(colour: string): Colours {
 
   const rgb = c.to("srgb").toString({ format: "rgb" });
 
+  console.log({ FALLBACK_COLOUR, colour, c, hue, rgb });
+
   const textColour = readableColor(rgb, "#E8ECEA", "#303030", false);
 
   return {
