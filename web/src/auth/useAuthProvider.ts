@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import { useAccountGet } from "src/api/openapi/accounts";
 
-const PRIVATE_PAGES = ["/settings", "/new"];
+const PRIVATE_PAGES = ["/settings", "/new", "/admin"];
 
 function privatePage(pathName: string): boolean {
   return PRIVATE_PAGES.includes(pathName);
