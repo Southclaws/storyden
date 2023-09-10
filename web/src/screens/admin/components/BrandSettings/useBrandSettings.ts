@@ -67,7 +67,17 @@ export function useBrandSettings(props: Props) {
     toast({ title: "Settings updated!" });
   });
 
-  const onSaveIcon = async (file: File) => {
+  const onSaveIcon = async (file: Blob | null) => {
+    if (!file) {
+      toast({
+        title: "Unable to access image",
+        status: "error",
+      });
+      return;
+    }
+
+    console.log(file);
+
     await iconUpload(file);
     mutate(getGetInfoKey());
     toast({ title: "Icon updated!" });

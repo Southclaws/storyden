@@ -8,13 +8,14 @@ import { Props, useIconEditor } from "./useIconEditor";
 const editorStyle = { backgroundColor: "var(--chakra-colors-gray-100)" };
 
 export function IconEditor(props: Props) {
-  const { position, setPosition, onFileChange, onSave, file } =
+  const { ref, position, setPosition, onFileChange, onSave, file } =
     useIconEditor(props);
 
   return (
     <VStack align="start">
       <HStack justify="start" align="end">
         <AvatarEditor
+          ref={ref}
           image={file}
           width={136}
           height={136}
