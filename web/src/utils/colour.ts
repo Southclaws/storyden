@@ -1,6 +1,8 @@
 import Color from "colorjs.io";
 import { readableColor } from "polished";
 
+const FALLBACK_COLOUR = `hsla(157, 65%, 44%, 1)`;
+
 type Colours = {
   "--text-colour": string;
 
@@ -13,7 +15,7 @@ type Colours = {
 };
 
 export function getColourVariants(colour: string): Colours {
-  const c = new Color(colour);
+  const c = parseColourWithFallback(colour);
 
   const hue = c.oklch["h"];
 
@@ -30,4 +32,12 @@ export function getColourVariants(colour: string): Colours {
     "--accent-colour-fallback": `hsl(${hue} 100% 43%)`,
     "--accent-colour-muted-fallback": `hsl(${hue} 24% 63%)`,
   };
+}
+
+function parseColourWithFallback(colour: string) {
+  try {
+    return new Color(colour);
+  } catch (_) {
+    return new Color(FALLBACK_COLOUR);
+  }
 }
