@@ -10,6 +10,7 @@ type Asset struct {
 	ID       AssetID
 	URL      string
 	MIMEType string
+	Size     int
 	Width    int
 	Height   int
 }

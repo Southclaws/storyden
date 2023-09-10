@@ -17,6 +17,10 @@ import type {
   InternalServerErrorResponse,
 } from "./schemas";
 
+type AwaitedInput<T> = PromiseLike<T> | T;
+
+type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
 /**
  * The version number includes the date and time of the release build as
 well as a short representation of the Git commit hash.

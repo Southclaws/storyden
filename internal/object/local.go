@@ -44,18 +44,24 @@ func (s *localStorer) Exists(ctx context.Context, path string) (bool, error) {
 	return true, nil
 }
 
-func (s *localStorer) Read(ctx context.Context, path string) (io.Reader, error) {
+func (s *localStorer) Read(ctx context.Context, path string) (io.Reader, int64, error) {
 	f, err := s.s.Open(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+			return nil, 0, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, 0, fault.Wrap(err, fctx.With(ctx))
 	}
-	return f, nil
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, 0, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return f, info.Size(), nil
 }
 
-func (s *localStorer) Write(ctx context.Context, path string, r io.Reader) error {
+func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size int64) error {
 	fullpath := filepath.Join(s.path, path)
 
 	f, err := os.OpenFile(fullpath,

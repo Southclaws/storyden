@@ -34,7 +34,7 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 }
 
 func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadRequestObject) (openapi.AssetUploadResponseObject, error) {
-	a, err := i.a.Upload(ctx, request.Body)
+	a, err := i.a.Upload(ctx, request.Body, int64(request.Params.ContentLength))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

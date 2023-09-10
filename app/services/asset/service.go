@@ -29,7 +29,7 @@ import (
 const assetsSubdirectory = "assets"
 
 type Service interface {
-	Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
+	Upload(ctx context.Context, r io.Reader, size int64) (*asset.Asset, error)
 	Get(ctx context.Context, path string) (*asset.Asset, io.Reader, error)
 }
 
@@ -72,7 +72,7 @@ func New(
 	}
 }
 
-func (s *service) Upload(ctx context.Context, r io.Reader) (*asset.Asset, error) {
+func (s *service) Upload(ctx context.Context, r io.Reader, size int64) (*asset.Asset, error) {
 	accountID, err := authentication.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -97,7 +97,7 @@ func (s *service) Upload(ctx context.Context, r io.Reader) (*asset.Asset, error)
 	assetID := hex.EncodeToString(hash[:])
 	filePath := filepath.Join(assetsSubdirectory, assetID)
 
-	if err := s.os.Write(ctx, filePath, r); err != nil {
+	if err := s.os.Write(ctx, filePath, r, size); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -127,10 +127,12 @@ func (s *service) Get(ctx context.Context, assetID string) (*asset.Asset, io.Rea
 	path := filepath.Join(assetsSubdirectory, assetID)
 	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", assetID)
 
-	r, err := s.os.Read(ctx, path)
+	r, size, err := s.os.Read(ctx, path)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	a.Size = int(size)
 
 	return a, r, nil
 }

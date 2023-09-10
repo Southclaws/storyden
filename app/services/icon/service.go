@@ -40,21 +40,21 @@ const (
 type Size string
 
 var sizes = []Size{
-	"32x32",
-	"120x120",
-	"152x152",
-	"167x167",
-	"180x180",
 	"512x512",
+	"180x180",
+	"167x167",
+	"152x152",
+	"120x120",
+	"32x32",
 }
 
 var sizeMap = map[Size]int{
-	"32x32":   32,
-	"120x120": 120,
-	"152x152": 152,
-	"167x167": 167,
-	"180x180": 180,
 	"512x512": 512,
+	"180x180": 180,
+	"167x167": 167,
+	"152x152": 152,
+	"120x120": 120,
+	"32x32":   32,
 }
 
 var (
@@ -64,7 +64,7 @@ var (
 
 type Service interface {
 	Upload(ctx context.Context, r io.Reader) error
-	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error)
+	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, int64, error)
 }
 
 func Build() fx.Option {
@@ -176,7 +176,9 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if err := s.os.Write(ctx, filepath, resizeBuffer); err != nil {
+		resizeBuffer.Len()
+
+		if err := s.os.Write(ctx, filepath, resizeBuffer, int64(resizeBuffer.Len())); err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -193,21 +195,21 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 	return nil
 }
 
-func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error) {
+func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, int64, error) {
 	filename := fmt.Sprintf(iconFileTemplate, size)
 
 	a, err := s.asset_repo.Get(ctx, filename)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, 0, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	filepath := path.Join(iconStoragePath, filename)
 	ctx = fctx.WithMeta(ctx, "path", filepath, "asset_id", string(a.ID))
 
-	r, err := s.os.Read(ctx, filepath)
+	r, b, err := s.os.Read(ctx, filepath)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, 0, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return a, r, nil
+	return a, r, b, nil
 }

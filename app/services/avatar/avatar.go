@@ -25,16 +25,16 @@ func (s *service) Exists(ctx context.Context, accountID account.AccountID) bool 
 	return exists
 }
 
-func (s *service) Set(ctx context.Context, accountID account.AccountID, stream io.Reader) error {
-	if err := s.storage.Write(ctx, avatarPath(accountID), stream); err != nil {
+func (s *service) Set(ctx context.Context, accountID account.AccountID, stream io.Reader, size int64) error {
+	if err := s.storage.Write(ctx, avatarPath(accountID), stream, size); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
 }
 
-func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Reader, error) {
-	stream, err := s.storage.Read(ctx, avatarPath(accountID))
+func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Reader, int64, error) {
+	stream, size, err := s.storage.Read(ctx, avatarPath(accountID))
 	if err != nil {
 		r, w := io.Pipe()
 
@@ -55,8 +55,8 @@ func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Read
 			return
 		}()
 
-		return r, nil
+		return r, 0, nil
 	}
 
-	return stream, nil
+	return stream, size, nil
 }

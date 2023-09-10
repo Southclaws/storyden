@@ -18,6 +18,10 @@ import type {
   InternalServerErrorResponse,
 } from "./schemas";
 
+type AwaitedInput<T> = PromiseLike<T> | T;
+
+type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
 /**
  * Create a category for organising posts.
  */
