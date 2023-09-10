@@ -86,14 +86,15 @@ func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.Account
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := i.av.Get(ctx, id)
+	r, size, err := i.av.Get(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AccountGetAvatar200ImagepngResponse{
 		AccountGetAvatarImagepngResponse: openapi.AccountGetAvatarImagepngResponse{
-			Body: r,
+			Body:          r,
+			ContentLength: size,
 		},
 	}, nil
 }
@@ -104,7 +105,7 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := i.av.Set(ctx, accountID, request.Body); err != nil {
+	if err := i.av.Set(ctx, accountID, request.Body, int64(request.Params.ContentLength)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

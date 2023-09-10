@@ -23,6 +23,10 @@ import type {
   UnauthorisedResponse,
 } from "./schemas";
 
+type AwaitedInput<T> = PromiseLike<T> | T;
+
+type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
 /**
  * Create a new thread within the specified category.
  */

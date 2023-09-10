@@ -139,6 +139,7 @@ paths:
       description: Upload and process the installation's logo image.
       tags: [misc]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      parameters: [$ref: "#/components/parameters/ContentLength"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -378,6 +379,7 @@ paths:
       description: Upload an avatar for the authenticated account.
       tags: [accounts]
       requestBody: { $ref: "#/components/requestBodies/AccountSetAvatar" }
+      parameters: [$ref: "#/components/parameters/ContentLength"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -662,6 +664,7 @@ paths:
       description: Upload and process a media file.
       tags: [assets]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      parameters: [$ref: "#/components/parameters/ContentLength"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -795,6 +798,14 @@ components:
           - 120x120 # iOS low DPI
           - 167x167 # iPad OS
           - 152x152 # iPad Mini
+
+    ContentLength:
+      description: Body content length in bytes.
+      name: Content-Length
+      in: header
+      required: true
+      schema:
+        type: number
 
     AccountHandleParam:
       description: Account handle.

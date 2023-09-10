@@ -12,6 +12,10 @@ import type {
   AdminSettingsUpdateOKResponse,
 } from "./schemas";
 
+type AwaitedInput<T> = PromiseLike<T> | T;
+
+type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
 /**
  * Update non-env configuration settings for installation.
  */

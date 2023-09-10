@@ -47,27 +47,32 @@ func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {
 	return true, nil
 }
 
-func (s *s3Storer) Read(ctx context.Context, path string) (io.Reader, error) {
+func (s *s3Storer) Read(ctx context.Context, path string) (io.Reader, int64, error) {
 	obj, err := s.minioClient.GetObject(ctx, s.bucket, path, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, 0, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = obj.Stat()
+	info, err := obj.Stat()
 	if err != nil {
 		if minio.ToErrorResponse(err).StatusCode == 404 {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+			return nil, 0, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
 		}
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, 0, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return obj, nil
+	return obj, info.Size, nil
 }
 
-func (s *s3Storer) Write(ctx context.Context, path string, stream io.Reader) error {
-	_, err := s.minioClient.PutObject(ctx, s.bucket, path, stream, -1, minio.PutObjectOptions{
-		SendContentMd5: true,
-	})
+func (s *s3Storer) Write(ctx context.Context, path string, stream io.Reader, size int64) error {
+	opts := minio.PutObjectOptions{}
+
+	if size <= 0 {
+		// If size is unknown Minio needs to compute an md5 hash of the content.
+		opts.SendContentMd5 = true
+	}
+
+	_, err := s.minioClient.PutObject(ctx, s.bucket, path, stream, size, opts)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
