@@ -43,7 +43,7 @@ export function Toolpill({
           width="full"
           maxW={{
             base: "23em",
-            md: "container.sm",
+            md: "40em",
           }}
           justifyContent="space-between"
           alignItems="center"
