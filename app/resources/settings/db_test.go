@@ -6,7 +6,6 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/stretchr/testify/assert"
@@ -14,9 +13,10 @@ import (
 )
 
 func TestSettings(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
+
 	defer integration.Test(t, nil, fx.Invoke(func(
-		_ seed.Ready,
 		sr settings.Repository,
 	) {
 		r := require.New(t)
@@ -26,8 +26,7 @@ func TestSettings(t *testing.T) {
 		r.NoError(err)
 		r.NotNil(s)
 
-		a.Equal("", s.Title.Get())
-
+		// The app sets a default during init.
 		err = s.Title.Set(ctx, sr, "Storyden")
 		r.NoError(err)
 

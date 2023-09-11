@@ -14,7 +14,7 @@ import (
 
 func TestPolicy(t *testing.T) {
 	defer integration.Test(t, nil, fx.Invoke(func(
-		am *restrict.AccessManager,
+		am rbac.AccessManager,
 	) {
 		a := assert.New(t)
 		err := am.Authorize(&restrict.AccessRequest{
@@ -29,7 +29,6 @@ func TestPolicy(t *testing.T) {
 			SkipConditions: false,
 		})
 
-		// TODO: Fix this to be NoError - Odin should be able to edit Thread 01.
-		a.Error(err)
+		a.NoError(err)
 	}))
 }
