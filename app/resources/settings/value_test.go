@@ -10,6 +10,8 @@ import (
 )
 
 func Test_fromEnt(t *testing.T) {
+	t.Parallel()
+
 	r := require.New(t)
 	a := assert.New(t)
 
@@ -25,5 +27,5 @@ func Test_fromEnt(t *testing.T) {
 
 	a.Equal("Storyden", out.Title.value)
 	a.Equal("A forum for the modern age.", out.Description.value)
-	a.Equal(uint32(27482225), out.AccentColour.value)
+	a.Equal("27482225", out.AccentColour.value)
 }
