@@ -11,7 +11,13 @@ import { extended } from "src/theme";
 export function Providers({ children }: PropsWithChildren) {
   return (
     <CacheProvider>
-      <ChakraProvider theme={extended}>
+      <ChakraProvider
+        theme={extended}
+        // We're not using Chakra's reset, instead we're using Panda CSS.
+        resetCSS={false}
+        // Similarly to above, we're using our own theming via Panda CSS.
+        disableGlobalStyle={true}
+      >
         <AuthProvider>
           <InfoProvider>
             {/* -- */}

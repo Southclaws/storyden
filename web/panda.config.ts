@@ -2,7 +2,7 @@ import { defineConfig } from "@pandacss/dev";
 
 export default defineConfig({
   // Whether to use css reset
-  preflight: false,
+  preflight: true,
 
   // Where to look for your css declarations
   include: ["./src/**/*.tsx"],
