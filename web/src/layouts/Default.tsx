@@ -19,7 +19,7 @@ export function Default(props: PropsWithChildren) {
         width="full"
         maxW={{
           base: "full",
-          lg: "4xl",
+          lg: "3xl",
         }}
         px={4}
         py={2}
