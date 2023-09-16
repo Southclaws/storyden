@@ -1,6 +1,8 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { PropsWithChildren } from "react";
 
+import { getIconGetKey } from "src/api/openapi/misc";
+import { getColourAsHex } from "src/utils/colour";
 import { getInfo } from "src/utils/info";
 
 import "./global.css";
@@ -30,10 +32,24 @@ export default function RootLayout({ children }: PropsWithChildren) {
 export async function generateMetadata(): Promise<Metadata> {
   const info = await getInfo();
 
+  const themeColour = getColourAsHex(info.accent_colour);
+  const iconLarge = getIconGetKey("512x512")[0];
+  const iconURL = `/api${iconLarge}`;
+
   return {
     title: info.title,
     description: info.description,
-    themeColor: info.accent_colour,
-    manifest: "/manifest.json",
+    themeColor: themeColour,
+    icons: {
+      icon: iconURL,
+      shortcut: iconURL,
+      apple: iconURL,
+    },
+    appleWebApp: {
+      capable: true,
+      title: info.title,
+      statusBarStyle: "black-translucent",
+      startupImage: iconURL,
+    },
   };
 }
