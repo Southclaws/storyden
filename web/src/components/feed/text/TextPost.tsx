@@ -26,11 +26,6 @@ export function TextPost(props: Props) {
         width="full"
         py={2}
         gap={2}
-        border="1px solid black"
-        borderRadius="lg"
-        borderWidth="2px"
-        borderStyle="solid"
-        borderColor="black"
       >
         <Flex justifyContent="space-between">
           <Heading size="sm">
