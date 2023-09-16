@@ -1,9 +1,9 @@
 "use client";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
+import { Onboarding } from "src/components/Onboarding/Onboarding";
 
 import { Content } from "./Content";
-import { Onboarding } from "./components/Onboarding/Onboarding";
 import { useHomeScreen } from "./useHomeScreen";
 
 export function HomeScreen() {

@@ -1,7 +1,7 @@
-import React from "react";
+import { FeedScreen } from "src/screens/feed/FeedScreen";
 
-import { HomeScreen } from "src/screens/home/HomeScreen";
+type Props = { params: { c: string } };
 
-export default function Page() {
-  return <HomeScreen />;
+export default function Page({ params: { c } }: Props) {
+  return <FeedScreen category={c} />;
 }
