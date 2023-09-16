@@ -1,5 +1,7 @@
 import { isNil, omitBy } from "lodash/fp";
 
+import { API_ADDRESS } from "src/config";
+
 type Options = {
   url: string;
   method: "get" | "post" | "put" | "delete" | "patch";
@@ -27,6 +29,38 @@ export const fetcher = async <T>({
     ...(headers ? { headers } : {}),
     body: buildPayload(data),
   });
+
+  const response = await fetch(req);
+
+  if (!response.ok) {
+    const data = await response
+      .json()
+      .catch(() => ({ error: "Failed to parse API response" }));
+    console.warn(data);
+    throw new Error(
+      data.message ?? `An unexpected error occurred: ${response.statusText}`,
+    );
+  }
+
+  // NOTE: The API code generator returns empty responses where there is no
+  // response type specified with a content type so this is the easy way to
+  // escape that code path and exit easily.
+  if (response.headers.get("content-length") === "0") {
+    return undefined as T;
+  }
+
+  return response.json();
+};
+
+export const server = async <T>(url: string, options?: Options): Promise<T> => {
+  const req = new Request(
+    `${API_ADDRESS}/api/${url}${cleanQuery(options?.params)}`,
+    {
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+    },
+  );
 
   const response = await fetch(req);
 
