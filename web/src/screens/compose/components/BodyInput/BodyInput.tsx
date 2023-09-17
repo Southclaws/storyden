@@ -3,7 +3,7 @@ import { PropsWithChildren } from "react";
 import { Controller } from "react-hook-form";
 
 import { Asset } from "src/api/openapi/schemas";
-import { ContentComposer } from "src/components/ContentComposer/ContentComposer";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
 import { useBodyInput } from "./useBodyInput";
 

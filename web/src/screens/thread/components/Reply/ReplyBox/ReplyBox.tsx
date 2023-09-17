@@ -1,9 +1,9 @@
 import { Button, HStack, VStack } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
-import { ContentComposer } from "src/components/ContentComposer/ContentComposer";
-import { Bold } from "src/components/ContentComposer/controls/Bold";
-import { Italic } from "src/components/ContentComposer/controls/Italic";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
+import { Bold } from "src/components/content/ContentComposer/controls/Bold";
+import { Italic } from "src/components/content/ContentComposer/controls/Italic";
 
 import { useReplyBox } from "./useReplyBox";
 
