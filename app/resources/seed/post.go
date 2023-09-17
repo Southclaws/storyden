@@ -12,6 +12,7 @@ import (
 	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -198,18 +199,83 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 		},
 	}
 
+	Post_04_Photos = thread.Thread{
+		ID:       post.ID(id("00000000000000000040")),
+		Title:    "Trip to Iceland",
+		Author:   profile.Profile{ID: Account_005_Þórr.ID},
+		Category: Category_02_Photos,
+		Assets: []*asset.Asset{
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
+				MIMEType: "image/jpeg", Size: 2537802, Width: 3024, Height: 4032,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
+				MIMEType: "image/jpeg", Size: 1433625, Width: 3024, Height: 4032,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
+				MIMEType: "image/jpeg", Size: 1828065, Width: 3024, Height: 4032,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
+				MIMEType: "image/jpeg", Size: 1769497, Width: 3024, Height: 4032,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
+				MIMEType: "image/jpeg", Size: 1930321, Width: 4032, Height: 3024,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
+				MIMEType: "image/jpeg", Size: 1724055, Width: 4032, Height: 3024,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
+				MIMEType: "video/quicktime", Size: 2552083, Width: 1080, Height: 1920,
+			},
+			{
+				ID:       "00000000000000000040-asset-01",
+				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
+				MIMEType: "video/quicktime", Size: 3155277, Width: 1080, Height: 1920,
+			},
+		},
+		Posts: []*reply.Reply{
+			{
+				Body: ``,
+			},
+		},
+	}
+
 	Threads = []thread.Thread{
 		Post_01_Welcome,
 		Post_02_HowToContribute,
 		Post_03_LoremIpsum,
+		Post_04_Photos,
 	}
 )
 
-func threads(tr thread.Repository, pr reply.Repository, rr react.Repository) {
+func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar asset.Repository) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
 		first := t.Posts[0]
+
+		assetIDs := []asset.AssetID{}
+		for i, a := range t.Assets {
+			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
+			a, err := ar.Add(ctx, t.Author.ID, id, a.URL, a.MIMEType, a.Width, a.Height)
+			if err != nil {
+				panic(err)
+			}
+			assetIDs = append(assetIDs, a.ID)
+		}
 
 		th, err := tr.Create(ctx,
 			t.Title,
@@ -219,6 +285,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository) {
 			t.Tags,
 			thread.WithID(t.ID),
 			thread.WithStatus(post.StatusPublished),
+			thread.WithAssets(assetIDs),
 		)
 		if err != nil {
 			if ent.IsConstraintError(err) {
