@@ -1,5 +1,5 @@
 import { ThreadReference } from "src/api/openapi/schemas";
-import { EmptyState } from "src/screens/home/components/EmptyState";
+import { EmptyState } from "src/components/feed/EmptyState";
 
 import { styled } from "@/styled-system/jsx";
 
