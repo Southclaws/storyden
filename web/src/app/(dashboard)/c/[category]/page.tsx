@@ -1,7 +1,11 @@
 import { FeedScreen } from "src/screens/feed/FeedScreen";
 
-type Props = { params: { c: string } };
+type Props = {
+  params: {
+    category: string;
+  };
+};
 
-export default function Page({ params: { c } }: Props) {
-  return <FeedScreen category={c} />;
+export default function Page(props: Props) {
+  return <FeedScreen category={props.params.category} />;
 }
