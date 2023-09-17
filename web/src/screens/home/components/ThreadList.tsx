@@ -4,8 +4,8 @@ import { Divider, List } from "@chakra-ui/react";
 import { Fragment } from "react";
 
 import { ThreadReference } from "src/api/openapi/schemas";
+import { EmptyState } from "src/components/feed/EmptyState";
 
-import { EmptyState } from "./EmptyState";
 import { ThreadListItem } from "./ThreadListItem";
 
 type Props = {
