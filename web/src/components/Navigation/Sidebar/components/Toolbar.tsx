@@ -1,6 +1,7 @@
 import { HStack } from "@chakra-ui/react";
+
 import { useSession } from "src/auth";
-import { Bell, Create, Home, Login } from "src/components/Action/Action";
+import { Bell, Create, Home, Login } from "src/components/site/Action/Action";
 
 export function Toolbar() {
   const account = useSession();

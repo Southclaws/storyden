@@ -1,6 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 
-import { Settings } from "../Action/Action";
+import { Settings } from "../site/Action/Action";
 
 export function SettingsMenu() {
   return (

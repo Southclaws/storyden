@@ -3,7 +3,7 @@ import { HStack } from "@chakra-ui/react";
 import { useSession } from "src/auth";
 
 import { ProfileReference } from "src/api/openapi/schemas";
-import { Avatar } from "../Avatar/Avatar";
+import { Avatar } from "../site/Avatar/Avatar";
 import { Anchor } from "../site/Anchor";
 import { Handle } from "./Handle";
 

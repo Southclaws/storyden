@@ -2,7 +2,7 @@
 
 import { Box, Flex, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 
-import { Back } from "src/components/Action/Action";
+import { Back } from "src/components/site/Action/Action";
 
 import { AuthMethod } from "./components/AuthMethod/AuthMethod";
 import { AuthSelection } from "./components/AuthSelection/AuthSelection";

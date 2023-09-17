@@ -20,11 +20,11 @@ import {
 import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
-import { CrownIcon } from "../graphics/CrownIcon";
-import { LoginIcon } from "../graphics/LoginIcon";
-import { LogoutIcon } from "../graphics/LogoutIcon";
-import { SendIcon } from "../graphics/SendIcon";
-import { SpeechPlusIcon } from "../graphics/SpeechPlusIcon";
+import { CrownIcon } from "../../graphics/CrownIcon";
+import { LoginIcon } from "../../graphics/LoginIcon";
+import { LogoutIcon } from "../../graphics/LogoutIcon";
+import { SendIcon } from "../../graphics/SendIcon";
+import { SpeechPlusIcon } from "../../graphics/SpeechPlusIcon";
 
 const actionStyles = {
   width: 8,
@@ -50,7 +50,7 @@ function useClickHandler(onClick: MouseEventHandler | undefined) {
         return onClick?.(e);
       }
     },
-    [onClick]
+    [onClick],
   );
 }
 
@@ -62,7 +62,7 @@ export const Action = forwardRef(
         {children}
       </Link>
     );
-  }
+  },
 );
 
 export const ActionButton = forwardRef<IconButtonProps, "button">(
@@ -84,7 +84,7 @@ export const ActionButton = forwardRef<IconButtonProps, "button">(
         {children}
       </IconButton>
     );
-  }
+  },
 );
 
 // A few actions have default page destinations (partly for consistency and also
@@ -153,7 +153,7 @@ export function Dashboard({ href = "/dashboard", ...props }: WithOptionalURL) {
 export const Settings = forwardRef(
   (
     { "aria-label": al, href = "/settings", ...props }: WithOptionalURL,
-    ref
+    ref,
   ) => {
     return (
       <Action
@@ -166,7 +166,7 @@ export const Settings = forwardRef(
         <Cog6ToothIcon width="1.25em" />
       </Action>
     );
-  }
+  },
 );
 
 export const Admin = forwardRef(
@@ -182,7 +182,7 @@ export const Admin = forwardRef(
         <CrownIcon width="1.25em" />
       </Action>
     );
-  }
+  },
 );
 
 export type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
@@ -280,7 +280,7 @@ export const More = forwardRef(
         icon={<EllipsisHorizontalIcon width="1.4em" />}
       />
     );
-  }
+  },
 );
 
 export const Bookmark = forwardRef(
@@ -295,7 +295,7 @@ export const Bookmark = forwardRef(
         icon={<BookmarkIcon width="1.4em" />}
       />
     );
-  }
+  },
 );
 
 export const BookmarkSolid = forwardRef(
@@ -310,5 +310,5 @@ export const BookmarkSolid = forwardRef(
         icon={<BookmarkSolidIcon width="1.4em" />}
       />
     );
-  }
+  },
 );
