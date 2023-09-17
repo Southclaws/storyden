@@ -1,6 +1,6 @@
+import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
 
-import { ThreadList } from "./components/ThreadList";
 import { useContent } from "./useContent";
 
 export function Content(props: { showEmptyState: boolean }) {
@@ -9,6 +9,6 @@ export function Content(props: { showEmptyState: boolean }) {
   if (!data) return <Unready {...error} />;
 
   return (
-    <ThreadList showEmptyState={props.showEmptyState} threads={data.threads} />
+    <TextPostList showEmptyState={props.showEmptyState} posts={data.threads} />
   );
 }
