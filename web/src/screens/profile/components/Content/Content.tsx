@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 
 import { PublicProfile } from "src/api/openapi/schemas";
+import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
-import { ThreadList } from "src/screens/home/components/ThreadList";
 
 import { CollectionList } from "../CollectionList/CollectionList";
 import { PostList } from "../PostList/PostList";
@@ -32,7 +32,7 @@ export function Content(props: PublicProfile) {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <ThreadList threads={content.data.threads} showEmptyState={false} />
+            <TextPostList posts={content.data.threads} showEmptyState={false} />
           </TabPanel>
           <TabPanel>
             <Box>
