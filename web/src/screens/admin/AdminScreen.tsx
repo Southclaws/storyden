@@ -2,8 +2,8 @@
 
 import { Heading, VStack } from "@chakra-ui/react";
 
-import ErrorBanner from "src/components/ErrorBanner";
-import { Unready } from "src/components/Unready";
+import ErrorBanner from "src/components/site/ErrorBanner";
+import { Unready } from "src/components/site/Unready";
 
 import { BrandSettings } from "./components/BrandSettings/BrandSettings";
 import { useAdminScreen } from "./useAdminScreen";

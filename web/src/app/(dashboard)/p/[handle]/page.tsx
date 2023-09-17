@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 import { ProfileScreen } from "src/screens/profile/ProfileScreen";
 
 import { ParamSchema } from "./utils";

@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 
 import { useGetInfo } from "src/api/openapi/misc";
-import { ColourField } from "src/components/ColourInput/ColourInput";
-import { Unready } from "src/components/Unready";
+import { ColourField } from "src/components/form/ColourInput/ColourInput";
+import { Unready } from "src/components/site/Unready";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 

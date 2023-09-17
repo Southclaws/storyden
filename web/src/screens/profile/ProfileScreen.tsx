@@ -1,4 +1,4 @@
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { Content } from "./components/Content/Content";
 import { ProfileContext } from "./context";

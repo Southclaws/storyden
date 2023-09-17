@@ -9,7 +9,7 @@ import {
   getCollectionListKey,
 } from "src/api/openapi/collections";
 import { APIError } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/ErrorBanner";
+import { errorToast } from "src/components/site/ErrorBanner";
 
 export const FormSchema = z.object({
   name: z.string(),

@@ -1,4 +1,4 @@
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { ThreadList } from "./components/ThreadList";
 import { useContent } from "./useContent";

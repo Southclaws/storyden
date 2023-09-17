@@ -2,7 +2,7 @@ import { Flex, Heading, Text, VStack } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
 import { CollectionWithItems } from "src/api/openapi/schemas";
-import { Timestamp } from "src/components/Timestamp";
+import { Timestamp } from "src/components/site/Timestamp";
 import { formatDistanceDefaults } from "src/utils/date";
 
 import { CollectionItemList } from "./CollectionItemList";

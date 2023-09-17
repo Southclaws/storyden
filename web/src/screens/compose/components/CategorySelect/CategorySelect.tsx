@@ -8,7 +8,7 @@ import { map } from "lodash/fp";
 import { Controller } from "react-hook-form";
 
 import { Category } from "src/api/openapi/schemas";
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { useCategorySelect } from "./useCategorySelect";
 

@@ -1,6 +1,6 @@
 import { LinkProps, Text } from "@chakra-ui/react";
 
-import { Anchor } from "./site/Anchor";
+import { Anchor } from "./Anchor";
 
 type Props = {
   created: string;

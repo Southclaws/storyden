@@ -16,8 +16,8 @@ import {
 import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
-import { CategoryCreateModal } from "src/components/Navigation/Sidebar/components/CategoryCreate/CategoryCreateModal";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
+import { CategoryCreateModal } from "src/components/site/Navigation/Sidebar/components/CategoryCreate/CategoryCreateModal";
 
 import { useOnboarding } from "./useOnboarding";
 

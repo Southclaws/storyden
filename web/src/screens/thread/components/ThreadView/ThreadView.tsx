@@ -1,10 +1,11 @@
 import { Heading, Input, VStack } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
-import { CategoryPill } from "src/components/CategoryPill";
 
+import { CategoryPill } from "../CategoryPill";
 import { PostListView } from "../PostList";
 import { Reply } from "../Reply/Reply";
+
 import { useThreadView } from "./useThreadView";
 
 export function ThreadView(props: Thread) {

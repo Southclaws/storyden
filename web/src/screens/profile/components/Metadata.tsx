@@ -2,7 +2,7 @@ import { Text } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 
 import { PublicProfile } from "src/api/openapi/schemas";
-import { Timestamp } from "src/components/Timestamp";
+import { Timestamp } from "src/components/site/Timestamp";
 
 export function Metadata(props: PublicProfile) {
   return (

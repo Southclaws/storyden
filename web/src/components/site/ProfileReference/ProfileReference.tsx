@@ -3,8 +3,8 @@ import { HStack } from "@chakra-ui/react";
 import { useSession } from "src/auth";
 
 import { ProfileReference } from "src/api/openapi/schemas";
-import { Avatar } from "../site/Avatar/Avatar";
-import { Anchor } from "../site/Anchor";
+import { Avatar } from "../Avatar/Avatar";
+import { Anchor } from "../Anchor";
 import { Handle } from "./Handle";
 
 type Props =  {

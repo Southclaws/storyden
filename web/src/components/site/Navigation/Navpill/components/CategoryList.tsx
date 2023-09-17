@@ -1,9 +1,10 @@
 import { Button, Flex } from "@chakra-ui/react";
 import { map } from "lodash/fp";
+
 import { useCategoryList } from "src/api/openapi/categories";
 import { Category } from "src/api/openapi/schemas";
-import { Unready } from "src/components/Unready";
 import { Anchor } from "src/components/site/Anchor";
+import { Unready } from "src/components/site/Unready";
 
 const mapCategories = (selected?: string) =>
   map((c: Category) => (

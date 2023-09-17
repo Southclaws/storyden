@@ -1,7 +1,7 @@
 import { Text, VStack } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { Header } from "./components/Header";
 import { Metadata } from "./components/Metadata";

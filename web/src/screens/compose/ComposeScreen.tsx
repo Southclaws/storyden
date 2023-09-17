@@ -1,6 +1,6 @@
 import { Skeleton, SkeletonText, VStack } from "@chakra-ui/react";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { ComposeForm } from "./components/ComposeForm/ComposeForm";
 import { Props, useComposeScreen } from "./useComposeScreen";

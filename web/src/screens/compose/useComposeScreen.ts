@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Thread } from "src/api/openapi/schemas";
 import { threadGet } from "src/api/openapi/threads";
-import { errorToast } from "src/components/ErrorBanner";
+import { errorToast } from "src/components/site/ErrorBanner";
 
 export type Props = { editing?: string };
 

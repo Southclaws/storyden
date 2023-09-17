@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { Navigation } from "src/components/Navigation/Navigation";
+import { Navigation } from "src/components/site/Navigation/Navigation";
 
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
