@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { z } from "zod";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 import { CollectionScreen } from "src/screens/collection/CollectionScreen";
 
 const ParamSchema = z.object({

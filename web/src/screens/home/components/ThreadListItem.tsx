@@ -10,7 +10,7 @@ import NextLink from "next/link";
 
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
-import { CollectionMenu } from "src/components/CollectionMenu/CollectionMenu";
+import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 import { Byline } from "src/screens/thread/components/Byline";
 
 import { ThreadMenu } from "./ThreadMenu/ThreadMenu";

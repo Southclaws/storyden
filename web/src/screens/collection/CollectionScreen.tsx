@@ -1,4 +1,4 @@
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { Collection } from "./components/Collection";
 import { Props, useCollectionScreen } from "./useCollectionScreen";

@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 
 import { PublicProfile } from "src/api/openapi/schemas";
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 import { ThreadList } from "src/screens/home/components/ThreadList";
 
 import { CollectionList } from "../CollectionList/CollectionList";

@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { PropsWithChildren } from "react";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 import { ProfileLayout } from "src/screens/profile/ProfileLayout";
 
 import { ParamSchema } from "./utils";

@@ -2,7 +2,7 @@ import { Box, FormControl, forwardRef } from "@chakra-ui/react";
 import { CSSProperties } from "react";
 import { Control, Controller } from "react-hook-form";
 
-import { DragHandleIcon } from "../graphics/DragHandleIcon";
+import { DragHandleIcon } from "../../graphics/DragHandleIcon";
 
 import { C, L, Props, conicGradient, useColourInput } from "./useColourInput";
 

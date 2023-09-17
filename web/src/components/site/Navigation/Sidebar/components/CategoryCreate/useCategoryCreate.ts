@@ -6,7 +6,7 @@ import { z } from "zod";
 import { categoryCreate, useCategoryList } from "src/api/openapi/categories";
 import { useGetInfo } from "src/api/openapi/misc";
 import { APIError } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/ErrorBanner";
+import { errorToast } from "src/components/site/ErrorBanner";
 
 export const FormSchema = z.object({
   name: z.string(),
@@ -36,7 +36,7 @@ export function useCategoryCreate(props: UseDisclosureProps) {
       mutateInfoStatus();
       mutate(
         { categories: updated },
-        { populateCache: true, rollbackOnError: true }
+        { populateCache: true, rollbackOnError: true },
       );
 
       props.onClose?.();

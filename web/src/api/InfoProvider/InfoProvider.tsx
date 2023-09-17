@@ -1,6 +1,9 @@
 import { PropsWithChildren } from "react";
-import ErrorBanner from "src/components/ErrorBanner";
+
+import ErrorBanner from "src/components/site/ErrorBanner";
+
 import { useGetInfo } from "../openapi/misc";
+
 import { InfoContext } from "./useInfoProvider";
 
 export function InfoProvider({ children }: PropsWithChildren) {

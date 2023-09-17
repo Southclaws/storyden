@@ -7,7 +7,7 @@ import {
 import { map } from "lodash/fp";
 
 import { Category } from "src/api/openapi/schemas";
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { CategoryListItem } from "./CategoryListItem";
 import { useCategoryList } from "./useCategoryList";

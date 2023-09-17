@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 
-import { Bookmark, BookmarkSolid } from "../site/Action/Action";
+import { Bookmark, BookmarkSolid } from "../../site/Action/Action";
 
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 

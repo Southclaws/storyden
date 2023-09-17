@@ -1,7 +1,10 @@
 import { List, ListItem, VStack } from "@chakra-ui/react";
+
 import { AuthProvider } from "src/api/openapi/schemas";
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
+
 import { AuthSelectionOption } from "../AuthSelectionOption";
+
 import { useAuthSelection } from "./useAuthSelection";
 
 export function AuthSelection() {

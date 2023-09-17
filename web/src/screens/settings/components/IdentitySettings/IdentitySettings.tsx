@@ -1,7 +1,7 @@
 import { Heading, Input, Text } from "@chakra-ui/react";
 
 import { useSession } from "src/auth";
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 

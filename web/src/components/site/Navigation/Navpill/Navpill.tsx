@@ -2,8 +2,6 @@
 
 import { HStack, Input, SlideFade } from "@chakra-ui/react";
 
-import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
-import { Toolpill } from "src/components/Toolpill/Toolpill";
 import {
   Admin,
   Bell,
@@ -15,6 +13,8 @@ import {
   Logout,
   Settings,
 } from "src/components/site/Action/Action";
+import { ProfileReference } from "src/components/site/ProfileReference/ProfileReference";
+import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";

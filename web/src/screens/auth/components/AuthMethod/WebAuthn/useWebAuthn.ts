@@ -16,7 +16,7 @@ import {
   webAuthnRequestCredential,
 } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/ErrorBanner";
+import { errorToast } from "src/components/site/ErrorBanner";
 
 export const FormSchema = z.object({
   username: z.string(),

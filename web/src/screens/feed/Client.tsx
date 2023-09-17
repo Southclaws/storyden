@@ -2,8 +2,8 @@
 
 import { ThreadList } from "src/api/openapi/schemas";
 import { useThreadList } from "src/api/openapi/threads";
-import { Unready } from "src/components/Unready";
 import { TextPostList } from "src/components/feed/text/TextPostList";
+import { Unready } from "src/components/site/Unready";
 
 export function Client(props: { category: string; threads: ThreadList }) {
   const { data, error } = useThreadList(

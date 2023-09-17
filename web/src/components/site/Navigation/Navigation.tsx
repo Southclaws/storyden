@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 
-import { Navpill } from "src/components/Navigation/Navpill/Navpill";
-import { Sidebar } from "src/components/Navigation/Sidebar/Sidebar";
+import { Navpill } from "src/components/site/Navigation/Navpill/Navpill";
+import { Sidebar } from "src/components/site/Navigation/Sidebar/Sidebar";
 
 import { Box } from "@/styled-system/jsx";
 

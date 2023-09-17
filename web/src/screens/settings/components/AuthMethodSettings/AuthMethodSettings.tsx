@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { Unready } from "src/components/Unready";
+import { Unready } from "src/components/site/Unready";
 import { AuthSelectionOption } from "src/screens/auth/components/AuthSelectionOption";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";

@@ -1,6 +1,6 @@
 import { Flex, VStack } from "@chakra-ui/react";
 
-import { useNavigation } from "src/components/Navigation/useNavigation";
+import { useNavigation } from "src/components/site/Navigation/useNavigation";
 
 import { CategoryList } from "./CategoryList";
 

@@ -11,7 +11,7 @@ import {
   ThreadStatus,
 } from "src/api/openapi/schemas";
 import { threadCreate, threadUpdate } from "src/api/openapi/threads";
-import { errorToast } from "src/components/ErrorBanner";
+import { errorToast } from "src/components/site/ErrorBanner";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -95,11 +95,11 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   }
 
   const onSave = formContext.handleSubmit((data) =>
-    doSave(data).catch(errorToast(toast))
+    doSave(data).catch(errorToast(toast)),
   );
 
   const onPublish = formContext.handleSubmit((data) =>
-    doPublish(data).catch(errorToast(toast))
+    doPublish(data).catch(errorToast(toast)),
   );
 
   return {

@@ -1,7 +1,7 @@
 "use client";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
-import { Onboarding } from "src/components/Onboarding/Onboarding";
+import { Onboarding } from "src/components/site/Onboarding/Onboarding";
 
 import { Content } from "./Content";
 import { useHomeScreen } from "./useHomeScreen";

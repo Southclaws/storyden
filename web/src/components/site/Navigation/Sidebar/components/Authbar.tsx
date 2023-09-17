@@ -1,8 +1,8 @@
 import { HStack, VStack } from "@chakra-ui/react";
 
 import { useSession } from "src/auth";
-import { ProfileReference } from "src/components/ProfileReference/ProfileReference";
 import { Admin, Logout, Settings } from "src/components/site/Action/Action";
+import { ProfileReference } from "src/components/site/ProfileReference/ProfileReference";
 
 export function Authbar() {
   const account = useSession();
