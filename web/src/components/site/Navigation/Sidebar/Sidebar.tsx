@@ -1,10 +1,10 @@
 "use client";
 
-import { Box, Divider, VStack } from "@chakra-ui/react";
+import { Divider } from "@chakra-ui/react";
 
 import { useNavigation } from "../useNavigation";
 
-import { styled } from "@/styled-system/jsx";
+import { Box, VStack, styled } from "@/styled-system/jsx";
 
 import { Authbar } from "./components/Authbar";
 import { CategoryCreate } from "./components/CategoryCreate/CategoryCreate";
@@ -37,8 +37,9 @@ export function Sidebar() {
         height="full"
         p={4}
       >
-        <VStack
-          as="nav"
+        <styled.nav
+          display="flex"
+          flexDir="column"
           height="full"
           gap={2}
           justifyContent="space-between"
@@ -49,7 +50,10 @@ export function Sidebar() {
 
             <Toolbar />
 
-            <Divider />
+            <Divider
+              // TODO: make this clever based on accent colour.
+              borderColor="oklch(0 0 0deg / 5%)"
+            />
 
             <Box overflowY="scroll" width="full">
               <CategoryList />
@@ -61,7 +65,7 @@ export function Sidebar() {
           <VStack alignItems="start">
             <Authbar />
           </VStack>
-        </VStack>
+        </styled.nav>
       </Box>
     </styled.header>
   );
