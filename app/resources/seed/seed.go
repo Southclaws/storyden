@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -63,6 +64,7 @@ func New(
 	thread_repo thread.Repository,
 	post_repo reply.Repository,
 	react_repo react.Repository,
+	asset_repo asset.Repository,
 ) (r Ready) {
 	if err := db.Truncate(database); err != nil {
 		panic(err)
@@ -72,7 +74,7 @@ func New(
 
 	accounts(account_repo, auth_repo)
 	categories(category_repo)
-	threads(thread_repo, post_repo, react_repo)
+	threads(thread_repo, post_repo, react_repo, asset_repo)
 
 	return Ready{}
 }
