@@ -3,9 +3,9 @@ import { isValid } from "date-fns";
 import { FormProvider } from "react-hook-form";
 
 import { Back, Save, Send } from "src/components/Action/Action";
-import { Bold } from "src/components/ContentComposer/controls/Bold";
-import { Italic } from "src/components/ContentComposer/controls/Italic";
 import { Toolpill } from "src/components/Toolpill/Toolpill";
+import { Bold } from "src/components/content/ContentComposer/controls/Bold";
+import { Italic } from "src/components/content/ContentComposer/controls/Italic";
 
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";

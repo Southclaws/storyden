@@ -1,8 +1,8 @@
 import { Button, Flex, HStack } from "@chakra-ui/react";
 
 import { PostProps } from "src/api/openapi/schemas";
-import { ContentComposer } from "src/components/ContentComposer/ContentComposer";
-import { ContentViewer } from "src/components/ContentViewer/ContentViewer";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
+import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 
 import { Byline } from "../Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
