@@ -1,7 +1,7 @@
 import { HStack, Heading, Text, VStack } from "@chakra-ui/react";
 
 import { PublicProfile } from "src/api/openapi/schemas";
-import { Avatar } from "src/components/Avatar/Avatar";
+import { Avatar } from "src/components/site/Avatar/Avatar";
 
 export function Header(props: PublicProfile) {
   return (

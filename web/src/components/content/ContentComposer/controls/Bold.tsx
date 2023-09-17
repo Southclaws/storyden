@@ -1,7 +1,7 @@
 import {
   ActionButton,
   WithOptionalARIALabel,
-} from "src/components/Action/Action";
+} from "src/components/site/Action/Action";
 
 import { useControl } from "./useControl";
 
