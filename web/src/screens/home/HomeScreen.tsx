@@ -1,39 +1,17 @@
-"use client";
+import { server } from "src/api/client";
+import { ThreadListOKResponse } from "src/api/openapi/schemas";
+import { getThreadListKey } from "src/api/openapi/threads";
 
-import { OnboardingStatus } from "src/api/openapi/schemas";
-import { Onboarding } from "src/components/site/Onboarding/Onboarding";
+import { Client } from "./Client";
 
-import { Content } from "./Content";
-import { useHomeScreen } from "./useHomeScreen";
+export async function HomeScreen() {
+  const key = getThreadListKey()[0];
 
-export function HomeScreen() {
-  const { onboardingStatus, onFinish } = useHomeScreen();
-
-  const showOnboarding = isOnboarding(onboardingStatus) && onboardingStatus;
+  const data = await server<ThreadListOKResponse>(key);
 
   return (
     <>
-      <Content showEmptyState={!showOnboarding} />
-
-      {showOnboarding && (
-        <Onboarding status={onboardingStatus} onFinish={onFinish} />
-      )}
+      <Client threads={data.threads} />
     </>
   );
-}
-
-function isOnboarding(status?: OnboardingStatus) {
-  switch (status) {
-    // NOTE: explicit exhaustivity here because we want to default to content
-    // if something went wrong with the info data. Last resort: show content!
-    case "requires_first_account":
-    case "requires_category":
-    case "requires_more_accounts":
-    case "requires_first_post":
-      return true;
-
-    case "complete":
-    default:
-      return false;
-  }
 }
