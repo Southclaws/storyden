@@ -7,11 +7,10 @@ import { TextPost } from "./TextPost";
 
 type Props = {
   posts: ThreadReference[];
-  showEmptyState?: boolean | undefined;
 };
 
 export function TextPostList(props: Props) {
-  if (props.showEmptyState && props.posts.length === 0) {
+  if (props.posts.length === 0) {
     return <EmptyState />;
   }
 

@@ -6,19 +6,18 @@ import { mutate } from "swr";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { getThreadListKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
-import {
-  getPermalinkForThread,
-  useQueryParameters,
-} from "src/screens/home/utils";
+import { WEB_ADDRESS } from "src/config";
 
 export function useFeedItemMenu(props: ThreadReference) {
   const toast = useToast();
   const account = useSession();
   const { onCopy } = useClipboard(getPermalinkForThread(props.slug));
-  const { category } = useQueryParameters();
 
   const shareEnabled = isShareEnabled();
   const deleteEnabled = account?.id === props.author.id;
+  const {
+    category: { name: category },
+  } = props;
 
   async function onCopyLink() {
     onCopy();
@@ -57,4 +56,8 @@ function isShareEnabled() {
   }
 
   return Boolean(navigator.share);
+}
+
+function getPermalinkForThread(slug: string) {
+  return `${WEB_ADDRESS}/t/${slug}`;
 }
