@@ -29,10 +29,10 @@ export function Sidebar() {
     >
       <Box
         id="desktop-nav-box"
-        maxWidth="2xs"
+        maxWidth="xs"
         minWidth={{
           base: "full",
-          lg: "3xs",
+          lg: "xs",
         }}
         height="full"
         p={4}
