@@ -1,7 +1,7 @@
 import Color from "colorjs.io";
 import { readableColor } from "polished";
 
-export const FALLBACK_COLOUR = `hsl(157 65% 44%)`;
+export const FALLBACK_COLOUR = "#27b981";
 
 type Colours = {
   "--text-colour": string;
@@ -41,7 +41,8 @@ export function getColourAsHex(colour: string) {
 function parseColourWithFallback(colour: string) {
   try {
     return new Color(colour);
-  } catch (_) {
+  } catch (e) {
+    console.log(e);
     return new Color(FALLBACK_COLOUR);
   }
 }
