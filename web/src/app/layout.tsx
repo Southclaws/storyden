@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { PropsWithChildren } from "react";
 
-import { getIconGetKey } from "src/api/openapi/misc";
 import { getColourAsHex } from "src/utils/colour";
 import { getInfo } from "src/utils/info";
 
@@ -33,8 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const info = await getInfo();
 
   const themeColour = getColourAsHex(info.accent_colour);
-  const iconLarge = getIconGetKey("512x512")[0];
-  const iconURL = `/api${iconLarge}`;
+  const iconURL = `/api/v1/info/icon/512x512`;
 
   return {
     title: info.title,
