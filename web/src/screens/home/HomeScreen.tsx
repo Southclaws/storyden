@@ -4,7 +4,7 @@ import { ThreadListOKResponse } from "src/api/openapi/schemas";
 import { Client } from "./Client";
 
 export async function HomeScreen() {
-  const data = await server<ThreadListOKResponse>("/v1/threads");
+  const data = await server<ThreadListOKResponse>({ url: "/v1/threads" });
 
   return (
     <>

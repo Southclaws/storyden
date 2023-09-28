@@ -4,7 +4,7 @@ import { API_ADDRESS } from "src/config";
 
 type Options = {
   url: string;
-  method: "get" | "post" | "put" | "delete" | "patch";
+  method?: "get" | "post" | "put" | "delete" | "patch";
   headers?: Record<string, string>;
   params?: Record<string, string | string[]>;
   data?: unknown;
@@ -13,7 +13,7 @@ type Options = {
 
 export const fetcher = async <T>({
   url,
-  method,
+  method = "get",
   headers,
   params,
   data,
@@ -52,15 +52,12 @@ export const fetcher = async <T>({
   return response.json();
 };
 
-export const server = async <T>(url: string, options?: Options): Promise<T> => {
-  const req = new Request(
-    `${API_ADDRESS}/api/${url}${cleanQuery(options?.params)}`,
-    {
-      method: "GET",
-      mode: "cors",
-      credentials: "include",
-    },
-  );
+export const server = async <T>({ url, params }: Options): Promise<T> => {
+  const req = new Request(`${API_ADDRESS}/api/${url}${cleanQuery(params)}`, {
+    method: "GET",
+    mode: "cors",
+    credentials: "include",
+  });
 
   const response = await fetch(req);
 

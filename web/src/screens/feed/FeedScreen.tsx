@@ -1,6 +1,8 @@
 import { server } from "src/api/client";
-import { ThreadListOKResponse } from "src/api/openapi/schemas";
-import { getThreadListKey } from "src/api/openapi/threads";
+import {
+  ThreadListOKResponse,
+  ThreadListParams,
+} from "src/api/openapi/schemas";
 
 import { Client } from "./Client";
 
@@ -9,9 +11,12 @@ type Props = {
 };
 
 export async function FeedScreen(props: Props) {
-  const key = getThreadListKey({ categories: [props.category] })[0];
-
-  const data = await server<ThreadListOKResponse>(key);
+  const data = await server<ThreadListOKResponse>({
+    url: `/v1/threads`,
+    params: {
+      categories: [props.category],
+    } as ThreadListParams,
+  });
 
   return <Client category={props.category} threads={data.threads} />;
 }
