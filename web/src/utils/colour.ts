@@ -17,7 +17,7 @@ type Colours = {
 export function getColourVariants(colour: string): Colours {
   const c = parseColourWithFallback(colour);
 
-  const hue = c.oklch["h"];
+  const hue = getHue(c);
 
   const rgb = c.to("srgb").toString({ format: "hex" });
 
@@ -47,6 +47,17 @@ function parseColourWithFallback(colour: string) {
     console.log(e);
     return new Color(FALLBACK_COLOUR);
   }
+}
+
+function getHue(c: Color) {
+  const hue = c.oklch["h"];
+  if (!hue) {
+    return 0;
+  }
+  if (isNaN(hue)) {
+    return 0;
+  }
+  return hue;
 }
 
 function readableColorWithFallback(rgb: string): string {
