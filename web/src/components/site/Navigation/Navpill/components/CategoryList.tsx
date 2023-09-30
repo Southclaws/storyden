@@ -1,23 +1,27 @@
 import { Button, Flex } from "@chakra-ui/react";
-import { map } from "lodash/fp";
+import { usePathname } from "next/navigation";
 
 import { useCategoryList } from "src/api/openapi/categories";
 import { Category } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
 import { Unready } from "src/components/site/Unready";
 
-const mapCategories = (selected?: string) =>
-  map((c: Category) => (
-    <Anchor key={c.id} href={`/c/${c.name}`} w="full">
-      <Button bgColor={c.name === selected ? "blackAlpha.200" : ""} w="full">
-        {c.name}
+function CategoryListItem(props: Category) {
+  const pathname = usePathname();
+
+  const href = `/c/${props.name}`;
+  const selected = href === pathname;
+
+  return (
+    <Anchor href={href} w="full">
+      <Button bgColor={selected ? "blackAlpha.200" : ""} w="full">
+        {props.name}
       </Button>
     </Anchor>
-  ));
+  );
+}
 
-type Props = { category?: string };
-
-export function CategoryList({ category }: Props) {
+export function CategoryList() {
   const { data } = useCategoryList();
   if (!data) return <Unready />;
 
@@ -36,7 +40,9 @@ export function CategoryList({ category }: Props) {
       alignItems="start"
       overflowY="scroll"
     >
-      {mapCategories(category)(data.categories)}
+      {data.categories.map((c) => (
+        <CategoryListItem key={c.id} {...c} />
+      ))}
     </Flex>
   );
 }
