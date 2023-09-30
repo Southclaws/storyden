@@ -4,7 +4,7 @@ import NextLink from "next/link";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { FeedItemMenu } from "src/components/feed/FeedItemMenu/FeedItemMenu";
+import { FeedItemMenu } from "src/components/feed/common/FeedItemMenu/FeedItemMenu";
 import { Byline } from "src/screens/thread/components/Byline";
 
 import { Flex, HStack, styled } from "@/styled-system/jsx";
