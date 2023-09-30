@@ -7,6 +7,8 @@ import { Category } from "src/api/openapi/schemas";
 import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
 import { Anchor } from "src/components/site/Anchor";
 
+import { CategoryEdit } from "../CategoryEdit/CategoryEdit";
+
 export function CategoryListItem(props: Category & { isAdmin: boolean }) {
   const {
     attributes,
@@ -28,6 +30,7 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
 
   return (
     <Box
+      id="category-list-item"
       style={style}
       key={props.id}
       ref={setNodeRef}
@@ -47,13 +50,17 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
         </Anchor>
 
         {props.isAdmin && (
-          <Box
-            {...attributes}
-            {...listeners}
-            cursor={isDragging ? "grabbing" : "grab"}
-          >
-            <DragHandleIcon />
-          </Box>
+          <HStack gap={0}>
+            <CategoryEdit {...props} />
+
+            <Box
+              {...attributes}
+              {...listeners}
+              cursor={isDragging ? "grabbing" : "grab"}
+            >
+              <DragHandleIcon />
+            </Box>
+          </HStack>
         )}
       </HStack>
     </Box>
