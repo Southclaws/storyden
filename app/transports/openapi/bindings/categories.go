@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/category"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
@@ -67,10 +68,10 @@ func (c Categories) CategoryUpdateOrder(ctx context.Context, request openapi.Cat
 
 func (c Categories) CategoryUpdate(ctx context.Context, request openapi.CategoryUpdateRequestObject) (openapi.CategoryUpdateResponseObject, error) {
 	cat, err := c.category_svc.Update(ctx, category.CategoryID(deserialiseID(request.CategoryId)), category_svc.Partial{
-		Name:        []string{},
-		Description: []string{},
-		Colour:      []string{},
-		Admin:       []bool{},
+		Name:        opt.NewPtr(request.Body.Name),
+		Description: opt.NewPtr(request.Body.Description),
+		Colour:      opt.NewPtr(request.Body.Colour),
+		Admin:       opt.NewPtr(request.Body.Admin),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
