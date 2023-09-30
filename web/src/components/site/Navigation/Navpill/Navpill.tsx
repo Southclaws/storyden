@@ -16,6 +16,8 @@ import {
 import { ProfileReference } from "src/components/site/ProfileReference/ProfileReference";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
+import { CategoryCreate } from "../Sidebar/components/CategoryCreate/CategoryCreate";
+
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";
 import { useNavpill } from "./useNavpill";
@@ -50,7 +52,12 @@ export function Navpill() {
                 <Logout />
               </HStack>
               <HStack>
-                {account.admin && <Admin />}
+                {account.admin && (
+                  <>
+                    <CategoryCreate action="icon" />
+                    <Admin />
+                  </>
+                )}
                 <Settings />
               </HStack>
             </>

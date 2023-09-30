@@ -59,7 +59,7 @@ export function Sidebar() {
               <CategoryList />
             </Box>
 
-            {isAdmin && <CategoryCreate />}
+            {isAdmin && <CategoryCreate action="text" />}
           </VStack>
 
           <VStack alignItems="start">

@@ -1,6 +1,6 @@
 import { Flex, VStack } from "@chakra-ui/react";
 
-import { CategoryList } from "./CategoryList";
+import { CategoryList } from "../../Sidebar/components/CategoryList/CategoryList";
 
 export function Menu() {
   return (

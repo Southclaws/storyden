@@ -1,25 +1,9 @@
-import { Button, Flex } from "@chakra-ui/react";
-import { usePathname } from "next/navigation";
+import { Flex } from "@chakra-ui/react";
 
 import { useCategoryList } from "src/api/openapi/categories";
-import { Category } from "src/api/openapi/schemas";
-import { Anchor } from "src/components/site/Anchor";
 import { Unready } from "src/components/site/Unready";
 
-function CategoryListItem(props: Category) {
-  const pathname = usePathname();
-
-  const href = `/c/${props.slug}`;
-  const selected = href === pathname;
-
-  return (
-    <Anchor href={href} w="full">
-      <Button bgColor={selected ? "blackAlpha.200" : ""} w="full">
-        {props.name}
-      </Button>
-    </Anchor>
-  );
-}
+import { CategoryListItem } from "../../Sidebar/components/CategoryList/CategoryListItem";
 
 export function CategoryList() {
   const { data } = useCategoryList();
@@ -41,7 +25,7 @@ export function CategoryList() {
       overflowY="scroll"
     >
       {data.categories.map((c) => (
-        <CategoryListItem key={c.id} {...c} />
+        <CategoryListItem key={c.id} {...c} isAdmin={false} />
       ))}
     </Flex>
   );

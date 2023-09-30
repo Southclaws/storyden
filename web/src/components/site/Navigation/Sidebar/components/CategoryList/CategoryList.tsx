@@ -36,6 +36,9 @@ export function CategoryList() {
         flexDirection="column"
         gap={2}
         width="full"
+        css={{
+          touchAction: "none",
+        }}
       >
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           {mapCategories(isAdmin)(categories)}

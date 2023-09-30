@@ -1,8 +1,17 @@
-import { Box, CloseButton, UseDisclosureProps, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  CloseButton,
+  HStack,
+  Heading,
+  UseDisclosureProps,
+  VStack,
+} from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-type Props = UseDisclosureProps;
+type Props = {
+  title?: string;
+} & UseDisclosureProps;
 
 export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
   const onOpenChange = (open: boolean) => {
@@ -25,12 +34,14 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               borderTopRadius="1em"
               borderBottomRadius={{ base: "0", md: "1em" }}
               bgColor="gray.100"
-              alignItems="end"
-              p={3}
-              px={3}
+              p={4}
             >
-              <CloseButton onClick={props.onClose} />
-              <Box h="full" w="full" px={3} pb={3}>
+              <HStack w="full" justify="space-between">
+                <Heading size="md">{props.title}</Heading>
+                <CloseButton onClick={props.onClose} />
+              </HStack>
+
+              <Box h="full" w="full" pb={3}>
                 {children}
               </Box>
             </VStack>
