@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { AccountHandle } from "./accountHandle";
-import type { CategoryNameList } from "./categoryNameList";
+import type { CategorySlugList } from "./categorySlugList";
 import type { TagListIDs } from "./tagListIDs";
 
 export type ThreadListParams = {
@@ -21,5 +21,5 @@ export type ThreadListParams = {
   /**
    * Show only results with these categories
    */
-  categories?: CategoryNameList;
+  categories?: CategorySlugList;
 };

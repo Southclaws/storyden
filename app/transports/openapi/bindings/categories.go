@@ -69,9 +69,11 @@ func (c Categories) CategoryUpdateOrder(ctx context.Context, request openapi.Cat
 func (c Categories) CategoryUpdate(ctx context.Context, request openapi.CategoryUpdateRequestObject) (openapi.CategoryUpdateResponseObject, error) {
 	cat, err := c.category_svc.Update(ctx, category.CategoryID(deserialiseID(request.CategoryId)), category_svc.Partial{
 		Name:        opt.NewPtr(request.Body.Name),
+		Slug:        opt.NewPtr(request.Body.Slug),
 		Description: opt.NewPtr(request.Body.Description),
 		Colour:      opt.NewPtr(request.Body.Colour),
 		Admin:       opt.NewPtr(request.Body.Admin),
+		Meta:        opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -106,23 +106,27 @@ func serialiseProfileReference(a profile.Profile) openapi.ProfileReference {
 func serialiseCategory(c *category.Category) openapi.Category {
 	return openapi.Category{
 		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
-		Admin:       &c.Admin,
-		Colour:      &c.Colour,
-		Description: &c.Description,
 		Name:        c.Name,
+		Slug:        c.Slug,
+		Colour:      c.Colour,
+		Description: c.Description,
 		PostCount:   c.PostCount,
+		Admin:       c.Admin,
 		Sort:        c.Sort,
+		Meta:        c.Metadata,
 	}
 }
 
 func serialiseCategoryReference(c *category.Category) openapi.CategoryReference {
 	return openapi.CategoryReference{
 		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
-		Admin:       &c.Admin,
-		Colour:      &c.Colour,
-		Description: &c.Description,
 		Name:        c.Name,
+		Slug:        c.Slug,
+		Admin:       c.Admin,
+		Colour:      c.Colour,
+		Description: c.Description,
 		Sort:        c.Sort,
+		Meta:        (openapi.Metadata)(c.Metadata),
 	}
 }
 

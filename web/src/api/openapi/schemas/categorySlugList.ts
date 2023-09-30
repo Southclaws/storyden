@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CategoryName } from "./categoryName";
+import type { CategorySlug } from "./categorySlug";
 
 /**
  * A list of category names.
  */
-export type CategoryNameList = CategoryName[];
+export type CategorySlugList = CategorySlug[];

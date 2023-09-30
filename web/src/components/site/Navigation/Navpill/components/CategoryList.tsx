@@ -9,7 +9,7 @@ import { Unready } from "src/components/site/Unready";
 function CategoryListItem(props: Category) {
   const pathname = usePathname();
 
-  const href = `/c/${props.name}`;
+  const href = `/c/${props.slug}`;
   const selected = href === pathname;
 
   return (

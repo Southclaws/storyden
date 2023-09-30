@@ -119,7 +119,7 @@ func HasTags(ids []xid.ID) Query {
 
 func HasCategories(ids []string) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.HasCategoryWith(ent_category.NameIn(ids...)))
+		q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(ids...)))
 	}
 }
 
