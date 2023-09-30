@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -23,6 +24,8 @@ type Category struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Slug holds the value of the "slug" field.
+	Slug string `json:"slug,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Colour holds the value of the "colour" field.
@@ -31,6 +34,8 @@ type Category struct {
 	Sort int `json:"sort,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
+	// Arbitrary metadata used by clients to store domain specific information.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CategoryQuery when eager-loading is set.
 	Edges CategoryEdges `json:"edges"`
@@ -59,11 +64,13 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case category.FieldMetadata:
+			values[i] = new([]byte)
 		case category.FieldAdmin:
 			values[i] = new(sql.NullBool)
 		case category.FieldSort:
 			values[i] = new(sql.NullInt64)
-		case category.FieldName, category.FieldDescription, category.FieldColour:
+		case category.FieldName, category.FieldSlug, category.FieldDescription, category.FieldColour:
 			values[i] = new(sql.NullString)
 		case category.FieldCreatedAt, category.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -108,6 +115,12 @@ func (c *Category) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
+		case category.FieldSlug:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field slug", values[i])
+			} else if value.Valid {
+				c.Slug = value.String
+			}
 		case category.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
@@ -131,6 +144,14 @@ func (c *Category) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
 				c.Admin = value.Bool
+			}
+		case category.FieldMetadata:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field metadata", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
+				}
 			}
 		}
 	}
@@ -174,6 +195,9 @@ func (c *Category) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
+	builder.WriteString("slug=")
+	builder.WriteString(c.Slug)
+	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
 	builder.WriteString(", ")
@@ -185,6 +209,9 @@ func (c *Category) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", c.Admin))
+	builder.WriteString(", ")
+	builder.WriteString("metadata=")
+	builder.WriteString(fmt.Sprintf("%v", c.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

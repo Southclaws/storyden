@@ -14,6 +14,8 @@ import type {
   CategoryCreateBody,
   CategoryCreateOKResponse,
   CategoryListOKResponse,
+  CategoryUpdateBody,
+  CategoryUpdateOKResponse,
   CategoryUpdateOrderBody,
   InternalServerErrorResponse,
 } from "./schemas";
@@ -89,5 +91,20 @@ export const categoryUpdateOrder = (
     method: "patch",
     headers: { "Content-Type": "application/json" },
     data: categoryUpdateOrderBody,
+  });
+};
+
+/**
+ * Create a category for organising posts.
+ */
+export const categoryUpdate = (
+  categoryId: string,
+  categoryUpdateBody: CategoryUpdateBody,
+) => {
+  return fetcher<CategoryUpdateOKResponse>({
+    url: `/v1/categories/${categoryId}`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: categoryUpdateBody,
   });
 };

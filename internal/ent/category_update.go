@@ -43,6 +43,12 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 	return cu
 }
 
+// SetSlug sets the "slug" field.
+func (cu *CategoryUpdate) SetSlug(s string) *CategoryUpdate {
+	cu.mutation.SetSlug(s)
+	return cu
+}
+
 // SetDescription sets the "description" field.
 func (cu *CategoryUpdate) SetDescription(s string) *CategoryUpdate {
 	cu.mutation.SetDescription(s)
@@ -103,6 +109,18 @@ func (cu *CategoryUpdate) SetNillableAdmin(b *bool) *CategoryUpdate {
 	if b != nil {
 		cu.SetAdmin(*b)
 	}
+	return cu
+}
+
+// SetMetadata sets the "metadata" field.
+func (cu *CategoryUpdate) SetMetadata(m map[string]interface{}) *CategoryUpdate {
+	cu.mutation.SetMetadata(m)
+	return cu
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (cu *CategoryUpdate) ClearMetadata() *CategoryUpdate {
+	cu.mutation.ClearMetadata()
 	return cu
 }
 
@@ -204,6 +222,9 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 	}
+	if value, ok := cu.mutation.Slug(); ok {
+		_spec.SetField(category.FieldSlug, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 	}
@@ -218,6 +239,12 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.Metadata(); ok {
+		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
+	}
+	if cu.mutation.MetadataCleared() {
+		_spec.ClearField(category.FieldMetadata, field.TypeJSON)
 	}
 	if cu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -298,6 +325,12 @@ func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 	return cuo
 }
 
+// SetSlug sets the "slug" field.
+func (cuo *CategoryUpdateOne) SetSlug(s string) *CategoryUpdateOne {
+	cuo.mutation.SetSlug(s)
+	return cuo
+}
+
 // SetDescription sets the "description" field.
 func (cuo *CategoryUpdateOne) SetDescription(s string) *CategoryUpdateOne {
 	cuo.mutation.SetDescription(s)
@@ -358,6 +391,18 @@ func (cuo *CategoryUpdateOne) SetNillableAdmin(b *bool) *CategoryUpdateOne {
 	if b != nil {
 		cuo.SetAdmin(*b)
 	}
+	return cuo
+}
+
+// SetMetadata sets the "metadata" field.
+func (cuo *CategoryUpdateOne) SetMetadata(m map[string]interface{}) *CategoryUpdateOne {
+	cuo.mutation.SetMetadata(m)
+	return cuo
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (cuo *CategoryUpdateOne) ClearMetadata() *CategoryUpdateOne {
+	cuo.mutation.ClearMetadata()
 	return cuo
 }
 
@@ -489,6 +534,9 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 	}
+	if value, ok := cuo.mutation.Slug(); ok {
+		_spec.SetField(category.FieldSlug, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 	}
@@ -503,6 +551,12 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 	}
 	if value, ok := cuo.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.Metadata(); ok {
+		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
+	}
+	if cuo.mutation.MetadataCleared() {
+		_spec.ClearField(category.FieldMetadata, field.TypeJSON)
 	}
 	if cuo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -6,10 +6,14 @@
  * OpenAPI spec version: 1
  */
 import type { CategoryName } from "./categoryName";
+import type { CategorySlug } from "./categorySlug";
+import type { Metadata } from "./metadata";
 
 export interface CategoryInitialProps {
   name: CategoryName;
+  slug?: CategorySlug;
   description: string;
   colour: string;
   admin: boolean;
+  meta?: Metadata;
 }

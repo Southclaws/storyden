@@ -21,12 +21,14 @@ type PostMeta struct {
 type Category struct {
 	ID          CategoryID
 	Name        string
+	Slug        string
 	Description string
 	Colour      string
 	Sort        int
 	Admin       bool
 	Recent      []PostMeta
 	PostCount   int
+	Metadata    map[string]any
 }
 
 func PostMetaFromModel(p *ent.Post) *PostMeta {
@@ -55,10 +57,12 @@ func FromModel(c *ent.Category) *Category {
 	return &Category{
 		ID:          CategoryID(c.ID),
 		Name:        c.Name,
+		Slug:        c.Slug,
 		Description: c.Description,
 		Colour:      c.Colour,
 		Sort:        c.Sort,
 		Admin:       c.Admin,
 		Recent:      recent,
+		Metadata:    c.Metadata,
 	}
 }

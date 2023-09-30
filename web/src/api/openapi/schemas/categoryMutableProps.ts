@@ -9,12 +9,11 @@ import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
 import type { Metadata } from "./metadata";
 
-export interface CategoryCommonProps {
-  name: CategoryName;
+export interface CategoryMutableProps {
+  name?: CategoryName;
   slug?: CategorySlug;
   description?: string;
   colour?: string;
-  sort: number;
   admin?: boolean;
   meta?: Metadata;
 }

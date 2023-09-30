@@ -155,19 +155,19 @@ func init() {
 	// category.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	category.UpdateDefaultUpdatedAt = categoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// categoryDescDescription is the schema descriptor for description field.
-	categoryDescDescription := categoryFields[1].Descriptor()
+	categoryDescDescription := categoryFields[2].Descriptor()
 	// category.DefaultDescription holds the default value on creation for the description field.
 	category.DefaultDescription = categoryDescDescription.Default.(string)
 	// categoryDescColour is the schema descriptor for colour field.
-	categoryDescColour := categoryFields[2].Descriptor()
+	categoryDescColour := categoryFields[3].Descriptor()
 	// category.DefaultColour holds the default value on creation for the colour field.
 	category.DefaultColour = categoryDescColour.Default.(string)
 	// categoryDescSort is the schema descriptor for sort field.
-	categoryDescSort := categoryFields[3].Descriptor()
+	categoryDescSort := categoryFields[4].Descriptor()
 	// category.DefaultSort holds the default value on creation for the sort field.
 	category.DefaultSort = categoryDescSort.Default.(int)
 	// categoryDescAdmin is the schema descriptor for admin field.
-	categoryDescAdmin := categoryFields[4].Descriptor()
+	categoryDescAdmin := categoryFields[5].Descriptor()
 	// category.DefaultAdmin holds the default value on creation for the admin field.
 	category.DefaultAdmin = categoryDescAdmin.Default.(bool)
 	// categoryDescID is the schema descriptor for id field.

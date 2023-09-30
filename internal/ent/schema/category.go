@@ -18,11 +18,15 @@ func (Category) Mixin() []ent.Mixin {
 // Fields of Category.
 func (Category) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name"),
+		field.String("name").Unique(),
+		field.String("slug").Unique(),
 		field.String("description").Default("(No description)"),
 		field.String("colour").Default("#8577ce"),
 		field.Int("sort").Default(-1),
 		field.Bool("admin").Default(false),
+		field.JSON("metadata", map[string]any{}).
+			Optional().
+			Comment("Arbitrary metadata used by clients to store domain specific information."),
 	}
 }
 

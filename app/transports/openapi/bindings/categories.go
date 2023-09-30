@@ -64,3 +64,19 @@ func (c Categories) CategoryUpdateOrder(ctx context.Context, request openapi.Cat
 		},
 	}, nil
 }
+
+func (c Categories) CategoryUpdate(ctx context.Context, request openapi.CategoryUpdateRequestObject) (openapi.CategoryUpdateResponseObject, error) {
+	cat, err := c.category_svc.Update(ctx, category.CategoryID(deserialiseID(request.CategoryId)), category_svc.Partial{
+		Name:        []string{},
+		Description: []string{},
+		Colour:      []string{},
+		Admin:       []bool{},
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.CategoryUpdate200JSONResponse{
+		CategoryUpdateOKJSONResponse: openapi.CategoryUpdateOKJSONResponse(serialiseCategory(cat)),
+	}, nil
+}
