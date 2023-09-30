@@ -30,7 +30,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               px={3}
             >
               <CloseButton onClick={props.onClose} />
-              <Box w="full" px={3} pb={3}>
+              <Box h="full" w="full" px={3} pb={3}>
                 {children}
               </Box>
             </VStack>
