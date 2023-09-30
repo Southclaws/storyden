@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -14,6 +15,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
 )
+
+var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Service interface {
 	Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error)
@@ -84,6 +87,10 @@ func (s *service) Reorder(ctx context.Context, ids []category.CategoryID) ([]*ca
 }
 
 func (s *service) Update(ctx context.Context, id category.CategoryID, partial Partial) (*category.Category, error) {
+	if err := s.authorise(ctx); err != nil {
+		return nil, err
+	}
+
 	opts := []category.Option{}
 
 	if v, ok := partial.Name.Get(); ok {
@@ -125,7 +132,7 @@ func (s *service) authorise(ctx context.Context) error {
 	}
 
 	if !acc.Admin {
-		return fault.New("")
+		return fault.Wrap(errNotAuthorised, fctx.With(ctx))
 	}
 
 	return nil
