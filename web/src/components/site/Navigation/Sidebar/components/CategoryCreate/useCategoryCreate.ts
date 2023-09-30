@@ -30,8 +30,8 @@ export function useCategoryCreate(props: UseDisclosureProps) {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const collection = await categoryCreate(data);
-      const updated = [...(existing?.categories ?? []), collection];
+      const category = await categoryCreate(data);
+      const updated = [...(existing?.categories ?? []), category];
 
       mutateInfoStatus();
       mutate(
@@ -41,8 +41,8 @@ export function useCategoryCreate(props: UseDisclosureProps) {
 
       props.onClose?.();
       toast({
-        title: "Collection created",
-        description: `${collection.name} is now ready to be filled with stuff!`,
+        title: "Category created",
+        description: `${category.name} is now ready to be filled with stuff!`,
       });
     } catch (e: unknown) {
       errorToast(toast)(e as APIError);
