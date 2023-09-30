@@ -14,6 +14,7 @@ import {
   Cog6ToothIcon,
   EllipsisHorizontalIcon,
   HomeIcon,
+  PencilIcon,
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -188,6 +189,16 @@ export const Admin = forwardRef(
 export type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
   "aria-label"?: string | undefined;
 };
+
+export const Edit = forwardRef(
+  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+    return (
+      <ActionButton ref={ref} title="Edit" aria-label={al ?? "edit"} {...props}>
+        <PencilIcon width="1em" height="1em" />
+      </ActionButton>
+    );
+  },
+);
 
 export function Close({ "aria-label": al, ...props }: WithOptionalARIALabel) {
   return (
