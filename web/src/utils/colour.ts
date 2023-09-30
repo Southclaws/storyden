@@ -21,8 +21,6 @@ export function getColourVariants(colour: string): Colours {
 
   const rgb = c.to("srgb").toString({ format: "hex" });
 
-  console.log({ colour, c, hue, rgb });
-
   const textColour = readableColorWithFallback(rgb);
 
   return {
@@ -44,7 +42,6 @@ function parseColourWithFallback(colour: string) {
   try {
     return new Color(colour);
   } catch (e) {
-    console.log(e);
     return new Color(FALLBACK_COLOUR);
   }
 }
@@ -64,7 +61,6 @@ function readableColorWithFallback(rgb: string): string {
   try {
     return readableColor(rgb, "#E8ECEA", "#303030", false);
   } catch (e) {
-    console.log(e);
     return "black";
   }
 }
