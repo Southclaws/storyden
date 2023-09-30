@@ -11,10 +11,10 @@ import type { Metadata } from "./metadata";
 
 export interface CategoryCommonProps {
   name: CategoryName;
-  slug?: CategorySlug;
-  description?: string;
-  colour?: string;
+  slug: CategorySlug;
+  description: string;
+  colour: string;
   sort: number;
-  admin?: boolean;
-  meta?: Metadata;
+  admin: boolean;
+  meta: Metadata;
 }
