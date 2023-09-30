@@ -24,7 +24,7 @@
     "date-fns": "^2.29.3",
     "framer-motion": "^10.16.4",
     "lodash": "^4.17.21",
-    "next": "^13.4.20-canary.23",
+    "next": "^13.5.3",
     "picmo": "^5.8.5",
     "polished": "^4.2.2",
     "react": "^18.2.0",
@@ -37,7 +37,7 @@
     "slate-react": "^0.98.3",
     "swr": "^2.2.2",
     "unified": "^10.1.2",
-    "vaul": "^0.4.6",
+    "vaul": "^0.6.8",
     "zod": "^3.22.2"
   },
   "devDependencies": {
@@ -50,7 +50,7 @@
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
     "eslint": "^8.48.0",
-    "eslint-config-next": "^13.4.19",
+    "eslint-config-next": "^13.5.3",
     "openapi-typescript": "^6.5.4",
     "orval": "^6.17.0",
     "prettier": "^3.0.3",
