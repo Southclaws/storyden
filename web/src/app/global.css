@@ -1,1 +1,6 @@
 @layer reset, base, tokens, recipes, utilities;
+
+html,
+body {
+  background-color: var(--accent-colour-subtle);
+}
