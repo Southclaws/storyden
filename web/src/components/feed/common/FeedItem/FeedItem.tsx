@@ -12,6 +12,7 @@ export function FeedItem({ children }: PropsWithChildren) {
       gap={2}
       boxShadow="6px 6px 16px 0px rgba(0, 0, 0, 0.03)"
       borderRadius="1rem"
+      backgroundColor="white"
     >
       {children}
     </styled.article>

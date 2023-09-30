@@ -21,9 +21,11 @@ export async function GET() {
     :root {
       --accent-colour: ${cv["--accent-colour-fallback"]};
       --accent-colour-muted: ${cv["--accent-colour-muted-fallback"]};
+      --accent-colour-subtle: ${cv["--accent-colour-subtle-fallback"]};
 
       --accent-colour: ${cv["--accent-colour"]};
       --accent-colour-muted: ${cv["--accent-colour-muted"]};
+      --accent-colour-subtle: ${cv["--accent-colour-subtle"]};
     }
   `;
 
