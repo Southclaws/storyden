@@ -6,7 +6,7 @@ import { useSession } from "src/auth";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 import { Byline } from "src/screens/thread/components/Byline";
 
-import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
+import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
 import { Flex, HStack, styled } from "@/styled-system/jsx";
 
