@@ -469,6 +469,19 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/CategoryListOK" }
 
+  /v1/categories/{category_id}:
+    patch:
+      operationId: CategoryUpdate
+      description: Create a category for organising posts.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/CategoryIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/CategoryUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+
   #
   # 888    888                                    888
   # 888    888                                    888
@@ -849,6 +862,14 @@ components:
       schema:
         type: string
 
+    CategoryIDParam:
+      description: Unique category ID.
+      name: category_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     CollectionIDParam:
       description: Unique collection ID.
       name: collection_id
@@ -926,6 +947,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryIdentifierList" }
+
+    CategoryUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryMutableProps" }
 
     ThreadCreate:
       content:
@@ -1092,6 +1118,13 @@ components:
             $ref: "#/components/schemas/PublicProfile"
 
     CategoryCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+
+    CategoryUpdateOK:
       description: OK
       content:
         application/json:
@@ -1896,6 +1929,8 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
+        slug:
+          $ref: "#/components/schemas/CategorySlug"
         description:
           type: string
         colour:
@@ -1904,6 +1939,7 @@ components:
           type: integer
         admin:
           type: boolean
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryInitialProps:
       type: object
@@ -1911,15 +1947,37 @@ components:
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
+        slug:
+          $ref: "#/components/schemas/CategorySlug"
         description:
           type: string
         colour:
           type: string
         admin:
           type: boolean
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    CategoryMutableProps:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/CategoryName"
+        slug:
+          $ref: "#/components/schemas/CategorySlug"
+        description:
+          type: string
+        colour:
+          type: string
+        admin:
+          type: boolean
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryName:
       description: A category's user-facing name.
+      type: string
+
+    CategorySlug:
+      description: A category's URL-safe slug.
       type: string
 
     CategoryNameList:

@@ -59,6 +59,12 @@ func (cc *CategoryCreate) SetName(s string) *CategoryCreate {
 	return cc
 }
 
+// SetSlug sets the "slug" field.
+func (cc *CategoryCreate) SetSlug(s string) *CategoryCreate {
+	cc.mutation.SetSlug(s)
+	return cc
+}
+
 // SetDescription sets the "description" field.
 func (cc *CategoryCreate) SetDescription(s string) *CategoryCreate {
 	cc.mutation.SetDescription(s)
@@ -112,6 +118,12 @@ func (cc *CategoryCreate) SetNillableAdmin(b *bool) *CategoryCreate {
 	if b != nil {
 		cc.SetAdmin(*b)
 	}
+	return cc
+}
+
+// SetMetadata sets the "metadata" field.
+func (cc *CategoryCreate) SetMetadata(m map[string]interface{}) *CategoryCreate {
+	cc.mutation.SetMetadata(m)
 	return cc
 }
 
@@ -220,6 +232,9 @@ func (cc *CategoryCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Category.name"`)}
 	}
+	if _, ok := cc.mutation.Slug(); !ok {
+		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Category.slug"`)}
+	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Category.description"`)}
 	}
@@ -285,6 +300,10 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := cc.mutation.Slug(); ok {
+		_spec.SetField(category.FieldSlug, field.TypeString, value)
+		_node.Slug = value
+	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 		_node.Description = value
@@ -300,6 +319,10 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
+	}
+	if value, ok := cc.mutation.Metadata(); ok {
+		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
 	}
 	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -393,6 +416,18 @@ func (u *CategoryUpsert) UpdateName() *CategoryUpsert {
 	return u
 }
 
+// SetSlug sets the "slug" field.
+func (u *CategoryUpsert) SetSlug(v string) *CategoryUpsert {
+	u.Set(category.FieldSlug, v)
+	return u
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateSlug() *CategoryUpsert {
+	u.SetExcluded(category.FieldSlug)
+	return u
+}
+
 // SetDescription sets the "description" field.
 func (u *CategoryUpsert) SetDescription(v string) *CategoryUpsert {
 	u.Set(category.FieldDescription, v)
@@ -444,6 +479,24 @@ func (u *CategoryUpsert) SetAdmin(v bool) *CategoryUpsert {
 // UpdateAdmin sets the "admin" field to the value that was provided on create.
 func (u *CategoryUpsert) UpdateAdmin() *CategoryUpsert {
 	u.SetExcluded(category.FieldAdmin)
+	return u
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *CategoryUpsert) SetMetadata(v map[string]interface{}) *CategoryUpsert {
+	u.Set(category.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateMetadata() *CategoryUpsert {
+	u.SetExcluded(category.FieldMetadata)
+	return u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *CategoryUpsert) ClearMetadata() *CategoryUpsert {
+	u.SetNull(category.FieldMetadata)
 	return u
 }
 
@@ -526,6 +579,20 @@ func (u *CategoryUpsertOne) UpdateName() *CategoryUpsertOne {
 	})
 }
 
+// SetSlug sets the "slug" field.
+func (u *CategoryUpsertOne) SetSlug(v string) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateSlug() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateSlug()
+	})
+}
+
 // SetDescription sets the "description" field.
 func (u *CategoryUpsertOne) SetDescription(v string) *CategoryUpsertOne {
 	return u.Update(func(s *CategoryUpsert) {
@@ -586,6 +653,27 @@ func (u *CategoryUpsertOne) SetAdmin(v bool) *CategoryUpsertOne {
 func (u *CategoryUpsertOne) UpdateAdmin() *CategoryUpsertOne {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *CategoryUpsertOne) SetMetadata(v map[string]interface{}) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateMetadata() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *CategoryUpsertOne) ClearMetadata() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearMetadata()
 	})
 }
 
@@ -831,6 +919,20 @@ func (u *CategoryUpsertBulk) UpdateName() *CategoryUpsertBulk {
 	})
 }
 
+// SetSlug sets the "slug" field.
+func (u *CategoryUpsertBulk) SetSlug(v string) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateSlug() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateSlug()
+	})
+}
+
 // SetDescription sets the "description" field.
 func (u *CategoryUpsertBulk) SetDescription(v string) *CategoryUpsertBulk {
 	return u.Update(func(s *CategoryUpsert) {
@@ -891,6 +993,27 @@ func (u *CategoryUpsertBulk) SetAdmin(v bool) *CategoryUpsertBulk {
 func (u *CategoryUpsertBulk) UpdateAdmin() *CategoryUpsertBulk {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *CategoryUpsertBulk) SetMetadata(v map[string]interface{}) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateMetadata() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *CategoryUpsertBulk) ClearMetadata() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearMetadata()
 	})
 }
 

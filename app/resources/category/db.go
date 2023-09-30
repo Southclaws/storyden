@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 	"go.uber.org/multierr"
 
@@ -16,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type database struct {
@@ -27,27 +27,22 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool, opts ...option) (*Category, error) {
-	insert := Category{
-		Name:        name,
-		Description: desc,
-		Colour:      colour,
-		Sort:        sort,
-		Admin:       admin,
+func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool, opts ...Option) (*Category, error) {
+	create := d.db.Category.Create()
+	mutation := create.Mutation()
+
+	mutation.SetName(name)
+	mutation.SetSlug(slug.Make(name))
+	mutation.SetDescription(desc)
+	mutation.SetColour(colour)
+	mutation.SetSort(sort)
+	mutation.SetAdmin(admin)
+
+	for _, fn := range opts {
+		fn(mutation)
 	}
 
-	for _, v := range opts {
-		v(&insert)
-	}
-
-	id, err := d.db.Category.
-		Create().
-		SetName(insert.Name).
-		SetDescription(insert.Description).
-		SetColour(insert.Colour).
-		SetSort(insert.Sort).
-		SetAdmin(insert.Admin).
-		SetNillableID(utils.OptionalID(xid.ID(insert.ID))).
+	id, err := create.
 		OnConflictColumns(category.FieldID).
 		UpdateNewValues().
 		ID(ctx)
@@ -178,33 +173,15 @@ func (d *database) Reorder(ctx context.Context, ids []CategoryID) ([]*Category, 
 	return newcats, nil
 }
 
-func (d *database) UpdateCategory(ctx context.Context, id CategoryID, name, desc, colour *string, sort *int, admin *bool) (*Category, error) {
-	u := d.db.Category.UpdateOneID(xid.ID(id))
+func (d *database) UpdateCategory(ctx context.Context, id CategoryID, opts ...Option) (*Category, error) {
+	update := d.db.Category.UpdateOneID(xid.ID(id))
+	mutation := update.Mutation()
 
-	// TODO: Write a less explicit, more ergonomic way to do this:
-
-	//nocheck:wsl
-	if name != nil {
-		u.SetName(*name)
+	for _, fn := range opts {
+		fn(mutation)
 	}
 
-	if desc != nil {
-		u.SetDescription(*desc)
-	}
-
-	if colour != nil {
-		u.SetColour(*colour)
-	}
-
-	if sort != nil {
-		u.SetSort(*sort)
-	}
-
-	if admin != nil {
-		u.SetAdmin(*admin)
-	}
-
-	c, err := u.Save(ctx)
+	c, err := update.Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}

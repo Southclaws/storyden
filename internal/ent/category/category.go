@@ -19,6 +19,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldSlug holds the string denoting the slug field in the database.
+	FieldSlug = "slug"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldColour holds the string denoting the colour field in the database.
@@ -27,6 +29,8 @@ const (
 	FieldSort = "sort"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// Table holds the table name of the category in the database.
@@ -46,10 +50,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldName,
+	FieldSlug,
 	FieldDescription,
 	FieldColour,
 	FieldSort,
 	FieldAdmin,
+	FieldMetadata,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

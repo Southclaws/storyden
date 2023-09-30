@@ -2858,11 +2858,13 @@ type CategoryMutation struct {
 	created_at    *time.Time
 	updated_at    *time.Time
 	name          *string
+	slug          *string
 	description   *string
 	colour        *string
 	sort          *int
 	addsort       *int
 	admin         *bool
+	metadata      *map[string]interface{}
 	clearedFields map[string]struct{}
 	posts         map[xid.ID]struct{}
 	removedposts  map[xid.ID]struct{}
@@ -3084,6 +3086,42 @@ func (m *CategoryMutation) ResetName() {
 	m.name = nil
 }
 
+// SetSlug sets the "slug" field.
+func (m *CategoryMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *CategoryMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *CategoryMutation) ResetSlug() {
+	m.slug = nil
+}
+
 // SetDescription sets the "description" field.
 func (m *CategoryMutation) SetDescription(s string) {
 	m.description = &s
@@ -3248,6 +3286,55 @@ func (m *CategoryMutation) ResetAdmin() {
 	m.admin = nil
 }
 
+// SetMetadata sets the "metadata" field.
+func (m *CategoryMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *CategoryMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *CategoryMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[category.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *CategoryMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[category.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *CategoryMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, category.FieldMetadata)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
 func (m *CategoryMutation) AddPostIDs(ids ...xid.ID) {
 	if m.posts == nil {
@@ -3336,7 +3423,7 @@ func (m *CategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategoryMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, category.FieldCreatedAt)
 	}
@@ -3345,6 +3432,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, category.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, category.FieldSlug)
 	}
 	if m.description != nil {
 		fields = append(fields, category.FieldDescription)
@@ -3357,6 +3447,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.admin != nil {
 		fields = append(fields, category.FieldAdmin)
+	}
+	if m.metadata != nil {
+		fields = append(fields, category.FieldMetadata)
 	}
 	return fields
 }
@@ -3372,6 +3465,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case category.FieldName:
 		return m.Name()
+	case category.FieldSlug:
+		return m.Slug()
 	case category.FieldDescription:
 		return m.Description()
 	case category.FieldColour:
@@ -3380,6 +3475,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Sort()
 	case category.FieldAdmin:
 		return m.Admin()
+	case category.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -3395,6 +3492,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldUpdatedAt(ctx)
 	case category.FieldName:
 		return m.OldName(ctx)
+	case category.FieldSlug:
+		return m.OldSlug(ctx)
 	case category.FieldDescription:
 		return m.OldDescription(ctx)
 	case category.FieldColour:
@@ -3403,6 +3502,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldSort(ctx)
 	case category.FieldAdmin:
 		return m.OldAdmin(ctx)
+	case category.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown Category field %s", name)
 }
@@ -3433,6 +3534,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case category.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
 	case category.FieldDescription:
 		v, ok := value.(string)
 		if !ok {
@@ -3460,6 +3568,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAdmin(v)
+		return nil
+	case category.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Category field %s", name)
@@ -3505,7 +3620,11 @@ func (m *CategoryMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CategoryMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(category.FieldMetadata) {
+		fields = append(fields, category.FieldMetadata)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3518,6 +3637,11 @@ func (m *CategoryMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CategoryMutation) ClearField(name string) error {
+	switch name {
+	case category.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
 	return fmt.Errorf("unknown Category nullable field %s", name)
 }
 
@@ -3534,6 +3658,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 	case category.FieldName:
 		m.ResetName()
 		return nil
+	case category.FieldSlug:
+		m.ResetSlug()
+		return nil
 	case category.FieldDescription:
 		m.ResetDescription()
 		return nil
@@ -3545,6 +3672,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 		return nil
 	case category.FieldAdmin:
 		m.ResetAdmin()
+		return nil
+	case category.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Category field %s", name)
