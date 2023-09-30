@@ -6,6 +6,7 @@ import { useSession } from "src/auth";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 import { Byline } from "src/screens/thread/components/Byline";
 
+import { FeedItem } from "../common/FeedItem/FeedItem";
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
 import { Flex, HStack, styled } from "@/styled-system/jsx";
@@ -20,13 +21,7 @@ export function TextPost(props: Props) {
 
   return (
     <LinkBox>
-      <styled.article
-        display="flex"
-        flexDir="column"
-        width="full"
-        py={2}
-        gap={2}
-      >
+      <FeedItem>
         <Flex justifyContent="space-between">
           <Heading size="sm">
             <LinkOverlay as={NextLink} href={permalink}>
@@ -50,7 +45,7 @@ export function TextPost(props: Props) {
             <FeedItemMenu {...props.thread} />
           </HStack>
         </Flex>
-      </styled.article>
+      </FeedItem>
     </LinkBox>
   );
 }
