@@ -155,6 +155,7 @@ export * from "./threadTitle";
 export * from "./threadUpdateBody";
 export * from "./threadUpdateOKResponse";
 export * from "./unauthorisedResponse";
+export * from "./url";
 export * from "./userVerificationRequirement";
 export * from "./webAuthnGetAssertionOKResponse";
 export * from "./webAuthnMakeAssertionBody";

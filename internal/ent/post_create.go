@@ -180,6 +180,20 @@ func (pc *PostCreate) SetNillableStatus(po *post.Status) *PostCreate {
 	return pc
 }
 
+// SetURL sets the "url" field.
+func (pc *PostCreate) SetURL(s string) *PostCreate {
+	pc.mutation.SetURL(s)
+	return pc
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (pc *PostCreate) SetNillableURL(s *string) *PostCreate {
+	if s != nil {
+		pc.SetURL(*s)
+	}
+	return pc
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
 	pc.mutation.SetCategoryID(x)
@@ -524,6 +538,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Status(); ok {
 		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := pc.mutation.URL(); ok {
+		_spec.SetField(post.FieldURL, field.TypeString, value)
+		_node.URL = &value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -921,6 +939,24 @@ func (u *PostUpsert) UpdateStatus() *PostUpsert {
 	return u
 }
 
+// SetURL sets the "url" field.
+func (u *PostUpsert) SetURL(v string) *PostUpsert {
+	u.Set(post.FieldURL, v)
+	return u
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *PostUpsert) UpdateURL() *PostUpsert {
+	u.SetExcluded(post.FieldURL)
+	return u
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *PostUpsert) ClearURL() *PostUpsert {
+	u.SetNull(post.FieldURL)
+	return u
+}
+
 // SetCategoryID sets the "category_id" field.
 func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
@@ -1197,6 +1233,27 @@ func (u *PostUpsertOne) SetStatus(v post.Status) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateStatus() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetURL sets the "url" field.
+func (u *PostUpsertOne) SetURL(v string) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURL(v)
+	})
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateURL() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURL()
+	})
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *PostUpsertOne) ClearURL() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURL()
 	})
 }
 
@@ -1642,6 +1699,27 @@ func (u *PostUpsertBulk) SetStatus(v post.Status) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateStatus() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateStatus()
+	})
+}
+
+// SetURL sets the "url" field.
+func (u *PostUpsertBulk) SetURL(v string) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURL(v)
+	})
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateURL() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURL()
+	})
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *PostUpsertBulk) ClearURL() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURL()
 	})
 }
 

@@ -56,6 +56,10 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	tags := opt.NewPtr(request.Body.Tags)
 
+	if v := request.Body.Url; v != nil {
+		opts = append(opts, thread.WithURL(*v))
+	}
+
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		request.Body.Body,

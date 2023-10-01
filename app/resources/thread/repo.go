@@ -103,6 +103,12 @@ func WithAssets(a []asset.AssetID) Option {
 	}
 }
 
+func WithURL(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetURL(v)
+	}
+}
+
 type Query func(q *ent.PostQuery)
 
 func HasAuthor(id account.AccountID) Query {

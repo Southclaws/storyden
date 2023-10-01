@@ -40,6 +40,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -134,6 +136,7 @@ var Columns = []string{
 	FieldShort,
 	FieldMetadata,
 	FieldStatus,
+	FieldURL,
 	FieldCategoryID,
 }
 

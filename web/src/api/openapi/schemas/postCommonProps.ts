@@ -12,6 +12,7 @@ import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
 import type { ThreadMark } from "./threadMark";
+import type { Url } from "./url";
 
 export interface PostCommonProps {
   root_id: Identifier;
@@ -22,4 +23,5 @@ export interface PostCommonProps {
   reacts: ReactList;
   reply_to?: Identifier;
   assets: AssetList;
+  url?: Url;
 }

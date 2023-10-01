@@ -4975,6 +4975,7 @@ type PostMutation struct {
 	short              *string
 	metadata           *map[string]interface{}
 	status             *post.Status
+	url                *string
 	clearedFields      map[string]struct{}
 	author             *xid.ID
 	clearedauthor      bool
@@ -5657,6 +5658,55 @@ func (m *PostMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetURL sets the "url" field.
+func (m *PostMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *PostMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ClearURL clears the value of the "url" field.
+func (m *PostMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[post.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *PostMutation) URLCleared() bool {
+	_, ok := m.clearedFields[post.FieldURL]
+	return ok
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *PostMutation) ResetURL() {
+	m.url = nil
+	delete(m.clearedFields, post.FieldURL)
+}
+
 // SetCategoryID sets the "category_id" field.
 func (m *PostMutation) SetCategoryID(x xid.ID) {
 	m.category = &x
@@ -6207,7 +6257,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -6247,6 +6297,9 @@ func (m *PostMutation) Fields() []string {
 	if m.status != nil {
 		fields = append(fields, post.FieldStatus)
 	}
+	if m.url != nil {
+		fields = append(fields, post.FieldURL)
+	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -6284,6 +6337,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case post.FieldStatus:
 		return m.Status()
+	case post.FieldURL:
+		return m.URL()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -6321,6 +6376,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldMetadata(ctx)
 	case post.FieldStatus:
 		return m.OldStatus(ctx)
+	case post.FieldURL:
+		return m.OldURL(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -6423,6 +6480,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
+	case post.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -6478,6 +6542,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldMetadata) {
 		fields = append(fields, post.FieldMetadata)
 	}
+	if m.FieldCleared(post.FieldURL) {
+		fields = append(fields, post.FieldURL)
+	}
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -6512,6 +6579,9 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldMetadata:
 		m.ClearMetadata()
+		return nil
+	case post.FieldURL:
+		m.ClearURL()
 		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
@@ -6562,6 +6632,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case post.FieldURL:
+		m.ResetURL()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()

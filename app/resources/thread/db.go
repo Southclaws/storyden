@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/gosimple/slug"
-	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -20,12 +19,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-)
-
-var (
-	ErrNoTitle      = errors.New("missing title")
-	ErrNoBody       = errors.New("missing body")
-	ErrUnauthorised = errors.New("unauthorised")
 )
 
 type database struct {

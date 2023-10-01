@@ -38,6 +38,7 @@ func (Post) Fields() []ent.Field {
 			"draft",
 			"published",
 		).Default("draft"),
+		field.String("url").Optional().Nillable(),
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),

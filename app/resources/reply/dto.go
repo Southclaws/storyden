@@ -27,6 +27,7 @@ type Reply struct {
 	Reacts         []*react.React
 	Meta           map[string]any
 	Assets         []*asset.Asset
+	URL            opt.Optional[string]
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
