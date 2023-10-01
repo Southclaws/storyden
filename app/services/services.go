@@ -17,6 +17,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
+	"github.com/Southclaws/storyden/app/services/thread_url"
+	"github.com/Southclaws/storyden/app/services/url"
 )
 
 func Build() fx.Option {
@@ -34,6 +36,8 @@ func Build() fx.Option {
 		asset.Build(),
 		thread_mark.Build(),
 		collection.Build(),
+		url.Build(),
+		thread_url.Build(),
 		fx.Provide(avatar_gen.New),
 	)
 }

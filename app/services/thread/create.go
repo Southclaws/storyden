@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -51,6 +52,11 @@ func (s *service) Create(ctx context.Context,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
+	}
+
+	thr, err = s.thread_url_svc.Hydrate(ctx, thr)
+	if err != nil {
+		s.l.Warn("failed to hydrate URL", zap.String("id", thr.ID.String()), zap.Error(err))
 	}
 
 	return thr, nil

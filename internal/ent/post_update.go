@@ -200,6 +200,26 @@ func (pu *PostUpdate) SetNillableStatus(po *post.Status) *PostUpdate {
 	return pu
 }
 
+// SetURL sets the "url" field.
+func (pu *PostUpdate) SetURL(s string) *PostUpdate {
+	pu.mutation.SetURL(s)
+	return pu
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableURL(s *string) *PostUpdate {
+	if s != nil {
+		pu.SetURL(*s)
+	}
+	return pu
+}
+
+// ClearURL clears the value of the "url" field.
+func (pu *PostUpdate) ClearURL() *PostUpdate {
+	pu.mutation.ClearURL()
+	return pu
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
 	pu.mutation.SetCategoryID(x)
@@ -627,6 +647,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Status(); ok {
 		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := pu.mutation.URL(); ok {
+		_spec.SetField(post.FieldURL, field.TypeString, value)
+	}
+	if pu.mutation.URLCleared() {
+		_spec.ClearField(post.FieldURL, field.TypeString)
 	}
 	if pu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1200,6 +1226,26 @@ func (puo *PostUpdateOne) SetNillableStatus(po *post.Status) *PostUpdateOne {
 	return puo
 }
 
+// SetURL sets the "url" field.
+func (puo *PostUpdateOne) SetURL(s string) *PostUpdateOne {
+	puo.mutation.SetURL(s)
+	return puo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableURL(s *string) *PostUpdateOne {
+	if s != nil {
+		puo.SetURL(*s)
+	}
+	return puo
+}
+
+// ClearURL clears the value of the "url" field.
+func (puo *PostUpdateOne) ClearURL() *PostUpdateOne {
+	puo.mutation.ClearURL()
+	return puo
+}
+
 // SetCategoryID sets the "category_id" field.
 func (puo *PostUpdateOne) SetCategoryID(x xid.ID) *PostUpdateOne {
 	puo.mutation.SetCategoryID(x)
@@ -1657,6 +1703,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Status(); ok {
 		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := puo.mutation.URL(); ok {
+		_spec.SetField(post.FieldURL, field.TypeString, value)
+	}
+	if puo.mutation.URLCleared() {
+		_spec.ClearField(post.FieldURL, field.TypeString)
 	}
 	if puo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{

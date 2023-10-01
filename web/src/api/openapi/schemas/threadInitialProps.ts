@@ -11,6 +11,7 @@ import type { PostContent } from "./postContent";
 import type { TagListIDs } from "./tagListIDs";
 import type { ThreadStatus } from "./threadStatus";
 import type { ThreadTitle } from "./threadTitle";
+import type { Url } from "./url";
 
 export interface ThreadInitialProps {
   title: ThreadTitle;
@@ -19,4 +20,5 @@ export interface ThreadInitialProps {
   meta?: Metadata;
   category: Identifier;
   status: ThreadStatus;
+  url?: Url;
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/services/thread_url"
 )
 
 type Service interface {
@@ -68,8 +69,9 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo account.Repository
-	thread_repo  thread.Repository
+	account_repo   account.Repository
+	thread_repo    thread.Repository
+	thread_url_svc thread_url.Service
 }
 
 func New(
@@ -78,11 +80,13 @@ func New(
 
 	account_repo account.Repository,
 	thread_repo thread.Repository,
+	thread_url_svc thread_url.Service,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "thread")),
-		rbac:         rbac,
-		account_repo: account_repo,
-		thread_repo:  thread_repo,
+		l:              l.With(zap.String("service", "thread")),
+		rbac:           rbac,
+		account_repo:   account_repo,
+		thread_repo:    thread_repo,
+		thread_url_svc: thread_url_svc,
 	}
 }

@@ -12,6 +12,7 @@ import type { Metadata } from "./metadata";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
 import type { ThreadMark } from "./threadMark";
+import type { Url } from "./url";
 
 export type ThreadReferenceAllOf = {
   /** The title of the thread. */
@@ -32,4 +33,5 @@ export type ThreadReferenceAllOf = {
   meta: Metadata;
   assets: AssetList;
   collections: CollectionList;
+  url?: Url;
 };

@@ -50,6 +50,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetReference),
 		Collections: dt.Map(t.Collections, serialiseCollection),
+		Url:         t.URL.Ptr(),
 	}
 }
 
@@ -75,6 +76,7 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
 		Assets:    dt.Map(t.Assets, serialiseAssetReference),
+		Url:       t.URL.Ptr(),
 	}, nil
 }
 
@@ -91,6 +93,7 @@ func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Url:       p.URL.Ptr(),
 	}, nil
 }
 

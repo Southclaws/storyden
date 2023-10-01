@@ -46,6 +46,8 @@ type Post struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Status holds the value of the "status" field.
 	Status post.Status `json:"status,omitempty"`
+	// URL holds the value of the "url" field.
+	URL *string `json:"url,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID xid.ID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -196,7 +198,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus, post.FieldURL:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -305,6 +307,13 @@ func (po *Post) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				po.Status = post.Status(value.String)
+			}
+		case post.FieldURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[i])
+			} else if value.Valid {
+				po.URL = new(string)
+				*po.URL = value.String
 			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -437,6 +446,11 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", po.Status))
+	builder.WriteString(", ")
+	if v := po.URL; v != nil {
+		builder.WriteString("url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))

@@ -1397,6 +1397,11 @@ components:
       additionalProperties: true
       description: Arbitrary metadata for the resource.
 
+    URL:
+      description: A web address
+      type: string
+      format: url
+
     AccountName:
       type: string
       description: The account owners display name.
@@ -2030,6 +2035,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
+        url: { $ref: "#/components/schemas/URL" }
 
     ThreadMutableProps:
       type: object
@@ -2040,6 +2046,7 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         status: { $ref: "#/components/schemas/ThreadStatus" }
+        url: { $ref: "#/components/schemas/URL" }
 
     ThreadReference:
       description: |
@@ -2092,6 +2099,7 @@ components:
             meta: { $ref: "#/components/schemas/Metadata" }
             assets: { $ref: "#/components/schemas/AssetList" }
             collections: { $ref: "#/components/schemas/CollectionList" }
+            url: { $ref: "#/components/schemas/URL" }
 
     ThreadList:
       type: array
@@ -2147,6 +2155,7 @@ components:
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
         assets: { $ref: "#/components/schemas/AssetList" }
+        url: { $ref: "#/components/schemas/URL" }
 
     PostInitialProps:
       type: object
@@ -2155,12 +2164,14 @@ components:
         body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
+        url: { $ref: "#/components/schemas/URL" }
 
     PostMutableProps:
       type: object
       properties:
         body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
+        url: { $ref: "#/components/schemas/URL" }
 
     ReactList:
       description: A list of reactions this post has had from people.

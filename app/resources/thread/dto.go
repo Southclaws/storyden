@@ -37,6 +37,7 @@ type Thread struct {
 	Meta        map[string]any
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
+	URL         opt.Optional[string]
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
@@ -111,5 +112,6 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Meta:        m.Metadata,
 		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
 		Collections: collections.OrZero(),
+		URL:         opt.NewPtr(m.URL),
 	}, nil
 }
