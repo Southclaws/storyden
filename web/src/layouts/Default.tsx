@@ -10,7 +10,7 @@ export function Default(props: PropsWithChildren) {
       minHeight="100vh"
       width="full"
       flexDirection="row"
-      background="var(--accent-colour-subtle)"
+      background="var(--accent-colour-flat-fill-3)"
       vaul-drawer-wrapper=""
     >
       <Navigation />

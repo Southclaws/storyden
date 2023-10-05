@@ -30,6 +30,7 @@ export function useBrandSettings(props: Props) {
     },
   });
   const [currentIcon, setCurrentIcon] = useState<File | undefined>(undefined);
+  const [contrast, setContrast] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -43,9 +44,9 @@ export function useBrandSettings(props: Props) {
     })();
   }, []);
 
-  const updateColour = (colour: string) => {
+  const updateColour = (colour: string, contrast: number) => {
     try {
-      const cv = getColourVariants(colour);
+      const cv = getColourVariants(colour, contrast);
 
       Object.entries(cv).forEach((property) =>
         document.documentElement.style.setProperty(property[0], property[1]),
@@ -57,7 +58,7 @@ export function useBrandSettings(props: Props) {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    updateColour(data.accentColour);
+    updateColour(data.accentColour, contrast);
     await adminSettingsUpdate({
       title: data.title,
       description: data.description,
@@ -82,7 +83,12 @@ export function useBrandSettings(props: Props) {
   };
 
   const onColourChangePreview = (colour: string) => {
-    updateColour(colour);
+    updateColour(colour, contrast);
+  };
+
+  const onContrastChange = (v: number) => {
+    setContrast(v);
+    updateColour(form.getValues().accentColour, v);
   };
 
   return {
@@ -92,5 +98,7 @@ export function useBrandSettings(props: Props) {
     currentIcon,
     onSaveIcon,
     onColourChangePreview,
+    onContrastChange,
+    contrast,
   };
 }

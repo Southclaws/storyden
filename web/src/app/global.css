@@ -2,5 +2,6 @@
 
 html,
 body {
-  background-color: var(--accent-colour-subtle);
+  background-color: var(--accent-colour-flat-fill-3);
+  color: var(--accent-colour-flat-text-3);
 }
