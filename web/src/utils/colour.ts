@@ -16,7 +16,7 @@ export function getColourVariants(
   const textColour = readableColorWithFallback(rgb);
 
   const flatClampLightness: [number, number] = [71.8, 93.7];
-  const flatClampChroma: [number, number] = [14, 5];
+  const flatClampChroma: [number, number] = [14, 3];
 
   const flatRamp = [1, 2, 3].reduce((o, i, _, a) => {
     const indices = a.length;
