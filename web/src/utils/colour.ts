@@ -3,20 +3,10 @@ import { readableColor } from "polished";
 
 export const FALLBACK_COLOUR = "#27b981";
 
-type Colours = {
-  "--text-colour": string;
-
-  "--accent-colour": string;
-  "--accent-colour-muted": string;
-  "--accent-colour-subtle": string;
-
-  // For browsers without OKLCH
-  "--accent-colour-fallback": string;
-  "--accent-colour-muted-fallback": string;
-  "--accent-colour-subtle-fallback": string;
-};
-
-export function getColourVariants(colour: string): Colours {
+export function getColourVariants(
+  colour: string,
+  contrast: number = 1,
+): Record<string, string> {
   const c = parseColourWithFallback(colour);
 
   const hue = getHue(c);
@@ -25,16 +15,61 @@ export function getColourVariants(colour: string): Colours {
 
   const textColour = readableColorWithFallback(rgb);
 
+  const flatClampLightness: [number, number] = [71.8, 93.7];
+  const flatClampChroma: [number, number] = [14, 5];
+
+  const flatRamp = [1, 2, 3].reduce((o, i, _, a) => {
+    const indices = a.length;
+    const [minL, maxL] = flatClampLightness;
+    const [minC, maxC] = flatClampChroma;
+
+    const L = minL + ((maxL - minL) / indices) * i * 1.725 * contrast;
+    const C = minC + ((maxC - minC) / indices) * i;
+
+    const fill = `oklch(${L}% ${C}% ${hue}deg)`;
+
+    const text = readableColorWithFallback(
+      parseColourWithFallback(fill).to("srgb").toString({ format: "hex" }),
+    );
+
+    return {
+      [`--accent-colour-flat-fill-${i}`]: fill,
+      [`--accent-colour-flat-text-${i}`]: text,
+      ...o,
+    };
+  }, {});
+
+  const darkClampLightness: [number, number] = [93.7, 50.8];
+  const darkClampChroma: [number, number] = [14, 7];
+
+  const darkRamp = [1, 2, 3].reduce((o, i, _, a) => {
+    const indices = a.length;
+    const [minL, maxL] = darkClampLightness;
+    const [minC, maxC] = darkClampChroma;
+
+    const L = minL + ((maxL - minL) / indices) * i * 1.725 * contrast;
+    const C = minC + ((maxC - minC) / indices) * i;
+
+    const fill = `oklch(${L}% ${C}% ${hue}deg)`;
+
+    const text = readableColorWithFallback(
+      parseColourWithFallback(fill).to("srgb").toString({ format: "hex" }),
+    );
+
+    return {
+      [`--accent-colour-dark-fill-${i}`]: fill,
+      [`--accent-colour-dark-text-${i}`]: text,
+      ...o,
+    };
+  }, {});
+
   return {
     "--text-colour": textColour,
 
-    "--accent-colour": `oklch(80% 0.2 ${hue}deg)`,
-    "--accent-colour-muted": `oklch(90% 0.1 ${hue}deg)`,
-    "--accent-colour-subtle": `oklch(100% 0.02 ${hue}deg)`,
+    "--accent-colour": `oklch(80% 20% ${hue}deg)`,
 
-    "--accent-colour-fallback": `hsl(${hue} 100% 43%)`,
-    "--accent-colour-muted-fallback": `hsl(${hue} 24% 63%)`,
-    "--accent-colour-subtle-fallback": `hsl(${hue} 100% 1%)`,
+    ...flatRamp,
+    ...darkRamp,
   };
 }
 
@@ -63,7 +98,7 @@ function getHue(c: Color) {
 
 function readableColorWithFallback(rgb: string): string {
   try {
-    return readableColor(rgb, "#E8ECEA", "#303030", false);
+    return readableColor(rgb, "#E8ECEA", "#303030", true);
   } catch (e) {
     return "black";
   }

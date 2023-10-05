@@ -25,7 +25,7 @@ export function Sidebar() {
       }}
       height="full"
       justifyContent="end"
-      bgColor="var(--accent-colour-muted)"
+      bgColor="var(--accent-colour-flat-fill-1)"
     >
       <Box
         id="desktop-nav-box"

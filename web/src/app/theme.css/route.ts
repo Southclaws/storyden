@@ -17,15 +17,11 @@ export async function GET() {
 
   const cv = getColourVariants(info.accent_colour);
 
+  const rules = Object.entries(cv).map(([k, v]) => `${k}: ${v};`);
+
   const document = css`
     :root {
-      --accent-colour: ${cv["--accent-colour-fallback"]};
-      --accent-colour-muted: ${cv["--accent-colour-muted-fallback"]};
-      --accent-colour-subtle: ${cv["--accent-colour-subtle-fallback"]};
-
-      --accent-colour: ${cv["--accent-colour"]};
-      --accent-colour-muted: ${cv["--accent-colour-muted"]};
-      --accent-colour-subtle: ${cv["--accent-colour-subtle"]};
+      ${rules.join("\n      ")}
     }
   `;
 
