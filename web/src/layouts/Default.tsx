@@ -10,7 +10,7 @@ export function Default(props: PropsWithChildren) {
       minHeight="100vh"
       width="full"
       flexDirection="row"
-      background="var(--accent-colour-flat-fill-3)"
+      backgroundColor="var(--accent-colour-flat-fill-3)"
       vaul-drawer-wrapper=""
     >
       <Navigation />
@@ -21,8 +21,7 @@ export function Default(props: PropsWithChildren) {
           base: "full",
           lg: "3xl",
         }}
-        px={4}
-        py={2}
+        p={4}
       >
         {props.children}
         <Box height="6rem"></Box>
