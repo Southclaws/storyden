@@ -47,6 +47,7 @@ export function Navigation() {
           md: "1/4",
           lg: "1/3",
         }}
+        boxShadow="md"
       >
         <Sidebar />
       </Box>
