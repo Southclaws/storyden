@@ -35,6 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const iconURL = `/api/v1/info/icon/512x512`;
 
   return {
+    manifest: "manifest.json",
     title: info.title,
     description: info.description,
     themeColor: themeColour,
