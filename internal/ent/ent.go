@@ -15,7 +15,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -79,7 +81,9 @@ func columnChecker(table string) func(string) error {
 		asset.Table:          asset.ValidColumn,
 		authentication.Table: authentication.ValidColumn,
 		category.Table:       category.ValidColumn,
+		cluster.Table:        cluster.ValidColumn,
 		collection.Table:     collection.ValidColumn,
+		item.Table:           item.ValidColumn,
 		notification.Table:   notification.ValidColumn,
 		post.Table:           post.ValidColumn,
 		react.Table:          react.ValidColumn,

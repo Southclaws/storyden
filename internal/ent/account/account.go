@@ -39,6 +39,10 @@ const (
 	EdgeTags = "tags"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeClusters holds the string denoting the clusters edge name in mutations.
+	EdgeClusters = "clusters"
+	// EdgeItems holds the string denoting the items edge name in mutations.
+	EdgeItems = "items"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the account in the database.
@@ -81,6 +85,20 @@ const (
 	CollectionsInverseTable = "collections"
 	// CollectionsColumn is the table column denoting the collections relation/edge.
 	CollectionsColumn = "account_collections"
+	// ClustersTable is the table that holds the clusters relation/edge.
+	ClustersTable = "clusters"
+	// ClustersInverseTable is the table name for the Cluster entity.
+	// It exists in this package in order to avoid circular dependency with the "cluster" package.
+	ClustersInverseTable = "clusters"
+	// ClustersColumn is the table column denoting the clusters relation/edge.
+	ClustersColumn = "account_id"
+	// ItemsTable is the table that holds the items relation/edge.
+	ItemsTable = "items"
+	// ItemsInverseTable is the table name for the Item entity.
+	// It exists in this package in order to avoid circular dependency with the "item" package.
+	ItemsInverseTable = "items"
+	// ItemsColumn is the table column denoting the items relation/edge.
+	ItemsColumn = "account_id"
 	// AssetsTable is the table that holds the assets relation/edge.
 	AssetsTable = "assets"
 	// AssetsInverseTable is the table name for the Asset entity.

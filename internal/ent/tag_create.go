@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
@@ -73,6 +75,36 @@ func (tc *TagCreate) AddPosts(p ...*Post) *TagCreate {
 		ids[i] = p[i].ID
 	}
 	return tc.AddPostIDs(ids...)
+}
+
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
+func (tc *TagCreate) AddClusterIDs(ids ...xid.ID) *TagCreate {
+	tc.mutation.AddClusterIDs(ids...)
+	return tc
+}
+
+// AddClusters adds the "clusters" edges to the Cluster entity.
+func (tc *TagCreate) AddClusters(c ...*Cluster) *TagCreate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tc.AddClusterIDs(ids...)
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (tc *TagCreate) AddItemIDs(ids ...xid.ID) *TagCreate {
+	tc.mutation.AddItemIDs(ids...)
+	return tc
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (tc *TagCreate) AddItems(i ...*Item) *TagCreate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return tc.AddItemIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
@@ -201,6 +233,38 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ClustersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   tag.ClustersTable,
+			Columns: tag.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   tag.ItemsTable,
+			Columns: tag.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

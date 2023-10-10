@@ -75,6 +75,8 @@ type Bindings struct {
 	Reacts
 	Assets
 	Collections
+	Clusters
+	Items
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -97,6 +99,8 @@ func bindingsProviders() fx.Option {
 		NewReacts,
 		NewAssets,
 		NewCollections,
+		NewClusters,
+		NewItems,
 	)
 }
 
