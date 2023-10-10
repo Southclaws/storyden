@@ -35,6 +35,7 @@ require (
 require github.com/Southclaws/fault v0.6.0
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Southclaws/opt v0.6.0
 	github.com/dboslee/lru v0.0.1
 	github.com/disintegration/imaging v1.6.2
@@ -52,7 +53,6 @@ require (
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/dave/jennifer v1.6.0 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
@@ -141,7 +141,7 @@ require (
 	golang.org/x/crypto v0.7.0
 	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
-	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/net v0.8.0
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
