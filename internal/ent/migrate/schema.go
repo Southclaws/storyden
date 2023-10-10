@@ -100,6 +100,38 @@ var (
 		Columns:    CategoriesColumns,
 		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
 	}
+	// ClustersColumns holds the columns for the "clusters" table.
+	ClustersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString},
+		{Name: "image_url", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "parent_cluster_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// ClustersTable holds the schema information for the "clusters" table.
+	ClustersTable = &schema.Table{
+		Name:       "clusters",
+		Columns:    ClustersColumns,
+		PrimaryKey: []*schema.Column{ClustersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "clusters_accounts_clusters",
+				Columns:    []*schema.Column{ClustersColumns[7]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "clusters_clusters_clusters",
+				Columns:    []*schema.Column{ClustersColumns[8]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// CollectionsColumns holds the columns for the "collections" table.
 	CollectionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -120,6 +152,31 @@ var (
 				Columns:    []*schema.Column{CollectionsColumns[5]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ItemsColumns holds the columns for the "items" table.
+	ItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString},
+		{Name: "image_url", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// ItemsTable holds the schema information for the "items" table.
+	ItemsTable = &schema.Table{
+		Name:       "items",
+		Columns:    ItemsColumns,
+		PrimaryKey: []*schema.Column{ItemsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "items_accounts_items",
+				Columns:    []*schema.Column{ItemsColumns[7]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -280,6 +337,56 @@ var (
 			},
 		},
 	}
+	// ClusterItemsColumns holds the columns for the "cluster_items" table.
+	ClusterItemsColumns = []*schema.Column{
+		{Name: "cluster_id", Type: field.TypeString, Size: 20},
+		{Name: "item_id", Type: field.TypeString, Size: 20},
+	}
+	// ClusterItemsTable holds the schema information for the "cluster_items" table.
+	ClusterItemsTable = &schema.Table{
+		Name:       "cluster_items",
+		Columns:    ClusterItemsColumns,
+		PrimaryKey: []*schema.Column{ClusterItemsColumns[0], ClusterItemsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "cluster_items_cluster_id",
+				Columns:    []*schema.Column{ClusterItemsColumns[0]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "cluster_items_item_id",
+				Columns:    []*schema.Column{ClusterItemsColumns[1]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ClusterAssetsColumns holds the columns for the "cluster_assets" table.
+	ClusterAssetsColumns = []*schema.Column{
+		{Name: "cluster_id", Type: field.TypeString, Size: 20},
+		{Name: "asset_id", Type: field.TypeString},
+	}
+	// ClusterAssetsTable holds the schema information for the "cluster_assets" table.
+	ClusterAssetsTable = &schema.Table{
+		Name:       "cluster_assets",
+		Columns:    ClusterAssetsColumns,
+		PrimaryKey: []*schema.Column{ClusterAssetsColumns[0], ClusterAssetsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "cluster_assets_cluster_id",
+				Columns:    []*schema.Column{ClusterAssetsColumns[0]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "cluster_assets_asset_id",
+				Columns:    []*schema.Column{ClusterAssetsColumns[1]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// CollectionPostsColumns holds the columns for the "collection_posts" table.
 	CollectionPostsColumns = []*schema.Column{
 		{Name: "collection_id", Type: field.TypeString, Size: 20},
@@ -301,6 +408,31 @@ var (
 				Symbol:     "collection_posts_post_id",
 				Columns:    []*schema.Column{CollectionPostsColumns[1]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ItemAssetsColumns holds the columns for the "item_assets" table.
+	ItemAssetsColumns = []*schema.Column{
+		{Name: "item_id", Type: field.TypeString, Size: 20},
+		{Name: "asset_id", Type: field.TypeString},
+	}
+	// ItemAssetsTable holds the schema information for the "item_assets" table.
+	ItemAssetsTable = &schema.Table{
+		Name:       "item_assets",
+		Columns:    ItemAssetsColumns,
+		PrimaryKey: []*schema.Column{ItemAssetsColumns[0], ItemAssetsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "item_assets_item_id",
+				Columns:    []*schema.Column{ItemAssetsColumns[0]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "item_assets_asset_id",
+				Columns:    []*schema.Column{ItemAssetsColumns[1]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -380,13 +512,65 @@ var (
 			},
 		},
 	}
+	// TagClustersColumns holds the columns for the "tag_clusters" table.
+	TagClustersColumns = []*schema.Column{
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+		{Name: "cluster_id", Type: field.TypeString, Size: 20},
+	}
+	// TagClustersTable holds the schema information for the "tag_clusters" table.
+	TagClustersTable = &schema.Table{
+		Name:       "tag_clusters",
+		Columns:    TagClustersColumns,
+		PrimaryKey: []*schema.Column{TagClustersColumns[0], TagClustersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tag_clusters_tag_id",
+				Columns:    []*schema.Column{TagClustersColumns[0]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "tag_clusters_cluster_id",
+				Columns:    []*schema.Column{TagClustersColumns[1]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// TagItemsColumns holds the columns for the "tag_items" table.
+	TagItemsColumns = []*schema.Column{
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+		{Name: "item_id", Type: field.TypeString, Size: 20},
+	}
+	// TagItemsTable holds the schema information for the "tag_items" table.
+	TagItemsTable = &schema.Table{
+		Name:       "tag_items",
+		Columns:    TagItemsColumns,
+		PrimaryKey: []*schema.Column{TagItemsColumns[0], TagItemsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tag_items_tag_id",
+				Columns:    []*schema.Column{TagItemsColumns[0]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "tag_items_item_id",
+				Columns:    []*schema.Column{TagItemsColumns[1]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
 		AssetsTable,
 		AuthenticationsTable,
 		CategoriesTable,
+		ClustersTable,
 		CollectionsTable,
+		ItemsTable,
 		NotificationsTable,
 		PostsTable,
 		ReactsTable,
@@ -394,17 +578,25 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
+		ClusterItemsTable,
+		ClusterAssetsTable,
 		CollectionPostsTable,
+		ItemAssetsTable,
 		PostAssetsTable,
 		RoleAccountsTable,
 		TagPostsTable,
+		TagClustersTable,
+		TagItemsTable,
 	}
 )
 
 func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
+	ClustersTable.ForeignKeys[0].RefTable = AccountsTable
+	ClustersTable.ForeignKeys[1].RefTable = ClustersTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
+	ItemsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
@@ -413,12 +605,22 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
+	ClusterItemsTable.ForeignKeys[0].RefTable = ClustersTable
+	ClusterItemsTable.ForeignKeys[1].RefTable = ItemsTable
+	ClusterAssetsTable.ForeignKeys[0].RefTable = ClustersTable
+	ClusterAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
+	ItemAssetsTable.ForeignKeys[0].RefTable = ItemsTable
+	ItemAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
 	RoleAccountsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
+	TagClustersTable.ForeignKeys[0].RefTable = TagsTable
+	TagClustersTable.ForeignKeys[1].RefTable = ClustersTable
+	TagItemsTable.ForeignKeys[0].RefTable = TagsTable
+	TagItemsTable.ForeignKeys[1].RefTable = ItemsTable
 }

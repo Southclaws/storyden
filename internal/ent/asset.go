@@ -41,11 +41,15 @@ type Asset struct {
 type AssetEdges struct {
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Clusters holds the value of the clusters edge.
+	Clusters []*Cluster `json:"clusters,omitempty"`
+	// Items holds the value of the items edge.
+	Items []*Item `json:"items,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -57,10 +61,28 @@ func (e AssetEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
+// ClustersOrErr returns the Clusters value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) ClustersOrErr() ([]*Cluster, error) {
+	if e.loadedTypes[1] {
+		return e.Clusters, nil
+	}
+	return nil, &NotLoadedError{edge: "clusters"}
+}
+
+// ItemsOrErr returns the Items value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) ItemsOrErr() ([]*Item, error) {
+	if e.loadedTypes[2] {
+		return e.Items, nil
+	}
+	return nil, &NotLoadedError{edge: "items"}
+}
+
 // OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e AssetEdges) OwnerOrErr() (*Account, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		if e.Owner == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: account.Label}
@@ -154,6 +176,16 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 // QueryPosts queries the "posts" edge of the Asset entity.
 func (a *Asset) QueryPosts() *PostQuery {
 	return NewAssetClient(a.config).QueryPosts(a)
+}
+
+// QueryClusters queries the "clusters" edge of the Asset entity.
+func (a *Asset) QueryClusters() *ClusterQuery {
+	return NewAssetClient(a.config).QueryClusters(a)
+}
+
+// QueryItems queries the "items" edge of the Asset entity.
+func (a *Asset) QueryItems() *ItemQuery {
+	return NewAssetClient(a.config).QueryItems(a)
 }
 
 // QueryOwner queries the "owner" edge of the Asset entity.

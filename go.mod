@@ -37,6 +37,7 @@ require github.com/Southclaws/fault v0.6.0
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Southclaws/opt v0.6.0
+	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/dboslee/lru v0.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.2
