@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/rs/xid"
 
@@ -29,6 +30,7 @@ func (j *cookieJar) Create(accountID string) string {
 		Name:     secureCookieName,
 		Value:    j.ss.Encrypt(accountID),
 		SameSite: http.SameSiteDefaultMode,
+		Expires:  time.Now().Add(time.Hour * 24 * 90),
 		Path:     "/",
 		Domain:   j.domain,
 		Secure:   true,
