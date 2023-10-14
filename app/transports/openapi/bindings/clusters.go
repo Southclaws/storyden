@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	cluster_svc "github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/clustertree"
+	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
@@ -23,17 +24,20 @@ type Clusters struct {
 	cs    cluster_svc.Manager
 	ctree clustertree.Graph
 	ctr   cluster_traversal.Repository
+	itree item_tree.Graph
 }
 
 func NewClusters(
 	cs cluster_svc.Manager,
 	ctree clustertree.Graph,
 	ctr cluster_traversal.Repository,
+	itree item_tree.Graph,
 ) Clusters {
 	return Clusters{
 		cs:    cs,
 		ctree: ctree,
 		ctr:   ctr,
+		itree: itree,
 	}
 }
 
@@ -144,11 +148,25 @@ func (c *Clusters) ClusterRemoveCluster(ctx context.Context, request openapi.Clu
 }
 
 func (c *Clusters) ClusterAddItem(ctx context.Context, request openapi.ClusterAddItemRequestObject) (openapi.ClusterAddItemResponseObject, error) {
-	return nil, nil
+	item, err := c.itree.Link(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterAddItem200JSONResponse{
+		ClusterAddItemOKJSONResponse: openapi.ClusterAddItemOKJSONResponse(serialiseItem(item)),
+	}, nil
 }
 
 func (c *Clusters) ClusterRemoveItem(ctx context.Context, request openapi.ClusterRemoveItemRequestObject) (openapi.ClusterRemoveItemResponseObject, error) {
-	return nil, nil
+	item, err := c.itree.Sever(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterRemoveItem200JSONResponse{
+		ClusterRemoveItemOKJSONResponse: openapi.ClusterRemoveItemOKJSONResponse(serialiseItem(item)),
+	}, nil
 }
 
 func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {

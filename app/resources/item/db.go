@@ -87,7 +87,9 @@ func (d *database) Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph
 		Query().
 		Where(item.Slug(string(slug))).
 		WithOwner().
-		WithClusters().
+		WithClusters(func(cq *ent.ClusterQuery) {
+			cq.WithOwner()
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
