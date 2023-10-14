@@ -930,6 +930,7 @@ paths:
       description: List all items using the filtering options.
       tags: [items]
       security: []
+      parameters: [$ref: "#/components/parameters/SearchQuery"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1030,6 +1031,14 @@ components:
       schema:
         type: string
 
+    SearchQuery:
+      description: Search query string.
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+
     AssetPath:
       description: Asset ID.
       name: id
@@ -1071,7 +1080,7 @@ components:
         $ref: "#/components/schemas/Identifier"
 
     ItemSlugParam:
-      description: Unique cluster Slug.
+      description: Unique item Slug.
       name: item_slug
       in: path
       required: true
@@ -1548,9 +1557,9 @@ components:
         application/json:
           schema:
             type: object
-            required: [clusters]
+            required: [items]
             properties:
-              clusters: { $ref: "#/components/schemas/ItemList" }
+              items: { $ref: "#/components/schemas/ItemList" }
 
     ItemGetOK:
       description: Item information and content.

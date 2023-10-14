@@ -16,6 +16,7 @@ import type {
   ItemCreateOKResponse,
   ItemGetOKResponse,
   ItemListOKResponse,
+  ItemListParams,
   ItemUpdateBody,
   ItemUpdateOKResponse,
   NotFoundResponse,
@@ -43,11 +44,16 @@ export const itemCreate = (itemCreateBody: ItemCreateBody) => {
 /**
  * List all items using the filtering options.
  */
-export const itemList = () => {
-  return fetcher<ItemListOKResponse>({ url: `/v1/items`, method: "get" });
+export const itemList = (params?: ItemListParams) => {
+  return fetcher<ItemListOKResponse>({
+    url: `/v1/items`,
+    method: "get",
+    params,
+  });
 };
 
-export const getItemListKey = () => [`/v1/items`] as const;
+export const getItemListKey = (params?: ItemListParams) =>
+  [`/v1/items`, ...(params ? [params] : [])] as const;
 
 export type ItemListQueryResult = NonNullable<
   Awaited<ReturnType<typeof itemList>>
@@ -56,18 +62,21 @@ export type ItemListQueryError = NotFoundResponse | InternalServerErrorResponse;
 
 export const useItemList = <
   TError = NotFoundResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof itemList>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-}) => {
+>(
+  params?: ItemListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof itemList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getItemListKey() : null));
-  const swrFn = () => itemList();
+    swrOptions?.swrKey ?? (() => (isEnabled ? getItemListKey(params) : null));
+  const swrFn = () => itemList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

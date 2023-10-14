@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/item_search"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -40,6 +41,7 @@ func Build() fx.Option {
 			cluster.New,
 			cluster_traversal.New,
 			item.New,
+			item_search.New,
 		),
 	)
 }
