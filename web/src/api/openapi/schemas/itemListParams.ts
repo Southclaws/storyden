@@ -5,8 +5,11 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ItemList } from "./itemList";
+import type { SearchQueryParameter } from "./searchQueryParameter";
 
-export type ItemListOKResponse = {
-  items: ItemList;
+export type ItemListParams = {
+  /**
+   * Search query string.
+   */
+  q?: SearchQueryParameter;
 };
