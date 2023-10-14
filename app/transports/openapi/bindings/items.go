@@ -3,32 +3,57 @@ package bindings
 import (
 	"context"
 
-	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	collection_svc "github.com/Southclaws/storyden/app/services/collection"
+	item_repo "github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/services/authentication"
+	item_svc "github.com/Southclaws/storyden/app/services/item"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Items struct {
-	collection_repo collection.Repository
-	collection_svc  collection_svc.Service
+	im item_svc.Manager
 }
 
 func NewItems(
-	collection_repo collection.Repository,
-	collection_svc collection_svc.Service,
+	im item_svc.Manager,
 ) Items {
 	return Items{
-		collection_repo: collection_repo,
-		collection_svc:  collection_svc,
+		im: im,
 	}
 }
 
-func (i *Items) ItemList(ctx context.Context, request openapi.ItemListRequestObject) (openapi.ItemListResponseObject, error) {
-	return nil, nil
+func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateRequestObject) (openapi.ItemCreateResponseObject, error) {
+	session, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	opts := []item_repo.Option{}
+
+	if v := request.Body.Properties; v != nil {
+		opts = append(opts, item_repo.WithProperties(*v))
+	}
+
+	itm, err := i.im.Create(ctx,
+		session,
+		request.Body.Name,
+		request.Body.Slug,
+		request.Body.Description,
+		opts...,
+	)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ItemCreate200JSONResponse{
+		ItemCreateOKJSONResponse: openapi.ItemCreateOKJSONResponse(serialiseItem(itm)),
+	}, nil
 }
 
-func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateRequestObject) (openapi.ItemCreateResponseObject, error) {
+func (i *Items) ItemList(ctx context.Context, request openapi.ItemListRequestObject) (openapi.ItemListResponseObject, error) {
 	return nil, nil
 }
 
