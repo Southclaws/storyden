@@ -12,7 +12,7 @@ type Item struct {
 }
 
 func (Item) Mixin() []ent.Mixin {
-	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
 }
 
 func (Item) Fields() []ent.Field {
@@ -22,6 +22,7 @@ func (Item) Fields() []ent.Field {
 		field.String("image_url").Optional().Nillable(),
 		field.String("description"),
 		field.String("account_id").GoType(xid.ID{}),
+		field.Any("properties").Optional(),
 	}
 }
 

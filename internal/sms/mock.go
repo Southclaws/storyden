@@ -10,7 +10,7 @@ import (
 type MockSender struct{}
 
 func newMock(l *zap.Logger) (Sender, error) {
-	l.Info("using mock sms sender - check the console for outgoing messages")
+	l.Debug("using mock sms sender - check the console for outgoing messages")
 	return &MockSender{}, nil
 }
 

@@ -105,10 +105,12 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "slug", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
+		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "parent_cluster_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
@@ -120,15 +122,22 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[7]},
+				Columns:    []*schema.Column{ClustersColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[8]},
+				Columns:    []*schema.Column{ClustersColumns[10]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "cluster_slug",
+				Unique:  false,
+				Columns: []*schema.Column{ClustersColumns[5]},
 			},
 		},
 	}
@@ -160,10 +169,12 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "slug", Type: field.TypeString},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
+		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
 	// ItemsTable holds the schema information for the "items" table.
@@ -174,7 +185,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[7]},
+				Columns:    []*schema.Column{ItemsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

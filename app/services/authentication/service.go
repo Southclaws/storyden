@@ -68,7 +68,7 @@ func New(
 		return p.Enabled()
 	})
 
-	l.Info("initialised oauth providers",
+	l.Debug("initialised oauth providers",
 		zap.Strings("all_providers", dt.Map(allProviders, name)),
 		zap.Strings("enabled_providers", dt.Map(enabledProviders, name)),
 	)

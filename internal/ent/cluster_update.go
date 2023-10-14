@@ -40,6 +40,26 @@ func (cu *ClusterUpdate) SetUpdatedAt(t time.Time) *ClusterUpdate {
 	return cu
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (cu *ClusterUpdate) SetDeletedAt(t time.Time) *ClusterUpdate {
+	cu.mutation.SetDeletedAt(t)
+	return cu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableDeletedAt(t *time.Time) *ClusterUpdate {
+	if t != nil {
+		cu.SetDeletedAt(*t)
+	}
+	return cu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (cu *ClusterUpdate) ClearDeletedAt() *ClusterUpdate {
+	cu.mutation.ClearDeletedAt()
+	return cu
+}
+
 // SetName sets the "name" field.
 func (cu *ClusterUpdate) SetName(s string) *ClusterUpdate {
 	cu.mutation.SetName(s)
@@ -101,6 +121,18 @@ func (cu *ClusterUpdate) ClearParentClusterID() *ClusterUpdate {
 // SetAccountID sets the "account_id" field.
 func (cu *ClusterUpdate) SetAccountID(x xid.ID) *ClusterUpdate {
 	cu.mutation.SetAccountID(x)
+	return cu
+}
+
+// SetProperties sets the "properties" field.
+func (cu *ClusterUpdate) SetProperties(a any) *ClusterUpdate {
+	cu.mutation.SetProperties(a)
+	return cu
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (cu *ClusterUpdate) ClearProperties() *ClusterUpdate {
+	cu.mutation.ClearProperties()
 	return cu
 }
 
@@ -360,6 +392,12 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.UpdatedAt(); ok {
 		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cu.mutation.DeletedAt(); ok {
+		_spec.SetField(cluster.FieldDeletedAt, field.TypeTime, value)
+	}
+	if cu.mutation.DeletedAtCleared() {
+		_spec.ClearField(cluster.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)
 	}
@@ -374,6 +412,12 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Properties(); ok {
+		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
+	}
+	if cu.mutation.PropertiesCleared() {
+		_spec.ClearField(cluster.FieldProperties, field.TypeJSON)
 	}
 	if cu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -641,6 +685,26 @@ func (cuo *ClusterUpdateOne) SetUpdatedAt(t time.Time) *ClusterUpdateOne {
 	return cuo
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (cuo *ClusterUpdateOne) SetDeletedAt(t time.Time) *ClusterUpdateOne {
+	cuo.mutation.SetDeletedAt(t)
+	return cuo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableDeletedAt(t *time.Time) *ClusterUpdateOne {
+	if t != nil {
+		cuo.SetDeletedAt(*t)
+	}
+	return cuo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (cuo *ClusterUpdateOne) ClearDeletedAt() *ClusterUpdateOne {
+	cuo.mutation.ClearDeletedAt()
+	return cuo
+}
+
 // SetName sets the "name" field.
 func (cuo *ClusterUpdateOne) SetName(s string) *ClusterUpdateOne {
 	cuo.mutation.SetName(s)
@@ -702,6 +766,18 @@ func (cuo *ClusterUpdateOne) ClearParentClusterID() *ClusterUpdateOne {
 // SetAccountID sets the "account_id" field.
 func (cuo *ClusterUpdateOne) SetAccountID(x xid.ID) *ClusterUpdateOne {
 	cuo.mutation.SetAccountID(x)
+	return cuo
+}
+
+// SetProperties sets the "properties" field.
+func (cuo *ClusterUpdateOne) SetProperties(a any) *ClusterUpdateOne {
+	cuo.mutation.SetProperties(a)
+	return cuo
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (cuo *ClusterUpdateOne) ClearProperties() *ClusterUpdateOne {
+	cuo.mutation.ClearProperties()
 	return cuo
 }
 
@@ -991,6 +1067,12 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	if value, ok := cuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cuo.mutation.DeletedAt(); ok {
+		_spec.SetField(cluster.FieldDeletedAt, field.TypeTime, value)
+	}
+	if cuo.mutation.DeletedAtCleared() {
+		_spec.ClearField(cluster.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)
 	}
@@ -1005,6 +1087,12 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Properties(); ok {
+		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
+	}
+	if cuo.mutation.PropertiesCleared() {
+		_spec.ClearField(cluster.FieldProperties, field.TypeJSON)
 	}
 	if cuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{

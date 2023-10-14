@@ -17,6 +17,7 @@ import type {
   ClusterCreateOKResponse,
   ClusterGetOKResponse,
   ClusterListOKResponse,
+  ClusterListParams,
   ClusterRemoveChildOKResponse,
   ClusterRemoveItemOKResponse,
   ClusterUpdateBody,
@@ -46,11 +47,16 @@ export const clusterCreate = (clusterCreateBody: ClusterCreateBody) => {
 /**
  * List all clusters.
  */
-export const clusterList = () => {
-  return fetcher<ClusterListOKResponse>({ url: `/v1/clusters`, method: "get" });
+export const clusterList = (params?: ClusterListParams) => {
+  return fetcher<ClusterListOKResponse>({
+    url: `/v1/clusters`,
+    method: "get",
+    params,
+  });
 };
 
-export const getClusterListKey = () => [`/v1/clusters`] as const;
+export const getClusterListKey = (params?: ClusterListParams) =>
+  [`/v1/clusters`, ...(params ? [params] : [])] as const;
 
 export type ClusterListQueryResult = NonNullable<
   Awaited<ReturnType<typeof clusterList>>
@@ -61,18 +67,22 @@ export type ClusterListQueryError =
 
 export const useClusterList = <
   TError = NotFoundResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof clusterList>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-}) => {
+>(
+  params?: ClusterListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof clusterList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getClusterListKey() : null));
-  const swrFn = () => clusterList();
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getClusterListKey(params) : null));
+  const swrFn = () => clusterList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

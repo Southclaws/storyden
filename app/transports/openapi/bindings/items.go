@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	collection_svc "github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -37,4 +38,18 @@ func (i *Items) ItemGet(ctx context.Context, request openapi.ItemGetRequestObjec
 
 func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateRequestObject) (openapi.ItemUpdateResponseObject, error) {
 	return nil, nil
+}
+
+func serialiseItem(in *datagraph.Item) openapi.Item {
+	return openapi.Item{
+		Id:          in.ID.String(),
+		CreatedAt:   in.CreatedAt,
+		UpdatedAt:   in.UpdatedAt,
+		Name:        in.Name,
+		Slug:        in.Slug,
+		ImageUrl:    in.ImageURL.Ptr(),
+		Description: in.Description,
+		Owner:       serialiseProfileReference(in.Owner),
+		Properties:  in.Properties,
+	}
 }

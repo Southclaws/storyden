@@ -56,6 +56,20 @@ func (ic *ItemCreate) SetNillableUpdatedAt(t *time.Time) *ItemCreate {
 	return ic
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (ic *ItemCreate) SetDeletedAt(t time.Time) *ItemCreate {
+	ic.mutation.SetDeletedAt(t)
+	return ic
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableDeletedAt(t *time.Time) *ItemCreate {
+	if t != nil {
+		ic.SetDeletedAt(*t)
+	}
+	return ic
+}
+
 // SetName sets the "name" field.
 func (ic *ItemCreate) SetName(s string) *ItemCreate {
 	ic.mutation.SetName(s)
@@ -91,6 +105,12 @@ func (ic *ItemCreate) SetDescription(s string) *ItemCreate {
 // SetAccountID sets the "account_id" field.
 func (ic *ItemCreate) SetAccountID(x xid.ID) *ItemCreate {
 	ic.mutation.SetAccountID(x)
+	return ic
+}
+
+// SetProperties sets the "properties" field.
+func (ic *ItemCreate) SetProperties(a any) *ItemCreate {
+	ic.mutation.SetProperties(a)
 	return ic
 }
 
@@ -285,6 +305,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := ic.mutation.DeletedAt(); ok {
+		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
+	}
 	if value, ok := ic.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -300,6 +324,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := ic.mutation.Properties(); ok {
+		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
+		_node.Properties = value
 	}
 	if nodes := ic.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -430,6 +458,24 @@ func (u *ItemUpsert) UpdateUpdatedAt() *ItemUpsert {
 	return u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ItemUpsert) SetDeletedAt(v time.Time) *ItemUpsert {
+	u.Set(item.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateDeletedAt() *ItemUpsert {
+	u.SetExcluded(item.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ItemUpsert) ClearDeletedAt() *ItemUpsert {
+	u.SetNull(item.FieldDeletedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *ItemUpsert) SetName(v string) *ItemUpsert {
 	u.Set(item.FieldName, v)
@@ -496,6 +542,24 @@ func (u *ItemUpsert) UpdateAccountID() *ItemUpsert {
 	return u
 }
 
+// SetProperties sets the "properties" field.
+func (u *ItemUpsert) SetProperties(v any) *ItemUpsert {
+	u.Set(item.FieldProperties, v)
+	return u
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateProperties() *ItemUpsert {
+	u.SetExcluded(item.FieldProperties)
+	return u
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ItemUpsert) ClearProperties() *ItemUpsert {
+	u.SetNull(item.FieldProperties)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -558,6 +622,27 @@ func (u *ItemUpsertOne) SetUpdatedAt(v time.Time) *ItemUpsertOne {
 func (u *ItemUpsertOne) UpdateUpdatedAt() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ItemUpsertOne) SetDeletedAt(v time.Time) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateDeletedAt() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ItemUpsertOne) ClearDeletedAt() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearDeletedAt()
 	})
 }
 
@@ -635,6 +720,27 @@ func (u *ItemUpsertOne) SetAccountID(v xid.ID) *ItemUpsertOne {
 func (u *ItemUpsertOne) UpdateAccountID() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetProperties sets the "properties" field.
+func (u *ItemUpsertOne) SetProperties(v any) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetProperties(v)
+	})
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateProperties() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateProperties()
+	})
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ItemUpsertOne) ClearProperties() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearProperties()
 	})
 }
 
@@ -866,6 +972,27 @@ func (u *ItemUpsertBulk) UpdateUpdatedAt() *ItemUpsertBulk {
 	})
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ItemUpsertBulk) SetDeletedAt(v time.Time) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateDeletedAt() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ItemUpsertBulk) ClearDeletedAt() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *ItemUpsertBulk) SetName(v string) *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
@@ -940,6 +1067,27 @@ func (u *ItemUpsertBulk) SetAccountID(v xid.ID) *ItemUpsertBulk {
 func (u *ItemUpsertBulk) UpdateAccountID() *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetProperties sets the "properties" field.
+func (u *ItemUpsertBulk) SetProperties(v any) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetProperties(v)
+	})
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateProperties() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateProperties()
+	})
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ItemUpsertBulk) ClearProperties() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearProperties()
 	})
 }
 

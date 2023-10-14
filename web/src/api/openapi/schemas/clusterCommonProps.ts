@@ -21,5 +21,5 @@ export interface ClusterCommonProps {
   image_url?: AssetURL;
   description: ClusterDescription;
   owner: ProfileReference;
-  properties?: Properties;
+  properties: Properties;
 }

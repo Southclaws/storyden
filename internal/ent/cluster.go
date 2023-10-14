@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -22,6 +23,8 @@ type Cluster struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -34,6 +37,8 @@ type Cluster struct {
 	ParentClusterID xid.ID `json:"parent_cluster_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// Properties holds the value of the "properties" field.
+	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClusterQuery when eager-loading is set.
 	Edges ClusterEdges `json:"edges"`
@@ -125,9 +130,11 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case cluster.FieldProperties:
+			values[i] = new([]byte)
 		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldDescription:
 			values[i] = new(sql.NullString)
-		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt:
+		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case cluster.FieldID, cluster.FieldParentClusterID, cluster.FieldAccountID:
 			values[i] = new(xid.ID)
@@ -163,6 +170,13 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				c.UpdatedAt = value.Time
+			}
+		case cluster.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				c.DeletedAt = new(time.Time)
+				*c.DeletedAt = value.Time
 			}
 		case cluster.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -200,6 +214,14 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
 				c.AccountID = *value
+			}
+		case cluster.FieldProperties:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field properties", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Properties); err != nil {
+					return fmt.Errorf("unmarshal field properties: %w", err)
+				}
 			}
 		}
 	}
@@ -265,6 +287,11 @@ func (c *Cluster) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
+	if v := c.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
@@ -284,6 +311,9 @@ func (c *Cluster) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.AccountID))
+	builder.WriteString(", ")
+	builder.WriteString("properties=")
+	builder.WriteString(fmt.Sprintf("%v", c.Properties))
 	builder.WriteByte(')')
 	return builder.String()
 }
