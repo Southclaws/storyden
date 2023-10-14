@@ -176,6 +176,26 @@ func TestClustersHappyPath(t *testing.T) {
 			a.NotContains(ids, clus1.JSON200.Id, "must not contain clus1 as it's not a descendant of clus2")
 			a.Contains(ids, clus2.JSON200.Id)
 			a.Contains(ids, clus3.JSON200.Id)
+
+			// Sever clus3 from clus2 so it's root level again
+
+			cremove, err := cl.ClusterRemoveClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(cremove)
+			r.Equal(200, cremove.StatusCode())
+			r.Equal(clus2.JSON200.Id, cremove.JSON200.Id)
+
+			clist5, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				ClusterId: &clus2.JSON200.Id,
+			})
+			r.NoError(err)
+			r.NotNil(clist5)
+			r.Equal(200, clist5.StatusCode())
+
+			ids = dt.Map(clist5.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+			a.NotContains(ids, clus1.JSON200.Id, "must not contain clus1 as it's not a descendant of clus2")
+			a.Contains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id, "must not contain clus3 as it was severed from clus2")
 		}))
 	}))
 }
