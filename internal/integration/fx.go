@@ -75,7 +75,7 @@ func application() fx.Option {
 	return fx.Options(
 		fx.NopLogger,
 
-		infrastructure.Build(),
+		infrastructure.Build(false),
 		resources.Build(),
 		services.Build(),
 	)

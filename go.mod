@@ -66,6 +66,7 @@ require (
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mazznoer/csscolorparser v0.1.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
@@ -105,7 +106,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect

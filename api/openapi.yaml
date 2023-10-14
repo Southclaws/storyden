@@ -814,6 +814,12 @@ paths:
       description: List all clusters.
       tags: [clusters]
       security: []
+      parameters:
+        - name: cluster_id
+          description: List this cluster and all child clusters.
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/Identifier" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1718,6 +1724,7 @@ components:
         number of pages, etc.
       type: object
       additionalProperties: true
+      x-go-type: any
 
     URL:
       description: A web address
@@ -2701,7 +2708,7 @@ components:
     ClusterCommonProps:
       description: The main properties of a cluster.
       type: object
-      required: [name, slug, description, owner]
+      required: [name, slug, description, owner, properties]
       properties:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
@@ -2788,7 +2795,7 @@ components:
     ItemCommonProps:
       description: The main properties for an item.
       type: object
-      required: [name, slug, description, owner]
+      required: [name, slug, description, owner, properties]
       properties:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }

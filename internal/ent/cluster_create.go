@@ -56,6 +56,20 @@ func (cc *ClusterCreate) SetNillableUpdatedAt(t *time.Time) *ClusterCreate {
 	return cc
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (cc *ClusterCreate) SetDeletedAt(t time.Time) *ClusterCreate {
+	cc.mutation.SetDeletedAt(t)
+	return cc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cc *ClusterCreate) SetNillableDeletedAt(t *time.Time) *ClusterCreate {
+	if t != nil {
+		cc.SetDeletedAt(*t)
+	}
+	return cc
+}
+
 // SetName sets the "name" field.
 func (cc *ClusterCreate) SetName(s string) *ClusterCreate {
 	cc.mutation.SetName(s)
@@ -105,6 +119,12 @@ func (cc *ClusterCreate) SetNillableParentClusterID(x *xid.ID) *ClusterCreate {
 // SetAccountID sets the "account_id" field.
 func (cc *ClusterCreate) SetAccountID(x xid.ID) *ClusterCreate {
 	cc.mutation.SetAccountID(x)
+	return cc
+}
+
+// SetProperties sets the "properties" field.
+func (cc *ClusterCreate) SetProperties(a any) *ClusterCreate {
+	cc.mutation.SetProperties(a)
 	return cc
 }
 
@@ -333,6 +353,10 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 		_spec.SetField(cluster.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := cc.mutation.DeletedAt(); ok {
+		_spec.SetField(cluster.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
+	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(cluster.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -348,6 +372,10 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := cc.mutation.Properties(); ok {
+		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
+		_node.Properties = value
 	}
 	if nodes := cc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -511,6 +539,24 @@ func (u *ClusterUpsert) UpdateUpdatedAt() *ClusterUpsert {
 	return u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClusterUpsert) SetDeletedAt(v time.Time) *ClusterUpsert {
+	u.Set(cluster.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClusterUpsert) UpdateDeletedAt() *ClusterUpsert {
+	u.SetExcluded(cluster.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClusterUpsert) ClearDeletedAt() *ClusterUpsert {
+	u.SetNull(cluster.FieldDeletedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *ClusterUpsert) SetName(v string) *ClusterUpsert {
 	u.Set(cluster.FieldName, v)
@@ -595,6 +641,24 @@ func (u *ClusterUpsert) UpdateAccountID() *ClusterUpsert {
 	return u
 }
 
+// SetProperties sets the "properties" field.
+func (u *ClusterUpsert) SetProperties(v any) *ClusterUpsert {
+	u.Set(cluster.FieldProperties, v)
+	return u
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ClusterUpsert) UpdateProperties() *ClusterUpsert {
+	u.SetExcluded(cluster.FieldProperties)
+	return u
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ClusterUpsert) ClearProperties() *ClusterUpsert {
+	u.SetNull(cluster.FieldProperties)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -657,6 +721,27 @@ func (u *ClusterUpsertOne) SetUpdatedAt(v time.Time) *ClusterUpsertOne {
 func (u *ClusterUpsertOne) UpdateUpdatedAt() *ClusterUpsertOne {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClusterUpsertOne) SetDeletedAt(v time.Time) *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClusterUpsertOne) UpdateDeletedAt() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClusterUpsertOne) ClearDeletedAt() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearDeletedAt()
 	})
 }
 
@@ -755,6 +840,27 @@ func (u *ClusterUpsertOne) SetAccountID(v xid.ID) *ClusterUpsertOne {
 func (u *ClusterUpsertOne) UpdateAccountID() *ClusterUpsertOne {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetProperties sets the "properties" field.
+func (u *ClusterUpsertOne) SetProperties(v any) *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetProperties(v)
+	})
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ClusterUpsertOne) UpdateProperties() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateProperties()
+	})
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ClusterUpsertOne) ClearProperties() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearProperties()
 	})
 }
 
@@ -986,6 +1092,27 @@ func (u *ClusterUpsertBulk) UpdateUpdatedAt() *ClusterUpsertBulk {
 	})
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ClusterUpsertBulk) SetDeletedAt(v time.Time) *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ClusterUpsertBulk) UpdateDeletedAt() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ClusterUpsertBulk) ClearDeletedAt() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *ClusterUpsertBulk) SetName(v string) *ClusterUpsertBulk {
 	return u.Update(func(s *ClusterUpsert) {
@@ -1081,6 +1208,27 @@ func (u *ClusterUpsertBulk) SetAccountID(v xid.ID) *ClusterUpsertBulk {
 func (u *ClusterUpsertBulk) UpdateAccountID() *ClusterUpsertBulk {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetProperties sets the "properties" field.
+func (u *ClusterUpsertBulk) SetProperties(v any) *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetProperties(v)
+	})
+}
+
+// UpdateProperties sets the "properties" field to the value that was provided on create.
+func (u *ClusterUpsertBulk) UpdateProperties() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateProperties()
+	})
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (u *ClusterUpsertBulk) ClearProperties() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearProperties()
 	})
 }
 

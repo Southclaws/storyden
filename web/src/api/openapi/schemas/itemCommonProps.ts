@@ -21,5 +21,5 @@ export interface ItemCommonProps {
   image_url?: AssetURL;
   description: ItemDescription;
   owner: ProfileReference;
-  properties?: Properties;
+  properties: Properties;
 }

@@ -17,6 +17,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldSlug holds the string denoting the slug field in the database.
@@ -29,6 +31,8 @@ const (
 	FieldParentClusterID = "parent_cluster_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldProperties holds the string denoting the properties field in the database.
+	FieldProperties = "properties"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
@@ -80,12 +84,14 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldDeletedAt,
 	FieldName,
 	FieldSlug,
 	FieldImageURL,
 	FieldDescription,
 	FieldParentClusterID,
 	FieldAccountID,
+	FieldProperties,
 }
 
 var (

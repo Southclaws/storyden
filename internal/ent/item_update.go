@@ -40,6 +40,26 @@ func (iu *ItemUpdate) SetUpdatedAt(t time.Time) *ItemUpdate {
 	return iu
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (iu *ItemUpdate) SetDeletedAt(t time.Time) *ItemUpdate {
+	iu.mutation.SetDeletedAt(t)
+	return iu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableDeletedAt(t *time.Time) *ItemUpdate {
+	if t != nil {
+		iu.SetDeletedAt(*t)
+	}
+	return iu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (iu *ItemUpdate) ClearDeletedAt() *ItemUpdate {
+	iu.mutation.ClearDeletedAt()
+	return iu
+}
+
 // SetName sets the "name" field.
 func (iu *ItemUpdate) SetName(s string) *ItemUpdate {
 	iu.mutation.SetName(s)
@@ -81,6 +101,18 @@ func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 // SetAccountID sets the "account_id" field.
 func (iu *ItemUpdate) SetAccountID(x xid.ID) *ItemUpdate {
 	iu.mutation.SetAccountID(x)
+	return iu
+}
+
+// SetProperties sets the "properties" field.
+func (iu *ItemUpdate) SetProperties(a any) *ItemUpdate {
+	iu.mutation.SetProperties(a)
+	return iu
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (iu *ItemUpdate) ClearProperties() *ItemUpdate {
+	iu.mutation.ClearProperties()
 	return iu
 }
 
@@ -279,6 +311,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.UpdatedAt(); ok {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := iu.mutation.DeletedAt(); ok {
+		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
+	}
+	if iu.mutation.DeletedAtCleared() {
+		_spec.ClearField(item.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := iu.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
@@ -293,6 +331,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.Properties(); ok {
+		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
+	}
+	if iu.mutation.PropertiesCleared() {
+		_spec.ClearField(item.FieldProperties, field.TypeJSON)
 	}
 	if iu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -486,6 +530,26 @@ func (iuo *ItemUpdateOne) SetUpdatedAt(t time.Time) *ItemUpdateOne {
 	return iuo
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (iuo *ItemUpdateOne) SetDeletedAt(t time.Time) *ItemUpdateOne {
+	iuo.mutation.SetDeletedAt(t)
+	return iuo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableDeletedAt(t *time.Time) *ItemUpdateOne {
+	if t != nil {
+		iuo.SetDeletedAt(*t)
+	}
+	return iuo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (iuo *ItemUpdateOne) ClearDeletedAt() *ItemUpdateOne {
+	iuo.mutation.ClearDeletedAt()
+	return iuo
+}
+
 // SetName sets the "name" field.
 func (iuo *ItemUpdateOne) SetName(s string) *ItemUpdateOne {
 	iuo.mutation.SetName(s)
@@ -527,6 +591,18 @@ func (iuo *ItemUpdateOne) SetDescription(s string) *ItemUpdateOne {
 // SetAccountID sets the "account_id" field.
 func (iuo *ItemUpdateOne) SetAccountID(x xid.ID) *ItemUpdateOne {
 	iuo.mutation.SetAccountID(x)
+	return iuo
+}
+
+// SetProperties sets the "properties" field.
+func (iuo *ItemUpdateOne) SetProperties(a any) *ItemUpdateOne {
+	iuo.mutation.SetProperties(a)
+	return iuo
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (iuo *ItemUpdateOne) ClearProperties() *ItemUpdateOne {
+	iuo.mutation.ClearProperties()
 	return iuo
 }
 
@@ -755,6 +831,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	if value, ok := iuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := iuo.mutation.DeletedAt(); ok {
+		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
+	}
+	if iuo.mutation.DeletedAtCleared() {
+		_spec.ClearField(item.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := iuo.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)
 	}
@@ -769,6 +851,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.Properties(); ok {
+		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
+	}
+	if iuo.mutation.PropertiesCleared() {
+		_spec.ClearField(item.FieldProperties, field.TypeJSON)
 	}
 	if iuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
