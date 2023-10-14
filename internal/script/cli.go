@@ -23,7 +23,7 @@ func Run(opts ...fx.Option) {
 	all := append(opts, []fx.Option{
 		fx.NopLogger,
 		config.Build(),
-		infrastructure.Build(),
+		infrastructure.Build(true),
 		services.Build(),
 		resources.Build(),
 	}...)
