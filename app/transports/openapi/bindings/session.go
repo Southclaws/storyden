@@ -14,18 +14,18 @@ import (
 
 const secureCookieName = "storyden-session"
 
-type cookieJar struct {
+type CookieJar struct {
 	ss     *securecookie.Session
 	domain string
 }
 
-func newCookieJar(cfg config.Config, ss *securecookie.Session) *cookieJar {
-	return &cookieJar{domain: cfg.CookieDomain, ss: ss}
+func newCookieJar(cfg config.Config, ss *securecookie.Session) *CookieJar {
+	return &CookieJar{domain: cfg.CookieDomain, ss: ss}
 }
 
 // Create an encrypted cookie from an account ID.
-func (j *cookieJar) Create(accountID string) string {
-	return (&http.Cookie{
+func (j *CookieJar) Create(accountID string) *http.Cookie {
+	return &http.Cookie{
 		Name:     secureCookieName,
 		Value:    j.ss.Encrypt(accountID),
 		SameSite: http.SameSiteDefaultMode,
@@ -33,11 +33,11 @@ func (j *cookieJar) Create(accountID string) string {
 		Domain:   j.domain,
 		Secure:   true,
 		HttpOnly: true,
-	}).String()
+	}
 }
 
-// withSession checks the request for a session and drops it into a context.
-func (j *cookieJar) withSession(r *http.Request) context.Context {
+// WithSession checks the request for a session and drops it into a context.
+func (j *CookieJar) WithSession(r *http.Request) context.Context {
 	cookie, err := r.Cookie(secureCookieName)
 	if err != nil {
 		return r.Context()
@@ -57,8 +57,8 @@ func (j *cookieJar) withSession(r *http.Request) context.Context {
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.
-func (j *cookieJar) WithAuth(next http.Handler) http.Handler {
+func (j *CookieJar) WithAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r.WithContext(j.withSession(r)))
+		next.ServeHTTP(w, r.WithContext(j.WithSession(r)))
 	})
 }

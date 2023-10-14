@@ -21,7 +21,7 @@ import (
 
 type Authentication struct {
 	p      *password.Provider
-	sm     *cookieJar
+	sm     *CookieJar
 	ar     account.Repository
 	am     *authentication.Manager
 	domain string
@@ -31,7 +31,7 @@ func NewAuthentication(
 	cfg config.Config,
 	p *password.Provider,
 	ar account.Repository,
-	sm *cookieJar,
+	sm *CookieJar,
 	am *authentication.Manager,
 ) Authentication {
 	return Authentication{p, sm, ar, am, cfg.CookieDomain}

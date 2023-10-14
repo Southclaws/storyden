@@ -31,7 +31,7 @@ const cookieName = "storyden-webauthn-session"
 var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
-	sm     *cookieJar
+	sm     *CookieJar
 	ar     account.Repository
 	wa     *waprovider.Provider
 	domain string
@@ -40,7 +40,7 @@ type WebAuthn struct {
 func NewWebAuthn(
 	cfg config.Config,
 	ar account.Repository,
-	sm *cookieJar,
+	sm *CookieJar,
 	wa *waprovider.Provider,
 	router *echo.Echo,
 ) WebAuthn {
@@ -148,7 +148,7 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.sm.Create(accountID.String()),
+				SetCookie: a.sm.Create(accountID.String()).String(),
 			},
 		},
 	}, nil
@@ -231,7 +231,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.sm.Create(acc.ID.String()),
+				SetCookie: a.sm.Create(acc.ID.String()).String(),
 			},
 		},
 	}, nil
