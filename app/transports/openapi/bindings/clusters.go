@@ -133,7 +133,14 @@ func (c *Clusters) ClusterAddCluster(ctx context.Context, request openapi.Cluste
 }
 
 func (c *Clusters) ClusterRemoveCluster(ctx context.Context, request openapi.ClusterRemoveClusterRequestObject) (openapi.ClusterRemoveClusterResponseObject, error) {
-	return nil, nil
+	clus, err := c.ctree.Sever(ctx, datagraph.ClusterSlug(request.ClusterSlugChild), datagraph.ClusterSlug(request.ClusterSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterRemoveCluster200JSONResponse{
+		ClusterRemoveChildOKJSONResponse: openapi.ClusterRemoveChildOKJSONResponse(serialiseCluster(clus)),
+	}, nil
 }
 
 func (c *Clusters) ClusterAddItem(ctx context.Context, request openapi.ClusterAddItemRequestObject) (openapi.ClusterAddItemResponseObject, error) {

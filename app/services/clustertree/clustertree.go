@@ -21,7 +21,7 @@ type Graph interface {
 	Move(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error)
 
 	// Sever orphans a cluster by removing it from its parent to the root level.
-	Sever(ctx context.Context, child datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	Sever(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error)
 }
 
 type service struct {
@@ -62,6 +62,32 @@ func (s *service) Move(ctx context.Context, child datagraph.ClusterSlug, parent 
 	return pclus, nil
 }
 
-func (s *service) Sever(ctx context.Context, child datagraph.ClusterSlug) (*datagraph.Cluster, error) {
-	return nil, nil
+func (s *service) Sever(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error) {
+	accountID, err := authentication.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	cclus, err := s.cr.Get(ctx, child)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	pclus, err := s.cr.Get(ctx, parent)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !cclus.Owner.Admin {
+		if cclus.Owner.ID != accountID && pclus.Owner.ID != accountID {
+			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
+		}
+	}
+
+	pclus, err = s.cr.Update(ctx, pclus.ID, cluster.WithChildClusterRemove(xid.ID(cclus.ID)))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return pclus, nil
 }
