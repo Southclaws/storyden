@@ -120,6 +120,122 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			itemids := dt.Map(clus1get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
+
+			// Get clus2
+
+			clus2get, err := cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
+			r.NoError(err)
+			r.NotNil(clus2get)
+			r.Equal(200, clus2get.StatusCode())
+
+			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
+			a.NotContains(itemids, item1.JSON200.Id)
+
+			// Add item to clus2
+
+			clus2added, err := cl.ClusterAddItemWithResponse(ctx, clus2.JSON200.Slug, item1.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(clus2added)
+			r.Equal(200, clus2added.StatusCode())
+
+			// Get clus2
+
+			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
+			r.NoError(err)
+			r.NotNil(clus2get)
+			r.Equal(200, clus2get.StatusCode())
+
+			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
+			a.Contains(itemids, item1.JSON200.Id)
+
+			// Create another item
+
+			itemname2 := "test-item-2-" + uuid.NewString()
+			itemslug2 := itemname2
+			item2, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{
+				Name:        itemname2,
+				Slug:        itemslug2,
+				Description: "testing items api 2",
+			}, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(item2)
+			r.Equal(200, item2.StatusCode())
+
+			// Add item2 to clus2
+
+			clus2added, err = cl.ClusterAddItemWithResponse(ctx, clus2.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(clus2added)
+			r.Equal(200, clus2added.StatusCode())
+
+			// Get clus2
+
+			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
+			r.NoError(err)
+			r.NotNil(clus2get)
+			r.Equal(200, clus2get.StatusCode())
+
+			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
+			a.Contains(itemids, item1.JSON200.Id)
+			a.Contains(itemids, item2.JSON200.Id)
+
+			// Add item2 to clus3
+
+			clus3added, err := cl.ClusterAddItemWithResponse(ctx, clus3.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(clus3added)
+			r.Equal(200, clus3added.StatusCode())
+
+			// Get clus3
+
+			clus3get, err := cl.ClusterGetWithResponse(ctx, clus3.JSON200.Slug)
+			r.NoError(err)
+			r.NotNil(clus3get)
+			r.Equal(200, clus3get.StatusCode())
+
+			itemids = dt.Map(clus3get.JSON200.Items, func(i openapi.Item) string { return i.Id })
+			a.NotContains(itemids, item1.JSON200.Id)
+			a.Contains(itemids, item2.JSON200.Id)
+
+			// Get item2, it's a member of two clusters
+
+			item1get, err := cl.ItemGetWithResponse(ctx, itemslug2)
+			r.NoError(err)
+			r.NotNil(item1get)
+			r.Equal(200, item1get.StatusCode())
+
+			clusterids := dt.Map(*item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+			a.Contains(clusterids, clus2.JSON200.Id)
+			a.Contains(clusterids, clus3.JSON200.Id)
+
+			// Remove item2 from clus2
+
+			item2remove, err := cl.ClusterRemoveItemWithResponse(ctx, clus2.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.NotNil(item2remove)
+			r.Equal(200, item2remove.StatusCode())
+
+			// Get item2, it's a member of just one cluster now
+
+			item1get, err = cl.ItemGetWithResponse(ctx, itemslug2)
+			r.NoError(err)
+			r.NotNil(item1get)
+			r.Equal(200, item1get.StatusCode())
+
+			clusterids = dt.Map(*item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+			a.NotContains(clusterids, clus2.JSON200.Id)
+			a.Contains(clusterids, clus3.JSON200.Id)
+
+			// Get clus2
+
+			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
+			r.NoError(err)
+			r.NotNil(clus2get)
+			r.Equal(200, clus2get.StatusCode())
+
+			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
+			a.Contains(itemids, item1.JSON200.Id)
+			a.NotContains(itemids, item2.JSON200.Id)
 		}))
 	}))
 }
