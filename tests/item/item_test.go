@@ -36,10 +36,12 @@ func TestItemsHappyPath(t *testing.T) {
 
 			name1 := "test-item-1-" + uuid.NewString()
 			slug1 := name1
+			cont1 := "# Item content\n\nRich text"
 			item1, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing items api",
+				Content:     &cont1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -48,6 +50,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(name1, item1.JSON200.Name)
 			a.Equal(slug1, item1.JSON200.Slug)
 			a.Equal("testing items api", item1.JSON200.Description)
+			a.Equal(cont1, *item1.JSON200.Content)
 			a.Equal(acc.ID.String(), string(item1.JSON200.Owner.Id))
 
 			// Get the item just created
@@ -60,6 +63,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(name1, item1get.JSON200.Name)
 			a.Equal(slug1, item1get.JSON200.Slug)
 			a.Equal("testing items api", item1get.JSON200.Description)
+			a.Equal(cont1, *item1get.JSON200.Content)
 			a.Equal(acc.ID.String(), string(item1get.JSON200.Owner.Id))
 
 			// Update the item just created
@@ -67,6 +71,7 @@ func TestItemsHappyPath(t *testing.T) {
 			name1 = "test-item-1-UPDATED"
 			slug1 = name1 + uuid.NewString()
 			desc1 := "a new description"
+			cont1 = "# New content"
 			iurl1 := "https://niceme.me"
 			prop1 := any(map[string]any{
 				"key": "value",
@@ -75,6 +80,7 @@ func TestItemsHappyPath(t *testing.T) {
 				Name:        &name1,
 				Slug:        &slug1,
 				Description: &desc1,
+				Content:     &cont1,
 				ImageUrl:    &iurl1,
 				Properties:  &prop1,
 			}, e2e.WithSession(ctx, cj))
@@ -85,6 +91,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(name1, item1update.JSON200.Name)
 			a.Equal(slug1, item1update.JSON200.Slug)
 			a.Equal(desc1, item1update.JSON200.Description)
+			a.Equal(cont1, *item1update.JSON200.Content)
 			a.Equal(iurl1, *item1update.JSON200.ImageUrl)
 			a.Equal(prop1, item1update.JSON200.Properties)
 

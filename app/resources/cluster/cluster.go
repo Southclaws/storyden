@@ -66,6 +66,12 @@ func WithDescription(v string) Option {
 	}
 }
 
+func WithContent(v string) Option {
+	return func(c *ent.ClusterMutation) {
+		c.SetContent(v)
+	}
+}
+
 func WithProperties(v any) Option {
 	return func(c *ent.ClusterMutation) {
 		c.SetProperties(v)

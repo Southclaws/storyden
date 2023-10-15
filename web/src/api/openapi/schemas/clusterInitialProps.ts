@@ -8,6 +8,7 @@
 import type { AssetURL } from "./assetURL";
 import type { ClusterDescription } from "./clusterDescription";
 import type { ClusterName } from "./clusterName";
+import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
 
@@ -16,5 +17,6 @@ export interface ClusterInitialProps {
   slug: Slug;
   image_url?: AssetURL;
   description: ClusterDescription;
+  content?: PostContent;
   properties?: Properties;
 }

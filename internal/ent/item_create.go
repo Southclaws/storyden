@@ -102,6 +102,20 @@ func (ic *ItemCreate) SetDescription(s string) *ItemCreate {
 	return ic
 }
 
+// SetContent sets the "content" field.
+func (ic *ItemCreate) SetContent(s string) *ItemCreate {
+	ic.mutation.SetContent(s)
+	return ic
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableContent(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetContent(*s)
+	}
+	return ic
+}
+
 // SetAccountID sets the "account_id" field.
 func (ic *ItemCreate) SetAccountID(x xid.ID) *ItemCreate {
 	ic.mutation.SetAccountID(x)
@@ -325,6 +339,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := ic.mutation.Content(); ok {
+		_spec.SetField(item.FieldContent, field.TypeString, value)
+		_node.Content = &value
+	}
 	if value, ok := ic.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
 		_node.Properties = value
@@ -530,6 +548,24 @@ func (u *ItemUpsert) UpdateDescription() *ItemUpsert {
 	return u
 }
 
+// SetContent sets the "content" field.
+func (u *ItemUpsert) SetContent(v string) *ItemUpsert {
+	u.Set(item.FieldContent, v)
+	return u
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateContent() *ItemUpsert {
+	u.SetExcluded(item.FieldContent)
+	return u
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ItemUpsert) ClearContent() *ItemUpsert {
+	u.SetNull(item.FieldContent)
+	return u
+}
+
 // SetAccountID sets the "account_id" field.
 func (u *ItemUpsert) SetAccountID(v xid.ID) *ItemUpsert {
 	u.Set(item.FieldAccountID, v)
@@ -706,6 +742,27 @@ func (u *ItemUpsertOne) SetDescription(v string) *ItemUpsertOne {
 func (u *ItemUpsertOne) UpdateDescription() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetContent sets the "content" field.
+func (u *ItemUpsertOne) SetContent(v string) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetContent(v)
+	})
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateContent() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateContent()
+	})
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ItemUpsertOne) ClearContent() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearContent()
 	})
 }
 
@@ -1057,6 +1114,27 @@ func (u *ItemUpsertBulk) SetDescription(v string) *ItemUpsertBulk {
 func (u *ItemUpsertBulk) UpdateDescription() *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetContent sets the "content" field.
+func (u *ItemUpsertBulk) SetContent(v string) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetContent(v)
+	})
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateContent() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateContent()
+	})
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ItemUpsertBulk) ClearContent() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearContent()
 	})
 }
 

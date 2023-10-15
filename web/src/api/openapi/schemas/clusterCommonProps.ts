@@ -8,6 +8,7 @@
 import type { AssetURL } from "./assetURL";
 import type { ClusterDescription } from "./clusterDescription";
 import type { ClusterName } from "./clusterName";
+import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
@@ -20,6 +21,7 @@ export interface ClusterCommonProps {
   slug: Slug;
   image_url?: AssetURL;
   description: ClusterDescription;
+  content?: PostContent;
   owner: ProfileReference;
   properties: Properties;
 }

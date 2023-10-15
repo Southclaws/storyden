@@ -39,6 +39,9 @@ func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateReques
 
 	opts := []item_repo.Option{}
 
+	if v := request.Body.Content; v != nil {
+		opts = append(opts, item_repo.WithContent(*v))
+	}
 	if v := request.Body.Properties; v != nil {
 		opts = append(opts, item_repo.WithProperties(*v))
 	}
@@ -95,6 +98,7 @@ func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateReques
 		Slug:        opt.NewPtr(request.Body.Slug),
 		ImageURL:    opt.NewPtr(request.Body.ImageUrl),
 		Description: opt.NewPtr(request.Body.Description),
+		Content:     opt.NewPtr(request.Body.Content),
 		Properties:  opt.NewPtr(request.Body.Properties),
 	})
 	if err != nil {
@@ -115,6 +119,7 @@ func serialiseItem(in *datagraph.Item) openapi.Item {
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
 		Description: in.Description,
+		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Properties:  in.Properties,
 	}
@@ -130,6 +135,7 @@ func serialiseItemWithParents(in *datagraph.Item) openapi.ItemWithParents {
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
 		Description: in.Description,
+		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Properties:  in.Properties,
 		Clusters:    &clusters,

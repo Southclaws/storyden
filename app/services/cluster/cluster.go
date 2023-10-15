@@ -35,6 +35,7 @@ type Partial struct {
 	Slug        opt.Optional[string]
 	ImageURL    opt.Optional[string]
 	Description opt.Optional[string]
+	Content     opt.Optional[string]
 	Properties  opt.Optional[any]
 }
 
@@ -93,6 +94,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.ClusterSlug, p Part
 	p.Slug.Call(func(value string) { opts = append(opts, cluster.WithSlug(value)) })
 	p.ImageURL.Call(func(value string) { opts = append(opts, cluster.WithImageURL(value)) })
 	p.Description.Call(func(value string) { opts = append(opts, cluster.WithDescription(value)) })
+	p.Content.Call(func(value string) { opts = append(opts, cluster.WithContent(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, cluster.WithProperties(value)) })
 
 	clus, err = s.cr.Update(ctx, clus.ID, opts...)

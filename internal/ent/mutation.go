@@ -4114,6 +4114,7 @@ type ClusterMutation struct {
 	slug            *string
 	image_url       *string
 	description     *string
+	content         *string
 	properties      *any
 	clearedFields   map[string]struct{}
 	owner           *xid.ID
@@ -4517,6 +4518,55 @@ func (m *ClusterMutation) OldDescription(ctx context.Context) (v string, err err
 // ResetDescription resets all changes to the "description" field.
 func (m *ClusterMutation) ResetDescription() {
 	m.description = nil
+}
+
+// SetContent sets the "content" field.
+func (m *ClusterMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *ClusterMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldContent(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ClearContent clears the value of the "content" field.
+func (m *ClusterMutation) ClearContent() {
+	m.content = nil
+	m.clearedFields[cluster.FieldContent] = struct{}{}
+}
+
+// ContentCleared returns if the "content" field was cleared in this mutation.
+func (m *ClusterMutation) ContentCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldContent]
+	return ok
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *ClusterMutation) ResetContent() {
+	m.content = nil
+	delete(m.clearedFields, cluster.FieldContent)
 }
 
 // SetParentClusterID sets the "parent_cluster_id" field.
@@ -4983,7 +5033,7 @@ func (m *ClusterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClusterMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, cluster.FieldCreatedAt)
 	}
@@ -5004,6 +5054,9 @@ func (m *ClusterMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, cluster.FieldDescription)
+	}
+	if m.content != nil {
+		fields = append(fields, cluster.FieldContent)
 	}
 	if m.parent != nil {
 		fields = append(fields, cluster.FieldParentClusterID)
@@ -5036,6 +5089,8 @@ func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 		return m.ImageURL()
 	case cluster.FieldDescription:
 		return m.Description()
+	case cluster.FieldContent:
+		return m.Content()
 	case cluster.FieldParentClusterID:
 		return m.ParentClusterID()
 	case cluster.FieldAccountID:
@@ -5065,6 +5120,8 @@ func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldImageURL(ctx)
 	case cluster.FieldDescription:
 		return m.OldDescription(ctx)
+	case cluster.FieldContent:
+		return m.OldContent(ctx)
 	case cluster.FieldParentClusterID:
 		return m.OldParentClusterID(ctx)
 	case cluster.FieldAccountID:
@@ -5129,6 +5186,13 @@ func (m *ClusterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case cluster.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
 	case cluster.FieldParentClusterID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -5186,6 +5250,9 @@ func (m *ClusterMutation) ClearedFields() []string {
 	if m.FieldCleared(cluster.FieldImageURL) {
 		fields = append(fields, cluster.FieldImageURL)
 	}
+	if m.FieldCleared(cluster.FieldContent) {
+		fields = append(fields, cluster.FieldContent)
+	}
 	if m.FieldCleared(cluster.FieldParentClusterID) {
 		fields = append(fields, cluster.FieldParentClusterID)
 	}
@@ -5211,6 +5278,9 @@ func (m *ClusterMutation) ClearField(name string) error {
 		return nil
 	case cluster.FieldImageURL:
 		m.ClearImageURL()
+		return nil
+	case cluster.FieldContent:
+		m.ClearContent()
 		return nil
 	case cluster.FieldParentClusterID:
 		m.ClearParentClusterID()
@@ -5246,6 +5316,9 @@ func (m *ClusterMutation) ResetField(name string) error {
 		return nil
 	case cluster.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case cluster.FieldContent:
+		m.ResetContent()
 		return nil
 	case cluster.FieldParentClusterID:
 		m.ResetParentClusterID()
@@ -6117,6 +6190,7 @@ type ItemMutation struct {
 	slug            *string
 	image_url       *string
 	description     *string
+	content         *string
 	properties      *any
 	clearedFields   map[string]struct{}
 	owner           *xid.ID
@@ -6517,6 +6591,55 @@ func (m *ItemMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetContent sets the "content" field.
+func (m *ItemMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *ItemMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldContent(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ClearContent clears the value of the "content" field.
+func (m *ItemMutation) ClearContent() {
+	m.content = nil
+	m.clearedFields[item.FieldContent] = struct{}{}
+}
+
+// ContentCleared returns if the "content" field was cleared in this mutation.
+func (m *ItemMutation) ContentCleared() bool {
+	_, ok := m.clearedFields[item.FieldContent]
+	return ok
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *ItemMutation) ResetContent() {
+	m.content = nil
+	delete(m.clearedFields, item.FieldContent)
+}
+
 // SetAccountID sets the "account_id" field.
 func (m *ItemMutation) SetAccountID(x xid.ID) {
 	m.owner = &x
@@ -6838,7 +6961,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, item.FieldCreatedAt)
 	}
@@ -6859,6 +6982,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, item.FieldDescription)
+	}
+	if m.content != nil {
+		fields = append(fields, item.FieldContent)
 	}
 	if m.owner != nil {
 		fields = append(fields, item.FieldAccountID)
@@ -6888,6 +7014,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.ImageURL()
 	case item.FieldDescription:
 		return m.Description()
+	case item.FieldContent:
+		return m.Content()
 	case item.FieldAccountID:
 		return m.AccountID()
 	case item.FieldProperties:
@@ -6915,6 +7043,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldImageURL(ctx)
 	case item.FieldDescription:
 		return m.OldDescription(ctx)
+	case item.FieldContent:
+		return m.OldContent(ctx)
 	case item.FieldAccountID:
 		return m.OldAccountID(ctx)
 	case item.FieldProperties:
@@ -6977,6 +7107,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case item.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
 	case item.FieldAccountID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -7027,6 +7164,9 @@ func (m *ItemMutation) ClearedFields() []string {
 	if m.FieldCleared(item.FieldImageURL) {
 		fields = append(fields, item.FieldImageURL)
 	}
+	if m.FieldCleared(item.FieldContent) {
+		fields = append(fields, item.FieldContent)
+	}
 	if m.FieldCleared(item.FieldProperties) {
 		fields = append(fields, item.FieldProperties)
 	}
@@ -7049,6 +7189,9 @@ func (m *ItemMutation) ClearField(name string) error {
 		return nil
 	case item.FieldImageURL:
 		m.ClearImageURL()
+		return nil
+	case item.FieldContent:
+		m.ClearContent()
 		return nil
 	case item.FieldProperties:
 		m.ClearProperties()
@@ -7081,6 +7224,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case item.FieldContent:
+		m.ResetContent()
 		return nil
 	case item.FieldAccountID:
 		m.ResetAccountID()

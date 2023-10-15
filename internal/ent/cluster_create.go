@@ -102,6 +102,20 @@ func (cc *ClusterCreate) SetDescription(s string) *ClusterCreate {
 	return cc
 }
 
+// SetContent sets the "content" field.
+func (cc *ClusterCreate) SetContent(s string) *ClusterCreate {
+	cc.mutation.SetContent(s)
+	return cc
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (cc *ClusterCreate) SetNillableContent(s *string) *ClusterCreate {
+	if s != nil {
+		cc.SetContent(*s)
+	}
+	return cc
+}
+
 // SetParentClusterID sets the "parent_cluster_id" field.
 func (cc *ClusterCreate) SetParentClusterID(x xid.ID) *ClusterCreate {
 	cc.mutation.SetParentClusterID(x)
@@ -373,6 +387,10 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := cc.mutation.Content(); ok {
+		_spec.SetField(cluster.FieldContent, field.TypeString, value)
+		_node.Content = &value
+	}
 	if value, ok := cc.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
 		_node.Properties = value
@@ -611,6 +629,24 @@ func (u *ClusterUpsert) UpdateDescription() *ClusterUpsert {
 	return u
 }
 
+// SetContent sets the "content" field.
+func (u *ClusterUpsert) SetContent(v string) *ClusterUpsert {
+	u.Set(cluster.FieldContent, v)
+	return u
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ClusterUpsert) UpdateContent() *ClusterUpsert {
+	u.SetExcluded(cluster.FieldContent)
+	return u
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ClusterUpsert) ClearContent() *ClusterUpsert {
+	u.SetNull(cluster.FieldContent)
+	return u
+}
+
 // SetParentClusterID sets the "parent_cluster_id" field.
 func (u *ClusterUpsert) SetParentClusterID(v xid.ID) *ClusterUpsert {
 	u.Set(cluster.FieldParentClusterID, v)
@@ -805,6 +841,27 @@ func (u *ClusterUpsertOne) SetDescription(v string) *ClusterUpsertOne {
 func (u *ClusterUpsertOne) UpdateDescription() *ClusterUpsertOne {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetContent sets the "content" field.
+func (u *ClusterUpsertOne) SetContent(v string) *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetContent(v)
+	})
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ClusterUpsertOne) UpdateContent() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateContent()
+	})
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ClusterUpsertOne) ClearContent() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearContent()
 	})
 }
 
@@ -1177,6 +1234,27 @@ func (u *ClusterUpsertBulk) SetDescription(v string) *ClusterUpsertBulk {
 func (u *ClusterUpsertBulk) UpdateDescription() *ClusterUpsertBulk {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetContent sets the "content" field.
+func (u *ClusterUpsertBulk) SetContent(v string) *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetContent(v)
+	})
+}
+
+// UpdateContent sets the "content" field to the value that was provided on create.
+func (u *ClusterUpsertBulk) UpdateContent() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateContent()
+	})
+}
+
+// ClearContent clears the value of the "content" field.
+func (u *ClusterUpsertBulk) ClearContent() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.ClearContent()
 	})
 }
 

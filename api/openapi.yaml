@@ -2723,6 +2723,7 @@ components:
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         properties: { $ref: "#/components/schemas/Properties" }
 
@@ -2738,6 +2739,7 @@ components:
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterMutableProps:
@@ -2749,6 +2751,7 @@ components:
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterItemList:
@@ -2810,6 +2813,7 @@ components:
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         properties: { $ref: "#/components/schemas/Properties" }
 
@@ -2840,6 +2844,7 @@ components:
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ItemMutableProps:
@@ -2851,6 +2856,7 @@ components:
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
 
   securitySchemes:
