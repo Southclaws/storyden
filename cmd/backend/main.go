@@ -30,7 +30,7 @@ func Start(ctx context.Context) {
 		fx.Provide(func() context.Context { return ctx }),
 
 		config.Build(),
-		infrastructure.Build(false),
+		infrastructure.Build(true),
 		resources.Build(),
 		services.Build(),
 		transport.Build(),
