@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"entgo.io/ent/dialect"             // nolint:gci
-	entsql "entgo.io/ent/dialect/sql"  // nolint:gci
-	"entgo.io/ent/dialect/sql/schema"  // nolint:gci
+	"entgo.io/ent/dialect"            // nolint:gci
+	entsql "entgo.io/ent/dialect/sql" // nolint:gci
+
+	// nolint:gci
 	"github.com/Southclaws/fault"      // nolint:gci
 	"github.com/Southclaws/fault/fctx" // nolint:gci
 	"github.com/Southclaws/fault/fmsg" // nolint:gci
@@ -18,7 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-func Build(migrate bool) fx.Option {
+func Build() fx.Option {
 	return fx.Options(
 		// provide the underlying *sql.DB to the system
 		fx.Provide(newSQL),
@@ -28,8 +29,6 @@ func Build(migrate bool) fx.Option {
 
 		// construct a new ent client using the *sql.DB provided above
 		fx.Provide(newEntClient),
-
-		newMigrate(migrate),
 	)
 }
 
@@ -80,27 +79,4 @@ func connect(ctx context.Context, driver *sql.DB) (*ent.Client, error) {
 	client := ent.NewClient(ent.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
 	return client, nil
-}
-
-func newMigrate(migrate bool) fx.Option {
-	if migrate {
-		return fx.Invoke(Migrate)
-	}
-
-	return fx.Options()
-}
-
-func Migrate(ctx context.Context, client *ent.Client) error {
-	opts := []schema.MigrateOption{}
-
-	// We don't do versioned migrations currently.
-	// opts = append(opts, schema.WithDropColumn(true))
-	// opts = append(opts, schema.WithDropIndex(true))
-
-	// Run only additive migrations
-	if err := client.Schema.Create(ctx, opts...); err != nil {
-		return fault.Wrap(err)
-	}
-
-	return nil
 }

@@ -12,10 +12,10 @@ import (
 	"github.com/Southclaws/storyden/internal/webauthn"
 )
 
-func Build(migrate bool) fx.Option {
+func Build() fx.Option {
 	return fx.Options(
 		logger.Build(),
-		db.Build(migrate), // TODO: safer migrations
+		db.Build(),
 		securecookie.Build(),
 		sms.Build(),
 		fx.Provide(webauthn.New),
