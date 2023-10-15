@@ -16,7 +16,7 @@ type Config struct {
 	DatabaseURL      string `envconfig:"DATABASE_URL"           required:"true"`
 	ListenAddr       string `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
 	CookieDomain     string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
-	SessionKey       string `envconfig:"SESSION_KEY"            required:"true"`
+	SessionKey       string `envconfig:"SESSION_KEY"            default:"0000000000000000"`
 	PublicWebAddress string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
