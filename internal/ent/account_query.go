@@ -29,7 +29,7 @@ import (
 type AccountQuery struct {
 	config
 	ctx                *QueryContext
-	order              []OrderFunc
+	order              []account.OrderOption
 	inters             []Interceptor
 	predicates         []predicate.Account
 	withPosts          *PostQuery
@@ -73,7 +73,7 @@ func (aq *AccountQuery) Unique(unique bool) *AccountQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (aq *AccountQuery) Order(o ...OrderFunc) *AccountQuery {
+func (aq *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
 	aq.order = append(aq.order, o...)
 	return aq
 }
@@ -465,7 +465,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 	return &AccountQuery{
 		config:             aq.config,
 		ctx:                aq.ctx.Clone(),
-		order:              append([]OrderFunc{}, aq.order...),
+		order:              append([]account.OrderOption{}, aq.order...),
 		inters:             append([]Interceptor{}, aq.inters...),
 		predicates:         append([]predicate.Account{}, aq.predicates...),
 		withPosts:          aq.withPosts.Clone(),
@@ -771,7 +771,7 @@ func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes [
 	}
 	query.withFKs = true
 	query.Where(predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.PostsColumn, fks...))
+		s.Where(sql.InValues(s.C(account.PostsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -784,7 +784,7 @@ func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes [
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_posts" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_posts" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -800,8 +800,11 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(react.FieldAccountID)
+	}
 	query.Where(predicate.React(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.ReactsColumn, fks...))
+		s.Where(sql.InValues(s.C(account.ReactsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -811,7 +814,7 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 		fk := n.AccountID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -890,7 +893,7 @@ func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 	}
 	query.withFKs = true
 	query.Where(predicate.Authentication(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.AuthenticationColumn, fks...))
+		s.Where(sql.InValues(s.C(account.AuthenticationColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -903,7 +906,7 @@ func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_authentication" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_authentication" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -982,7 +985,7 @@ func (aq *AccountQuery) loadCollections(ctx context.Context, query *CollectionQu
 	}
 	query.withFKs = true
 	query.Where(predicate.Collection(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.CollectionsColumn, fks...))
+		s.Where(sql.InValues(s.C(account.CollectionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -995,7 +998,7 @@ func (aq *AccountQuery) loadCollections(ctx context.Context, query *CollectionQu
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_collections" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_collections" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1011,8 +1014,11 @@ func (aq *AccountQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(cluster.FieldAccountID)
+	}
 	query.Where(predicate.Cluster(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.ClustersColumn, fks...))
+		s.Where(sql.InValues(s.C(account.ClustersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1022,7 +1028,7 @@ func (aq *AccountQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 		fk := n.AccountID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1038,8 +1044,11 @@ func (aq *AccountQuery) loadItems(ctx context.Context, query *ItemQuery, nodes [
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(item.FieldAccountID)
+	}
 	query.Where(predicate.Item(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.ItemsColumn, fks...))
+		s.Where(sql.InValues(s.C(account.ItemsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1049,7 +1058,7 @@ func (aq *AccountQuery) loadItems(ctx context.Context, query *ItemQuery, nodes [
 		fk := n.AccountID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1065,8 +1074,11 @@ func (aq *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(asset.FieldAccountID)
+	}
 	query.Where(predicate.Asset(func(s *sql.Selector) {
-		s.Where(sql.InValues(account.AssetsColumn, fks...))
+		s.Where(sql.InValues(s.C(account.AssetsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1076,7 +1088,7 @@ func (aq *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes
 		fk := n.AccountID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -46,7 +46,7 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:openapi, generate:graphql]
+    deps: [generate:db, generate:openapi]
 
   generate:db:
     cmds: [go generate ./internal/ent]
@@ -58,10 +58,6 @@ tasks:
   generate:openapi:frontend:
     dir: web
     cmds: [yarn openapi]
-
-  generate:graphql:
-    cmds: [go generate ./app/transports/graphql]
-
   # -
   # Database
   # -

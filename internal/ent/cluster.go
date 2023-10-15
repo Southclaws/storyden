@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
@@ -41,7 +42,8 @@ type Cluster struct {
 	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClusterQuery when eager-loading is set.
-	Edges ClusterEdges `json:"edges"`
+	Edges        ClusterEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ClusterEdges holds the relations/edges for other nodes in the graph.
@@ -139,7 +141,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		case cluster.FieldID, cluster.FieldParentClusterID, cluster.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Cluster", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -223,9 +225,17 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field properties: %w", err)
 				}
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Cluster.
+// This includes values selected through modifiers, order, etc.
+func (c *Cluster) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Cluster entity.

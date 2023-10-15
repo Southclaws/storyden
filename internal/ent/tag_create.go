@@ -130,7 +130,7 @@ func (tc *TagCreate) Mutation() *TagMutation {
 // Save creates the Tag in the database.
 func (tc *TagCreate) Save(ctx context.Context) (*Tag, error) {
 	tc.defaults()
-	return withHooks[*Tag, TagMutation](ctx, tc.sqlSave, tc.mutation, tc.hooks)
+	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -435,12 +435,16 @@ func (u *TagUpsertOne) IDX(ctx context.Context) xid.ID {
 // TagCreateBulk is the builder for creating many Tag entities in bulk.
 type TagCreateBulk struct {
 	config
+	err      error
 	builders []*TagCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Tag entities in the database.
 func (tcb *TagCreateBulk) Save(ctx context.Context) ([]*Tag, error) {
+	if tcb.err != nil {
+		return nil, tcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
 	nodes := make([]*Tag, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))
@@ -457,8 +461,8 @@ func (tcb *TagCreateBulk) Save(ctx context.Context) ([]*Tag, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, tcb.builders[i+1].mutation)
 				} else {
@@ -613,6 +617,9 @@ func (u *TagUpsertBulk) Update(set func(*TagUpsert)) *TagUpsertBulk {
 
 // Exec executes the query.
 func (u *TagUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TagCreateBulk instead", i)

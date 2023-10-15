@@ -168,7 +168,7 @@ func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CategoryUpdate) Save(ctx context.Context) (int, error) {
 	cu.defaults()
-	return withHooks[int, CategoryMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -463,7 +463,7 @@ func (cuo *CategoryUpdateOne) Select(field string, fields ...string) *CategoryUp
 // Save executes the query and returns the updated Category entity.
 func (cuo *CategoryUpdateOne) Save(ctx context.Context) (*Category, error) {
 	cuo.defaults()
-	return withHooks[*Category, CategoryMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

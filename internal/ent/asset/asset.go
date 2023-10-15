@@ -4,6 +4,9 @@ package asset
 
 import (
 	"time"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -103,3 +106,123 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Asset queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByMimetype orders the results by the mimetype field.
+func ByMimetype(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMimetype, opts...).ToFunc()
+}
+
+// ByWidth orders the results by the width field.
+func ByWidth(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWidth, opts...).ToFunc()
+}
+
+// ByHeight orders the results by the height field.
+func ByHeight(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHeight, opts...).ToFunc()
+}
+
+// ByAccountID orders the results by the account_id field.
+func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
+}
+
+// ByPostsCount orders the results by posts count.
+func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostsStep(), opts...)
+	}
+}
+
+// ByPosts orders the results by posts terms.
+func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByClustersCount orders the results by clusters count.
+func ByClustersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClustersStep(), opts...)
+	}
+}
+
+// ByClusters orders the results by clusters terms.
+func ByClusters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClustersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByItemsCount orders the results by items count.
+func ByItemsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newItemsStep(), opts...)
+	}
+}
+
+// ByItems orders the results by items terms.
+func ByItems(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newItemsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOwnerField orders the results by owner field.
+func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newPostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, PostsTable, PostsPrimaryKey...),
+	)
+}
+func newClustersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClustersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClustersTable, ClustersPrimaryKey...),
+	)
+}
+func newItemsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ItemsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ItemsTable, ItemsPrimaryKey...),
+	)
+}
+func newOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OwnerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}

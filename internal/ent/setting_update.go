@@ -49,7 +49,7 @@ func (su *SettingUpdate) Mutation() *SettingMutation {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (su *SettingUpdate) Save(ctx context.Context) (int, error) {
 	su.defaults()
-	return withHooks[int, SettingMutation](ctx, su.sqlSave, su.mutation, su.hooks)
+	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -158,7 +158,7 @@ func (suo *SettingUpdateOne) Select(field string, fields ...string) *SettingUpda
 // Save executes the query and returns the updated Setting entity.
 func (suo *SettingUpdateOne) Save(ctx context.Context) (*Setting, error) {
 	suo.defaults()
-	return withHooks[*Setting, SettingMutation](ctx, suo.sqlSave, suo.mutation, suo.hooks)
+	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

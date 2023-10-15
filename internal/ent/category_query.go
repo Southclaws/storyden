@@ -21,7 +21,7 @@ import (
 type CategoryQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []category.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Category
 	withPosts  *PostQuery
@@ -57,7 +57,7 @@ func (cq *CategoryQuery) Unique(unique bool) *CategoryQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CategoryQuery) Order(o ...OrderFunc) *CategoryQuery {
+func (cq *CategoryQuery) Order(o ...category.OrderOption) *CategoryQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -273,7 +273,7 @@ func (cq *CategoryQuery) Clone() *CategoryQuery {
 	return &CategoryQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
+		order:      append([]category.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Category{}, cq.predicates...),
 		withPosts:  cq.withPosts.Clone(),
@@ -418,8 +418,11 @@ func (cq *CategoryQuery) loadPosts(ctx context.Context, query *PostQuery, nodes 
 		}
 	}
 	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(post.FieldCategoryID)
+	}
 	query.Where(predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.InValues(category.PostsColumn, fks...))
+		s.Where(sql.InValues(s.C(category.PostsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -429,7 +432,7 @@ func (cq *CategoryQuery) loadPosts(ctx context.Context, query *PostQuery, nodes 
 		fk := n.CategoryID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "category_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "category_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

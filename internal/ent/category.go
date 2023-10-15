@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/rs/xid"
@@ -38,7 +39,8 @@ type Category struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CategoryQuery when eager-loading is set.
-	Edges CategoryEdges `json:"edges"`
+	Edges        CategoryEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // CategoryEdges holds the relations/edges for other nodes in the graph.
@@ -77,7 +79,7 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 		case category.FieldID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Category", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -153,9 +155,17 @@ func (c *Category) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Category.
+// This includes values selected through modifiers, order, etc.
+func (c *Category) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Category entity.

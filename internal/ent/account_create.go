@@ -272,7 +272,7 @@ func (ac *AccountCreate) Mutation() *AccountMutation {
 // Save creates the Account in the database.
 func (ac *AccountCreate) Save(ctx context.Context) (*Account, error) {
 	ac.defaults()
-	return withHooks[*Account, AccountMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -883,12 +883,16 @@ func (u *AccountUpsertOne) IDX(ctx context.Context) xid.ID {
 // AccountCreateBulk is the builder for creating many Account entities in bulk.
 type AccountCreateBulk struct {
 	config
+	err      error
 	builders []*AccountCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Account entities in the database.
 func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Account, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
@@ -905,8 +909,8 @@ func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
@@ -1156,6 +1160,9 @@ func (u *AccountUpsertBulk) UpdateAdmin() *AccountUpsertBulk {
 
 // Exec executes the query.
 func (u *AccountUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AccountCreateBulk instead", i)

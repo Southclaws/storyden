@@ -5,6 +5,8 @@ package authentication
 import (
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 )
 
@@ -79,3 +81,45 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Authentication queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByService orders the results by the service field.
+func ByService(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldService, opts...).ToFunc()
+}
+
+// ByIdentifier orders the results by the identifier field.
+func ByIdentifier(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIdentifier, opts...).ToFunc()
+}
+
+// ByToken orders the results by the token field.
+func ByToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldToken, opts...).ToFunc()
+}
+
+// ByAccountField orders the results by account field.
+func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAccountStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newAccountStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AccountInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
+	)
+}

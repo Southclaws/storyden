@@ -22,7 +22,7 @@ import (
 type CollectionQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []collection.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Collection
 	withOwner  *AccountQuery
@@ -60,7 +60,7 @@ func (cq *CollectionQuery) Unique(unique bool) *CollectionQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CollectionQuery) Order(o ...OrderFunc) *CollectionQuery {
+func (cq *CollectionQuery) Order(o ...collection.OrderOption) *CollectionQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -298,7 +298,7 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 	return &CollectionQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
+		order:      append([]collection.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Collection{}, cq.predicates...),
 		withOwner:  cq.withOwner.Clone(),

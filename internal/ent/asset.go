@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
@@ -34,7 +35,8 @@ type Asset struct {
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AssetQuery when eager-loading is set.
-	Edges AssetEdges `json:"edges"`
+	Edges        AssetEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // AssetEdges holds the relations/edges for other nodes in the graph.
@@ -106,7 +108,7 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 		case asset.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Asset", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -168,9 +170,17 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				a.AccountID = *value
 			}
+		default:
+			a.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Asset.
+// This includes values selected through modifiers, order, etc.
+func (a *Asset) Value(name string) (ent.Value, error) {
+	return a.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Asset entity.

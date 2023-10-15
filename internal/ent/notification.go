@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/rs/xid"
@@ -26,7 +27,8 @@ type Notification struct {
 	// Link holds the value of the "link" field.
 	Link string `json:"link,omitempty"`
 	// Read holds the value of the "read" field.
-	Read bool `json:"read,omitempty"`
+	Read         bool `json:"read,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -43,7 +45,7 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 		case notification.FieldID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Notification", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -93,9 +95,17 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Read = value.Bool
 			}
+		default:
+			n.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Notification.
+// This includes values selected through modifiers, order, etc.
+func (n *Notification) Value(name string) (ent.Value, error) {
+	return n.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Notification.

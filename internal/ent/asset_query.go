@@ -24,7 +24,7 @@ import (
 type AssetQuery struct {
 	config
 	ctx          *QueryContext
-	order        []OrderFunc
+	order        []asset.OrderOption
 	inters       []Interceptor
 	predicates   []predicate.Asset
 	withPosts    *PostQuery
@@ -63,7 +63,7 @@ func (aq *AssetQuery) Unique(unique bool) *AssetQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (aq *AssetQuery) Order(o ...OrderFunc) *AssetQuery {
+func (aq *AssetQuery) Order(o ...asset.OrderOption) *AssetQuery {
 	aq.order = append(aq.order, o...)
 	return aq
 }
@@ -345,7 +345,7 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 	return &AssetQuery{
 		config:       aq.config,
 		ctx:          aq.ctx.Clone(),
-		order:        append([]OrderFunc{}, aq.order...),
+		order:        append([]asset.OrderOption{}, aq.order...),
 		inters:       append([]Interceptor{}, aq.inters...),
 		predicates:   append([]predicate.Asset{}, aq.predicates...),
 		withPosts:    aq.withPosts.Clone(),
@@ -778,6 +778,9 @@ func (aq *AssetQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != asset.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if aq.withOwner != nil {
+			_spec.Node.AddColumnOnce(asset.FieldAccountID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

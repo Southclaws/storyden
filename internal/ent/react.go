@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -29,7 +30,8 @@ type React struct {
 	Emoji string `json:"emoji,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReactQuery when eager-loading is set.
-	Edges ReactEdges `json:"edges"`
+	Edges        ReactEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ReactEdges holds the relations/edges for other nodes in the graph.
@@ -81,7 +83,7 @@ func (*React) scanValues(columns []string) ([]any, error) {
 		case react.FieldID, react.FieldAccountID, react.FieldPostID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type React", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -125,9 +127,17 @@ func (r *React) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.Emoji = value.String
 			}
+		default:
+			r.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the React.
+// This includes values selected through modifiers, order, etc.
+func (r *React) Value(name string) (ent.Value, error) {
+	return r.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the React entity.

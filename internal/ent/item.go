@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/item"
@@ -39,7 +40,8 @@ type Item struct {
 	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ItemQuery when eager-loading is set.
-	Edges ItemEdges `json:"edges"`
+	Edges        ItemEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ItemEdges holds the relations/edges for other nodes in the graph.
@@ -111,7 +113,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		case item.FieldID, item.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Item", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -189,9 +191,17 @@ func (i *Item) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field properties: %w", err)
 				}
 			}
+		default:
+			i.selectValues.Set(columns[j], values[j])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Item.
+// This includes values selected through modifiers, order, etc.
+func (i *Item) Value(name string) (ent.Value, error) {
+	return i.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Item entity.

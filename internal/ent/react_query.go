@@ -21,7 +21,7 @@ import (
 type ReactQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []react.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.React
 	withAccount *AccountQuery
@@ -58,7 +58,7 @@ func (rq *ReactQuery) Unique(unique bool) *ReactQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (rq *ReactQuery) Order(o ...OrderFunc) *ReactQuery {
+func (rq *ReactQuery) Order(o ...react.OrderOption) *ReactQuery {
 	rq.order = append(rq.order, o...)
 	return rq
 }
@@ -296,7 +296,7 @@ func (rq *ReactQuery) Clone() *ReactQuery {
 	return &ReactQuery{
 		config:      rq.config,
 		ctx:         rq.ctx.Clone(),
-		order:       append([]OrderFunc{}, rq.order...),
+		order:       append([]react.OrderOption{}, rq.order...),
 		inters:      append([]Interceptor{}, rq.inters...),
 		predicates:  append([]predicate.React{}, rq.predicates...),
 		withAccount: rq.withAccount.Clone(),
@@ -534,6 +534,12 @@ func (rq *ReactQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != react.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if rq.withAccount != nil {
+			_spec.Node.AddColumnOnce(react.FieldAccountID)
+		}
+		if rq.withPost != nil {
+			_spec.Node.AddColumnOnce(react.FieldPostID)
 		}
 	}
 	if ps := rq.predicates; len(ps) > 0 {

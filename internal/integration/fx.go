@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"

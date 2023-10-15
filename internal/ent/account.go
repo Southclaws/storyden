@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/rs/xid"
@@ -33,7 +34,8 @@ type Account struct {
 	Admin bool `json:"admin,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
-	Edges AccountEdges `json:"edges"`
+	Edges        AccountEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // AccountEdges holds the relations/edges for other nodes in the graph.
@@ -156,7 +158,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 		case account.FieldID:
 			values[i] = new(xid.ID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Account", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -219,9 +221,17 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Admin = value.Bool
 			}
+		default:
+			a.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Account.
+// This includes values selected through modifiers, order, etc.
+func (a *Account) Value(name string) (ent.Value, error) {
+	return a.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Account entity.

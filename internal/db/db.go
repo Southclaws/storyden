@@ -4,16 +4,14 @@ import (
 	"context"
 	"database/sql"
 
-	"entgo.io/ent/dialect"            // nolint:gci
-	entsql "entgo.io/ent/dialect/sql" // nolint:gci
-
-	// nolint:gci
-	"github.com/Southclaws/fault"      // nolint:gci
-	"github.com/Southclaws/fault/fctx" // nolint:gci
-	"github.com/Southclaws/fault/fmsg" // nolint:gci
-	_ "github.com/jackc/pgx/v4/stdlib" // nolint:gci
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"go.uber.org/fx" // nolint:gci
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"

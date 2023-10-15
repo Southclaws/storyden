@@ -185,11 +185,7 @@ func HasPosts() predicate.Tag {
 // HasPostsWith applies the HasEdge predicate on the "posts" edge with a given conditions (other predicates).
 func HasPostsWith(preds ...predicate.Post) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PostsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
-		)
+		step := newPostsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -212,11 +208,7 @@ func HasClusters() predicate.Tag {
 // HasClustersWith applies the HasEdge predicate on the "clusters" edge with a given conditions (other predicates).
 func HasClustersWith(preds ...predicate.Cluster) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ClustersInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ClustersTable, ClustersPrimaryKey...),
-		)
+		step := newClustersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -239,11 +231,7 @@ func HasItems() predicate.Tag {
 // HasItemsWith applies the HasEdge predicate on the "items" edge with a given conditions (other predicates).
 func HasItemsWith(preds ...predicate.Item) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ItemsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ItemsTable, ItemsPrimaryKey...),
-		)
+		step := newItemsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -266,11 +254,7 @@ func HasAccounts() predicate.Tag {
 // HasAccountsWith applies the HasEdge predicate on the "accounts" edge with a given conditions (other predicates).
 func HasAccountsWith(preds ...predicate.Account) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(AccountsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, AccountsTable, AccountsPrimaryKey...),
-		)
+		step := newAccountsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -281,32 +265,15 @@ func HasAccountsWith(preds ...predicate.Account) predicate.Tag {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Tag) predicate.Tag {
-	return predicate.Tag(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Tag(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Tag) predicate.Tag {
-	return predicate.Tag(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Tag(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Tag) predicate.Tag {
-	return predicate.Tag(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Tag(sql.NotPredicates(p))
 }

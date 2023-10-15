@@ -27,7 +27,7 @@ func (cd *CollectionDelete) Where(ps ...predicate.Collection) *CollectionDelete 
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (cd *CollectionDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, CollectionMutation](ctx, cd.sqlExec, cd.mutation, cd.hooks)
+	return withHooks(ctx, cd.sqlExec, cd.mutation, cd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

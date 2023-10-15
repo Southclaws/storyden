@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
@@ -33,6 +34,7 @@ type Authentication struct {
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
 	Edges                  AuthenticationEdges `json:"edges"`
 	account_authentication *xid.ID
+	selectValues           sql.SelectValues
 }
 
 // AuthenticationEdges holds the relations/edges for other nodes in the graph.
@@ -73,7 +75,7 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 		case authentication.ForeignKeys[0]: // account_authentication
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Authentication", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -132,9 +134,17 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 				a.account_authentication = new(xid.ID)
 				*a.account_authentication = *value.S.(*xid.ID)
 			}
+		default:
+			a.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Authentication.
+// This includes values selected through modifiers, order, etc.
+func (a *Authentication) Value(name string) (ent.Value, error) {
+	return a.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the Authentication entity.

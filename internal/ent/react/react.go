@@ -5,6 +5,8 @@ package react
 import (
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 )
 
@@ -70,3 +72,59 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the React queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByAccountID orders the results by the account_id field.
+func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
+}
+
+// ByPostID orders the results by the post_id field.
+func ByPostID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPostID, opts...).ToFunc()
+}
+
+// ByEmoji orders the results by the emoji field.
+func ByEmoji(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmoji, opts...).ToFunc()
+}
+
+// ByAccountField orders the results by account field.
+func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAccountStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByPostField orders the results by Post field.
+func ByPostField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newAccountStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AccountInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
+	)
+}
+func newPostStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, PostTable, PostColumn),
+	)
+}

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 )
 
@@ -212,4 +214,264 @@ func StatusValidator(s Status) error {
 	default:
 		return fmt.Errorf("post: invalid enum value for status field: %q", s)
 	}
+}
+
+// OrderOption defines the ordering options for the Post queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+}
+
+// ByFirst orders the results by the first field.
+func ByFirst(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirst, opts...).ToFunc()
+}
+
+// ByTitle orders the results by the title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
+}
+
+// ByPinned orders the results by the pinned field.
+func ByPinned(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPinned, opts...).ToFunc()
+}
+
+// ByRootPostID orders the results by the root_post_id field.
+func ByRootPostID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRootPostID, opts...).ToFunc()
+}
+
+// ByReplyToPostID orders the results by the reply_to_post_id field.
+func ByReplyToPostID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReplyToPostID, opts...).ToFunc()
+}
+
+// ByBody orders the results by the body field.
+func ByBody(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBody, opts...).ToFunc()
+}
+
+// ByShort orders the results by the short field.
+func ByShort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShort, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByCategoryID orders the results by the category_id field.
+func ByCategoryID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategoryID, opts...).ToFunc()
+}
+
+// ByAuthorField orders the results by author field.
+func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAuthorStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCategoryField orders the results by category field.
+func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByTagsCount orders the results by tags count.
+func ByTagsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTagsStep(), opts...)
+	}
+}
+
+// ByTags orders the results by tags terms.
+func ByTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRootField orders the results by root field.
+func ByRootField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRootStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByPostsCount orders the results by posts count.
+func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostsStep(), opts...)
+	}
+}
+
+// ByPosts orders the results by posts terms.
+func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByReplyToField orders the results by replyTo field.
+func ByReplyToField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReplyToStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByRepliesCount orders the results by replies count.
+func ByRepliesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRepliesStep(), opts...)
+	}
+}
+
+// ByReplies orders the results by replies terms.
+func ByReplies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRepliesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByReactsCount orders the results by reacts count.
+func ByReactsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReactsStep(), opts...)
+	}
+}
+
+// ByReacts orders the results by reacts terms.
+func ByReacts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReactsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAssetsCount orders the results by assets count.
+func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAssetsStep(), opts...)
+	}
+}
+
+// ByAssets orders the results by assets terms.
+func ByAssets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAssetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCollectionsCount orders the results by collections count.
+func ByCollectionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionsStep(), opts...)
+	}
+}
+
+// ByCollections orders the results by collections terms.
+func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newAuthorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AuthorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AuthorTable, AuthorColumn),
+	)
+}
+func newCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newTagsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TagsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, TagsTable, TagsPrimaryKey...),
+	)
+}
+func newRootStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, RootTable, RootColumn),
+	)
+}
+func newPostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
+	)
+}
+func newReplyToStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ReplyToTable, ReplyToColumn),
+	)
+}
+func newRepliesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RepliesTable, RepliesColumn),
+	)
+}
+func newReactsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReactsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ReactsTable, ReactsColumn),
+	)
+}
+func newAssetsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AssetsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, AssetsTable, AssetsPrimaryKey...),
+	)
+}
+func newCollectionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
+	)
 }

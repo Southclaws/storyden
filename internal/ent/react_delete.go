@@ -27,7 +27,7 @@ func (rd *ReactDelete) Where(ps ...predicate.React) *ReactDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (rd *ReactDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, ReactMutation](ctx, rd.sqlExec, rd.mutation, rd.hooks)
+	return withHooks(ctx, rd.sqlExec, rd.mutation, rd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

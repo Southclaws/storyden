@@ -24,7 +24,7 @@ import (
 type ClusterQuery struct {
 	config
 	ctx          *QueryContext
-	order        []OrderFunc
+	order        []cluster.OrderOption
 	inters       []Interceptor
 	predicates   []predicate.Cluster
 	withOwner    *AccountQuery
@@ -65,7 +65,7 @@ func (cq *ClusterQuery) Unique(unique bool) *ClusterQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *ClusterQuery) Order(o ...OrderFunc) *ClusterQuery {
+func (cq *ClusterQuery) Order(o ...cluster.OrderOption) *ClusterQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -391,7 +391,7 @@ func (cq *ClusterQuery) Clone() *ClusterQuery {
 	return &ClusterQuery{
 		config:       cq.config,
 		ctx:          cq.ctx.Clone(),
-		order:        append([]OrderFunc{}, cq.order...),
+		order:        append([]cluster.OrderOption{}, cq.order...),
 		inters:       append([]Interceptor{}, cq.inters...),
 		predicates:   append([]predicate.Cluster{}, cq.predicates...),
 		withOwner:    cq.withOwner.Clone(),
@@ -691,8 +691,11 @@ func (cq *ClusterQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(cluster.FieldParentClusterID)
+	}
 	query.Where(predicate.Cluster(func(s *sql.Selector) {
-		s.Where(sql.InValues(cluster.ClustersColumn, fks...))
+		s.Where(sql.InValues(s.C(cluster.ClustersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -702,7 +705,7 @@ func (cq *ClusterQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 		fk := n.ParentClusterID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "parent_cluster_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_cluster_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -919,6 +922,12 @@ func (cq *ClusterQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != cluster.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if cq.withOwner != nil {
+			_spec.Node.AddColumnOnce(cluster.FieldAccountID)
+		}
+		if cq.withParent != nil {
+			_spec.Node.AddColumnOnce(cluster.FieldParentClusterID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

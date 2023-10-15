@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 )
@@ -19,7 +20,8 @@ type Setting struct {
 	// Value holds the value of the "value" field.
 	Value string `json:"value,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +34,7 @@ func (*Setting) scanValues(columns []string) ([]any, error) {
 		case setting.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Setting", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -64,9 +66,17 @@ func (s *Setting) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.UpdatedAt = value.Time
 			}
+		default:
+			s.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// GetValue returns the ent.Value that was dynamically selected and assigned to the Setting.
+// This includes values selected through modifiers, order, etc.
+func (s *Setting) GetValue(name string) (ent.Value, error) {
+	return s.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Setting.

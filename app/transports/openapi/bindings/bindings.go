@@ -196,6 +196,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *Cook
 			IncludeResponseStatus: true,
 			AuthenticationFunc:    auth.validator,
 		},
+		SilenceServersWarning: true,
 		// Handles validation errors that occur BEFORE the handler is called.
 		ErrorHandler: glue.ValidatorErrorHandler(),
 	}))

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -54,6 +55,7 @@ type Post struct {
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges         PostEdges `json:"edges"`
 	account_posts *xid.ID
+	selectValues  sql.SelectValues
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
@@ -207,7 +209,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 		case post.ForeignKeys[0]: // account_posts
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -328,9 +330,17 @@ func (po *Post) assignValues(columns []string, values []any) error {
 				po.account_posts = new(xid.ID)
 				*po.account_posts = *value.S.(*xid.ID)
 			}
+		default:
+			po.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Post.
+// This includes values selected through modifiers, order, etc.
+func (po *Post) Value(name string) (ent.Value, error) {
+	return po.selectValues.Get(name)
 }
 
 // QueryAuthor queries the "author" edge of the Post entity.

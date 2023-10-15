@@ -240,7 +240,7 @@ func (cc *ClusterCreate) Mutation() *ClusterMutation {
 // Save creates the Cluster in the database.
 func (cc *ClusterCreate) Save(ctx context.Context) (*Cluster, error) {
 	cc.defaults()
-	return withHooks[*Cluster, ClusterMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -905,12 +905,16 @@ func (u *ClusterUpsertOne) IDX(ctx context.Context) xid.ID {
 // ClusterCreateBulk is the builder for creating many Cluster entities in bulk.
 type ClusterCreateBulk struct {
 	config
+	err      error
 	builders []*ClusterCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Cluster entities in the database.
 func (ccb *ClusterCreateBulk) Save(ctx context.Context) ([]*Cluster, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Cluster, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
@@ -927,8 +931,8 @@ func (ccb *ClusterCreateBulk) Save(ctx context.Context) ([]*Cluster, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
@@ -1234,6 +1238,9 @@ func (u *ClusterUpsertBulk) ClearProperties() *ClusterUpsertBulk {
 
 // Exec executes the query.
 func (u *ClusterUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ClusterCreateBulk instead", i)

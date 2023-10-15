@@ -24,7 +24,7 @@ import (
 type ItemQuery struct {
 	config
 	ctx          *QueryContext
-	order        []OrderFunc
+	order        []item.OrderOption
 	inters       []Interceptor
 	predicates   []predicate.Item
 	withOwner    *AccountQuery
@@ -63,7 +63,7 @@ func (iq *ItemQuery) Unique(unique bool) *ItemQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (iq *ItemQuery) Order(o ...OrderFunc) *ItemQuery {
+func (iq *ItemQuery) Order(o ...item.OrderOption) *ItemQuery {
 	iq.order = append(iq.order, o...)
 	return iq
 }
@@ -345,7 +345,7 @@ func (iq *ItemQuery) Clone() *ItemQuery {
 	return &ItemQuery{
 		config:       iq.config,
 		ctx:          iq.ctx.Clone(),
-		order:        append([]OrderFunc{}, iq.order...),
+		order:        append([]item.OrderOption{}, iq.order...),
 		inters:       append([]Interceptor{}, iq.inters...),
 		predicates:   append([]predicate.Item{}, iq.predicates...),
 		withOwner:    iq.withOwner.Clone(),
@@ -778,6 +778,9 @@ func (iq *ItemQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != item.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if iq.withOwner != nil {
+			_spec.Node.AddColumnOnce(item.FieldAccountID)
 		}
 	}
 	if ps := iq.predicates; len(ps) > 0 {

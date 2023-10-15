@@ -84,7 +84,7 @@ func (au *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AuthenticationUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, AuthenticationMutation](ctx, au.sqlSave, au.mutation, au.hooks)
+	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -278,7 +278,7 @@ func (auo *AuthenticationUpdateOne) Select(field string, fields ...string) *Auth
 
 // Save executes the query and returns the updated Authentication entity.
 func (auo *AuthenticationUpdateOne) Save(ctx context.Context) (*Authentication, error) {
-	return withHooks[*Authentication, AuthenticationMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
+	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

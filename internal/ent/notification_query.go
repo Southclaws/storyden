@@ -19,7 +19,7 @@ import (
 type NotificationQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []notification.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Notification
 	modifiers  []func(*sql.Selector)
@@ -54,7 +54,7 @@ func (nq *NotificationQuery) Unique(unique bool) *NotificationQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (nq *NotificationQuery) Order(o ...OrderFunc) *NotificationQuery {
+func (nq *NotificationQuery) Order(o ...notification.OrderOption) *NotificationQuery {
 	nq.order = append(nq.order, o...)
 	return nq
 }
@@ -248,7 +248,7 @@ func (nq *NotificationQuery) Clone() *NotificationQuery {
 	return &NotificationQuery{
 		config:     nq.config,
 		ctx:        nq.ctx.Clone(),
-		order:      append([]OrderFunc{}, nq.order...),
+		order:      append([]notification.OrderOption{}, nq.order...),
 		inters:     append([]Interceptor{}, nq.inters...),
 		predicates: append([]predicate.Notification{}, nq.predicates...),
 		// clone intermediate query.
