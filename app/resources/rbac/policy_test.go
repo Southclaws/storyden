@@ -13,7 +13,9 @@ import (
 )
 
 func TestPolicy(t *testing.T) {
-	defer integration.Test(t, nil, fx.Invoke(func(
+	t.Parallel()
+
+	integration.Test(t, nil, fx.Invoke(func(
 		am rbac.AccessManager,
 	) {
 		a := assert.New(t)

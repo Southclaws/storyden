@@ -19,6 +19,7 @@ linters:
   disable:
     - scopelint
     - asciicheck
+    - tagalign
   presets:
     - bugs
     - unused

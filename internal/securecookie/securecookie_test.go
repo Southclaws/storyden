@@ -12,7 +12,7 @@ import (
 )
 
 func TestSession(t *testing.T) {
-	defer integration.Test(t, &config.Config{
+	integration.Test(t, &config.Config{
 		SessionKey: "e6386bdf71c523e4f313a244e64d560db172731674861e735a1eae90ecef98f3df6cb2a385f6d96cc9f9746ca83b8839868c",
 	},
 		fx.Invoke(func(

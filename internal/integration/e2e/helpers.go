@@ -17,7 +17,7 @@ func WithAccount(ctx context.Context, ar account.Repository, template account.Ac
 	template.ID = account.AccountID(unique)
 	template.Handle = template.Handle + "-" + unique.String()
 
-	opts = append(opts, account.WithID(template.ID), account.WithName(template.Name))
+	opts = append(opts, account.WithID(template.ID), account.WithName(template.Name), account.WithAdmin(template.Admin))
 
 	acc, err := ar.Create(ctx, template.Handle, opts...)
 	if err != nil {

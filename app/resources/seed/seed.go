@@ -28,17 +28,6 @@ import (
 // referred to as: "3-byte counter, starting with a random value."
 var id = func(s string) xid.ID { return utils.Must(xid.FromString(s)) }
 
-// Ready is a type you can depend on during integration tests which, when used
-// will ensure the database is seeded with data before your tests run.
-// Usage is simple, use `integration.Test` and add this value as a parameter to
-// the test function invoke call:
-//
-//	integration.Test(t, nil, fx.Invoke(
-//	    func(
-//	        _ seed.Ready,
-//	        repo user.Repository,
-//	    ) {
-//	        ... your test code
 type Ready struct{}
 
 type Empty struct{}
