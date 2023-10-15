@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/imdario/mergo"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
-	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
@@ -30,9 +30,15 @@ import (
 //	    }))
 //	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
-	defaultConfig := config.Config{}
+	defaultConfig := config.Config{
+		CookieDomain:     "localhost",
+		PublicWebAddress: "http://localhost",
+	}
 
 	if url := os.Getenv("DATABASE_URL"); url != "" {
+		if isMaybeProdDB(url) {
+			panic("maybe accidental prod DATABASE_URL in integration tests!")
+		}
 		defaultConfig.DatabaseURL = url
 	} else {
 		defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
@@ -43,9 +49,6 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	o = append(o,
 		// main application dependencies
 		application(),
-
-		// seeded database
-		seed.Create(),
 
 		// provide a global context
 		fx.Provide(func() context.Context { return ctx }),
@@ -72,8 +75,26 @@ func application() fx.Option {
 	return fx.Options(
 		fx.NopLogger,
 
-		infrastructure.Build(),
+		infrastructure.Build(false),
 		resources.Build(),
 		services.Build(),
 	)
+}
+
+func isMaybeProdDB(url string) bool {
+	dangerous := []string{
+		"free-tier",
+		".aws-eu-central",
+		"cockroachlabs",
+		"cloud",
+		"verify-full",
+	}
+
+	for _, v := range dangerous {
+		if strings.Contains(url, v) {
+			return true
+		}
+	}
+
+	return false
 }

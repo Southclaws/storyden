@@ -11,24 +11,39 @@ import (
 	"github.com/Southclaws/fault/fctx" // nolint:gci
 	"github.com/Southclaws/fault/fmsg" // nolint:gci
 	_ "github.com/jackc/pgx/v4/stdlib" // nolint:gci
-	"go.uber.org/fx"                   // nolint:gci
+	"github.com/jmoiron/sqlx"
+	"go.uber.org/fx" // nolint:gci
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-func Build() fx.Option {
+func Build(migrate bool) fx.Option {
 	return fx.Options(
 		// provide the underlying *sql.DB to the system
 		fx.Provide(newSQL),
 
+		// provide sqlx to make hand written queries slightly less painful
+		fx.Provide(newSQLX),
+
 		// construct a new ent client using the *sql.DB provided above
 		fx.Provide(newEntClient),
+
+		newMigrate(migrate),
 	)
 }
 
 func newSQL(cfg config.Config) (*sql.DB, error) {
 	driver, err := sql.Open("pgx", cfg.DatabaseURL)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
+	}
+
+	return driver, nil
+}
+
+func newSQLX(cfg config.Config) (*sqlx.DB, error) {
+	driver, err := sqlx.Connect("pgx", cfg.DatabaseURL)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
 	}
@@ -64,9 +79,19 @@ func newEntClient(lc fx.Lifecycle, db *sql.DB) (*ent.Client, error) {
 func connect(ctx context.Context, driver *sql.DB) (*ent.Client, error) {
 	client := ent.NewClient(ent.Driver(entsql.OpenDB(dialect.Postgres, driver)))
 
-	opts := []schema.MigrateOption{
-		schema.WithAtlas(true),
+	return client, nil
+}
+
+func newMigrate(migrate bool) fx.Option {
+	if migrate {
+		return fx.Invoke(Migrate)
 	}
+
+	return fx.Options()
+}
+
+func Migrate(ctx context.Context, client *ent.Client) error {
+	opts := []schema.MigrateOption{}
 
 	// We don't do versioned migrations currently.
 	// opts = append(opts, schema.WithDropColumn(true))
@@ -74,8 +99,8 @@ func connect(ctx context.Context, driver *sql.DB) (*ent.Client, error) {
 
 	// Run only additive migrations
 	if err := client.Schema.Create(ctx, opts...); err != nil {
-		return nil, fault.Wrap(err)
+		return fault.Wrap(err)
 	}
 
-	return client, nil
+	return nil
 }
