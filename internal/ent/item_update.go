@@ -98,6 +98,26 @@ func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 	return iu
 }
 
+// SetContent sets the "content" field.
+func (iu *ItemUpdate) SetContent(s string) *ItemUpdate {
+	iu.mutation.SetContent(s)
+	return iu
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableContent(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetContent(*s)
+	}
+	return iu
+}
+
+// ClearContent clears the value of the "content" field.
+func (iu *ItemUpdate) ClearContent() *ItemUpdate {
+	iu.mutation.ClearContent()
+	return iu
+}
+
 // SetAccountID sets the "account_id" field.
 func (iu *ItemUpdate) SetAccountID(x xid.ID) *ItemUpdate {
 	iu.mutation.SetAccountID(x)
@@ -331,6 +351,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := iu.mutation.Content(); ok {
+		_spec.SetField(item.FieldContent, field.TypeString, value)
+	}
+	if iu.mutation.ContentCleared() {
+		_spec.ClearField(item.FieldContent, field.TypeString)
 	}
 	if value, ok := iu.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
@@ -585,6 +611,26 @@ func (iuo *ItemUpdateOne) ClearImageURL() *ItemUpdateOne {
 // SetDescription sets the "description" field.
 func (iuo *ItemUpdateOne) SetDescription(s string) *ItemUpdateOne {
 	iuo.mutation.SetDescription(s)
+	return iuo
+}
+
+// SetContent sets the "content" field.
+func (iuo *ItemUpdateOne) SetContent(s string) *ItemUpdateOne {
+	iuo.mutation.SetContent(s)
+	return iuo
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableContent(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetContent(*s)
+	}
+	return iuo
+}
+
+// ClearContent clears the value of the "content" field.
+func (iuo *ItemUpdateOne) ClearContent() *ItemUpdateOne {
+	iuo.mutation.ClearContent()
 	return iuo
 }
 
@@ -851,6 +897,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := iuo.mutation.Content(); ok {
+		_spec.SetField(item.FieldContent, field.TypeString, value)
+	}
+	if iuo.mutation.ContentCleared() {
+		_spec.ClearField(item.FieldContent, field.TypeString)
 	}
 	if value, ok := iuo.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)

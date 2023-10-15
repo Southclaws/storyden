@@ -98,6 +98,26 @@ func (cu *ClusterUpdate) SetDescription(s string) *ClusterUpdate {
 	return cu
 }
 
+// SetContent sets the "content" field.
+func (cu *ClusterUpdate) SetContent(s string) *ClusterUpdate {
+	cu.mutation.SetContent(s)
+	return cu
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableContent(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetContent(*s)
+	}
+	return cu
+}
+
+// ClearContent clears the value of the "content" field.
+func (cu *ClusterUpdate) ClearContent() *ClusterUpdate {
+	cu.mutation.ClearContent()
+	return cu
+}
+
 // SetParentClusterID sets the "parent_cluster_id" field.
 func (cu *ClusterUpdate) SetParentClusterID(x xid.ID) *ClusterUpdate {
 	cu.mutation.SetParentClusterID(x)
@@ -412,6 +432,12 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Content(); ok {
+		_spec.SetField(cluster.FieldContent, field.TypeString, value)
+	}
+	if cu.mutation.ContentCleared() {
+		_spec.ClearField(cluster.FieldContent, field.TypeString)
 	}
 	if value, ok := cu.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
@@ -740,6 +766,26 @@ func (cuo *ClusterUpdateOne) ClearImageURL() *ClusterUpdateOne {
 // SetDescription sets the "description" field.
 func (cuo *ClusterUpdateOne) SetDescription(s string) *ClusterUpdateOne {
 	cuo.mutation.SetDescription(s)
+	return cuo
+}
+
+// SetContent sets the "content" field.
+func (cuo *ClusterUpdateOne) SetContent(s string) *ClusterUpdateOne {
+	cuo.mutation.SetContent(s)
+	return cuo
+}
+
+// SetNillableContent sets the "content" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableContent(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetContent(*s)
+	}
+	return cuo
+}
+
+// ClearContent clears the value of the "content" field.
+func (cuo *ClusterUpdateOne) ClearContent() *ClusterUpdateOne {
+	cuo.mutation.ClearContent()
 	return cuo
 }
 
@@ -1087,6 +1133,12 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Content(); ok {
+		_spec.SetField(cluster.FieldContent, field.TypeString, value)
+	}
+	if cuo.mutation.ContentCleared() {
+		_spec.ClearField(cluster.FieldContent, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)

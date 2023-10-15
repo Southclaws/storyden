@@ -34,6 +34,8 @@ type Cluster struct {
 	ImageURL *string `json:"image_url,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Content holds the value of the "content" field.
+	Content *string `json:"content,omitempty"`
 	// ParentClusterID holds the value of the "parent_cluster_id" field.
 	ParentClusterID xid.ID `json:"parent_cluster_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
@@ -134,7 +136,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cluster.FieldProperties:
 			values[i] = new([]byte)
-		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldDescription:
+		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldDescription, cluster.FieldContent:
 			values[i] = new(sql.NullString)
 		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -204,6 +206,13 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				c.Description = value.String
+			}
+		case cluster.FieldContent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field content", values[i])
+			} else if value.Valid {
+				c.Content = new(string)
+				*c.Content = value.String
 			}
 		case cluster.FieldParentClusterID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -315,6 +324,11 @@ func (c *Cluster) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(c.Description)
+	builder.WriteString(", ")
+	if v := c.Content; v != nil {
+		builder.WriteString("content=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("parent_cluster_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.ParentClusterID))

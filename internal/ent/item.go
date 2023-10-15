@@ -34,6 +34,8 @@ type Item struct {
 	ImageURL *string `json:"image_url,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Content holds the value of the "content" field.
+	Content *string `json:"content,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Properties holds the value of the "properties" field.
@@ -106,7 +108,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldProperties:
 			values[i] = new([]byte)
-		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldDescription:
+		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldDescription, item.FieldContent:
 			values[i] = new(sql.NullString)
 		case item.FieldCreatedAt, item.FieldUpdatedAt, item.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -176,6 +178,13 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[j])
 			} else if value.Valid {
 				i.Description = value.String
+			}
+		case item.FieldContent:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field content", values[j])
+			} else if value.Valid {
+				i.Content = new(string)
+				*i.Content = value.String
 			}
 		case item.FieldAccountID:
 			if value, ok := values[j].(*xid.ID); !ok {
@@ -271,6 +280,11 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(i.Description)
+	builder.WriteString(", ")
+	if v := i.Content; v != nil {
+		builder.WriteString("content=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.AccountID))

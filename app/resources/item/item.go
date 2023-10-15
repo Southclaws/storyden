@@ -62,6 +62,12 @@ func WithDescription(v string) Option {
 	}
 }
 
+func WithContent(v string) Option {
+	return func(c *ent.ItemMutation) {
+		c.SetContent(v)
+	}
+}
+
 func WithProperties(v any) Option {
 	return func(c *ent.ItemMutation) {
 		c.SetProperties(v)

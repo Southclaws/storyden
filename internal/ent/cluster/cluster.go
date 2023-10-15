@@ -29,6 +29,8 @@ const (
 	FieldImageURL = "image_url"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldContent holds the string denoting the content field in the database.
+	FieldContent = "content"
 	// FieldParentClusterID holds the string denoting the parent_cluster_id field in the database.
 	FieldParentClusterID = "parent_cluster_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
@@ -91,6 +93,7 @@ var Columns = []string{
 	FieldSlug,
 	FieldImageURL,
 	FieldDescription,
+	FieldContent,
 	FieldParentClusterID,
 	FieldAccountID,
 	FieldProperties,
@@ -172,6 +175,11 @@ func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByContent orders the results by the content field.
+func ByContent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContent, opts...).ToFunc()
 }
 
 // ByParentClusterID orders the results by the parent_cluster_id field.

@@ -8,6 +8,7 @@
 import type { AssetURL } from "./assetURL";
 import type { ItemDescription } from "./itemDescription";
 import type { ItemName } from "./itemName";
+import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
 
@@ -20,5 +21,6 @@ export interface ItemMutableProps {
   slug?: Slug;
   image_url?: AssetURL;
   description?: ItemDescription;
+  content?: PostContent;
   properties?: Properties;
 }

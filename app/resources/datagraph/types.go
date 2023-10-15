@@ -28,6 +28,7 @@ type Item struct {
 	Slug        string
 	ImageURL    opt.Optional[string]
 	Description string
+	Content     opt.Optional[string]
 	Owner       profile.Profile
 	In          []*Cluster
 	Properties  any
@@ -44,6 +45,7 @@ type Cluster struct {
 	Slug        string
 	ImageURL    opt.Optional[string]
 	Description string
+	Content     opt.Optional[string]
 	Owner       profile.Profile
 	Properties  any
 

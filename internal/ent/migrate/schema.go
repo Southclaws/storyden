@@ -110,6 +110,7 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "parent_cluster_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -122,13 +123,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[9]},
+				Columns:    []*schema.Column{ClustersColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[10]},
+				Columns:    []*schema.Column{ClustersColumns[11]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -174,6 +175,7 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
@@ -185,7 +187,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[9]},
+				Columns:    []*schema.Column{ItemsColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

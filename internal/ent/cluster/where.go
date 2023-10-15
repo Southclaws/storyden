@@ -91,6 +91,11 @@ func Description(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldDescription, v))
 }
 
+// Content applies equality check predicate on the "content" field. It's identical to ContentEQ.
+func Content(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldContent, v))
+}
+
 // ParentClusterID applies equality check predicate on the "parent_cluster_id" field. It's identical to ParentClusterIDEQ.
 func ParentClusterID(v xid.ID) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldParentClusterID, v))
@@ -499,6 +504,81 @@ func DescriptionEqualFold(v string) predicate.Cluster {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// ContentEQ applies the EQ predicate on the "content" field.
+func ContentEQ(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldContent, v))
+}
+
+// ContentNEQ applies the NEQ predicate on the "content" field.
+func ContentNEQ(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNEQ(FieldContent, v))
+}
+
+// ContentIn applies the In predicate on the "content" field.
+func ContentIn(vs ...string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldIn(FieldContent, vs...))
+}
+
+// ContentNotIn applies the NotIn predicate on the "content" field.
+func ContentNotIn(vs ...string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotIn(FieldContent, vs...))
+}
+
+// ContentGT applies the GT predicate on the "content" field.
+func ContentGT(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGT(FieldContent, v))
+}
+
+// ContentGTE applies the GTE predicate on the "content" field.
+func ContentGTE(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldGTE(FieldContent, v))
+}
+
+// ContentLT applies the LT predicate on the "content" field.
+func ContentLT(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLT(FieldContent, v))
+}
+
+// ContentLTE applies the LTE predicate on the "content" field.
+func ContentLTE(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldLTE(FieldContent, v))
+}
+
+// ContentContains applies the Contains predicate on the "content" field.
+func ContentContains(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldContains(FieldContent, v))
+}
+
+// ContentHasPrefix applies the HasPrefix predicate on the "content" field.
+func ContentHasPrefix(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldHasPrefix(FieldContent, v))
+}
+
+// ContentHasSuffix applies the HasSuffix predicate on the "content" field.
+func ContentHasSuffix(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldHasSuffix(FieldContent, v))
+}
+
+// ContentIsNil applies the IsNil predicate on the "content" field.
+func ContentIsNil() predicate.Cluster {
+	return predicate.Cluster(sql.FieldIsNull(FieldContent))
+}
+
+// ContentNotNil applies the NotNil predicate on the "content" field.
+func ContentNotNil() predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotNull(FieldContent))
+}
+
+// ContentEqualFold applies the EqualFold predicate on the "content" field.
+func ContentEqualFold(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEqualFold(FieldContent, v))
+}
+
+// ContentContainsFold applies the ContainsFold predicate on the "content" field.
+func ContentContainsFold(v string) predicate.Cluster {
+	return predicate.Cluster(sql.FieldContainsFold(FieldContent, v))
 }
 
 // ParentClusterIDEQ applies the EQ predicate on the "parent_cluster_id" field.
