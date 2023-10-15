@@ -1,6 +1,7 @@
 package seed
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -55,6 +56,10 @@ func New(
 	react_repo react.Repository,
 	asset_repo asset.Repository,
 ) (r Ready) {
+	if err := client.Schema.Create(context.Background()); err != nil {
+		panic(err)
+	}
+
 	if err := db.Truncate(database); err != nil {
 		panic(err)
 	}

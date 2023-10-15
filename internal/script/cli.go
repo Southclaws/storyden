@@ -24,7 +24,7 @@ func Run(opts ...fx.Option) {
 		fx.NopLogger,
 		fx.Provide(func() context.Context { return ctx }),
 		config.Build(),
-		infrastructure.Build(true),
+		infrastructure.Build(),
 		services.Build(),
 		resources.Build(),
 	}...)
