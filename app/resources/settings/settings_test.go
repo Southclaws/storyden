@@ -16,7 +16,7 @@ func TestSettings(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 
-	defer integration.Test(t, nil, fx.Invoke(func(
+	integration.Test(t, nil, fx.Invoke(func(
 		sr settings.Repository,
 	) {
 		r := require.New(t)

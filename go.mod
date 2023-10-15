@@ -43,6 +43,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2
 	github.com/go-faster/errors v0.6.1
 	github.com/go-faster/jx v1.0.0
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mazznoer/colorgrad v0.9.1
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
@@ -66,7 +67,6 @@ require (
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
-	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mazznoer/csscolorparser v0.1.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect

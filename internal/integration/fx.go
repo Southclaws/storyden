@@ -29,7 +29,7 @@ import (
 //
 //	    }))
 //	}
-func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
+func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	defaultConfig := config.Config{
 		CookieDomain:     "localhost",
 		PublicWebAddress: "http://localhost",
@@ -45,6 +45,9 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
+	t.Cleanup(func() {
+		cf()
+	})
 
 	o = append(o,
 		// main application dependencies
@@ -67,7 +70,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) func() {
 		t.Error()
 	}
 
-	return cf
+	return
 }
 
 // application gives you some basics needed by most components.

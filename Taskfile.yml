@@ -27,7 +27,7 @@ tasks:
       - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/internal/config.Version={{.VERSION}}'" ./cmd/backend
   backend:test:
     cmds:
-      - go test -p 1 -race ./...
+      - go test ./...
 
   # -
   # Docker
