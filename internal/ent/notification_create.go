@@ -84,7 +84,7 @@ func (nc *NotificationCreate) Mutation() *NotificationMutation {
 // Save creates the Notification in the database.
 func (nc *NotificationCreate) Save(ctx context.Context) (*Notification, error) {
 	nc.defaults()
-	return withHooks[*Notification, NotificationMutation](ctx, nc.sqlSave, nc.mutation, nc.hooks)
+	return withHooks(ctx, nc.sqlSave, nc.mutation, nc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -447,12 +447,16 @@ func (u *NotificationUpsertOne) IDX(ctx context.Context) xid.ID {
 // NotificationCreateBulk is the builder for creating many Notification entities in bulk.
 type NotificationCreateBulk struct {
 	config
+	err      error
 	builders []*NotificationCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Notification entities in the database.
 func (ncb *NotificationCreateBulk) Save(ctx context.Context) ([]*Notification, error) {
+	if ncb.err != nil {
+		return nil, ncb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ncb.builders))
 	nodes := make([]*Notification, len(ncb.builders))
 	mutators := make([]Mutator, len(ncb.builders))
@@ -469,8 +473,8 @@ func (ncb *NotificationCreateBulk) Save(ctx context.Context) ([]*Notification, e
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ncb.builders[i+1].mutation)
 				} else {
@@ -678,6 +682,9 @@ func (u *NotificationUpsertBulk) UpdateRead() *NotificationUpsertBulk {
 
 // Exec executes the query.
 func (u *NotificationUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the NotificationCreateBulk instead", i)

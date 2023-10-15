@@ -217,7 +217,7 @@ func (au *AssetUpdate) ClearOwner() *AssetUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AssetUpdate) Save(ctx context.Context) (int, error) {
 	au.defaults()
-	return withHooks[int, AssetMutation](ctx, au.sqlSave, au.mutation, au.hooks)
+	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -679,7 +679,7 @@ func (auo *AssetUpdateOne) Select(field string, fields ...string) *AssetUpdateOn
 // Save executes the query and returns the updated Asset entity.
 func (auo *AssetUpdateOne) Save(ctx context.Context) (*Asset, error) {
 	auo.defaults()
-	return withHooks[*Asset, AssetMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
+	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

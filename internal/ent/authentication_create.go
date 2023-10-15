@@ -96,7 +96,7 @@ func (ac *AuthenticationCreate) Mutation() *AuthenticationMutation {
 // Save creates the Authentication in the database.
 func (ac *AuthenticationCreate) Save(ctx context.Context) (*Authentication, error) {
 	ac.defaults()
-	return withHooks[*Authentication, AuthenticationMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -499,12 +499,16 @@ func (u *AuthenticationUpsertOne) IDX(ctx context.Context) xid.ID {
 // AuthenticationCreateBulk is the builder for creating many Authentication entities in bulk.
 type AuthenticationCreateBulk struct {
 	config
+	err      error
 	builders []*AuthenticationCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Authentication entities in the database.
 func (acb *AuthenticationCreateBulk) Save(ctx context.Context) ([]*Authentication, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Authentication, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
@@ -521,8 +525,8 @@ func (acb *AuthenticationCreateBulk) Save(ctx context.Context) ([]*Authenticatio
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
@@ -737,6 +741,9 @@ func (u *AuthenticationUpsertBulk) ClearMetadata() *AuthenticationUpsertBulk {
 
 // Exec executes the query.
 func (u *AuthenticationUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AuthenticationCreateBulk instead", i)

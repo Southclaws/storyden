@@ -18,7 +18,7 @@ import (
 type SettingQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []setting.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Setting
 	modifiers  []func(*sql.Selector)
@@ -53,7 +53,7 @@ func (sq *SettingQuery) Unique(unique bool) *SettingQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (sq *SettingQuery) Order(o ...OrderFunc) *SettingQuery {
+func (sq *SettingQuery) Order(o ...setting.OrderOption) *SettingQuery {
 	sq.order = append(sq.order, o...)
 	return sq
 }
@@ -247,7 +247,7 @@ func (sq *SettingQuery) Clone() *SettingQuery {
 	return &SettingQuery{
 		config:     sq.config,
 		ctx:        sq.ctx.Clone(),
-		order:      append([]OrderFunc{}, sq.order...),
+		order:      append([]setting.OrderOption{}, sq.order...),
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.Setting{}, sq.predicates...),
 		// clone intermediate query.

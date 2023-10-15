@@ -96,7 +96,7 @@ func (rc *RoleCreate) Mutation() *RoleMutation {
 // Save creates the Role in the database.
 func (rc *RoleCreate) Save(ctx context.Context) (*Role, error) {
 	rc.defaults()
-	return withHooks[*Role, RoleMutation](ctx, rc.sqlSave, rc.mutation, rc.hooks)
+	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -413,12 +413,16 @@ func (u *RoleUpsertOne) IDX(ctx context.Context) xid.ID {
 // RoleCreateBulk is the builder for creating many Role entities in bulk.
 type RoleCreateBulk struct {
 	config
+	err      error
 	builders []*RoleCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Role entities in the database.
 func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
+	if rcb.err != nil {
+		return nil, rcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(rcb.builders))
 	nodes := make([]*Role, len(rcb.builders))
 	mutators := make([]Mutator, len(rcb.builders))
@@ -435,8 +439,8 @@ func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, rcb.builders[i+1].mutation)
 				} else {
@@ -616,6 +620,9 @@ func (u *RoleUpsertBulk) UpdateName() *RoleUpsertBulk {
 
 // Exec executes the query.
 func (u *RoleUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the RoleCreateBulk instead", i)

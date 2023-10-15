@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -30,6 +31,7 @@ type Collection struct {
 	// The values are being populated by the CollectionQuery when eager-loading is set.
 	Edges               CollectionEdges `json:"edges"`
 	account_collections *xid.ID
+	selectValues        sql.SelectValues
 }
 
 // CollectionEdges holds the relations/edges for other nodes in the graph.
@@ -79,7 +81,7 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 		case collection.ForeignKeys[0]: // account_collections
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Collection", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -130,9 +132,17 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 				c.account_collections = new(xid.ID)
 				*c.account_collections = *value.S.(*xid.ID)
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Collection.
+// This includes values selected through modifiers, order, etc.
+func (c *Collection) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Collection entity.

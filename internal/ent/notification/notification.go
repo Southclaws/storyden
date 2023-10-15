@@ -5,6 +5,7 @@ package notification
 import (
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/rs/xid"
 )
 
@@ -55,3 +56,36 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Notification queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByTitle orders the results by the title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+}
+
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByLink orders the results by the link field.
+func ByLink(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLink, opts...).ToFunc()
+}
+
+// ByRead orders the results by the read field.
+func ByRead(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRead, opts...).ToFunc()
+}

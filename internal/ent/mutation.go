@@ -2103,6 +2103,7 @@ func (m *AssetMutation) SetOwnerID(id xid.ID) {
 // ClearOwner clears the "owner" edge to the Account entity.
 func (m *AssetMutation) ClearOwner() {
 	m.clearedowner = true
+	m.clearedFields[asset.FieldAccountID] = struct{}{}
 }
 
 // OwnerCleared reports if the "owner" edge to the Account entity was cleared.
@@ -4660,6 +4661,7 @@ func (m *ClusterMutation) SetOwnerID(id xid.ID) {
 // ClearOwner clears the "owner" edge to the Account entity.
 func (m *ClusterMutation) ClearOwner() {
 	m.clearedowner = true
+	m.clearedFields[cluster.FieldAccountID] = struct{}{}
 }
 
 // OwnerCleared reports if the "owner" edge to the Account entity was cleared.
@@ -4699,6 +4701,7 @@ func (m *ClusterMutation) SetParentID(id xid.ID) {
 // ClearParent clears the "parent" edge to the Cluster entity.
 func (m *ClusterMutation) ClearParent() {
 	m.clearedparent = true
+	m.clearedFields[cluster.FieldParentClusterID] = struct{}{}
 }
 
 // ParentCleared reports if the "parent" edge to the Cluster entity was cleared.
@@ -6607,6 +6610,7 @@ func (m *ItemMutation) SetOwnerID(id xid.ID) {
 // ClearOwner clears the "owner" edge to the Account entity.
 func (m *ItemMutation) ClearOwner() {
 	m.clearedowner = true
+	m.clearedFields[item.FieldAccountID] = struct{}{}
 }
 
 // OwnerCleared reports if the "owner" edge to the Account entity was cleared.
@@ -8630,6 +8634,7 @@ func (m *PostMutation) ResetAuthor() {
 // ClearCategory clears the "category" edge to the Category entity.
 func (m *PostMutation) ClearCategory() {
 	m.clearedcategory = true
+	m.clearedFields[post.FieldCategoryID] = struct{}{}
 }
 
 // CategoryCleared reports if the "category" edge to the Category entity was cleared.
@@ -8715,6 +8720,7 @@ func (m *PostMutation) SetRootID(id xid.ID) {
 // ClearRoot clears the "root" edge to the Post entity.
 func (m *PostMutation) ClearRoot() {
 	m.clearedroot = true
+	m.clearedFields[post.FieldRootPostID] = struct{}{}
 }
 
 // RootCleared reports if the "root" edge to the Post entity was cleared.
@@ -8808,6 +8814,7 @@ func (m *PostMutation) SetReplyToID(id xid.ID) {
 // ClearReplyTo clears the "replyTo" edge to the Post entity.
 func (m *PostMutation) ClearReplyTo() {
 	m.clearedreplyTo = true
+	m.clearedFields[post.FieldReplyToPostID] = struct{}{}
 }
 
 // ReplyToCleared reports if the "replyTo" edge to the Post entity was cleared.
@@ -10030,6 +10037,7 @@ func (m *ReactMutation) ResetEmoji() {
 // ClearAccount clears the "account" edge to the Account entity.
 func (m *ReactMutation) ClearAccount() {
 	m.clearedaccount = true
+	m.clearedFields[react.FieldAccountID] = struct{}{}
 }
 
 // AccountCleared reports if the "account" edge to the Account entity was cleared.
@@ -10056,6 +10064,7 @@ func (m *ReactMutation) ResetAccount() {
 // ClearPost clears the "Post" edge to the Post entity.
 func (m *ReactMutation) ClearPost() {
 	m.cleared_Post = true
+	m.clearedFields[react.FieldPostID] = struct{}{}
 }
 
 // PostCleared reports if the "Post" edge to the Post entity was cleared.

@@ -542,7 +542,7 @@ func (pu *PostUpdate) RemoveCollections(c ...*Collection) *PostUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PostUpdate) Save(ctx context.Context) (int, error) {
 	pu.defaults()
-	return withHooks[int, PostMutation](ctx, pu.sqlSave, pu.mutation, pu.hooks)
+	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -1581,7 +1581,7 @@ func (puo *PostUpdateOne) Select(field string, fields ...string) *PostUpdateOne 
 // Save executes the query and returns the updated Post entity.
 func (puo *PostUpdateOne) Save(ctx context.Context) (*Post, error) {
 	puo.defaults()
-	return withHooks[*Post, PostMutation](ctx, puo.sqlSave, puo.mutation, puo.hooks)
+	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

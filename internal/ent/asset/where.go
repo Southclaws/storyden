@@ -475,11 +475,7 @@ func HasPosts() predicate.Asset {
 // HasPostsWith applies the HasEdge predicate on the "posts" edge with a given conditions (other predicates).
 func HasPostsWith(preds ...predicate.Post) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(PostsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, PostsTable, PostsPrimaryKey...),
-		)
+		step := newPostsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -502,11 +498,7 @@ func HasClusters() predicate.Asset {
 // HasClustersWith applies the HasEdge predicate on the "clusters" edge with a given conditions (other predicates).
 func HasClustersWith(preds ...predicate.Cluster) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ClustersInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClustersTable, ClustersPrimaryKey...),
-		)
+		step := newClustersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -529,11 +521,7 @@ func HasItems() predicate.Asset {
 // HasItemsWith applies the HasEdge predicate on the "items" edge with a given conditions (other predicates).
 func HasItemsWith(preds ...predicate.Item) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(ItemsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ItemsTable, ItemsPrimaryKey...),
-		)
+		step := newItemsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -556,11 +544,7 @@ func HasOwner() predicate.Asset {
 // HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
 func HasOwnerWith(preds ...predicate.Account) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(OwnerInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
-		)
+		step := newOwnerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -571,32 +555,15 @@ func HasOwnerWith(preds ...predicate.Account) predicate.Asset {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Asset) predicate.Asset {
-	return predicate.Asset(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Asset(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Asset) predicate.Asset {
-	return predicate.Asset(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Asset(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Asset) predicate.Asset {
-	return predicate.Asset(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Asset(sql.NotPredicates(p))
 }

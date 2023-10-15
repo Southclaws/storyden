@@ -26,7 +26,7 @@ import (
 type PostQuery struct {
 	config
 	ctx             *QueryContext
-	order           []OrderFunc
+	order           []post.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Post
 	withAuthor      *AccountQuery
@@ -72,7 +72,7 @@ func (pq *PostQuery) Unique(unique bool) *PostQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (pq *PostQuery) Order(o ...OrderFunc) *PostQuery {
+func (pq *PostQuery) Order(o ...post.OrderOption) *PostQuery {
 	pq.order = append(pq.order, o...)
 	return pq
 }
@@ -486,7 +486,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 	return &PostQuery{
 		config:          pq.config,
 		ctx:             pq.ctx.Clone(),
-		order:           append([]OrderFunc{}, pq.order...),
+		order:           append([]post.OrderOption{}, pq.order...),
 		inters:          append([]Interceptor{}, pq.inters...),
 		predicates:      append([]predicate.Post{}, pq.predicates...),
 		withAuthor:      pq.withAuthor.Clone(),
@@ -707,7 +707,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withCollections != nil,
 		}
 	)
-	if pq.withAuthor != nil || pq.withCategory != nil || pq.withRoot != nil || pq.withReplyTo != nil {
+	if pq.withAuthor != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -965,8 +965,11 @@ func (pq *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*P
 		}
 	}
 	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(post.FieldRootPostID)
+	}
 	query.Where(predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.InValues(post.PostsColumn, fks...))
+		s.Where(sql.InValues(s.C(post.PostsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -976,7 +979,7 @@ func (pq *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*P
 		fk := n.RootPostID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "root_post_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "root_post_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1022,8 +1025,11 @@ func (pq *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 		}
 	}
 	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(post.FieldReplyToPostID)
+	}
 	query.Where(predicate.Post(func(s *sql.Selector) {
-		s.Where(sql.InValues(post.RepliesColumn, fks...))
+		s.Where(sql.InValues(s.C(post.RepliesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1033,7 +1039,7 @@ func (pq *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 		fk := n.ReplyToPostID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "reply_to_post_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "reply_to_post_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1049,8 +1055,11 @@ func (pq *PostQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(react.FieldPostID)
+	}
 	query.Where(predicate.React(func(s *sql.Selector) {
-		s.Where(sql.InValues(post.ReactsColumn, fks...))
+		s.Where(sql.InValues(s.C(post.ReactsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1060,7 +1069,7 @@ func (pq *PostQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []
 		fk := n.PostID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "post_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "post_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1216,6 +1225,15 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != post.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if pq.withCategory != nil {
+			_spec.Node.AddColumnOnce(post.FieldCategoryID)
+		}
+		if pq.withRoot != nil {
+			_spec.Node.AddColumnOnce(post.FieldRootPostID)
+		}
+		if pq.withReplyTo != nil {
+			_spec.Node.AddColumnOnce(post.FieldReplyToPostID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

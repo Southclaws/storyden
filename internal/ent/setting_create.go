@@ -57,7 +57,7 @@ func (sc *SettingCreate) Mutation() *SettingMutation {
 // Save creates the Setting in the database.
 func (sc *SettingCreate) Save(ctx context.Context) (*Setting, error) {
 	sc.defaults()
-	return withHooks[*Setting, SettingMutation](ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -335,12 +335,16 @@ func (u *SettingUpsertOne) IDX(ctx context.Context) string {
 // SettingCreateBulk is the builder for creating many Setting entities in bulk.
 type SettingCreateBulk struct {
 	config
+	err      error
 	builders []*SettingCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Setting entities in the database.
 func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
+	if scb.err != nil {
+		return nil, scb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
 	nodes := make([]*Setting, len(scb.builders))
 	mutators := make([]Mutator, len(scb.builders))
@@ -357,8 +361,8 @@ func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
 				} else {
@@ -535,6 +539,9 @@ func (u *SettingUpsertBulk) UpdateUpdatedAt() *SettingUpsertBulk {
 
 // Exec executes the query.
 func (u *SettingUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SettingCreateBulk instead", i)

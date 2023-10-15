@@ -330,7 +330,7 @@ func (cu *ClusterUpdate) RemoveTags(t ...*Tag) *ClusterUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ClusterUpdate) Save(ctx context.Context) (int, error) {
 	cu.defaults()
-	return withHooks[int, ClusterMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -988,7 +988,7 @@ func (cuo *ClusterUpdateOne) Select(field string, fields ...string) *ClusterUpda
 // Save executes the query and returns the updated Cluster entity.
 func (cuo *ClusterUpdateOne) Save(ctx context.Context) (*Cluster, error) {
 	cuo.defaults()
-	return withHooks[*Cluster, ClusterMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

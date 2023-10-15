@@ -119,7 +119,7 @@ func (cu *CollectionUpdate) RemovePosts(p ...*Post) *CollectionUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CollectionUpdate) Save(ctx context.Context) (int, error) {
 	cu.defaults()
-	return withHooks[int, CollectionMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -372,7 +372,7 @@ func (cuo *CollectionUpdateOne) Select(field string, fields ...string) *Collecti
 // Save executes the query and returns the updated Collection entity.
 func (cuo *CollectionUpdateOne) Save(ctx context.Context) (*Collection, error) {
 	cuo.defaults()
-	return withHooks[*Collection, CollectionMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

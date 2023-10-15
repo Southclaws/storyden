@@ -59,7 +59,7 @@ func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (nu *NotificationUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, NotificationMutation](ctx, nu.sqlSave, nu.mutation, nu.hooks)
+	return withHooks(ctx, nu.sqlSave, nu.mutation, nu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -177,7 +177,7 @@ func (nuo *NotificationUpdateOne) Select(field string, fields ...string) *Notifi
 
 // Save executes the query and returns the updated Notification entity.
 func (nuo *NotificationUpdateOne) Save(ctx context.Context) (*Notification, error) {
-	return withHooks[*Notification, NotificationMutation](ctx, nuo.sqlSave, nuo.mutation, nuo.hooks)
+	return withHooks(ctx, nuo.sqlSave, nuo.mutation, nuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

@@ -122,7 +122,7 @@ func (cc *CollectionCreate) Mutation() *CollectionMutation {
 // Save creates the Collection in the database.
 func (cc *CollectionCreate) Save(ctx context.Context) (*Collection, error) {
 	cc.defaults()
-	return withHooks[*Collection, CollectionMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -489,12 +489,16 @@ func (u *CollectionUpsertOne) IDX(ctx context.Context) xid.ID {
 // CollectionCreateBulk is the builder for creating many Collection entities in bulk.
 type CollectionCreateBulk struct {
 	config
+	err      error
 	builders []*CollectionCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Collection entities in the database.
 func (ccb *CollectionCreateBulk) Save(ctx context.Context) ([]*Collection, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Collection, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
@@ -511,8 +515,8 @@ func (ccb *CollectionCreateBulk) Save(ctx context.Context) ([]*Collection, error
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
@@ -706,6 +710,9 @@ func (u *CollectionUpsertBulk) UpdateDescription() *CollectionUpsertBulk {
 
 // Exec executes the query.
 func (u *CollectionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CollectionCreateBulk instead", i)

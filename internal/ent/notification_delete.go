@@ -27,7 +27,7 @@ func (nd *NotificationDelete) Where(ps ...predicate.Notification) *NotificationD
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (nd *NotificationDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, NotificationMutation](ctx, nd.sqlExec, nd.mutation, nd.hooks)
+	return withHooks(ctx, nd.sqlExec, nd.mutation, nd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

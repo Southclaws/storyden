@@ -5,6 +5,8 @@ package category
 import (
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 )
 
@@ -88,3 +90,72 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Category queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
+}
+
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByColour orders the results by the colour field.
+func ByColour(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldColour, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
+}
+
+// ByAdmin orders the results by the admin field.
+func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
+}
+
+// ByPostsCount orders the results by posts count.
+func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostsStep(), opts...)
+	}
+}
+
+// ByPosts orders the results by posts terms.
+func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newPostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
+	)
+}

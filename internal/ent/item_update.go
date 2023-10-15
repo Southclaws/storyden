@@ -249,7 +249,7 @@ func (iu *ItemUpdate) RemoveTags(t ...*Tag) *ItemUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (iu *ItemUpdate) Save(ctx context.Context) (int, error) {
 	iu.defaults()
-	return withHooks[int, ItemMutation](ctx, iu.sqlSave, iu.mutation, iu.hooks)
+	return withHooks(ctx, iu.sqlSave, iu.mutation, iu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -752,7 +752,7 @@ func (iuo *ItemUpdateOne) Select(field string, fields ...string) *ItemUpdateOne 
 // Save executes the query and returns the updated Item entity.
 func (iuo *ItemUpdateOne) Save(ctx context.Context) (*Item, error) {
 	iuo.defaults()
-	return withHooks[*Item, ItemMutation](ctx, iuo.sqlSave, iuo.mutation, iuo.hooks)
+	return withHooks(ctx, iuo.sqlSave, iuo.mutation, iuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

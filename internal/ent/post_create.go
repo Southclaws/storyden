@@ -374,7 +374,7 @@ func (pc *PostCreate) Mutation() *PostMutation {
 // Save creates the Post in the database.
 func (pc *PostCreate) Save(ctx context.Context) (*Post, error) {
 	pc.defaults()
-	return withHooks[*Post, PostMutation](ctx, pc.sqlSave, pc.mutation, pc.hooks)
+	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -1319,12 +1319,16 @@ func (u *PostUpsertOne) IDX(ctx context.Context) xid.ID {
 // PostCreateBulk is the builder for creating many Post entities in bulk.
 type PostCreateBulk struct {
 	config
+	err      error
 	builders []*PostCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Post entities in the database.
 func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
+	if pcb.err != nil {
+		return nil, pcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
 	nodes := make([]*Post, len(pcb.builders))
 	mutators := make([]Mutator, len(pcb.builders))
@@ -1341,8 +1345,8 @@ func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
 				} else {
@@ -1746,6 +1750,9 @@ func (u *PostUpsertBulk) ClearCategoryID() *PostUpsertBulk {
 
 // Exec executes the query.
 func (u *PostUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the PostCreateBulk instead", i)

@@ -156,7 +156,7 @@ func (ac *AssetCreate) Mutation() *AssetMutation {
 // Save creates the Asset in the database.
 func (ac *AssetCreate) Save(ctx context.Context) (*Asset, error) {
 	ac.defaults()
-	return withHooks[*Asset, AssetMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -675,12 +675,16 @@ func (u *AssetUpsertOne) IDX(ctx context.Context) string {
 // AssetCreateBulk is the builder for creating many Asset entities in bulk.
 type AssetCreateBulk struct {
 	config
+	err      error
 	builders []*AssetCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Asset entities in the database.
 func (acb *AssetCreateBulk) Save(ctx context.Context) ([]*Asset, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Asset, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
@@ -697,8 +701,8 @@ func (acb *AssetCreateBulk) Save(ctx context.Context) ([]*Asset, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {
@@ -948,6 +952,9 @@ func (u *AssetUpsertBulk) UpdateAccountID() *AssetUpsertBulk {
 
 // Exec executes the query.
 func (u *AssetUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AssetCreateBulk instead", i)

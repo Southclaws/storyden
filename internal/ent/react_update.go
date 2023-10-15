@@ -78,7 +78,7 @@ func (ru *ReactUpdate) ClearPost() *ReactUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ru *ReactUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ReactMutation](ctx, ru.sqlSave, ru.mutation, ru.hooks)
+	return withHooks(ctx, ru.sqlSave, ru.mutation, ru.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -275,7 +275,7 @@ func (ruo *ReactUpdateOne) Select(field string, fields ...string) *ReactUpdateOn
 
 // Save executes the query and returns the updated React entity.
 func (ruo *ReactUpdateOne) Save(ctx context.Context) (*React, error) {
-	return withHooks[*React, ReactMutation](ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
+	return withHooks(ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

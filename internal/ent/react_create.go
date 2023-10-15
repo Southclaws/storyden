@@ -90,7 +90,7 @@ func (rc *ReactCreate) Mutation() *ReactMutation {
 // Save creates the React in the database.
 func (rc *ReactCreate) Save(ctx context.Context) (*React, error) {
 	rc.defaults()
-	return withHooks[*React, ReactMutation](ctx, rc.sqlSave, rc.mutation, rc.hooks)
+	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -452,12 +452,16 @@ func (u *ReactUpsertOne) IDX(ctx context.Context) xid.ID {
 // ReactCreateBulk is the builder for creating many React entities in bulk.
 type ReactCreateBulk struct {
 	config
+	err      error
 	builders []*ReactCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the React entities in the database.
 func (rcb *ReactCreateBulk) Save(ctx context.Context) ([]*React, error) {
+	if rcb.err != nil {
+		return nil, rcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(rcb.builders))
 	nodes := make([]*React, len(rcb.builders))
 	mutators := make([]Mutator, len(rcb.builders))
@@ -474,8 +478,8 @@ func (rcb *ReactCreateBulk) Save(ctx context.Context) ([]*React, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, rcb.builders[i+1].mutation)
 				} else {
@@ -669,6 +673,9 @@ func (u *ReactUpsertBulk) UpdateEmoji() *ReactUpsertBulk {
 
 // Exec executes the query.
 func (u *ReactUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ReactCreateBulk instead", i)

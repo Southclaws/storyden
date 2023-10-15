@@ -87,7 +87,7 @@ func (ru *RoleUpdate) RemoveAccounts(a ...*Account) *RoleUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ru *RoleUpdate) Save(ctx context.Context) (int, error) {
 	ru.defaults()
-	return withHooks[int, RoleMutation](ctx, ru.sqlSave, ru.mutation, ru.hooks)
+	return withHooks(ctx, ru.sqlSave, ru.mutation, ru.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -277,7 +277,7 @@ func (ruo *RoleUpdateOne) Select(field string, fields ...string) *RoleUpdateOne 
 // Save executes the query and returns the updated Role entity.
 func (ruo *RoleUpdateOne) Save(ctx context.Context) (*Role, error) {
 	ruo.defaults()
-	return withHooks[*Role, RoleMutation](ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
+	return withHooks(ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
