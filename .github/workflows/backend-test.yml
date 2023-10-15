@@ -29,7 +29,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           cache: true
-          go-version: 1.19
       - run: go build ./cmd/backend
       - run: go run ./cmd/migrate
       - run: go test ./...
