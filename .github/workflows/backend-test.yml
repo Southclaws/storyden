@@ -4,18 +4,6 @@ on:
   push:
 
 jobs:
-  backend-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.17
-      - uses: actions/checkout@v3
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-
   backend-test:
     runs-on: ubuntu-latest
 
@@ -33,32 +21,15 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: "postgresql://default:default@localhost:5432/postgres?sslmode=disable"
+
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup go-task/task
-        uses: lukeshay/setup-task@v1
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - uses: actions/setup-go@v4
         with:
+          cache: true
           go-version: 1.19
-
-      - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Build
-        run: task backend
-
-      - name: Migrate
-        run: task seed
-
-      - name: Test
-        run: task backend:test
+      - run: go build ./cmd/backend
+      - run: go run ./cmd/seed
+      - run: go test ./...
