@@ -171,7 +171,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "slug", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -188,6 +188,13 @@ var (
 				Columns:    []*schema.Column{ItemsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "item_slug",
+				Unique:  false,
+				Columns: []*schema.Column{ItemsColumns[5]},
 			},
 		},
 	}

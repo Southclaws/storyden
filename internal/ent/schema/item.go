@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -18,11 +19,17 @@ func (Item) Mixin() []ent.Mixin {
 func (Item) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
-		field.String("slug"),
+		field.String("slug").Unique(),
 		field.String("image_url").Optional().Nillable(),
 		field.String("description"),
 		field.String("account_id").GoType(xid.ID{}),
 		field.Any("properties").Optional(),
+	}
+}
+
+func (Item) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("slug"),
 	}
 }
 
