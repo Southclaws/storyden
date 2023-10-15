@@ -6,7 +6,6 @@ require (
 	ariga.io/atlas v0.14.2 // indirect
 	dario.cat/mergo v1.0.0
 	entgo.io/ent v0.12.4
-	github.com/99designs/gqlgen v0.17.39
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v0.0.0-20230305115115-4b3c3280a736
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
@@ -25,7 +24,6 @@ require (
 	github.com/rs/xid v1.5.0
 	github.com/samber/lo v1.38.1
 	github.com/stretchr/testify v1.8.4
-	github.com/vektah/gqlparser/v2 v2.5.10 // indirect
 	go.uber.org/dig v1.17.0
 	go.uber.org/fx v1.20.0
 	go.uber.org/zap v1.26.0
@@ -37,7 +35,6 @@ require github.com/Southclaws/fault v0.7.0
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Southclaws/opt v0.6.0
-	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/dboslee/lru v0.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.3
@@ -93,6 +90,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
+	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/tdewolff/minify/v2 v2.12.9 // indirect
 	github.com/tdewolff/parse/v2 v2.6.8 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -117,7 +115,6 @@ require (
 require (
 	github.com/Southclaws/enumerator v1.3.1
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/cockroachdb/apd v1.1.1-0.20181017181144-bced77f817b4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -171,7 +168,6 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
