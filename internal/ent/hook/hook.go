@@ -57,6 +57,18 @@ func (f CategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CategoryMutation", m)
 }
 
+// The ClusterFunc type is an adapter to allow the use of ordinary
+// function as Cluster mutator.
+type ClusterFunc func(context.Context, *ent.ClusterMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClusterFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClusterMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClusterMutation", m)
+}
+
 // The CollectionFunc type is an adapter to allow the use of ordinary
 // function as Collection mutator.
 type CollectionFunc func(context.Context, *ent.CollectionMutation) (ent.Value, error)
@@ -67,6 +79,18 @@ func (f CollectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionMutation", m)
+}
+
+// The ItemFunc type is an adapter to allow the use of ordinary
+// function as Item mutator.
+type ItemFunc func(context.Context, *ent.ItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ItemMutation", m)
 }
 
 // The NotificationFunc type is an adapter to allow the use of ordinary

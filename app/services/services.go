@@ -9,8 +9,12 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
+	"github.com/Southclaws/storyden/app/services/cluster"
+	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/icon"
+	"github.com/Southclaws/storyden/app/services/item_crud"
+	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -39,5 +43,7 @@ func Build() fx.Option {
 		url.Build(),
 		thread_url.Build(),
 		fx.Provide(avatar_gen.New),
+		fx.Provide(cluster.New, clustertree.New),
+		fx.Provide(item_crud.New, item_tree.New),
 	)
 }

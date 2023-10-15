@@ -19,6 +19,10 @@ const (
 	FieldName = "name"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
+	// EdgeClusters holds the string denoting the clusters edge name in mutations.
+	EdgeClusters = "clusters"
+	// EdgeItems holds the string denoting the items edge name in mutations.
+	EdgeItems = "items"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
 	EdgeAccounts = "accounts"
 	// Table holds the table name of the tag in the database.
@@ -28,6 +32,16 @@ const (
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
+	// ClustersTable is the table that holds the clusters relation/edge. The primary key declared below.
+	ClustersTable = "tag_clusters"
+	// ClustersInverseTable is the table name for the Cluster entity.
+	// It exists in this package in order to avoid circular dependency with the "cluster" package.
+	ClustersInverseTable = "clusters"
+	// ItemsTable is the table that holds the items relation/edge. The primary key declared below.
+	ItemsTable = "tag_items"
+	// ItemsInverseTable is the table name for the Item entity.
+	// It exists in this package in order to avoid circular dependency with the "item" package.
+	ItemsInverseTable = "items"
 	// AccountsTable is the table that holds the accounts relation/edge. The primary key declared below.
 	AccountsTable = "account_tags"
 	// AccountsInverseTable is the table name for the Account entity.
@@ -46,6 +60,12 @@ var (
 	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
 	// primary key for the posts relation (M2M).
 	PostsPrimaryKey = []string{"tag_id", "post_id"}
+	// ClustersPrimaryKey and ClustersColumn2 are the table columns denoting the
+	// primary key for the clusters relation (M2M).
+	ClustersPrimaryKey = []string{"tag_id", "cluster_id"}
+	// ItemsPrimaryKey and ItemsColumn2 are the table columns denoting the
+	// primary key for the items relation (M2M).
+	ItemsPrimaryKey = []string{"tag_id", "item_id"}
 	// AccountsPrimaryKey and AccountsColumn2 are the table columns denoting the
 	// primary key for the accounts relation (M2M).
 	AccountsPrimaryKey = []string{"account_id", "tag_id"}

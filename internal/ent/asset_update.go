@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -97,6 +99,36 @@ func (au *AssetUpdate) AddPosts(p ...*Post) *AssetUpdate {
 	return au.AddPostIDs(ids...)
 }
 
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
+func (au *AssetUpdate) AddClusterIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.AddClusterIDs(ids...)
+	return au
+}
+
+// AddClusters adds the "clusters" edges to the Cluster entity.
+func (au *AssetUpdate) AddClusters(c ...*Cluster) *AssetUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.AddClusterIDs(ids...)
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (au *AssetUpdate) AddItemIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.AddItemIDs(ids...)
+	return au
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (au *AssetUpdate) AddItems(i ...*Item) *AssetUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.AddItemIDs(ids...)
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
 func (au *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
 	au.mutation.SetOwnerID(id)
@@ -132,6 +164,48 @@ func (au *AssetUpdate) RemovePosts(p ...*Post) *AssetUpdate {
 		ids[i] = p[i].ID
 	}
 	return au.RemovePostIDs(ids...)
+}
+
+// ClearClusters clears all "clusters" edges to the Cluster entity.
+func (au *AssetUpdate) ClearClusters() *AssetUpdate {
+	au.mutation.ClearClusters()
+	return au
+}
+
+// RemoveClusterIDs removes the "clusters" edge to Cluster entities by IDs.
+func (au *AssetUpdate) RemoveClusterIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.RemoveClusterIDs(ids...)
+	return au
+}
+
+// RemoveClusters removes "clusters" edges to Cluster entities.
+func (au *AssetUpdate) RemoveClusters(c ...*Cluster) *AssetUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return au.RemoveClusterIDs(ids...)
+}
+
+// ClearItems clears all "items" edges to the Item entity.
+func (au *AssetUpdate) ClearItems() *AssetUpdate {
+	au.mutation.ClearItems()
+	return au
+}
+
+// RemoveItemIDs removes the "items" edge to Item entities by IDs.
+func (au *AssetUpdate) RemoveItemIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.RemoveItemIDs(ids...)
+	return au
+}
+
+// RemoveItems removes "items" edges to Item entities.
+func (au *AssetUpdate) RemoveItems(i ...*Item) *AssetUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.RemoveItemIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -268,6 +342,96 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.ClustersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedClustersIDs(); len(nodes) > 0 && !au.mutation.ClustersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ClustersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedItemsIDs(); len(nodes) > 0 && !au.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -384,6 +548,36 @@ func (auo *AssetUpdateOne) AddPosts(p ...*Post) *AssetUpdateOne {
 	return auo.AddPostIDs(ids...)
 }
 
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
+func (auo *AssetUpdateOne) AddClusterIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.AddClusterIDs(ids...)
+	return auo
+}
+
+// AddClusters adds the "clusters" edges to the Cluster entity.
+func (auo *AssetUpdateOne) AddClusters(c ...*Cluster) *AssetUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.AddClusterIDs(ids...)
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (auo *AssetUpdateOne) AddItemIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.AddItemIDs(ids...)
+	return auo
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (auo *AssetUpdateOne) AddItems(i ...*Item) *AssetUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.AddItemIDs(ids...)
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
 func (auo *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
 	auo.mutation.SetOwnerID(id)
@@ -419,6 +613,48 @@ func (auo *AssetUpdateOne) RemovePosts(p ...*Post) *AssetUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return auo.RemovePostIDs(ids...)
+}
+
+// ClearClusters clears all "clusters" edges to the Cluster entity.
+func (auo *AssetUpdateOne) ClearClusters() *AssetUpdateOne {
+	auo.mutation.ClearClusters()
+	return auo
+}
+
+// RemoveClusterIDs removes the "clusters" edge to Cluster entities by IDs.
+func (auo *AssetUpdateOne) RemoveClusterIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.RemoveClusterIDs(ids...)
+	return auo
+}
+
+// RemoveClusters removes "clusters" edges to Cluster entities.
+func (auo *AssetUpdateOne) RemoveClusters(c ...*Cluster) *AssetUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return auo.RemoveClusterIDs(ids...)
+}
+
+// ClearItems clears all "items" edges to the Item entity.
+func (auo *AssetUpdateOne) ClearItems() *AssetUpdateOne {
+	auo.mutation.ClearItems()
+	return auo
+}
+
+// RemoveItemIDs removes the "items" edge to Item entities by IDs.
+func (auo *AssetUpdateOne) RemoveItemIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.RemoveItemIDs(ids...)
+	return auo
+}
+
+// RemoveItems removes "items" edges to Item entities.
+func (auo *AssetUpdateOne) RemoveItems(i ...*Item) *AssetUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.RemoveItemIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -578,6 +814,96 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ClustersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedClustersIDs(); len(nodes) > 0 && !auo.mutation.ClustersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ClustersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ClustersTable,
+			Columns: asset.ClustersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !auo.mutation.ItemsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.ItemsTable,
+			Columns: asset.ItemsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

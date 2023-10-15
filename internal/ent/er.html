@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+		<div class="mermaid" id="er-diagram">
+erDiagram
+    Account {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string handle
+        string name
+        string bio
+        bool admin
+    }
+    Asset {
+        string id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        string url
+        string mimetype
+        int width
+        int height
+        xidDOTID account_id
+    }
+    Authentication {
+        xidDOTID id
+        timeDOTTime created_at
+        string service
+        string identifier
+        string token
+        mapLBRACKstringRBRACKinterface {} metadata
+    }
+    Category {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        string name
+        string slug
+        string description
+        string colour
+        int sort
+        bool admin
+        mapLBRACKstringRBRACKinterface {} metadata
+    }
+    Cluster {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string name
+        string slug
+        string image_url
+        string description
+        xidDOTID parent_cluster_id
+        xidDOTID account_id
+        any properties
+    }
+    Collection {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        string name
+        string description
+    }
+    Item {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string name
+        string slug
+        string image_url
+        string description
+        xidDOTID account_id
+        any properties
+    }
+    Notification {
+        xidDOTID id
+        timeDOTTime created_at
+        string title
+        string description
+        string link
+        bool read
+    }
+    Post {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        bool first
+        string title
+        string slug
+        bool pinned
+        xidDOTID root_post_id
+        xidDOTID reply_to_post_id
+        string body
+        string short
+        mapLBRACKstringRBRACKinterface {} metadata
+        postDOTStatus status
+        string url
+        xidDOTID category_id
+    }
+    React {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        xidDOTID post_id
+        string emoji
+    }
+    Role {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        string name
+    }
+    Setting {
+        string id
+        string value
+        timeDOTTime updated_at
+    }
+    Tag {
+        xidDOTID id
+        timeDOTTime created_at
+        string name
+    }
+    	Account |o--o{ Post : "posts/author"
+    	Account |o--o{ React : "reacts/account"
+    	Account |o--o{ Authentication : "authentication/account"
+    	Account }o--o{ Tag : "tags/accounts"
+    	Account |o--o{ Collection : "collections/owner"
+    	Account |o--o{ Cluster : "clusters/owner"
+    	Account |o--o{ Item : "items/owner"
+    	Account |o--o{ Asset : "assets/owner"
+    	Category |o--o{ Post : "posts/category"
+    	Cluster |o--o{ Cluster : "clusters/parent"
+    	Cluster }o--o{ Item : "items/clusters"
+    	Cluster }o--o{ Asset : "assets/clusters"
+    	Collection }o--o{ Post : "posts/collections"
+    	Item }o--o{ Asset : "assets/items"
+    	Post |o--o{ Post : "posts/root"
+    	Post |o--o{ Post : "replies/replyTo"
+    	Post |o--o{ React : "reacts/Post"
+    	Post }o--o{ Asset : "assets/posts"
+    	Role }o--o{ Account : "accounts/roles"
+    	Tag }o--o{ Post : "posts/tags"
+    	Tag }o--o{ Cluster : "clusters/tags"
+    	Tag }o--o{ Item : "items/tags"
+		</div>
+	<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+	<script src="https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js"></script>
+	<script>
+		mermaid.mermaidAPI.initialize({
+			startOnLoad: true,
+		});
+		var observer = new MutationObserver((event) => {
+			document.querySelectorAll('text[id^=text-entity]').forEach(text => {
+				text.textContent = text.textContent.replace('DOT', '.');
+				text.textContent = text.textContent.replace('STAR', '*');
+				text.textContent = text.textContent.replace('LBRACK', '[');
+				text.textContent = text.textContent.replace('RBRACK', ']');
+			});
+			observer.disconnect();
+			panzoom(document.getElementById('er-diagram'));
+		});
+		observer.observe(document.getElementById('er-diagram'), { attributes: true, childList: true });
+	</script>
+</body>
+</html>

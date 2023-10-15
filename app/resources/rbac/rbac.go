@@ -2,6 +2,7 @@ package rbac
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
@@ -10,6 +11,8 @@ import (
 	"github.com/el-mike/restrict/adapters"
 	"go.uber.org/fx"
 )
+
+var lock sync.RWMutex
 
 type AccessManager interface {
 	Authorize(request *restrict.AccessRequest) error
@@ -40,6 +43,9 @@ func NewAdapter() restrict.StorageAdapter {
 }
 
 func NewPolicyManager(storage restrict.StorageAdapter) (*restrict.PolicyManager, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	pm, err := restrict.NewPolicyManager(storage, true)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new policy manager"))

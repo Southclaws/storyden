@@ -15,7 +15,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -39,7 +41,9 @@ const (
 	TypeAsset          = "Asset"
 	TypeAuthentication = "Authentication"
 	TypeCategory       = "Category"
+	TypeCluster        = "Cluster"
 	TypeCollection     = "Collection"
+	TypeItem           = "Item"
 	TypeNotification   = "Notification"
 	TypePost           = "Post"
 	TypeReact          = "React"
@@ -80,6 +84,12 @@ type AccountMutation struct {
 	collections           map[xid.ID]struct{}
 	removedcollections    map[xid.ID]struct{}
 	clearedcollections    bool
+	clusters              map[xid.ID]struct{}
+	removedclusters       map[xid.ID]struct{}
+	clearedclusters       bool
+	items                 map[xid.ID]struct{}
+	removeditems          map[xid.ID]struct{}
+	cleareditems          bool
 	assets                map[string]struct{}
 	removedassets         map[string]struct{}
 	clearedassets         bool
@@ -794,6 +804,114 @@ func (m *AccountMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *AccountMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *AccountMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *AccountMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *AccountMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *AccountMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *AccountMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *AccountMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by ids.
+func (m *AccountMutation) AddItemIDs(ids ...xid.ID) {
+	if m.items == nil {
+		m.items = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.items[ids[i]] = struct{}{}
+	}
+}
+
+// ClearItems clears the "items" edge to the Item entity.
+func (m *AccountMutation) ClearItems() {
+	m.cleareditems = true
+}
+
+// ItemsCleared reports if the "items" edge to the Item entity was cleared.
+func (m *AccountMutation) ItemsCleared() bool {
+	return m.cleareditems
+}
+
+// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
+func (m *AccountMutation) RemoveItemIDs(ids ...xid.ID) {
+	if m.removeditems == nil {
+		m.removeditems = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.items, ids[i])
+		m.removeditems[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
+func (m *AccountMutation) RemovedItemsIDs() (ids []xid.ID) {
+	for id := range m.removeditems {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ItemsIDs returns the "items" edge IDs in the mutation.
+func (m *AccountMutation) ItemsIDs() (ids []xid.ID) {
+	for id := range m.items {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetItems resets all changes to the "items" edge.
+func (m *AccountMutation) ResetItems() {
+	m.items = nil
+	m.cleareditems = false
+	m.removeditems = nil
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *AccountMutation) AddAssetIDs(ids ...string) {
 	if m.assets == nil {
@@ -1098,7 +1216,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1116,6 +1234,12 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.collections != nil {
 		edges = append(edges, account.EdgeCollections)
+	}
+	if m.clusters != nil {
+		edges = append(edges, account.EdgeClusters)
+	}
+	if m.items != nil {
+		edges = append(edges, account.EdgeItems)
 	}
 	if m.assets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -1163,6 +1287,18 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.items))
+		for id := range m.items {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -1175,7 +1311,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1193,6 +1329,12 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, account.EdgeCollections)
+	}
+	if m.removedclusters != nil {
+		edges = append(edges, account.EdgeClusters)
+	}
+	if m.removeditems != nil {
+		edges = append(edges, account.EdgeItems)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -1240,6 +1382,18 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.removeditems))
+		for id := range m.removeditems {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.removedassets))
 		for id := range m.removedassets {
@@ -1252,7 +1406,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 9)
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1270,6 +1424,12 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedcollections {
 		edges = append(edges, account.EdgeCollections)
+	}
+	if m.clearedclusters {
+		edges = append(edges, account.EdgeClusters)
+	}
+	if m.cleareditems {
+		edges = append(edges, account.EdgeItems)
 	}
 	if m.clearedassets {
 		edges = append(edges, account.EdgeAssets)
@@ -1293,6 +1453,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedtags
 	case account.EdgeCollections:
 		return m.clearedcollections
+	case account.EdgeClusters:
+		return m.clearedclusters
+	case account.EdgeItems:
+		return m.cleareditems
 	case account.EdgeAssets:
 		return m.clearedassets
 	}
@@ -1329,6 +1493,12 @@ func (m *AccountMutation) ResetEdge(name string) error {
 	case account.EdgeCollections:
 		m.ResetCollections()
 		return nil
+	case account.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case account.EdgeItems:
+		m.ResetItems()
+		return nil
 	case account.EdgeAssets:
 		m.ResetAssets()
 		return nil
@@ -1339,26 +1509,32 @@ func (m *AccountMutation) ResetEdge(name string) error {
 // AssetMutation represents an operation that mutates the Asset nodes in the graph.
 type AssetMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	url           *string
-	mimetype      *string
-	width         *int
-	addwidth      *int
-	height        *int
-	addheight     *int
-	clearedFields map[string]struct{}
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	owner         *xid.ID
-	clearedowner  bool
-	done          bool
-	oldValue      func(context.Context) (*Asset, error)
-	predicates    []predicate.Asset
+	op              Op
+	typ             string
+	id              *string
+	created_at      *time.Time
+	updated_at      *time.Time
+	url             *string
+	mimetype        *string
+	width           *int
+	addwidth        *int
+	height          *int
+	addheight       *int
+	clearedFields   map[string]struct{}
+	posts           map[xid.ID]struct{}
+	removedposts    map[xid.ID]struct{}
+	clearedposts    bool
+	clusters        map[xid.ID]struct{}
+	removedclusters map[xid.ID]struct{}
+	clearedclusters bool
+	items           map[xid.ID]struct{}
+	removeditems    map[xid.ID]struct{}
+	cleareditems    bool
+	owner           *xid.ID
+	clearedowner    bool
+	done            bool
+	oldValue        func(context.Context) (*Asset, error)
+	predicates      []predicate.Asset
 }
 
 var _ ent.Mutation = (*AssetMutation)(nil)
@@ -1811,6 +1987,114 @@ func (m *AssetMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *AssetMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *AssetMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *AssetMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *AssetMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *AssetMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *AssetMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *AssetMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by ids.
+func (m *AssetMutation) AddItemIDs(ids ...xid.ID) {
+	if m.items == nil {
+		m.items = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.items[ids[i]] = struct{}{}
+	}
+}
+
+// ClearItems clears the "items" edge to the Item entity.
+func (m *AssetMutation) ClearItems() {
+	m.cleareditems = true
+}
+
+// ItemsCleared reports if the "items" edge to the Item entity was cleared.
+func (m *AssetMutation) ItemsCleared() bool {
+	return m.cleareditems
+}
+
+// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
+func (m *AssetMutation) RemoveItemIDs(ids ...xid.ID) {
+	if m.removeditems == nil {
+		m.removeditems = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.items, ids[i])
+		m.removeditems[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
+func (m *AssetMutation) RemovedItemsIDs() (ids []xid.ID) {
+	for id := range m.removeditems {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ItemsIDs returns the "items" edge IDs in the mutation.
+func (m *AssetMutation) ItemsIDs() (ids []xid.ID) {
+	for id := range m.items {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetItems resets all changes to the "items" edge.
+func (m *AssetMutation) ResetItems() {
+	m.items = nil
+	m.cleareditems = false
+	m.removeditems = nil
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by id.
 func (m *AssetMutation) SetOwnerID(id xid.ID) {
 	m.owner = &id
@@ -2112,9 +2396,15 @@ func (m *AssetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.posts != nil {
 		edges = append(edges, asset.EdgePosts)
+	}
+	if m.clusters != nil {
+		edges = append(edges, asset.EdgeClusters)
+	}
+	if m.items != nil {
+		edges = append(edges, asset.EdgeItems)
 	}
 	if m.owner != nil {
 		edges = append(edges, asset.EdgeOwner)
@@ -2132,6 +2422,18 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case asset.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.items))
+		for id := range m.items {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeOwner:
 		if id := m.owner; id != nil {
 			return []ent.Value{*id}
@@ -2142,9 +2444,15 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedposts != nil {
 		edges = append(edges, asset.EdgePosts)
+	}
+	if m.removedclusters != nil {
+		edges = append(edges, asset.EdgeClusters)
+	}
+	if m.removeditems != nil {
+		edges = append(edges, asset.EdgeItems)
 	}
 	return edges
 }
@@ -2159,15 +2467,33 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case asset.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.removeditems))
+		for id := range m.removeditems {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedposts {
 		edges = append(edges, asset.EdgePosts)
+	}
+	if m.clearedclusters {
+		edges = append(edges, asset.EdgeClusters)
+	}
+	if m.cleareditems {
+		edges = append(edges, asset.EdgeItems)
 	}
 	if m.clearedowner {
 		edges = append(edges, asset.EdgeOwner)
@@ -2181,6 +2507,10 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 	switch name {
 	case asset.EdgePosts:
 		return m.clearedposts
+	case asset.EdgeClusters:
+		return m.clearedclusters
+	case asset.EdgeItems:
+		return m.cleareditems
 	case asset.EdgeOwner:
 		return m.clearedowner
 	}
@@ -2204,6 +2534,12 @@ func (m *AssetMutation) ResetEdge(name string) error {
 	switch name {
 	case asset.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case asset.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case asset.EdgeItems:
+		m.ResetItems()
 		return nil
 	case asset.EdgeOwner:
 		m.ResetOwner()
@@ -3764,6 +4100,1361 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Category edge %s", name)
 }
 
+// ClusterMutation represents an operation that mutates the Cluster nodes in the graph.
+type ClusterMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	updated_at      *time.Time
+	deleted_at      *time.Time
+	name            *string
+	slug            *string
+	image_url       *string
+	description     *string
+	properties      *any
+	clearedFields   map[string]struct{}
+	owner           *xid.ID
+	clearedowner    bool
+	parent          *xid.ID
+	clearedparent   bool
+	clusters        map[xid.ID]struct{}
+	removedclusters map[xid.ID]struct{}
+	clearedclusters bool
+	items           map[xid.ID]struct{}
+	removeditems    map[xid.ID]struct{}
+	cleareditems    bool
+	assets          map[string]struct{}
+	removedassets   map[string]struct{}
+	clearedassets   bool
+	tags            map[xid.ID]struct{}
+	removedtags     map[xid.ID]struct{}
+	clearedtags     bool
+	done            bool
+	oldValue        func(context.Context) (*Cluster, error)
+	predicates      []predicate.Cluster
+}
+
+var _ ent.Mutation = (*ClusterMutation)(nil)
+
+// clusterOption allows management of the mutation configuration using functional options.
+type clusterOption func(*ClusterMutation)
+
+// newClusterMutation creates new mutation for the Cluster entity.
+func newClusterMutation(c config, op Op, opts ...clusterOption) *ClusterMutation {
+	m := &ClusterMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCluster,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withClusterID sets the ID field of the mutation.
+func withClusterID(id xid.ID) clusterOption {
+	return func(m *ClusterMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Cluster
+		)
+		m.oldValue = func(ctx context.Context) (*Cluster, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Cluster.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCluster sets the old Cluster of the mutation.
+func withCluster(node *Cluster) clusterOption {
+	return func(m *ClusterMutation) {
+		m.oldValue = func(context.Context) (*Cluster, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ClusterMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ClusterMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Cluster entities.
+func (m *ClusterMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ClusterMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ClusterMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Cluster.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ClusterMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ClusterMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ClusterMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ClusterMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ClusterMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ClusterMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ClusterMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ClusterMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *ClusterMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[cluster.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *ClusterMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ClusterMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, cluster.FieldDeletedAt)
+}
+
+// SetName sets the "name" field.
+func (m *ClusterMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ClusterMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ClusterMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *ClusterMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *ClusterMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *ClusterMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetImageURL sets the "image_url" field.
+func (m *ClusterMutation) SetImageURL(s string) {
+	m.image_url = &s
+}
+
+// ImageURL returns the value of the "image_url" field in the mutation.
+func (m *ClusterMutation) ImageURL() (r string, exists bool) {
+	v := m.image_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImageURL returns the old "image_url" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldImageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImageURL: %w", err)
+	}
+	return oldValue.ImageURL, nil
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (m *ClusterMutation) ClearImageURL() {
+	m.image_url = nil
+	m.clearedFields[cluster.FieldImageURL] = struct{}{}
+}
+
+// ImageURLCleared returns if the "image_url" field was cleared in this mutation.
+func (m *ClusterMutation) ImageURLCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldImageURL]
+	return ok
+}
+
+// ResetImageURL resets all changes to the "image_url" field.
+func (m *ClusterMutation) ResetImageURL() {
+	m.image_url = nil
+	delete(m.clearedFields, cluster.FieldImageURL)
+}
+
+// SetDescription sets the "description" field.
+func (m *ClusterMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ClusterMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ClusterMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetParentClusterID sets the "parent_cluster_id" field.
+func (m *ClusterMutation) SetParentClusterID(x xid.ID) {
+	m.parent = &x
+}
+
+// ParentClusterID returns the value of the "parent_cluster_id" field in the mutation.
+func (m *ClusterMutation) ParentClusterID() (r xid.ID, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentClusterID returns the old "parent_cluster_id" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldParentClusterID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentClusterID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentClusterID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentClusterID: %w", err)
+	}
+	return oldValue.ParentClusterID, nil
+}
+
+// ClearParentClusterID clears the value of the "parent_cluster_id" field.
+func (m *ClusterMutation) ClearParentClusterID() {
+	m.parent = nil
+	m.clearedFields[cluster.FieldParentClusterID] = struct{}{}
+}
+
+// ParentClusterIDCleared returns if the "parent_cluster_id" field was cleared in this mutation.
+func (m *ClusterMutation) ParentClusterIDCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldParentClusterID]
+	return ok
+}
+
+// ResetParentClusterID resets all changes to the "parent_cluster_id" field.
+func (m *ClusterMutation) ResetParentClusterID() {
+	m.parent = nil
+	delete(m.clearedFields, cluster.FieldParentClusterID)
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *ClusterMutation) SetAccountID(x xid.ID) {
+	m.owner = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *ClusterMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.owner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *ClusterMutation) ResetAccountID() {
+	m.owner = nil
+}
+
+// SetProperties sets the "properties" field.
+func (m *ClusterMutation) SetProperties(a any) {
+	m.properties = &a
+}
+
+// Properties returns the value of the "properties" field in the mutation.
+func (m *ClusterMutation) Properties() (r any, exists bool) {
+	v := m.properties
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProperties returns the old "properties" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldProperties(ctx context.Context) (v any, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProperties is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProperties requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProperties: %w", err)
+	}
+	return oldValue.Properties, nil
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (m *ClusterMutation) ClearProperties() {
+	m.properties = nil
+	m.clearedFields[cluster.FieldProperties] = struct{}{}
+}
+
+// PropertiesCleared returns if the "properties" field was cleared in this mutation.
+func (m *ClusterMutation) PropertiesCleared() bool {
+	_, ok := m.clearedFields[cluster.FieldProperties]
+	return ok
+}
+
+// ResetProperties resets all changes to the "properties" field.
+func (m *ClusterMutation) ResetProperties() {
+	m.properties = nil
+	delete(m.clearedFields, cluster.FieldProperties)
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by id.
+func (m *ClusterMutation) SetOwnerID(id xid.ID) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (m *ClusterMutation) ClearOwner() {
+	m.clearedowner = true
+}
+
+// OwnerCleared reports if the "owner" edge to the Account entity was cleared.
+func (m *ClusterMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *ClusterMutation) OwnerID() (id xid.ID, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *ClusterMutation) OwnerIDs() (ids []xid.ID) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *ClusterMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
+// SetParentID sets the "parent" edge to the Cluster entity by id.
+func (m *ClusterMutation) SetParentID(id xid.ID) {
+	m.parent = &id
+}
+
+// ClearParent clears the "parent" edge to the Cluster entity.
+func (m *ClusterMutation) ClearParent() {
+	m.clearedparent = true
+}
+
+// ParentCleared reports if the "parent" edge to the Cluster entity was cleared.
+func (m *ClusterMutation) ParentCleared() bool {
+	return m.ParentClusterIDCleared() || m.clearedparent
+}
+
+// ParentID returns the "parent" edge ID in the mutation.
+func (m *ClusterMutation) ParentID() (id xid.ID, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *ClusterMutation) ParentIDs() (ids []xid.ID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *ClusterMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *ClusterMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *ClusterMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *ClusterMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *ClusterMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *ClusterMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *ClusterMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *ClusterMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by ids.
+func (m *ClusterMutation) AddItemIDs(ids ...xid.ID) {
+	if m.items == nil {
+		m.items = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.items[ids[i]] = struct{}{}
+	}
+}
+
+// ClearItems clears the "items" edge to the Item entity.
+func (m *ClusterMutation) ClearItems() {
+	m.cleareditems = true
+}
+
+// ItemsCleared reports if the "items" edge to the Item entity was cleared.
+func (m *ClusterMutation) ItemsCleared() bool {
+	return m.cleareditems
+}
+
+// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
+func (m *ClusterMutation) RemoveItemIDs(ids ...xid.ID) {
+	if m.removeditems == nil {
+		m.removeditems = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.items, ids[i])
+		m.removeditems[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
+func (m *ClusterMutation) RemovedItemsIDs() (ids []xid.ID) {
+	for id := range m.removeditems {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ItemsIDs returns the "items" edge IDs in the mutation.
+func (m *ClusterMutation) ItemsIDs() (ids []xid.ID) {
+	for id := range m.items {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetItems resets all changes to the "items" edge.
+func (m *ClusterMutation) ResetItems() {
+	m.items = nil
+	m.cleareditems = false
+	m.removeditems = nil
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
+func (m *ClusterMutation) AddAssetIDs(ids ...string) {
+	if m.assets == nil {
+		m.assets = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.assets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAssets clears the "assets" edge to the Asset entity.
+func (m *ClusterMutation) ClearAssets() {
+	m.clearedassets = true
+}
+
+// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
+func (m *ClusterMutation) AssetsCleared() bool {
+	return m.clearedassets
+}
+
+// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
+func (m *ClusterMutation) RemoveAssetIDs(ids ...string) {
+	if m.removedassets == nil {
+		m.removedassets = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.assets, ids[i])
+		m.removedassets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
+func (m *ClusterMutation) RemovedAssetsIDs() (ids []string) {
+	for id := range m.removedassets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AssetsIDs returns the "assets" edge IDs in the mutation.
+func (m *ClusterMutation) AssetsIDs() (ids []string) {
+	for id := range m.assets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAssets resets all changes to the "assets" edge.
+func (m *ClusterMutation) ResetAssets() {
+	m.assets = nil
+	m.clearedassets = false
+	m.removedassets = nil
+}
+
+// AddTagIDs adds the "tags" edge to the Tag entity by ids.
+func (m *ClusterMutation) AddTagIDs(ids ...xid.ID) {
+	if m.tags == nil {
+		m.tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTags clears the "tags" edge to the Tag entity.
+func (m *ClusterMutation) ClearTags() {
+	m.clearedtags = true
+}
+
+// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
+func (m *ClusterMutation) TagsCleared() bool {
+	return m.clearedtags
+}
+
+// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
+func (m *ClusterMutation) RemoveTagIDs(ids ...xid.ID) {
+	if m.removedtags == nil {
+		m.removedtags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.tags, ids[i])
+		m.removedtags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
+func (m *ClusterMutation) RemovedTagsIDs() (ids []xid.ID) {
+	for id := range m.removedtags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TagsIDs returns the "tags" edge IDs in the mutation.
+func (m *ClusterMutation) TagsIDs() (ids []xid.ID) {
+	for id := range m.tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTags resets all changes to the "tags" edge.
+func (m *ClusterMutation) ResetTags() {
+	m.tags = nil
+	m.clearedtags = false
+	m.removedtags = nil
+}
+
+// Where appends a list predicates to the ClusterMutation builder.
+func (m *ClusterMutation) Where(ps ...predicate.Cluster) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ClusterMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ClusterMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Cluster, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ClusterMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ClusterMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Cluster).
+func (m *ClusterMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ClusterMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, cluster.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, cluster.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, cluster.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, cluster.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, cluster.FieldSlug)
+	}
+	if m.image_url != nil {
+		fields = append(fields, cluster.FieldImageURL)
+	}
+	if m.description != nil {
+		fields = append(fields, cluster.FieldDescription)
+	}
+	if m.parent != nil {
+		fields = append(fields, cluster.FieldParentClusterID)
+	}
+	if m.owner != nil {
+		fields = append(fields, cluster.FieldAccountID)
+	}
+	if m.properties != nil {
+		fields = append(fields, cluster.FieldProperties)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case cluster.FieldCreatedAt:
+		return m.CreatedAt()
+	case cluster.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case cluster.FieldDeletedAt:
+		return m.DeletedAt()
+	case cluster.FieldName:
+		return m.Name()
+	case cluster.FieldSlug:
+		return m.Slug()
+	case cluster.FieldImageURL:
+		return m.ImageURL()
+	case cluster.FieldDescription:
+		return m.Description()
+	case cluster.FieldParentClusterID:
+		return m.ParentClusterID()
+	case cluster.FieldAccountID:
+		return m.AccountID()
+	case cluster.FieldProperties:
+		return m.Properties()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case cluster.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case cluster.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case cluster.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case cluster.FieldName:
+		return m.OldName(ctx)
+	case cluster.FieldSlug:
+		return m.OldSlug(ctx)
+	case cluster.FieldImageURL:
+		return m.OldImageURL(ctx)
+	case cluster.FieldDescription:
+		return m.OldDescription(ctx)
+	case cluster.FieldParentClusterID:
+		return m.OldParentClusterID(ctx)
+	case cluster.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case cluster.FieldProperties:
+		return m.OldProperties(ctx)
+	}
+	return nil, fmt.Errorf("unknown Cluster field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClusterMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case cluster.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case cluster.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case cluster.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case cluster.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case cluster.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case cluster.FieldImageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImageURL(v)
+		return nil
+	case cluster.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case cluster.FieldParentClusterID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentClusterID(v)
+		return nil
+	case cluster.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case cluster.FieldProperties:
+		v, ok := value.(any)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProperties(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Cluster field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ClusterMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ClusterMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClusterMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Cluster numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ClusterMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(cluster.FieldDeletedAt) {
+		fields = append(fields, cluster.FieldDeletedAt)
+	}
+	if m.FieldCleared(cluster.FieldImageURL) {
+		fields = append(fields, cluster.FieldImageURL)
+	}
+	if m.FieldCleared(cluster.FieldParentClusterID) {
+		fields = append(fields, cluster.FieldParentClusterID)
+	}
+	if m.FieldCleared(cluster.FieldProperties) {
+		fields = append(fields, cluster.FieldProperties)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ClusterMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ClusterMutation) ClearField(name string) error {
+	switch name {
+	case cluster.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case cluster.FieldImageURL:
+		m.ClearImageURL()
+		return nil
+	case cluster.FieldParentClusterID:
+		m.ClearParentClusterID()
+		return nil
+	case cluster.FieldProperties:
+		m.ClearProperties()
+		return nil
+	}
+	return fmt.Errorf("unknown Cluster nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ClusterMutation) ResetField(name string) error {
+	switch name {
+	case cluster.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case cluster.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case cluster.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case cluster.FieldName:
+		m.ResetName()
+		return nil
+	case cluster.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case cluster.FieldImageURL:
+		m.ResetImageURL()
+		return nil
+	case cluster.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case cluster.FieldParentClusterID:
+		m.ResetParentClusterID()
+		return nil
+	case cluster.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case cluster.FieldProperties:
+		m.ResetProperties()
+		return nil
+	}
+	return fmt.Errorf("unknown Cluster field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ClusterMutation) AddedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.owner != nil {
+		edges = append(edges, cluster.EdgeOwner)
+	}
+	if m.parent != nil {
+		edges = append(edges, cluster.EdgeParent)
+	}
+	if m.clusters != nil {
+		edges = append(edges, cluster.EdgeClusters)
+	}
+	if m.items != nil {
+		edges = append(edges, cluster.EdgeItems)
+	}
+	if m.assets != nil {
+		edges = append(edges, cluster.EdgeAssets)
+	}
+	if m.tags != nil {
+		edges = append(edges, cluster.EdgeTags)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ClusterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case cluster.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	case cluster.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case cluster.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.items))
+		for id := range m.items {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.assets))
+		for id := range m.assets {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.tags))
+		for id := range m.tags {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ClusterMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.removedclusters != nil {
+		edges = append(edges, cluster.EdgeClusters)
+	}
+	if m.removeditems != nil {
+		edges = append(edges, cluster.EdgeItems)
+	}
+	if m.removedassets != nil {
+		edges = append(edges, cluster.EdgeAssets)
+	}
+	if m.removedtags != nil {
+		edges = append(edges, cluster.EdgeTags)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ClusterMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case cluster.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.removeditems))
+		for id := range m.removeditems {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.removedassets))
+		for id := range m.removedassets {
+			ids = append(ids, id)
+		}
+		return ids
+	case cluster.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.removedtags))
+		for id := range m.removedtags {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ClusterMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 6)
+	if m.clearedowner {
+		edges = append(edges, cluster.EdgeOwner)
+	}
+	if m.clearedparent {
+		edges = append(edges, cluster.EdgeParent)
+	}
+	if m.clearedclusters {
+		edges = append(edges, cluster.EdgeClusters)
+	}
+	if m.cleareditems {
+		edges = append(edges, cluster.EdgeItems)
+	}
+	if m.clearedassets {
+		edges = append(edges, cluster.EdgeAssets)
+	}
+	if m.clearedtags {
+		edges = append(edges, cluster.EdgeTags)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ClusterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case cluster.EdgeOwner:
+		return m.clearedowner
+	case cluster.EdgeParent:
+		return m.clearedparent
+	case cluster.EdgeClusters:
+		return m.clearedclusters
+	case cluster.EdgeItems:
+		return m.cleareditems
+	case cluster.EdgeAssets:
+		return m.clearedassets
+	case cluster.EdgeTags:
+		return m.clearedtags
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ClusterMutation) ClearEdge(name string) error {
+	switch name {
+	case cluster.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	case cluster.EdgeParent:
+		m.ClearParent()
+		return nil
+	}
+	return fmt.Errorf("unknown Cluster unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ClusterMutation) ResetEdge(name string) error {
+	switch name {
+	case cluster.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	case cluster.EdgeParent:
+		m.ResetParent()
+		return nil
+	case cluster.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case cluster.EdgeItems:
+		m.ResetItems()
+		return nil
+	case cluster.EdgeAssets:
+		m.ResetAssets()
+		return nil
+	case cluster.EdgeTags:
+		m.ResetTags()
+		return nil
+	}
+	return fmt.Errorf("unknown Cluster edge %s", name)
+}
+
 // CollectionMutation represents an operation that mutates the Collection nodes in the graph.
 type CollectionMutation struct {
 	config
@@ -4408,6 +6099,1147 @@ func (m *CollectionMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Collection edge %s", name)
+}
+
+// ItemMutation represents an operation that mutates the Item nodes in the graph.
+type ItemMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	updated_at      *time.Time
+	deleted_at      *time.Time
+	name            *string
+	slug            *string
+	image_url       *string
+	description     *string
+	properties      *any
+	clearedFields   map[string]struct{}
+	owner           *xid.ID
+	clearedowner    bool
+	clusters        map[xid.ID]struct{}
+	removedclusters map[xid.ID]struct{}
+	clearedclusters bool
+	assets          map[string]struct{}
+	removedassets   map[string]struct{}
+	clearedassets   bool
+	tags            map[xid.ID]struct{}
+	removedtags     map[xid.ID]struct{}
+	clearedtags     bool
+	done            bool
+	oldValue        func(context.Context) (*Item, error)
+	predicates      []predicate.Item
+}
+
+var _ ent.Mutation = (*ItemMutation)(nil)
+
+// itemOption allows management of the mutation configuration using functional options.
+type itemOption func(*ItemMutation)
+
+// newItemMutation creates new mutation for the Item entity.
+func newItemMutation(c config, op Op, opts ...itemOption) *ItemMutation {
+	m := &ItemMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeItem,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withItemID sets the ID field of the mutation.
+func withItemID(id xid.ID) itemOption {
+	return func(m *ItemMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Item
+		)
+		m.oldValue = func(ctx context.Context) (*Item, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Item.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withItem sets the old Item of the mutation.
+func withItem(node *Item) itemOption {
+	return func(m *ItemMutation) {
+		m.oldValue = func(context.Context) (*Item, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ItemMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ItemMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Item entities.
+func (m *ItemMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ItemMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ItemMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Item.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ItemMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ItemMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ItemMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ItemMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ItemMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ItemMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ItemMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ItemMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *ItemMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[item.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *ItemMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[item.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ItemMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, item.FieldDeletedAt)
+}
+
+// SetName sets the "name" field.
+func (m *ItemMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ItemMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ItemMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *ItemMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *ItemMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *ItemMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetImageURL sets the "image_url" field.
+func (m *ItemMutation) SetImageURL(s string) {
+	m.image_url = &s
+}
+
+// ImageURL returns the value of the "image_url" field in the mutation.
+func (m *ItemMutation) ImageURL() (r string, exists bool) {
+	v := m.image_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImageURL returns the old "image_url" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldImageURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImageURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImageURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImageURL: %w", err)
+	}
+	return oldValue.ImageURL, nil
+}
+
+// ClearImageURL clears the value of the "image_url" field.
+func (m *ItemMutation) ClearImageURL() {
+	m.image_url = nil
+	m.clearedFields[item.FieldImageURL] = struct{}{}
+}
+
+// ImageURLCleared returns if the "image_url" field was cleared in this mutation.
+func (m *ItemMutation) ImageURLCleared() bool {
+	_, ok := m.clearedFields[item.FieldImageURL]
+	return ok
+}
+
+// ResetImageURL resets all changes to the "image_url" field.
+func (m *ItemMutation) ResetImageURL() {
+	m.image_url = nil
+	delete(m.clearedFields, item.FieldImageURL)
+}
+
+// SetDescription sets the "description" field.
+func (m *ItemMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ItemMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ItemMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *ItemMutation) SetAccountID(x xid.ID) {
+	m.owner = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *ItemMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.owner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *ItemMutation) ResetAccountID() {
+	m.owner = nil
+}
+
+// SetProperties sets the "properties" field.
+func (m *ItemMutation) SetProperties(a any) {
+	m.properties = &a
+}
+
+// Properties returns the value of the "properties" field in the mutation.
+func (m *ItemMutation) Properties() (r any, exists bool) {
+	v := m.properties
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProperties returns the old "properties" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldProperties(ctx context.Context) (v any, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProperties is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProperties requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProperties: %w", err)
+	}
+	return oldValue.Properties, nil
+}
+
+// ClearProperties clears the value of the "properties" field.
+func (m *ItemMutation) ClearProperties() {
+	m.properties = nil
+	m.clearedFields[item.FieldProperties] = struct{}{}
+}
+
+// PropertiesCleared returns if the "properties" field was cleared in this mutation.
+func (m *ItemMutation) PropertiesCleared() bool {
+	_, ok := m.clearedFields[item.FieldProperties]
+	return ok
+}
+
+// ResetProperties resets all changes to the "properties" field.
+func (m *ItemMutation) ResetProperties() {
+	m.properties = nil
+	delete(m.clearedFields, item.FieldProperties)
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by id.
+func (m *ItemMutation) SetOwnerID(id xid.ID) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (m *ItemMutation) ClearOwner() {
+	m.clearedowner = true
+}
+
+// OwnerCleared reports if the "owner" edge to the Account entity was cleared.
+func (m *ItemMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *ItemMutation) OwnerID() (id xid.ID, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *ItemMutation) OwnerIDs() (ids []xid.ID) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *ItemMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *ItemMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *ItemMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *ItemMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *ItemMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *ItemMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *ItemMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *ItemMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
+func (m *ItemMutation) AddAssetIDs(ids ...string) {
+	if m.assets == nil {
+		m.assets = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.assets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAssets clears the "assets" edge to the Asset entity.
+func (m *ItemMutation) ClearAssets() {
+	m.clearedassets = true
+}
+
+// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
+func (m *ItemMutation) AssetsCleared() bool {
+	return m.clearedassets
+}
+
+// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
+func (m *ItemMutation) RemoveAssetIDs(ids ...string) {
+	if m.removedassets == nil {
+		m.removedassets = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.assets, ids[i])
+		m.removedassets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
+func (m *ItemMutation) RemovedAssetsIDs() (ids []string) {
+	for id := range m.removedassets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AssetsIDs returns the "assets" edge IDs in the mutation.
+func (m *ItemMutation) AssetsIDs() (ids []string) {
+	for id := range m.assets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAssets resets all changes to the "assets" edge.
+func (m *ItemMutation) ResetAssets() {
+	m.assets = nil
+	m.clearedassets = false
+	m.removedassets = nil
+}
+
+// AddTagIDs adds the "tags" edge to the Tag entity by ids.
+func (m *ItemMutation) AddTagIDs(ids ...xid.ID) {
+	if m.tags == nil {
+		m.tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTags clears the "tags" edge to the Tag entity.
+func (m *ItemMutation) ClearTags() {
+	m.clearedtags = true
+}
+
+// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
+func (m *ItemMutation) TagsCleared() bool {
+	return m.clearedtags
+}
+
+// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
+func (m *ItemMutation) RemoveTagIDs(ids ...xid.ID) {
+	if m.removedtags == nil {
+		m.removedtags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.tags, ids[i])
+		m.removedtags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
+func (m *ItemMutation) RemovedTagsIDs() (ids []xid.ID) {
+	for id := range m.removedtags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TagsIDs returns the "tags" edge IDs in the mutation.
+func (m *ItemMutation) TagsIDs() (ids []xid.ID) {
+	for id := range m.tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTags resets all changes to the "tags" edge.
+func (m *ItemMutation) ResetTags() {
+	m.tags = nil
+	m.clearedtags = false
+	m.removedtags = nil
+}
+
+// Where appends a list predicates to the ItemMutation builder.
+func (m *ItemMutation) Where(ps ...predicate.Item) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ItemMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ItemMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Item, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ItemMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ItemMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Item).
+func (m *ItemMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ItemMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, item.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, item.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, item.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, item.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, item.FieldSlug)
+	}
+	if m.image_url != nil {
+		fields = append(fields, item.FieldImageURL)
+	}
+	if m.description != nil {
+		fields = append(fields, item.FieldDescription)
+	}
+	if m.owner != nil {
+		fields = append(fields, item.FieldAccountID)
+	}
+	if m.properties != nil {
+		fields = append(fields, item.FieldProperties)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ItemMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case item.FieldCreatedAt:
+		return m.CreatedAt()
+	case item.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case item.FieldDeletedAt:
+		return m.DeletedAt()
+	case item.FieldName:
+		return m.Name()
+	case item.FieldSlug:
+		return m.Slug()
+	case item.FieldImageURL:
+		return m.ImageURL()
+	case item.FieldDescription:
+		return m.Description()
+	case item.FieldAccountID:
+		return m.AccountID()
+	case item.FieldProperties:
+		return m.Properties()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case item.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case item.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case item.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case item.FieldName:
+		return m.OldName(ctx)
+	case item.FieldSlug:
+		return m.OldSlug(ctx)
+	case item.FieldImageURL:
+		return m.OldImageURL(ctx)
+	case item.FieldDescription:
+		return m.OldDescription(ctx)
+	case item.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case item.FieldProperties:
+		return m.OldProperties(ctx)
+	}
+	return nil, fmt.Errorf("unknown Item field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ItemMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case item.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case item.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case item.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case item.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case item.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case item.FieldImageURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImageURL(v)
+		return nil
+	case item.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case item.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case item.FieldProperties:
+		v, ok := value.(any)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProperties(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Item field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ItemMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ItemMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ItemMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Item numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ItemMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(item.FieldDeletedAt) {
+		fields = append(fields, item.FieldDeletedAt)
+	}
+	if m.FieldCleared(item.FieldImageURL) {
+		fields = append(fields, item.FieldImageURL)
+	}
+	if m.FieldCleared(item.FieldProperties) {
+		fields = append(fields, item.FieldProperties)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ItemMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ItemMutation) ClearField(name string) error {
+	switch name {
+	case item.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case item.FieldImageURL:
+		m.ClearImageURL()
+		return nil
+	case item.FieldProperties:
+		m.ClearProperties()
+		return nil
+	}
+	return fmt.Errorf("unknown Item nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ItemMutation) ResetField(name string) error {
+	switch name {
+	case item.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case item.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case item.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case item.FieldName:
+		m.ResetName()
+		return nil
+	case item.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case item.FieldImageURL:
+		m.ResetImageURL()
+		return nil
+	case item.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case item.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case item.FieldProperties:
+		m.ResetProperties()
+		return nil
+	}
+	return fmt.Errorf("unknown Item field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ItemMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.owner != nil {
+		edges = append(edges, item.EdgeOwner)
+	}
+	if m.clusters != nil {
+		edges = append(edges, item.EdgeClusters)
+	}
+	if m.assets != nil {
+		edges = append(edges, item.EdgeAssets)
+	}
+	if m.tags != nil {
+		edges = append(edges, item.EdgeTags)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ItemMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case item.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	case item.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case item.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.assets))
+		for id := range m.assets {
+			ids = append(ids, id)
+		}
+		return ids
+	case item.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.tags))
+		for id := range m.tags {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ItemMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removedclusters != nil {
+		edges = append(edges, item.EdgeClusters)
+	}
+	if m.removedassets != nil {
+		edges = append(edges, item.EdgeAssets)
+	}
+	if m.removedtags != nil {
+		edges = append(edges, item.EdgeTags)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ItemMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case item.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case item.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.removedassets))
+		for id := range m.removedassets {
+			ids = append(ids, id)
+		}
+		return ids
+	case item.EdgeTags:
+		ids := make([]ent.Value, 0, len(m.removedtags))
+		for id := range m.removedtags {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ItemMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedowner {
+		edges = append(edges, item.EdgeOwner)
+	}
+	if m.clearedclusters {
+		edges = append(edges, item.EdgeClusters)
+	}
+	if m.clearedassets {
+		edges = append(edges, item.EdgeAssets)
+	}
+	if m.clearedtags {
+		edges = append(edges, item.EdgeTags)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ItemMutation) EdgeCleared(name string) bool {
+	switch name {
+	case item.EdgeOwner:
+		return m.clearedowner
+	case item.EdgeClusters:
+		return m.clearedclusters
+	case item.EdgeAssets:
+		return m.clearedassets
+	case item.EdgeTags:
+		return m.clearedtags
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ItemMutation) ClearEdge(name string) error {
+	switch name {
+	case item.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
+	return fmt.Errorf("unknown Item unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ItemMutation) ResetEdge(name string) error {
+	switch name {
+	case item.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	case item.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case item.EdgeAssets:
+		m.ResetAssets()
+		return nil
+	case item.EdgeTags:
+		m.ResetTags()
+		return nil
+	}
+	return fmt.Errorf("unknown Item edge %s", name)
 }
 
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.
@@ -8452,6 +11284,12 @@ type TagMutation struct {
 	posts           map[xid.ID]struct{}
 	removedposts    map[xid.ID]struct{}
 	clearedposts    bool
+	clusters        map[xid.ID]struct{}
+	removedclusters map[xid.ID]struct{}
+	clearedclusters bool
+	items           map[xid.ID]struct{}
+	removeditems    map[xid.ID]struct{}
+	cleareditems    bool
 	accounts        map[xid.ID]struct{}
 	removedaccounts map[xid.ID]struct{}
 	clearedaccounts bool
@@ -8690,6 +11528,114 @@ func (m *TagMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *TagMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *TagMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *TagMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *TagMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *TagMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *TagMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *TagMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by ids.
+func (m *TagMutation) AddItemIDs(ids ...xid.ID) {
+	if m.items == nil {
+		m.items = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.items[ids[i]] = struct{}{}
+	}
+}
+
+// ClearItems clears the "items" edge to the Item entity.
+func (m *TagMutation) ClearItems() {
+	m.cleareditems = true
+}
+
+// ItemsCleared reports if the "items" edge to the Item entity was cleared.
+func (m *TagMutation) ItemsCleared() bool {
+	return m.cleareditems
+}
+
+// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
+func (m *TagMutation) RemoveItemIDs(ids ...xid.ID) {
+	if m.removeditems == nil {
+		m.removeditems = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.items, ids[i])
+		m.removeditems[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
+func (m *TagMutation) RemovedItemsIDs() (ids []xid.ID) {
+	for id := range m.removeditems {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ItemsIDs returns the "items" edge IDs in the mutation.
+func (m *TagMutation) ItemsIDs() (ids []xid.ID) {
+	for id := range m.items {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetItems resets all changes to the "items" edge.
+func (m *TagMutation) ResetItems() {
+	m.items = nil
+	m.cleareditems = false
+	m.removeditems = nil
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by ids.
 func (m *TagMutation) AddAccountIDs(ids ...xid.ID) {
 	if m.accounts == nil {
@@ -8894,9 +11840,15 @@ func (m *TagMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TagMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.posts != nil {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.clusters != nil {
+		edges = append(edges, tag.EdgeClusters)
+	}
+	if m.items != nil {
+		edges = append(edges, tag.EdgeItems)
 	}
 	if m.accounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
@@ -8914,6 +11866,18 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case tag.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.items))
+		for id := range m.items {
+			ids = append(ids, id)
+		}
+		return ids
 	case tag.EdgeAccounts:
 		ids := make([]ent.Value, 0, len(m.accounts))
 		for id := range m.accounts {
@@ -8926,9 +11890,15 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TagMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedposts != nil {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.removedclusters != nil {
+		edges = append(edges, tag.EdgeClusters)
+	}
+	if m.removeditems != nil {
+		edges = append(edges, tag.EdgeItems)
 	}
 	if m.removedaccounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
@@ -8946,6 +11916,18 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case tag.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.removeditems))
+		for id := range m.removeditems {
+			ids = append(ids, id)
+		}
+		return ids
 	case tag.EdgeAccounts:
 		ids := make([]ent.Value, 0, len(m.removedaccounts))
 		for id := range m.removedaccounts {
@@ -8958,9 +11940,15 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TagMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedposts {
 		edges = append(edges, tag.EdgePosts)
+	}
+	if m.clearedclusters {
+		edges = append(edges, tag.EdgeClusters)
+	}
+	if m.cleareditems {
+		edges = append(edges, tag.EdgeItems)
 	}
 	if m.clearedaccounts {
 		edges = append(edges, tag.EdgeAccounts)
@@ -8974,6 +11962,10 @@ func (m *TagMutation) EdgeCleared(name string) bool {
 	switch name {
 	case tag.EdgePosts:
 		return m.clearedposts
+	case tag.EdgeClusters:
+		return m.clearedclusters
+	case tag.EdgeItems:
+		return m.cleareditems
 	case tag.EdgeAccounts:
 		return m.clearedaccounts
 	}
@@ -8994,6 +11986,12 @@ func (m *TagMutation) ResetEdge(name string) error {
 	switch name {
 	case tag.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case tag.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case tag.EdgeItems:
+		m.ResetItems()
 		return nil
 	case tag.EdgeAccounts:
 		m.ResetAccounts()

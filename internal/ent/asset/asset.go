@@ -27,6 +27,10 @@ const (
 	FieldAccountID = "account_id"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
+	// EdgeClusters holds the string denoting the clusters edge name in mutations.
+	EdgeClusters = "clusters"
+	// EdgeItems holds the string denoting the items edge name in mutations.
+	EdgeItems = "items"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the asset in the database.
@@ -36,6 +40,16 @@ const (
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
+	// ClustersTable is the table that holds the clusters relation/edge. The primary key declared below.
+	ClustersTable = "cluster_assets"
+	// ClustersInverseTable is the table name for the Cluster entity.
+	// It exists in this package in order to avoid circular dependency with the "cluster" package.
+	ClustersInverseTable = "clusters"
+	// ItemsTable is the table that holds the items relation/edge. The primary key declared below.
+	ItemsTable = "item_assets"
+	// ItemsInverseTable is the table name for the Item entity.
+	// It exists in this package in order to avoid circular dependency with the "item" package.
+	ItemsInverseTable = "items"
 	// OwnerTable is the table that holds the owner relation/edge.
 	OwnerTable = "assets"
 	// OwnerInverseTable is the table name for the Account entity.
@@ -61,6 +75,12 @@ var (
 	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
 	// primary key for the posts relation (M2M).
 	PostsPrimaryKey = []string{"post_id", "asset_id"}
+	// ClustersPrimaryKey and ClustersColumn2 are the table columns denoting the
+	// primary key for the clusters relation (M2M).
+	ClustersPrimaryKey = []string{"cluster_id", "asset_id"}
+	// ItemsPrimaryKey and ItemsColumn2 are the table columns denoting the
+	// primary key for the items relation (M2M).
+	ItemsPrimaryKey = []string{"item_id", "asset_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

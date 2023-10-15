@@ -12,10 +12,10 @@ import (
 
 type PhoneAuth struct {
 	pp *phone.Provider
-	sm *cookieJar
+	sm *CookieJar
 }
 
-func NewPhoneAuth(pp *phone.Provider, sm *cookieJar) PhoneAuth {
+func NewPhoneAuth(pp *phone.Provider, sm *CookieJar) PhoneAuth {
 	return PhoneAuth{pp, sm}
 }
 
@@ -42,7 +42,7 @@ func (i *PhoneAuth) PhoneSubmitCode(ctx context.Context, request openapi.PhoneSu
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.sm.Create(acc.ID.String()),
+				SetCookie: i.sm.Create(acc.ID.String()).String(),
 			},
 		},
 	}, nil

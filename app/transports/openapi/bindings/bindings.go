@@ -75,6 +75,8 @@ type Bindings struct {
 	Reacts
 	Assets
 	Collections
+	Clusters
+	Items
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -97,6 +99,8 @@ func bindingsProviders() fx.Option {
 		NewReacts,
 		NewAssets,
 		NewCollections,
+		NewClusters,
+		NewItems,
 	)
 }
 
@@ -132,7 +136,7 @@ func mount(lc fx.Lifecycle, l *zap.Logger, mux *http.ServeMux, router *echo.Echo
 		OnStart: func(_ context.Context) error {
 			openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), "/api")
 
-			l.Info("mounted OpenAPI to service bindings",
+			l.Debug("mounted OpenAPI to service bindings",
 				zap.Strings("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
 					return r.Path
 				})),
@@ -146,7 +150,7 @@ func mount(lc fx.Lifecycle, l *zap.Logger, mux *http.ServeMux, router *echo.Echo
 	})
 }
 
-func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *cookieJar, auth Authentication) error {
+func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *CookieJar, auth Authentication) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
 		return fault.Wrap(err, fmsg.With("failed to get openapi specification"))
@@ -228,7 +232,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	// simply depend on the router in a provider or invoker and do `router.Use`.
 	// To mount routes use the lifecycle `OnStart` hook and mount them normally.
 
-	l.Info("created router", zap.Strings("origins", origins))
+	l.Debug("created router", zap.Strings("origins", origins))
 
 	return router
 }
