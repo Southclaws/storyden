@@ -43,6 +43,8 @@ tags:
     description: User accounts.
   - name: profiles
     description: Public profiles.
+  - name: pages
+    description: Content pages for showing threads, posts, clusters, items, etc.
   - name: categories
     description: Thread categories.
   - name: threads
@@ -429,6 +431,59 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileGetOK" }
+
+  #
+  # 88888b.   8888b.   .d88b.   .d88b.  .d8888b
+  # 888 "88b     "88b d88P"88b d8P  Y8b 88K
+  # 888  888 .d888888 888  888 88888888 "Y8888b.
+  # 888 d88P 888  888 Y88b 888 Y8b.          X88
+  # 88888P"  "Y888888  "Y88888  "Y8888   88888P'
+  # 888                    888
+  # 888               Y8b d88P
+  # 888                "Y88P"
+  #
+
+  /v1/pages:
+    post:
+      operationId: PageCreate
+      description: Create a page for organising content.
+      tags: [pages]
+      requestBody: { $ref: "#/components/requestBodies/PageCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PageCreateOK" }
+    get:
+      operationId: PageList
+      description: Get a list of all pages on the site.
+      security: []
+      tags: [pages]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/PageListOK" }
+    patch:
+      operationId: PageUpdateOrder
+      description: Update the sort order of pages.
+      security: []
+      tags: [pages]
+      requestBody: { $ref: "#/components/requestBodies/PageUpdateOrder" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/PageListOK" }
+
+  /v1/pages/{page_slug}:
+    patch:
+      operationId: PageUpdate
+      description: Retrieve a page's content.
+      tags: [pages]
+      parameters: [$ref: "#/components/parameters/PageSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/PageUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PageUpdateOK" }
 
   #
   #                   888                                      d8b
@@ -1047,6 +1102,14 @@ components:
       schema:
         type: string
 
+    PageSlugParam:
+      description: Unique page URL slug.
+      name: page_slug
+      in: path
+      required: true
+      schema:
+        type: string
+
     CategoryIDParam:
       description: Unique category ID.
       name: category_id
@@ -1146,6 +1209,21 @@ components:
           schema:
             type: string
             format: binary
+
+    PageCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PageInitialProps" }
+
+    PageUpdateOrder:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PageSlugList" }
+
+    PageUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PageMutableProps" }
 
     CategoryCreate:
       content:
@@ -1345,6 +1423,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/PublicProfile"
+
+    PageCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Page"
+
+    PageUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Page"
+
+    PageListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PageList"
 
     CategoryCreateOK:
       description: OK
@@ -2240,6 +2339,187 @@ components:
               $ref: "#/components/schemas/TagList"
 
     #
+    # 8888888b.
+    # 888   Y88b
+    # 888    888
+    # 888   d88P 8888b.   .d88b.   .d88b.
+    # 8888888P"     "88b d88P"88b d8P  Y8b
+    # 888       .d888888 888  888 88888888
+    # 888       888  888 Y88b 888 Y8b.
+    # 888       "Y888888  "Y88888  "Y8888
+    #                         888
+    #                    Y8b d88P
+    #                     "Y88P"
+    #
+
+    PageType:
+      type: string
+      enum:
+        - static
+        - content_feed
+        - cluster_list
+        - cluster
+
+    Page:
+      type: object
+      required: [name, slug, description, colour, sort, admin, meta, type]
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/PageAdditional"
+      oneOf:
+        - $ref: "#/components/schemas/PageTypeStaticProps"
+        - $ref: "#/components/schemas/PageTypeContentFeedProps"
+        - $ref: "#/components/schemas/PageClusterListProps"
+        - $ref: "#/components/schemas/PageClusterProps"
+      discriminator:
+        propertyName: type
+        mapping:
+          static: "#/components/schemas/PageTypeStaticProps"
+          content_feed: "#/components/schemas/PageTypeContentFeedProps"
+          cluster_list: "#/components/schemas/PageClusterListProps"
+          cluster: "#/components/schemas/PageClusterProps"
+      properties:
+        name:
+          $ref: "#/components/schemas/PageName"
+        slug:
+          $ref: "#/components/schemas/PageSlug"
+        description:
+          type: string
+        sort:
+          type: integer
+        admin:
+          type: boolean
+        properties: { $ref: "#/components/schemas/Properties" }
+        type: { $ref: "#/components/schemas/PageType" }
+
+    PageTypeStaticProps:
+      type: object
+      properties:
+        content: { $ref: "#/components/schemas/PostContent" }
+
+    PageTypeContentFeedProps:
+      type: object
+      properties:
+        feed: { $ref: "#/components/schemas/ThreadList" }
+
+    PageClusterListProps:
+      type: object
+      properties:
+        clusters: { $ref: "#/components/schemas/ClusterList" }
+
+    PageClusterProps:
+      type: object
+      properties:
+        cluster: { $ref: "#/components/schemas/Cluster" }
+
+    PageInitialProps:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PageTypeSpecificMutableProps"
+      required: [name, description, colour, admin]
+      properties:
+        name:
+          $ref: "#/components/schemas/PageName"
+        slug:
+          $ref: "#/components/schemas/PageSlug"
+        description:
+          type: string
+        colour:
+          type: string
+        admin:
+          type: boolean
+        properties: { $ref: "#/components/schemas/Properties" }
+
+    PageMutableProps:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PageTypeSpecificMutableProps"
+      properties:
+        name:
+          $ref: "#/components/schemas/PageName"
+        slug:
+          $ref: "#/components/schemas/PageSlug"
+        description:
+          type: string
+        content: { $ref: "#/components/schemas/PostContent" }
+        colour:
+          type: string
+        admin:
+          type: boolean
+        properties: { $ref: "#/components/schemas/Properties" }
+
+    PageTypeSpecificMutableProps:
+      description: |
+        Defines the specific mutable properties depending on the type. The type
+        specified here may change the type of a page and may result in config
+        related to the original type being lost. For example, if you switch from
+        a static content page to a feed page, the original content will be lost.
+      required: [type]
+      properties:
+        type: { $ref: "#/components/schemas/PageType" }
+      oneOf:
+        - $ref: "#/components/schemas/PageTypeStaticMutableProps"
+        - $ref: "#/components/schemas/PageTypeContentFeedMutableProps"
+        - $ref: "#/components/schemas/PageClusterListMutableProps"
+        - $ref: "#/components/schemas/PageClusterMutableProps"
+      discriminator:
+        propertyName: type
+        mapping:
+          static: "#/components/schemas/PageTypeStaticMutableProps"
+          content_feed: "#/components/schemas/PageTypeContentFeedMutableProps"
+          cluster_list: "#/components/schemas/PageClusterListMutableProps"
+          cluster: "#/components/schemas/PageClusterMutableProps"
+
+    PageTypeStaticMutableProps:
+      type: object
+      properties:
+        content: { $ref: "#/components/schemas/PostContent" }
+
+    PageTypeContentFeedMutableProps:
+      type: object
+      properties:
+        category: { $ref: "#/components/schemas/Identifier" }
+
+    PageClusterListMutableProps:
+      type: object
+      properties:
+        clusters: { $ref: "#/components/schemas/ClusterSlugList" }
+
+    PageClusterMutableProps:
+      type: object
+      properties:
+        clusters: { $ref: "#/components/schemas/ClusterSlugList" }
+
+    PageName:
+      description: A Page's user-facing name.
+      type: string
+
+    PageSlug:
+      description: A Page's URL-safe slug.
+      type: string
+
+    PageSlugList:
+      description: A list of Page names.
+      type: array
+      items:
+        $ref: "#/components/schemas/PageSlug"
+
+    PageAdditional:
+      type: object
+      required: [postCount]
+      properties:
+        postCount:
+          type: integer
+
+    PageList:
+      type: object
+      required: [categories]
+      properties:
+        categories:
+          type: array
+          items: { $ref: "#/components/schemas/Page" }
+
+    #
     #  .d8888b.           888
     # d88P  Y88b          888
     # 888    888          888
@@ -2710,6 +2990,11 @@ components:
 
     ClusterSlug:
       $ref: "#/components/schemas/Slug"
+
+    ClusterSlugList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Slug"
 
     ClusterDescription:
       type: string
