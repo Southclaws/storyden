@@ -42,6 +42,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mazznoer/colorgrad v0.9.1
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
+	github.com/oapi-codegen/runtime v1.0.0
 	github.com/twilio/twilio-go v1.14.1
 )
 
@@ -51,7 +52,6 @@ require (
 	github.com/CloudyKit/jet/v6 v6.2.0 // indirect
 	github.com/Joker/jade v1.1.3 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20220729165902-8cddb4f5de06 // indirect
-	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
