@@ -206,6 +206,76 @@ func TestClustersHappyPath(t *testing.T) {
 	}))
 }
 
+func TestClustersFiltering(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *bindings.CookieJar,
+		ar account.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			ctx1, acc1 := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+			ctx2, acc2 := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
+
+			name1 := "test-cluster-owned-by-1"
+			slug1 := name1 + uuid.NewString()
+			content1 := "# Clusters\n\nOwned by Odin."
+			clus1, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
+				Name:        name1,
+				Slug:        slug1,
+				Description: "testing clusters api",
+				Content:     &content1,
+			}, e2e.WithSession(ctx1, cj))
+			r.NoError(err)
+			r.NotNil(clus1)
+			r.Equal(200, clus1.StatusCode())
+
+			name2 := "test-cluster-owned-by-2"
+			slug2 := name2 + uuid.NewString()
+			content2 := "# Clusters\n\nOwned by Frigg."
+			clus2, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
+				Name:        name2,
+				Slug:        slug2,
+				Description: "testing clusters api",
+				Content:     &content2,
+			}, e2e.WithSession(ctx2, cj))
+			r.NoError(err)
+			r.NotNil(clus1)
+			r.Equal(200, clus1.StatusCode())
+
+			clist, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Author: &acc1.Handle,
+			})
+			r.NoError(err)
+			r.NotNil(clist)
+			r.Equal(200, clist.StatusCode())
+
+			ids := dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.Contains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+
+			clist2, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Author: &acc2.Handle,
+			})
+			r.NoError(err)
+			r.NotNil(clist2)
+			r.Equal(200, clist2.StatusCode())
+
+			ids2 := dt.Map(clist2.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.NotContains(ids2, clus1.JSON200.Id)
+			a.Contains(ids2, clus2.JSON200.Id)
+		}))
+	}))
+}
+
 func TestClustersErrors(t *testing.T) {
 	t.Parallel()
 

@@ -820,6 +820,11 @@ paths:
           required: false
           in: query
           schema: { $ref: "#/components/schemas/Identifier" }
+        - name: author
+          description: Show only results owned by this account.
+          required: false
+          in: query
+          schema: { $ref: "#/components/schemas/AccountHandle" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
