@@ -55,6 +55,9 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 	if v := request.Body.Properties; v != nil {
 		opts = append(opts, cluster_repo.WithProperties(*v))
 	}
+	if v := request.Body.ImageUrl; v != nil {
+		opts = append(opts, cluster_repo.WithImageURL(*v))
+	}
 
 	clus, err := c.cs.Create(ctx,
 		session,
