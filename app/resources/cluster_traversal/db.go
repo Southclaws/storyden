@@ -12,10 +12,11 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 )
 
@@ -28,8 +29,17 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 	return &database{db, raw}
 }
 
-func (d *database) Root(ctx context.Context) ([]*datagraph.Cluster, error) {
+func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Cluster, error) {
 	query := d.db.Cluster.Query().Where(cluster.ParentClusterIDIsNil()).WithOwner()
+
+	f := filters{}
+	for _, fn := range fs {
+		fn(&f)
+	}
+
+	if f.accountSlug != nil {
+		query.Where(cluster.HasOwnerWith(account.Handle(*f.accountSlug)))
+	}
 
 	cs, err := query.All(ctx)
 	if err != nil {
@@ -132,7 +142,7 @@ func fromRow(r subtreeRow) (*datagraph.Cluster, error) {
 		ImageURL:    opt.NewPtr(r.ClusterImageUrl),
 		Description: r.ClusterDescription,
 		Owner: profile.Profile{
-			ID:     account.AccountID(r.OwnerId),
+			ID:     account_repo.AccountID(r.OwnerId),
 			Handle: r.OwnerHandle,
 			Name:   r.OwnerName,
 			Bio:    opt.NewPtr(r.OwnerBio).OrZero(),
@@ -142,9 +152,20 @@ func fromRow(r subtreeRow) (*datagraph.Cluster, error) {
 	}, nil
 }
 
-func (d *database) Subtree(ctx context.Context, id datagraph.ClusterID) ([]*datagraph.Cluster, error) {
-	filters := ""
-	r, err := d.raw.QueryxContext(ctx, fmt.Sprintf(ddl, filters), id.String())
+func (d *database) Subtree(ctx context.Context, id datagraph.ClusterID, fs ...Filter) ([]*datagraph.Cluster, error) {
+	f := filters{}
+	for _, fn := range fs {
+		fn(&f)
+	}
+
+	predicates := ""
+	predicateN := 2
+	if f.accountSlug != nil {
+		predicates = fmt.Sprintf("%s AND a.handle = $%d", predicates, predicateN)
+		// predicateN++ // Do this when more predicates are added.
+	}
+
+	r, err := d.raw.QueryxContext(ctx, fmt.Sprintf(ddl, predicates), id.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

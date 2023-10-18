@@ -76,18 +76,24 @@ func (c *Clusters) ClusterList(ctx context.Context, request openapi.ClusterListR
 	var cs []*datagraph.Cluster
 	var err error
 
+	opts := []cluster_traversal.Filter{}
+
+	if v := request.Params.Author; v != nil {
+		opts = append(opts, cluster_traversal.WithOwner(*v))
+	}
+
 	if id := request.Params.ClusterId; id != nil {
 		cid, err := xid.FromString(*id)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 
-		cs, err = c.ctr.Subtree(ctx, datagraph.ClusterID(cid))
+		cs, err = c.ctr.Subtree(ctx, datagraph.ClusterID(cid), opts...)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 	} else {
-		cs, err = c.ctr.Root(ctx)
+		cs, err = c.ctr.Root(ctx, opts...)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
