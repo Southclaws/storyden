@@ -224,7 +224,12 @@ func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, ac
 		return nil
 	}
 
-	if err := p.avatar_svc.Set(ctx, acc.ID, avatarBinary.RawBody(), avatarBinary.Size()); err != nil {
+	size := avatarBinary.RawResponse.ContentLength
+
+	rc := avatarBinary.RawBody()
+	defer rc.Close()
+
+	if err := p.avatar_svc.Set(ctx, acc.ID, rc, size); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
