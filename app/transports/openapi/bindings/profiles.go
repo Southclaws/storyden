@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -9,17 +10,19 @@ import (
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type Profiles struct {
-	as account.Service
-	ar account_repo.Repository
+	apiAddress string
+	as         account.Service
+	ar         account_repo.Repository
 }
 
-func NewProfiles(as account.Service, ar account_repo.Repository) Profiles {
-	return Profiles{as, ar}
+func NewProfiles(cfg config.Config, as account.Service, ar account_repo.Repository) Profiles {
+	return Profiles{cfg.PublicWebAddress, as, ar}
 }
 
 func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
@@ -33,11 +36,15 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// TODO: Make this a bit more well designed and less coupled to the hostname
+	avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", p.apiAddress, acc.Handle)
+
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
 			Bio:       utils.Ref(acc.Bio.OrZero()),
 			Handle:    acc.Handle,
+			Image:     &avatarURL,
 			Name:      acc.Name,
 			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
 		},
