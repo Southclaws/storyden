@@ -71,7 +71,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 			return nil, fault.Wrap(errHandleMismatch,
 				fctx.With(ctx),
 				ftag.With(ftag.PermissionDenied),
-				fmsg.WithDesc("handle mismatch", "Handle already registered with a different authentication method."),
+				fmsg.WithDesc("handle mismatch", "Phone number already registered to a different account."),
 			)
 		}
 
