@@ -38,12 +38,14 @@ func TestItemsHappyPath(t *testing.T) {
 			slug1 := name1
 			cont1 := "# Item content\n\nRich text"
 			iurl1 := "https://picsum.photos/200/200"
+			url1 := "https://southcla.ws"
 			item1, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing items api",
 				Content:     &cont1,
 				ImageUrl:    &iurl1,
+				Url:         &url1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -52,6 +54,8 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(name1, item1.JSON200.Name)
 			a.Equal(slug1, item1.JSON200.Slug)
 			a.Equal("testing items api", item1.JSON200.Description)
+			a.Equal(iurl1, *item1.JSON200.ImageUrl)
+			a.Equal(url1, *item1.JSON200.Url)
 			a.Equal(cont1, *item1.JSON200.Content)
 			a.Equal(acc.ID.String(), string(item1.JSON200.Owner.Id))
 
@@ -75,6 +79,7 @@ func TestItemsHappyPath(t *testing.T) {
 			desc1 := "a new description"
 			cont1 = "# New content"
 			iurl1 = "https://picsum.photos/500/500"
+			url1 = "https://cla.ws"
 			prop1 := any(map[string]any{
 				"key": "value",
 			})
@@ -84,6 +89,7 @@ func TestItemsHappyPath(t *testing.T) {
 				Description: &desc1,
 				Content:     &cont1,
 				ImageUrl:    &iurl1,
+				Url:         &url1,
 				Properties:  &prop1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
@@ -95,6 +101,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(desc1, item1update.JSON200.Description)
 			a.Equal(cont1, *item1update.JSON200.Content)
 			a.Equal(iurl1, *item1update.JSON200.ImageUrl)
+			a.Equal(url1, *item1update.JSON200.Url)
 			a.Equal(prop1, item1update.JSON200.Properties)
 
 			// Query for the exact item

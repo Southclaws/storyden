@@ -5,6 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AccountHandle } from "./accountHandle";
 import type { Identifier } from "./identifier";
 
 export type ClusterListParams = {
@@ -12,4 +13,8 @@ export type ClusterListParams = {
    * List this cluster and all child clusters.
    */
   cluster_id?: Identifier;
+  /**
+   * Show only results owned by this account.
+   */
+  author?: AccountHandle;
 };

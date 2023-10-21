@@ -12,6 +12,7 @@ import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
+import type { Url } from "./url";
 
 /**
  * The main properties for an item.
@@ -20,6 +21,7 @@ export interface ItemCommonProps {
   name: ItemName;
   slug: Slug;
   image_url?: AssetURL;
+  url?: Url;
   description: ItemDescription;
   content?: PostContent;
   owner: ProfileReference;

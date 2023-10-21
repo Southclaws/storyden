@@ -92,6 +92,26 @@ func (iu *ItemUpdate) ClearImageURL() *ItemUpdate {
 	return iu
 }
 
+// SetURL sets the "url" field.
+func (iu *ItemUpdate) SetURL(s string) *ItemUpdate {
+	iu.mutation.SetURL(s)
+	return iu
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableURL(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetURL(*s)
+	}
+	return iu
+}
+
+// ClearURL clears the value of the "url" field.
+func (iu *ItemUpdate) ClearURL() *ItemUpdate {
+	iu.mutation.ClearURL()
+	return iu
+}
+
 // SetDescription sets the "description" field.
 func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 	iu.mutation.SetDescription(s)
@@ -349,6 +369,12 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if iu.mutation.ImageURLCleared() {
 		_spec.ClearField(item.FieldImageURL, field.TypeString)
 	}
+	if value, ok := iu.mutation.URL(); ok {
+		_spec.SetField(item.FieldURL, field.TypeString, value)
+	}
+	if iu.mutation.URLCleared() {
+		_spec.ClearField(item.FieldURL, field.TypeString)
+	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 	}
@@ -605,6 +631,26 @@ func (iuo *ItemUpdateOne) SetNillableImageURL(s *string) *ItemUpdateOne {
 // ClearImageURL clears the value of the "image_url" field.
 func (iuo *ItemUpdateOne) ClearImageURL() *ItemUpdateOne {
 	iuo.mutation.ClearImageURL()
+	return iuo
+}
+
+// SetURL sets the "url" field.
+func (iuo *ItemUpdateOne) SetURL(s string) *ItemUpdateOne {
+	iuo.mutation.SetURL(s)
+	return iuo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableURL(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetURL(*s)
+	}
+	return iuo
+}
+
+// ClearURL clears the value of the "url" field.
+func (iuo *ItemUpdateOne) ClearURL() *ItemUpdateOne {
+	iuo.mutation.ClearURL()
 	return iuo
 }
 
@@ -894,6 +940,12 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if iuo.mutation.ImageURLCleared() {
 		_spec.ClearField(item.FieldImageURL, field.TypeString)
+	}
+	if value, ok := iuo.mutation.URL(); ok {
+		_spec.SetField(item.FieldURL, field.TypeString, value)
+	}
+	if iuo.mutation.URLCleared() {
+		_spec.ClearField(item.FieldURL, field.TypeString)
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)

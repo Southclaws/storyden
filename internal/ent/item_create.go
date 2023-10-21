@@ -96,6 +96,20 @@ func (ic *ItemCreate) SetNillableImageURL(s *string) *ItemCreate {
 	return ic
 }
 
+// SetURL sets the "url" field.
+func (ic *ItemCreate) SetURL(s string) *ItemCreate {
+	ic.mutation.SetURL(s)
+	return ic
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableURL(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetURL(*s)
+	}
+	return ic
+}
+
 // SetDescription sets the "description" field.
 func (ic *ItemCreate) SetDescription(s string) *ItemCreate {
 	ic.mutation.SetDescription(s)
@@ -335,6 +349,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = &value
 	}
+	if value, ok := ic.mutation.URL(); ok {
+		_spec.SetField(item.FieldURL, field.TypeString, value)
+		_node.URL = &value
+	}
 	if value, ok := ic.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 		_node.Description = value
@@ -536,6 +554,24 @@ func (u *ItemUpsert) ClearImageURL() *ItemUpsert {
 	return u
 }
 
+// SetURL sets the "url" field.
+func (u *ItemUpsert) SetURL(v string) *ItemUpsert {
+	u.Set(item.FieldURL, v)
+	return u
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateURL() *ItemUpsert {
+	u.SetExcluded(item.FieldURL)
+	return u
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *ItemUpsert) ClearURL() *ItemUpsert {
+	u.SetNull(item.FieldURL)
+	return u
+}
+
 // SetDescription sets the "description" field.
 func (u *ItemUpsert) SetDescription(v string) *ItemUpsert {
 	u.Set(item.FieldDescription, v)
@@ -728,6 +764,27 @@ func (u *ItemUpsertOne) UpdateImageURL() *ItemUpsertOne {
 func (u *ItemUpsertOne) ClearImageURL() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.ClearImageURL()
+	})
+}
+
+// SetURL sets the "url" field.
+func (u *ItemUpsertOne) SetURL(v string) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURL(v)
+	})
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateURL() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURL()
+	})
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *ItemUpsertOne) ClearURL() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURL()
 	})
 }
 
@@ -1100,6 +1157,27 @@ func (u *ItemUpsertBulk) UpdateImageURL() *ItemUpsertBulk {
 func (u *ItemUpsertBulk) ClearImageURL() *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
 		s.ClearImageURL()
+	})
+}
+
+// SetURL sets the "url" field.
+func (u *ItemUpsertBulk) SetURL(v string) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURL(v)
+	})
+}
+
+// UpdateURL sets the "url" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateURL() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURL()
+	})
+}
+
+// ClearURL clears the value of the "url" field.
+func (u *ItemUpsertBulk) ClearURL() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURL()
 	})
 }
 

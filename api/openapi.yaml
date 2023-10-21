@@ -2727,6 +2727,7 @@ components:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
@@ -2743,6 +2744,7 @@ components:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
@@ -2755,6 +2757,7 @@ components:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
@@ -2817,6 +2820,7 @@ components:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
@@ -2849,6 +2853,7 @@ components:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
@@ -2861,6 +2866,7 @@ components:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
+        url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
