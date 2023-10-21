@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -34,12 +35,15 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
+			iurl := "https://picsum.photos/500/500"
+
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
 			clus1, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing clusters api",
+				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -58,6 +62,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
+				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -80,6 +85,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
+				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
@@ -99,6 +105,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname1,
 				Slug:        itemslug1,
 				Description: "testing items api",
+				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -156,6 +163,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname2,
 				Slug:        itemslug2,
 				Description: "testing items api 2",
+				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item2)
@@ -204,7 +212,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			r.NotNil(item1get)
 			r.Equal(200, item1get.StatusCode())
 
-			clusterids := dt.Map(*item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+			clusterids := dt.Map(item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.Contains(clusterids, clus2.JSON200.Id)
 			a.Contains(clusterids, clus3.JSON200.Id)
 
@@ -222,7 +230,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			r.NotNil(item1get)
 			r.Equal(200, item1get.StatusCode())
 
-			clusterids = dt.Map(*item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+			clusterids = dt.Map(item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.NotContains(clusterids, clus2.JSON200.Id)
 			a.Contains(clusterids, clus3.JSON200.Id)
 
@@ -236,6 +244,24 @@ func TestDatagraphHappyPath(t *testing.T) {
 			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
 			a.NotContains(itemids, item2.JSON200.Id)
+
+			// Query for the exact item
+
+			q := itemname1
+			items1, err := cl.ItemListWithResponse(ctx, &openapi.ItemListParams{
+				Q: &q,
+			})
+			r.NoError(err)
+			r.NotNil(items1)
+			r.Equal(200, items1.StatusCode())
+
+			item1found, found := lo.Find(items1.JSON200.Items, func(item openapi.ItemWithParents) bool {
+				return item.Id == item1.JSON200.Id
+			})
+			r.True(found)
+
+			r.Len(item1found.Clusters, 2)
+			a.Equal(clus1.JSON200.Id, item1found.Clusters[0].Id)
 		}))
 	}))
 }

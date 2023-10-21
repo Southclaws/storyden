@@ -51,7 +51,9 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Item
 	query := s.db.Item.Query().Where(
 		item.NameContainsFold(q.qs),
 		// TODO: more query/filter params
-	).WithOwner()
+	).WithOwner().WithClusters(func(cq *ent.ClusterQuery) {
+		cq.WithOwner()
+	})
 
 	r, err := query.All(ctx)
 	if err != nil {

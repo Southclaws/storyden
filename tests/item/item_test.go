@@ -37,11 +37,13 @@ func TestItemsHappyPath(t *testing.T) {
 			name1 := "test-item-1-" + uuid.NewString()
 			slug1 := name1
 			cont1 := "# Item content\n\nRich text"
+			iurl1 := "https://picsum.photos/200/200"
 			item1, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing items api",
 				Content:     &cont1,
+				ImageUrl:    &iurl1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -72,7 +74,7 @@ func TestItemsHappyPath(t *testing.T) {
 			slug1 = name1 + uuid.NewString()
 			desc1 := "a new description"
 			cont1 = "# New content"
-			iurl1 := "https://niceme.me"
+			iurl1 = "https://picsum.photos/500/500"
 			prop1 := any(map[string]any{
 				"key": "value",
 			})

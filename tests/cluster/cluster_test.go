@@ -37,7 +37,7 @@ func TestClustersHappyPath(t *testing.T) {
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Clusters\n\nRich text content."
-			iurl1 := "https://cla.ws/image.png"
+			iurl1 := "https://picsum.photos/200/200"
 			clus1, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
 				Name:        name1,
 				Slug:        slug1,
@@ -74,7 +74,7 @@ func TestClustersHappyPath(t *testing.T) {
 			slug1 = name1 + uuid.NewString()
 			desc1 := "a new description"
 			cont1 := "# New content"
-			iurl1 = "https://niceme.me"
+			iurl1 = "https://picsum.photos/500/500"
 			prop1 := any(map[string]any{
 				"key": "value",
 			})
@@ -116,6 +116,7 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
+				ImageUrl:    &iurl1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -150,6 +151,7 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
+				ImageUrl:    &iurl1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
