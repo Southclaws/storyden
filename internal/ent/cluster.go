@@ -32,6 +32,8 @@ type Cluster struct {
 	Slug string `json:"slug,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
 	ImageURL *string `json:"image_url,omitempty"`
+	// URL holds the value of the "url" field.
+	URL *string `json:"url,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
@@ -136,7 +138,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cluster.FieldProperties:
 			values[i] = new([]byte)
-		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldDescription, cluster.FieldContent:
+		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldURL, cluster.FieldDescription, cluster.FieldContent:
 			values[i] = new(sql.NullString)
 		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -200,6 +202,13 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.ImageURL = new(string)
 				*c.ImageURL = value.String
+			}
+		case cluster.FieldURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[i])
+			} else if value.Valid {
+				c.URL = new(string)
+				*c.URL = value.String
 			}
 		case cluster.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -319,6 +328,11 @@ func (c *Cluster) String() string {
 	builder.WriteString(", ")
 	if v := c.ImageURL; v != nil {
 		builder.WriteString("image_url=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := c.URL; v != nil {
+		builder.WriteString("url=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

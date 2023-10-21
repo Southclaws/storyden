@@ -11,6 +11,7 @@ import type { ItemName } from "./itemName";
 import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
+import type { Url } from "./url";
 
 /**
  * Note: Properties are replace-all and are not merged with existing.
@@ -20,6 +21,7 @@ export interface ItemMutableProps {
   name?: ItemName;
   slug?: Slug;
   image_url?: AssetURL;
+  url?: Url;
   description?: ItemDescription;
   content?: PostContent;
   properties?: Properties;

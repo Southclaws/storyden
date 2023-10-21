@@ -56,6 +56,12 @@ func WithImageURL(v string) Option {
 	}
 }
 
+func WithURL(v string) Option {
+	return func(c *ent.ItemMutation) {
+		c.SetURL(v)
+	}
+}
+
 func WithDescription(v string) Option {
 	return func(c *ent.ItemMutation) {
 		c.SetDescription(v)

@@ -11,11 +11,13 @@ import type { ClusterName } from "./clusterName";
 import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
+import type { Url } from "./url";
 
 export interface ClusterInitialProps {
   name: ClusterName;
   slug: Slug;
   image_url?: AssetURL;
+  url?: Url;
   description: ClusterDescription;
   content?: PostContent;
   properties?: Properties;

@@ -58,6 +58,9 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 	if v := request.Body.ImageUrl; v != nil {
 		opts = append(opts, cluster_repo.WithImageURL(*v))
 	}
+	if v := request.Body.Url; v != nil {
+		opts = append(opts, cluster_repo.WithURL(*v))
+	}
 
 	clus, err := c.cs.Create(ctx,
 		session,
@@ -125,6 +128,7 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 		Name:        opt.NewPtr(request.Body.Name),
 		Slug:        opt.NewPtr(request.Body.Slug),
 		ImageURL:    opt.NewPtr(request.Body.ImageUrl),
+		URL:         opt.NewPtr(request.Body.Url),
 		Description: opt.NewPtr(request.Body.Description),
 		Content:     opt.NewPtr(request.Body.Content),
 		Properties:  opt.NewPtr(request.Body.Properties),
@@ -190,6 +194,7 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
+		Url:         in.URL.Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
@@ -205,6 +210,7 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
+		Url:         in.URL.Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),

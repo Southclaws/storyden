@@ -60,6 +60,12 @@ func WithImageURL(v string) Option {
 	}
 }
 
+func WithURL(v string) Option {
+	return func(c *ent.ClusterMutation) {
+		c.SetURL(v)
+	}
+}
+
 func WithDescription(v string) Option {
 	return func(c *ent.ClusterMutation) {
 		c.SetDescription(v)

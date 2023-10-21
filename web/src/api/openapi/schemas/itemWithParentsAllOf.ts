@@ -8,5 +8,5 @@
 import type { ClusterList } from "./clusterList";
 
 export type ItemWithParentsAllOf = {
-  clusters?: ClusterList;
+  clusters: ClusterList;
 };
