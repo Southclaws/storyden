@@ -162,11 +162,11 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *Cook
 		return func(c echo.Context) error {
 			r := c.Request()
 
-			l.Info(
-				"request",
+			zap.L().Info(
+				r.URL.Path,
 				zap.String("method", r.Method),
-				zap.String("path", r.URL.Path),
 				zap.Any("query", r.URL.Query()),
+				zap.Any("headers", r.Header),
 				zap.Int64("body", r.ContentLength),
 			)
 
