@@ -138,6 +138,6 @@ func serialiseItemWithParents(in *datagraph.Item) openapi.ItemWithParents {
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Properties:  in.Properties,
-		Clusters:    &clusters,
+		Clusters:    clusters,
 	}
 }

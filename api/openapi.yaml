@@ -2830,7 +2830,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/ItemCommonProps"
-        - properties:
+        - required: [clusters]
+          properties:
             clusters: { $ref: "#/components/schemas/ClusterList" }
 
     ItemList:
