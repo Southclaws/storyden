@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"net/http"
-
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"go.uber.org/fx"
@@ -48,18 +46,4 @@ func replaceGlobals(c config.Config, l *zap.Logger) {
 	if !c.Production {
 		l.Debug("logger configured in development mode")
 	}
-}
-
-// WithLogger is simple Zap logger HTTP middleware
-func WithLogger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		zap.L().Info(
-			r.URL.Path,
-			zap.String("method", r.Method),
-			zap.Any("query", r.URL.Query()),
-			zap.Any("headers", r.Header),
-			zap.Int64("body", r.ContentLength),
-		)
-		next.ServeHTTP(w, r)
-	})
 }
