@@ -58,6 +58,15 @@ func newEntClient(lc fx.Lifecycle, db *sql.DB) (*ent.Client, error) {
 	}
 
 	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			// Run create-only migrations after initialisation.
+			// This is done in tests and scripts too.
+			if err := client.Schema.Create(ctx); err != nil {
+				return fault.Wrap(err, fctx.With(ctx))
+			}
+
+			return nil
+		},
 		OnStop: func(ctx context.Context) error {
 			defer cancel()
 
