@@ -21,9 +21,20 @@ func NewServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.S
 
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
-			l.Info("http server starting", zap.String("address", cfg.ListenAddr))
 			server.BaseContext = func(ln net.Listener) context.Context { return wctx }
 			go func() {
+				// The HTTP server is the root node of dependency tree, because
+				// it depends on everything else being initialised first. So, if
+				// the app reaches this point, its considered a successful boot!
+
+				l.Info("storyden http server starting",
+					zap.String("address", cfg.ListenAddr),
+					zap.String("cookie_domain", cfg.CookieDomain),
+					zap.String("frontend_address", cfg.PublicWebAddress),
+					zap.Bool("frontend_address", cfg.Production),
+					zap.String("log_level", cfg.LogLevel.String()),
+				)
+
 				if err := server.ListenAndServe(); err != nil {
 					l.Fatal("http server stopped unexpectedly", zap.Error(err))
 				}
@@ -35,8 +46,6 @@ func NewServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.S
 			return nil
 		},
 	})
-
-	l.Info("created http server")
 
 	return server
 }
