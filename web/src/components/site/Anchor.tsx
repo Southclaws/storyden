@@ -1,12 +1,15 @@
-import { Link as ChakraLink, LinkProps } from "@chakra-ui/react";
-import NextLink from "next/link";
-import { PropsWithRef, useCallback } from "react";
+import Link from "next/link";
+import { AnchorHTMLAttributes, PropsWithRef, useCallback } from "react";
+
+import { css, cx } from "@/styled-system/css";
 
 export function Anchor({
   children,
+  className,
   onClick,
+  href,
   ...rest
-}: PropsWithRef<LinkProps>) {
+}: PropsWithRef<AnchorHTMLAttributes<HTMLAnchorElement>>) {
   // This allows us to progressively enhance features on the application by
   // treating important buttons as links to fallback pages. For example, there
   // may be a button that triggers the opening of a modal dialogue but if the
@@ -23,8 +26,18 @@ export function Anchor({
   );
 
   return (
-    <ChakraLink as={NextLink} onClick={handleClick} {...rest}>
+    <Link
+      className={cx(
+        css({
+          _hover: { textDecoration: "underline" },
+        }),
+        className,
+      )}
+      href={href!}
+      onClick={handleClick}
+      {...rest}
+    >
       {children}
-    </ChakraLink>
+    </Link>
   );
 }

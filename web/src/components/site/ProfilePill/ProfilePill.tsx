@@ -3,6 +3,7 @@ import { useSession } from "src/auth";
 import { Anchor } from "src/components/site/Anchor";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 
+import { css } from "@/styled-system/css";
 import { Box, HStack } from "@/styled-system/jsx";
 
 import { Handle } from "./Handle";
@@ -25,14 +26,15 @@ export function ProfilePill({
 
   return (
     <Anchor
-      className="profile-reference"
-      p={1}
-      pr={showHandle ? 2 : 1}
-      borderRadius="full"
-      _hover={{ backgroundColor: "blackAlpha.100" }}
-      href={`/p/${profileReference.handle}`}
       title={title}
-      minW={0}
+      href={`/p/${profileReference.handle}`}
+      className={css({
+        p: 1,
+        pr: showHandle ? 2 : 1,
+        borderRadius: "full",
+        _hover: { backgroundColor: "blackAlpha.100" },
+        minW: 0,
+      })}
     >
       <HStack>
         <Avatar
