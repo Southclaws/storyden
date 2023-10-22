@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,8 +18,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/react"
+	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 type database struct {
@@ -181,10 +186,13 @@ func (d *database) List(
 		Limit(max).
 		WithCategory().
 		WithAuthor().
-		WithAssets().
+		WithAssets(func(aq *ent.AssetQuery) {
+			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
+		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
-			cq.WithOwner()
-		})
+			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
+		}).
+		Order(ent_post.ByUpdatedAt(sql.OrderDesc()), ent_post.ByCreatedAt(sql.OrderDesc()))
 
 	for _, fn := range opts {
 		fn(query)
@@ -230,8 +238,12 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 		}).
 		WithAuthor().
 		WithCategory().
-		WithTags().
-		WithReacts().
+		WithTags(func(tq *ent.TagQuery) {
+			tq.Order(tag.ByCreatedAt())
+		}).
+		WithReacts(func(rq *ent.ReactQuery) {
+			rq.Order(react.ByCreatedAt())
+		}).
 		WithAssets().
 		Only(ctx)
 	if err != nil {
@@ -265,100 +277,3 @@ func (d *database) Delete(ctx context.Context, id post.ID) error {
 
 	return nil
 }
-
-// func (d *database) GetPostCounts(ctx context.Context) (map[string]int, error) {
-// 	type PostCount struct {
-// 		PostID string `json:"rootPostId"`
-// 		Count  int    `json:"count"`
-// 	}
-
-// 	var counts []PostCount
-// 	err := d.db.Prisma.Raw.QueryRaw(`
-// 		with recursive counts AS(
-// 			select id, "rootPostId"
-// 			from public."Post"
-// 			where "rootPostId" is not null
-
-// 			union
-
-// 			select s.id, s."rootPostId"
-// 			from public."Post" s
-// 			inner join counts c on c.id = s."rootPostId"
-// 		) select "rootPostId", count(*) from counts
-// 		group by "rootPostId"`).
-// 		Exec(ctx, &counts)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	result := make(map[string]int)
-// 	for _, c := range counts {
-// 		result[c.PostID] = c.Count
-// 	}
-
-// 	return result, nil
-// }
-
-// func (d *database) Update(ctx context.Context, userID, id string, title, categoryID *string, pinned *bool) (*post.Post, error) {
-// 	updates := []db.PostSetParam{
-// 		db.Post.Title.SetIfPresent(title),
-// 		db.Post.CategoryID.SetIfPresent(categoryID),
-// 		db.Post.Pinned.SetIfPresent(pinned),
-// 	}
-
-// 	if err := post.CanUserMutatePost(ctx, d.db, userID, id); err != nil {
-// 		return nil, post.ErrUnauthorised
-// 	}
-
-// 	p, err := d.db.Post.
-// 		FindUnique(db.Post.ID.Equals(id)).
-// 		With(
-// 			db.Post.Author.Fetch(),
-// 			db.Post.Category.Fetch(),
-// 			db.Post.Tags.Fetch(),
-// 		).
-// 		Update(updates...).
-// 		Exec(ctx)
-// 	if err != nil {
-// 		if errors.Is(err, db.ErrNotFound) {
-// 			return nil, nil
-// 		}
-// 		return nil, err
-// 	}
-// 	return post.FromModel(p), nil
-// }
-
-// func (d *database) Delete(ctx context.Context, id, authorID string) (int, error) {
-// 	// NOTE:
-// 	// We really want this authorID to eventually be removed from this API.
-// 	// Because this API should be user-agnostic, and should be usable by non-
-// 	// human users. Therefore, the validation of access rights should happen at
-// 	// a different abstraction layer. Lower than the HTTP API but higher than
-// 	// the database implementation.
-// 	if err := post.CanUserMutatePost(ctx, d.db, authorID, id); err != nil {
-// 		return 0, fault.Wrap(err, "failed to check user permissions")
-// 	}
-
-// 	result, err := d.db.Post.FindMany(
-// 		db.Post.Or(
-// 			db.Post.And(
-// 				db.Post.First.Equals(true),
-// 				db.Post.ID.Equals(id),
-// 			),
-// 			db.Post.And(
-// 				db.Post.First.Equals(false),
-// 				db.Post.Root.Where(db.Post.ID.Equals(id)),
-// 			),
-// 		),
-// 	).Update(
-// 		db.Post.DeletedAt.Set(time.Now()),
-// 	).Exec(ctx)
-// 	if err != nil {
-// 		if errors.Is(err, db.ErrNotFound) {
-// 			return 0, nil
-// 		}
-// 		return 0, fault.Wrap(err, "failed to set deletedAt for posts")
-// 	}
-
-// 	return result.Count, nil
-// }

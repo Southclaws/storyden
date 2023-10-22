@@ -261,7 +261,10 @@ func TestDatagraphHappyPath(t *testing.T) {
 			r.True(found)
 
 			r.Len(item1found.Clusters, 2)
-			a.Equal(clus1.JSON200.Id, item1found.Clusters[0].Id)
+			clusterids = dt.Map(item1found.Clusters, func(i openapi.Cluster) string { return i.Id })
+			a.Contains(clusterids, clus1.JSON200.Id)
+			a.Contains(clusterids, clus2.JSON200.Id)
+			a.NotContains(clusterids, clus3.JSON200.Id)
 		}))
 	}))
 }
