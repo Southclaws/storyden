@@ -4,7 +4,7 @@ import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 
-import { Byline } from "../Byline";
+import { Byline } from "../../../../components/feed/common/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
 import { ReactList } from "../ReactList/ReactList";
 
