@@ -1,4 +1,3 @@
-import { Box, HStack, Heading } from "@chakra-ui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { usePathname } from "next/navigation";
@@ -8,6 +7,9 @@ import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
 import { Anchor } from "src/components/site/Anchor";
 
 import { CategoryEdit } from "../CategoryEdit/CategoryEdit";
+
+import { css } from "@/styled-system/css";
+import { Box, HStack, styled } from "@/styled-system/jsx";
 
 export function CategoryListItem(props: Category & { isAdmin: boolean }) {
   const {
@@ -35,7 +37,6 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       key={props.id}
       ref={setNodeRef}
       borderRadius="md"
-      p={2}
       bgColor={selected ? "blackAlpha.100" : ""}
       _hover={{
         backgroundColor: "blackAlpha.50",
@@ -43,10 +44,16 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       w="full"
     >
       <HStack justifyContent="space-between">
-        <Anchor href={href} w="full" _hover={{ textDecor: "none" }}>
-          <Heading size="sm" role="navigation" variant="ghost" w="full">
+        <Anchor
+          href={href}
+          className={css({
+            w: "full",
+            _hover: { textDecoration: "none" },
+          })}
+        >
+          <styled.h2 p={2} role="navigation" w="full" fontWeight="bold">
             {props.name}
-          </Heading>
+          </styled.h2>
         </Anchor>
 
         {props.isAdmin && (
