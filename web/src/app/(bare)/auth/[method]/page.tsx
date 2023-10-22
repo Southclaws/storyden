@@ -1,8 +1,9 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AuthScreen } from "src/screens/auth/AuthScreen";
 import { z } from "zod";
+
+import { AuthScreen } from "src/screens/auth/AuthScreen";
 
 const ParamSchema = z.object({ method: z.string().optional() });
 

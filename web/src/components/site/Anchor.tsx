@@ -19,7 +19,7 @@ export function Anchor({
         return onClick?.(e);
       }
     },
-    [onClick]
+    [onClick],
   );
 
   return (

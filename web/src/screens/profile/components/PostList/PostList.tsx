@@ -1,5 +1,7 @@
 import { Divider, ListItem, OrderedList } from "@chakra-ui/react";
+
 import { PostProps } from "src/api/openapi/schemas";
+
 import { PostListItem } from "./PostListItem";
 
 type Props = {

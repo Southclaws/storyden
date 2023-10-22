@@ -37,7 +37,7 @@ export function usePassword() {
           title: "Failed!",
           description: `Sign in failed: ${e.message}`,
           status: "error",
-        })
+        }),
       );
   }
 
@@ -52,7 +52,7 @@ export function usePassword() {
           title: "Failed!",
           description: `Sign up failed: ${e.message}`,
           status: "error",
-        })
+        }),
       );
   }
 

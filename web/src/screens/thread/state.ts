@@ -7,7 +7,7 @@ import { Thread } from "src/api/openapi/schemas";
 import { ThreadScreenContextShape } from "./context";
 
 export function useThreadScreenState(
-  props: Thread | undefined
+  props: Thread | undefined,
 ): ThreadScreenContextShape {
   const [editingPostID, _setEditingPostID] =
     useState<ThreadScreenContextShape["editingPostID"]>(undefined);

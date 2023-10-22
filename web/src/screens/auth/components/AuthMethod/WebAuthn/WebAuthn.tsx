@@ -2,11 +2,12 @@ import {
   Box,
   Button,
   FormLabel,
-  Heading,
   HStack,
+  Heading,
   Input,
   VStack,
 } from "@chakra-ui/react";
+
 import { useWebAuthn } from "./useWebAuthn";
 
 export function WebAuthn() {

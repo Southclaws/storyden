@@ -16,7 +16,7 @@ export function usePostMenu(props: PostProps) {
   const account = useSession();
   const { thread, setEditingPostID } = useThreadScreenContext();
   const { onCopy } = useClipboard(
-    getPermalinkForPost(props.root_slug, props.id)
+    getPermalinkForPost(props.root_slug, props.id),
   );
 
   const shareEnabled = !!navigator.share;

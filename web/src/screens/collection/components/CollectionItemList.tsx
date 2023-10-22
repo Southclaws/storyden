@@ -3,7 +3,7 @@ import { Fragment } from "react";
 
 import { CollectionItem as CollectionItemSchema } from "src/api/openapi/schemas";
 
-import { CollectionItem } from "./CollectionItem";
+import { CollectionItemListItem } from "./CollectionItemListItem";
 
 type Props = { items: CollectionItemSchema[] };
 
@@ -13,7 +13,7 @@ export function CollectionItemList(props: Props) {
       {props.items.map((t) => (
         <Fragment key={t.id}>
           <Divider />
-          <CollectionItem key={t.id} item={t} />
+          <CollectionItemListItem key={t.id} item={t} />
         </Fragment>
       ))}
     </List>

@@ -58,7 +58,7 @@ export function useContentComposer(props: Props) {
 
   function onChange(value: Descendant[]) {
     const isAstChange = editor.operations.some(
-      (op) => "set_selection" !== op.type
+      (op) => "set_selection" !== op.type,
     );
 
     if (isAstChange) {

@@ -19,7 +19,7 @@ const formatDistanceLocale = {
 
 export const formatDistance = (
   token: keyof typeof formatDistanceLocale,
-  count: string
+  count: string,
 ) => {
   const result = formatDistanceLocale[token].replace("{{count}}", count);
 

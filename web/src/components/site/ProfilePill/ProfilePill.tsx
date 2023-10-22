@@ -1,19 +1,19 @@
-import { Box, HStack } from "@/styled-system/jsx";
-
-import { useSession } from "src/auth";
 import { ProfileReference } from "src/api/openapi/schemas";
-import { Avatar } from "src/components/site/Avatar/Avatar";
+import { useSession } from "src/auth";
 import { Anchor } from "src/components/site/Anchor";
+import { Avatar } from "src/components/site/Avatar/Avatar";
+
+import { Box, HStack } from "@/styled-system/jsx";
 
 import { Handle } from "./Handle";
 
-type Props =  {
+type Props = {
   profileReference: ProfileReference;
   showHandle?: boolean;
   size?: "sm" | "lg";
 };
 
-export function ProfileReference({
+export function ProfilePill({
   profileReference,
   showHandle = true,
   size = "sm",
@@ -35,10 +35,16 @@ export function ProfileReference({
       minW={0}
     >
       <HStack>
-        <Avatar flexShrink={0} handle={profileReference.handle} width={large ? 8 : 6} />
-        {showHandle && <Box minW={0} flexShrink={1}>
-          <Handle profileReference={profileReference} size={size} />
-        </Box>}
+        <Avatar
+          flexShrink={0}
+          handle={profileReference.handle}
+          width={large ? 8 : 6}
+        />
+        {showHandle && (
+          <Box minW={0} flexShrink={1}>
+            <Handle profileReference={profileReference} size={size} />
+          </Box>
+        )}
       </HStack>
     </Anchor>
   );
