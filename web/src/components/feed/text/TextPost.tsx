@@ -4,7 +4,7 @@ import NextLink from "next/link";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Byline } from "src/screens/thread/components/Byline";
+import { Byline } from "src/components/feed/common/Byline";
 
 import { FeedItem } from "../common/FeedItem/FeedItem";
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";

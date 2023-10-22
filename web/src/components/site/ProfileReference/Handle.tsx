@@ -1,7 +1,8 @@
-import { Icon, Text } from "@chakra-ui/react";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 import { ProfileReference } from "src/api/openapi/schemas";
+
+import { styled } from "@/styled-system/jsx";
 
 export type Props = {
   profileReference: ProfileReference;
@@ -10,20 +11,20 @@ export type Props = {
 
 export function Handle({ profileReference, size }: Props) {
   return (
-    <Text
-      fontSize={size === "lg" ? "md" : "sm"}
-      display="flex"
-      alignItems="center"
-      gap={1}
-    >
-      @{profileReference.handle}
+    <styled.p fontSize={size === "lg" ? "md" : "sm"} display="flex">
+      <styled.span
+        whiteSpace="nowrap"
+        textOverflow="ellipsis"
+        overflow="hidden"
+      >
+        @{profileReference.handle}
+      </styled.span>
+
       {profileReference.admin && (
-        <Text as="span" title="Admin">
-          <Icon>
-            <CheckBadgeIcon />
-          </Icon>
-        </Text>
+        <styled.span title="Admin">
+          <CheckBadgeIcon height="1rem" />
+        </styled.span>
       )}
-    </Text>
+    </styled.p>
   );
 }

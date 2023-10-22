@@ -1,10 +1,10 @@
-import { HStack } from "@chakra-ui/react";
+import { Box, HStack } from "@/styled-system/jsx";
 
 import { useSession } from "src/auth";
-
 import { ProfileReference } from "src/api/openapi/schemas";
-import { Avatar } from "../Avatar/Avatar";
-import { Anchor } from "../Anchor";
+import { Avatar } from "src/components/site/Avatar/Avatar";
+import { Anchor } from "src/components/site/Anchor";
+
 import { Handle } from "./Handle";
 
 type Props =  {
@@ -25,16 +25,20 @@ export function ProfileReference({
 
   return (
     <Anchor
+      className="profile-reference"
       p={1}
       pr={showHandle ? 2 : 1}
       borderRadius="full"
       _hover={{ backgroundColor: "blackAlpha.100" }}
       href={`/p/${profileReference.handle}`}
       title={title}
+      minW={0}
     >
       <HStack>
-        <Avatar handle={profileReference.handle} width={large ? 8 : 6} />
-        {showHandle && <Handle profileReference={profileReference} size={size} />}
+        <Avatar flexShrink={0} handle={profileReference.handle} width={large ? 8 : 6} />
+        {showHandle && <Box minW={0} flexShrink={1}>
+          <Handle profileReference={profileReference} size={size} />
+        </Box>}
       </HStack>
     </Anchor>
   );

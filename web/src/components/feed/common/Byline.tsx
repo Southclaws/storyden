@@ -22,7 +22,13 @@ export function Byline(props: Props) {
       : undefined;
 
   return (
-    <Flex alignItems="center" fontSize="sm" color="gray.500" gap={0}>
+    <Flex
+      alignItems="center"
+      fontSize="sm"
+      color="gray.500"
+      gap={0}
+      minWidth={0}
+    >
       <ProfileReference profileReference={props.author} />
       <Text as="span" pr={2}>
         •

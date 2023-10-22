@@ -2,7 +2,7 @@ import { Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 import { CollectionItem } from "src/api/openapi/schemas";
-import { Byline } from "src/screens/thread/components/Byline";
+import { Byline } from "src/components/feed/common/Byline";
 
 export function CollectionItem(props: { item: CollectionItem }) {
   const permalink = `/t/${props.item.slug}`;
