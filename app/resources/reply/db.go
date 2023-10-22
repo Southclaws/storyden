@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
@@ -101,7 +102,9 @@ func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 		WithRoot(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
 		}).
-		WithAssets().
+		WithAssets(func(aq *ent.AssetQuery) {
+			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

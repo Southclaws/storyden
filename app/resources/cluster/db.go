@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -15,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/item"
 )
 
 type database struct {
@@ -63,7 +65,8 @@ func (d *database) Create(
 func (d *database) List(ctx context.Context, filters ...Filter) ([]*datagraph.Cluster, error) {
 	q := d.db.Cluster.
 		Query().
-		WithOwner()
+		WithOwner().
+		Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 
 	for _, fn := range filters {
 		fn(q)
@@ -88,7 +91,8 @@ func (d *database) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagr
 		Where(cluster.Slug(string(slug))).
 		WithOwner().
 		WithItems(func(iq *ent.ItemQuery) {
-			iq.WithOwner()
+			iq.WithOwner().
+				Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)
 	if err != nil {
