@@ -62,7 +62,7 @@ export function useFileDrop(props: Props) {
 
             await process(file);
           }
-        })
+        }),
       );
     } else {
       await Promise.all([...e.dataTransfer.files].map(process));

@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@chakra-ui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+
 import { Props, emojiPickerContainerID, useReactList } from "./useReactList";
 
 export function ReactList(props: Props) {

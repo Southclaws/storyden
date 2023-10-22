@@ -4,7 +4,9 @@ import NextLink from "next/link";
 import { CollectionItem } from "src/api/openapi/schemas";
 import { Byline } from "src/components/feed/common/Byline";
 
-export function CollectionItem(props: { item: CollectionItem }) {
+type Props = { item: CollectionItem };
+
+export function CollectionItemListItem(props: Props) {
   const permalink = `/t/${props.item.slug}`;
 
   return (
@@ -27,10 +29,7 @@ export function CollectionItem(props: { item: CollectionItem }) {
           author={props.item.author}
           time={new Date(props.item.createdAt)}
           updated={new Date(props.item.updatedAt)}
-          //   more={<ThreadMenu {...props.item} />}
         />
-
-        {/* Tags list */}
       </Flex>
     </Flex>
   );

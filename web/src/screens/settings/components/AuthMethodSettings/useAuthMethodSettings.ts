@@ -30,7 +30,7 @@ export function useAuthMethodSettings(): AuthMethodSettings {
   }
 
   const [active, rest] = partitionByActive(
-    response.data.auth_methods.sort((a, b) => a.name.localeCompare(b.name))
+    response.data.auth_methods.sort((a, b) => a.name.localeCompare(b.name)),
   );
 
   return {

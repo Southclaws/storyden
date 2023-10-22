@@ -13,7 +13,7 @@ import {
   Logout,
   Settings,
 } from "src/components/site/Action/Action";
-import { ProfileReference } from "src/components/site/ProfileReference/ProfileReference";
+import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
 import { CategoryCreate } from "../Sidebar/components/CategoryCreate/CategoryCreate";
@@ -77,7 +77,7 @@ export function Navpill() {
         <HStack gap={4} w="full" justifyContent="space-between">
           {isExpanded ? (
             <>
-              <ProfileReference profileReference={account} showHandle={false} />
+              <ProfilePill profileReference={account} showHandle={false} />
 
               <Input
                 variant="outline"
@@ -92,7 +92,7 @@ export function Navpill() {
             </>
           ) : (
             <>
-              <ProfileReference profileReference={account} showHandle={false} />
+              <ProfilePill profileReference={account} showHandle={false} />
               <Home />
               <Create />
               <Bell />

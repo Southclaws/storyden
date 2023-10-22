@@ -6,6 +6,7 @@ import {
   Input,
   VStack,
 } from "@chakra-ui/react";
+
 import { usePassword } from "./usePassword";
 
 export function Password() {

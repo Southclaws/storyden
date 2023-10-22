@@ -27,7 +27,7 @@ export function usePostView(props: PostProps) {
   async function onPublishEdit() {
     if (!editingPostID) {
       throw new Error(
-        "Cannot publish edits as the editing context has lost the target post ID."
+        "Cannot publish edits as the editing context has lost the target post ID.",
       );
     }
 

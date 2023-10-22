@@ -23,7 +23,7 @@ export function useReactList(props: Props) {
 
   async function onOpen() {
     const rootElement = document.querySelector(
-      `#${emojiPickerContainerID}-${props.id}`
+      `#${emojiPickerContainerID}-${props.id}`,
     ) as HTMLElement;
 
     if (!rootElement) {

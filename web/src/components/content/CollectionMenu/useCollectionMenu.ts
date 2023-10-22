@@ -41,7 +41,7 @@ export function useCollectionMenu(props: Props) {
 
   const postCollections = new Set(props.thread.collections.map((c) => c.id));
   const isAlreadySaved = Boolean(
-    props.thread.collections.filter((c) => c.owner.id === account?.id).length
+    props.thread.collections.filter((c) => c.owner.id === account?.id).length,
   );
 
   const collections: CollectionState[] =

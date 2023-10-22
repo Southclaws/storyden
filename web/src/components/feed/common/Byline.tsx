@@ -1,14 +1,14 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
-import { ProfileReference as ProfileReferenceSchema } from "src/api/openapi/schemas";
-import { ProfileReference } from "src/components/site/ProfileReference/ProfileReference";
+import { ProfileReference } from "src/api/openapi/schemas";
+import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Timestamp } from "src/components/site/Timestamp";
 import { formatDistanceDefaults } from "src/utils/date";
 
 type Props = {
   href: string;
-  author: ProfileReferenceSchema;
+  author: ProfileReference;
   time: Date;
   updated: Date;
   more?: React.ReactElement;
@@ -29,7 +29,7 @@ export function Byline(props: Props) {
       gap={0}
       minWidth={0}
     >
-      <ProfileReference profileReference={props.author} />
+      <ProfilePill profileReference={props.author} />
       <Text as="span" pr={2}>
         •
       </Text>
