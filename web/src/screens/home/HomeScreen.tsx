@@ -1,14 +1,25 @@
 import { server } from "src/api/client";
 import { ThreadListOKResponse } from "src/api/openapi/schemas";
+import { Unready } from "src/components/site/Unready";
 
 import { Client } from "./Client";
 
 export async function HomeScreen() {
-  const data = await server<ThreadListOKResponse>({ url: "/v1/threads" });
+  try {
+    const data = await server<ThreadListOKResponse>({ url: "/v1/threads" });
 
-  return (
-    <>
-      <Client threads={data.threads} />
-    </>
-  );
+    return (
+      <>
+        <Client threads={data.threads} />
+      </>
+    );
+  } catch (error) {
+    return (
+      <Unready
+        message={"Content failed to load"}
+        error={(error as Error).message}
+        metadata={JSON.parse(JSON.stringify(error))}
+      />
+    );
+  }
 }
