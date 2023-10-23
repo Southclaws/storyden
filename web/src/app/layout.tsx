@@ -21,7 +21,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <link rel="stylesheet" href="/theme.css" />
       </head>
 
-      <body suppressHydrationWarning={true}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

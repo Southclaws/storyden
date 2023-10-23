@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { useInfoProvider } from "src/api/InfoProvider/useInfoProvider";
+import { useGetInfo } from "src/api/openapi/misc";
 import { OnboardingStatus } from "src/api/openapi/schemas";
 
 export function useOnboarding() {
-  const info = useInfoProvider();
+  const { data: info } = useGetInfo();
   const [localStatus, setlocalStatus] = useState<string | null>(null);
 
   // NOTE: local onboarding status value takes priority.
