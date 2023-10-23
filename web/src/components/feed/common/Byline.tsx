@@ -1,10 +1,11 @@
-import { Flex, Text } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
 import { ProfileReference } from "src/api/openapi/schemas";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Timestamp } from "src/components/site/Timestamp";
 import { formatDistanceDefaults } from "src/utils/date";
+
+import { Flex, styled } from "@/styled-system/jsx";
 
 type Props = {
   href: string;
@@ -30,9 +31,7 @@ export function Byline(props: Props) {
       minWidth={0}
     >
       <ProfilePill profileReference={props.author} />
-      <Text as="span" pr={2}>
-        •
-      </Text>
+      <styled.span pr={2}>•</styled.span>
       <Timestamp created={created} updated={updated} href={props.href} />
     </Flex>
   );
