@@ -23,6 +23,7 @@ export function ContentViewer({ value }: Props) {
   return (
     <Slate editor={editor} initialValue={deserialise(value)}>
       <Editable
+        className="typography content-viewer"
         renderLeaf={renderLeaf}
         renderElement={renderElement}
         readOnly
