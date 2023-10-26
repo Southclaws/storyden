@@ -1,7 +1,159 @@
 @layer reset, base, tokens, recipes, utilities;
 
+:root {
+  --font-size-h1: 2.488rem;
+  --font-size-h2: 2.074rem;
+  --font-size-h3: 1.728rem;
+  --font-size-h4: 1.44rem;
+  --font-size-h5: 1.2rem;
+  --font-size-h6: 1.125rem;
+
+  --font-size-h1-variable: clamp(
+    100%,
+    calc(var(--font-size-h1) / 4) + 4vw,
+    var(--font-size-h1)
+  );
+  --font-size-h2-variable: clamp(
+    100%,
+    calc(var(--font-size-h2) / 4) + 4vw,
+    var(--font-size-h2)
+  );
+  --font-size-h3-variable: clamp(
+    100%,
+    calc(var(--font-size-h3) / 4) + 4vw,
+    var(--font-size-h3)
+  );
+  --font-size-h4-variable: clamp(
+    100%,
+    calc(var(--font-size-h4) / 4) + 4vw,
+    var(--font-size-h4)
+  );
+  --font-size-h5-variable: clamp(
+    100%,
+    calc(var(--font-size-h5) / 4) + 4vw,
+    var(--font-size-h5)
+  );
+  --font-size-h6-variable: clamp(
+    100%,
+    calc(var(--font-size-h6) / 4) + 4vw,
+    var(--font-size-h6)
+  );
+}
+
 html,
 body {
   background-color: var(--accent-colour-flat-fill-3);
   color: var(--accent-colour-flat-text-3);
+}
+
+.content-viewer {
+  width: 100%;
+}
+
+.typography {
+  /* BLOCK ELEMENTS */
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  a {
+    color: var(--colors-blue-500);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 1rem 0 1.38rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  h1 {
+    margin-top: 0;
+
+    font-size: var(--font-size-h1);
+    font-size: var(--font-size-h1-variable);
+  }
+  h2 {
+    font-size: var(--font-size-h2);
+    font-size: var(--font-size-h2-variable);
+  }
+  h3 {
+    font-size: var(--font-size-h3);
+    font-size: var(--font-size-h3-variable);
+  }
+  h4 {
+    font-size: var(--font-size-h4);
+    font-size: var(--font-size-h4-variable);
+  }
+  h5 {
+    font-size: var(--font-size-h5);
+    font-size: var(--font-size-h5-variable);
+  }
+  h6 {
+    font-size: var(--font-size-h6);
+    font-size: var(--font-size-h6-variable);
+  }
+
+  small {
+    font-size: var(--font-size);
+    font-size: clamp(100%, calc(var(--font-size) / 4) + 4vw, var(--font-size));
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: circle;
+  }
+
+  li {
+    margin-left: var(--spacing-4);
+  }
+
+  blockquote {
+    background: var(--colors-gray-50);
+    border-left: var(--spacing-2) solid var(--colors-gray-200);
+    margin: var(--spacing-4) var(--spacing-2);
+    padding: var(--spacing-2);
+    border-radius: var(--radii-lg);
+  }
+  blockquote p {
+    display: inline;
+  }
+
+  pre {
+    font-family: monospace;
+    overflow-x: scroll;
+    max-width: 100%;
+  }
+
+  /* LEAF ELEMENTS */
+
+  strong {
+    font-weight: 500;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  u {
+    font-size: larger;
+    text-decoration: underline;
+  }
+
+  code {
+    font-family: monospace;
+  }
+
+  hr {
+    border-color: var(--colors-gray-100);
+    padding-bottom: var(--spacing-2);
+    padding-top: var(--spacing-2);
+  }
 }

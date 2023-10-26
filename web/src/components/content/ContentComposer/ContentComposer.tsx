@@ -19,7 +19,12 @@ export function ContentComposer({
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
 
   return (
-    <Box id="rich-text-editor" w="full" onDragOver={(e) => e.preventDefault()}>
+    <Box
+      id="rich-text-editor"
+      className="typography"
+      w="full"
+      onDragOver={(e) => e.preventDefault()}
+    >
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
         {children}
 
