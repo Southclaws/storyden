@@ -7,6 +7,7 @@ import { ThreadReference } from "src/api/openapi/schemas";
 import { getThreadListKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
+import { isShareEnabled } from "src/utils/client";
 
 export function useFeedItemMenu(props: ThreadReference) {
   const toast = useToast();
@@ -48,14 +49,6 @@ export function useFeedItemMenu(props: ThreadReference) {
     deleteEnabled,
     onDelete,
   };
-}
-
-function isShareEnabled() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return Boolean(navigator.share);
 }
 
 function getPermalinkForThread(slug: string) {
