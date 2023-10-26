@@ -4,7 +4,7 @@ import { postUpdate } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { threadUpdate } from "src/api/openapi/threads";
 
-import { useThreadScreenContext } from "../../context";
+import { useThreadScreenContext } from "../context/context";
 
 export function usePostView(props: PostProps) {
   const {

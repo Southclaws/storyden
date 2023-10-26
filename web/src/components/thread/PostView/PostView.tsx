@@ -1,12 +1,14 @@
-import { Button, Flex, HStack } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 
 import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 
-import { Byline } from "../../../../components/feed/common/Byline";
+import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
 import { ReactList } from "../ReactList/ReactList";
+
+import { Flex, HStack } from "@/styled-system/jsx";
 
 import { usePostView } from "./usePostView";
 
@@ -46,7 +48,9 @@ export function PostView(props: Props) {
           </HStack>
         </>
       ) : (
-        <ContentViewer value={props.body} />
+        <>
+          <ContentViewer value={props.body} />
+        </>
       )}
       <ReactList {...props} />
     </Flex>

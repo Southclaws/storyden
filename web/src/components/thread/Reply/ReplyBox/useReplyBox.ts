@@ -49,7 +49,7 @@ export function useReplyBox(thread: Thread) {
     doReply();
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+  function onKeyDown(event: React.KeyboardEvent<HTMLFormElement>) {
     if (event.key == "Enter" && (event.metaKey || event.ctrlKey)) {
       doReply();
     }

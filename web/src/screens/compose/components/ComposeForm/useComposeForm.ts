@@ -20,6 +20,7 @@ export const FormShapeSchema = z.object({
   body: z.string().min(1),
   category: z.string(),
   tags: z.string().array().optional(),
+  // assets: z.array(z.string()),
 });
 export type FormShape = z.infer<typeof FormShapeSchema>;
 
@@ -49,6 +50,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       // When saving a new draft, these are optional but must be explicitly set.
       title: data.title ?? "",
       body: data.body ?? "",
+      // assets: data.assets ?? [],
 
       status: ThreadStatus.draft,
     };

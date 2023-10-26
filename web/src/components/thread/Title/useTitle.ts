@@ -4,9 +4,9 @@ import { ChangeEvent } from "react";
 
 import { Thread } from "src/api/openapi/schemas";
 
-import { useThreadScreenContext } from "../../context";
+import { useThreadScreenContext } from "../context/context";
 
-export function useThreadView(thread: Thread) {
+export function useTitle(thread: Thread) {
   const { editingPostID, editingTitle, setEditingTitle } =
     useThreadScreenContext();
 

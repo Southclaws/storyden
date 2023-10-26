@@ -1,8 +1,9 @@
-import { HStack, Text } from "@chakra-ui/react";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 
 import { Thread } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
+
+import { HStack } from "@/styled-system/jsx";
 
 import { ReplyBox } from "./ReplyBox/ReplyBox";
 import { useReply } from "./useReply";
@@ -25,9 +26,9 @@ export function Reply(props: Thread) {
     >
       <ChatBubbleLeftRightIcon width="1.5em" />
 
-      <Text>
+      <p>
         Please <Anchor href="/auth">sign up or log in</Anchor> to reply
-      </Text>
+      </p>
     </HStack>
   );
 }
