@@ -34,11 +34,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const themeColour = getColourAsHex(info.accent_colour);
   const iconURL = `/api/v1/info/icon/512x512`;
 
+  const canonical =
+    process.env["NEXT_PUBLIC_WEB_ADDRESS"] ?? "http://localhost:3000";
+
   // TODO: Add another settings field for this.
   const title = `${info.title} | ${info.description}`;
 
   return {
     manifest: "/manifest.json",
+    metadataBase: new URL(canonical),
     title: title,
     description: info.description,
     themeColor: themeColour,
