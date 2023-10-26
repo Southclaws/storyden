@@ -34,9 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const themeColour = getColourAsHex(info.accent_colour);
   const iconURL = `/api/v1/info/icon/512x512`;
 
+  // TODO: Add another settings field for this.
+  const title = `${info.title} | ${info.description}`;
+
   return {
-    manifest: "manifest.json",
-    title: info.title,
+    manifest: "/manifest.json",
+    title: title,
     description: info.description,
     themeColor: themeColour,
     icons: {
@@ -46,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     appleWebApp: {
       capable: true,
-      title: info.title,
+      title: title,
       statusBarStyle: "black-translucent",
       startupImage: iconURL,
     },
