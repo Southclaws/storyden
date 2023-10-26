@@ -17,6 +17,7 @@ export function Default(props: PropsWithChildren) {
 
       <styled.main
         width="full"
+        minW={0}
         maxW={{
           base: "full",
           lg: "3xl",
