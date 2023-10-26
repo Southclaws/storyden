@@ -1,33 +1,19 @@
-"use client";
+import { server } from "src/api/client";
+import { ThreadGetResponse } from "src/api/openapi/schemas";
 
-import { Skeleton, SkeletonText } from "@chakra-ui/react";
+import { Client } from "./Client";
 
-import { Unready } from "src/components/site/Unready";
+type Props = {
+  slug: string;
+};
 
-import { ThreadView } from "./components/ThreadView/ThreadView";
-import { ThreadScreenContext } from "./context";
-import { useThreadScreen } from "./useThreadScreen";
+export async function ThreadScreen(props: Props) {
+  const data = await server<ThreadGetResponse>({
+    url: `/v1/threads/${props.slug}`,
+    params: {
+      slug: [props.slug],
+    },
+  });
 
-// TODO: Make thread view SSR and remove use client from this screen root.
-
-export function ThreadScreen() {
-  const { state, data, error } = useThreadScreen();
-
-  if (!data)
-    return (
-      <Unready {...error}>
-        <Skeleton height={8} />
-        <Skeleton height={4} />
-        <Skeleton height={5} />
-        <SkeletonText noOfLines={3} />
-        <SkeletonText noOfLines={5} />
-        <SkeletonText noOfLines={9} />
-      </Unready>
-    );
-
-  return (
-    <ThreadScreenContext.Provider value={state}>
-      <ThreadView {...data} />
-    </ThreadScreenContext.Provider>
-  );
+  return <Client slug={props.slug} thread={data} />;
 }

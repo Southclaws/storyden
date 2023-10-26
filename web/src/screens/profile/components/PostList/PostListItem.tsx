@@ -1,10 +1,10 @@
 import { Flex } from "@chakra-ui/react";
 
 import { PostProps } from "src/api/openapi/schemas";
+import { Byline } from "src/components/content/Byline";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
-import { Byline } from "src/components/feed/common/Byline";
-import { PostMenu } from "src/screens/thread/components/PostMenu/PostMenu";
-import { ReactList } from "src/screens/thread/components/ReactList/ReactList";
+import { PostMenu } from "src/components/thread/PostMenu/PostMenu";
+import { ReactList } from "src/components/thread/ReactList/ReactList";
 
 export function PostListItem(props: PostProps) {
   return (

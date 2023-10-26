@@ -1,7 +1,8 @@
-import { Tag } from "@chakra-ui/react";
 import { readableColor, tint } from "polished";
 
 import { CategoryReference } from "src/api/openapi/schemas";
+
+import { styled } from "@/styled-system/jsx";
 
 type Props = { category: CategoryReference };
 
@@ -11,16 +12,14 @@ export function CategoryPill({ category }: Props) {
   const textColour = readableColor(backColour);
 
   return (
-    <Tag
-      size="sm"
-      variant="subtle"
+    <styled.span
       px={3}
       py={1}
       borderRadius="lg"
       bgColor={backColour}
-      textColor={textColour}
+      color={textColour}
     >
       {category.name}
-    </Tag>
+    </styled.span>
   );
 }

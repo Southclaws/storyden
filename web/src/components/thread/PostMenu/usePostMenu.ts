@@ -1,3 +1,5 @@
+"use client";
+
 import { useClipboard, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
@@ -6,9 +8,10 @@ import { postDelete } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
+import { isShareEnabled } from "src/utils/client";
 
-import { useThreadScreenContext } from "../../context";
-import { getPermalinkForPost } from "../../utils";
+import { useThreadScreenContext } from "../context/context";
+import { getPermalinkForPost } from "../utils";
 
 export function usePostMenu(props: PostProps) {
   const router = useRouter();
@@ -19,7 +22,7 @@ export function usePostMenu(props: PostProps) {
     getPermalinkForPost(props.root_slug, props.id),
   );
 
-  const shareEnabled = !!navigator.share;
+  const shareEnabled = isShareEnabled();
   const editEnabled = account?.id === props.author.id;
   const deleteEnabled = account?.id === props.author.id;
 

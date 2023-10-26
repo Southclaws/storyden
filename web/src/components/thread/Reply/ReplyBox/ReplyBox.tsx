@@ -1,9 +1,11 @@
-import { Button, HStack, VStack } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 
 import { Thread } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { Bold } from "src/components/content/ContentComposer/controls/Bold";
 import { Italic } from "src/components/content/ContentComposer/controls/Italic";
+
+import { HStack, styled } from "@/styled-system/jsx";
 
 import { useReplyBox } from "./useReplyBox";
 
@@ -12,8 +14,9 @@ export function ReplyBox(props: Thread) {
     useReplyBox(props);
 
   return (
-    <VStack
-      as="form"
+    <styled.form
+      display="flex"
+      flexDirection="column"
       width="full"
       borderRadius="2xl"
       p={2}
@@ -37,6 +40,6 @@ export function ReplyBox(props: Thread) {
           Post
         </Button>
       </HStack>
-    </VStack>
+    </styled.form>
   );
 }

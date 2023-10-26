@@ -1,7 +1,8 @@
-import { Divider, ListItem, OrderedList } from "@chakra-ui/react";
 import { Fragment } from "react";
 
 import { PostProps } from "src/api/openapi/schemas";
+
+import { Divider, styled } from "@/styled-system/jsx";
 
 import { PostView } from "./PostView/PostView";
 
@@ -12,7 +13,7 @@ type Props = {
 
 export function PostListView(props: Props) {
   return (
-    <OrderedList
+    <styled.ol
       listStyleType="none"
       m={0}
       gap={4}
@@ -23,11 +24,11 @@ export function PostListView(props: Props) {
       {props.posts.map((p) => (
         <Fragment key={p.id}>
           <Divider />
-          <ListItem key={p.id} listStyleType="none" m={0}>
+          <styled.li key={p.id} listStyleType="none" m={0}>
             <PostView slug={props.slug} {...p} />
-          </ListItem>
+          </styled.li>
         </Fragment>
       ))}
-    </OrderedList>
+    </styled.ol>
   );
 }
