@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -27,21 +28,28 @@ func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("posts", Post.Type),
 
-		edge.To("reacts", React.Type),
+		edge.To("reacts", React.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.From("roles", Role.Type).
 			Ref("accounts"),
 
-		edge.To("authentication", Authentication.Type),
+		edge.To("authentication", Authentication.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("tags", Tag.Type),
+		edge.To("tags", Tag.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("collections", Collection.Type),
+		edge.To("collections", Collection.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("clusters", Cluster.Type),
+		edge.To("clusters", Cluster.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 
-		edge.To("items", Item.Type),
+		edge.To("items", Item.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 
-		edge.To("assets", Asset.Type),
+		edge.To("assets", Asset.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }
