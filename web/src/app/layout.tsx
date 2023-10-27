@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
@@ -28,10 +28,19 @@ export default function RootLayout({ children }: PropsWithChildren) {
   );
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateViewport(): Promise<Viewport> {
   const info = await getInfo();
 
   const themeColour = getColourAsHex(info.accent_colour);
+
+  return {
+    themeColor: themeColour,
+  };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const info = await getInfo();
+
   const iconURL = `/api/v1/info/icon/512x512`;
 
   const canonical =
@@ -45,7 +54,6 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(canonical),
     title: title,
     description: info.description,
-    themeColor: themeColour,
     icons: {
       icon: iconURL,
       shortcut: iconURL,
