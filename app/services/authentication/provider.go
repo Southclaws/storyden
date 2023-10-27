@@ -22,7 +22,6 @@ type Provider interface {
 	// part of the interface for now, despite bloating the interface a bit.
 	Name() string
 	ID() string
-	LogoURL() string
 
 	// Link will, for providers that support it, provide a URL to a third-party
 	// authenticator. OAuth providers use this to start the authentication flow.

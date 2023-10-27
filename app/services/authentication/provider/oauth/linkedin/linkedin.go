@@ -29,7 +29,6 @@ var (
 const (
 	id   = "linkedin"
 	name = "LinkedIn"
-	logo = "https://brand.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg"
 )
 
 type LinkedInProvider struct {
@@ -56,10 +55,9 @@ func New(cfg config.Config, auth_repo authentication.Repository, register regist
 	}, nil
 }
 
-func (p *LinkedInProvider) Enabled() bool   { return p.config.Enabled }
-func (p *LinkedInProvider) ID() string      { return id }
-func (p *LinkedInProvider) Name() string    { return name }
-func (p *LinkedInProvider) LogoURL() string { return logo }
+func (p *LinkedInProvider) Enabled() bool { return p.config.Enabled }
+func (p *LinkedInProvider) ID() string    { return id }
+func (p *LinkedInProvider) Name() string  { return name }
 
 func (p *LinkedInProvider) Link() string {
 	c := oauth2.Config{

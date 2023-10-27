@@ -43,7 +43,6 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 			return openapi.AuthProvider{
 				Provider: p.ID(),
 				Name:     p.Name(),
-				LogoUrl:  p.LogoURL(),
 				Link:     p.Link(),
 			}
 		},

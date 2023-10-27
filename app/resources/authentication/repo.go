@@ -19,6 +19,9 @@ type Repository interface {
 	// Gets an auth method based on a service's external account ID.
 	LookupByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, bool, error)
 
+	// Gets an auth method based on a service and the account's handle.
+	LookupByHandle(ctx context.Context, service Service, handle string) (*Authentication, bool, error)
+
 	// Gets all auth methods that a account has.
 	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]*Authentication, error)
 

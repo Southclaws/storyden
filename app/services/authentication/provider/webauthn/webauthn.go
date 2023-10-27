@@ -26,7 +26,6 @@ var (
 const (
 	id   = "webauthn"
 	name = "WebAuthn"
-	logo = "https://www.yubico.com/wp-content/uploads/2021/02/illus-yubikey-fingerprint-password-dkteal-r4.svg" // todo; change this image
 )
 
 type Provider struct {
@@ -52,10 +51,9 @@ func New(
 	}, nil
 }
 
-func (p *Provider) Enabled() bool   { return true }
-func (p *Provider) ID() string      { return id }
-func (p *Provider) Name() string    { return name }
-func (p *Provider) LogoURL() string { return logo }
+func (p *Provider) Enabled() bool { return true }
+func (p *Provider) ID() string    { return id }
+func (p *Provider) Name() string  { return name }
 
 func (p *Provider) Link() string {
 	return ""

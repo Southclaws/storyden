@@ -116,7 +116,6 @@ func serialiseAuthMethod(in *account.AuthMethod) openapi.AccountAuthMethod {
 	return openapi.AccountAuthMethod{
 		Provider: in.ID(),
 		Name:     in.Name(),
-		LogoUrl:  in.LogoURL(),
 		Link:     in.Link(),
 		Active:   in.Active,
 	}

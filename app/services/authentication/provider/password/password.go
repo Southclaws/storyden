@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
@@ -24,7 +25,6 @@ var (
 const (
 	id   = "password"
 	name = "Password"
-	logo = "" // TODO: a basic logo symbol for password based auth.
 )
 
 type Provider struct {
@@ -36,13 +36,12 @@ func New(auth authentication.Repository, register register.Service) *Provider {
 	return &Provider{auth, register}
 }
 
-func (p *Provider) Enabled() bool   { return true } // TODO: Allow disabling.
-func (p *Provider) ID() string      { return id }
-func (p *Provider) Name() string    { return name }
-func (p *Provider) LogoURL() string { return logo }
+func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
+func (p *Provider) ID() string    { return id }
+func (p *Provider) Name() string  { return name }
 
 func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	_, exists, err := b.auth.LookupByIdentifier(ctx, id, identifier)
+	_, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -61,7 +60,7 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	_, err = b.auth.Create(ctx, account.ID, id, identifier, string(hashed), nil)
+	_, err = b.auth.Create(ctx, account.ID, id, xid.New().String(), string(hashed), nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
@@ -75,7 +74,7 @@ func (b *Provider) Link() string {
 }
 
 func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	a, exists, err := b.auth.LookupByIdentifier(ctx, id, identifier)
+	a, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}

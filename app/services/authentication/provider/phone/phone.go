@@ -27,7 +27,6 @@ var (
 const (
 	id   = "phone"
 	name = "Phone"
-	logo = ""
 )
 
 const template = `Your unique one-time login code is: %s`
@@ -44,10 +43,9 @@ func New(auth authentication.Repository, account account.Repository, register re
 	return &Provider{auth, account, register, sms}
 }
 
-func (p *Provider) Enabled() bool   { return p.sms != nil }
-func (p *Provider) ID() string      { return id }
-func (p *Provider) Name() string    { return name }
-func (p *Provider) LogoURL() string { return logo }
+func (p *Provider) Enabled() bool { return p.sms != nil }
+func (p *Provider) ID() string    { return id }
+func (p *Provider) Name() string  { return name }
 
 func (p *Provider) Register(ctx context.Context, handle string, phone string) (*account.Account, error) {
 	//
