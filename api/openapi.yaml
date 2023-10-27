@@ -1854,16 +1854,13 @@ components:
 
     AuthProvider:
       type: object
-      required: [provider, name, logo_url, link]
+      required: [provider, name, link]
       properties:
         provider:
           description: The slug name of the provider.
           type: string
         name:
           description: The human-readable name of the provider.
-          type: string
-        logo_url:
-          description: The logo to display for the provider.
           type: string
         link:
           description: The hyperlink to render for the user.

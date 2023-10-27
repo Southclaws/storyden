@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/rs/xid"
 )
 
 const SeedPassword = `$argon2id$v=19$m=65536,t=1,p=2$MAwllQoeGcxCPOC52OQwZA$jLlzHsmSHmQPbpQ6Y5+877NlacOYeyqEqWoKJJXRcHM`
@@ -56,7 +57,7 @@ func accounts(r account.Repository, auth authentication.Repository) {
 		// TODO: email+password auth provider.
 		// email := acc.Handle + "@storyd.en"
 
-		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), acc.Handle, SeedPassword, nil); err != nil {
+		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
 			panic(err)
 		}
 

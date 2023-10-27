@@ -24,7 +24,6 @@ export function AuthSelection() {
             <AuthSelectionOption
               name={v.name}
               method={v.provider}
-              icon={v.logo_url}
               link={v.link || undefined}
             />
           </ListItem>

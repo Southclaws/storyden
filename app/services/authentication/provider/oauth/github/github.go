@@ -16,7 +16,6 @@ import (
 const (
 	id   = "github"
 	name = "GitHub"
-	logo = "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
 )
 
 type GitHubProvider struct {
@@ -39,10 +38,9 @@ func New(cfg config.Config, auth_repo authentication.Repository) (*GitHubProvide
 	}, nil
 }
 
-func (p *GitHubProvider) Enabled() bool   { return p.config.Enabled }
-func (p *GitHubProvider) ID() string      { return id }
-func (p *GitHubProvider) Name() string    { return name }
-func (p *GitHubProvider) LogoURL() string { return logo }
+func (p *GitHubProvider) Enabled() bool { return p.config.Enabled }
+func (p *GitHubProvider) ID() string    { return id }
+func (p *GitHubProvider) Name() string  { return name }
 
 func (p *GitHubProvider) Link() string {
 	c := oauth2.Config{

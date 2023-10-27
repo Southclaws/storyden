@@ -3,6 +3,7 @@ package authentication
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -70,6 +71,34 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		).
 		WithAccount().
 		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, false, nil
+		}
+
+		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	auth, err := FromModel(r)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return auth, true, nil
+}
+
+func (d *database) LookupByHandle(ctx context.Context, service Service, handle string) (*Authentication, bool, error) {
+	r, err := d.db.Authentication.
+		Query().
+		Where(
+			authentication.ServiceEQ(string(service)),
+			authentication.HasAccountWith(model_account.Handle(handle)),
+		).
+		WithAccount().
+		Order(authentication.ByCreatedAt(sql.OrderDesc())).
+		// NOTE: We pick the latest here and don't handle multiple providers of
+		// the same type very well (it's quite an edge case...)
+		First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, false, nil

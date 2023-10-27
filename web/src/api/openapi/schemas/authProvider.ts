@@ -11,8 +11,6 @@ export interface AuthProvider {
   provider: string;
   /** The human-readable name of the provider. */
   name: string;
-  /** The logo to display for the provider. */
-  logo_url: string;
   /** The hyperlink to render for the user. */
   link: string;
 }
