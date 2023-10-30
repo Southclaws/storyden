@@ -21,6 +21,7 @@ import (
 var (
 	errHandleMismatch      = fault.New("phone already linked to different account")
 	errNoPhoneAuth         = fault.New("no phone auth method linked to account")
+	errNotFound            = fault.New("account not found")
 	errOneTimeCodeMismatch = fault.New("one time code mismatch")
 )
 
@@ -150,9 +151,15 @@ func (p *Provider) Link() string {
 }
 
 func (p *Provider) Login(ctx context.Context, handle string, onetimecode string) (*account.Account, error) {
-	acc, err := p.account.GetByHandle(ctx, handle)
+	acc, exists, err := p.account.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return nil, fault.Wrap(errNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "No account was found with the provided handle."))
 	}
 
 	auths, err := p.auth.GetAuthMethods(ctx, acc.ID)

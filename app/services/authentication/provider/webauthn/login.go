@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 
@@ -16,9 +17,16 @@ import (
 )
 
 func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
-	acc, err := p.account_repo.GetByHandle(ctx, handle)
+	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !exists {
+		return nil, nil, fault.Wrap(ErrNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "No account was found with the provided handle."))
 	}
 
 	ams, err := p.auth_repo.GetAuthMethods(ctx, acc.ID)
@@ -61,9 +69,16 @@ func (p *Provider) FinishLogin(ctx context.Context,
 	session webauthn.SessionData,
 	parsedResponse *protocol.ParsedCredentialAssertionData,
 ) (*webauthn.Credential, *account.Account, error) {
-	acc, err := p.account_repo.GetByHandle(ctx, handle)
+	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !exists {
+		return nil, nil, fault.Wrap(ErrNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "No account was found with the provided handle."))
 	}
 
 	ams, err := p.auth_repo.GetAuthMethods(ctx, acc.ID)

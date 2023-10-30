@@ -14,12 +14,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
-	"github.com/Southclaws/storyden/internal/ent"
 )
 
 var (
 	ErrNoAuthRecord           = fault.New("webauthn does not match account")
 	ErrExistsOnAnotherAccount = fault.New("webauthn id already bound to another account")
+	ErrNotFound               = fault.New("account not found")
 	ErrAccountExists          = fault.New("requester already has an account")
 )
 
@@ -64,18 +64,12 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 }
 
 func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential) (*account.Account, error) {
-	// TODO: LookupByHandle returning (account, bool, error) to stop this mess.
-	accfound := true
-	acc, err := p.account_repo.GetByHandle(ctx, handle)
+	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			accfound = false
-		} else {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if accfound {
+	if exists {
 		return nil, fault.Wrap(ErrAccountExists,
 			fctx.With(ctx),
 			ftag.With(ftag.AlreadyExists),
