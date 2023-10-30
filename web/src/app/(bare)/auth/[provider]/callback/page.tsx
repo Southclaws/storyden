@@ -1,47 +1,65 @@
-import { redirect } from "next/navigation";
+"use client";
 
-import { AuthSuccessOKResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
-import ErrorBanner from "src/components/site/ErrorBanner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
+import { oAuthProviderCallback } from "src/api/openapi/auth";
+import { Unready } from "src/components/site/Unready";
 import { Link } from "src/theme/components/Link";
 import { deriveError } from "src/utils/error";
 
-import { HStack, VStack } from "@/styled-system/jsx";
+import { Center, HStack, VStack } from "@/styled-system/jsx";
 
 export type Props = {
   params: {
     provider: string;
   };
-  searchParams: {
-    code: string;
-    state: string;
-  };
 };
 
-export default async function Page(props: Props) {
-  try {
-    const { id } = await server<AuthSuccessOKResponse>({
-      url: `/v1/auth/oauth/${props.params.provider}/callback`,
-      method: "post",
-      data: props.searchParams,
-    });
+export default function Page(props: Props) {
+  const initialized = useRef(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-    return redirect(`/?id=${id}`);
-  } catch (e) {
-    console.log(e);
+  const params = Object.fromEntries(searchParams.entries());
 
-    const message = deriveError(e);
-    const error = (e as any).error ?? undefined;
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+    }
 
-    return (
-      <VStack height="dvh" justify="center" p="10">
-        <ErrorBanner message={message} error={error} />
+    (async () => {
+      try {
+        const { id } = await oAuthProviderCallback(
+          props.params.provider,
+          params as any,
+        );
 
-        <HStack>
-          <Link href="/register">Back to register</Link>
-          <Link href="/login">Back to login</Link>
-        </HStack>
-      </VStack>
-    );
-  }
+        return router.push(`/?id=${id}`);
+      } catch (e) {
+        console.log(e);
+
+        const message = deriveError(e);
+
+        setError(message);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <VStack w="full" height="dvh" justify="center" p="10">
+      <Unready error={error} message={error && "Something went wrong"}>
+        <Center>
+          <em>Please wait...</em>
+        </Center>
+      </Unready>
+
+      <HStack>
+        <Link href="/register">Back to register</Link>
+        <Link href="/login">Back to login</Link>
+      </HStack>
+    </VStack>
+  );
 }
