@@ -26,7 +26,7 @@ export function PostView(props: Props) {
   } = usePostView(props);
 
   return (
-    <Flex id={props.id} flexDir="column" gap={2}>
+    <Flex id={props.id} flexDir="column" gap="2">
       <Byline
         href={`#${props.id}`}
         author={props.author}

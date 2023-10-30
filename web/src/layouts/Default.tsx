@@ -7,25 +7,25 @@ import { Box, Flex, styled } from "@/styled-system/jsx";
 export function Default(props: PropsWithChildren) {
   return (
     <Flex
-      minHeight="100vh"
+      minHeight="dvh"
       width="full"
       flexDirection="row"
-      backgroundColor="var(--accent-colour-flat-fill-3)"
+      backgroundColor="accent.50"
       vaul-drawer-wrapper=""
     >
       <Navigation />
 
       <styled.main
         width="full"
-        minW={0}
+        minW="0"
         maxW={{
           base: "full",
           lg: "3xl",
         }}
-        p={4}
+        p="4"
       >
         {props.children}
-        <Box height="6rem"></Box>
+        <Box height="24"></Box>
       </styled.main>
     </Flex>
   );

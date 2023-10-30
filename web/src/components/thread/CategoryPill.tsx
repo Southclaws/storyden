@@ -13,11 +13,11 @@ export function CategoryPill({ category }: Props) {
 
   return (
     <styled.span
-      px={3}
-      py={1}
+      px="3"
+      py="1"
       borderRadius="lg"
-      bgColor={backColour}
-      color={textColour}
+      bgColor={backColour as any}
+      color={textColour as any}
     >
       {category.name}
     </styled.span>

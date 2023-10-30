@@ -1,16 +1,14 @@
 import {
-  Box,
   Button,
   HStack,
   Heading,
-  Image,
   List,
   ListItem,
   Text,
 } from "@chakra-ui/react";
 
 import { Unready } from "src/components/site/Unready";
-import { AuthSelectionOption } from "src/screens/auth/components/AuthSelectionOption";
+import { Link } from "src/theme/components/Link";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
@@ -37,11 +35,6 @@ export function AuthMethodSettings() {
           <ListItem key={v.provider}>
             <Button width="full" variant="outline" disabled>
               <HStack>
-                {v.logo_url && (
-                  <Box overflow="clip" height="1rem">
-                    <Image src={v.logo_url} height="1rem" alt="" />
-                  </Box>
-                )}
                 <Text>{v.name}</Text>
               </HStack>
             </Button>
@@ -54,12 +47,7 @@ export function AuthMethodSettings() {
       <List display="flex" flexDir="column" gap={2} w="full">
         {state.rest.map((v) => (
           <ListItem key={v.provider}>
-            <AuthSelectionOption
-              name={v.name}
-              method={v.provider}
-              icon={v.logo_url}
-              link={v.link || undefined}
-            />
+            <Link href={v.link}>{v.name}</Link>
           </ListItem>
         ))}
       </List>

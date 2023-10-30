@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const url = request.nextUrl.clone();
-  url.pathname = "/";
+import { WEB_ADDRESS } from "src/config";
 
-  return NextResponse.redirect(url, {
+export async function GET() {
+  return NextResponse.redirect(WEB_ADDRESS, {
     headers: {
       "Clear-Site-Data": `"*"`,
+      "Set-Cookie": "storyden-session=",
     },
   });
 }

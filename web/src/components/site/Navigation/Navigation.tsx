@@ -35,7 +35,7 @@ export function Navigation() {
           base: "none",
           md: "flex",
         }}
-        height="100vh"
+        height="dvh"
         // The sidebar width is identical in both this container and the sidebar
         // itself. The reason for this is the sidebar is "position: fixed" which
         // means it cannot inherit the width from a parent since its true parent

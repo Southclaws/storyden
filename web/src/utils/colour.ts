@@ -3,10 +3,30 @@ import { readableColor } from "polished";
 
 export const FALLBACK_COLOUR = "#27b981";
 
-export function getColourVariants(
-  colour: string,
-  contrast: number = 1,
-): Record<string, string> {
+const ramp = [
+  "50", // 1
+  "100", // 2
+  "200", // 3
+  "300", // 4
+  "400", // 5
+  "500", // 6
+  "600", // 7
+  "700", // 8
+  "800", // 9
+  "900", // 10
+];
+
+const rampSize = 10;
+
+export const flatClampL: [number, number] = [98.7, 51.8];
+export const flatClampC: [number, number] = [2, 45];
+export const flatContrast = 1.241;
+
+export const darkClampL: [number, number] = [65, 20];
+export const darkClampC: [number, number] = [10, 14];
+export const darkContrast = 1.33;
+
+export function getColourVariants(colour: string): Record<string, string> {
   const c = parseColourWithFallback(colour);
 
   const hue = getHue(c);
@@ -15,16 +35,12 @@ export function getColourVariants(
 
   const textColour = readableColorWithFallback(rgb);
 
-  const flatClampLightness: [number, number] = [71.8, 88.7];
-  const flatClampChroma: [number, number] = [14, 3];
+  const flatRamp = ramp.reduceRight((o, r, i) => {
+    const [minL, maxL] = flatClampL;
+    const [minC, maxC] = flatClampC;
 
-  const flatRamp = [1, 2, 3].reduce((o, i, _, a) => {
-    const indices = a.length;
-    const [minL, maxL] = flatClampLightness;
-    const [minC, maxC] = flatClampChroma;
-
-    const L = minL + ((maxL - minL) / indices) * i * 1.725 * contrast;
-    const C = minC + ((maxC - minC) / indices) * i;
+    const L = minL + ((maxL - minL) / rampSize) * i * flatContrast;
+    const C = minC + ((maxC - minC) / rampSize) * i;
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
@@ -33,22 +49,18 @@ export function getColourVariants(
     );
 
     return {
-      [`--accent-colour-flat-fill-${i}`]: fill,
-      [`--accent-colour-flat-text-${i}`]: text,
+      [`--accent-colour-flat-fill-${r}`]: fill,
+      [`--accent-colour-flat-text-${r}`]: text,
       ...o,
     };
   }, {});
 
-  const darkClampLightness: [number, number] = [93.7, 50.8];
-  const darkClampChroma: [number, number] = [14, 7];
+  const darkRamp = ramp.reduceRight((o, r, i) => {
+    const [minL, maxL] = darkClampL;
+    const [minC, maxC] = darkClampC;
 
-  const darkRamp = [1, 2, 3].reduce((o, i, _, a) => {
-    const indices = a.length;
-    const [minL, maxL] = darkClampLightness;
-    const [minC, maxC] = darkClampChroma;
-
-    const L = minL + ((maxL - minL) / indices) * i * 1.725 * contrast;
-    const C = minC + ((maxC - minC) / indices) * i;
+    const L = minL + ((maxL - minL) / rampSize) * i * darkContrast;
+    const C = minC + ((maxC - minC) / rampSize) * i;
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
@@ -57,8 +69,8 @@ export function getColourVariants(
     );
 
     return {
-      [`--accent-colour-dark-fill-${i}`]: fill,
-      [`--accent-colour-dark-text-${i}`]: text,
+      [`--accent-colour-dark-fill-${r}`]: fill,
+      [`--accent-colour-dark-text-${r}`]: text,
       ...o,
     };
   }, {});
@@ -98,7 +110,7 @@ function getHue(c: Color) {
 
 function readableColorWithFallback(rgb: string): string {
   try {
-    return readableColor(rgb, "#E8ECEA", "#303030", true);
+    return readableColor(rgb, "#303030", "#E8ECEA", false);
   } catch (e) {
     return "black";
   }

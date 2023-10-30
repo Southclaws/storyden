@@ -29,11 +29,11 @@ export function ProfilePill({
       title={title}
       href={`/p/${profileReference.handle}`}
       className={css({
-        p: 1,
-        pr: showHandle ? 2 : 1,
+        p: "1",
+        pr: showHandle ? "2" : "1",
         borderRadius: "full",
         _hover: { backgroundColor: "blackAlpha.100" },
-        minW: 0,
+        minW: "0",
       })}
     >
       <HStack>
@@ -43,7 +43,7 @@ export function ProfilePill({
           width={large ? 8 : 6}
         />
         {showHandle && (
-          <Box minW={0} flexShrink={1}>
+          <Box minW="0" flexShrink={1}>
             <Handle profileReference={profileReference} size={size} />
           </Box>
         )}

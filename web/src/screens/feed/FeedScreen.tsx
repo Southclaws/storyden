@@ -1,8 +1,8 @@
-import { server } from "src/api/client";
 import {
   ThreadListOKResponse,
   ThreadListParams,
 } from "src/api/openapi/schemas";
+import { server } from "src/api/server";
 
 import { Client } from "./Client";
 

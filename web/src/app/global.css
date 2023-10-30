@@ -42,8 +42,8 @@
 
 html,
 body {
-  background-color: var(--accent-colour-flat-fill-3);
-  color: var(--accent-colour-flat-text-3);
+  background-color: var(--accent-colour-flat-fill-50);
+  color: var(--accent-colour-flat-text-50);
 }
 
 .content-viewer {

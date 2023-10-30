@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
-import { server } from "src/api/client";
 import { ThreadGetResponse } from "src/api/openapi/schemas";
+import { server } from "src/api/server";
 import { getInfo } from "src/utils/info";
 
 import { Props } from "./page";

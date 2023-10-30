@@ -8,8 +8,8 @@ export function FeedItem({ children }: PropsWithChildren) {
       display="flex"
       flexDir="column"
       width="full"
-      p={2}
-      gap={2}
+      p="2"
+      gap="2"
       boxShadow="md"
       borderRadius="md"
       backgroundColor="white"

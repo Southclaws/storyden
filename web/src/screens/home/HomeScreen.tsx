@@ -1,5 +1,5 @@
-import { server } from "src/api/client";
 import { ThreadListOKResponse } from "src/api/openapi/schemas";
+import { server } from "src/api/server";
 import { Unready } from "src/components/site/Unready";
 
 import { Client } from "./Client";

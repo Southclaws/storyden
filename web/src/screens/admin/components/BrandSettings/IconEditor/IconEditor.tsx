@@ -70,11 +70,11 @@ export function IconEditor(props: Props) {
         <styled.input
           id="file-input"
           display="none"
-          width="min-content"
+          width="min"
           type="file"
           bgColor="gray.100"
           borderRadius="md"
-          border={0}
+          border="none"
           onChange={onFileChange}
         />
         <HStack>

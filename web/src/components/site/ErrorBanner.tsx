@@ -14,8 +14,8 @@ export default function ErrorBanner({
 
   return (
     <Flex width="full" justifyContent="center">
-      <Flex flexDir="column" gap={2} bgColor="red.50" borderRadius="xl" p={4}>
-        <Flex id="error__heading" gap={2} alignItems="center">
+      <Flex flexDir="column" gap="2" bgColor="red.50" borderRadius="xl" p="4">
+        <Flex id="error__heading" gap="2" alignItems="center">
           <ExclamationTriangleIcon width={32} height={32} />
           <styled.h1 fontSize="md" fontWeight="bold" my="0">
             that&apos;s a yikes from me

@@ -1,34 +1,37 @@
-import { List, ListItem, VStack } from "@chakra-ui/react";
-
 import { AuthProvider } from "src/api/openapi/schemas";
-import { Unready } from "src/components/site/Unready";
+import { Link } from "src/theme/components/Link";
 
-import { AuthSelectionOption } from "../AuthSelectionOption";
+import { getProviders } from "../../providers";
 
-import { useAuthSelection } from "./useAuthSelection";
+import { styled } from "@/styled-system/jsx";
 
-export function AuthSelection() {
-  const { data, error } = useAuthSelection();
-
-  if (!data) <Unready {...error} />;
+export async function AuthSelection() {
+  const { providers } = await getProviders();
 
   // sort by alphabetical because lazy
   // TODO: allow the order to be configured by the admin.
-  data?.providers?.sort((a, b) => a.provider.localeCompare(b.provider));
+  providers?.sort((a, b) => a.provider.localeCompare(b.provider));
 
   return (
-    <VStack w="full" gap={4}>
-      <List display="flex" flexDir="column" gap={4} w="full">
-        {data?.providers?.map((v: AuthProvider) => (
-          <ListItem key={v.provider}>
-            <AuthSelectionOption
-              name={v.name}
-              method={v.provider}
-              link={v.link || undefined}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </VStack>
+    <styled.ul
+      display="flex"
+      flexDir="column"
+      gap="2"
+      alignItems="center"
+      w="1/2"
+    >
+      {providers?.map((v: AuthProvider) => (
+        <styled.li w="full" key={v.provider}>
+          <Link
+            size="sm"
+            kind="secondary"
+            w="full"
+            href={v.link ?? `/auth/${v.provider}`}
+          >
+            {v.name}
+          </Link>
+        </styled.li>
+      ))}
+    </styled.ul>
   );
 }

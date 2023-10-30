@@ -110,7 +110,7 @@ export function Home({ href = "/", ...props }: WithOptionalURL) {
   );
 }
 
-export function Login({ href = "/auth", ...props }: WithOptionalURL) {
+export function Login({ href = "/register", ...props }: WithOptionalURL) {
   return (
     <Action href={href} title="Sign up or Log in" {...props}>
       <LoginIcon width="1.5em" />

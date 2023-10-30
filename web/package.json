@@ -34,6 +34,7 @@
     "react-hook-form": "^7.46.1",
     "remark-parse": "^10.0.2",
     "remark-slate": "^1.8.6",
+    "server-only": "^0.0.1",
     "slate": "^0.94.1",
     "slate-react": "^0.98.3",
     "swr": "^2.2.2",

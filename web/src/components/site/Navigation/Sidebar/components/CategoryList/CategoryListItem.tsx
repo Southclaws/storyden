@@ -37,7 +37,7 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       key={props.id}
       ref={setNodeRef}
       borderRadius="md"
-      bgColor={selected ? "blackAlpha.100" : ""}
+      bgColor={selected ? "blackAlpha.100" : undefined}
       _hover={{
         backgroundColor: "blackAlpha.50",
       }}
@@ -51,13 +51,13 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
             _hover: { textDecoration: "none" },
           })}
         >
-          <styled.h2 p={2} role="navigation" w="full" fontWeight="bold">
+          <styled.h2 p="2" role="navigation" w="full" fontWeight="bold">
             {props.name}
           </styled.h2>
         </Anchor>
 
         {props.isAdmin && (
-          <HStack gap={0}>
+          <HStack gap="0">
             <CategoryEdit {...props} />
 
             <Box

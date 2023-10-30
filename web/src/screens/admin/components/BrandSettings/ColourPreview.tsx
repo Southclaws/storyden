@@ -3,8 +3,8 @@ import { Box, HStack } from "@/styled-system/jsx";
 export function ColourPreview() {
   return (
     <>
-      <Box p={1}>
-        <HStack maxWidth="full" justify="space-between" gap={1} height="4em">
+      <Box p="1">
+        <HStack maxWidth="full" justify="space-between" gap="1" height="16">
           {[3, 2, 1].map((value) => (
             <Shade
               key={value}
@@ -36,7 +36,7 @@ export function ColourPreview() {
 
 function Shade({ fill, text }: { fill: string; text: string }) {
   return (
-    <Box width="full" height="full" borderRadius={5} overflow="hidden">
+    <Box width="full" height="full" borderRadius="md" overflow="hidden">
       <svg
         width="100%"
         height="100%"
