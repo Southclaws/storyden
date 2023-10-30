@@ -24,18 +24,19 @@ export default function ErrorBanner({
 
         <styled.p id="error__message">
           <span>{message ?? "something bad happened :("}</span>
-          {showDetails && (
-            <details id="error__details-container">
-              <summary id="error__details-summary">
-                <em>more information</em>
-              </summary>
-              <em>{error}</em>
-              <pre id="error__details-code">
-                {JSON.stringify(metadata, null, 2)}
-              </pre>
-            </details>
-          )}
         </styled.p>
+
+        {showDetails && (
+          <details id="error__details-container">
+            <summary id="error__details-summary">
+              <em>more information</em>
+            </summary>
+            <em>{error}</em>
+            <pre id="error__details-code">
+              {JSON.stringify(metadata, null, 2)}
+            </pre>
+          </details>
+        )}
       </Flex>
     </Flex>
   );
