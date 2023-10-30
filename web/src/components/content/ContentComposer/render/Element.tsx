@@ -59,7 +59,7 @@ export function Element({
 
     case "code_block":
       return (
-        <styled.pre overflowX="scroll" width="full" maxW="10rem">
+        <styled.pre overflowX="scroll" width="full" maxW="40">
           {children}
         </styled.pre>
       );

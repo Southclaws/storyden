@@ -25,7 +25,7 @@ export function Sidebar() {
       }}
       height="full"
       justifyContent="end"
-      bgColor="var(--accent-colour-flat-fill-1)"
+      bgColor="accent.200"
     >
       <Box
         id="desktop-nav-box"
@@ -35,13 +35,13 @@ export function Sidebar() {
           lg: "xs",
         }}
         height="full"
-        p={4}
+        p="4"
       >
         <styled.nav
           display="flex"
           flexDir="column"
           height="full"
-          gap={2}
+          gap="2"
           justifyContent="space-between"
           alignItems="start"
         >

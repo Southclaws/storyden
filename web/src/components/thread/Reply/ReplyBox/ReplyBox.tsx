@@ -19,7 +19,7 @@ export function ReplyBox(props: Thread) {
       flexDirection="column"
       width="full"
       borderRadius="2xl"
-      p={2}
+      p="2"
       alignItems="end"
       onKeyDown={onKeyDown}
     >
@@ -35,7 +35,7 @@ export function ReplyBox(props: Thread) {
         </HStack>
       </ContentComposer>
 
-      <HStack mt={4} justifyContent="end">
+      <HStack mt="4" justifyContent="end">
         <Button type="submit" onClick={onReply} isLoading={isLoading}>
           Post
         </Button>

@@ -17,8 +17,8 @@ interface PropertyValueTypes {
 	insetInlineStart: Tokens["spacing"];
 	right: Tokens["spacing"];
 	bottom: Tokens["spacing"];
-	insetX: Tokens["spacing"] | CssProperties["insetInline"];
-	insetY: Tokens["spacing"] | CssProperties["insetBlock"];
+	insetX: Tokens["spacing"];
+	insetY: Tokens["spacing"];
 	float: "left" | "right" | "start" | "end";
 	hideFrom: Tokens["breakpoints"];
 	hideBelow: Tokens["breakpoints"];
@@ -64,7 +64,6 @@ interface PropertyValueTypes {
 	divideX: string;
 	divideY: string;
 	divideColor: Tokens["colors"];
-	divideStyle: CssProperties["borderStyle"];
 	width: "auto" | Tokens["sizes"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6" | "1/12" | "2/12" | "3/12" | "4/12" | "5/12" | "6/12" | "7/12" | "8/12" | "9/12" | "10/12" | "11/12" | "screen";
 	inlineSize: "auto" | Tokens["sizes"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6" | "1/12" | "2/12" | "3/12" | "4/12" | "5/12" | "6/12" | "7/12" | "8/12" | "9/12" | "10/12" | "11/12" | "screen";
 	minWidth: "auto" | Tokens["sizes"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6" | "1/12" | "2/12" | "3/12" | "4/12" | "5/12" | "6/12" | "7/12" | "8/12" | "9/12" | "10/12" | "11/12" | "screen";
@@ -104,16 +103,16 @@ interface PropertyValueTypes {
 	borderTopRightRadius: Tokens["radii"];
 	borderBottomRightRadius: Tokens["radii"];
 	borderBottomLeftRadius: Tokens["radii"];
-	borderTopRadius: Tokens["radii"] | CssProperties["borderRadius"];
-	borderRightRadius: Tokens["radii"] | CssProperties["borderRadius"];
-	borderBottomRadius: Tokens["radii"] | CssProperties["borderRadius"];
-	borderLeftRadius: Tokens["radii"] | CssProperties["borderRadius"];
+	borderTopRadius: Tokens["radii"];
+	borderRightRadius: Tokens["radii"];
+	borderBottomRadius: Tokens["radii"];
+	borderLeftRadius: Tokens["radii"];
 	borderStartStartRadius: Tokens["radii"];
 	borderStartEndRadius: Tokens["radii"];
-	borderStartRadius: Tokens["radii"] | CssProperties["borderRadius"];
+	borderStartRadius: Tokens["radii"];
 	borderEndStartRadius: Tokens["radii"];
 	borderEndEndRadius: Tokens["radii"];
-	borderEndRadius: Tokens["radii"] | CssProperties["borderRadius"];
+	borderEndRadius: Tokens["radii"];
 	border: Tokens["borders"];
 	borderColor: Tokens["colors"];
 	borderInline: Tokens["borders"];
@@ -158,16 +157,16 @@ interface PropertyValueTypes {
 	animation: Tokens["animations"];
 	animationName: Tokens["animationName"];
 	animationDelay: Tokens["durations"];
-	scale: "auto" | CssProperties["scale"];
-	translate: "auto" | CssProperties["translate"];
+	scale: "auto";
+	translate: "auto";
 	translateX: Tokens["spacing"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "full" | "-1/2" | "-1/3" | "-2/3" | "-1/4" | "-2/4" | "-3/4" | "-full";
 	translateY: Tokens["spacing"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "full" | "-1/2" | "-1/3" | "-2/3" | "-1/4" | "-2/4" | "-3/4" | "-full";
 	accentColor: Tokens["colors"];
 	caretColor: Tokens["colors"];
 	scrollbar: "visible" | "hidden";
 	scrollMargin: Tokens["spacing"];
-	scrollMarginX: Tokens["spacing"] | CssProperties["scrollMarginInline"];
-	scrollMarginY: Tokens["spacing"] | CssProperties["scrollMarginBlock"];
+	scrollMarginX: Tokens["spacing"];
+	scrollMarginY: Tokens["spacing"];
 	scrollMarginLeft: Tokens["spacing"];
 	scrollMarginRight: Tokens["spacing"];
 	scrollMarginTop: Tokens["spacing"];
@@ -185,8 +184,8 @@ interface PropertyValueTypes {
 	scrollPaddingInline: Tokens["spacing"];
 	scrollPaddingInlineEnd: Tokens["spacing"];
 	scrollPaddingInlineStart: Tokens["spacing"];
-	scrollPaddingX: Tokens["spacing"] | CssProperties["scrollPaddingInline"];
-	scrollPaddingY: Tokens["spacing"] | CssProperties["scrollPaddingBlock"];
+	scrollPaddingX: Tokens["spacing"];
+	scrollPaddingY: Tokens["spacing"];
 	scrollPaddingLeft: Tokens["spacing"];
 	scrollPaddingRight: Tokens["spacing"];
 	scrollPaddingTop: Tokens["spacing"];
@@ -202,7 +201,7 @@ interface PropertyValueTypes {
 	stroke: Tokens["colors"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "whiteAlpha" | "blackAlpha";
+	colorPalette: "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "whiteAlpha" | "blackAlpha" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "bg" | "fg" | "border";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl";
 }
 
@@ -210,7 +209,7 @@ interface PropertyValueTypes {
 
   type CssValue<T> = T extends keyof CssProperties ? CssProperties[T] : never
 
-  type Shorthand<T> = T extends keyof PropertyValueTypes ? PropertyValueTypes[T] | CssValue<T> : CssValue<T>
+  type Shorthand<T> = T extends keyof PropertyValueTypes ? PropertyValueTypes[T] : CssValue<T>
 
   export interface PropertyTypes extends PropertyValueTypes {
   
@@ -303,7 +302,7 @@ interface PropertyValueTypes {
 }
 
 export type PropertyValue<T extends string> = T extends keyof PropertyTypes
-  ? ConditionalValue<PropertyTypes[T] | CssValue<T> | (string & {})>
+  ? ConditionalValue<PropertyTypes[T]>
   : T extends keyof CssProperties
-  ? ConditionalValue<CssProperties[T] | (string & {})>
+  ? ConditionalValue<CssProperties[T]>
   : ConditionalValue<string | number>

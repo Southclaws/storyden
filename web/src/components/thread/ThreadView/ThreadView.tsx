@@ -13,7 +13,7 @@ export function ThreadView(props: Thread) {
 
   return (
     <ThreadScreenContext.Provider value={state}>
-      <VStack alignItems="start" gap={2} width="full">
+      <VStack alignItems="start" gap="2" width="full">
         <Title {...props} />
 
         <PostListView {...props} />

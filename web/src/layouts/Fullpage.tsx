@@ -7,7 +7,7 @@ export function Fullpage(props: PropsWithChildren) {
     <Flex
       width="full"
       height="full"
-      minHeight="100vh"
+      minHeight="dvh"
       justifyContent="start"
       alignItems="center"
       flexDirection="column"

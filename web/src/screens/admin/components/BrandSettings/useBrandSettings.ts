@@ -44,9 +44,9 @@ export function useBrandSettings(props: Props) {
     })();
   }, []);
 
-  const updateColour = (colour: string, contrast: number) => {
+  const updateColour = (colour: string) => {
     try {
-      const cv = getColourVariants(colour, contrast);
+      const cv = getColourVariants(colour);
 
       Object.entries(cv).forEach((property) =>
         document.documentElement.style.setProperty(property[0], property[1]),
@@ -58,7 +58,7 @@ export function useBrandSettings(props: Props) {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    updateColour(data.accentColour, contrast);
+    updateColour(data.accentColour);
     await adminSettingsUpdate({
       title: data.title,
       description: data.description,
@@ -83,12 +83,12 @@ export function useBrandSettings(props: Props) {
   };
 
   const onColourChangePreview = (colour: string) => {
-    updateColour(colour, contrast);
+    updateColour(colour);
   };
 
   const onContrastChange = (v: number) => {
     setContrast(v);
-    updateColour(form.getValues().accentColour, v);
+    updateColour(form.getValues().accentColour);
   };
 
   return {

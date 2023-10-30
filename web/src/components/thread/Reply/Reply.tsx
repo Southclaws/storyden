@@ -19,7 +19,7 @@ export function Reply(props: Thread) {
   return (
     <HStack
       w="full"
-      p={8}
+      p="8"
       borderRadius="xl"
       bgColor="blackAlpha.50"
       justifyContent="center"
@@ -27,7 +27,7 @@ export function Reply(props: Thread) {
       <ChatBubbleLeftRightIcon width="1.5em" />
 
       <p>
-        Please <Anchor href="/auth">sign up or log in</Anchor> to reply
+        Please <Anchor href="/register">sign up or log in</Anchor> to reply
       </p>
     </HStack>
   );

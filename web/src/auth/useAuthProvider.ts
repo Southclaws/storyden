@@ -21,9 +21,9 @@ export function useAuthProvider() {
     if (isLoading) return;
 
     if (!loggedIn && isPrivate) {
-      push("/auth");
+      push("/register");
     }
-    if (loggedIn && pathname === "/auth") {
+    if (loggedIn && (pathname === "/register" || pathname === "/login")) {
       push("/");
     }
   }, [isLoading, loggedIn, isPrivate, pathname, push]);

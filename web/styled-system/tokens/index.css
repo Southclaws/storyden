@@ -45,20 +45,6 @@
   --letter-spacings-wide: 0.025em;
   --letter-spacings-wider: 0.05em;
   --letter-spacings-widest: 0.1em;
-  --font-sizes-2xs: 0.5rem;
-  --font-sizes-xs: 0.75rem;
-  --font-sizes-sm: 0.875rem;
-  --font-sizes-md: 1rem;
-  --font-sizes-lg: 1.125rem;
-  --font-sizes-xl: 1.25rem;
-  --font-sizes-2xl: 1.5rem;
-  --font-sizes-3xl: 1.875rem;
-  --font-sizes-4xl: 2.25rem;
-  --font-sizes-5xl: 3rem;
-  --font-sizes-6xl: 3.75rem;
-  --font-sizes-7xl: 4.5rem;
-  --font-sizes-8xl: 6rem;
-  --font-sizes-9xl: 8rem;
   --shadows-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadows-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadows-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -167,6 +153,32 @@
   --animations-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animations-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animations-bounce: bounce 1s infinite;
+  --font-sizes-2xs: 0.5rem;
+  --font-sizes-xs: 0.75rem;
+  --font-sizes-5xl: 3rem;
+  --font-sizes-6xl: 3.75rem;
+  --font-sizes-7xl: 4.5rem;
+  --font-sizes-8xl: 6rem;
+  --font-sizes-9xl: 8rem;
+  --font-sizes-sm: 1rem;
+  --font-sizes-md: 1.125rem;
+  --font-sizes-lg: 1.2rem;
+  --font-sizes-xl: 1.44rem;
+  --font-sizes-2xl: 1.728rem;
+  --font-sizes-3xl: 2.074rem;
+  --font-sizes-4xl: 2.488rem;
+  --font-sizes-heading-1: var(--font-size-h1);
+  --font-sizes-heading-2: var(--font-size-h2);
+  --font-sizes-heading-3: var(--font-size-h3);
+  --font-sizes-heading-4: var(--font-size-h4);
+  --font-sizes-heading-5: var(--font-size-h5);
+  --font-sizes-heading-6: var(--font-size-h6);
+  --font-sizes-heading-variable-1: var(--font-size-h1-variable);
+  --font-sizes-heading-variable-2: var(--font-size-h2-variable);
+  --font-sizes-heading-variable-3: var(--font-size-h3-variable);
+  --font-sizes-heading-variable-4: var(--font-size-h4-variable);
+  --font-sizes-heading-variable-5: var(--font-size-h5-variable);
+  --font-sizes-heading-variable-6: var(--font-size-h6-variable);
   --colors-current: currentColor;
   --colors-black: #000;
   --colors-white: #fff;
@@ -437,7 +449,71 @@
   --breakpoints-md: 768px;
   --breakpoints-lg: 1024px;
   --breakpoints-xl: 1280px;
-  --breakpoints-2xl: 1536px
+  --breakpoints-2xl: 1536px;
+  --colors-accent-50: var(--accent-colour-flat-fill-50);
+  --colors-accent-100: var(--accent-colour-flat-fill-100);
+  --colors-accent-200: var(--accent-colour-flat-fill-200);
+  --colors-accent-300: var(--accent-colour-flat-fill-300);
+  --colors-accent-400: var(--accent-colour-flat-fill-400);
+  --colors-accent-500: var(--accent-colour-flat-fill-500);
+  --colors-accent-600: var(--accent-colour-flat-fill-600);
+  --colors-accent-700: var(--accent-colour-flat-fill-700);
+  --colors-accent-800: var(--accent-colour-flat-fill-800);
+  --colors-accent-900: var(--accent-colour-flat-fill-900);
+  --colors-accent-text-50: var(--accent-colour-flat-text-50);
+  --colors-accent-text-100: var(--accent-colour-flat-text-100);
+  --colors-accent-text-200: var(--accent-colour-flat-text-200);
+  --colors-accent-text-300: var(--accent-colour-flat-text-300);
+  --colors-accent-text-400: var(--accent-colour-flat-text-400);
+  --colors-accent-text-500: var(--accent-colour-flat-text-500);
+  --colors-accent-text-600: var(--accent-colour-flat-text-600);
+  --colors-accent-text-700: var(--accent-colour-flat-text-700);
+  --colors-accent-text-800: var(--accent-colour-flat-text-800);
+  --colors-accent-text-900: var(--accent-colour-flat-text-900);
+  --colors-accent-dark-50: var(--accent-colour-dark-fill-50);
+  --colors-accent-dark-100: var(--accent-colour-dark-fill-100);
+  --colors-accent-dark-200: var(--accent-colour-dark-fill-200);
+  --colors-accent-dark-300: var(--accent-colour-dark-fill-300);
+  --colors-accent-dark-400: var(--accent-colour-dark-fill-400);
+  --colors-accent-dark-500: var(--accent-colour-dark-fill-500);
+  --colors-accent-dark-600: var(--accent-colour-dark-fill-600);
+  --colors-accent-dark-700: var(--accent-colour-dark-fill-700);
+  --colors-accent-dark-800: var(--accent-colour-dark-fill-800);
+  --colors-accent-dark-900: var(--accent-colour-dark-fill-900);
+  --colors-accent-dark-text-50: var(--accent-colour-dark-text-50);
+  --colors-accent-dark-text-100: var(--accent-colour-dark-text-100);
+  --colors-accent-dark-text-200: var(--accent-colour-dark-text-200);
+  --colors-accent-dark-text-300: var(--accent-colour-dark-text-300);
+  --colors-accent-dark-text-400: var(--accent-colour-dark-text-400);
+  --colors-accent-dark-text-500: var(--accent-colour-dark-text-500);
+  --colors-accent-dark-text-600: var(--accent-colour-dark-text-600);
+  --colors-accent-dark-text-700: var(--accent-colour-dark-text-700);
+  --colors-accent-dark-text-800: var(--accent-colour-dark-text-800);
+  --colors-accent-dark-text-900: var(--accent-colour-dark-text-900);
+  --colors-bg-canvas: var(--colors-gray-100);
+  --colors-bg-default: var(--colors-white);
+  --colors-bg-subtle: var(--colors-gray-200);
+  --colors-bg-muted: var(--colors-gray-300);
+  --colors-bg-emphasized: var(--colors-gray-400);
+  --colors-bg-disabled: var(--colors-gray-300);
+  --colors-fg-default: var(--colors-gray-900);
+  --colors-fg-muted: var(--colors-gray-800);
+  --colors-fg-subtle: var(--colors-gray-700);
+  --colors-fg-disabled: var(--colors-gray-500);
+  --colors-border-default: var(--colors-gray-400);
+  --colors-border-muted: var(--colors-gray-500);
+  --colors-border-subtle: var(--colors-gray-300);
+  --colors-border-disabled: var(--colors-gray-400);
+  --colors-border-outline: var(--colors-black-alpha-50);
+  --colors-border-accent: var(--colors-accent-default)
+}
+
+.dark {
+  --colors-bg-default: var(--colors-gray-200);
+  --colors-bg-subtle: var(--colors-gray-300);
+  --colors-bg-muted: var(--colors-gray-400);
+  --colors-bg-emphasized: var(--colors-gray-500);
+  --colors-bg-disabled: var(--colors-gray-400)
 }
   }
   

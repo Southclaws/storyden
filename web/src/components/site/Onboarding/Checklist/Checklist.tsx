@@ -42,7 +42,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           step={1}
           current={onboardingStatus}
           title="Create an account"
-          url="/auth"
+          url="/register"
         >
           <Text>
             Start by creating an account. The first registration is

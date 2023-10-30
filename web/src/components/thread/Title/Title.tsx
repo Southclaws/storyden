@@ -17,7 +17,7 @@ export function Title(props: Thread) {
         {editing ? (
           <Input value={editingTitle} onChange={onTitleChange} />
         ) : (
-          <styled.h1 fontSize="var(--font-size-h1-variable)" fontWeight={600}>
+          <styled.h1 fontSize="heading.variable.1" fontWeight="bold">
             {props.title}
           </styled.h1>
         )}

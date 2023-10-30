@@ -5,10 +5,9 @@ import { Box, Flex, HStack, Heading, Text, VStack } from "@chakra-ui/react";
 import { Back } from "src/components/site/Action/Action";
 
 import { AuthMethod } from "./components/AuthMethod/AuthMethod";
-import { AuthSelection } from "./components/AuthSelection/AuthSelection";
 
 type Props = {
-  method?: string | undefined | null;
+  method: string;
 };
 export function AuthScreen({ method }: Props) {
   return (
@@ -49,7 +48,7 @@ export function AuthScreen({ method }: Props) {
           <Box w="1.4em" />
         </HStack>
 
-        {method === null ? <AuthSelection /> : <AuthMethod method={method} />}
+        <AuthMethod method={method} />
       </VStack>
     </Flex>
   );

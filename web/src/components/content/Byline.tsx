@@ -23,16 +23,16 @@ export function Byline(props: Props) {
       : undefined;
 
   return (
-    <Flex alignItems="center" justify="space-between" minWidth={0}>
+    <Flex alignItems="center" justify="space-between" minWidth="0">
       <Flex
         alignItems="center"
-        gap={0}
-        minWidth={0}
+        gap="0"
+        minWidth="0"
         fontSize="sm"
         color="gray.500"
       >
         <ProfilePill profileReference={props.author} />
-        <styled.span pr={2}>•</styled.span>
+        <styled.span pr="2">•</styled.span>
         <Timestamp created={created} updated={updated} href={props.href} />
       </Flex>
 

@@ -15,8 +15,8 @@ export function PostListView(props: Props) {
   return (
     <styled.ol
       listStyleType="none"
-      m={0}
-      gap={4}
+      m="0"
+      gap="4"
       display="flex"
       flexDir="column"
       width="full"
@@ -24,7 +24,7 @@ export function PostListView(props: Props) {
       {props.posts.map((p) => (
         <Fragment key={p.id}>
           <Divider />
-          <styled.li key={p.id} listStyleType="none" m={0}>
+          <styled.li key={p.id} listStyleType="none" m="0">
             <PostView slug={props.slug} {...p} />
           </styled.li>
         </Fragment>

@@ -1,5 +1,5 @@
-import { server } from "src/api/client";
 import { ThreadGetResponse } from "src/api/openapi/schemas";
+import { server } from "src/api/server";
 import { ThreadScreen } from "src/screens/thread/ThreadScreen";
 import { getInfo } from "src/utils/info";
 
