@@ -70,13 +70,13 @@ func ResolveHandle(ctx context.Context, r account.Repository, u AccountHandle) (
 		return account.AccountID(a.ID), nil
 	}
 
-	a, err := r.GetByHandle(ctx, string(u))
+	a, found, err := r.LookupByHandle(ctx, string(u))
 	if err != nil {
-		if model.IsNotFound(err) {
-			return account.AccountID(xid.NilID()), fault.Wrap(ErrNoAccountWithHandle, fctx.With(ctx), ftag.With(ftag.NotFound))
-		}
-
 		return account.AccountID(xid.NilID()), err
+	}
+
+	if !found {
+		return account.AccountID(xid.NilID()), fault.Wrap(ErrNoAccountWithHandle, fctx.With(ctx), ftag.With(ftag.NotFound))
 	}
 
 	return account.AccountID(a.ID), nil

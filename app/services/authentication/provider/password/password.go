@@ -19,6 +19,7 @@ import (
 var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
+	ErrNoPassword           = errors.New("password not enabled")
 	ErrNotFound             = errors.New("account not found")
 )
 
@@ -29,11 +30,12 @@ const (
 
 type Provider struct {
 	auth     authentication.Repository
+	ar       account.Repository
 	register register.Service
 }
 
-func New(auth authentication.Repository, register register.Service) *Provider {
-	return &Provider{auth, register}
+func New(auth authentication.Repository, ar account.Repository, register register.Service) *Provider {
+	return &Provider{auth, ar, register}
 }
 
 func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
@@ -41,13 +43,16 @@ func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
 func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	_, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
+	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
 
 	if exists {
-		return nil, fault.Wrap(ErrAccountAlreadyExists, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+		return nil, fault.Wrap(ErrAccountAlreadyExists,
+			fctx.With(ctx),
+			ftag.With(ftag.AlreadyExists),
+			fmsg.WithDesc("exists", "The specified handle has already been registered."))
 	}
 
 	account, err := b.register.Create(ctx, identifier)
@@ -74,13 +79,28 @@ func (b *Provider) Link() string {
 }
 
 func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
-	a, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
+	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
 
 	if !exists {
-		return nil, fault.Wrap(ErrNotFound, fctx.With(ctx), ftag.With(ftag.NotFound))
+		return nil, fault.Wrap(ErrNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "No account was found with the provided handle."))
+	}
+
+	a, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !exists {
+		return nil, fault.Wrap(ErrNoPassword,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
 	}
 
 	match, _, err := argon2id.CheckHash(password, a.Token)
@@ -89,7 +109,10 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 	}
 
 	if !match {
-		return nil, fault.Wrap(ErrPasswordMismatch, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
+		return nil, fault.Wrap(ErrPasswordMismatch,
+			fctx.With(ctx),
+			ftag.With(ftag.Unauthenticated),
+			fmsg.WithDesc("mismatch", "The provided password did not match the account."))
 	}
 
 	return &a.Account, nil

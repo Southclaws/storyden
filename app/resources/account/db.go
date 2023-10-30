@@ -69,7 +69,7 @@ func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) 
 	return FromModel(account)
 }
 
-func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, error) {
+func (d *database) LookupByHandle(ctx context.Context, handle string) (*Account, bool, error) {
 	q := d.db.Account.
 		Query().
 		Where(account.Handle(handle)).
@@ -78,10 +78,10 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 	account, err := q.Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+			return nil, false, nil
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	// threads, posts, err := d.getPostCounts(ctx, account.ID)
@@ -89,11 +89,14 @@ func (d *database) GetByHandle(ctx context.Context, handle string) (*Account, er
 	// 	return nil, err
 	// }
 	acc, err := FromModel(account)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
-	return acc, err
+	return acc, true, nil
 }
 
 // func (d *database) getPostCounts(ctx context.Context, id string) (int, int, error) {
