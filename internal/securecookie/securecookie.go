@@ -54,6 +54,10 @@ func (s *Session) Decrypt(message string) (string, bool) {
 	var decryptNonce [24]byte
 
 	hex.Decode(box, []byte(message))
+	if len(box) == 0 {
+		return "", false
+	}
+
 	copy(decryptNonce[:], box[:24])
 
 	result, ok := secretbox.Open(nil, box[24:], &decryptNonce, &s.key)
