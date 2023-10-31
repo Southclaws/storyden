@@ -27,7 +27,8 @@ export const fetcher = async <T>({
       .catch(() => ({ error: "Failed to parse API response" }));
     console.warn(data);
     throw new Error(
-      data.message ?? `An unexpected error occurred: ${response.statusText}`,
+      data.message ??
+        `An unexpected error occurred:  ${response.status} ${response.statusText}`,
     );
   }
 
