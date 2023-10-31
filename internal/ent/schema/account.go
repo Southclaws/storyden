@@ -44,12 +44,12 @@ func (Account) Edges() []ent.Edge {
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("clusters", Cluster.Type).
-			Annotations(entsql.OnDelete(entsql.SetNull)),
+			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
 
 		edge.To("items", Item.Type).
-			Annotations(entsql.OnDelete(entsql.SetNull)),
+			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
 
 		edge.To("assets", Asset.Type).
-			Annotations(entsql.OnDelete(entsql.SetNull)),
+			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
 	}
 }

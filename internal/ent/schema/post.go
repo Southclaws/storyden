@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
@@ -67,15 +68,18 @@ func (Post) Edges() []ent.Edge {
 			From("root").
 			Unique().
 			Field("root_post_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)).
 			Comment("A many-to-many recursive self reference. The root post is the first post in the thread."),
 
 		edge.To("replies", Post.Type).
 			From("replyTo").
 			Unique().
 			Field("reply_to_post_id").
+			Annotations(entsql.OnDelete(entsql.SetNull)).
 			Comment("A many-to-many recursive self reference. The replyTo post is an optional post that this post is in reply to."),
 
-		edge.To("reacts", React.Type),
+		edge.To("reacts", React.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("assets", Asset.Type),
 
