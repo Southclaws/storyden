@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 
-export interface AccountAuthMethodProps {
-  /** True if the account is using this auth method. */
-  active: boolean;
+export interface AuthPasswordMutableProps {
+  old: string;
+  new: string;
 }

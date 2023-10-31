@@ -1,18 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startRegistration } from "@simplewebauthn/browser";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { useAccountGet } from "src/api/openapi/accounts";
-import {
-  authPasswordSignup,
-  webAuthnMakeCredential,
-  webAuthnRequestCredential,
-} from "src/api/openapi/auth";
+import { authPasswordSignup } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
+import { passkeyRegister } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 
 export type Props = {
@@ -34,7 +30,7 @@ const UsernameSchema = z
 
 const PasswordSchema = z
   .string()
-  .min(10, "Password must be at least 10 characters.");
+  .min(8, "Password must be at least 8 characters.");
 
 const FormSchema = z.object({
   identifier: UsernameSchema,
@@ -85,13 +81,7 @@ export function useRegisterForm() {
 
   async function handleWebauthn(payload: Form) {
     try {
-      const { publicKey } = await webAuthnRequestCredential(payload.identifier);
-
-      const credential = await startRegistration({
-        ...publicKey,
-      });
-
-      await webAuthnMakeCredential(credential);
+      passkeyRegister(payload.identifier);
 
       push("/");
       mutate();

@@ -57,6 +57,20 @@ func (ac *AuthenticationCreate) SetToken(s string) *AuthenticationCreate {
 	return ac
 }
 
+// SetName sets the "name" field.
+func (ac *AuthenticationCreate) SetName(s string) *AuthenticationCreate {
+	ac.mutation.SetName(s)
+	return ac
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableName(s *string) *AuthenticationCreate {
+	if s != nil {
+		ac.SetName(*s)
+	}
+	return ac
+}
+
 // SetMetadata sets the "metadata" field.
 func (ac *AuthenticationCreate) SetMetadata(m map[string]interface{}) *AuthenticationCreate {
 	ac.mutation.SetMetadata(m)
@@ -217,6 +231,10 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 		_node.Token = value
 	}
+	if value, ok := ac.mutation.Name(); ok {
+		_spec.SetField(authentication.FieldName, field.TypeString, value)
+		_node.Name = &value
+	}
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
@@ -323,6 +341,24 @@ func (u *AuthenticationUpsert) SetToken(v string) *AuthenticationUpsert {
 // UpdateToken sets the "token" field to the value that was provided on create.
 func (u *AuthenticationUpsert) UpdateToken() *AuthenticationUpsert {
 	u.SetExcluded(authentication.FieldToken)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *AuthenticationUpsert) SetName(v string) *AuthenticationUpsert {
+	u.Set(authentication.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateName() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldName)
+	return u
+}
+
+// ClearName clears the value of the "name" field.
+func (u *AuthenticationUpsert) ClearName() *AuthenticationUpsert {
+	u.SetNull(authentication.FieldName)
 	return u
 }
 
@@ -434,6 +470,27 @@ func (u *AuthenticationUpsertOne) SetToken(v string) *AuthenticationUpsertOne {
 func (u *AuthenticationUpsertOne) UpdateToken() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateToken()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AuthenticationUpsertOne) SetName(v string) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateName() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateName()
+	})
+}
+
+// ClearName clears the value of the "name" field.
+func (u *AuthenticationUpsertOne) ClearName() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearName()
 	})
 }
 
@@ -715,6 +772,27 @@ func (u *AuthenticationUpsertBulk) SetToken(v string) *AuthenticationUpsertBulk 
 func (u *AuthenticationUpsertBulk) UpdateToken() *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateToken()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AuthenticationUpsertBulk) SetName(v string) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateName() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateName()
+	})
+}
+
+// ClearName clears the value of the "name" field.
+func (u *AuthenticationUpsertBulk) ClearName() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearName()
 	})
 }
 

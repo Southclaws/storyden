@@ -28,6 +28,8 @@ type Authentication struct {
 	Identifier string `json:"identifier,omitempty"`
 	// The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string.
 	Token string `json:"-"`
+	// A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname.
+	Name *string `json:"name,omitempty"`
 	// Any necessary metadata specific to the authentication method.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -66,7 +68,7 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case authentication.FieldMetadata:
 			values[i] = new([]byte)
-		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken:
+		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -118,6 +120,13 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
 				a.Token = value.String
+			}
+		case authentication.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				a.Name = new(string)
+				*a.Name = value.String
 			}
 		case authentication.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -185,6 +194,11 @@ func (a *Authentication) String() string {
 	builder.WriteString(a.Identifier)
 	builder.WriteString(", ")
 	builder.WriteString("token=<sensitive>")
+	builder.WriteString(", ")
+	if v := a.Name; v != nil {
+		builder.WriteString("name=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))

@@ -1,41 +1,47 @@
-import { partition } from "lodash/fp";
 import { SWRResponse } from "swr";
 
 import { useAccountAuthProviderList } from "src/api/openapi/accounts";
+import { APIError, AccountAuthMethods } from "src/api/openapi/schemas";
 import {
-  APIError,
-  AccountAuthMethod,
-  AccountAuthMethods,
-} from "src/api/openapi/schemas";
+  groupAuthMethods,
+  groupAuthProviders,
+} from "src/components/settings/utils";
 
-const partitionByActive = partition<AccountAuthMethod>("active");
-
-type AuthMethodSettings =
-  | {
-      ready: false;
-      error?: APIError;
-    }
-  | {
-      ready: true;
-      active: AccountAuthMethod[];
-      rest: AccountAuthMethod[];
-    };
-
-export function useAuthMethodSettings(): AuthMethodSettings {
+export function useAuthMethodSettings() {
   const response: SWRResponse<AccountAuthMethods, APIError> =
     useAccountAuthProviderList();
 
   if (!response.data) {
-    return { ready: false, error: response.error };
+    return { ready: false as const, error: response.error };
   }
 
-  const [active, rest] = partitionByActive(
-    response.data.auth_methods.sort((a, b) => a.name.localeCompare(b.name)),
-  );
+  const { active, available } = response.data;
+
+  const { password, phone, webauthn, providers } =
+    groupAuthProviders(available);
+
+  const {
+    password: passwordActive,
+    phone: phoneActive,
+    webauthn: webauthnActive,
+    methods,
+  } = groupAuthMethods(active);
+
+  const sorted = providers.sort((a, b) => a.name.localeCompare(b.name));
 
   return {
-    ready: true,
-    active,
-    rest,
+    ready: true as const,
+    available: {
+      password,
+      phone,
+      webauthn,
+      oauth: sorted,
+    },
+    active: {
+      password: passwordActive ?? [],
+      phone: phoneActive ?? [],
+      webauthn: webauthnActive ?? [],
+      methods,
+    },
   };
 }

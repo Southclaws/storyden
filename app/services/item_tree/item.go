@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -34,7 +34,7 @@ func New(cr cluster.Repository, ir item.Repository) Graph {
 }
 
 func (s *service) Link(ctx context.Context, is datagraph.ItemSlug, cs datagraph.ClusterSlug) (*datagraph.Item, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -64,7 +64,7 @@ func (s *service) Link(ctx context.Context, is datagraph.ItemSlug, cs datagraph.
 }
 
 func (s *service) Sever(ctx context.Context, is datagraph.ItemSlug, cs datagraph.ClusterSlug) (*datagraph.Item, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

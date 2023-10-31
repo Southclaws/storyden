@@ -1,18 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startAuthentication } from "@simplewebauthn/browser";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { useAccountGet } from "src/api/openapi/accounts";
-import {
-  authPasswordSignin,
-  webAuthnGetAssertion,
-  webAuthnMakeAssertion,
-} from "src/api/openapi/auth";
+import { authPasswordSignin } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
+import { passkeyLogin } from "src/components/auth/webauthn/utils";
 import { deriveError, zodFormError } from "src/utils/error";
 
 export type Props = {
@@ -30,7 +26,7 @@ const UsernameSchema = z
 
 const PasswordSchema = z
   .string()
-  .min(10, "Password must be at least 10 characters.");
+  .min(8, "Password must be at least 8 characters.");
 
 const FormSchema = z.object({
   identifier: UsernameSchema,
@@ -82,16 +78,7 @@ export function useLoginForm() {
 
   async function handleWebauthn(payload: Form) {
     try {
-      const { publicKey } = await webAuthnGetAssertion(payload.identifier);
-      const credential = await startAuthentication(publicKey);
-
-      // HACK:
-      // 1. https://github.com/MasterKale/SimpleWebAuthn/issues/330
-      // 2. https://github.com/go-webauthn/webauthn/issues/93
-      credential.response.userHandle = undefined;
-
-      await webAuthnMakeAssertion(credential);
-
+      await passkeyLogin(payload.identifier);
       push("/");
       mutate();
     } catch (error) {

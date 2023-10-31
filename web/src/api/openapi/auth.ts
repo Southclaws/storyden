@@ -12,6 +12,7 @@ import { fetcher } from "../client";
 
 import type {
   AuthPasswordBody,
+  AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
   BadRequestResponse,
@@ -105,7 +106,23 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
 };
 
 /**
- * Sign in to an existing account with a username and password.
+ * Given the requesting account has a password authentication, update the
+password on file.
+
+ */
+export const authPasswordUpdate = (
+  authPasswordUpdateBody: AuthPasswordUpdateBody,
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/password`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: authPasswordUpdateBody,
+  });
+};
+
+/**
+ * OAuth2 callback.
  */
 export const oAuthProviderCallback = (
   oauthProvider: string,

@@ -1,4 +1,3 @@
-import { keyBy, values } from "lodash/fp";
 import "server-only";
 
 import {
@@ -6,6 +5,7 @@ import {
   AuthProviderListOKResponse,
 } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
+import { groupAuthProviders } from "src/components/settings/utils";
 
 interface Providers {
   password: boolean;
@@ -13,8 +13,6 @@ interface Providers {
   webauthn: boolean;
   providers: AuthProvider[];
 }
-
-const group = keyBy<AuthProvider>("provider");
 
 /**
  * Gets available auth providers but separates out Password and Phone providers
@@ -27,13 +25,5 @@ export async function getProviders(): Promise<Providers> {
     url: "/v1/auth",
   });
 
-  // pull out password and phone, if present, the rest are OAuth2 providers.
-  const { password, phone, webauthn, ...rest } = group(providers);
-
-  return {
-    password: Boolean(password),
-    phone: Boolean(phone),
-    webauthn: Boolean(webauthn),
-    providers: values(rest),
-  };
+  return groupAuthProviders(providers);
 }

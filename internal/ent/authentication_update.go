@@ -48,6 +48,26 @@ func (au *AuthenticationUpdate) SetToken(s string) *AuthenticationUpdate {
 	return au
 }
 
+// SetName sets the "name" field.
+func (au *AuthenticationUpdate) SetName(s string) *AuthenticationUpdate {
+	au.mutation.SetName(s)
+	return au
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableName(s *string) *AuthenticationUpdate {
+	if s != nil {
+		au.SetName(*s)
+	}
+	return au
+}
+
+// ClearName clears the value of the "name" field.
+func (au *AuthenticationUpdate) ClearName() *AuthenticationUpdate {
+	au.mutation.ClearName()
+	return au
+}
+
 // SetMetadata sets the "metadata" field.
 func (au *AuthenticationUpdate) SetMetadata(m map[string]interface{}) *AuthenticationUpdate {
 	au.mutation.SetMetadata(m)
@@ -154,6 +174,12 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := au.mutation.Token(); ok {
 		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 	}
+	if value, ok := au.mutation.Name(); ok {
+		_spec.SetField(authentication.FieldName, field.TypeString, value)
+	}
+	if au.mutation.NameCleared() {
+		_spec.ClearField(authentication.FieldName, field.TypeString)
+	}
 	if value, ok := au.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 	}
@@ -226,6 +252,26 @@ func (auo *AuthenticationUpdateOne) SetIdentifier(s string) *AuthenticationUpdat
 // SetToken sets the "token" field.
 func (auo *AuthenticationUpdateOne) SetToken(s string) *AuthenticationUpdateOne {
 	auo.mutation.SetToken(s)
+	return auo
+}
+
+// SetName sets the "name" field.
+func (auo *AuthenticationUpdateOne) SetName(s string) *AuthenticationUpdateOne {
+	auo.mutation.SetName(s)
+	return auo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableName(s *string) *AuthenticationUpdateOne {
+	if s != nil {
+		auo.SetName(*s)
+	}
+	return auo
+}
+
+// ClearName clears the value of the "name" field.
+func (auo *AuthenticationUpdateOne) ClearName() *AuthenticationUpdateOne {
+	auo.mutation.ClearName()
 	return auo
 }
 
@@ -364,6 +410,12 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	}
 	if value, ok := auo.mutation.Token(); ok {
 		_spec.SetField(authentication.FieldToken, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.Name(); ok {
+		_spec.SetField(authentication.FieldName, field.TypeString, value)
+	}
+	if auo.mutation.NameCleared() {
+		_spec.ClearField(authentication.FieldName, field.TypeString)
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)

@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
@@ -32,6 +33,27 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 	}
 
 	return openapi.AuthPasswordSignup200JSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
+			Body: openapi.AuthSuccessOK{Id: u.ID.String()},
+			Headers: openapi.AuthSuccessOKResponseHeaders{
+				SetCookie: i.sm.Create(u.ID.String()).String(),
+			},
+		},
+	}, nil
+}
+
+func (i *Authentication) AuthPasswordUpdate(ctx context.Context, request openapi.AuthPasswordUpdateRequestObject) (openapi.AuthPasswordUpdateResponseObject, error) {
+	id, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	u, err := i.p.Update(ctx, id, request.Body.Old, request.Body.New)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AuthPasswordUpdate200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: u.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{

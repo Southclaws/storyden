@@ -86,6 +86,7 @@ require (
 	github.com/mailgun/raymond/v2 v2.0.48 // indirect
 	github.com/mazznoer/csscolorparser v0.1.3 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.26 // indirect
+	github.com/mileusna/useragent v1.3.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect

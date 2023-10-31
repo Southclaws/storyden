@@ -2,18 +2,24 @@ package authentication
 
 import (
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+type ID = xid.ID
+
 type Service string
 
 type Authentication struct {
+	ID         ID
 	Account    account.Account
 	Service    Service
 	Identifier string
 	Token      string
+	Name       opt.Optional[string]
 	Metadata   interface{}
 }
 
@@ -29,10 +35,12 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 	}
 
 	return &Authentication{
+		ID:         ID(m.ID),
 		Account:    *acc,
 		Service:    Service(m.Service),
 		Identifier: m.Identifier,
 		Token:      m.Token,
+		Name:       opt.NewPtr(m.Name),
 		Metadata:   m.Metadata,
 	}, nil
 }

@@ -57,6 +57,7 @@ var (
 		{Name: "service", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_authentication", Type: field.TypeString, Size: 20},
 	}
@@ -68,7 +69,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "authentications_accounts_authentication",
-				Columns:    []*schema.Column{AuthenticationsColumns[6]},
+				Columns:    []*schema.Column{AuthenticationsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

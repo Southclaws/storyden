@@ -25,7 +25,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/object"
 )
@@ -107,7 +107,7 @@ func New(
 }
 
 func (s *service) Upload(ctx context.Context, r io.Reader) error {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -125,7 +125,7 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 }
 
 func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) error {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

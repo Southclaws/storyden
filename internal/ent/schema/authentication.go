@@ -29,6 +29,11 @@ func (Authentication) Fields() []ent.Field {
 			Sensitive().
 			Comment("The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string."),
 
+		field.String("name").
+			Optional().
+			Nillable().
+			Comment("A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname."),
+
 		field.JSON("metadata", map[string]interface{}{}).
 			Optional().
 			Comment("Any necessary metadata specific to the authentication method."),

@@ -5,7 +5,18 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AccountAuthMethodProps } from "./accountAuthMethodProps";
 import type { AuthProvider } from "./authProvider";
 
-export type AccountAuthMethod = AuthProvider & AccountAuthMethodProps;
+/**
+ * An authentication method is an active instance of an authentication
+provider associated with an account. Use this to display a user's active
+authentication methods so they can edit or remove it.
+
+ */
+export interface AccountAuthMethod {
+  provider: AuthProvider;
+  /** The internal unique ID this method has. */
+  id: string;
+  /** The personal name given to the method. */
+  name: string;
+}

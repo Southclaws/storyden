@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	item_repo "github.com/Southclaws/storyden/app/resources/item"
 	"github.com/Southclaws/storyden/app/resources/item_search"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/item_crud"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -32,7 +32,7 @@ func NewItems(
 }
 
 func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateRequestObject) (openapi.ItemCreateResponseObject, error) {
-	session, err := authentication.GetAccountID(ctx)
+	session, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
