@@ -1,6 +1,8 @@
 package authentication
 
 import (
+	"time"
+
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -15,6 +17,7 @@ type Service string
 
 type Authentication struct {
 	ID         ID
+	Created    time.Time
 	Account    account.Account
 	Service    Service
 	Identifier string
@@ -36,6 +39,7 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 
 	return &Authentication{
 		ID:         ID(m.ID),
+		Created:    m.CreatedAt,
 		Account:    *acc,
 		Service:    Service(m.Service),
 		Identifier: m.Identifier,
