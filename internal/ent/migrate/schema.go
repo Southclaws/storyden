@@ -46,7 +46,7 @@ var (
 				Symbol:     "assets_accounts_assets",
 				Columns:    []*schema.Column{AssetsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -126,7 +126,7 @@ var (
 				Symbol:     "clusters_accounts_clusters",
 				Columns:    []*schema.Column{ClustersColumns[11]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
@@ -191,7 +191,7 @@ var (
 				Symbol:     "items_accounts_items",
 				Columns:    []*schema.Column{ItemsColumns[11]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -293,7 +293,7 @@ var (
 				Symbol:     "reacts_posts_reacts",
 				Columns:    []*schema.Column{ReactsColumns[4]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
