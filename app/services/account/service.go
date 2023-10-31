@@ -15,12 +15,12 @@ import (
 type Service interface {
 	Get(ctx context.Context, id account.AccountID) (*account.Account, error)
 	GetAuthMethods(ctx context.Context, id account.AccountID) ([]*AuthMethod, error)
+	DeleteAuthMethod(ctx context.Context, id account.AccountID, aid authentication_repo.ID) error
 	Update(ctx context.Context, id account.AccountID, params Partial) (*account.Account, error)
 }
 
 type AuthMethod struct {
-	ID       string
-	Name     string
+	Instance authentication_repo.Authentication
 	Provider authentication.Provider
 }
 

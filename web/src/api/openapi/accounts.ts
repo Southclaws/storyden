@@ -137,6 +137,18 @@ export const useAccountAuthProviderList = <
 };
 
 /**
+ * Retrieve a list of authentication providers with a flag indicating which
+ones are active for the currently authenticated account.
+
+ */
+export const accountAuthMethodDelete = (authMethodId: string) => {
+  return fetcher<AccountAuthProviderListOKResponse>({
+    url: `/v1/accounts/self/auth-methods/${authMethodId}`,
+    method: "delete",
+  });
+};
+
+/**
  * Upload an avatar for the authenticated account.
  */
 export const accountSetAvatar = (

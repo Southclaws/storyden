@@ -227,6 +227,7 @@ func newRouter(l *zap.Logger, cfg config.Config) *echo.Echo {
 	}))
 
 	router.Use(glue.ParameterContext)
+	router.Use(glue.UserAgentContext)
 	router.HTTPErrorHandler = glue.HTTPErrorHandler(l)
 
 	// Router must add all middleware before mounting routes. To add middleware,

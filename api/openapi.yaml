@@ -386,7 +386,24 @@ paths:
         Retrieve a list of authentication providers with a flag indicating which
         ones are active for the currently authenticated account.
       tags: [accounts]
-      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
+
+  /v1/accounts/self/auth-methods/{auth_method_id}:
+    delete:
+      operationId: AccountAuthMethodDelete
+      description: |
+        Retrieve a list of authentication providers with a flag indicating which
+        ones are active for the currently authenticated account.
+      tags: [accounts]
+      parameters:
+        - name: auth_method_id
+          required: true
+          in: path
+          schema:
+            type: string
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -2235,15 +2252,22 @@ components:
         provider associated with an account. Use this to display a user's active
         authentication methods so they can edit or remove it.
       type: object
-      required: [provider, id, name]
+      required: [id, created_at, name, identifier, provider]
       properties:
-        provider: { $ref: "#/components/schemas/AuthProvider" }
         id:
           description: The internal unique ID this method has.
           type: string
+        created_at:
+          type: string
+          format: date-time
+          description: When this auth method was registered to the account.
         name:
           description: The personal name given to the method.
           type: string
+        identifier:
+          description: The external identifier (third party ID or device ID)
+          type: string
+        provider: { $ref: "#/components/schemas/AuthProvider" }
 
     #
     # 8888888b.                   .d888 d8b 888

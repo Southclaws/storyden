@@ -30,14 +30,22 @@ func (d *database) Create(ctx context.Context,
 	identifier string,
 	token string,
 	metadata map[string]any,
+	opts ...Option,
 ) (*Authentication, error) {
-	r, err := d.db.Authentication.Create().
-		SetAccountID(xid.ID(id)).
-		SetService(string(service)).
-		SetIdentifier(identifier).
-		SetToken(token).
-		SetMetadata(metadata).
-		Save(ctx)
+	create := d.db.Authentication.Create()
+	mutate := create.Mutation()
+
+	mutate.SetAccountID(xid.ID(id))
+	mutate.SetService(string(service))
+	mutate.SetIdentifier(identifier)
+	mutate.SetToken(token)
+	mutate.SetMetadata(metadata)
+
+	for _, fn := range opts {
+		fn(mutate)
+	}
+
+	r, err := create.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
@@ -161,6 +169,26 @@ func (d *database) Update(ctx context.Context, id ID, opts ...Option) (*Authenti
 	}
 
 	return a, nil
+}
+
+func (d *database) DeleteByID(ctx context.Context, accountID account.AccountID, aid ID) (bool, error) {
+	n, err := d.db.Authentication.
+		Delete().
+		Where(
+			authentication.HasAccountWith(
+				model_account.ID(xid.ID(accountID)),
+			),
+			authentication.ID(aid),
+		).Exec(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return false, nil
+		}
+
+		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return n > 0, nil
 }
 
 func (d *database) Delete(ctx context.Context, accountID account.AccountID, identifier string, service Service) (bool, error) {

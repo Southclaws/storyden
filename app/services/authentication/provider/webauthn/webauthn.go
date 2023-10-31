@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
+	"github.com/Southclaws/storyden/app/transports/openapi/glue"
 )
 
 var (
@@ -90,7 +91,14 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, id, base64.RawURLEncoding.EncodeToString(credential.ID), string(encoded), nil)
+	_, err = p.auth_repo.Create(ctx,
+		acc.ID,
+		id,
+		base64.RawURLEncoding.EncodeToString(credential.ID),
+		string(encoded),
+		nil,
+		authentication.WithName(glue.GetDeviceName(ctx)),
+	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -109,7 +117,14 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, id, base64.RawURLEncoding.EncodeToString(credential.ID), string(encoded), nil)
+	_, err = p.auth_repo.Create(ctx,
+		acc.ID,
+		id,
+		base64.RawURLEncoding.EncodeToString(credential.ID),
+		string(encoded),
+		nil,
+		authentication.WithName(glue.GetDeviceName(ctx)),
+	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -6,7 +6,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
@@ -83,6 +85,35 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 	}, nil
 }
 
+func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.AccountAuthMethodDeleteRequestObject) (openapi.AccountAuthMethodDeleteResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	id, err := xid.FromString(request.AuthMethodId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	err = i.as.DeleteAuthMethod(ctx, accountID, id)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	authmethods, err := i.as.GetAuthMethods(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountAuthMethodDelete200JSONResponse{
+		AccountAuthProviderListOKJSONResponse: openapi.AccountAuthProviderListOKJSONResponse{
+			Available: dt.Map(i.am.Providers(), serialiseAuthProvider),
+			Active:    dt.Map(authmethods, serialiseAuthMethod),
+		},
+	}, nil
+}
+
 func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.AccountGetAvatarRequestObject) (openapi.AccountGetAvatarResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
 	if err != nil {
@@ -117,8 +148,10 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 
 func serialiseAuthMethod(in *account.AuthMethod) openapi.AccountAuthMethod {
 	return openapi.AccountAuthMethod{
-		Provider: serialiseAuthProvider(in.Provider),
-		Name:     in.Name,
-		Id:       in.ID,
+		Id:         in.Instance.ID.String(),
+		CreatedAt:  in.Instance.Created,
+		Name:       in.Instance.Name.Or("Unknown"),
+		Identifier: in.Instance.Identifier,
+		Provider:   serialiseAuthProvider(in.Provider),
 	}
 }

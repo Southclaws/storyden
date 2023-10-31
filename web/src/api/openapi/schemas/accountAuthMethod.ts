@@ -14,9 +14,13 @@ authentication methods so they can edit or remove it.
 
  */
 export interface AccountAuthMethod {
-  provider: AuthProvider;
   /** The internal unique ID this method has. */
   id: string;
+  /** When this auth method was registered to the account. */
+  created_at: string;
   /** The personal name given to the method. */
   name: string;
+  /** The external identifier (third party ID or device ID) */
+  identifier: string;
+  provider: AuthProvider;
 }

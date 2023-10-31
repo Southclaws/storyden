@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
+	authentication_repo "github.com/Southclaws/storyden/app/resources/authentication"
 	authentication_service "github.com/Southclaws/storyden/app/services/authentication"
 )
 
@@ -42,9 +43,17 @@ func (s *service) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*
 		p := mapping[string(a.Service)]
 
 		return &AuthMethod{
-			ID:       a.ID.String(),
-			Name:     a.Name.Or(p.Name()),
+			Instance: *a,
 			Provider: p,
 		}
 	}), nil
+}
+
+func (s *service) DeleteAuthMethod(ctx context.Context, id account.AccountID, aid authentication_repo.ID) error {
+	_, err := s.auth_repo.DeleteByID(ctx, id, aid)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
