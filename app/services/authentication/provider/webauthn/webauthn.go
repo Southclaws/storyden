@@ -97,3 +97,22 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 
 	return acc, nil
 }
+
+func (p *Provider) add(ctx context.Context, accountID account.AccountID, credential *webauthn.Credential) (*account.Account, error) {
+	acc, err := p.account_repo.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	encoded, err := json.Marshal(credential)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = p.auth_repo.Create(ctx, acc.ID, id, base64.RawURLEncoding.EncodeToString(credential.ID), string(encoded), nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return acc, nil
+}

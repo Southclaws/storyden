@@ -13,7 +13,7 @@ import (
 	cluster_repo "github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	cluster_svc "github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/item_tree"
@@ -42,7 +42,7 @@ func NewClusters(
 }
 
 func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCreateRequestObject) (openapi.ClusterCreateResponseObject, error) {
-	session, err := authentication.GetAccountID(ctx)
+	session, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	collection_svc "github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -31,7 +31,7 @@ func NewCollections(
 }
 
 func (i *Collections) CollectionCreate(ctx context.Context, request openapi.CollectionCreateRequestObject) (openapi.CollectionCreateResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

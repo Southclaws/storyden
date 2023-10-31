@@ -133,23 +133,34 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 	return auths, nil
 }
 
-func (d *database) IsEqual(ctx context.Context, id account.AccountID, identifier string, token string) (bool, error) {
-	r, err := d.db.Authentication.
-		Query().
-		Where(
-			authentication.HasAccountWith(model_account.IDEQ(xid.ID(id))),
-			authentication.IdentifierEQ(identifier),
-		).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
-		}
+func (d *database) Update(ctx context.Context, id ID, opts ...Option) (*Authentication, error) {
+	update := d.db.Authentication.UpdateOneID(xid.ID(id))
+	mutate := update.Mutation()
 
-		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	for _, fn := range opts {
+		fn(mutate)
 	}
 
-	return r.Token == token, nil
+	r, err := update.Save(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	r, err = d.db.Authentication.Query().Where(authentication.ID(r.ID)).WithAccount().Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	a, err := FromModel(r)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return a, nil
 }
 
 func (d *database) Delete(ctx context.Context, accountID account.AccountID, identifier string, service Service) (bool, error) {

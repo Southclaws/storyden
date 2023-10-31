@@ -20,6 +20,7 @@ var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
 	ErrNoPassword           = errors.New("password not enabled")
+	ErrPasswordTooShort     = errors.New("password too short")
 	ErrNotFound             = errors.New("account not found")
 )
 
@@ -43,6 +44,13 @@ func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
 func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
+	if len(password) < 8 {
+		return nil, fault.Wrap(ErrPasswordTooShort,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
+	}
+
 	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
@@ -79,6 +87,13 @@ func (b *Provider) Link() string {
 }
 
 func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
+	if len(password) < 8 {
+		return nil, fault.Wrap(ErrPasswordTooShort,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
+	}
+
 	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
@@ -116,4 +131,54 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 	}
 
 	return &a.Account, nil
+}
+
+func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpassword, newpassword string) (*account.Account, error) {
+	if len(newpassword) < 8 {
+		return nil, fault.Wrap(ErrPasswordTooShort,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
+	}
+
+	a, err := b.ar.GetByID(ctx, aid)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
+	}
+
+	auth, exists, err := b.auth.LookupByHandle(ctx, id, a.Handle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !exists {
+		return nil, fault.Wrap(ErrNoPassword,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
+	}
+
+	match, _, err := argon2id.CheckHash(oldpassword, auth.Token)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to compare secure password hash"))
+	}
+
+	if !match {
+		return nil, fault.Wrap(ErrPasswordMismatch,
+			fctx.With(ctx),
+			ftag.With(ftag.Unauthenticated),
+			fmsg.WithDesc("mismatch", "The provided password did not match the account."))
+	}
+
+	hashed, err := argon2id.CreateHash(newpassword, argon2id.DefaultParams)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
+	}
+
+	auth, err = b.auth.Update(ctx, auth.ID, authentication.WithToken(hashed))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return &auth.Account, nil
 }

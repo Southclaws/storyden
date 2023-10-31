@@ -23,6 +23,8 @@ const (
 	FieldIdentifier = "identifier"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -45,6 +47,7 @@ var Columns = []string{
 	FieldService,
 	FieldIdentifier,
 	FieldToken,
+	FieldName,
 	FieldMetadata,
 }
 
@@ -108,6 +111,11 @@ func ByIdentifier(opts ...sql.OrderTermOption) OrderOption {
 // ByToken orders the results by the token field.
 func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByAccountField orders the results by account field.

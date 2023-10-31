@@ -7,7 +7,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -24,12 +24,12 @@ func WithAccount(ctx context.Context, ar account.Repository, template account.Ac
 		panic(err)
 	}
 
-	ctx = authentication.WithAccountID(ctx, acc.ID)
+	ctx = session.WithAccountID(ctx, acc.ID)
 	return ctx, acc
 }
 
 func WithSession(ctx context.Context, cj *bindings.CookieJar) openapi.RequestEditorFn {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		panic(err)
 	}

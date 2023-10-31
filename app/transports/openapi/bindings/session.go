@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/securecookie"
 )
@@ -55,7 +55,7 @@ func (j *CookieJar) WithSession(r *http.Request) context.Context {
 		return r.Context()
 	}
 
-	return authentication.WithAccountID(r.Context(), account.AccountID(id))
+	return session.WithAccountID(r.Context(), account.AccountID(id))
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.

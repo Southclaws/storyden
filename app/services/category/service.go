@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -121,7 +121,7 @@ func (s *service) Update(ctx context.Context, id category.CategoryID, partial Pa
 }
 
 func (s *service) authorise(ctx context.Context) error {
-	aid, err := authentication.GetAccountID(ctx)
+	aid, err := session.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

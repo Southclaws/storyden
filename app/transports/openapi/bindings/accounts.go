@@ -11,6 +11,7 @@ import (
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -18,15 +19,16 @@ import (
 type Accounts struct {
 	as account.Service
 	av avatar.Service
+	am *authentication.Manager
 	ar account_repo.Repository
 }
 
-func NewAccounts(as account.Service, av avatar.Service, ar account_repo.Repository) Accounts {
-	return Accounts{as, av, ar}
+func NewAccounts(as account.Service, av avatar.Service, am *authentication.Manager, ar account_repo.Repository) Accounts {
+	return Accounts{as, av, am, ar}
 }
 
 func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -42,7 +44,7 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 }
 
 func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpdateRequestObject) (openapi.AccountUpdateResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -63,7 +65,7 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 }
 
 func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.AccountAuthProviderListRequestObject) (openapi.AccountAuthProviderListResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -75,7 +77,8 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 
 	return openapi.AccountAuthProviderList200JSONResponse{
 		AccountAuthProviderListOKJSONResponse: openapi.AccountAuthProviderListOKJSONResponse{
-			AuthMethods: dt.Map(authmethods, serialiseAuthMethod),
+			Available: dt.Map(i.am.Providers(), serialiseAuthProvider),
+			Active:    dt.Map(authmethods, serialiseAuthMethod),
 		},
 	}, nil
 }
@@ -100,7 +103,7 @@ func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.Account
 }
 
 func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.AccountSetAvatarRequestObject) (openapi.AccountSetAvatarResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -114,9 +117,8 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 
 func serialiseAuthMethod(in *account.AuthMethod) openapi.AccountAuthMethod {
 	return openapi.AccountAuthMethod{
-		Provider: in.ID(),
-		Name:     in.Name(),
-		Link:     in.Link(),
-		Active:   in.Active,
+		Provider: serialiseAuthProvider(in.Provider),
+		Name:     in.Name,
+		Id:       in.ID,
 	}
 }

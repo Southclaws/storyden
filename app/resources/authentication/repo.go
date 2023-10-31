@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type Repository interface {
@@ -25,8 +26,15 @@ type Repository interface {
 	// Gets all auth methods that a account has.
 	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]*Authentication, error)
 
-	// Checks if the given token is equal to the stored auth method's token.
-	IsEqual(ctx context.Context, userID account.AccountID, identifier string, token string) (bool, error)
+	Update(ctx context.Context, id ID, options ...Option) (*Authentication, error)
 
 	Delete(ctx context.Context, userID account.AccountID, identifier string, service Service) (bool, error)
+}
+
+type Option func(*ent.AuthenticationMutation)
+
+func WithToken(token string) Option {
+	return func(am *ent.AuthenticationMutation) {
+		am.SetToken(token)
+	}
 }

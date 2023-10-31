@@ -223,10 +223,25 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /v1/auth/password:
+    patch:
+      operationId: AuthPasswordUpdate
+      description: |
+        Given the requesting account has a password authentication, update the
+        password on file.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthPasswordUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
   /v1/auth/oauth/{oauth_provider}/callback:
     post:
       operationId: OAuthProviderCallback
-      description: Sign in to an existing account with a username and password.
+      description: OAuth2 callback.
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/OAuthProvider"]
@@ -1115,6 +1130,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPair" }
 
+    AuthPasswordUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthPasswordMutableProps" }
+
     OAuthProviderCallback:
       content:
         application/json:
@@ -1877,6 +1897,17 @@ components:
           example: "password"
           type: string
 
+    AuthPasswordMutableProps:
+      type: object
+      required: [old, new]
+      properties:
+        old:
+          example: "password123"
+          type: string
+        new:
+          example: "password456"
+          type: string
+
     AuthSuccess:
       type: object
       required: [id]
@@ -2189,27 +2220,30 @@ components:
 
     AccountAuthMethods:
       type: object
-      required: [auth_methods]
+      required: [active, available]
       properties:
-        auth_methods: { $ref: "#/components/schemas/AccountAuthMethodList" }
+        active: { $ref: "#/components/schemas/AccountAuthMethodList" }
+        available: { $ref: "#/components/schemas/AuthProviderList" }
 
     AccountAuthMethodList:
       type: array
       items: { $ref: "#/components/schemas/AccountAuthMethod" }
 
     AccountAuthMethod:
+      description: |
+        An authentication method is an active instance of an authentication
+        provider associated with an account. Use this to display a user's active
+        authentication methods so they can edit or remove it.
       type: object
-      allOf:
-        - $ref: "#/components/schemas/AuthProvider"
-        - $ref: "#/components/schemas/AccountAuthMethodProps"
-
-    AccountAuthMethodProps:
-      type: object
-      required: [active]
+      required: [provider, id, name]
       properties:
-        active:
-          description: True if the account is using this auth method.
-          type: boolean
+        provider: { $ref: "#/components/schemas/AuthProvider" }
+        id:
+          description: The internal unique ID this method has.
+          type: string
+        name:
+          description: The personal name given to the method.
+          type: string
 
     #
     # 8888888b.                   .d888 d8b 888

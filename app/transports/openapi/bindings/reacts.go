@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/internal/openapi"
@@ -22,7 +22,7 @@ func NewReacts(thread_mark_svc thread_mark.Service, react_svc react.Service) Rea
 }
 
 func (p *Reacts) PostReactAdd(ctx context.Context, request openapi.PostReactAddRequestObject) (openapi.PostReactAddResponseObject, error) {
-	accountID, err := authentication.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

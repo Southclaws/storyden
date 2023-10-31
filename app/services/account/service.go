@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	authentication_repo "github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
 )
@@ -18,8 +19,9 @@ type Service interface {
 }
 
 type AuthMethod struct {
-	authentication.Provider
-	Active bool
+	ID       string
+	Name     string
+	Provider authentication.Provider
 }
 
 func Build() fx.Option {
@@ -30,6 +32,7 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
+	auth_repo    authentication_repo.Repository
 	account_repo account.Repository
 
 	auth_svc *authentication.Manager
@@ -39,6 +42,7 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
+	auth_repo authentication_repo.Repository,
 	account_repo account.Repository,
 
 	auth_svc *authentication.Manager,
@@ -46,6 +50,7 @@ func New(
 	return &service{
 		l:            l.With(zap.String("service", "account")),
 		rbac:         rbac,
+		auth_repo:    auth_repo,
 		account_repo: account_repo,
 		auth_svc:     auth_svc,
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 // TODO: Move to actual accounts model.
@@ -61,12 +62,38 @@ func (p *Provider) FinishRegistration(ctx context.Context,
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := p.register(ctx, handle, credential)
+	a, err := p.createOrUpdateAccount(ctx, handle, credential)
 	if err != nil {
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return credential, acc.ID, nil
+	return credential, a, err
+}
+
+func (p *Provider) createOrUpdateAccount(ctx context.Context,
+	handle string,
+	credential *webauthn.Credential,
+) (account.AccountID, error) {
+	accountID := session.GetOptAccountID(ctx)
+
+	// If the request is from an account that's already logged in, instead of
+	// treating this as a registration for a new account, add the credential to
+	// the existing account's authentications keychain.
+	if id, ok := accountID.Get(); ok {
+		acc, err := p.add(ctx, id, credential)
+		if err != nil {
+			return account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return acc.ID, nil
+	}
+
+	acc, err := p.register(ctx, handle, credential)
+	if err != nil {
+		return account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return acc.ID, nil
 }
 
 func waErrMetadata(in error) []string {

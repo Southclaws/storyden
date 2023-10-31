@@ -6,7 +6,9 @@
  * OpenAPI spec version: 1
  */
 import type { AccountAuthMethodList } from "./accountAuthMethodList";
+import type { AuthProviderList } from "./authProviderList";
 
 export interface AccountAuthMethods {
-  auth_methods: AccountAuthMethodList;
+  active: AccountAuthMethodList;
+  available: AuthProviderList;
 }

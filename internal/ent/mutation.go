@@ -2559,6 +2559,7 @@ type AuthenticationMutation struct {
 	service        *string
 	identifier     *string
 	token          *string
+	name           *string
 	metadata       *map[string]interface{}
 	clearedFields  map[string]struct{}
 	account        *xid.ID
@@ -2816,6 +2817,55 @@ func (m *AuthenticationMutation) ResetToken() {
 	m.token = nil
 }
 
+// SetName sets the "name" field.
+func (m *AuthenticationMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *AuthenticationMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldName(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *AuthenticationMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[authentication.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *AuthenticationMutation) NameCleared() bool {
+	_, ok := m.clearedFields[authentication.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *AuthenticationMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, authentication.FieldName)
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *AuthenticationMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -2938,7 +2988,7 @@ func (m *AuthenticationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthenticationMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, authentication.FieldCreatedAt)
 	}
@@ -2950,6 +3000,9 @@ func (m *AuthenticationMutation) Fields() []string {
 	}
 	if m.token != nil {
 		fields = append(fields, authentication.FieldToken)
+	}
+	if m.name != nil {
+		fields = append(fields, authentication.FieldName)
 	}
 	if m.metadata != nil {
 		fields = append(fields, authentication.FieldMetadata)
@@ -2970,6 +3023,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.Identifier()
 	case authentication.FieldToken:
 		return m.Token()
+	case authentication.FieldName:
+		return m.Name()
 	case authentication.FieldMetadata:
 		return m.Metadata()
 	}
@@ -2989,6 +3044,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldIdentifier(ctx)
 	case authentication.FieldToken:
 		return m.OldToken(ctx)
+	case authentication.FieldName:
+		return m.OldName(ctx)
 	case authentication.FieldMetadata:
 		return m.OldMetadata(ctx)
 	}
@@ -3028,6 +3085,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetToken(v)
 		return nil
+	case authentication.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
 	case authentication.FieldMetadata:
 		v, ok := value.(map[string]interface{})
 		if !ok {
@@ -3065,6 +3129,9 @@ func (m *AuthenticationMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *AuthenticationMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(authentication.FieldName) {
+		fields = append(fields, authentication.FieldName)
+	}
 	if m.FieldCleared(authentication.FieldMetadata) {
 		fields = append(fields, authentication.FieldMetadata)
 	}
@@ -3082,6 +3149,9 @@ func (m *AuthenticationMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *AuthenticationMutation) ClearField(name string) error {
 	switch name {
+	case authentication.FieldName:
+		m.ClearName()
+		return nil
 	case authentication.FieldMetadata:
 		m.ClearMetadata()
 		return nil
@@ -3104,6 +3174,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldToken:
 		m.ResetToken()
+		return nil
+	case authentication.FieldName:
+		m.ResetName()
 		return nil
 	case authentication.FieldMetadata:
 		m.ResetMetadata()
