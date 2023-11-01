@@ -1,5 +1,7 @@
 "use client";
 
+import { OnboardingStatus } from "src/api/openapi/schemas";
+import { CategoryCreateModal } from "src/components/site/Navigation/Sidebar/components/CategoryCreate/CategoryCreateModal";
 import {
   Button,
   Heading,
@@ -7,10 +9,7 @@ import {
   OrderedList,
   Text,
   VStack,
-} from "@chakra-ui/react";
-
-import { OnboardingStatus } from "src/api/openapi/schemas";
-import { CategoryCreateModal } from "src/components/site/Navigation/Sidebar/components/CategoryCreate/CategoryCreateModal";
+} from "src/theme/components";
 
 import { Card } from "./Card";
 import { isComplete, useChecklist } from "./useChecklist";

@@ -1,7 +1,6 @@
-import { useDisclosure } from "@chakra-ui/react";
-
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
+import { useDisclosure } from "src/theme/components";
 
 export type Step = 1 | 2 | 3 | 4 | 5;
 

@@ -1,5 +1,6 @@
-import { Heading } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
+import { Heading } from "src/theme/components";
 
 export function Title({ children }: PropsWithChildren) {
   return (

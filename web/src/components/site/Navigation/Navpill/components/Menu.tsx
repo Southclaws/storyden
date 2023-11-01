@@ -1,4 +1,4 @@
-import { Flex, VStack } from "@chakra-ui/react";
+import { Flex, VStack } from "src/theme/components";
 
 import { CategoryList } from "../../Sidebar/components/CategoryList/CategoryList";
 

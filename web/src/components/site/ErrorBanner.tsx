@@ -1,7 +1,7 @@
-import { CreateToastFnReturn } from "@chakra-ui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { APIError } from "src/api/openapi/schemas";
+import { CreateToastFnReturn } from "src/theme/components";
 
 import { Flex, styled } from "@/styled-system/jsx";
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { HStack, Input, SlideFade } from "@chakra-ui/react";
-
 import {
   Admin,
   Bell,
@@ -15,6 +13,7 @@ import {
 } from "src/components/site/Action/Action";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
+import { HStack, Input, SlideFade } from "src/theme/components";
 
 import { CategoryCreate } from "../Sidebar/components/CategoryCreate/CategoryCreate";
 

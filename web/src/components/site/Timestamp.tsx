@@ -1,4 +1,4 @@
-import { LinkProps, Text } from "@chakra-ui/react";
+import { LinkProps, Text } from "src/theme/components";
 
 import { Anchor } from "./Anchor";
 

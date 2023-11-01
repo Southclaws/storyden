@@ -1,3 +1,4 @@
+import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
 import {
   Button,
   FormControl,
@@ -7,9 +8,7 @@ import {
   Input,
   UseDisclosureProps,
   VStack,
-} from "@chakra-ui/react";
-
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
+} from "src/theme/components";
 
 import { useCategoryCreate } from "./useCategoryCreate";
 

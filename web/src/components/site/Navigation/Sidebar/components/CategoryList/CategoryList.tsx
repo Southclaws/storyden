@@ -1,4 +1,3 @@
-import { List } from "@chakra-ui/react";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -8,6 +7,7 @@ import { map } from "lodash/fp";
 
 import { Category } from "src/api/openapi/schemas";
 import { Unready } from "src/components/site/Unready";
+import { List } from "src/theme/components";
 
 import { CategoryListItem } from "./CategoryListItem";
 import { useCategoryList } from "./useCategoryList";

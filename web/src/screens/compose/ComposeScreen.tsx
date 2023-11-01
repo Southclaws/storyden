@@ -1,6 +1,8 @@
-import { Skeleton, SkeletonText, VStack } from "@chakra-ui/react";
+import { Skeleton, SkeletonText } from "@chakra-ui/react";
 
 import { Unready } from "src/components/site/Unready";
+
+import { VStack } from "@/styled-system/jsx";
 
 import { ComposeForm } from "./components/ComposeForm/ComposeForm";
 import { Props, useComposeScreen } from "./useComposeScreen";
@@ -17,7 +19,7 @@ export function ComposeScreen(props: Props) {
     );
 
   return (
-    <VStack alignItems="start" gap={2} w="full" h="full" py={5}>
+    <VStack alignItems="start" gap="2" w="full" h="full">
       <ComposeForm {...props} initialDraft={draft} />
     </VStack>
   );

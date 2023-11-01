@@ -1,7 +1,6 @@
-import { Flex } from "@chakra-ui/react";
-
 import { useCategoryList } from "src/api/openapi/categories";
 import { Unready } from "src/components/site/Unready";
+import { Flex } from "src/theme/components";
 
 import { CategoryListItem } from "../../Sidebar/components/CategoryList/CategoryListItem";
 

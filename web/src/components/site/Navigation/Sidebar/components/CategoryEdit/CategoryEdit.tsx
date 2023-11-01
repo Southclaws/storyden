@@ -1,7 +1,6 @@
-import { useDisclosure } from "@chakra-ui/react";
-
 import { Category } from "src/api/openapi/schemas";
 import { Edit } from "src/components/site/Action/Action";
+import { useDisclosure } from "src/theme/components";
 
 import { CategoryEditModal } from "./CategoryEditModal";
 

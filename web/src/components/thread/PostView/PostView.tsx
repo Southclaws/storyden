@@ -1,8 +1,7 @@
-import { Button } from "@chakra-ui/react";
-
 import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
+import { Button } from "src/theme/components";
 
 import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";

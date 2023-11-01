@@ -1,4 +1,4 @@
-import { Box, BoxProps, Image } from "@chakra-ui/react";
+import { Box, BoxProps, Image } from "src/theme/components";
 
 import { useAvatar } from "./useAvatar";
 

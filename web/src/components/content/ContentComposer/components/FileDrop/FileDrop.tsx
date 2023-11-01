@@ -1,7 +1,8 @@
 "use client";
 
-import { Box } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
+import { Box } from "src/theme/components";
 
 import { Props, useFileDrop } from "./useFileDrop";
 

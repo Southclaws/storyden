@@ -1,12 +1,12 @@
 "use client";
 
-import { useClipboard, useToast } from "@chakra-ui/react";
 import { mutate } from "swr";
 
 import { ThreadReference } from "src/api/openapi/schemas";
 import { getThreadListKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
+import { useClipboard, useToast } from "src/theme/components";
 import { isShareEnabled } from "src/utils/client";
 
 export function useFeedItemMenu(props: ThreadReference) {

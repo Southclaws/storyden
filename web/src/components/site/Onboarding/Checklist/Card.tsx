@@ -1,5 +1,9 @@
 "use client";
 
+import { PropsWithChildren } from "react";
+
+import { OnboardingStatus } from "src/api/openapi/schemas";
+import { CheckCircle } from "src/components/graphics/CheckCircle";
 import {
   Box,
   Button,
@@ -9,11 +13,7 @@ import {
   ListIcon,
   ListItem,
   Text,
-} from "@chakra-ui/react";
-import { PropsWithChildren } from "react";
-
-import { OnboardingStatus } from "src/api/openapi/schemas";
-import { CheckCircle } from "src/components/graphics/CheckCircle";
+} from "src/theme/components";
 
 import { Step, isComplete, statusToStep } from "./useChecklist";
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { useToast } from "@chakra-ui/react";
 import { FormEvent, useState } from "react";
 
 import { postCreate } from "src/api/openapi/posts";
 import { Thread } from "src/api/openapi/schemas";
 import { useThreadGet } from "src/api/openapi/threads";
 import { errorToast } from "src/components/site/ErrorBanner";
+import { useToast } from "src/theme/components";
 
 export function useReplyBox(thread: Thread) {
   const toast = useToast();

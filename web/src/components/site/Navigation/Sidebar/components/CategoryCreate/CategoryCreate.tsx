@@ -1,7 +1,7 @@
-import { Button, useDisclosure } from "@chakra-ui/react";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 import { Add } from "src/components/site/Action/Action";
+import { Button, useDisclosure } from "src/theme/components";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 

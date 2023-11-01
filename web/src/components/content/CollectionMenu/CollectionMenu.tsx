@@ -1,3 +1,5 @@
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
+
 import {
   Box,
   Checkbox,
@@ -7,8 +9,7 @@ import {
   MenuGroup,
   MenuItem,
   MenuList,
-} from "@chakra-ui/react";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
+} from "src/theme/components";
 
 import { Bookmark, BookmarkSolid } from "../../site/Action/Action";
 

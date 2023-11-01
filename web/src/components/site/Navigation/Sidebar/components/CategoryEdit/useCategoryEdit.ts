@@ -1,4 +1,3 @@
-import { UseDisclosureProps, useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,6 +6,7 @@ import { categoryUpdate, useCategoryList } from "src/api/openapi/categories";
 import { useGetInfo } from "src/api/openapi/misc";
 import { APIError, Category } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/site/ErrorBanner";
+import { UseDisclosureProps, useToast } from "src/theme/components";
 
 export type Props = {
   category: Category;

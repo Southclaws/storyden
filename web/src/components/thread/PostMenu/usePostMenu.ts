@@ -1,6 +1,5 @@
 "use client";
 
-import { useClipboard, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
@@ -8,6 +7,7 @@ import { postDelete } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
+import { useClipboard, useToast } from "src/theme/components";
 import { isShareEnabled } from "src/utils/client";
 
 import { useThreadScreenContext } from "../context/context";

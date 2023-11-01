@@ -1,5 +1,11 @@
 "use client";
 
+import { LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ShareIcon } from "@heroicons/react/24/solid";
+import format from "date-fns/format";
+
+import { ThreadReference } from "src/api/openapi/schemas";
+import { More } from "src/components/site/Action/Action";
 import {
   Menu,
   MenuButton,
@@ -7,13 +13,7 @@ import {
   MenuGroup,
   MenuItem,
   MenuList,
-} from "@chakra-ui/react";
-import { LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { ShareIcon } from "@heroicons/react/24/solid";
-import format from "date-fns/format";
-
-import { ThreadReference } from "src/api/openapi/schemas";
-import { More } from "src/components/site/Action/Action";
+} from "src/theme/components";
 
 import { useFeedItemMenu } from "./useFeedItemMenu";
 

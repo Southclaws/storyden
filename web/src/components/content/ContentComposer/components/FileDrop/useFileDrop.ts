@@ -1,12 +1,12 @@
 "use client";
 
-import { useToast } from "@chakra-ui/react";
 import { DragEvent, useState } from "react";
 import { Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 import { assetUpload } from "src/api/openapi/assets";
 import { Asset } from "src/api/openapi/schemas";
+import { useToast } from "src/theme/components";
 
 import { isSupportedImage } from "./utils";
 

@@ -1,7 +1,8 @@
-import { Box, BoxProps } from "@chakra-ui/react";
 import { PropsWithChildren, useCallback } from "react";
 import { Transforms } from "slate";
 import { Editable, Slate } from "slate-react";
+
+import { Box, BoxProps } from "src/theme/components";
 
 import { FileDrop } from "./components/FileDrop/FileDrop";
 import { Element } from "./render/Element";
