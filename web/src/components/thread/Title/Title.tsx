@@ -1,4 +1,4 @@
-import { Input } from "@chakra-ui/react";
+import { Input } from "src/theme/components";
 
 import { Thread } from "src/api/openapi/schemas";
 

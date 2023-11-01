@@ -1,5 +1,6 @@
-import { Box, Flex, FlexProps } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+
+import { Box, Flex, FlexProps } from "src/theme/components";
 
 import { Props, useToolpill } from "./useToolpill";
 

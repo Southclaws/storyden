@@ -1,6 +1,6 @@
 "use client";
 
-import { Divider } from "@chakra-ui/react";
+import { Divider } from "src/theme/components";
 
 import { useNavigation } from "../useNavigation";
 

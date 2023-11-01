@@ -1,4 +1,4 @@
-import { Heading, LinkBox, LinkOverlay } from "@chakra-ui/react";
+import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
 import NextLink from "next/link";
 
 import { ThreadReference } from "src/api/openapi/schemas";

@@ -1,3 +1,6 @@
+import { PropsWithChildren } from "react";
+import { Drawer } from "vaul";
+
 import {
   Box,
   CloseButton,
@@ -5,9 +8,7 @@ import {
   Heading,
   UseDisclosureProps,
   VStack,
-} from "@chakra-ui/react";
-import { PropsWithChildren } from "react";
-import { Drawer } from "vaul";
+} from "src/theme/components";
 
 type Props = {
   title?: string;

@@ -1,3 +1,5 @@
+import { PlusIcon } from "@heroicons/react/24/outline";
+
 import {
   Box,
   Button,
@@ -9,8 +11,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
-} from "@chakra-ui/react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+} from "src/theme/components";
 
 import { Props, emojiPickerContainerID, useReactList } from "./useReactList";
 

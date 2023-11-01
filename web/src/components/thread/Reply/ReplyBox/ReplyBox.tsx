@@ -1,9 +1,8 @@
-import { Button } from "@chakra-ui/react";
-
 import { Thread } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { Bold } from "src/components/content/ContentComposer/controls/Bold";
 import { Italic } from "src/components/content/ContentComposer/controls/Italic";
+import { Button } from "src/theme/components";
 
 import { HStack, styled } from "@/styled-system/jsx";
 

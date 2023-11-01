@@ -1,6 +1,8 @@
-import { Box, FormControl, forwardRef } from "@chakra-ui/react";
+import { forwardRef } from "@chakra-ui/react";
 import { CSSProperties } from "react";
 import { Control, Controller } from "react-hook-form";
+
+import { Box, FormControl } from "src/theme/components";
 
 import { DragHandleIcon } from "../../graphics/DragHandleIcon";
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useDisclosure } from "@chakra-ui/react";
 import { KeyboardEvent, MouseEvent, useState } from "react";
 import { mutate } from "swr";
 
@@ -12,6 +11,7 @@ import {
 import { ThreadReference } from "src/api/openapi/schemas";
 import { getThreadListKey } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
+import { useDisclosure } from "src/theme/components";
 
 export type Props = {
   thread: ThreadReference;

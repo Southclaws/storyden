@@ -1,6 +1,5 @@
-import { ListItem, OrderedList, Text } from "@chakra-ui/react";
-
 import { PostProps } from "src/api/openapi/schemas";
+import { ListItem, OrderedList, Text } from "src/theme/components";
 
 type Props = {
   results: PostProps[];

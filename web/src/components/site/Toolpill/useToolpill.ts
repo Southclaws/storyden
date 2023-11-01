@@ -1,7 +1,8 @@
 "use client";
 
-import { useOutsideClick } from "@chakra-ui/react";
 import { RefObject, useRef } from "react";
+
+import { useOutsideClick } from "src/theme/components";
 
 export type Props = {
   onClickOutside?: () => void;

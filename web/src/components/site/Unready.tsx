@@ -1,9 +1,9 @@
 "use client";
 
-import { Flex, SkeletonText } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
 import { APIError } from "src/api/openapi/schemas";
+import { Flex, SkeletonText } from "src/theme/components";
 
 import ErrorBanner from "./ErrorBanner";
 

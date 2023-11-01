@@ -1,8 +1,7 @@
-import { useToast } from "@chakra-ui/react";
-
 import { postUpdate } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { threadUpdate } from "src/api/openapi/threads";
+import { useToast } from "src/theme/components";
 
 import { useThreadScreenContext } from "../context/context";
 
