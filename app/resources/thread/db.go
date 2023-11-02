@@ -252,6 +252,9 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 			rq.Order(react.ByCreatedAt())
 		}).
 		WithAssets().
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

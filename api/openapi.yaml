@@ -1792,6 +1792,7 @@ components:
           type: string
         description:
           type: string
+        assets: { $ref: "#/components/schemas/AssetList" }
 
     AccountName:
       type: string

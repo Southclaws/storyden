@@ -102,8 +102,9 @@ func (s *service) scrape(ctx context.Context, url string) (*link.Link, error) {
 
 	opts := []link.Option{}
 
+	var a *asset.Asset
 	if wc.Image != "" {
-		a, err := s.copy(ctx, wc.Image)
+		a, err = s.copy(ctx, wc.Image)
 		if err != nil {
 			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", url))
 		} else {
@@ -114,6 +115,10 @@ func (s *service) scrape(ctx context.Context, url string) (*link.Link, error) {
 	ln, err := s.lr.Store(ctx, url, wc.Title, wc.Description, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if a != nil {
+		ln.Assets = append(ln.Assets, a)
 	}
 
 	return ln, nil
