@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -92,48 +93,6 @@ func (cc *ClusterCreate) SetImageURL(s string) *ClusterCreate {
 func (cc *ClusterCreate) SetNillableImageURL(s *string) *ClusterCreate {
 	if s != nil {
 		cc.SetImageURL(*s)
-	}
-	return cc
-}
-
-// SetURL sets the "url" field.
-func (cc *ClusterCreate) SetURL(s string) *ClusterCreate {
-	cc.mutation.SetURL(s)
-	return cc
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (cc *ClusterCreate) SetNillableURL(s *string) *ClusterCreate {
-	if s != nil {
-		cc.SetURL(*s)
-	}
-	return cc
-}
-
-// SetURLTitle sets the "url_title" field.
-func (cc *ClusterCreate) SetURLTitle(s string) *ClusterCreate {
-	cc.mutation.SetURLTitle(s)
-	return cc
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (cc *ClusterCreate) SetNillableURLTitle(s *string) *ClusterCreate {
-	if s != nil {
-		cc.SetURLTitle(*s)
-	}
-	return cc
-}
-
-// SetURLDescription sets the "url_description" field.
-func (cc *ClusterCreate) SetURLDescription(s string) *ClusterCreate {
-	cc.mutation.SetURLDescription(s)
-	return cc
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (cc *ClusterCreate) SetNillableURLDescription(s *string) *ClusterCreate {
-	if s != nil {
-		cc.SetURLDescription(*s)
 	}
 	return cc
 }
@@ -288,6 +247,21 @@ func (cc *ClusterCreate) AddTags(t ...*Tag) *ClusterCreate {
 	return cc.AddTagIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (cc *ClusterCreate) AddLinkIDs(ids ...xid.ID) *ClusterCreate {
+	cc.mutation.AddLinkIDs(ids...)
+	return cc
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (cc *ClusterCreate) AddLinks(l ...*Link) *ClusterCreate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cc.AddLinkIDs(ids...)
+}
+
 // Mutation returns the ClusterMutation object of the builder.
 func (cc *ClusterCreate) Mutation() *ClusterMutation {
 	return cc.mutation
@@ -425,18 +399,6 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 		_spec.SetField(cluster.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = &value
 	}
-	if value, ok := cc.mutation.URL(); ok {
-		_spec.SetField(cluster.FieldURL, field.TypeString, value)
-		_node.URL = &value
-	}
-	if value, ok := cc.mutation.URLTitle(); ok {
-		_spec.SetField(cluster.FieldURLTitle, field.TypeString, value)
-		_node.URLTitle = &value
-	}
-	if value, ok := cc.mutation.URLDescription(); ok {
-		_spec.SetField(cluster.FieldURLDescription, field.TypeString, value)
-		_node.URLDescription = &value
-	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 		_node.Description = value
@@ -540,6 +502,22 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -668,60 +646,6 @@ func (u *ClusterUpsert) UpdateImageURL() *ClusterUpsert {
 // ClearImageURL clears the value of the "image_url" field.
 func (u *ClusterUpsert) ClearImageURL() *ClusterUpsert {
 	u.SetNull(cluster.FieldImageURL)
-	return u
-}
-
-// SetURL sets the "url" field.
-func (u *ClusterUpsert) SetURL(v string) *ClusterUpsert {
-	u.Set(cluster.FieldURL, v)
-	return u
-}
-
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *ClusterUpsert) UpdateURL() *ClusterUpsert {
-	u.SetExcluded(cluster.FieldURL)
-	return u
-}
-
-// ClearURL clears the value of the "url" field.
-func (u *ClusterUpsert) ClearURL() *ClusterUpsert {
-	u.SetNull(cluster.FieldURL)
-	return u
-}
-
-// SetURLTitle sets the "url_title" field.
-func (u *ClusterUpsert) SetURLTitle(v string) *ClusterUpsert {
-	u.Set(cluster.FieldURLTitle, v)
-	return u
-}
-
-// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
-func (u *ClusterUpsert) UpdateURLTitle() *ClusterUpsert {
-	u.SetExcluded(cluster.FieldURLTitle)
-	return u
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (u *ClusterUpsert) ClearURLTitle() *ClusterUpsert {
-	u.SetNull(cluster.FieldURLTitle)
-	return u
-}
-
-// SetURLDescription sets the "url_description" field.
-func (u *ClusterUpsert) SetURLDescription(v string) *ClusterUpsert {
-	u.Set(cluster.FieldURLDescription, v)
-	return u
-}
-
-// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
-func (u *ClusterUpsert) UpdateURLDescription() *ClusterUpsert {
-	u.SetExcluded(cluster.FieldURLDescription)
-	return u
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (u *ClusterUpsert) ClearURLDescription() *ClusterUpsert {
-	u.SetNull(cluster.FieldURLDescription)
 	return u
 }
 
@@ -935,69 +859,6 @@ func (u *ClusterUpsertOne) UpdateImageURL() *ClusterUpsertOne {
 func (u *ClusterUpsertOne) ClearImageURL() *ClusterUpsertOne {
 	return u.Update(func(s *ClusterUpsert) {
 		s.ClearImageURL()
-	})
-}
-
-// SetURL sets the "url" field.
-func (u *ClusterUpsertOne) SetURL(v string) *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURL(v)
-	})
-}
-
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *ClusterUpsertOne) UpdateURL() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURL()
-	})
-}
-
-// ClearURL clears the value of the "url" field.
-func (u *ClusterUpsertOne) ClearURL() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURL()
-	})
-}
-
-// SetURLTitle sets the "url_title" field.
-func (u *ClusterUpsertOne) SetURLTitle(v string) *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURLTitle(v)
-	})
-}
-
-// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
-func (u *ClusterUpsertOne) UpdateURLTitle() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURLTitle()
-	})
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (u *ClusterUpsertOne) ClearURLTitle() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURLTitle()
-	})
-}
-
-// SetURLDescription sets the "url_description" field.
-func (u *ClusterUpsertOne) SetURLDescription(v string) *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURLDescription(v)
-	})
-}
-
-// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
-func (u *ClusterUpsertOne) UpdateURLDescription() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURLDescription()
-	})
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (u *ClusterUpsertOne) ClearURLDescription() *ClusterUpsertOne {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURLDescription()
 	})
 }
 
@@ -1391,69 +1252,6 @@ func (u *ClusterUpsertBulk) UpdateImageURL() *ClusterUpsertBulk {
 func (u *ClusterUpsertBulk) ClearImageURL() *ClusterUpsertBulk {
 	return u.Update(func(s *ClusterUpsert) {
 		s.ClearImageURL()
-	})
-}
-
-// SetURL sets the "url" field.
-func (u *ClusterUpsertBulk) SetURL(v string) *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURL(v)
-	})
-}
-
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *ClusterUpsertBulk) UpdateURL() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURL()
-	})
-}
-
-// ClearURL clears the value of the "url" field.
-func (u *ClusterUpsertBulk) ClearURL() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURL()
-	})
-}
-
-// SetURLTitle sets the "url_title" field.
-func (u *ClusterUpsertBulk) SetURLTitle(v string) *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURLTitle(v)
-	})
-}
-
-// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
-func (u *ClusterUpsertBulk) UpdateURLTitle() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURLTitle()
-	})
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (u *ClusterUpsertBulk) ClearURLTitle() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURLTitle()
-	})
-}
-
-// SetURLDescription sets the "url_description" field.
-func (u *ClusterUpsertBulk) SetURLDescription(v string) *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.SetURLDescription(v)
-	})
-}
-
-// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
-func (u *ClusterUpsertBulk) UpdateURLDescription() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.UpdateURLDescription()
-	})
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (u *ClusterUpsertBulk) ClearURLDescription() *ClusterUpsertBulk {
-	return u.Update(func(s *ClusterUpsert) {
-		s.ClearURLDescription()
 	})
 }
 

@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
@@ -89,66 +90,6 @@ func (cu *ClusterUpdate) SetNillableImageURL(s *string) *ClusterUpdate {
 // ClearImageURL clears the value of the "image_url" field.
 func (cu *ClusterUpdate) ClearImageURL() *ClusterUpdate {
 	cu.mutation.ClearImageURL()
-	return cu
-}
-
-// SetURL sets the "url" field.
-func (cu *ClusterUpdate) SetURL(s string) *ClusterUpdate {
-	cu.mutation.SetURL(s)
-	return cu
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (cu *ClusterUpdate) SetNillableURL(s *string) *ClusterUpdate {
-	if s != nil {
-		cu.SetURL(*s)
-	}
-	return cu
-}
-
-// ClearURL clears the value of the "url" field.
-func (cu *ClusterUpdate) ClearURL() *ClusterUpdate {
-	cu.mutation.ClearURL()
-	return cu
-}
-
-// SetURLTitle sets the "url_title" field.
-func (cu *ClusterUpdate) SetURLTitle(s string) *ClusterUpdate {
-	cu.mutation.SetURLTitle(s)
-	return cu
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (cu *ClusterUpdate) SetNillableURLTitle(s *string) *ClusterUpdate {
-	if s != nil {
-		cu.SetURLTitle(*s)
-	}
-	return cu
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (cu *ClusterUpdate) ClearURLTitle() *ClusterUpdate {
-	cu.mutation.ClearURLTitle()
-	return cu
-}
-
-// SetURLDescription sets the "url_description" field.
-func (cu *ClusterUpdate) SetURLDescription(s string) *ClusterUpdate {
-	cu.mutation.SetURLDescription(s)
-	return cu
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (cu *ClusterUpdate) SetNillableURLDescription(s *string) *ClusterUpdate {
-	if s != nil {
-		cu.SetURLDescription(*s)
-	}
-	return cu
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (cu *ClusterUpdate) ClearURLDescription() *ClusterUpdate {
-	cu.mutation.ClearURLDescription()
 	return cu
 }
 
@@ -306,6 +247,21 @@ func (cu *ClusterUpdate) AddTags(t ...*Tag) *ClusterUpdate {
 	return cu.AddTagIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (cu *ClusterUpdate) AddLinkIDs(ids ...xid.ID) *ClusterUpdate {
+	cu.mutation.AddLinkIDs(ids...)
+	return cu
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (cu *ClusterUpdate) AddLinks(l ...*Link) *ClusterUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cu.AddLinkIDs(ids...)
+}
+
 // Mutation returns the ClusterMutation object of the builder.
 func (cu *ClusterUpdate) Mutation() *ClusterMutation {
 	return cu.mutation
@@ -407,6 +363,27 @@ func (cu *ClusterUpdate) RemoveTags(t ...*Tag) *ClusterUpdate {
 	return cu.RemoveTagIDs(ids...)
 }
 
+// ClearLinks clears all "links" edges to the Link entity.
+func (cu *ClusterUpdate) ClearLinks() *ClusterUpdate {
+	cu.mutation.ClearLinks()
+	return cu
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (cu *ClusterUpdate) RemoveLinkIDs(ids ...xid.ID) *ClusterUpdate {
+	cu.mutation.RemoveLinkIDs(ids...)
+	return cu
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (cu *ClusterUpdate) RemoveLinks(l ...*Link) *ClusterUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cu.RemoveLinkIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ClusterUpdate) Save(ctx context.Context) (int, error) {
 	cu.defaults()
@@ -489,24 +466,6 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ImageURLCleared() {
 		_spec.ClearField(cluster.FieldImageURL, field.TypeString)
-	}
-	if value, ok := cu.mutation.URL(); ok {
-		_spec.SetField(cluster.FieldURL, field.TypeString, value)
-	}
-	if cu.mutation.URLCleared() {
-		_spec.ClearField(cluster.FieldURL, field.TypeString)
-	}
-	if value, ok := cu.mutation.URLTitle(); ok {
-		_spec.SetField(cluster.FieldURLTitle, field.TypeString, value)
-	}
-	if cu.mutation.URLTitleCleared() {
-		_spec.ClearField(cluster.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := cu.mutation.URLDescription(); ok {
-		_spec.SetField(cluster.FieldURLDescription, field.TypeString, value)
-	}
-	if cu.mutation.URLDescriptionCleared() {
-		_spec.ClearField(cluster.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
@@ -761,6 +720,51 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedLinksIDs(); len(nodes) > 0 && !cu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -838,66 +842,6 @@ func (cuo *ClusterUpdateOne) SetNillableImageURL(s *string) *ClusterUpdateOne {
 // ClearImageURL clears the value of the "image_url" field.
 func (cuo *ClusterUpdateOne) ClearImageURL() *ClusterUpdateOne {
 	cuo.mutation.ClearImageURL()
-	return cuo
-}
-
-// SetURL sets the "url" field.
-func (cuo *ClusterUpdateOne) SetURL(s string) *ClusterUpdateOne {
-	cuo.mutation.SetURL(s)
-	return cuo
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (cuo *ClusterUpdateOne) SetNillableURL(s *string) *ClusterUpdateOne {
-	if s != nil {
-		cuo.SetURL(*s)
-	}
-	return cuo
-}
-
-// ClearURL clears the value of the "url" field.
-func (cuo *ClusterUpdateOne) ClearURL() *ClusterUpdateOne {
-	cuo.mutation.ClearURL()
-	return cuo
-}
-
-// SetURLTitle sets the "url_title" field.
-func (cuo *ClusterUpdateOne) SetURLTitle(s string) *ClusterUpdateOne {
-	cuo.mutation.SetURLTitle(s)
-	return cuo
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (cuo *ClusterUpdateOne) SetNillableURLTitle(s *string) *ClusterUpdateOne {
-	if s != nil {
-		cuo.SetURLTitle(*s)
-	}
-	return cuo
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (cuo *ClusterUpdateOne) ClearURLTitle() *ClusterUpdateOne {
-	cuo.mutation.ClearURLTitle()
-	return cuo
-}
-
-// SetURLDescription sets the "url_description" field.
-func (cuo *ClusterUpdateOne) SetURLDescription(s string) *ClusterUpdateOne {
-	cuo.mutation.SetURLDescription(s)
-	return cuo
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (cuo *ClusterUpdateOne) SetNillableURLDescription(s *string) *ClusterUpdateOne {
-	if s != nil {
-		cuo.SetURLDescription(*s)
-	}
-	return cuo
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (cuo *ClusterUpdateOne) ClearURLDescription() *ClusterUpdateOne {
-	cuo.mutation.ClearURLDescription()
 	return cuo
 }
 
@@ -1055,6 +999,21 @@ func (cuo *ClusterUpdateOne) AddTags(t ...*Tag) *ClusterUpdateOne {
 	return cuo.AddTagIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (cuo *ClusterUpdateOne) AddLinkIDs(ids ...xid.ID) *ClusterUpdateOne {
+	cuo.mutation.AddLinkIDs(ids...)
+	return cuo
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (cuo *ClusterUpdateOne) AddLinks(l ...*Link) *ClusterUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cuo.AddLinkIDs(ids...)
+}
+
 // Mutation returns the ClusterMutation object of the builder.
 func (cuo *ClusterUpdateOne) Mutation() *ClusterMutation {
 	return cuo.mutation
@@ -1154,6 +1113,27 @@ func (cuo *ClusterUpdateOne) RemoveTags(t ...*Tag) *ClusterUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return cuo.RemoveTagIDs(ids...)
+}
+
+// ClearLinks clears all "links" edges to the Link entity.
+func (cuo *ClusterUpdateOne) ClearLinks() *ClusterUpdateOne {
+	cuo.mutation.ClearLinks()
+	return cuo
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (cuo *ClusterUpdateOne) RemoveLinkIDs(ids ...xid.ID) *ClusterUpdateOne {
+	cuo.mutation.RemoveLinkIDs(ids...)
+	return cuo
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (cuo *ClusterUpdateOne) RemoveLinks(l ...*Link) *ClusterUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cuo.RemoveLinkIDs(ids...)
 }
 
 // Where appends a list predicates to the ClusterUpdate builder.
@@ -1268,24 +1248,6 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if cuo.mutation.ImageURLCleared() {
 		_spec.ClearField(cluster.FieldImageURL, field.TypeString)
-	}
-	if value, ok := cuo.mutation.URL(); ok {
-		_spec.SetField(cluster.FieldURL, field.TypeString, value)
-	}
-	if cuo.mutation.URLCleared() {
-		_spec.ClearField(cluster.FieldURL, field.TypeString)
-	}
-	if value, ok := cuo.mutation.URLTitle(); ok {
-		_spec.SetField(cluster.FieldURLTitle, field.TypeString, value)
-	}
-	if cuo.mutation.URLTitleCleared() {
-		_spec.ClearField(cluster.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := cuo.mutation.URLDescription(); ok {
-		_spec.SetField(cluster.FieldURLDescription, field.TypeString, value)
-	}
-	if cuo.mutation.URLDescriptionCleared() {
-		_spec.ClearField(cluster.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
@@ -1533,6 +1495,51 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !cuo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cluster.LinksTable,
+			Columns: cluster.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

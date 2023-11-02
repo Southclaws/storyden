@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -200,66 +201,6 @@ func (pu *PostUpdate) SetNillableStatus(po *post.Status) *PostUpdate {
 	return pu
 }
 
-// SetURL sets the "url" field.
-func (pu *PostUpdate) SetURL(s string) *PostUpdate {
-	pu.mutation.SetURL(s)
-	return pu
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableURL(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetURL(*s)
-	}
-	return pu
-}
-
-// ClearURL clears the value of the "url" field.
-func (pu *PostUpdate) ClearURL() *PostUpdate {
-	pu.mutation.ClearURL()
-	return pu
-}
-
-// SetURLTitle sets the "url_title" field.
-func (pu *PostUpdate) SetURLTitle(s string) *PostUpdate {
-	pu.mutation.SetURLTitle(s)
-	return pu
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableURLTitle(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetURLTitle(*s)
-	}
-	return pu
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (pu *PostUpdate) ClearURLTitle() *PostUpdate {
-	pu.mutation.ClearURLTitle()
-	return pu
-}
-
-// SetURLDescription sets the "url_description" field.
-func (pu *PostUpdate) SetURLDescription(s string) *PostUpdate {
-	pu.mutation.SetURLDescription(s)
-	return pu
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableURLDescription(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetURLDescription(*s)
-	}
-	return pu
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (pu *PostUpdate) ClearURLDescription() *PostUpdate {
-	pu.mutation.ClearURLDescription()
-	return pu
-}
-
 // SetCategoryID sets the "category_id" field.
 func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
 	pu.mutation.SetCategoryID(x)
@@ -424,6 +365,21 @@ func (pu *PostUpdate) AddCollections(c ...*Collection) *PostUpdate {
 	return pu.AddCollectionIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (pu *PostUpdate) AddLinkIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddLinkIDs(ids...)
+	return pu
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (pu *PostUpdate) AddLinks(l ...*Link) *PostUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return pu.AddLinkIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
@@ -579,6 +535,27 @@ func (pu *PostUpdate) RemoveCollections(c ...*Collection) *PostUpdate {
 	return pu.RemoveCollectionIDs(ids...)
 }
 
+// ClearLinks clears all "links" edges to the Link entity.
+func (pu *PostUpdate) ClearLinks() *PostUpdate {
+	pu.mutation.ClearLinks()
+	return pu
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (pu *PostUpdate) RemoveLinkIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveLinkIDs(ids...)
+	return pu
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (pu *PostUpdate) RemoveLinks(l ...*Link) *PostUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return pu.RemoveLinkIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (pu *PostUpdate) Save(ctx context.Context) (int, error) {
 	pu.defaults()
@@ -687,24 +664,6 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Status(); ok {
 		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := pu.mutation.URL(); ok {
-		_spec.SetField(post.FieldURL, field.TypeString, value)
-	}
-	if pu.mutation.URLCleared() {
-		_spec.ClearField(post.FieldURL, field.TypeString)
-	}
-	if value, ok := pu.mutation.URLTitle(); ok {
-		_spec.SetField(post.FieldURLTitle, field.TypeString, value)
-	}
-	if pu.mutation.URLTitleCleared() {
-		_spec.ClearField(post.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := pu.mutation.URLDescription(); ok {
-		_spec.SetField(post.FieldURLDescription, field.TypeString, value)
-	}
-	if pu.mutation.URLDescriptionCleared() {
-		_spec.ClearField(post.FieldURLDescription, field.TypeString)
 	}
 	if pu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1092,6 +1051,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedLinksIDs(); len(nodes) > 0 && !pu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1278,66 +1282,6 @@ func (puo *PostUpdateOne) SetNillableStatus(po *post.Status) *PostUpdateOne {
 	return puo
 }
 
-// SetURL sets the "url" field.
-func (puo *PostUpdateOne) SetURL(s string) *PostUpdateOne {
-	puo.mutation.SetURL(s)
-	return puo
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableURL(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetURL(*s)
-	}
-	return puo
-}
-
-// ClearURL clears the value of the "url" field.
-func (puo *PostUpdateOne) ClearURL() *PostUpdateOne {
-	puo.mutation.ClearURL()
-	return puo
-}
-
-// SetURLTitle sets the "url_title" field.
-func (puo *PostUpdateOne) SetURLTitle(s string) *PostUpdateOne {
-	puo.mutation.SetURLTitle(s)
-	return puo
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableURLTitle(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetURLTitle(*s)
-	}
-	return puo
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (puo *PostUpdateOne) ClearURLTitle() *PostUpdateOne {
-	puo.mutation.ClearURLTitle()
-	return puo
-}
-
-// SetURLDescription sets the "url_description" field.
-func (puo *PostUpdateOne) SetURLDescription(s string) *PostUpdateOne {
-	puo.mutation.SetURLDescription(s)
-	return puo
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableURLDescription(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetURLDescription(*s)
-	}
-	return puo
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (puo *PostUpdateOne) ClearURLDescription() *PostUpdateOne {
-	puo.mutation.ClearURLDescription()
-	return puo
-}
-
 // SetCategoryID sets the "category_id" field.
 func (puo *PostUpdateOne) SetCategoryID(x xid.ID) *PostUpdateOne {
 	puo.mutation.SetCategoryID(x)
@@ -1502,6 +1446,21 @@ func (puo *PostUpdateOne) AddCollections(c ...*Collection) *PostUpdateOne {
 	return puo.AddCollectionIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (puo *PostUpdateOne) AddLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddLinkIDs(ids...)
+	return puo
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (puo *PostUpdateOne) AddLinks(l ...*Link) *PostUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return puo.AddLinkIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
@@ -1657,6 +1616,27 @@ func (puo *PostUpdateOne) RemoveCollections(c ...*Collection) *PostUpdateOne {
 	return puo.RemoveCollectionIDs(ids...)
 }
 
+// ClearLinks clears all "links" edges to the Link entity.
+func (puo *PostUpdateOne) ClearLinks() *PostUpdateOne {
+	puo.mutation.ClearLinks()
+	return puo
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (puo *PostUpdateOne) RemoveLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveLinkIDs(ids...)
+	return puo
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (puo *PostUpdateOne) RemoveLinks(l ...*Link) *PostUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return puo.RemoveLinkIDs(ids...)
+}
+
 // Where appends a list predicates to the PostUpdate builder.
 func (puo *PostUpdateOne) Where(ps ...predicate.Post) *PostUpdateOne {
 	puo.mutation.Where(ps...)
@@ -1795,24 +1775,6 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Status(); ok {
 		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
-	}
-	if value, ok := puo.mutation.URL(); ok {
-		_spec.SetField(post.FieldURL, field.TypeString, value)
-	}
-	if puo.mutation.URLCleared() {
-		_spec.ClearField(post.FieldURL, field.TypeString)
-	}
-	if value, ok := puo.mutation.URLTitle(); ok {
-		_spec.SetField(post.FieldURLTitle, field.TypeString, value)
-	}
-	if puo.mutation.URLTitleCleared() {
-		_spec.ClearField(post.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := puo.mutation.URLDescription(); ok {
-		_spec.SetField(post.FieldURLDescription, field.TypeString, value)
-	}
-	if puo.mutation.URLDescriptionCleared() {
-		_spec.ClearField(post.FieldURLDescription, field.TypeString)
 	}
 	if puo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2193,6 +2155,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !puo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.LinksTable,
+			Columns: post.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

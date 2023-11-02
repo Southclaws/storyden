@@ -103,17 +103,9 @@ func WithAssets(a []asset.AssetID) Option {
 	}
 }
 
-func WithURL(v string) Option {
+func WithLinks(ids ...xid.ID) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetURL(v)
-	}
-}
-
-func WithLink(url, title, description string) Option {
-	return func(pm *ent.PostMutation) {
-		pm.SetURL(url)
-		pm.SetURLTitle(title)
-		pm.SetURLDescription(description)
+		pm.AddLinkIDs(ids...)
 	}
 }
 

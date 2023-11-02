@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -44,6 +45,7 @@ const (
 	TypeCluster        = "Cluster"
 	TypeCollection     = "Collection"
 	TypeItem           = "Item"
+	TypeLink           = "Link"
 	TypeNotification   = "Notification"
 	TypePost           = "Post"
 	TypeReact          = "React"
@@ -1530,6 +1532,9 @@ type AssetMutation struct {
 	items           map[xid.ID]struct{}
 	removeditems    map[xid.ID]struct{}
 	cleareditems    bool
+	links           map[xid.ID]struct{}
+	removedlinks    map[xid.ID]struct{}
+	clearedlinks    bool
 	owner           *xid.ID
 	clearedowner    bool
 	done            bool
@@ -2095,6 +2100,60 @@ func (m *AssetMutation) ResetItems() {
 	m.removeditems = nil
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by ids.
+func (m *AssetMutation) AddLinkIDs(ids ...xid.ID) {
+	if m.links == nil {
+		m.links = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLinks clears the "links" edge to the Link entity.
+func (m *AssetMutation) ClearLinks() {
+	m.clearedlinks = true
+}
+
+// LinksCleared reports if the "links" edge to the Link entity was cleared.
+func (m *AssetMutation) LinksCleared() bool {
+	return m.clearedlinks
+}
+
+// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
+func (m *AssetMutation) RemoveLinkIDs(ids ...xid.ID) {
+	if m.removedlinks == nil {
+		m.removedlinks = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.links, ids[i])
+		m.removedlinks[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
+func (m *AssetMutation) RemovedLinksIDs() (ids []xid.ID) {
+	for id := range m.removedlinks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LinksIDs returns the "links" edge IDs in the mutation.
+func (m *AssetMutation) LinksIDs() (ids []xid.ID) {
+	for id := range m.links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLinks resets all changes to the "links" edge.
+func (m *AssetMutation) ResetLinks() {
+	m.links = nil
+	m.clearedlinks = false
+	m.removedlinks = nil
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by id.
 func (m *AssetMutation) SetOwnerID(id xid.ID) {
 	m.owner = &id
@@ -2397,7 +2456,7 @@ func (m *AssetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.posts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -2406,6 +2465,9 @@ func (m *AssetMutation) AddedEdges() []string {
 	}
 	if m.items != nil {
 		edges = append(edges, asset.EdgeItems)
+	}
+	if m.links != nil {
+		edges = append(edges, asset.EdgeLinks)
 	}
 	if m.owner != nil {
 		edges = append(edges, asset.EdgeOwner)
@@ -2435,6 +2497,12 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.links))
+		for id := range m.links {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeOwner:
 		if id := m.owner; id != nil {
 			return []ent.Value{*id}
@@ -2445,7 +2513,7 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedposts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -2454,6 +2522,9 @@ func (m *AssetMutation) RemovedEdges() []string {
 	}
 	if m.removeditems != nil {
 		edges = append(edges, asset.EdgeItems)
+	}
+	if m.removedlinks != nil {
+		edges = append(edges, asset.EdgeLinks)
 	}
 	return edges
 }
@@ -2480,13 +2551,19 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.removedlinks))
+		for id := range m.removedlinks {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedposts {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -2495,6 +2572,9 @@ func (m *AssetMutation) ClearedEdges() []string {
 	}
 	if m.cleareditems {
 		edges = append(edges, asset.EdgeItems)
+	}
+	if m.clearedlinks {
+		edges = append(edges, asset.EdgeLinks)
 	}
 	if m.clearedowner {
 		edges = append(edges, asset.EdgeOwner)
@@ -2512,6 +2592,8 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 		return m.clearedclusters
 	case asset.EdgeItems:
 		return m.cleareditems
+	case asset.EdgeLinks:
+		return m.clearedlinks
 	case asset.EdgeOwner:
 		return m.clearedowner
 	}
@@ -2541,6 +2623,9 @@ func (m *AssetMutation) ResetEdge(name string) error {
 		return nil
 	case asset.EdgeItems:
 		m.ResetItems()
+		return nil
+	case asset.EdgeLinks:
+		m.ResetLinks()
 		return nil
 	case asset.EdgeOwner:
 		m.ResetOwner()
@@ -4186,9 +4271,6 @@ type ClusterMutation struct {
 	name            *string
 	slug            *string
 	image_url       *string
-	url             *string
-	url_title       *string
-	url_description *string
 	description     *string
 	content         *string
 	properties      *any
@@ -4209,6 +4291,9 @@ type ClusterMutation struct {
 	tags            map[xid.ID]struct{}
 	removedtags     map[xid.ID]struct{}
 	clearedtags     bool
+	links           map[xid.ID]struct{}
+	removedlinks    map[xid.ID]struct{}
+	clearedlinks    bool
 	done            bool
 	oldValue        func(context.Context) (*Cluster, error)
 	predicates      []predicate.Cluster
@@ -4558,153 +4643,6 @@ func (m *ClusterMutation) ImageURLCleared() bool {
 func (m *ClusterMutation) ResetImageURL() {
 	m.image_url = nil
 	delete(m.clearedFields, cluster.FieldImageURL)
-}
-
-// SetURL sets the "url" field.
-func (m *ClusterMutation) SetURL(s string) {
-	m.url = &s
-}
-
-// URL returns the value of the "url" field in the mutation.
-func (m *ClusterMutation) URL() (r string, exists bool) {
-	v := m.url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURL returns the old "url" field's value of the Cluster entity.
-// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClusterMutation) OldURL(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
-	}
-	return oldValue.URL, nil
-}
-
-// ClearURL clears the value of the "url" field.
-func (m *ClusterMutation) ClearURL() {
-	m.url = nil
-	m.clearedFields[cluster.FieldURL] = struct{}{}
-}
-
-// URLCleared returns if the "url" field was cleared in this mutation.
-func (m *ClusterMutation) URLCleared() bool {
-	_, ok := m.clearedFields[cluster.FieldURL]
-	return ok
-}
-
-// ResetURL resets all changes to the "url" field.
-func (m *ClusterMutation) ResetURL() {
-	m.url = nil
-	delete(m.clearedFields, cluster.FieldURL)
-}
-
-// SetURLTitle sets the "url_title" field.
-func (m *ClusterMutation) SetURLTitle(s string) {
-	m.url_title = &s
-}
-
-// URLTitle returns the value of the "url_title" field in the mutation.
-func (m *ClusterMutation) URLTitle() (r string, exists bool) {
-	v := m.url_title
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLTitle returns the old "url_title" field's value of the Cluster entity.
-// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClusterMutation) OldURLTitle(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLTitle is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLTitle requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLTitle: %w", err)
-	}
-	return oldValue.URLTitle, nil
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (m *ClusterMutation) ClearURLTitle() {
-	m.url_title = nil
-	m.clearedFields[cluster.FieldURLTitle] = struct{}{}
-}
-
-// URLTitleCleared returns if the "url_title" field was cleared in this mutation.
-func (m *ClusterMutation) URLTitleCleared() bool {
-	_, ok := m.clearedFields[cluster.FieldURLTitle]
-	return ok
-}
-
-// ResetURLTitle resets all changes to the "url_title" field.
-func (m *ClusterMutation) ResetURLTitle() {
-	m.url_title = nil
-	delete(m.clearedFields, cluster.FieldURLTitle)
-}
-
-// SetURLDescription sets the "url_description" field.
-func (m *ClusterMutation) SetURLDescription(s string) {
-	m.url_description = &s
-}
-
-// URLDescription returns the value of the "url_description" field in the mutation.
-func (m *ClusterMutation) URLDescription() (r string, exists bool) {
-	v := m.url_description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLDescription returns the old "url_description" field's value of the Cluster entity.
-// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClusterMutation) OldURLDescription(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLDescription: %w", err)
-	}
-	return oldValue.URLDescription, nil
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (m *ClusterMutation) ClearURLDescription() {
-	m.url_description = nil
-	m.clearedFields[cluster.FieldURLDescription] = struct{}{}
-}
-
-// URLDescriptionCleared returns if the "url_description" field was cleared in this mutation.
-func (m *ClusterMutation) URLDescriptionCleared() bool {
-	_, ok := m.clearedFields[cluster.FieldURLDescription]
-	return ok
-}
-
-// ResetURLDescription resets all changes to the "url_description" field.
-func (m *ClusterMutation) ResetURLDescription() {
-	m.url_description = nil
-	delete(m.clearedFields, cluster.FieldURLDescription)
 }
 
 // SetDescription sets the "description" field.
@@ -5222,6 +5160,60 @@ func (m *ClusterMutation) ResetTags() {
 	m.removedtags = nil
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by ids.
+func (m *ClusterMutation) AddLinkIDs(ids ...xid.ID) {
+	if m.links == nil {
+		m.links = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLinks clears the "links" edge to the Link entity.
+func (m *ClusterMutation) ClearLinks() {
+	m.clearedlinks = true
+}
+
+// LinksCleared reports if the "links" edge to the Link entity was cleared.
+func (m *ClusterMutation) LinksCleared() bool {
+	return m.clearedlinks
+}
+
+// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
+func (m *ClusterMutation) RemoveLinkIDs(ids ...xid.ID) {
+	if m.removedlinks == nil {
+		m.removedlinks = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.links, ids[i])
+		m.removedlinks[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
+func (m *ClusterMutation) RemovedLinksIDs() (ids []xid.ID) {
+	for id := range m.removedlinks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LinksIDs returns the "links" edge IDs in the mutation.
+func (m *ClusterMutation) LinksIDs() (ids []xid.ID) {
+	for id := range m.links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLinks resets all changes to the "links" edge.
+func (m *ClusterMutation) ResetLinks() {
+	m.links = nil
+	m.clearedlinks = false
+	m.removedlinks = nil
+}
+
 // Where appends a list predicates to the ClusterMutation builder.
 func (m *ClusterMutation) Where(ps ...predicate.Cluster) {
 	m.predicates = append(m.predicates, ps...)
@@ -5256,7 +5248,7 @@ func (m *ClusterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClusterMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, cluster.FieldCreatedAt)
 	}
@@ -5274,15 +5266,6 @@ func (m *ClusterMutation) Fields() []string {
 	}
 	if m.image_url != nil {
 		fields = append(fields, cluster.FieldImageURL)
-	}
-	if m.url != nil {
-		fields = append(fields, cluster.FieldURL)
-	}
-	if m.url_title != nil {
-		fields = append(fields, cluster.FieldURLTitle)
-	}
-	if m.url_description != nil {
-		fields = append(fields, cluster.FieldURLDescription)
 	}
 	if m.description != nil {
 		fields = append(fields, cluster.FieldDescription)
@@ -5319,12 +5302,6 @@ func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 		return m.Slug()
 	case cluster.FieldImageURL:
 		return m.ImageURL()
-	case cluster.FieldURL:
-		return m.URL()
-	case cluster.FieldURLTitle:
-		return m.URLTitle()
-	case cluster.FieldURLDescription:
-		return m.URLDescription()
 	case cluster.FieldDescription:
 		return m.Description()
 	case cluster.FieldContent:
@@ -5356,12 +5333,6 @@ func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSlug(ctx)
 	case cluster.FieldImageURL:
 		return m.OldImageURL(ctx)
-	case cluster.FieldURL:
-		return m.OldURL(ctx)
-	case cluster.FieldURLTitle:
-		return m.OldURLTitle(ctx)
-	case cluster.FieldURLDescription:
-		return m.OldURLDescription(ctx)
 	case cluster.FieldDescription:
 		return m.OldDescription(ctx)
 	case cluster.FieldContent:
@@ -5422,27 +5393,6 @@ func (m *ClusterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImageURL(v)
-		return nil
-	case cluster.FieldURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURL(v)
-		return nil
-	case cluster.FieldURLTitle:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLTitle(v)
-		return nil
-	case cluster.FieldURLDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLDescription(v)
 		return nil
 	case cluster.FieldDescription:
 		v, ok := value.(string)
@@ -5515,15 +5465,6 @@ func (m *ClusterMutation) ClearedFields() []string {
 	if m.FieldCleared(cluster.FieldImageURL) {
 		fields = append(fields, cluster.FieldImageURL)
 	}
-	if m.FieldCleared(cluster.FieldURL) {
-		fields = append(fields, cluster.FieldURL)
-	}
-	if m.FieldCleared(cluster.FieldURLTitle) {
-		fields = append(fields, cluster.FieldURLTitle)
-	}
-	if m.FieldCleared(cluster.FieldURLDescription) {
-		fields = append(fields, cluster.FieldURLDescription)
-	}
 	if m.FieldCleared(cluster.FieldContent) {
 		fields = append(fields, cluster.FieldContent)
 	}
@@ -5552,15 +5493,6 @@ func (m *ClusterMutation) ClearField(name string) error {
 		return nil
 	case cluster.FieldImageURL:
 		m.ClearImageURL()
-		return nil
-	case cluster.FieldURL:
-		m.ClearURL()
-		return nil
-	case cluster.FieldURLTitle:
-		m.ClearURLTitle()
-		return nil
-	case cluster.FieldURLDescription:
-		m.ClearURLDescription()
 		return nil
 	case cluster.FieldContent:
 		m.ClearContent()
@@ -5597,15 +5529,6 @@ func (m *ClusterMutation) ResetField(name string) error {
 	case cluster.FieldImageURL:
 		m.ResetImageURL()
 		return nil
-	case cluster.FieldURL:
-		m.ResetURL()
-		return nil
-	case cluster.FieldURLTitle:
-		m.ResetURLTitle()
-		return nil
-	case cluster.FieldURLDescription:
-		m.ResetURLDescription()
-		return nil
 	case cluster.FieldDescription:
 		m.ResetDescription()
 		return nil
@@ -5627,7 +5550,7 @@ func (m *ClusterMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClusterMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.owner != nil {
 		edges = append(edges, cluster.EdgeOwner)
 	}
@@ -5645,6 +5568,9 @@ func (m *ClusterMutation) AddedEdges() []string {
 	}
 	if m.tags != nil {
 		edges = append(edges, cluster.EdgeTags)
+	}
+	if m.links != nil {
+		edges = append(edges, cluster.EdgeLinks)
 	}
 	return edges
 }
@@ -5685,13 +5611,19 @@ func (m *ClusterMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case cluster.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.links))
+		for id := range m.links {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClusterMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removedclusters != nil {
 		edges = append(edges, cluster.EdgeClusters)
 	}
@@ -5703,6 +5635,9 @@ func (m *ClusterMutation) RemovedEdges() []string {
 	}
 	if m.removedtags != nil {
 		edges = append(edges, cluster.EdgeTags)
+	}
+	if m.removedlinks != nil {
+		edges = append(edges, cluster.EdgeLinks)
 	}
 	return edges
 }
@@ -5735,13 +5670,19 @@ func (m *ClusterMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case cluster.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.removedlinks))
+		for id := range m.removedlinks {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClusterMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedowner {
 		edges = append(edges, cluster.EdgeOwner)
 	}
@@ -5759,6 +5700,9 @@ func (m *ClusterMutation) ClearedEdges() []string {
 	}
 	if m.clearedtags {
 		edges = append(edges, cluster.EdgeTags)
+	}
+	if m.clearedlinks {
+		edges = append(edges, cluster.EdgeLinks)
 	}
 	return edges
 }
@@ -5779,6 +5723,8 @@ func (m *ClusterMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case cluster.EdgeTags:
 		return m.clearedtags
+	case cluster.EdgeLinks:
+		return m.clearedlinks
 	}
 	return false
 }
@@ -5818,6 +5764,9 @@ func (m *ClusterMutation) ResetEdge(name string) error {
 		return nil
 	case cluster.EdgeTags:
 		m.ResetTags()
+		return nil
+	case cluster.EdgeLinks:
+		m.ResetLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown Cluster edge %s", name)
@@ -6481,9 +6430,6 @@ type ItemMutation struct {
 	name            *string
 	slug            *string
 	image_url       *string
-	url             *string
-	url_title       *string
-	url_description *string
 	description     *string
 	content         *string
 	properties      *any
@@ -6499,6 +6445,9 @@ type ItemMutation struct {
 	tags            map[xid.ID]struct{}
 	removedtags     map[xid.ID]struct{}
 	clearedtags     bool
+	links           map[xid.ID]struct{}
+	removedlinks    map[xid.ID]struct{}
+	clearedlinks    bool
 	done            bool
 	oldValue        func(context.Context) (*Item, error)
 	predicates      []predicate.Item
@@ -6848,153 +6797,6 @@ func (m *ItemMutation) ImageURLCleared() bool {
 func (m *ItemMutation) ResetImageURL() {
 	m.image_url = nil
 	delete(m.clearedFields, item.FieldImageURL)
-}
-
-// SetURL sets the "url" field.
-func (m *ItemMutation) SetURL(s string) {
-	m.url = &s
-}
-
-// URL returns the value of the "url" field in the mutation.
-func (m *ItemMutation) URL() (r string, exists bool) {
-	v := m.url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURL returns the old "url" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldURL(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
-	}
-	return oldValue.URL, nil
-}
-
-// ClearURL clears the value of the "url" field.
-func (m *ItemMutation) ClearURL() {
-	m.url = nil
-	m.clearedFields[item.FieldURL] = struct{}{}
-}
-
-// URLCleared returns if the "url" field was cleared in this mutation.
-func (m *ItemMutation) URLCleared() bool {
-	_, ok := m.clearedFields[item.FieldURL]
-	return ok
-}
-
-// ResetURL resets all changes to the "url" field.
-func (m *ItemMutation) ResetURL() {
-	m.url = nil
-	delete(m.clearedFields, item.FieldURL)
-}
-
-// SetURLTitle sets the "url_title" field.
-func (m *ItemMutation) SetURLTitle(s string) {
-	m.url_title = &s
-}
-
-// URLTitle returns the value of the "url_title" field in the mutation.
-func (m *ItemMutation) URLTitle() (r string, exists bool) {
-	v := m.url_title
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLTitle returns the old "url_title" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldURLTitle(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLTitle is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLTitle requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLTitle: %w", err)
-	}
-	return oldValue.URLTitle, nil
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (m *ItemMutation) ClearURLTitle() {
-	m.url_title = nil
-	m.clearedFields[item.FieldURLTitle] = struct{}{}
-}
-
-// URLTitleCleared returns if the "url_title" field was cleared in this mutation.
-func (m *ItemMutation) URLTitleCleared() bool {
-	_, ok := m.clearedFields[item.FieldURLTitle]
-	return ok
-}
-
-// ResetURLTitle resets all changes to the "url_title" field.
-func (m *ItemMutation) ResetURLTitle() {
-	m.url_title = nil
-	delete(m.clearedFields, item.FieldURLTitle)
-}
-
-// SetURLDescription sets the "url_description" field.
-func (m *ItemMutation) SetURLDescription(s string) {
-	m.url_description = &s
-}
-
-// URLDescription returns the value of the "url_description" field in the mutation.
-func (m *ItemMutation) URLDescription() (r string, exists bool) {
-	v := m.url_description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLDescription returns the old "url_description" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldURLDescription(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLDescription: %w", err)
-	}
-	return oldValue.URLDescription, nil
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (m *ItemMutation) ClearURLDescription() {
-	m.url_description = nil
-	m.clearedFields[item.FieldURLDescription] = struct{}{}
-}
-
-// URLDescriptionCleared returns if the "url_description" field was cleared in this mutation.
-func (m *ItemMutation) URLDescriptionCleared() bool {
-	_, ok := m.clearedFields[item.FieldURLDescription]
-	return ok
-}
-
-// ResetURLDescription resets all changes to the "url_description" field.
-func (m *ItemMutation) ResetURLDescription() {
-	m.url_description = nil
-	delete(m.clearedFields, item.FieldURLDescription)
 }
 
 // SetDescription sets the "description" field.
@@ -7369,6 +7171,60 @@ func (m *ItemMutation) ResetTags() {
 	m.removedtags = nil
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by ids.
+func (m *ItemMutation) AddLinkIDs(ids ...xid.ID) {
+	if m.links == nil {
+		m.links = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLinks clears the "links" edge to the Link entity.
+func (m *ItemMutation) ClearLinks() {
+	m.clearedlinks = true
+}
+
+// LinksCleared reports if the "links" edge to the Link entity was cleared.
+func (m *ItemMutation) LinksCleared() bool {
+	return m.clearedlinks
+}
+
+// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
+func (m *ItemMutation) RemoveLinkIDs(ids ...xid.ID) {
+	if m.removedlinks == nil {
+		m.removedlinks = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.links, ids[i])
+		m.removedlinks[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
+func (m *ItemMutation) RemovedLinksIDs() (ids []xid.ID) {
+	for id := range m.removedlinks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LinksIDs returns the "links" edge IDs in the mutation.
+func (m *ItemMutation) LinksIDs() (ids []xid.ID) {
+	for id := range m.links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLinks resets all changes to the "links" edge.
+func (m *ItemMutation) ResetLinks() {
+	m.links = nil
+	m.clearedlinks = false
+	m.removedlinks = nil
+}
+
 // Where appends a list predicates to the ItemMutation builder.
 func (m *ItemMutation) Where(ps ...predicate.Item) {
 	m.predicates = append(m.predicates, ps...)
@@ -7403,7 +7259,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, item.FieldCreatedAt)
 	}
@@ -7421,15 +7277,6 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.image_url != nil {
 		fields = append(fields, item.FieldImageURL)
-	}
-	if m.url != nil {
-		fields = append(fields, item.FieldURL)
-	}
-	if m.url_title != nil {
-		fields = append(fields, item.FieldURLTitle)
-	}
-	if m.url_description != nil {
-		fields = append(fields, item.FieldURLDescription)
 	}
 	if m.description != nil {
 		fields = append(fields, item.FieldDescription)
@@ -7463,12 +7310,6 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Slug()
 	case item.FieldImageURL:
 		return m.ImageURL()
-	case item.FieldURL:
-		return m.URL()
-	case item.FieldURLTitle:
-		return m.URLTitle()
-	case item.FieldURLDescription:
-		return m.URLDescription()
 	case item.FieldDescription:
 		return m.Description()
 	case item.FieldContent:
@@ -7498,12 +7339,6 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldSlug(ctx)
 	case item.FieldImageURL:
 		return m.OldImageURL(ctx)
-	case item.FieldURL:
-		return m.OldURL(ctx)
-	case item.FieldURLTitle:
-		return m.OldURLTitle(ctx)
-	case item.FieldURLDescription:
-		return m.OldURLDescription(ctx)
 	case item.FieldDescription:
 		return m.OldDescription(ctx)
 	case item.FieldContent:
@@ -7562,27 +7397,6 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImageURL(v)
-		return nil
-	case item.FieldURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURL(v)
-		return nil
-	case item.FieldURLTitle:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLTitle(v)
-		return nil
-	case item.FieldURLDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLDescription(v)
 		return nil
 	case item.FieldDescription:
 		v, ok := value.(string)
@@ -7648,15 +7462,6 @@ func (m *ItemMutation) ClearedFields() []string {
 	if m.FieldCleared(item.FieldImageURL) {
 		fields = append(fields, item.FieldImageURL)
 	}
-	if m.FieldCleared(item.FieldURL) {
-		fields = append(fields, item.FieldURL)
-	}
-	if m.FieldCleared(item.FieldURLTitle) {
-		fields = append(fields, item.FieldURLTitle)
-	}
-	if m.FieldCleared(item.FieldURLDescription) {
-		fields = append(fields, item.FieldURLDescription)
-	}
 	if m.FieldCleared(item.FieldContent) {
 		fields = append(fields, item.FieldContent)
 	}
@@ -7682,15 +7487,6 @@ func (m *ItemMutation) ClearField(name string) error {
 		return nil
 	case item.FieldImageURL:
 		m.ClearImageURL()
-		return nil
-	case item.FieldURL:
-		m.ClearURL()
-		return nil
-	case item.FieldURLTitle:
-		m.ClearURLTitle()
-		return nil
-	case item.FieldURLDescription:
-		m.ClearURLDescription()
 		return nil
 	case item.FieldContent:
 		m.ClearContent()
@@ -7724,15 +7520,6 @@ func (m *ItemMutation) ResetField(name string) error {
 	case item.FieldImageURL:
 		m.ResetImageURL()
 		return nil
-	case item.FieldURL:
-		m.ResetURL()
-		return nil
-	case item.FieldURLTitle:
-		m.ResetURLTitle()
-		return nil
-	case item.FieldURLDescription:
-		m.ResetURLDescription()
-		return nil
 	case item.FieldDescription:
 		m.ResetDescription()
 		return nil
@@ -7751,7 +7538,7 @@ func (m *ItemMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ItemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.owner != nil {
 		edges = append(edges, item.EdgeOwner)
 	}
@@ -7763,6 +7550,9 @@ func (m *ItemMutation) AddedEdges() []string {
 	}
 	if m.tags != nil {
 		edges = append(edges, item.EdgeTags)
+	}
+	if m.links != nil {
+		edges = append(edges, item.EdgeLinks)
 	}
 	return edges
 }
@@ -7793,13 +7583,19 @@ func (m *ItemMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case item.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.links))
+		for id := range m.links {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ItemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedclusters != nil {
 		edges = append(edges, item.EdgeClusters)
 	}
@@ -7808,6 +7604,9 @@ func (m *ItemMutation) RemovedEdges() []string {
 	}
 	if m.removedtags != nil {
 		edges = append(edges, item.EdgeTags)
+	}
+	if m.removedlinks != nil {
+		edges = append(edges, item.EdgeLinks)
 	}
 	return edges
 }
@@ -7834,13 +7633,19 @@ func (m *ItemMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case item.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.removedlinks))
+		for id := range m.removedlinks {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ItemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedowner {
 		edges = append(edges, item.EdgeOwner)
 	}
@@ -7852,6 +7657,9 @@ func (m *ItemMutation) ClearedEdges() []string {
 	}
 	if m.clearedtags {
 		edges = append(edges, item.EdgeTags)
+	}
+	if m.clearedlinks {
+		edges = append(edges, item.EdgeLinks)
 	}
 	return edges
 }
@@ -7868,6 +7676,8 @@ func (m *ItemMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case item.EdgeTags:
 		return m.clearedtags
+	case item.EdgeLinks:
+		return m.clearedlinks
 	}
 	return false
 }
@@ -7899,8 +7709,847 @@ func (m *ItemMutation) ResetEdge(name string) error {
 	case item.EdgeTags:
 		m.ResetTags()
 		return nil
+	case item.EdgeLinks:
+		m.ResetLinks()
+		return nil
 	}
 	return fmt.Errorf("unknown Item edge %s", name)
+}
+
+// LinkMutation represents an operation that mutates the Link nodes in the graph.
+type LinkMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	url             *string
+	title           *string
+	description     *string
+	clearedFields   map[string]struct{}
+	posts           map[xid.ID]struct{}
+	removedposts    map[xid.ID]struct{}
+	clearedposts    bool
+	clusters        map[xid.ID]struct{}
+	removedclusters map[xid.ID]struct{}
+	clearedclusters bool
+	items           map[xid.ID]struct{}
+	removeditems    map[xid.ID]struct{}
+	cleareditems    bool
+	assets          map[string]struct{}
+	removedassets   map[string]struct{}
+	clearedassets   bool
+	done            bool
+	oldValue        func(context.Context) (*Link, error)
+	predicates      []predicate.Link
+}
+
+var _ ent.Mutation = (*LinkMutation)(nil)
+
+// linkOption allows management of the mutation configuration using functional options.
+type linkOption func(*LinkMutation)
+
+// newLinkMutation creates new mutation for the Link entity.
+func newLinkMutation(c config, op Op, opts ...linkOption) *LinkMutation {
+	m := &LinkMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeLink,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withLinkID sets the ID field of the mutation.
+func withLinkID(id xid.ID) linkOption {
+	return func(m *LinkMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Link
+		)
+		m.oldValue = func(ctx context.Context) (*Link, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Link.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withLink sets the old Link of the mutation.
+func withLink(node *Link) linkOption {
+	return func(m *LinkMutation) {
+		m.oldValue = func(context.Context) (*Link, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m LinkMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m LinkMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Link entities.
+func (m *LinkMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *LinkMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *LinkMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Link.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *LinkMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *LinkMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *LinkMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetURL sets the "url" field.
+func (m *LinkMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *LinkMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *LinkMutation) ResetURL() {
+	m.url = nil
+}
+
+// SetTitle sets the "title" field.
+func (m *LinkMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *LinkMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *LinkMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *LinkMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *LinkMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *LinkMutation) ResetDescription() {
+	m.description = nil
+}
+
+// AddPostIDs adds the "posts" edge to the Post entity by ids.
+func (m *LinkMutation) AddPostIDs(ids ...xid.ID) {
+	if m.posts == nil {
+		m.posts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.posts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPosts clears the "posts" edge to the Post entity.
+func (m *LinkMutation) ClearPosts() {
+	m.clearedposts = true
+}
+
+// PostsCleared reports if the "posts" edge to the Post entity was cleared.
+func (m *LinkMutation) PostsCleared() bool {
+	return m.clearedposts
+}
+
+// RemovePostIDs removes the "posts" edge to the Post entity by IDs.
+func (m *LinkMutation) RemovePostIDs(ids ...xid.ID) {
+	if m.removedposts == nil {
+		m.removedposts = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.posts, ids[i])
+		m.removedposts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPosts returns the removed IDs of the "posts" edge to the Post entity.
+func (m *LinkMutation) RemovedPostsIDs() (ids []xid.ID) {
+	for id := range m.removedposts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostsIDs returns the "posts" edge IDs in the mutation.
+func (m *LinkMutation) PostsIDs() (ids []xid.ID) {
+	for id := range m.posts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPosts resets all changes to the "posts" edge.
+func (m *LinkMutation) ResetPosts() {
+	m.posts = nil
+	m.clearedposts = false
+	m.removedposts = nil
+}
+
+// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
+func (m *LinkMutation) AddClusterIDs(ids ...xid.ID) {
+	if m.clusters == nil {
+		m.clusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.clusters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClusters clears the "clusters" edge to the Cluster entity.
+func (m *LinkMutation) ClearClusters() {
+	m.clearedclusters = true
+}
+
+// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
+func (m *LinkMutation) ClustersCleared() bool {
+	return m.clearedclusters
+}
+
+// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
+func (m *LinkMutation) RemoveClusterIDs(ids ...xid.ID) {
+	if m.removedclusters == nil {
+		m.removedclusters = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.clusters, ids[i])
+		m.removedclusters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
+func (m *LinkMutation) RemovedClustersIDs() (ids []xid.ID) {
+	for id := range m.removedclusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClustersIDs returns the "clusters" edge IDs in the mutation.
+func (m *LinkMutation) ClustersIDs() (ids []xid.ID) {
+	for id := range m.clusters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClusters resets all changes to the "clusters" edge.
+func (m *LinkMutation) ResetClusters() {
+	m.clusters = nil
+	m.clearedclusters = false
+	m.removedclusters = nil
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by ids.
+func (m *LinkMutation) AddItemIDs(ids ...xid.ID) {
+	if m.items == nil {
+		m.items = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.items[ids[i]] = struct{}{}
+	}
+}
+
+// ClearItems clears the "items" edge to the Item entity.
+func (m *LinkMutation) ClearItems() {
+	m.cleareditems = true
+}
+
+// ItemsCleared reports if the "items" edge to the Item entity was cleared.
+func (m *LinkMutation) ItemsCleared() bool {
+	return m.cleareditems
+}
+
+// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
+func (m *LinkMutation) RemoveItemIDs(ids ...xid.ID) {
+	if m.removeditems == nil {
+		m.removeditems = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.items, ids[i])
+		m.removeditems[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
+func (m *LinkMutation) RemovedItemsIDs() (ids []xid.ID) {
+	for id := range m.removeditems {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ItemsIDs returns the "items" edge IDs in the mutation.
+func (m *LinkMutation) ItemsIDs() (ids []xid.ID) {
+	for id := range m.items {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetItems resets all changes to the "items" edge.
+func (m *LinkMutation) ResetItems() {
+	m.items = nil
+	m.cleareditems = false
+	m.removeditems = nil
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
+func (m *LinkMutation) AddAssetIDs(ids ...string) {
+	if m.assets == nil {
+		m.assets = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.assets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAssets clears the "assets" edge to the Asset entity.
+func (m *LinkMutation) ClearAssets() {
+	m.clearedassets = true
+}
+
+// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
+func (m *LinkMutation) AssetsCleared() bool {
+	return m.clearedassets
+}
+
+// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
+func (m *LinkMutation) RemoveAssetIDs(ids ...string) {
+	if m.removedassets == nil {
+		m.removedassets = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.assets, ids[i])
+		m.removedassets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
+func (m *LinkMutation) RemovedAssetsIDs() (ids []string) {
+	for id := range m.removedassets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AssetsIDs returns the "assets" edge IDs in the mutation.
+func (m *LinkMutation) AssetsIDs() (ids []string) {
+	for id := range m.assets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAssets resets all changes to the "assets" edge.
+func (m *LinkMutation) ResetAssets() {
+	m.assets = nil
+	m.clearedassets = false
+	m.removedassets = nil
+}
+
+// Where appends a list predicates to the LinkMutation builder.
+func (m *LinkMutation) Where(ps ...predicate.Link) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the LinkMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *LinkMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Link, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *LinkMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *LinkMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Link).
+func (m *LinkMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *LinkMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, link.FieldCreatedAt)
+	}
+	if m.url != nil {
+		fields = append(fields, link.FieldURL)
+	}
+	if m.title != nil {
+		fields = append(fields, link.FieldTitle)
+	}
+	if m.description != nil {
+		fields = append(fields, link.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *LinkMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case link.FieldCreatedAt:
+		return m.CreatedAt()
+	case link.FieldURL:
+		return m.URL()
+	case link.FieldTitle:
+		return m.Title()
+	case link.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *LinkMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case link.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case link.FieldURL:
+		return m.OldURL(ctx)
+	case link.FieldTitle:
+		return m.OldTitle(ctx)
+	case link.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Link field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LinkMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case link.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case link.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case link.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case link.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Link field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *LinkMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *LinkMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LinkMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Link numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *LinkMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *LinkMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *LinkMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Link nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *LinkMutation) ResetField(name string) error {
+	switch name {
+	case link.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case link.FieldURL:
+		m.ResetURL()
+		return nil
+	case link.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case link.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Link field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *LinkMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.posts != nil {
+		edges = append(edges, link.EdgePosts)
+	}
+	if m.clusters != nil {
+		edges = append(edges, link.EdgeClusters)
+	}
+	if m.items != nil {
+		edges = append(edges, link.EdgeItems)
+	}
+	if m.assets != nil {
+		edges = append(edges, link.EdgeAssets)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *LinkMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case link.EdgePosts:
+		ids := make([]ent.Value, 0, len(m.posts))
+		for id := range m.posts {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.clusters))
+		for id := range m.clusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.items))
+		for id := range m.items {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.assets))
+		for id := range m.assets {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *LinkMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removedposts != nil {
+		edges = append(edges, link.EdgePosts)
+	}
+	if m.removedclusters != nil {
+		edges = append(edges, link.EdgeClusters)
+	}
+	if m.removeditems != nil {
+		edges = append(edges, link.EdgeItems)
+	}
+	if m.removedassets != nil {
+		edges = append(edges, link.EdgeAssets)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case link.EdgePosts:
+		ids := make([]ent.Value, 0, len(m.removedposts))
+		for id := range m.removedposts {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeClusters:
+		ids := make([]ent.Value, 0, len(m.removedclusters))
+		for id := range m.removedclusters {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeItems:
+		ids := make([]ent.Value, 0, len(m.removeditems))
+		for id := range m.removeditems {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.removedassets))
+		for id := range m.removedassets {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *LinkMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedposts {
+		edges = append(edges, link.EdgePosts)
+	}
+	if m.clearedclusters {
+		edges = append(edges, link.EdgeClusters)
+	}
+	if m.cleareditems {
+		edges = append(edges, link.EdgeItems)
+	}
+	if m.clearedassets {
+		edges = append(edges, link.EdgeAssets)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *LinkMutation) EdgeCleared(name string) bool {
+	switch name {
+	case link.EdgePosts:
+		return m.clearedposts
+	case link.EdgeClusters:
+		return m.clearedclusters
+	case link.EdgeItems:
+		return m.cleareditems
+	case link.EdgeAssets:
+		return m.clearedassets
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *LinkMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Link unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *LinkMutation) ResetEdge(name string) error {
+	switch name {
+	case link.EdgePosts:
+		m.ResetPosts()
+		return nil
+	case link.EdgeClusters:
+		m.ResetClusters()
+		return nil
+	case link.EdgeItems:
+		m.ResetItems()
+		return nil
+	case link.EdgeAssets:
+		m.ResetAssets()
+		return nil
+	}
+	return fmt.Errorf("unknown Link edge %s", name)
 }
 
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.
@@ -8468,9 +9117,6 @@ type PostMutation struct {
 	short              *string
 	metadata           *map[string]interface{}
 	status             *post.Status
-	url                *string
-	url_title          *string
-	url_description    *string
 	clearedFields      map[string]struct{}
 	author             *xid.ID
 	clearedauthor      bool
@@ -8498,6 +9144,9 @@ type PostMutation struct {
 	collections        map[xid.ID]struct{}
 	removedcollections map[xid.ID]struct{}
 	clearedcollections bool
+	links              map[xid.ID]struct{}
+	removedlinks       map[xid.ID]struct{}
+	clearedlinks       bool
 	done               bool
 	oldValue           func(context.Context) (*Post, error)
 	predicates         []predicate.Post
@@ -9153,153 +9802,6 @@ func (m *PostMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetURL sets the "url" field.
-func (m *PostMutation) SetURL(s string) {
-	m.url = &s
-}
-
-// URL returns the value of the "url" field in the mutation.
-func (m *PostMutation) URL() (r string, exists bool) {
-	v := m.url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURL returns the old "url" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldURL(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
-	}
-	return oldValue.URL, nil
-}
-
-// ClearURL clears the value of the "url" field.
-func (m *PostMutation) ClearURL() {
-	m.url = nil
-	m.clearedFields[post.FieldURL] = struct{}{}
-}
-
-// URLCleared returns if the "url" field was cleared in this mutation.
-func (m *PostMutation) URLCleared() bool {
-	_, ok := m.clearedFields[post.FieldURL]
-	return ok
-}
-
-// ResetURL resets all changes to the "url" field.
-func (m *PostMutation) ResetURL() {
-	m.url = nil
-	delete(m.clearedFields, post.FieldURL)
-}
-
-// SetURLTitle sets the "url_title" field.
-func (m *PostMutation) SetURLTitle(s string) {
-	m.url_title = &s
-}
-
-// URLTitle returns the value of the "url_title" field in the mutation.
-func (m *PostMutation) URLTitle() (r string, exists bool) {
-	v := m.url_title
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLTitle returns the old "url_title" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldURLTitle(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLTitle is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLTitle requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLTitle: %w", err)
-	}
-	return oldValue.URLTitle, nil
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (m *PostMutation) ClearURLTitle() {
-	m.url_title = nil
-	m.clearedFields[post.FieldURLTitle] = struct{}{}
-}
-
-// URLTitleCleared returns if the "url_title" field was cleared in this mutation.
-func (m *PostMutation) URLTitleCleared() bool {
-	_, ok := m.clearedFields[post.FieldURLTitle]
-	return ok
-}
-
-// ResetURLTitle resets all changes to the "url_title" field.
-func (m *PostMutation) ResetURLTitle() {
-	m.url_title = nil
-	delete(m.clearedFields, post.FieldURLTitle)
-}
-
-// SetURLDescription sets the "url_description" field.
-func (m *PostMutation) SetURLDescription(s string) {
-	m.url_description = &s
-}
-
-// URLDescription returns the value of the "url_description" field in the mutation.
-func (m *PostMutation) URLDescription() (r string, exists bool) {
-	v := m.url_description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldURLDescription returns the old "url_description" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldURLDescription(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURLDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURLDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURLDescription: %w", err)
-	}
-	return oldValue.URLDescription, nil
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (m *PostMutation) ClearURLDescription() {
-	m.url_description = nil
-	m.clearedFields[post.FieldURLDescription] = struct{}{}
-}
-
-// URLDescriptionCleared returns if the "url_description" field was cleared in this mutation.
-func (m *PostMutation) URLDescriptionCleared() bool {
-	_, ok := m.clearedFields[post.FieldURLDescription]
-	return ok
-}
-
-// ResetURLDescription resets all changes to the "url_description" field.
-func (m *PostMutation) ResetURLDescription() {
-	m.url_description = nil
-	delete(m.clearedFields, post.FieldURLDescription)
-}
-
 // SetCategoryID sets the "category_id" field.
 func (m *PostMutation) SetCategoryID(x xid.ID) {
 	m.category = &x
@@ -9819,6 +10321,60 @@ func (m *PostMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by ids.
+func (m *PostMutation) AddLinkIDs(ids ...xid.ID) {
+	if m.links == nil {
+		m.links = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.links[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLinks clears the "links" edge to the Link entity.
+func (m *PostMutation) ClearLinks() {
+	m.clearedlinks = true
+}
+
+// LinksCleared reports if the "links" edge to the Link entity was cleared.
+func (m *PostMutation) LinksCleared() bool {
+	return m.clearedlinks
+}
+
+// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
+func (m *PostMutation) RemoveLinkIDs(ids ...xid.ID) {
+	if m.removedlinks == nil {
+		m.removedlinks = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.links, ids[i])
+		m.removedlinks[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
+func (m *PostMutation) RemovedLinksIDs() (ids []xid.ID) {
+	for id := range m.removedlinks {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LinksIDs returns the "links" edge IDs in the mutation.
+func (m *PostMutation) LinksIDs() (ids []xid.ID) {
+	for id := range m.links {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLinks resets all changes to the "links" edge.
+func (m *PostMutation) ResetLinks() {
+	m.links = nil
+	m.clearedlinks = false
+	m.removedlinks = nil
+}
+
 // Where appends a list predicates to the PostMutation builder.
 func (m *PostMutation) Where(ps ...predicate.Post) {
 	m.predicates = append(m.predicates, ps...)
@@ -9853,7 +10409,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -9893,15 +10449,6 @@ func (m *PostMutation) Fields() []string {
 	if m.status != nil {
 		fields = append(fields, post.FieldStatus)
 	}
-	if m.url != nil {
-		fields = append(fields, post.FieldURL)
-	}
-	if m.url_title != nil {
-		fields = append(fields, post.FieldURLTitle)
-	}
-	if m.url_description != nil {
-		fields = append(fields, post.FieldURLDescription)
-	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -9939,12 +10486,6 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case post.FieldStatus:
 		return m.Status()
-	case post.FieldURL:
-		return m.URL()
-	case post.FieldURLTitle:
-		return m.URLTitle()
-	case post.FieldURLDescription:
-		return m.URLDescription()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -9982,12 +10523,6 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldMetadata(ctx)
 	case post.FieldStatus:
 		return m.OldStatus(ctx)
-	case post.FieldURL:
-		return m.OldURL(ctx)
-	case post.FieldURLTitle:
-		return m.OldURLTitle(ctx)
-	case post.FieldURLDescription:
-		return m.OldURLDescription(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -10090,27 +10625,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
-	case post.FieldURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURL(v)
-		return nil
-	case post.FieldURLTitle:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLTitle(v)
-		return nil
-	case post.FieldURLDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetURLDescription(v)
-		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -10166,15 +10680,6 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldMetadata) {
 		fields = append(fields, post.FieldMetadata)
 	}
-	if m.FieldCleared(post.FieldURL) {
-		fields = append(fields, post.FieldURL)
-	}
-	if m.FieldCleared(post.FieldURLTitle) {
-		fields = append(fields, post.FieldURLTitle)
-	}
-	if m.FieldCleared(post.FieldURLDescription) {
-		fields = append(fields, post.FieldURLDescription)
-	}
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
 	}
@@ -10209,15 +10714,6 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldMetadata:
 		m.ClearMetadata()
-		return nil
-	case post.FieldURL:
-		m.ClearURL()
-		return nil
-	case post.FieldURLTitle:
-		m.ClearURLTitle()
-		return nil
-	case post.FieldURLDescription:
-		m.ClearURLDescription()
 		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
@@ -10269,15 +10765,6 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldStatus:
 		m.ResetStatus()
 		return nil
-	case post.FieldURL:
-		m.ResetURL()
-		return nil
-	case post.FieldURLTitle:
-		m.ResetURLTitle()
-		return nil
-	case post.FieldURLDescription:
-		m.ResetURLDescription()
-		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()
 		return nil
@@ -10287,7 +10774,7 @@ func (m *PostMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 11)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -10317,6 +10804,9 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.collections != nil {
 		edges = append(edges, post.EdgeCollections)
+	}
+	if m.links != nil {
+		edges = append(edges, post.EdgeLinks)
 	}
 	return edges
 }
@@ -10377,13 +10867,19 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.links))
+		for id := range m.links {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 11)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -10401,6 +10897,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, post.EdgeCollections)
+	}
+	if m.removedlinks != nil {
+		edges = append(edges, post.EdgeLinks)
 	}
 	return edges
 }
@@ -10445,13 +10944,19 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeLinks:
+		ids := make([]ent.Value, 0, len(m.removedlinks))
+		for id := range m.removedlinks {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 11)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -10482,6 +10987,9 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedcollections {
 		edges = append(edges, post.EdgeCollections)
 	}
+	if m.clearedlinks {
+		edges = append(edges, post.EdgeLinks)
+	}
 	return edges
 }
 
@@ -10509,6 +11017,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case post.EdgeCollections:
 		return m.clearedcollections
+	case post.EdgeLinks:
+		return m.clearedlinks
 	}
 	return false
 }
@@ -10566,6 +11076,9 @@ func (m *PostMutation) ResetEdge(name string) error {
 		return nil
 	case post.EdgeCollections:
 		m.ResetCollections()
+		return nil
+	case post.EdgeLinks:
+		m.ResetLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)

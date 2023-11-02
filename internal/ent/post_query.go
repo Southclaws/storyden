@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -39,6 +40,7 @@ type PostQuery struct {
 	withReacts      *ReactQuery
 	withAssets      *AssetQuery
 	withCollections *CollectionQuery
+	withLinks       *LinkQuery
 	withFKs         bool
 	modifiers       []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -297,6 +299,28 @@ func (pq *PostQuery) QueryCollections() *CollectionQuery {
 	return query
 }
 
+// QueryLinks chains the current query on the "links" edge.
+func (pq *PostQuery) QueryLinks() *LinkQuery {
+	query := (&LinkClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, post.LinksTable, post.LinksPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Post entity from the query.
 // Returns a *NotFoundError when no Post was found.
 func (pq *PostQuery) First(ctx context.Context) (*Post, error) {
@@ -499,6 +523,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withReacts:      pq.withReacts.Clone(),
 		withAssets:      pq.withAssets.Clone(),
 		withCollections: pq.withCollections.Clone(),
+		withLinks:       pq.withLinks.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -615,6 +640,17 @@ func (pq *PostQuery) WithCollections(opts ...func(*CollectionQuery)) *PostQuery 
 	return pq
 }
 
+// WithLinks tells the query-builder to eager-load the nodes that are connected to
+// the "links" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithLinks(opts ...func(*LinkQuery)) *PostQuery {
+	query := (&LinkClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withLinks = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -694,7 +730,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		nodes       = []*Post{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [10]bool{
+		loadedTypes = [11]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -705,6 +741,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withReacts != nil,
 			pq.withAssets != nil,
 			pq.withCollections != nil,
+			pq.withLinks != nil,
 		}
 	)
 	if pq.withAuthor != nil {
@@ -797,6 +834,13 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := pq.loadCollections(ctx, query, nodes,
 			func(n *Post) { n.Edges.Collections = []*Collection{} },
 			func(n *Post, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withLinks; query != nil {
+		if err := pq.loadLinks(ctx, query, nodes,
+			func(n *Post) { n.Edges.Links = []*Link{} },
+			func(n *Post, e *Link) { n.Edges.Links = append(n.Edges.Links, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1190,6 +1234,67 @@ func (pq *PostQuery) loadCollections(ctx context.Context, query *CollectionQuery
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "collections" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (pq *PostQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*Post, init func(*Post), assign func(*Post, *Link)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[xid.ID]*Post)
+	nids := make(map[xid.ID]map[*Post]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(post.LinksTable)
+		s.Join(joinT).On(s.C(link.FieldID), joinT.C(post.LinksPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(post.LinksPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(post.LinksPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Post]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Link](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "links" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

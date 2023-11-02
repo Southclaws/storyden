@@ -39,9 +39,6 @@ func (Post) Fields() []ent.Field {
 			"draft",
 			"published",
 		).Default("draft"),
-		field.String("url").Optional().Nillable(),
-		field.String("url_title").Optional().Nillable(),
-		field.String("url_description").Optional().Nillable(),
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),
@@ -86,6 +83,9 @@ func (Post) Edges() []ent.Edge {
 		edge.To("assets", Asset.Type),
 
 		edge.From("collections", Collection.Type).
+			Ref("posts"),
+
+		edge.From("links", Link.Type).
 			Ref("posts"),
 	}
 }

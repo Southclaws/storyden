@@ -47,12 +47,6 @@ type Post struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Status holds the value of the "status" field.
 	Status post.Status `json:"status,omitempty"`
-	// URL holds the value of the "url" field.
-	URL *string `json:"url,omitempty"`
-	// URLTitle holds the value of the "url_title" field.
-	URLTitle *string `json:"url_title,omitempty"`
-	// URLDescription holds the value of the "url_description" field.
-	URLDescription *string `json:"url_description,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID xid.ID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -84,9 +78,11 @@ type PostEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
+	// Links holds the value of the links edge.
+	Links []*Link `json:"links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [10]bool
+	loadedTypes [11]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -195,6 +191,15 @@ func (e PostEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
+// LinksOrErr returns the Links value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) LinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[10] {
+		return e.Links, nil
+	}
+	return nil, &NotLoadedError{edge: "links"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Post) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -204,7 +209,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus, post.FieldURL, post.FieldURLTitle, post.FieldURLDescription:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -314,27 +319,6 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.Status = post.Status(value.String)
 			}
-		case post.FieldURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
-			} else if value.Valid {
-				po.URL = new(string)
-				*po.URL = value.String
-			}
-		case post.FieldURLTitle:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_title", values[i])
-			} else if value.Valid {
-				po.URLTitle = new(string)
-				*po.URLTitle = value.String
-			}
-		case post.FieldURLDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_description", values[i])
-			} else if value.Valid {
-				po.URLDescription = new(string)
-				*po.URLDescription = value.String
-			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
@@ -411,6 +395,11 @@ func (po *Post) QueryCollections() *CollectionQuery {
 	return NewPostClient(po.config).QueryCollections(po)
 }
 
+// QueryLinks queries the "links" edge of the Post entity.
+func (po *Post) QueryLinks() *LinkQuery {
+	return NewPostClient(po.config).QueryLinks(po)
+}
+
 // Update returns a builder for updating this Post.
 // Note that you need to call Post.Unwrap() before calling this method if this Post
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -474,21 +463,6 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", po.Status))
-	builder.WriteString(", ")
-	if v := po.URL; v != nil {
-		builder.WriteString("url=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := po.URLTitle; v != nil {
-		builder.WriteString("url_title=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := po.URLDescription; v != nil {
-		builder.WriteString("url_description=")
-		builder.WriteString(*v)
-	}
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))

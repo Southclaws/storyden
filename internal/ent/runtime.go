@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -296,6 +297,37 @@ func init() {
 	// item.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	item.IDValidator = func() func(string) error {
 		validators := itemDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	linkMixin := schema.Link{}.Mixin()
+	linkMixinFields0 := linkMixin[0].Fields()
+	_ = linkMixinFields0
+	linkMixinFields1 := linkMixin[1].Fields()
+	_ = linkMixinFields1
+	linkFields := schema.Link{}.Fields()
+	_ = linkFields
+	// linkDescCreatedAt is the schema descriptor for created_at field.
+	linkDescCreatedAt := linkMixinFields1[0].Descriptor()
+	// link.DefaultCreatedAt holds the default value on creation for the created_at field.
+	link.DefaultCreatedAt = linkDescCreatedAt.Default.(func() time.Time)
+	// linkDescID is the schema descriptor for id field.
+	linkDescID := linkMixinFields0[0].Descriptor()
+	// link.DefaultID holds the default value on creation for the id field.
+	link.DefaultID = linkDescID.Default.(func() xid.ID)
+	// link.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	link.IDValidator = func() func(string) error {
+		validators := linkDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

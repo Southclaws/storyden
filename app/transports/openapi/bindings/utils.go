@@ -52,7 +52,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetReference),
 		Collections: dt.Map(t.Collections, serialiseCollection),
-		Link:        opt.Map(t.Link, serialiseLink).Ptr(),
+		Link:        opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
 	}
 }
 
@@ -78,7 +78,7 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
 		Assets:    dt.Map(t.Assets, serialiseAssetReference),
-		Link:      opt.Map(t.Link, serialiseLink).Ptr(),
+		Link:      opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
 	}, nil
 }
 

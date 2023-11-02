@@ -42,12 +42,6 @@ const (
 	FieldMetadata = "metadata"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
-	// FieldURLTitle holds the string denoting the url_title field in the database.
-	FieldURLTitle = "url_title"
-	// FieldURLDescription holds the string denoting the url_description field in the database.
-	FieldURLDescription = "url_description"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -70,6 +64,8 @@ const (
 	EdgeAssets = "assets"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeLinks holds the string denoting the links edge name in mutations.
+	EdgeLinks = "links"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -124,6 +120,11 @@ const (
 	// CollectionsInverseTable is the table name for the Collection entity.
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
+	// LinksTable is the table that holds the links relation/edge. The primary key declared below.
+	LinksTable = "link_posts"
+	// LinksInverseTable is the table name for the Link entity.
+	// It exists in this package in order to avoid circular dependency with the "link" package.
+	LinksInverseTable = "links"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -142,9 +143,6 @@ var Columns = []string{
 	FieldShort,
 	FieldMetadata,
 	FieldStatus,
-	FieldURL,
-	FieldURLTitle,
-	FieldURLDescription,
 	FieldCategoryID,
 }
 
@@ -164,6 +162,9 @@ var (
 	// CollectionsPrimaryKey and CollectionsColumn2 are the table columns denoting the
 	// primary key for the collections relation (M2M).
 	CollectionsPrimaryKey = []string{"collection_id", "post_id"}
+	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
+	// primary key for the links relation (M2M).
+	LinksPrimaryKey = []string{"link_id", "post_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -290,21 +291,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
-}
-
-// ByURLTitle orders the results by the url_title field.
-func ByURLTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURLTitle, opts...).ToFunc()
-}
-
-// ByURLDescription orders the results by the url_description field.
-func ByURLDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURLDescription, opts...).ToFunc()
-}
-
 // ByCategoryID orders the results by the category_id field.
 func ByCategoryID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryID, opts...).ToFunc()
@@ -421,6 +407,20 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByLinksCount orders the results by links count.
+func ByLinksCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLinksStep(), opts...)
+	}
+}
+
+// ByLinks orders the results by links terms.
+func ByLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAuthorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -489,5 +489,12 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CollectionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
+	)
+}
+func newLinksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LinksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
 	)
 }

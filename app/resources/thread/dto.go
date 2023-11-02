@@ -38,7 +38,7 @@ type Thread struct {
 	Meta        map[string]any
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
-	Link        opt.Optional[link.Link]
+	Links       link.Links
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
@@ -113,6 +113,6 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Meta:        m.Metadata,
 		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
 		Collections: collections.OrZero(),
-		Link:        link.NewLinkOpt(m.URL, m.URLTitle, m.URLDescription),
+		Links:       dt.Map(m.Edges.Links, link.Map),
 	}, nil
 }

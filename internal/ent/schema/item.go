@@ -21,9 +21,6 @@ func (Item) Fields() []ent.Field {
 		field.String("name"),
 		field.String("slug").Unique(),
 		field.String("image_url").Optional().Nillable(),
-		field.String("url").Optional().Nillable(),
-		field.String("url_title").Optional().Nillable(),
-		field.String("url_description").Optional().Nillable(),
 		field.String("description"),
 		field.String("content").Optional().Nillable(),
 		field.String("account_id").GoType(xid.ID{}),
@@ -51,6 +48,9 @@ func (Item) Edges() []ent.Edge {
 		edge.To("assets", Asset.Type),
 
 		edge.From("tags", Tag.Type).
+			Ref("items"),
+
+		edge.From("links", Link.Type).
 			Ref("items"),
 	}
 }

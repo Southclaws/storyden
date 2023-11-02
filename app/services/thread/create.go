@@ -45,16 +45,7 @@ func (s *service) Create(ctx context.Context,
 		thread.WithMeta(meta),
 	)
 
-	if v, ok := partial.URL.Get(); ok {
-		linkopts, err := s.hydrator.HydrateThread(ctx, v)
-		if err != nil {
-			s.l.Warn("failed to hydrate URL",
-				zap.String("url", v),
-				zap.Error(err))
-		}
-
-		opts = append(opts, linkopts...)
-	}
+	opts = append(opts, s.hydrateLink(ctx, partial)...)
 
 	thr, err := s.thread_repo.Create(ctx,
 		title,
@@ -69,4 +60,20 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	return thr, nil
+}
+
+func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []thread.Option) {
+	v, ok := partial.URL.Get()
+	if !ok {
+		return
+	}
+
+	opts, err := s.hydrator.HydrateThread(ctx, v)
+	if err != nil {
+		s.l.Warn("failed to hydrate URL",
+			zap.String("url", v),
+			zap.Error(err))
+	}
+
+	return
 }

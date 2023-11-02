@@ -110,9 +110,6 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
-		{Name: "url", Type: field.TypeString, Nullable: true},
-		{Name: "url_title", Type: field.TypeString, Nullable: true},
-		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -127,13 +124,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[13]},
+				Columns:    []*schema.Column{ClustersColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[14]},
+				Columns:    []*schema.Column{ClustersColumns[11]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -178,9 +175,6 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
-		{Name: "url", Type: field.TypeString, Nullable: true},
-		{Name: "url_title", Type: field.TypeString, Nullable: true},
-		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -194,7 +188,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[13]},
+				Columns:    []*schema.Column{ItemsColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -204,6 +198,27 @@ var (
 				Name:    "item_slug",
 				Unique:  false,
 				Columns: []*schema.Column{ItemsColumns[5]},
+			},
+		},
+	}
+	// LinksColumns holds the columns for the "links" table.
+	LinksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "url", Type: field.TypeString, Unique: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+	}
+	// LinksTable holds the schema information for the "links" table.
+	LinksTable = &schema.Table{
+		Name:       "links",
+		Columns:    LinksColumns,
+		PrimaryKey: []*schema.Column{LinksColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "link_url",
+				Unique:  false,
+				Columns: []*schema.Column{LinksColumns[2]},
 			},
 		},
 	}
@@ -236,9 +251,6 @@ var (
 		{Name: "short", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "published"}, Default: "draft"},
-		{Name: "url", Type: field.TypeString, Nullable: true},
-		{Name: "url_title", Type: field.TypeString, Nullable: true},
-		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "account_posts", Type: field.TypeString, Size: 20},
 		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "root_post_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -252,25 +264,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_accounts_posts",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[12]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[16]},
+				Columns:    []*schema.Column{PostsColumns[13]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[17]},
+				Columns:    []*schema.Column{PostsColumns[14]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_replies",
-				Columns:    []*schema.Column{PostsColumns[18]},
+				Columns:    []*schema.Column{PostsColumns[15]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -466,6 +478,106 @@ var (
 			},
 		},
 	}
+	// LinkPostsColumns holds the columns for the "link_posts" table.
+	LinkPostsColumns = []*schema.Column{
+		{Name: "link_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// LinkPostsTable holds the schema information for the "link_posts" table.
+	LinkPostsTable = &schema.Table{
+		Name:       "link_posts",
+		Columns:    LinkPostsColumns,
+		PrimaryKey: []*schema.Column{LinkPostsColumns[0], LinkPostsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "link_posts_link_id",
+				Columns:    []*schema.Column{LinkPostsColumns[0]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "link_posts_post_id",
+				Columns:    []*schema.Column{LinkPostsColumns[1]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// LinkClustersColumns holds the columns for the "link_clusters" table.
+	LinkClustersColumns = []*schema.Column{
+		{Name: "link_id", Type: field.TypeString, Size: 20},
+		{Name: "cluster_id", Type: field.TypeString, Size: 20},
+	}
+	// LinkClustersTable holds the schema information for the "link_clusters" table.
+	LinkClustersTable = &schema.Table{
+		Name:       "link_clusters",
+		Columns:    LinkClustersColumns,
+		PrimaryKey: []*schema.Column{LinkClustersColumns[0], LinkClustersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "link_clusters_link_id",
+				Columns:    []*schema.Column{LinkClustersColumns[0]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "link_clusters_cluster_id",
+				Columns:    []*schema.Column{LinkClustersColumns[1]},
+				RefColumns: []*schema.Column{ClustersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// LinkItemsColumns holds the columns for the "link_items" table.
+	LinkItemsColumns = []*schema.Column{
+		{Name: "link_id", Type: field.TypeString, Size: 20},
+		{Name: "item_id", Type: field.TypeString, Size: 20},
+	}
+	// LinkItemsTable holds the schema information for the "link_items" table.
+	LinkItemsTable = &schema.Table{
+		Name:       "link_items",
+		Columns:    LinkItemsColumns,
+		PrimaryKey: []*schema.Column{LinkItemsColumns[0], LinkItemsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "link_items_link_id",
+				Columns:    []*schema.Column{LinkItemsColumns[0]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "link_items_item_id",
+				Columns:    []*schema.Column{LinkItemsColumns[1]},
+				RefColumns: []*schema.Column{ItemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// LinkAssetsColumns holds the columns for the "link_assets" table.
+	LinkAssetsColumns = []*schema.Column{
+		{Name: "link_id", Type: field.TypeString, Size: 20},
+		{Name: "asset_id", Type: field.TypeString},
+	}
+	// LinkAssetsTable holds the schema information for the "link_assets" table.
+	LinkAssetsTable = &schema.Table{
+		Name:       "link_assets",
+		Columns:    LinkAssetsColumns,
+		PrimaryKey: []*schema.Column{LinkAssetsColumns[0], LinkAssetsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "link_assets_link_id",
+				Columns:    []*schema.Column{LinkAssetsColumns[0]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "link_assets_asset_id",
+				Columns:    []*schema.Column{LinkAssetsColumns[1]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// PostAssetsColumns holds the columns for the "post_assets" table.
 	PostAssetsColumns = []*schema.Column{
 		{Name: "post_id", Type: field.TypeString, Size: 20},
@@ -600,6 +712,7 @@ var (
 		ClustersTable,
 		CollectionsTable,
 		ItemsTable,
+		LinksTable,
 		NotificationsTable,
 		PostsTable,
 		ReactsTable,
@@ -611,6 +724,10 @@ var (
 		ClusterAssetsTable,
 		CollectionPostsTable,
 		ItemAssetsTable,
+		LinkPostsTable,
+		LinkClustersTable,
+		LinkItemsTable,
+		LinkAssetsTable,
 		PostAssetsTable,
 		RoleAccountsTable,
 		TagPostsTable,
@@ -642,6 +759,14 @@ func init() {
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	ItemAssetsTable.ForeignKeys[0].RefTable = ItemsTable
 	ItemAssetsTable.ForeignKeys[1].RefTable = AssetsTable
+	LinkPostsTable.ForeignKeys[0].RefTable = LinksTable
+	LinkPostsTable.ForeignKeys[1].RefTable = PostsTable
+	LinkClustersTable.ForeignKeys[0].RefTable = LinksTable
+	LinkClustersTable.ForeignKeys[1].RefTable = ClustersTable
+	LinkItemsTable.ForeignKeys[0].RefTable = LinksTable
+	LinkItemsTable.ForeignKeys[1].RefTable = ItemsTable
+	LinkAssetsTable.ForeignKeys[0].RefTable = LinksTable
+	LinkAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable

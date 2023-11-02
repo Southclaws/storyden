@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -103,6 +104,8 @@ func (d *database) Create(
 		WithAuthor().
 		WithCategory().
 		WithTags().
+		WithAssets().
+		WithLinks().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -150,6 +153,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		WithCategory().
 		WithTags().
 		WithAssets().
+		WithLinks().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -191,6 +195,9 @@ func (d *database) List(
 		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
 			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
+		}).
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Order(ent_post.ByUpdatedAt(sql.OrderDesc()), ent_post.ByCreatedAt(sql.OrderDesc()))
 

@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	item_repo "github.com/Southclaws/storyden/app/resources/item"
 	"github.com/Southclaws/storyden/app/resources/item_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/item_crud"
@@ -37,27 +36,17 @@ func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	opts := []item_repo.Option{}
-
-	if v := request.Body.Content; v != nil {
-		opts = append(opts, item_repo.WithContent(*v))
-	}
-	if v := request.Body.Properties; v != nil {
-		opts = append(opts, item_repo.WithProperties(*v))
-	}
-	if v := request.Body.ImageUrl; v != nil {
-		opts = append(opts, item_repo.WithImageURL(*v))
-	}
-	if v := request.Body.Url; v != nil {
-		opts = append(opts, item_repo.WithURL(*v))
-	}
-
 	itm, err := i.im.Create(ctx,
 		session,
 		request.Body.Name,
 		request.Body.Slug,
 		request.Body.Description,
-		opts...,
+		item_crud.Partial{
+			Content:    opt.NewPtr(request.Body.Content),
+			ImageURL:   opt.NewPtr(request.Body.ImageUrl),
+			Properties: opt.NewPtr(request.Body.Properties),
+			URL:        opt.NewPtr(request.Body.Url),
+		},
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -125,7 +114,7 @@ func serialiseItem(in *datagraph.Item) openapi.Item {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
-		Link:        opt.Map(in.Link, serialiseLink).Ptr(),
+		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
@@ -142,7 +131,7 @@ func serialiseItemWithParents(in *datagraph.Item) openapi.ItemWithParents {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		ImageUrl:    in.ImageURL.Ptr(),
-		Link:        opt.Map(in.Link, serialiseLink).Ptr(),
+		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
