@@ -1,8 +1,8 @@
+import { Thread } from "src/api/openapi/schemas";
 import { Input } from "src/theme/components";
 
-import { Thread } from "src/api/openapi/schemas";
-
 import { CategoryPill } from "../CategoryPill";
+import { LinkView } from "../LinkView/LinkView";
 
 import { styled } from "@/styled-system/jsx";
 
@@ -22,6 +22,7 @@ export function Title(props: Thread) {
           </styled.h1>
         )}
       </div>
+      {props.link && <LinkView link={props.link} asset={props.assets?.[0]} />}
       <CategoryPill category={props.category} />
     </>
   );
