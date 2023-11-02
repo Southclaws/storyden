@@ -2,7 +2,7 @@
 
 import { ThreadList } from "src/api/openapi/schemas";
 import { useThreadList } from "src/api/openapi/threads";
-import { TextPostList } from "src/components/feed/text/TextPostList";
+import { MixedPostList } from "src/components/feed/mixed/MixedPostList";
 import { Onboarding } from "src/components/site/Onboarding/Onboarding";
 import { Unready } from "src/components/site/Unready";
 
@@ -23,7 +23,7 @@ export function Client(props: Props) {
   return (
     <>
       <Onboarding />
-      <TextPostList posts={data?.threads} />
+      <MixedPostList posts={data?.threads} />
     </>
   );
 }
