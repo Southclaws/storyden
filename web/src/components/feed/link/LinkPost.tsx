@@ -32,22 +32,14 @@ export function LinkPost(props: Props) {
         backgroundColor="white"
         overflow="hidden"
       >
-        <Box
-          display="flex"
-          w="full"
-          bgColor="accent.100"
-          overflow="hidden"
-          height="24"
-          p="2"
-          gap="2"
-        >
+        <Box display="flex" w="full" bgColor="accent.100" height="24">
           {asset && (
             <Box flexGrow="1" flexShrink="0" width="32">
               <styled.img
                 src={asset.url}
                 height="full"
                 width="full"
-                objectPosition="left"
+                objectPosition="center"
                 objectFit="cover"
               />
             </Box>
