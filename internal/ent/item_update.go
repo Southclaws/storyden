@@ -112,6 +112,46 @@ func (iu *ItemUpdate) ClearURL() *ItemUpdate {
 	return iu
 }
 
+// SetURLTitle sets the "url_title" field.
+func (iu *ItemUpdate) SetURLTitle(s string) *ItemUpdate {
+	iu.mutation.SetURLTitle(s)
+	return iu
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableURLTitle(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetURLTitle(*s)
+	}
+	return iu
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (iu *ItemUpdate) ClearURLTitle() *ItemUpdate {
+	iu.mutation.ClearURLTitle()
+	return iu
+}
+
+// SetURLDescription sets the "url_description" field.
+func (iu *ItemUpdate) SetURLDescription(s string) *ItemUpdate {
+	iu.mutation.SetURLDescription(s)
+	return iu
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableURLDescription(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetURLDescription(*s)
+	}
+	return iu
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (iu *ItemUpdate) ClearURLDescription() *ItemUpdate {
+	iu.mutation.ClearURLDescription()
+	return iu
+}
+
 // SetDescription sets the "description" field.
 func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 	iu.mutation.SetDescription(s)
@@ -374,6 +414,18 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.URLCleared() {
 		_spec.ClearField(item.FieldURL, field.TypeString)
+	}
+	if value, ok := iu.mutation.URLTitle(); ok {
+		_spec.SetField(item.FieldURLTitle, field.TypeString, value)
+	}
+	if iu.mutation.URLTitleCleared() {
+		_spec.ClearField(item.FieldURLTitle, field.TypeString)
+	}
+	if value, ok := iu.mutation.URLDescription(); ok {
+		_spec.SetField(item.FieldURLDescription, field.TypeString, value)
+	}
+	if iu.mutation.URLDescriptionCleared() {
+		_spec.ClearField(item.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
@@ -651,6 +703,46 @@ func (iuo *ItemUpdateOne) SetNillableURL(s *string) *ItemUpdateOne {
 // ClearURL clears the value of the "url" field.
 func (iuo *ItemUpdateOne) ClearURL() *ItemUpdateOne {
 	iuo.mutation.ClearURL()
+	return iuo
+}
+
+// SetURLTitle sets the "url_title" field.
+func (iuo *ItemUpdateOne) SetURLTitle(s string) *ItemUpdateOne {
+	iuo.mutation.SetURLTitle(s)
+	return iuo
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableURLTitle(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetURLTitle(*s)
+	}
+	return iuo
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (iuo *ItemUpdateOne) ClearURLTitle() *ItemUpdateOne {
+	iuo.mutation.ClearURLTitle()
+	return iuo
+}
+
+// SetURLDescription sets the "url_description" field.
+func (iuo *ItemUpdateOne) SetURLDescription(s string) *ItemUpdateOne {
+	iuo.mutation.SetURLDescription(s)
+	return iuo
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableURLDescription(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetURLDescription(*s)
+	}
+	return iuo
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (iuo *ItemUpdateOne) ClearURLDescription() *ItemUpdateOne {
+	iuo.mutation.ClearURLDescription()
 	return iuo
 }
 
@@ -946,6 +1038,18 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if iuo.mutation.URLCleared() {
 		_spec.ClearField(item.FieldURL, field.TypeString)
+	}
+	if value, ok := iuo.mutation.URLTitle(); ok {
+		_spec.SetField(item.FieldURLTitle, field.TypeString, value)
+	}
+	if iuo.mutation.URLTitleCleared() {
+		_spec.ClearField(item.FieldURLTitle, field.TypeString)
+	}
+	if value, ok := iuo.mutation.URLDescription(); ok {
+		_spec.SetField(item.FieldURLDescription, field.TypeString, value)
+	}
+	if iuo.mutation.URLDescriptionCleared() {
+		_spec.ClearField(item.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)

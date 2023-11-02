@@ -5,6 +5,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -37,7 +38,7 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		Name:        c.Name,
 		Slug:        c.Slug,
 		ImageURL:    opt.NewPtr(c.ImageURL),
-		URL:         opt.NewPtr(c.URL),
+		Link:        link.NewLinkOpt(c.URL, c.URLTitle, c.URLDescription),
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
 		Owner:       *pro,
@@ -70,7 +71,7 @@ func ItemFromModel(c *ent.Item) (*Item, error) {
 		Name:        c.Name,
 		Slug:        c.Slug,
 		ImageURL:    opt.NewPtr(c.ImageURL),
-		URL:         opt.NewPtr(c.URL),
+		Link:        link.NewLinkOpt(c.URL, c.URLTitle, c.URLDescription),
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
 		Owner:       *pro,

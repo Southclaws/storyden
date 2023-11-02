@@ -110,6 +110,34 @@ func (ic *ItemCreate) SetNillableURL(s *string) *ItemCreate {
 	return ic
 }
 
+// SetURLTitle sets the "url_title" field.
+func (ic *ItemCreate) SetURLTitle(s string) *ItemCreate {
+	ic.mutation.SetURLTitle(s)
+	return ic
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableURLTitle(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetURLTitle(*s)
+	}
+	return ic
+}
+
+// SetURLDescription sets the "url_description" field.
+func (ic *ItemCreate) SetURLDescription(s string) *ItemCreate {
+	ic.mutation.SetURLDescription(s)
+	return ic
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableURLDescription(s *string) *ItemCreate {
+	if s != nil {
+		ic.SetURLDescription(*s)
+	}
+	return ic
+}
+
 // SetDescription sets the "description" field.
 func (ic *ItemCreate) SetDescription(s string) *ItemCreate {
 	ic.mutation.SetDescription(s)
@@ -353,6 +381,14 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldURL, field.TypeString, value)
 		_node.URL = &value
 	}
+	if value, ok := ic.mutation.URLTitle(); ok {
+		_spec.SetField(item.FieldURLTitle, field.TypeString, value)
+		_node.URLTitle = &value
+	}
+	if value, ok := ic.mutation.URLDescription(); ok {
+		_spec.SetField(item.FieldURLDescription, field.TypeString, value)
+		_node.URLDescription = &value
+	}
 	if value, ok := ic.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 		_node.Description = value
@@ -572,6 +608,42 @@ func (u *ItemUpsert) ClearURL() *ItemUpsert {
 	return u
 }
 
+// SetURLTitle sets the "url_title" field.
+func (u *ItemUpsert) SetURLTitle(v string) *ItemUpsert {
+	u.Set(item.FieldURLTitle, v)
+	return u
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateURLTitle() *ItemUpsert {
+	u.SetExcluded(item.FieldURLTitle)
+	return u
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *ItemUpsert) ClearURLTitle() *ItemUpsert {
+	u.SetNull(item.FieldURLTitle)
+	return u
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *ItemUpsert) SetURLDescription(v string) *ItemUpsert {
+	u.Set(item.FieldURLDescription, v)
+	return u
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateURLDescription() *ItemUpsert {
+	u.SetExcluded(item.FieldURLDescription)
+	return u
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *ItemUpsert) ClearURLDescription() *ItemUpsert {
+	u.SetNull(item.FieldURLDescription)
+	return u
+}
+
 // SetDescription sets the "description" field.
 func (u *ItemUpsert) SetDescription(v string) *ItemUpsert {
 	u.Set(item.FieldDescription, v)
@@ -785,6 +857,48 @@ func (u *ItemUpsertOne) UpdateURL() *ItemUpsertOne {
 func (u *ItemUpsertOne) ClearURL() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.ClearURL()
+	})
+}
+
+// SetURLTitle sets the "url_title" field.
+func (u *ItemUpsertOne) SetURLTitle(v string) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURLTitle(v)
+	})
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateURLTitle() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURLTitle()
+	})
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *ItemUpsertOne) ClearURLTitle() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURLTitle()
+	})
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *ItemUpsertOne) SetURLDescription(v string) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURLDescription(v)
+	})
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateURLDescription() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURLDescription()
+	})
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *ItemUpsertOne) ClearURLDescription() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURLDescription()
 	})
 }
 
@@ -1178,6 +1292,48 @@ func (u *ItemUpsertBulk) UpdateURL() *ItemUpsertBulk {
 func (u *ItemUpsertBulk) ClearURL() *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
 		s.ClearURL()
+	})
+}
+
+// SetURLTitle sets the "url_title" field.
+func (u *ItemUpsertBulk) SetURLTitle(v string) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURLTitle(v)
+	})
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateURLTitle() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURLTitle()
+	})
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *ItemUpsertBulk) ClearURLTitle() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURLTitle()
+	})
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *ItemUpsertBulk) SetURLDescription(v string) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetURLDescription(v)
+	})
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateURLDescription() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateURLDescription()
+	})
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *ItemUpsertBulk) ClearURLDescription() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.ClearURLDescription()
 	})
 }
 

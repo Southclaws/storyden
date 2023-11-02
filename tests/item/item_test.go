@@ -55,7 +55,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(slug1, item1.JSON200.Slug)
 			a.Equal("testing items api", item1.JSON200.Description)
 			a.Equal(iurl1, *item1.JSON200.ImageUrl)
-			a.Equal(url1, *item1.JSON200.Url)
+			a.Equal(url1, *item1.JSON200.Link.Url)
 			a.Equal(cont1, *item1.JSON200.Content)
 			a.Equal(acc.ID.String(), string(item1.JSON200.Owner.Id))
 
@@ -101,7 +101,7 @@ func TestItemsHappyPath(t *testing.T) {
 			a.Equal(desc1, item1update.JSON200.Description)
 			a.Equal(cont1, *item1update.JSON200.Content)
 			a.Equal(iurl1, *item1update.JSON200.ImageUrl)
-			a.Equal(url1, *item1update.JSON200.Url)
+			a.Equal(url1, *item1update.JSON200.Link.Url)
 			a.Equal(prop1, item1update.JSON200.Properties)
 
 			// Query for the exact item

@@ -109,6 +109,14 @@ func WithURL(v string) Option {
 	}
 }
 
+func WithLink(url, title, description string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetURL(url)
+		pm.SetURLTitle(title)
+		pm.SetURLDescription(description)
+	}
+}
+
 type Query func(q *ent.PostQuery)
 
 func HasAuthor(id account.AccountID) Query {

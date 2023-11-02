@@ -1782,6 +1782,17 @@ components:
       type: string
       format: url
 
+    Link:
+      description: |
+        A web address with content information such as title, description, etc.
+      type: object
+      properties:
+        url: { $ref: "#/components/schemas/URL" }
+        title:
+          type: string
+        description:
+          type: string
+
     AccountName:
       type: string
       description: The account owners display name.
@@ -2497,7 +2508,7 @@ components:
             meta: { $ref: "#/components/schemas/Metadata" }
             assets: { $ref: "#/components/schemas/AssetList" }
             collections: { $ref: "#/components/schemas/CollectionList" }
-            url: { $ref: "#/components/schemas/URL" }
+            link: { $ref: "#/components/schemas/Link" }
 
     ThreadList:
       type: array
@@ -2553,7 +2564,7 @@ components:
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
         assets: { $ref: "#/components/schemas/AssetList" }
-        url: { $ref: "#/components/schemas/URL" }
+        link: { $ref: "#/components/schemas/Link" }
 
     PostInitialProps:
       type: object
@@ -2782,7 +2793,7 @@ components:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
-        url: { $ref: "#/components/schemas/URL" }
+        link: { $ref: "#/components/schemas/Link" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
@@ -2875,7 +2886,7 @@ components:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
         image_url: { $ref: "#/components/schemas/AssetURL" }
-        url: { $ref: "#/components/schemas/URL" }
+        link: { $ref: "#/components/schemas/Link" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }

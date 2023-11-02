@@ -29,6 +29,10 @@ const (
 	FieldImageURL = "image_url"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
+	// FieldURLTitle holds the string denoting the url_title field in the database.
+	FieldURLTitle = "url_title"
+	// FieldURLDescription holds the string denoting the url_description field in the database.
+	FieldURLDescription = "url_description"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldContent holds the string denoting the content field in the database.
@@ -95,6 +99,8 @@ var Columns = []string{
 	FieldSlug,
 	FieldImageURL,
 	FieldURL,
+	FieldURLTitle,
+	FieldURLDescription,
 	FieldDescription,
 	FieldContent,
 	FieldParentClusterID,
@@ -178,6 +184,16 @@ func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByURLTitle orders the results by the url_title field.
+func ByURLTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURLTitle, opts...).ToFunc()
+}
+
+// ByURLDescription orders the results by the url_description field.
+func ByURLDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURLDescription, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.

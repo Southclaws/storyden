@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -52,13 +51,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
-	opts := []thread.Option{}
-
 	tags := opt.NewPtr(request.Body.Tags)
-
-	if v := request.Body.Url; v != nil {
-		opts = append(opts, thread.WithURL(*v))
-	}
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
@@ -68,7 +61,9 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		status,
 		tags.OrZero(),
 		meta,
-		opts...,
+		thread_service.Partial{
+			URL: opt.NewPtr(request.Body.Url),
+		},
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/authentication"
-	"github.com/rs/xid"
 )
 
 const SeedPassword = `$argon2id$v=19$m=65536,t=1,p=2$MAwllQoeGcxCPOC52OQwZA$jLlzHsmSHmQPbpQ6Y5+877NlacOYeyqEqWoKJJXRcHM`

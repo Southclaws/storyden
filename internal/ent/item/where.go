@@ -91,6 +91,16 @@ func URL(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldURL, v))
 }
 
+// URLTitle applies equality check predicate on the "url_title" field. It's identical to URLTitleEQ.
+func URLTitle(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldURLTitle, v))
+}
+
+// URLDescription applies equality check predicate on the "url_description" field. It's identical to URLDescriptionEQ.
+func URLDescription(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldURLDescription, v))
+}
+
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldDescription, v))
@@ -514,6 +524,156 @@ func URLEqualFold(v string) predicate.Item {
 // URLContainsFold applies the ContainsFold predicate on the "url" field.
 func URLContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldURL, v))
+}
+
+// URLTitleEQ applies the EQ predicate on the "url_title" field.
+func URLTitleEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldURLTitle, v))
+}
+
+// URLTitleNEQ applies the NEQ predicate on the "url_title" field.
+func URLTitleNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldURLTitle, v))
+}
+
+// URLTitleIn applies the In predicate on the "url_title" field.
+func URLTitleIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldURLTitle, vs...))
+}
+
+// URLTitleNotIn applies the NotIn predicate on the "url_title" field.
+func URLTitleNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldURLTitle, vs...))
+}
+
+// URLTitleGT applies the GT predicate on the "url_title" field.
+func URLTitleGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldURLTitle, v))
+}
+
+// URLTitleGTE applies the GTE predicate on the "url_title" field.
+func URLTitleGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldURLTitle, v))
+}
+
+// URLTitleLT applies the LT predicate on the "url_title" field.
+func URLTitleLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldURLTitle, v))
+}
+
+// URLTitleLTE applies the LTE predicate on the "url_title" field.
+func URLTitleLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldURLTitle, v))
+}
+
+// URLTitleContains applies the Contains predicate on the "url_title" field.
+func URLTitleContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldURLTitle, v))
+}
+
+// URLTitleHasPrefix applies the HasPrefix predicate on the "url_title" field.
+func URLTitleHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldURLTitle, v))
+}
+
+// URLTitleHasSuffix applies the HasSuffix predicate on the "url_title" field.
+func URLTitleHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldURLTitle, v))
+}
+
+// URLTitleIsNil applies the IsNil predicate on the "url_title" field.
+func URLTitleIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldURLTitle))
+}
+
+// URLTitleNotNil applies the NotNil predicate on the "url_title" field.
+func URLTitleNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldURLTitle))
+}
+
+// URLTitleEqualFold applies the EqualFold predicate on the "url_title" field.
+func URLTitleEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldURLTitle, v))
+}
+
+// URLTitleContainsFold applies the ContainsFold predicate on the "url_title" field.
+func URLTitleContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldURLTitle, v))
+}
+
+// URLDescriptionEQ applies the EQ predicate on the "url_description" field.
+func URLDescriptionEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldURLDescription, v))
+}
+
+// URLDescriptionNEQ applies the NEQ predicate on the "url_description" field.
+func URLDescriptionNEQ(v string) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldURLDescription, v))
+}
+
+// URLDescriptionIn applies the In predicate on the "url_description" field.
+func URLDescriptionIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldURLDescription, vs...))
+}
+
+// URLDescriptionNotIn applies the NotIn predicate on the "url_description" field.
+func URLDescriptionNotIn(vs ...string) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldURLDescription, vs...))
+}
+
+// URLDescriptionGT applies the GT predicate on the "url_description" field.
+func URLDescriptionGT(v string) predicate.Item {
+	return predicate.Item(sql.FieldGT(FieldURLDescription, v))
+}
+
+// URLDescriptionGTE applies the GTE predicate on the "url_description" field.
+func URLDescriptionGTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldGTE(FieldURLDescription, v))
+}
+
+// URLDescriptionLT applies the LT predicate on the "url_description" field.
+func URLDescriptionLT(v string) predicate.Item {
+	return predicate.Item(sql.FieldLT(FieldURLDescription, v))
+}
+
+// URLDescriptionLTE applies the LTE predicate on the "url_description" field.
+func URLDescriptionLTE(v string) predicate.Item {
+	return predicate.Item(sql.FieldLTE(FieldURLDescription, v))
+}
+
+// URLDescriptionContains applies the Contains predicate on the "url_description" field.
+func URLDescriptionContains(v string) predicate.Item {
+	return predicate.Item(sql.FieldContains(FieldURLDescription, v))
+}
+
+// URLDescriptionHasPrefix applies the HasPrefix predicate on the "url_description" field.
+func URLDescriptionHasPrefix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasPrefix(FieldURLDescription, v))
+}
+
+// URLDescriptionHasSuffix applies the HasSuffix predicate on the "url_description" field.
+func URLDescriptionHasSuffix(v string) predicate.Item {
+	return predicate.Item(sql.FieldHasSuffix(FieldURLDescription, v))
+}
+
+// URLDescriptionIsNil applies the IsNil predicate on the "url_description" field.
+func URLDescriptionIsNil() predicate.Item {
+	return predicate.Item(sql.FieldIsNull(FieldURLDescription))
+}
+
+// URLDescriptionNotNil applies the NotNil predicate on the "url_description" field.
+func URLDescriptionNotNil() predicate.Item {
+	return predicate.Item(sql.FieldNotNull(FieldURLDescription))
+}
+
+// URLDescriptionEqualFold applies the EqualFold predicate on the "url_description" field.
+func URLDescriptionEqualFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldEqualFold(FieldURLDescription, v))
+}
+
+// URLDescriptionContainsFold applies the ContainsFold predicate on the "url_description" field.
+func URLDescriptionContainsFold(v string) predicate.Item {
+	return predicate.Item(sql.FieldContainsFold(FieldURLDescription, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

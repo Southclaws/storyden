@@ -34,6 +34,10 @@ type Item struct {
 	ImageURL *string `json:"image_url,omitempty"`
 	// URL holds the value of the "url" field.
 	URL *string `json:"url,omitempty"`
+	// URLTitle holds the value of the "url_title" field.
+	URLTitle *string `json:"url_title,omitempty"`
+	// URLDescription holds the value of the "url_description" field.
+	URLDescription *string `json:"url_description,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
@@ -110,7 +114,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldProperties:
 			values[i] = new([]byte)
-		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldURL, item.FieldDescription, item.FieldContent:
+		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldURL, item.FieldURLTitle, item.FieldURLDescription, item.FieldDescription, item.FieldContent:
 			values[i] = new(sql.NullString)
 		case item.FieldCreatedAt, item.FieldUpdatedAt, item.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -181,6 +185,20 @@ func (i *Item) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				i.URL = new(string)
 				*i.URL = value.String
+			}
+		case item.FieldURLTitle:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url_title", values[j])
+			} else if value.Valid {
+				i.URLTitle = new(string)
+				*i.URLTitle = value.String
+			}
+		case item.FieldURLDescription:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url_description", values[j])
+			} else if value.Valid {
+				i.URLDescription = new(string)
+				*i.URLDescription = value.String
 			}
 		case item.FieldDescription:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -289,6 +307,16 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	if v := i.URL; v != nil {
 		builder.WriteString("url=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := i.URLTitle; v != nil {
+		builder.WriteString("url_title=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := i.URLDescription; v != nil {
+		builder.WriteString("url_description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

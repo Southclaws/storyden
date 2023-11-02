@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -37,7 +38,7 @@ type Thread struct {
 	Meta        map[string]any
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
-	URL         opt.Optional[string]
+	Link        opt.Optional[link.Link]
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
@@ -112,6 +113,6 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Meta:        m.Metadata,
 		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
 		Collections: collections.OrZero(),
-		URL:         opt.NewPtr(m.URL),
+		Link:        link.NewLinkOpt(m.URL, m.URLTitle, m.URLDescription),
 	}, nil
 }

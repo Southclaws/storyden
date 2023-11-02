@@ -44,6 +44,10 @@ const (
 	FieldStatus = "status"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
+	// FieldURLTitle holds the string denoting the url_title field in the database.
+	FieldURLTitle = "url_title"
+	// FieldURLDescription holds the string denoting the url_description field in the database.
+	FieldURLDescription = "url_description"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -139,6 +143,8 @@ var Columns = []string{
 	FieldMetadata,
 	FieldStatus,
 	FieldURL,
+	FieldURLTitle,
+	FieldURLDescription,
 	FieldCategoryID,
 }
 
@@ -287,6 +293,16 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByURLTitle orders the results by the url_title field.
+func ByURLTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURLTitle, opts...).ToFunc()
+}
+
+// ByURLDescription orders the results by the url_description field.
+func ByURLDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURLDescription, opts...).ToFunc()
 }
 
 // ByCategoryID orders the results by the category_id field.

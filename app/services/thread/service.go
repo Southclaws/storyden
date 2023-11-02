@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/app/services/thread_url"
+	"github.com/Southclaws/storyden/app/services/hydrator"
 )
 
 type Service interface {
@@ -30,7 +30,7 @@ type Service interface {
 		status post.Status,
 		tags []string,
 		meta map[string]any,
-		opts ...thread.Option,
+		partial Partial,
 	) (*thread.Thread, error)
 
 	Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error)
@@ -58,7 +58,18 @@ type Partial struct {
 	Tags     opt.Optional[[]xid.ID]
 	Category opt.Optional[xid.ID]
 	Status   opt.Optional[post.Status]
+	URL      opt.Optional[string]
 	Meta     opt.Optional[map[string]any]
+}
+
+func (p Partial) Opts() (opts []thread.Option) {
+	p.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
+	p.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
+	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
+	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
+	p.Status.Call(func(v post.Status) { opts = append(opts, thread.WithStatus(v)) })
+	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
+	return
 }
 
 func Build() fx.Option {
@@ -69,9 +80,9 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo   account.Repository
-	thread_repo    thread.Repository
-	thread_url_svc thread_url.Service
+	account_repo account.Repository
+	thread_repo  thread.Repository
+	hydrator     hydrator.Service
 }
 
 func New(
@@ -80,13 +91,13 @@ func New(
 
 	account_repo account.Repository,
 	thread_repo thread.Repository,
-	thread_url_svc thread_url.Service,
+	hydrator hydrator.Service,
 ) Service {
 	return &service{
-		l:              l.With(zap.String("service", "thread")),
-		rbac:           rbac,
-		account_repo:   account_repo,
-		thread_repo:    thread_repo,
-		thread_url_svc: thread_url_svc,
+		l:            l.With(zap.String("service", "thread")),
+		rbac:         rbac,
+		account_repo: account_repo,
+		thread_repo:  thread_repo,
+		hydrator:     hydrator,
 	}
 }
