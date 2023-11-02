@@ -194,6 +194,34 @@ func (pc *PostCreate) SetNillableURL(s *string) *PostCreate {
 	return pc
 }
 
+// SetURLTitle sets the "url_title" field.
+func (pc *PostCreate) SetURLTitle(s string) *PostCreate {
+	pc.mutation.SetURLTitle(s)
+	return pc
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (pc *PostCreate) SetNillableURLTitle(s *string) *PostCreate {
+	if s != nil {
+		pc.SetURLTitle(*s)
+	}
+	return pc
+}
+
+// SetURLDescription sets the "url_description" field.
+func (pc *PostCreate) SetURLDescription(s string) *PostCreate {
+	pc.mutation.SetURLDescription(s)
+	return pc
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (pc *PostCreate) SetNillableURLDescription(s *string) *PostCreate {
+	if s != nil {
+		pc.SetURLDescription(*s)
+	}
+	return pc
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
 	pc.mutation.SetCategoryID(x)
@@ -542,6 +570,14 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.URL(); ok {
 		_spec.SetField(post.FieldURL, field.TypeString, value)
 		_node.URL = &value
+	}
+	if value, ok := pc.mutation.URLTitle(); ok {
+		_spec.SetField(post.FieldURLTitle, field.TypeString, value)
+		_node.URLTitle = &value
+	}
+	if value, ok := pc.mutation.URLDescription(); ok {
+		_spec.SetField(post.FieldURLDescription, field.TypeString, value)
+		_node.URLDescription = &value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -957,6 +993,42 @@ func (u *PostUpsert) ClearURL() *PostUpsert {
 	return u
 }
 
+// SetURLTitle sets the "url_title" field.
+func (u *PostUpsert) SetURLTitle(v string) *PostUpsert {
+	u.Set(post.FieldURLTitle, v)
+	return u
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *PostUpsert) UpdateURLTitle() *PostUpsert {
+	u.SetExcluded(post.FieldURLTitle)
+	return u
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *PostUpsert) ClearURLTitle() *PostUpsert {
+	u.SetNull(post.FieldURLTitle)
+	return u
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *PostUpsert) SetURLDescription(v string) *PostUpsert {
+	u.Set(post.FieldURLDescription, v)
+	return u
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *PostUpsert) UpdateURLDescription() *PostUpsert {
+	u.SetExcluded(post.FieldURLDescription)
+	return u
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *PostUpsert) ClearURLDescription() *PostUpsert {
+	u.SetNull(post.FieldURLDescription)
+	return u
+}
+
 // SetCategoryID sets the "category_id" field.
 func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
@@ -1254,6 +1326,48 @@ func (u *PostUpsertOne) UpdateURL() *PostUpsertOne {
 func (u *PostUpsertOne) ClearURL() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearURL()
+	})
+}
+
+// SetURLTitle sets the "url_title" field.
+func (u *PostUpsertOne) SetURLTitle(v string) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURLTitle(v)
+	})
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateURLTitle() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURLTitle()
+	})
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *PostUpsertOne) ClearURLTitle() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURLTitle()
+	})
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *PostUpsertOne) SetURLDescription(v string) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURLDescription(v)
+	})
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateURLDescription() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURLDescription()
+	})
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *PostUpsertOne) ClearURLDescription() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURLDescription()
 	})
 }
 
@@ -1724,6 +1838,48 @@ func (u *PostUpsertBulk) UpdateURL() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearURL() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearURL()
+	})
+}
+
+// SetURLTitle sets the "url_title" field.
+func (u *PostUpsertBulk) SetURLTitle(v string) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURLTitle(v)
+	})
+}
+
+// UpdateURLTitle sets the "url_title" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateURLTitle() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURLTitle()
+	})
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (u *PostUpsertBulk) ClearURLTitle() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURLTitle()
+	})
+}
+
+// SetURLDescription sets the "url_description" field.
+func (u *PostUpsertBulk) SetURLDescription(v string) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetURLDescription(v)
+	})
+}
+
+// UpdateURLDescription sets the "url_description" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateURLDescription() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateURLDescription()
+	})
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (u *PostUpsertBulk) ClearURLDescription() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearURLDescription()
 	})
 }
 

@@ -112,6 +112,46 @@ func (cu *ClusterUpdate) ClearURL() *ClusterUpdate {
 	return cu
 }
 
+// SetURLTitle sets the "url_title" field.
+func (cu *ClusterUpdate) SetURLTitle(s string) *ClusterUpdate {
+	cu.mutation.SetURLTitle(s)
+	return cu
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableURLTitle(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetURLTitle(*s)
+	}
+	return cu
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (cu *ClusterUpdate) ClearURLTitle() *ClusterUpdate {
+	cu.mutation.ClearURLTitle()
+	return cu
+}
+
+// SetURLDescription sets the "url_description" field.
+func (cu *ClusterUpdate) SetURLDescription(s string) *ClusterUpdate {
+	cu.mutation.SetURLDescription(s)
+	return cu
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableURLDescription(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetURLDescription(*s)
+	}
+	return cu
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (cu *ClusterUpdate) ClearURLDescription() *ClusterUpdate {
+	cu.mutation.ClearURLDescription()
+	return cu
+}
+
 // SetDescription sets the "description" field.
 func (cu *ClusterUpdate) SetDescription(s string) *ClusterUpdate {
 	cu.mutation.SetDescription(s)
@@ -455,6 +495,18 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.URLCleared() {
 		_spec.ClearField(cluster.FieldURL, field.TypeString)
+	}
+	if value, ok := cu.mutation.URLTitle(); ok {
+		_spec.SetField(cluster.FieldURLTitle, field.TypeString, value)
+	}
+	if cu.mutation.URLTitleCleared() {
+		_spec.ClearField(cluster.FieldURLTitle, field.TypeString)
+	}
+	if value, ok := cu.mutation.URLDescription(); ok {
+		_spec.SetField(cluster.FieldURLDescription, field.TypeString, value)
+	}
+	if cu.mutation.URLDescriptionCleared() {
+		_spec.ClearField(cluster.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
@@ -806,6 +858,46 @@ func (cuo *ClusterUpdateOne) SetNillableURL(s *string) *ClusterUpdateOne {
 // ClearURL clears the value of the "url" field.
 func (cuo *ClusterUpdateOne) ClearURL() *ClusterUpdateOne {
 	cuo.mutation.ClearURL()
+	return cuo
+}
+
+// SetURLTitle sets the "url_title" field.
+func (cuo *ClusterUpdateOne) SetURLTitle(s string) *ClusterUpdateOne {
+	cuo.mutation.SetURLTitle(s)
+	return cuo
+}
+
+// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableURLTitle(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetURLTitle(*s)
+	}
+	return cuo
+}
+
+// ClearURLTitle clears the value of the "url_title" field.
+func (cuo *ClusterUpdateOne) ClearURLTitle() *ClusterUpdateOne {
+	cuo.mutation.ClearURLTitle()
+	return cuo
+}
+
+// SetURLDescription sets the "url_description" field.
+func (cuo *ClusterUpdateOne) SetURLDescription(s string) *ClusterUpdateOne {
+	cuo.mutation.SetURLDescription(s)
+	return cuo
+}
+
+// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableURLDescription(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetURLDescription(*s)
+	}
+	return cuo
+}
+
+// ClearURLDescription clears the value of the "url_description" field.
+func (cuo *ClusterUpdateOne) ClearURLDescription() *ClusterUpdateOne {
+	cuo.mutation.ClearURLDescription()
 	return cuo
 }
 
@@ -1182,6 +1274,18 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if cuo.mutation.URLCleared() {
 		_spec.ClearField(cluster.FieldURL, field.TypeString)
+	}
+	if value, ok := cuo.mutation.URLTitle(); ok {
+		_spec.SetField(cluster.FieldURLTitle, field.TypeString, value)
+	}
+	if cuo.mutation.URLTitleCleared() {
+		_spec.ClearField(cluster.FieldURLTitle, field.TypeString)
+	}
+	if value, ok := cuo.mutation.URLDescription(); ok {
+		_spec.SetField(cluster.FieldURLDescription, field.TypeString, value)
+	}
+	if cuo.mutation.URLDescriptionCleared() {
+		_spec.ClearField(cluster.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)

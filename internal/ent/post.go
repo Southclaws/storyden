@@ -49,6 +49,10 @@ type Post struct {
 	Status post.Status `json:"status,omitempty"`
 	// URL holds the value of the "url" field.
 	URL *string `json:"url,omitempty"`
+	// URLTitle holds the value of the "url_title" field.
+	URLTitle *string `json:"url_title,omitempty"`
+	// URLDescription holds the value of the "url_description" field.
+	URLDescription *string `json:"url_description,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID xid.ID `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -200,7 +204,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case post.FieldFirst, post.FieldPinned:
 			values[i] = new(sql.NullBool)
-		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus, post.FieldURL:
+		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldStatus, post.FieldURL, post.FieldURLTitle, post.FieldURLDescription:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -316,6 +320,20 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.URL = new(string)
 				*po.URL = value.String
+			}
+		case post.FieldURLTitle:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url_title", values[i])
+			} else if value.Valid {
+				po.URLTitle = new(string)
+				*po.URLTitle = value.String
+			}
+		case post.FieldURLDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url_description", values[i])
+			} else if value.Valid {
+				po.URLDescription = new(string)
+				*po.URLDescription = value.String
 			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -459,6 +477,16 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	if v := po.URL; v != nil {
 		builder.WriteString("url=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := po.URLTitle; v != nil {
+		builder.WriteString("url_title=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := po.URLDescription; v != nil {
+		builder.WriteString("url_description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

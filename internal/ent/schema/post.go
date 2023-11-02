@@ -40,6 +40,8 @@ func (Post) Fields() []ent.Field {
 			"published",
 		).Default("draft"),
 		field.String("url").Optional().Nillable(),
+		field.String("url_title").Optional().Nillable(),
+		field.String("url_description").Optional().Nillable(),
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),

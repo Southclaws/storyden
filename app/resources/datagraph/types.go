@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/profile"
 )
 
@@ -27,7 +28,7 @@ type Item struct {
 	Name        string
 	Slug        string
 	ImageURL    opt.Optional[string]
-	URL         opt.Optional[string]
+	Link        opt.Optional[link.Link]
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
@@ -45,7 +46,7 @@ type Cluster struct {
 	Name        string
 	Slug        string
 	ImageURL    opt.Optional[string]
-	URL         opt.Optional[string]
+	Link        opt.Optional[link.Link]
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile

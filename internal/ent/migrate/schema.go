@@ -111,6 +111,8 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "url_title", Type: field.TypeString, Nullable: true},
+		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -125,13 +127,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[11]},
+				Columns:    []*schema.Column{ClustersColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[12]},
+				Columns:    []*schema.Column{ClustersColumns[14]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -177,6 +179,8 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "url_title", Type: field.TypeString, Nullable: true},
+		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -190,7 +194,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[11]},
+				Columns:    []*schema.Column{ItemsColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -233,6 +237,8 @@ var (
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "published"}, Default: "draft"},
 		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "url_title", Type: field.TypeString, Nullable: true},
+		{Name: "url_description", Type: field.TypeString, Nullable: true},
 		{Name: "account_posts", Type: field.TypeString, Size: 20},
 		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "root_post_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -246,25 +252,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_accounts_posts",
-				Columns:    []*schema.Column{PostsColumns[13]},
+				Columns:    []*schema.Column{PostsColumns[15]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[14]},
+				Columns:    []*schema.Column{PostsColumns[16]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[17]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_replies",
-				Columns:    []*schema.Column{PostsColumns[16]},
+				Columns:    []*schema.Column{PostsColumns[18]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

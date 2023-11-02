@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -39,14 +38,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
 	}
 
-	opts := []thread.Option{}
-
-	partial.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
-	partial.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
-	partial.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
-	partial.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
-	partial.Status.Call(func(v post.Status) { opts = append(opts, thread.WithStatus(v)) })
-	partial.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
+	opts := partial.Opts()
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)
 	if err != nil {

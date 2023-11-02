@@ -24,7 +24,7 @@ func (s *service) Create(ctx context.Context,
 	status post.Status,
 	tags []string,
 	meta map[string]any,
-	opts ...thread.Option,
+	partial Partial,
 ) (*thread.Thread, error) {
 	acc, err := s.account_repo.GetByID(ctx, authorID)
 	if err != nil {
@@ -39,24 +39,33 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
 	}
 
+	opts := partial.Opts()
+	opts = append(opts,
+		thread.WithStatus(status),
+		thread.WithMeta(meta),
+	)
+
+	if v, ok := partial.URL.Get(); ok {
+		linkopts, err := s.hydrator.HydrateThread(ctx, v)
+		if err != nil {
+			s.l.Warn("failed to hydrate URL",
+				zap.String("url", v),
+				zap.Error(err))
+		}
+
+		opts = append(opts, linkopts...)
+	}
+
 	thr, err := s.thread_repo.Create(ctx,
 		title,
 		body,
 		authorID,
 		categoryID,
 		tags,
-		append(opts,
-			thread.WithStatus(status),
-			thread.WithMeta(meta),
-		)...,
+		opts...,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
-	}
-
-	thr, err = s.thread_url_svc.Hydrate(ctx, thr)
-	if err != nil {
-		s.l.Warn("failed to hydrate URL", zap.String("id", thr.ID.String()), zap.Error(err))
 	}
 
 	return thr, nil

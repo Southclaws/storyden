@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/item_crud"
 	"github.com/Southclaws/storyden/app/services/item_tree"
@@ -21,7 +22,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
-	"github.com/Southclaws/storyden/app/services/thread_url"
 	"github.com/Southclaws/storyden/app/services/url"
 )
 
@@ -41,7 +41,7 @@ func Build() fx.Option {
 		thread_mark.Build(),
 		collection.Build(),
 		url.Build(),
-		thread_url.Build(),
+		hydrator.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(cluster.New, clustertree.New),
 		fx.Provide(item_crud.New, item_tree.New),

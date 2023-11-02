@@ -3,9 +3,11 @@ package cluster
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -60,9 +62,23 @@ func WithImageURL(v string) Option {
 	}
 }
 
+func WithAssets(a []asset.AssetID) Option {
+	return func(m *ent.ClusterMutation) {
+		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+	}
+}
+
 func WithURL(v string) Option {
 	return func(c *ent.ClusterMutation) {
 		c.SetURL(v)
+	}
+}
+
+func WithLink(url, title, description string) Option {
+	return func(pm *ent.ClusterMutation) {
+		pm.SetURL(url)
+		pm.SetURLTitle(title)
+		pm.SetURLDescription(description)
 	}
 }
 
