@@ -1,4 +1,3 @@
-import { Button, Flex, HStack, VStack } from "@chakra-ui/react";
 import { isValid } from "date-fns";
 import { FormProvider } from "react-hook-form";
 
@@ -6,10 +5,14 @@ import { Bold } from "src/components/content/ContentComposer/controls/Bold";
 import { Italic } from "src/components/content/ContentComposer/controls/Italic";
 import { Back, Save, Send } from "src/components/site/Action/Action";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
+import { Button } from "src/theme/components/Button";
 
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";
+import { LinkInput } from "../LinkInput/LinkInput";
 import { TitleInput } from "../TitleInput/TitleInput";
+
+import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useComposeForm } from "./useComposeForm";
 
@@ -18,7 +21,14 @@ export function ComposeForm(props: Props) {
     useComposeForm(props);
 
   return (
-    <VStack as="form" onSubmit={onPublish} alignItems="start" w="full" gap={2}>
+    <styled.form
+      display="flex"
+      flexDir="column"
+      alignItems="start"
+      w="full"
+      gap="2"
+      onSubmit={onPublish}
+    >
       <FormProvider {...formContext}>
         <HStack width="full" justifyContent="space-between" alignItems="start">
           <HStack width="full">
@@ -27,20 +37,22 @@ export function ComposeForm(props: Props) {
 
           <HStack
             display={{ base: "none", md: "flex" }}
-            flex="1 0 auto"
-            maxWidth="min-content"
+            flexGrow="1"
+            flexShrink="0"
+            maxWidth="min"
             flexDir={{ base: "column-reverse", md: "row" }}
-            gap={2}
+            gap="2"
             alignItems="end"
           >
-            <Button variant="outline" isDisabled={!isValid} onClick={onSave}>
+            <Button kind="secondary" disabled={!isValid} onClick={onSave}>
               Save
             </Button>
 
             <Button
+              kind="primary"
               type="submit"
-              isDisabled={!isValid}
-              isLoading={formContext.formState.isSubmitting}
+              disabled={!isValid}
+              // isLoading={formContext.formState.isSubmitting}
             >
               Post
             </Button>
@@ -49,10 +61,10 @@ export function ComposeForm(props: Props) {
 
         <HStack width="full">
           <CategorySelect />
+        </HStack>
 
-          <Flex flex="1 1 auto" gap={2} overflow="hidden">
-            {/* TODO: tag select */}
-          </Flex>
+        <HStack width="full">
+          <LinkInput />
         </HStack>
 
         <BodyInput onAssetUpload={onAssetUpload}>
@@ -75,6 +87,6 @@ export function ComposeForm(props: Props) {
           </HStack>
         </BodyInput>
       </FormProvider>
-    </VStack>
+    </styled.form>
   );
 }

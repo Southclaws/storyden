@@ -132,6 +132,7 @@ export * from "./itemUpdateBody";
 export * from "./itemUpdateOKResponse";
 export * from "./itemWithParents";
 export * from "./itemWithParentsAllOf";
+export * from "./link";
 export * from "./metadata";
 export * from "./notFoundResponse";
 export * from "./oAuthCallback";

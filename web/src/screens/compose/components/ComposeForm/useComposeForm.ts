@@ -20,6 +20,7 @@ export const FormShapeSchema = z.object({
   body: z.string().min(1),
   category: z.string(),
   tags: z.string().array().optional(),
+  url: z.string().optional(),
   // assets: z.array(z.string()),
 });
 export type FormShape = z.infer<typeof FormShapeSchema>;
@@ -36,6 +37,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           title: initialDraft.title,
           body: initialDraft.posts[0]?.body,
           tags: initialDraft.tags,
+          url: initialDraft.url,
         }
       : {
           // hack: the underlying category list select component can't do this.
@@ -50,6 +52,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       // When saving a new draft, these are optional but must be explicitly set.
       title: data.title ?? "",
       body: data.body ?? "",
+      url: data.url ?? "",
       // assets: data.assets ?? [],
 
       status: ThreadStatus.draft,
@@ -64,7 +67,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     }
   };
 
-  const doPublish = async ({ title, body, category }: FormShape) => {
+  const doPublish = async ({ title, body, category, url }: FormShape) => {
     if (editing) {
       const { slug } = await threadUpdate(editing, {
         status: ThreadStatus.published,
@@ -77,6 +80,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         category,
         status: ThreadStatus.published,
         tags: [],
+        url,
       });
       router.push(`/t/${slug}`);
     }
