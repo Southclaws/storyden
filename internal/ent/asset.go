@@ -47,11 +47,13 @@ type AssetEdges struct {
 	Clusters []*Cluster `json:"clusters,omitempty"`
 	// Items holds the value of the items edge.
 	Items []*Item `json:"items,omitempty"`
+	// Links holds the value of the links edge.
+	Links []*Link `json:"links,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -81,10 +83,19 @@ func (e AssetEdges) ItemsOrErr() ([]*Item, error) {
 	return nil, &NotLoadedError{edge: "items"}
 }
 
+// LinksOrErr returns the Links value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) LinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[3] {
+		return e.Links, nil
+	}
+	return nil, &NotLoadedError{edge: "links"}
+}
+
 // OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e AssetEdges) OwnerOrErr() (*Account, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Owner == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: account.Label}
@@ -196,6 +207,11 @@ func (a *Asset) QueryClusters() *ClusterQuery {
 // QueryItems queries the "items" edge of the Asset entity.
 func (a *Asset) QueryItems() *ItemQuery {
 	return NewAssetClient(a.config).QueryItems(a)
+}
+
+// QueryLinks queries the "links" edge of the Asset entity.
+func (a *Asset) QueryLinks() *LinkQuery {
+	return NewAssetClient(a.config).QueryLinks(a)
 }
 
 // QueryOwner queries the "owner" edge of the Asset entity.

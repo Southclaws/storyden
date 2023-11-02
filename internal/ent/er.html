@@ -55,9 +55,6 @@ erDiagram
         string name
         string slug
         string image_url
-        string url
-        string url_title
-        string url_description
         string description
         string content
         xidDOTID parent_cluster_id
@@ -79,13 +76,17 @@ erDiagram
         string name
         string slug
         string image_url
-        string url
-        string url_title
-        string url_description
         string description
         string content
         xidDOTID account_id
         any properties
+    }
+    Link {
+        xidDOTID id
+        timeDOTTime created_at
+        string url
+        string title
+        string description
     }
     Notification {
         xidDOTID id
@@ -110,9 +111,6 @@ erDiagram
         string short
         mapLBRACKstringRBRACKinterface {} metadata
         postDOTStatus status
-        string url
-        string url_title
-        string url_description
         xidDOTID category_id
     }
     React {
@@ -152,6 +150,10 @@ erDiagram
     	Cluster }o--o{ Asset : "assets/clusters"
     	Collection }o--o{ Post : "posts/collections"
     	Item }o--o{ Asset : "assets/items"
+    	Link }o--o{ Post : "posts/links"
+    	Link }o--o{ Cluster : "clusters/links"
+    	Link }o--o{ Item : "items/links"
+    	Link }o--o{ Asset : "assets/links"
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"

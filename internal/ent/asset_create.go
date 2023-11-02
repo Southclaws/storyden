@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
@@ -135,6 +136,21 @@ func (ac *AssetCreate) AddItems(i ...*Item) *AssetCreate {
 		ids[j] = i[j].ID
 	}
 	return ac.AddItemIDs(ids...)
+}
+
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (ac *AssetCreate) AddLinkIDs(ids ...xid.ID) *AssetCreate {
+	ac.mutation.AddLinkIDs(ids...)
+	return ac
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (ac *AssetCreate) AddLinks(l ...*Link) *AssetCreate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return ac.AddLinkIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
@@ -325,6 +341,22 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

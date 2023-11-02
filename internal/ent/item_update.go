@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
@@ -89,66 +90,6 @@ func (iu *ItemUpdate) SetNillableImageURL(s *string) *ItemUpdate {
 // ClearImageURL clears the value of the "image_url" field.
 func (iu *ItemUpdate) ClearImageURL() *ItemUpdate {
 	iu.mutation.ClearImageURL()
-	return iu
-}
-
-// SetURL sets the "url" field.
-func (iu *ItemUpdate) SetURL(s string) *ItemUpdate {
-	iu.mutation.SetURL(s)
-	return iu
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableURL(s *string) *ItemUpdate {
-	if s != nil {
-		iu.SetURL(*s)
-	}
-	return iu
-}
-
-// ClearURL clears the value of the "url" field.
-func (iu *ItemUpdate) ClearURL() *ItemUpdate {
-	iu.mutation.ClearURL()
-	return iu
-}
-
-// SetURLTitle sets the "url_title" field.
-func (iu *ItemUpdate) SetURLTitle(s string) *ItemUpdate {
-	iu.mutation.SetURLTitle(s)
-	return iu
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableURLTitle(s *string) *ItemUpdate {
-	if s != nil {
-		iu.SetURLTitle(*s)
-	}
-	return iu
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (iu *ItemUpdate) ClearURLTitle() *ItemUpdate {
-	iu.mutation.ClearURLTitle()
-	return iu
-}
-
-// SetURLDescription sets the "url_description" field.
-func (iu *ItemUpdate) SetURLDescription(s string) *ItemUpdate {
-	iu.mutation.SetURLDescription(s)
-	return iu
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableURLDescription(s *string) *ItemUpdate {
-	if s != nil {
-		iu.SetURLDescription(*s)
-	}
-	return iu
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (iu *ItemUpdate) ClearURLDescription() *ItemUpdate {
-	iu.mutation.ClearURLDescription()
 	return iu
 }
 
@@ -252,6 +193,21 @@ func (iu *ItemUpdate) AddTags(t ...*Tag) *ItemUpdate {
 	return iu.AddTagIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (iu *ItemUpdate) AddLinkIDs(ids ...xid.ID) *ItemUpdate {
+	iu.mutation.AddLinkIDs(ids...)
+	return iu
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (iu *ItemUpdate) AddLinks(l ...*Link) *ItemUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return iu.AddLinkIDs(ids...)
+}
+
 // Mutation returns the ItemMutation object of the builder.
 func (iu *ItemUpdate) Mutation() *ItemMutation {
 	return iu.mutation
@@ -324,6 +280,27 @@ func (iu *ItemUpdate) RemoveTags(t ...*Tag) *ItemUpdate {
 		ids[i] = t[i].ID
 	}
 	return iu.RemoveTagIDs(ids...)
+}
+
+// ClearLinks clears all "links" edges to the Link entity.
+func (iu *ItemUpdate) ClearLinks() *ItemUpdate {
+	iu.mutation.ClearLinks()
+	return iu
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (iu *ItemUpdate) RemoveLinkIDs(ids ...xid.ID) *ItemUpdate {
+	iu.mutation.RemoveLinkIDs(ids...)
+	return iu
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (iu *ItemUpdate) RemoveLinks(l ...*Link) *ItemUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return iu.RemoveLinkIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -408,24 +385,6 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.ImageURLCleared() {
 		_spec.ClearField(item.FieldImageURL, field.TypeString)
-	}
-	if value, ok := iu.mutation.URL(); ok {
-		_spec.SetField(item.FieldURL, field.TypeString, value)
-	}
-	if iu.mutation.URLCleared() {
-		_spec.ClearField(item.FieldURL, field.TypeString)
-	}
-	if value, ok := iu.mutation.URLTitle(); ok {
-		_spec.SetField(item.FieldURLTitle, field.TypeString, value)
-	}
-	if iu.mutation.URLTitleCleared() {
-		_spec.ClearField(item.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := iu.mutation.URLDescription(); ok {
-		_spec.SetField(item.FieldURLDescription, field.TypeString, value)
-	}
-	if iu.mutation.URLDescriptionCleared() {
-		_spec.ClearField(item.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
@@ -606,6 +565,51 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if iu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.RemovedLinksIDs(); len(nodes) > 0 && !iu.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(iu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -683,66 +687,6 @@ func (iuo *ItemUpdateOne) SetNillableImageURL(s *string) *ItemUpdateOne {
 // ClearImageURL clears the value of the "image_url" field.
 func (iuo *ItemUpdateOne) ClearImageURL() *ItemUpdateOne {
 	iuo.mutation.ClearImageURL()
-	return iuo
-}
-
-// SetURL sets the "url" field.
-func (iuo *ItemUpdateOne) SetURL(s string) *ItemUpdateOne {
-	iuo.mutation.SetURL(s)
-	return iuo
-}
-
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableURL(s *string) *ItemUpdateOne {
-	if s != nil {
-		iuo.SetURL(*s)
-	}
-	return iuo
-}
-
-// ClearURL clears the value of the "url" field.
-func (iuo *ItemUpdateOne) ClearURL() *ItemUpdateOne {
-	iuo.mutation.ClearURL()
-	return iuo
-}
-
-// SetURLTitle sets the "url_title" field.
-func (iuo *ItemUpdateOne) SetURLTitle(s string) *ItemUpdateOne {
-	iuo.mutation.SetURLTitle(s)
-	return iuo
-}
-
-// SetNillableURLTitle sets the "url_title" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableURLTitle(s *string) *ItemUpdateOne {
-	if s != nil {
-		iuo.SetURLTitle(*s)
-	}
-	return iuo
-}
-
-// ClearURLTitle clears the value of the "url_title" field.
-func (iuo *ItemUpdateOne) ClearURLTitle() *ItemUpdateOne {
-	iuo.mutation.ClearURLTitle()
-	return iuo
-}
-
-// SetURLDescription sets the "url_description" field.
-func (iuo *ItemUpdateOne) SetURLDescription(s string) *ItemUpdateOne {
-	iuo.mutation.SetURLDescription(s)
-	return iuo
-}
-
-// SetNillableURLDescription sets the "url_description" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableURLDescription(s *string) *ItemUpdateOne {
-	if s != nil {
-		iuo.SetURLDescription(*s)
-	}
-	return iuo
-}
-
-// ClearURLDescription clears the value of the "url_description" field.
-func (iuo *ItemUpdateOne) ClearURLDescription() *ItemUpdateOne {
-	iuo.mutation.ClearURLDescription()
 	return iuo
 }
 
@@ -846,6 +790,21 @@ func (iuo *ItemUpdateOne) AddTags(t ...*Tag) *ItemUpdateOne {
 	return iuo.AddTagIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (iuo *ItemUpdateOne) AddLinkIDs(ids ...xid.ID) *ItemUpdateOne {
+	iuo.mutation.AddLinkIDs(ids...)
+	return iuo
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (iuo *ItemUpdateOne) AddLinks(l ...*Link) *ItemUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return iuo.AddLinkIDs(ids...)
+}
+
 // Mutation returns the ItemMutation object of the builder.
 func (iuo *ItemUpdateOne) Mutation() *ItemMutation {
 	return iuo.mutation
@@ -918,6 +877,27 @@ func (iuo *ItemUpdateOne) RemoveTags(t ...*Tag) *ItemUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return iuo.RemoveTagIDs(ids...)
+}
+
+// ClearLinks clears all "links" edges to the Link entity.
+func (iuo *ItemUpdateOne) ClearLinks() *ItemUpdateOne {
+	iuo.mutation.ClearLinks()
+	return iuo
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (iuo *ItemUpdateOne) RemoveLinkIDs(ids ...xid.ID) *ItemUpdateOne {
+	iuo.mutation.RemoveLinkIDs(ids...)
+	return iuo
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (iuo *ItemUpdateOne) RemoveLinks(l ...*Link) *ItemUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return iuo.RemoveLinkIDs(ids...)
 }
 
 // Where appends a list predicates to the ItemUpdate builder.
@@ -1032,24 +1012,6 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if iuo.mutation.ImageURLCleared() {
 		_spec.ClearField(item.FieldImageURL, field.TypeString)
-	}
-	if value, ok := iuo.mutation.URL(); ok {
-		_spec.SetField(item.FieldURL, field.TypeString, value)
-	}
-	if iuo.mutation.URLCleared() {
-		_spec.ClearField(item.FieldURL, field.TypeString)
-	}
-	if value, ok := iuo.mutation.URLTitle(); ok {
-		_spec.SetField(item.FieldURLTitle, field.TypeString, value)
-	}
-	if iuo.mutation.URLTitleCleared() {
-		_spec.ClearField(item.FieldURLTitle, field.TypeString)
-	}
-	if value, ok := iuo.mutation.URLDescription(); ok {
-		_spec.SetField(item.FieldURLDescription, field.TypeString, value)
-	}
-	if iuo.mutation.URLDescriptionCleared() {
-		_spec.ClearField(item.FieldURLDescription, field.TypeString)
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
@@ -1223,6 +1185,51 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iuo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !iuo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   item.LinksTable,
+			Columns: item.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
 type database struct {
@@ -66,6 +67,10 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*datagraph.It
 	q := d.db.Item.
 		Query().
 		WithOwner().
+		WithAssets().
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
 		Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
 
 	for _, fn := range filters {
@@ -90,6 +95,10 @@ func (d *database) Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph
 		Query().
 		Where(item.Slug(string(slug))).
 		WithOwner().
+		WithAssets().
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
 		WithClusters(func(cq *ent.ClusterQuery) {
 			cq.WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 		}).

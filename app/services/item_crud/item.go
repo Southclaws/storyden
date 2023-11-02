@@ -7,11 +7,13 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/hydrator"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -22,7 +24,8 @@ type Manager interface {
 		name string,
 		slug string,
 		desc string,
-		opts ...item.Option) (*datagraph.Item, error)
+		p Partial,
+	) (*datagraph.Item, error)
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 	Update(ctx context.Context, slug datagraph.ItemSlug, p Partial) (*datagraph.Item, error)
 	Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
@@ -38,12 +41,32 @@ type Partial struct {
 	Properties  opt.Optional[any]
 }
 
-type service struct {
-	cr item.Repository
+func (p Partial) Opts() (opts []item.Option) {
+	p.Name.Call(func(value string) { opts = append(opts, item.WithName(value)) })
+	p.Slug.Call(func(value string) { opts = append(opts, item.WithSlug(value)) })
+	p.ImageURL.Call(func(value string) { opts = append(opts, item.WithImageURL(value)) })
+	p.Description.Call(func(value string) { opts = append(opts, item.WithDescription(value)) })
+	p.Content.Call(func(value string) { opts = append(opts, item.WithContent(value)) })
+	p.Properties.Call(func(value any) { opts = append(opts, item.WithProperties(value)) })
+	return
 }
 
-func New(cr item.Repository) Manager {
-	return &service{cr: cr}
+type service struct {
+	l        *zap.Logger
+	cr       item.Repository
+	hydrator hydrator.Service
+}
+
+func New(
+	l *zap.Logger,
+	cr item.Repository,
+	hydrator hydrator.Service,
+) Manager {
+	return &service{
+		l:        l.With(zap.String("service", "cluster")),
+		cr:       cr,
+		hydrator: hydrator,
+	}
 }
 
 func (s *service) Create(ctx context.Context,
@@ -51,8 +74,11 @@ func (s *service) Create(ctx context.Context,
 	name string,
 	slug string,
 	desc string,
-	opts ...item.Option,
+	p Partial,
 ) (*datagraph.Item, error) {
+	opts := p.Opts()
+	opts = append(opts, s.hydrateLink(ctx, p)...)
+
 	itm, err := s.cr.Create(ctx, owner, name, slug, desc, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -87,15 +113,8 @@ func (s *service) Update(ctx context.Context, slug datagraph.ItemSlug, p Partial
 		}
 	}
 
-	opts := []item.Option{}
-
-	p.Name.Call(func(value string) { opts = append(opts, item.WithName(value)) })
-	p.Slug.Call(func(value string) { opts = append(opts, item.WithSlug(value)) })
-	p.ImageURL.Call(func(value string) { opts = append(opts, item.WithImageURL(value)) })
-	p.URL.Call(func(value string) { opts = append(opts, item.WithURL(value)) })
-	p.Description.Call(func(value string) { opts = append(opts, item.WithDescription(value)) })
-	p.Content.Call(func(value string) { opts = append(opts, item.WithContent(value)) })
-	p.Properties.Call(func(value any) { opts = append(opts, item.WithProperties(value)) })
+	opts := p.Opts()
+	opts = append(opts, s.hydrateLink(ctx, p)...)
 
 	itm, err = s.cr.Update(ctx, itm.ID, opts...)
 	if err != nil {
@@ -112,4 +131,20 @@ func (s *service) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagr
 	}
 
 	return itm, nil
+}
+
+func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []item.Option) {
+	v, ok := partial.URL.Get()
+	if !ok {
+		return
+	}
+
+	opts, err := s.hydrator.HydrateItem(ctx, v)
+	if err != nil {
+		s.l.Warn("failed to hydrate URL",
+			zap.String("url", v),
+			zap.Error(err))
+	}
+
+	return
 }

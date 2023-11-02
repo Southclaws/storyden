@@ -32,12 +32,6 @@ type Item struct {
 	Slug string `json:"slug,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
 	ImageURL *string `json:"image_url,omitempty"`
-	// URL holds the value of the "url" field.
-	URL *string `json:"url,omitempty"`
-	// URLTitle holds the value of the "url_title" field.
-	URLTitle *string `json:"url_title,omitempty"`
-	// URLDescription holds the value of the "url_description" field.
-	URLDescription *string `json:"url_description,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
@@ -62,9 +56,11 @@ type ItemEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Links holds the value of the links edge.
+	Links []*Link `json:"links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -107,6 +103,15 @@ func (e ItemEdges) TagsOrErr() ([]*Tag, error) {
 	return nil, &NotLoadedError{edge: "tags"}
 }
 
+// LinksOrErr returns the Links value or an error if the edge
+// was not loaded in eager-loading.
+func (e ItemEdges) LinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[4] {
+		return e.Links, nil
+	}
+	return nil, &NotLoadedError{edge: "links"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Item) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -114,7 +119,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldProperties:
 			values[i] = new([]byte)
-		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldURL, item.FieldURLTitle, item.FieldURLDescription, item.FieldDescription, item.FieldContent:
+		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldDescription, item.FieldContent:
 			values[i] = new(sql.NullString)
 		case item.FieldCreatedAt, item.FieldUpdatedAt, item.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -179,27 +184,6 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				i.ImageURL = new(string)
 				*i.ImageURL = value.String
 			}
-		case item.FieldURL:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[j])
-			} else if value.Valid {
-				i.URL = new(string)
-				*i.URL = value.String
-			}
-		case item.FieldURLTitle:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_title", values[j])
-			} else if value.Valid {
-				i.URLTitle = new(string)
-				*i.URLTitle = value.String
-			}
-		case item.FieldURLDescription:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_description", values[j])
-			} else if value.Valid {
-				i.URLDescription = new(string)
-				*i.URLDescription = value.String
-			}
 		case item.FieldDescription:
 			if value, ok := values[j].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[j])
@@ -260,6 +244,11 @@ func (i *Item) QueryTags() *TagQuery {
 	return NewItemClient(i.config).QueryTags(i)
 }
 
+// QueryLinks queries the "links" edge of the Item entity.
+func (i *Item) QueryLinks() *LinkQuery {
+	return NewItemClient(i.config).QueryLinks(i)
+}
+
 // Update returns a builder for updating this Item.
 // Note that you need to call Item.Unwrap() before calling this method if this Item
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -302,21 +291,6 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	if v := i.ImageURL; v != nil {
 		builder.WriteString("image_url=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := i.URL; v != nil {
-		builder.WriteString("url=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := i.URLTitle; v != nil {
-		builder.WriteString("url_title=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := i.URLDescription; v != nil {
-		builder.WriteString("url_description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

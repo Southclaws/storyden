@@ -530,6 +530,29 @@ func HasItemsWith(preds ...predicate.Item) predicate.Asset {
 	})
 }
 
+// HasLinks applies the HasEdge predicate on the "links" edge.
+func HasLinks() predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLinksWith applies the HasEdge predicate on the "links" edge with a given conditions (other predicates).
+func HasLinksWith(preds ...predicate.Link) predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := newLinksStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasOwner applies the HasEdge predicate on the "owner" edge.
 func HasOwner() predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {

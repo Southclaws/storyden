@@ -28,7 +28,7 @@ type Item struct {
 	Name        string
 	Slug        string
 	ImageURL    opt.Optional[string]
-	Link        opt.Optional[link.Link]
+	Links       link.Links
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
@@ -46,7 +46,7 @@ type Cluster struct {
 	Name        string
 	Slug        string
 	ImageURL    opt.Optional[string]
-	Link        opt.Optional[link.Link]
+	Links       link.Links
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile

@@ -111,21 +111,6 @@ func Short(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldShort, v))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURL, v))
-}
-
-// URLTitle applies equality check predicate on the "url_title" field. It's identical to URLTitleEQ.
-func URLTitle(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURLTitle, v))
-}
-
-// URLDescription applies equality check predicate on the "url_description" field. It's identical to URLDescriptionEQ.
-func URLDescription(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURLDescription, v))
-}
-
 // CategoryID applies equality check predicate on the "category_id" field. It's identical to CategoryIDEQ.
 func CategoryID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCategoryID, v))
@@ -751,231 +736,6 @@ func StatusNotIn(vs ...Status) predicate.Post {
 	return predicate.Post(sql.FieldNotIn(FieldStatus, vs...))
 }
 
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURL, v))
-}
-
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldURL, v))
-}
-
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldURL, vs...))
-}
-
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldURL, vs...))
-}
-
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.Post {
-	return predicate.Post(sql.FieldGT(FieldURL, v))
-}
-
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldGTE(FieldURL, v))
-}
-
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.Post {
-	return predicate.Post(sql.FieldLT(FieldURL, v))
-}
-
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldLTE(FieldURL, v))
-}
-
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.Post {
-	return predicate.Post(sql.FieldContains(FieldURL, v))
-}
-
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasPrefix(FieldURL, v))
-}
-
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasSuffix(FieldURL, v))
-}
-
-// URLIsNil applies the IsNil predicate on the "url" field.
-func URLIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldURL))
-}
-
-// URLNotNil applies the NotNil predicate on the "url" field.
-func URLNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldURL))
-}
-
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldEqualFold(FieldURL, v))
-}
-
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldContainsFold(FieldURL, v))
-}
-
-// URLTitleEQ applies the EQ predicate on the "url_title" field.
-func URLTitleEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURLTitle, v))
-}
-
-// URLTitleNEQ applies the NEQ predicate on the "url_title" field.
-func URLTitleNEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldURLTitle, v))
-}
-
-// URLTitleIn applies the In predicate on the "url_title" field.
-func URLTitleIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldURLTitle, vs...))
-}
-
-// URLTitleNotIn applies the NotIn predicate on the "url_title" field.
-func URLTitleNotIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldURLTitle, vs...))
-}
-
-// URLTitleGT applies the GT predicate on the "url_title" field.
-func URLTitleGT(v string) predicate.Post {
-	return predicate.Post(sql.FieldGT(FieldURLTitle, v))
-}
-
-// URLTitleGTE applies the GTE predicate on the "url_title" field.
-func URLTitleGTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldGTE(FieldURLTitle, v))
-}
-
-// URLTitleLT applies the LT predicate on the "url_title" field.
-func URLTitleLT(v string) predicate.Post {
-	return predicate.Post(sql.FieldLT(FieldURLTitle, v))
-}
-
-// URLTitleLTE applies the LTE predicate on the "url_title" field.
-func URLTitleLTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldLTE(FieldURLTitle, v))
-}
-
-// URLTitleContains applies the Contains predicate on the "url_title" field.
-func URLTitleContains(v string) predicate.Post {
-	return predicate.Post(sql.FieldContains(FieldURLTitle, v))
-}
-
-// URLTitleHasPrefix applies the HasPrefix predicate on the "url_title" field.
-func URLTitleHasPrefix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasPrefix(FieldURLTitle, v))
-}
-
-// URLTitleHasSuffix applies the HasSuffix predicate on the "url_title" field.
-func URLTitleHasSuffix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasSuffix(FieldURLTitle, v))
-}
-
-// URLTitleIsNil applies the IsNil predicate on the "url_title" field.
-func URLTitleIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldURLTitle))
-}
-
-// URLTitleNotNil applies the NotNil predicate on the "url_title" field.
-func URLTitleNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldURLTitle))
-}
-
-// URLTitleEqualFold applies the EqualFold predicate on the "url_title" field.
-func URLTitleEqualFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldEqualFold(FieldURLTitle, v))
-}
-
-// URLTitleContainsFold applies the ContainsFold predicate on the "url_title" field.
-func URLTitleContainsFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldContainsFold(FieldURLTitle, v))
-}
-
-// URLDescriptionEQ applies the EQ predicate on the "url_description" field.
-func URLDescriptionEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldURLDescription, v))
-}
-
-// URLDescriptionNEQ applies the NEQ predicate on the "url_description" field.
-func URLDescriptionNEQ(v string) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldURLDescription, v))
-}
-
-// URLDescriptionIn applies the In predicate on the "url_description" field.
-func URLDescriptionIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldURLDescription, vs...))
-}
-
-// URLDescriptionNotIn applies the NotIn predicate on the "url_description" field.
-func URLDescriptionNotIn(vs ...string) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldURLDescription, vs...))
-}
-
-// URLDescriptionGT applies the GT predicate on the "url_description" field.
-func URLDescriptionGT(v string) predicate.Post {
-	return predicate.Post(sql.FieldGT(FieldURLDescription, v))
-}
-
-// URLDescriptionGTE applies the GTE predicate on the "url_description" field.
-func URLDescriptionGTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldGTE(FieldURLDescription, v))
-}
-
-// URLDescriptionLT applies the LT predicate on the "url_description" field.
-func URLDescriptionLT(v string) predicate.Post {
-	return predicate.Post(sql.FieldLT(FieldURLDescription, v))
-}
-
-// URLDescriptionLTE applies the LTE predicate on the "url_description" field.
-func URLDescriptionLTE(v string) predicate.Post {
-	return predicate.Post(sql.FieldLTE(FieldURLDescription, v))
-}
-
-// URLDescriptionContains applies the Contains predicate on the "url_description" field.
-func URLDescriptionContains(v string) predicate.Post {
-	return predicate.Post(sql.FieldContains(FieldURLDescription, v))
-}
-
-// URLDescriptionHasPrefix applies the HasPrefix predicate on the "url_description" field.
-func URLDescriptionHasPrefix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasPrefix(FieldURLDescription, v))
-}
-
-// URLDescriptionHasSuffix applies the HasSuffix predicate on the "url_description" field.
-func URLDescriptionHasSuffix(v string) predicate.Post {
-	return predicate.Post(sql.FieldHasSuffix(FieldURLDescription, v))
-}
-
-// URLDescriptionIsNil applies the IsNil predicate on the "url_description" field.
-func URLDescriptionIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldURLDescription))
-}
-
-// URLDescriptionNotNil applies the NotNil predicate on the "url_description" field.
-func URLDescriptionNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldURLDescription))
-}
-
-// URLDescriptionEqualFold applies the EqualFold predicate on the "url_description" field.
-func URLDescriptionEqualFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldEqualFold(FieldURLDescription, v))
-}
-
-// URLDescriptionContainsFold applies the ContainsFold predicate on the "url_description" field.
-func URLDescriptionContainsFold(v string) predicate.Post {
-	return predicate.Post(sql.FieldContainsFold(FieldURLDescription, v))
-}
-
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.
 func CategoryIDEQ(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCategoryID, v))
@@ -1278,6 +1038,29 @@ func HasCollections() predicate.Post {
 func HasCollectionsWith(preds ...predicate.Collection) predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
 		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasLinks applies the HasEdge predicate on the "links" edge.
+func HasLinks() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLinksWith applies the HasEdge predicate on the "links" edge with a given conditions (other predicates).
+func HasLinksWith(preds ...predicate.Link) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newLinksStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

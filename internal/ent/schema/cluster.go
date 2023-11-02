@@ -21,9 +21,6 @@ func (Cluster) Fields() []ent.Field {
 		field.String("name"),
 		field.String("slug").Unique(),
 		field.String("image_url").Optional().Nillable(),
-		field.String("url").Optional().Nillable(),
-		field.String("url_title").Optional().Nillable(),
-		field.String("url_description").Optional().Nillable(),
 		field.String("description"),
 		field.String("content").Optional().Nillable(),
 		field.String("parent_cluster_id").GoType(xid.ID{}).Optional(),
@@ -57,6 +54,9 @@ func (Cluster) Edges() []ent.Edge {
 		edge.To("assets", Asset.Type),
 
 		edge.From("tags", Tag.Type).
+			Ref("clusters"),
+
+		edge.From("links", Link.Type).
 			Ref("clusters"),
 	}
 }

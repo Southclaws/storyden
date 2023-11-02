@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -129,6 +130,21 @@ func (au *AssetUpdate) AddItems(i ...*Item) *AssetUpdate {
 	return au.AddItemIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (au *AssetUpdate) AddLinkIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.AddLinkIDs(ids...)
+	return au
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (au *AssetUpdate) AddLinks(l ...*Link) *AssetUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return au.AddLinkIDs(ids...)
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
 func (au *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
 	au.mutation.SetOwnerID(id)
@@ -206,6 +222,27 @@ func (au *AssetUpdate) RemoveItems(i ...*Item) *AssetUpdate {
 		ids[j] = i[j].ID
 	}
 	return au.RemoveItemIDs(ids...)
+}
+
+// ClearLinks clears all "links" edges to the Link entity.
+func (au *AssetUpdate) ClearLinks() *AssetUpdate {
+	au.mutation.ClearLinks()
+	return au
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (au *AssetUpdate) RemoveLinkIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.RemoveLinkIDs(ids...)
+	return au
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (au *AssetUpdate) RemoveLinks(l ...*Link) *AssetUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return au.RemoveLinkIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -432,6 +469,51 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedLinksIDs(); len(nodes) > 0 && !au.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -578,6 +660,21 @@ func (auo *AssetUpdateOne) AddItems(i ...*Item) *AssetUpdateOne {
 	return auo.AddItemIDs(ids...)
 }
 
+// AddLinkIDs adds the "links" edge to the Link entity by IDs.
+func (auo *AssetUpdateOne) AddLinkIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.AddLinkIDs(ids...)
+	return auo
+}
+
+// AddLinks adds the "links" edges to the Link entity.
+func (auo *AssetUpdateOne) AddLinks(l ...*Link) *AssetUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return auo.AddLinkIDs(ids...)
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
 func (auo *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
 	auo.mutation.SetOwnerID(id)
@@ -655,6 +752,27 @@ func (auo *AssetUpdateOne) RemoveItems(i ...*Item) *AssetUpdateOne {
 		ids[j] = i[j].ID
 	}
 	return auo.RemoveItemIDs(ids...)
+}
+
+// ClearLinks clears all "links" edges to the Link entity.
+func (auo *AssetUpdateOne) ClearLinks() *AssetUpdateOne {
+	auo.mutation.ClearLinks()
+	return auo
+}
+
+// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
+func (auo *AssetUpdateOne) RemoveLinkIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.RemoveLinkIDs(ids...)
+	return auo
+}
+
+// RemoveLinks removes "links" edges to Link entities.
+func (auo *AssetUpdateOne) RemoveLinks(l ...*Link) *AssetUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return auo.RemoveLinkIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
@@ -904,6 +1022,51 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !auo.mutation.LinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.LinksIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   asset.LinksTable,
+			Columns: asset.LinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

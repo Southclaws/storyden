@@ -7,10 +7,12 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	asset_svc "github.com/Southclaws/storyden/app/services/asset"
 	"github.com/Southclaws/storyden/app/services/url"
@@ -27,81 +29,94 @@ func Build() fx.Option {
 }
 
 type service struct {
+	l  *zap.Logger
 	as asset_svc.Service
 	tr thread.Repository
 	cr cluster.Repository
 	ir item.Repository
+	lr link.Repository
 	sc url.Scraper
 }
 
 func New(
+	l *zap.Logger,
 	as asset_svc.Service,
 	tr thread.Repository,
 	cr cluster.Repository,
 	ir item.Repository,
+	lr link.Repository,
 	sc url.Scraper,
 ) Service {
 	return &service{
-		as,
-		tr,
-		cr,
-		ir,
-		sc,
+		l:  l.With(zap.String("service", "hydrator")),
+		as: as,
+		tr: tr,
+		cr: cr,
+		ir: ir,
+		lr: lr,
+		sc: sc,
 	}
 }
 
 func (s *service) HydrateThread(ctx context.Context, url string) ([]thread.Option, error) {
-	a, wc, err := s.scrape(ctx, url)
+	ln, err := s.scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return []thread.Option{
-		thread.WithAssets([]asset.AssetID{a.ID}),
-		thread.WithLink(url, wc.Title, wc.Description),
+		thread.WithAssets(ln.AssetIDs()),
+		thread.WithLinks(ln.ID),
 	}, nil
 }
 
 func (s *service) HydrateCluster(ctx context.Context, url string) ([]cluster.Option, error) {
-	a, wc, err := s.scrape(ctx, url)
+	ln, err := s.scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return []cluster.Option{
-		cluster.WithAssets([]asset.AssetID{a.ID}),
-		cluster.WithLink(url, wc.Title, wc.Description),
+		cluster.WithAssets(ln.AssetIDs()),
+		cluster.WithLinks(ln.ID),
 	}, nil
 }
 
 func (s *service) HydrateItem(ctx context.Context, url string) ([]item.Option, error) {
-	a, wc, err := s.scrape(ctx, url)
+	ln, err := s.scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return []item.Option{
-		item.WithAssets([]asset.AssetID{a.ID}),
-		item.WithLink(url, wc.Title, wc.Description),
+		item.WithAssets(ln.AssetIDs()),
+		item.WithLinks(ln.ID),
 	}, nil
 }
 
-func (s *service) scrape(ctx context.Context, url string) (*asset.Asset, *url.WebContent, error) {
+func (s *service) scrape(ctx context.Context, url string) (*link.Link, error) {
 	wc, err := s.sc.Scrape(ctx, url)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if wc.Image == "" {
-		return nil, nil, nil
+	opts := []link.Option{}
+
+	if wc.Image != "" {
+		a, err := s.copy(ctx, wc.Image)
+		if err != nil {
+			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", url))
+		} else {
+			opts = append(opts, link.WithAssets(string(a.ID)))
+		}
 	}
 
-	a, err := s.copy(ctx, wc.Image)
+	ln, err := s.lr.Store(ctx, url, wc.Title, wc.Description, opts...)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return a, wc, nil
+	return ln, nil
 }
 
 func (s *service) copy(ctx context.Context, url string) (*asset.Asset, error) {

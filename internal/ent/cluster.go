@@ -32,12 +32,6 @@ type Cluster struct {
 	Slug string `json:"slug,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
 	ImageURL *string `json:"image_url,omitempty"`
-	// URL holds the value of the "url" field.
-	URL *string `json:"url,omitempty"`
-	// URLTitle holds the value of the "url_title" field.
-	URLTitle *string `json:"url_title,omitempty"`
-	// URLDescription holds the value of the "url_description" field.
-	URLDescription *string `json:"url_description,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
@@ -68,9 +62,11 @@ type ClusterEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Links holds the value of the links edge.
+	Links []*Link `json:"links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -135,6 +131,15 @@ func (e ClusterEdges) TagsOrErr() ([]*Tag, error) {
 	return nil, &NotLoadedError{edge: "tags"}
 }
 
+// LinksOrErr returns the Links value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClusterEdges) LinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[6] {
+		return e.Links, nil
+	}
+	return nil, &NotLoadedError{edge: "links"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Cluster) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -142,7 +147,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cluster.FieldProperties:
 			values[i] = new([]byte)
-		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldURL, cluster.FieldURLTitle, cluster.FieldURLDescription, cluster.FieldDescription, cluster.FieldContent:
+		case cluster.FieldName, cluster.FieldSlug, cluster.FieldImageURL, cluster.FieldDescription, cluster.FieldContent:
 			values[i] = new(sql.NullString)
 		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -206,27 +211,6 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.ImageURL = new(string)
 				*c.ImageURL = value.String
-			}
-		case cluster.FieldURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
-			} else if value.Valid {
-				c.URL = new(string)
-				*c.URL = value.String
-			}
-		case cluster.FieldURLTitle:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_title", values[i])
-			} else if value.Valid {
-				c.URLTitle = new(string)
-				*c.URLTitle = value.String
-			}
-		case cluster.FieldURLDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url_description", values[i])
-			} else if value.Valid {
-				c.URLDescription = new(string)
-				*c.URLDescription = value.String
 			}
 		case cluster.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -304,6 +288,11 @@ func (c *Cluster) QueryTags() *TagQuery {
 	return NewClusterClient(c.config).QueryTags(c)
 }
 
+// QueryLinks queries the "links" edge of the Cluster entity.
+func (c *Cluster) QueryLinks() *LinkQuery {
+	return NewClusterClient(c.config).QueryLinks(c)
+}
+
 // Update returns a builder for updating this Cluster.
 // Note that you need to call Cluster.Unwrap() before calling this method if this Cluster
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -346,21 +335,6 @@ func (c *Cluster) String() string {
 	builder.WriteString(", ")
 	if v := c.ImageURL; v != nil {
 		builder.WriteString("image_url=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := c.URL; v != nil {
-		builder.WriteString("url=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := c.URLTitle; v != nil {
-		builder.WriteString("url_title=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := c.URLDescription; v != nil {
-		builder.WriteString("url_description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

@@ -27,12 +27,6 @@ const (
 	FieldSlug = "slug"
 	// FieldImageURL holds the string denoting the image_url field in the database.
 	FieldImageURL = "image_url"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
-	// FieldURLTitle holds the string denoting the url_title field in the database.
-	FieldURLTitle = "url_title"
-	// FieldURLDescription holds the string denoting the url_description field in the database.
-	FieldURLDescription = "url_description"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldContent holds the string denoting the content field in the database.
@@ -55,6 +49,8 @@ const (
 	EdgeAssets = "assets"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
+	// EdgeLinks holds the string denoting the links edge name in mutations.
+	EdgeLinks = "links"
 	// Table holds the table name of the cluster in the database.
 	Table = "clusters"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -87,6 +83,11 @@ const (
 	// TagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	TagsInverseTable = "tags"
+	// LinksTable is the table that holds the links relation/edge. The primary key declared below.
+	LinksTable = "link_clusters"
+	// LinksInverseTable is the table name for the Link entity.
+	// It exists in this package in order to avoid circular dependency with the "link" package.
+	LinksInverseTable = "links"
 )
 
 // Columns holds all SQL columns for cluster fields.
@@ -98,9 +99,6 @@ var Columns = []string{
 	FieldName,
 	FieldSlug,
 	FieldImageURL,
-	FieldURL,
-	FieldURLTitle,
-	FieldURLDescription,
 	FieldDescription,
 	FieldContent,
 	FieldParentClusterID,
@@ -118,6 +116,9 @@ var (
 	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
 	// primary key for the tags relation (M2M).
 	TagsPrimaryKey = []string{"tag_id", "cluster_id"}
+	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
+	// primary key for the links relation (M2M).
+	LinksPrimaryKey = []string{"link_id", "cluster_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -179,21 +180,6 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 // ByImageURL orders the results by the image_url field.
 func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
-}
-
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
-}
-
-// ByURLTitle orders the results by the url_title field.
-func ByURLTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURLTitle, opts...).ToFunc()
-}
-
-// ByURLDescription orders the results by the url_description field.
-func ByURLDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURLDescription, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.
@@ -285,6 +271,20 @@ func ByTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByLinksCount orders the results by links count.
+func ByLinksCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLinksStep(), opts...)
+	}
+}
+
+// ByLinks orders the results by links terms.
+func ByLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -325,5 +325,12 @@ func newTagsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TagsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, TagsTable, TagsPrimaryKey...),
+	)
+}
+func newLinksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LinksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
 	)
 }
