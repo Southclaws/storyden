@@ -2,7 +2,7 @@
 
 import { ThreadList } from "src/api/openapi/schemas";
 import { useThreadList } from "src/api/openapi/threads";
-import { TextPostList } from "src/components/feed/text/TextPostList";
+import { MixedPostList } from "src/components/feed/mixed/MixedPostList";
 import { Unready } from "src/components/site/Unready";
 
 export function Client(props: { category: string; threads: ThreadList }) {
@@ -17,5 +17,5 @@ export function Client(props: { category: string; threads: ThreadList }) {
 
   if (!data) return <Unready {...error} />;
 
-  return <TextPostList posts={data?.threads} />;
+  return <MixedPostList posts={data?.threads} />;
 }
