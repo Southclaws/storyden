@@ -37,7 +37,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           title: initialDraft.title,
           body: initialDraft.posts[0]?.body,
           tags: initialDraft.tags,
-          url: initialDraft.url,
+          url: initialDraft.link?.url,
         }
       : {
           // hack: the underlying category list select component can't do this.
