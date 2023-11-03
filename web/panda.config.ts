@@ -7,6 +7,7 @@ import {
 import { button } from "src/theme/components/Button/button.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
+import { menu } from "src/theme/components/Menu/menu.recipe";
 
 export default defineConfig({
   preflight: true,
@@ -27,6 +28,7 @@ export default defineConfig({
       input: input,
       button: button,
       link: link,
+      menu: menu,
     },
     extend: {
       semanticTokens: defineSemanticTokens({

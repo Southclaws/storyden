@@ -1,53 +1,36 @@
 "use client";
 
-import { LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { ShareIcon } from "@heroicons/react/24/solid";
-import format from "date-fns/format";
+import { Portal } from "@ark-ui/react";
 
 import { ThreadReference } from "src/api/openapi/schemas";
 import { More } from "src/components/site/Action/Action";
 import {
   Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
+  MenuContent,
   MenuItem,
-  MenuList,
-} from "src/theme/components";
+  MenuPositioner,
+  MenuTrigger,
+} from "src/theme/components/Menu";
 
-import { useFeedItemMenu } from "./useFeedItemMenu";
+// import { useFeedItemMenu } from "./useFeedItemMenu";
 
 export function FeedItemMenu(props: ThreadReference) {
-  const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
-    useFeedItemMenu(props);
+  // const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
+  //   useFeedItemMenu(props);
 
   return (
     <Menu>
-      <MenuButton as={More} />
-      <MenuList>
-        <MenuGroup title={`Post by ${props.author.name}`}>
-          <MenuItem isDisabled>
-            {format(new Date(props.createdAt), "yyyy-mm-dd")}
-          </MenuItem>
-        </MenuGroup>
-        <MenuDivider />
-
-        <MenuItem icon={<LinkIcon width="1.4em" />} onClick={onCopyLink}>
-          Copy link
-        </MenuItem>
-
-        {shareEnabled && (
-          <MenuItem icon={<ShareIcon width="1.4em" />} onClick={onShare}>
-            Share
-          </MenuItem>
-        )}
-
-        {deleteEnabled && (
-          <MenuItem icon={<TrashIcon width="1.4em" />} onClick={onDelete}>
-            Delete
-          </MenuItem>
-        )}
-      </MenuList>
+      <MenuTrigger asChild>
+        <More />
+      </MenuTrigger>
+      <Portal>
+        <MenuPositioner>
+          <MenuContent>
+            <MenuItem id="one">{props.id}</MenuItem>
+            <MenuItem id="twi">{props.author.handle}</MenuItem>
+          </MenuContent>
+        </MenuPositioner>
+      </Portal>
     </Menu>
   );
 }
