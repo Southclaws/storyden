@@ -50,6 +50,7 @@ func accounts(r account.Repository, auth authentication.Repository) {
 			account.WithID(v.ID),
 			account.WithName(v.Name),
 			account.WithBio(v.Bio.OrZero()),
+			account.WithAdmin(v.Admin),
 		)
 		if err != nil {
 			panic(err)
