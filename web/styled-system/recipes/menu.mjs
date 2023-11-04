@@ -73,7 +73,6 @@ export const menu = /* @__PURE__ */ Object.assign(menuFn, {
   variantKeys: menuVariantKeys,
   variantMap: {
   "size": [
-    "xs",
     "sm",
     "md",
     "lg"
