@@ -32,7 +32,10 @@ export function Content(props: PublicProfile) {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <MixedPostList posts={content.data.threads} />
+            <MixedPostList
+              posts={content.data.threads}
+              onDelete={content.handlers.handleDelete}
+            />
           </TabPanel>
           <TabPanel>
             <Box>

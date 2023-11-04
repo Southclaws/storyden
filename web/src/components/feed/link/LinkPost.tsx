@@ -12,6 +12,7 @@ import { Box, Flex, HStack, VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
+  onDelete: () => void;
 };
 
 export function LinkPost(props: Props) {
@@ -78,7 +79,7 @@ export function LinkPost(props: Props) {
 
           <HStack>
             {session && <CollectionMenu thread={props.thread} />}
-            <FeedItemMenu {...props.thread} />
+            <FeedItemMenu thread={props.thread} onDelete={props.onDelete} />
           </HStack>
         </Flex>
       </styled.article>

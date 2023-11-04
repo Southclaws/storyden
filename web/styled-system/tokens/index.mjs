@@ -611,6 +611,54 @@ const tokens = {
     "value": "bounce 1s infinite",
     "variable": "var(--animations-bounce)"
   },
+  "zIndex.hide": {
+    "value": -1,
+    "variable": "var(--z-index-hide)"
+  },
+  "zIndex.base": {
+    "value": 0,
+    "variable": "var(--z-index-base)"
+  },
+  "zIndex.docked": {
+    "value": 10,
+    "variable": "var(--z-index-docked)"
+  },
+  "zIndex.dropdown": {
+    "value": 1000,
+    "variable": "var(--z-index-dropdown)"
+  },
+  "zIndex.sticky": {
+    "value": 1100,
+    "variable": "var(--z-index-sticky)"
+  },
+  "zIndex.banner": {
+    "value": 1200,
+    "variable": "var(--z-index-banner)"
+  },
+  "zIndex.overlay": {
+    "value": 1300,
+    "variable": "var(--z-index-overlay)"
+  },
+  "zIndex.modal": {
+    "value": 1400,
+    "variable": "var(--z-index-modal)"
+  },
+  "zIndex.popover": {
+    "value": 1500,
+    "variable": "var(--z-index-popover)"
+  },
+  "zIndex.skipLink": {
+    "value": 1600,
+    "variable": "var(--z-index-skip-link)"
+  },
+  "zIndex.toast": {
+    "value": 1700,
+    "variable": "var(--z-index-toast)"
+  },
+  "zIndex.tooltip": {
+    "value": 1800,
+    "variable": "var(--z-index-tooltip)"
+  },
   "fontSizes.2xs": {
     "value": "0.5rem",
     "variable": "var(--font-sizes-2xs)"

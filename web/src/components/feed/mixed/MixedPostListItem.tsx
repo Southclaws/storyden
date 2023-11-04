@@ -7,6 +7,7 @@ import { getPostType } from "./utils";
 
 type Props = {
   thread: ThreadReference;
+  onDelete: () => void;
 };
 
 export function MixedPostListItem(props: Props) {
