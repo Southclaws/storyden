@@ -1,24 +1,23 @@
 "use client";
 
-import { mutate } from "swr";
-
 import { ThreadReference } from "src/api/openapi/schemas";
-import { getThreadListKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
-import { useClipboard, useToast } from "src/theme/components";
+import { useClipboard } from "src/theme/components";
 import { isShareEnabled } from "src/utils/client";
 
-export function useFeedItemMenu(props: ThreadReference) {
-  const toast = useToast();
+export type Props = {
+  thread: ThreadReference;
+  onDelete: () => void;
+};
+
+export function useFeedItemMenu(props: Props) {
   const account = useSession();
-  const { onCopy } = useClipboard(getPermalinkForThread(props.slug));
+  const { onCopy } = useClipboard(getPermalinkForThread(props.thread.slug));
 
   const shareEnabled = isShareEnabled();
-  const deleteEnabled = account?.id === props.author.id;
-  const {
-    category: { name: category },
-  } = props;
+  const deleteEnabled =
+    account?.admin || account?.id === props.thread.author.id;
 
   async function onCopyLink() {
     onCopy();
@@ -26,20 +25,10 @@ export function useFeedItemMenu(props: ThreadReference) {
 
   async function onShare() {
     await navigator.share({
-      title: `A post by ${props.author.name}`,
-      url: `#${props.id}`,
-      text: props.short,
+      title: `A post by ${props.thread.author.name}`,
+      url: `#${props.thread.id}`,
+      text: props.thread.short,
     });
-  }
-
-  async function onDelete() {
-    await threadDelete(props.id);
-    toast({ title: "Thread deleted" });
-    mutate(
-      getThreadListKey({
-        categories: category ? [category] : undefined,
-      }),
-    );
   }
 
   return {
@@ -47,7 +36,7 @@ export function useFeedItemMenu(props: ThreadReference) {
     shareEnabled,
     onShare,
     deleteEnabled,
-    onDelete,
+    onDelete: props.onDelete,
   };
 }
 

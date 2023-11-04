@@ -1,33 +1,66 @@
-"use client";
-
 import { Portal } from "@ark-ui/react";
+import format from "date-fns/format";
 
-import { ThreadReference } from "src/api/openapi/schemas";
 import { More } from "src/components/site/Action/Action";
 import {
   Menu,
   MenuContent,
   MenuItem,
+  MenuItemGroup,
+  MenuItemGroupLabel,
   MenuPositioner,
+  MenuSeparator,
   MenuTrigger,
 } from "src/theme/components/Menu";
 
-// import { useFeedItemMenu } from "./useFeedItemMenu";
+import { styled } from "@/styled-system/jsx";
 
-export function FeedItemMenu(props: ThreadReference) {
-  // const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
-  //   useFeedItemMenu(props);
+import { Props, useFeedItemMenu } from "./useFeedItemMenu";
+
+export function FeedItemMenu(props: Props) {
+  const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
+    useFeedItemMenu(props);
 
   return (
-    <Menu>
+    <Menu size="sm">
       <MenuTrigger asChild>
         <More />
       </MenuTrigger>
       <Portal>
         <MenuPositioner>
-          <MenuContent>
-            <MenuItem id="one">{props.id}</MenuItem>
-            <MenuItem id="twi">{props.author.handle}</MenuItem>
+          <MenuContent lazyMount minW="36">
+            <MenuItemGroup id="user">
+              <MenuItemGroupLabel
+                htmlFor="user"
+                display="flex"
+                flexDir="column"
+                userSelect="none"
+              >
+                <styled.span>{`Post by ${props.thread.author.name}`}</styled.span>
+
+                <styled.time fontWeight="normal">
+                  {format(new Date(props.thread.createdAt), "yyyy-mm-dd")}
+                </styled.time>
+              </MenuItemGroupLabel>
+
+              <MenuSeparator />
+
+              <MenuItem id="copy-link" onClick={onCopyLink}>
+                Copy link
+              </MenuItem>
+
+              {shareEnabled && (
+                <MenuItem id="share" onClick={onShare}>
+                  Share
+                </MenuItem>
+              )}
+
+              {deleteEnabled && (
+                <MenuItem id="delete" onClick={onDelete}>
+                  Delete
+                </MenuItem>
+              )}
+            </MenuItemGroup>
           </MenuContent>
         </MenuPositioner>
       </Portal>

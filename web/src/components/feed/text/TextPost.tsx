@@ -1,10 +1,10 @@
-import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
 import NextLink from "next/link";
 
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
+import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
 
 import { FeedItem } from "../common/FeedItem/FeedItem";
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
@@ -13,6 +13,7 @@ import { Flex, HStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
+  onDelete: () => void;
 };
 
 export function TextPost(props: Props) {
@@ -42,7 +43,7 @@ export function TextPost(props: Props) {
 
           <HStack>
             {session && <CollectionMenu thread={props.thread} />}
-            <FeedItemMenu {...props.thread} />
+            <FeedItemMenu thread={props.thread} onDelete={props.onDelete} />
           </HStack>
         </Flex>
       </FeedItem>
