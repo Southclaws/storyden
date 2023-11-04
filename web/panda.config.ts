@@ -7,6 +7,7 @@ import {
 import { button } from "src/theme/components/Button/button.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
+import { menu } from "src/theme/components/Menu/menu.recipe";
 
 export default defineConfig({
   preflight: true,
@@ -14,6 +15,21 @@ export default defineConfig({
   include: ["./src/**/*.tsx"],
   jsxFramework: "react",
   exclude: [],
+
+  conditions: {
+    checked:
+      "&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])",
+    indeterminate:
+      "&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])",
+    closed: "&:is([data-state=closed])",
+    open: "&:is([open], [data-state=open])",
+    hidden: "&:is([hidden])",
+    current: "&:is([data-current])",
+    today: "&:is([data-today])",
+    placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
+    collapsed:
+      '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
+  },
 
   // NOTE: The theme references some CSS variables defined in global.css, this
   // is in order to provide some level of customisability for hosts who want to
@@ -27,6 +43,7 @@ export default defineConfig({
       input: input,
       button: button,
       link: link,
+      menu: menu,
     },
     extend: {
       semanticTokens: defineSemanticTokens({
@@ -114,7 +131,21 @@ export default defineConfig({
           },
         },
       }),
-      tokens: {
+      tokens: defineTokens({
+        zIndex: {
+          hide: { value: -1 },
+          base: { value: 0 },
+          docked: { value: 10 },
+          dropdown: { value: 1000 },
+          sticky: { value: 1100 },
+          banner: { value: 1200 },
+          overlay: { value: 1300 },
+          modal: { value: 1400 },
+          popover: { value: 1500 },
+          skipLink: { value: 1600 },
+          toast: { value: 1700 },
+          tooltip: { value: 1800 },
+        },
         fontSizes: {
           sm: { value: "1rem" },
           md: { value: "1.125rem" },
@@ -166,7 +197,7 @@ export default defineConfig({
             900: { value: "rgba(0, 0, 0, 0.92)" },
           },
         }),
-      },
+      }),
     },
   },
 

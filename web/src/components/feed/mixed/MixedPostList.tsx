@@ -7,6 +7,7 @@ import { MixedPostListItem } from "./MixedPostListItem";
 
 type Props = {
   posts: ThreadReference[];
+  onDelete: (id: string) => void;
 };
 
 export function MixedPostList(props: Props) {
@@ -17,7 +18,11 @@ export function MixedPostList(props: Props) {
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="4">
       {props.posts.map((t) => (
-        <MixedPostListItem key={t.id} thread={t} />
+        <MixedPostListItem
+          key={t.id}
+          thread={t}
+          onDelete={() => props.onDelete(t.id)}
+        />
       ))}
     </styled.ol>
   );

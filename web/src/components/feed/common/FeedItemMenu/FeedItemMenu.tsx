@@ -1,53 +1,69 @@
-"use client";
-
-import { LinkIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { ShareIcon } from "@heroicons/react/24/solid";
+import { Portal } from "@ark-ui/react";
 import format from "date-fns/format";
 
-import { ThreadReference } from "src/api/openapi/schemas";
 import { More } from "src/components/site/Action/Action";
 import {
   Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
+  MenuContent,
   MenuItem,
-  MenuList,
-} from "src/theme/components";
+  MenuItemGroup,
+  MenuItemGroupLabel,
+  MenuPositioner,
+  MenuSeparator,
+  MenuTrigger,
+} from "src/theme/components/Menu";
 
-import { useFeedItemMenu } from "./useFeedItemMenu";
+import { styled } from "@/styled-system/jsx";
 
-export function FeedItemMenu(props: ThreadReference) {
+import { Props, useFeedItemMenu } from "./useFeedItemMenu";
+
+export function FeedItemMenu(props: Props) {
   const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
     useFeedItemMenu(props);
 
   return (
-    <Menu>
-      <MenuButton as={More} />
-      <MenuList>
-        <MenuGroup title={`Post by ${props.author.name}`}>
-          <MenuItem isDisabled>
-            {format(new Date(props.createdAt), "yyyy-mm-dd")}
-          </MenuItem>
-        </MenuGroup>
-        <MenuDivider />
+    <Menu size="sm">
+      <MenuTrigger asChild>
+        <More />
+      </MenuTrigger>
+      <Portal>
+        <MenuPositioner>
+          <MenuContent lazyMount minW="36">
+            <MenuItemGroup id="user">
+              <MenuItemGroupLabel
+                htmlFor="user"
+                display="flex"
+                flexDir="column"
+                userSelect="none"
+              >
+                <styled.span>{`Post by ${props.thread.author.name}`}</styled.span>
 
-        <MenuItem icon={<LinkIcon width="1.4em" />} onClick={onCopyLink}>
-          Copy link
-        </MenuItem>
+                <styled.time fontWeight="normal">
+                  {format(new Date(props.thread.createdAt), "yyyy-mm-dd")}
+                </styled.time>
+              </MenuItemGroupLabel>
 
-        {shareEnabled && (
-          <MenuItem icon={<ShareIcon width="1.4em" />} onClick={onShare}>
-            Share
-          </MenuItem>
-        )}
+              <MenuSeparator />
 
-        {deleteEnabled && (
-          <MenuItem icon={<TrashIcon width="1.4em" />} onClick={onDelete}>
-            Delete
-          </MenuItem>
-        )}
-      </MenuList>
+              <MenuItem id="copy-link" onClick={onCopyLink}>
+                Copy link
+              </MenuItem>
+
+              {shareEnabled && (
+                <MenuItem id="share" onClick={onShare}>
+                  Share
+                </MenuItem>
+              )}
+
+              {deleteEnabled && (
+                <MenuItem id="delete" onClick={onDelete}>
+                  Delete
+                </MenuItem>
+              )}
+            </MenuItemGroup>
+          </MenuContent>
+        </MenuPositioner>
+      </Portal>
     </Menu>
   );
 }

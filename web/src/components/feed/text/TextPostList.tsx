@@ -7,6 +7,7 @@ import { TextPost } from "./TextPost";
 
 type Props = {
   posts: ThreadReference[];
+  onDelete: (id: string) => void;
 };
 
 export function TextPostList(props: Props) {
@@ -17,7 +18,7 @@ export function TextPostList(props: Props) {
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="4">
       {props.posts.map((t) => (
-        <TextPost key={t.id} thread={t} />
+        <TextPost key={t.id} thread={t} onDelete={() => props.onDelete(t.id)} />
       ))}
     </styled.ol>
   );
