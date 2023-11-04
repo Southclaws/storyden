@@ -2,6 +2,24 @@
 import type { AnySelector, Selectors } from './selectors';
 
 export interface Conditions {
+	/** `&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])` */
+	"_checked": string
+	/** `&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])` */
+	"_indeterminate": string
+	/** `&:is([data-state=closed])` */
+	"_closed": string
+	/** `&:is([open], [data-state=open])` */
+	"_open": string
+	/** `&:is([hidden])` */
+	"_hidden": string
+	/** `&:is([data-current])` */
+	"_current": string
+	/** `&:is([data-today])` */
+	"_today": string
+	/** `&:is(:placeholder-shown, [data-placeholder-shown])` */
+	"_placeholderShown": string
+	/** `&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])` */
+	"_collapsed": string
 	/** `&:is(:hover, [data-hover])` */
 	"_hover": string
 	/** `&:is(:focus, [data-focus])` */
@@ -24,8 +42,6 @@ export interface Conditions {
 	"_readWrite": string
 	/** `&:is(:empty, [data-empty])` */
 	"_empty": string
-	/** `&:is(:checked, [data-checked], [aria-checked=true], [data-state="checked"])` */
-	"_checked": string
 	/** `&:enabled` */
 	"_enabled": string
 	/** `&:is([aria-expanded=true], [data-expanded], [data-state="expanded"])` */
@@ -102,8 +118,6 @@ export interface Conditions {
 	"_groupExpanded": string
 	/** `.group:invalid &` */
 	"_groupInvalid": string
-	/** `&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state="indeterminate")` */
-	"_indeterminate": string
 	/** `&:required` */
 	"_required": string
 	/** `&:is(:valid, [data-valid])` */
@@ -118,8 +132,6 @@ export interface Conditions {
 	"_outOfRange": string
 	/** `&::placeholder` */
 	"_placeholder": string
-	/** `&:placeholder-shown` */
-	"_placeholderShown": string
 	/** `&:is([aria-pressed=true], [data-pressed])` */
 	"_pressed": string
 	/** `&:is([aria-selected=true], [data-selected])` */
@@ -128,8 +140,6 @@ export interface Conditions {
 	"_default": string
 	/** `&:optional` */
 	"_optional": string
-	/** `&:is([open], [data-open], [data-state="open"])` */
-	"_open": string
 	/** `&:fullscreen` */
 	"_fullscreen": string
 	/** `&:is([data-loading], [aria-busy=true])` */
