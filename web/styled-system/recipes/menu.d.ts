@@ -4,7 +4,7 @@ import type { Pretty } from '../types/helpers';
 import type { DistributiveOmit } from '../types/system-types';
 
 interface MenuVariant {
-  size: "xs" | "sm" | "md" | "lg"
+  size: "sm" | "md" | "lg"
 }
 
 type MenuVariantMap = {

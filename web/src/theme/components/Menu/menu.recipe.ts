@@ -3,7 +3,7 @@ import { defineSlotRecipe } from "@pandacss/dev";
 
 const itemStyle = {
   alignItems: "center",
-  borderRadius: "l1",
+  borderRadius: "sm",
   cursor: "pointer",
   display: "flex",
   fontWeight: "medium",
@@ -13,16 +13,10 @@ const itemStyle = {
   transitionTimingFunction: "default",
   _hover: {
     background: "bg.subtle",
-    "& :where(svg)": {
-      color: "fg.default",
-    },
+    "& :where(svg)": { color: "fg.default" },
   },
-  _highlighted: {
-    background: "bg.subtle",
-  },
-  "& :where(svg)": {
-    color: "fg.muted",
-  },
+  _highlighted: { background: "bg.subtle" },
+  "& :where(svg)": { color: "fg.muted" },
 };
 
 export const menu = defineSlotRecipe({
@@ -35,7 +29,7 @@ export const menu = defineSlotRecipe({
     },
     content: {
       background: "bg.default",
-      borderRadius: "l2",
+      borderRadius: "md",
       boxShadow: "lg",
       display: "flex",
       flexDirection: "column",
@@ -48,12 +42,14 @@ export const menu = defineSlotRecipe({
         animation: "fadeIn 0.25s ease-out",
       },
       _closed: {
+        display: "none",
         animation: "fadeOut 0.2s ease-out",
       },
     },
     itemGroup: {
       display: "flex",
       flexDirection: "column",
+      gap: "1",
     },
     positioner: {
       zIndex: "dropdown",
@@ -67,168 +63,70 @@ export const menu = defineSlotRecipe({
   },
   variants: {
     size: {
-      xs: {
-        itemGroup: {
-          gap: "1",
-        },
-        itemGroupLabel: {
-          py: "1.5",
-          px: "1.5",
-          mx: "1",
-        },
-        content: {
-          py: "1",
-          gap: "1",
-        },
-        item: {
-          h: "8",
-          px: "1.5",
-          mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
-        },
-        optionItem: {
-          h: "8",
-          px: "1.5",
-          mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
-        },
-        triggerItem: {
-          h: "8",
-          px: "1.5",
-          mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
-        },
-      },
       sm: {
-        itemGroup: {
-          gap: "1",
-        },
-        itemGroupLabel: {
-          py: "2",
-          px: "2",
-          mx: "1",
-        },
-        content: {
-          py: "1",
-          gap: "1",
-        },
+        itemGroupLabel: { py: "1.5", px: "1.5", mx: "1" },
+        content: { py: "1", gap: "1" },
         item: {
-          h: "9",
-          px: "2",
+          h: "8",
+          px: "1.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          "& :where(svg)": { width: "4", height: "4" },
         },
         optionItem: {
-          h: "9",
-          px: "2",
+          h: "8",
+          px: "1.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          "& :where(svg)": { width: "4", height: "4" },
         },
         triggerItem: {
-          h: "9",
-          px: "2",
-          mx: "1.5",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          h: "8",
+          px: "1.5",
+          mx: "1",
+          "& :where(svg)": { width: "4", height: "4" },
         },
       },
       md: {
-        itemGroup: {
-          gap: "1",
-        },
-        itemGroupLabel: {
-          py: "2.5",
-          px: "2.5",
-          mx: "1",
-        },
-        content: {
-          py: "1",
-          gap: "1",
-        },
+        itemGroupLabel: { py: "2.5", px: "2.5", mx: "1" },
+        content: { py: "1", gap: "1" },
         item: {
           h: "10",
           px: "2.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          "& :where(svg)": { width: "4", height: "4" },
         },
         optionItem: {
           h: "10",
           px: "2.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          "& :where(svg)": { width: "4", height: "4" },
         },
         triggerItem: {
           h: "10",
           px: "2.5",
           mx: "1.5",
-          "& :where(svg)": {
-            width: "4",
-            height: "4",
-          },
+          "& :where(svg)": { width: "4", height: "4" },
         },
       },
       lg: {
-        itemGroup: {
-          gap: "1",
-        },
-        itemGroupLabel: {
-          py: "2.5",
-          px: "2.5",
-          mx: "1",
-        },
-        content: {
-          py: "1",
-          gap: "1",
-        },
+        itemGroupLabel: { py: "2.5", px: "2.5", mx: "1" },
+        content: { py: "1", gap: "1" },
         item: {
           h: "11",
           px: "2.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "5",
-            height: "5",
-          },
+          "& :where(svg)": { width: "5", height: "5" },
         },
         optionItem: {
           h: "11",
           px: "2.5",
           mx: "1",
-          "& :where(svg)": {
-            width: "5",
-            height: "5",
-          },
+          "& :where(svg)": { width: "5", height: "5" },
         },
         triggerItem: {
           h: "11",
           px: "2.5",
           mx: "1.5",
-          "& :where(svg)": {
-            width: "5",
-            height: "5",
-          },
+          "& :where(svg)": { width: "5", height: "5" },
         },
       },
     },

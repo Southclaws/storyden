@@ -131,7 +131,21 @@ export default defineConfig({
           },
         },
       }),
-      tokens: {
+      tokens: defineTokens({
+        zIndex: {
+          hide: { value: -1 },
+          base: { value: 0 },
+          docked: { value: 10 },
+          dropdown: { value: 1000 },
+          sticky: { value: 1100 },
+          banner: { value: 1200 },
+          overlay: { value: 1300 },
+          modal: { value: 1400 },
+          popover: { value: 1500 },
+          skipLink: { value: 1600 },
+          toast: { value: 1700 },
+          tooltip: { value: 1800 },
+        },
         fontSizes: {
           sm: { value: "1rem" },
           md: { value: "1.125rem" },
@@ -183,7 +197,7 @@ export default defineConfig({
             900: { value: "rgba(0, 0, 0, 0.92)" },
           },
         }),
-      },
+      }),
     },
   },
 
