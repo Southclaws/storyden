@@ -16,6 +16,21 @@ export default defineConfig({
   jsxFramework: "react",
   exclude: [],
 
+  conditions: {
+    checked:
+      "&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])",
+    indeterminate:
+      "&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])",
+    closed: "&:is([data-state=closed])",
+    open: "&:is([open], [data-state=open])",
+    hidden: "&:is([hidden])",
+    current: "&:is([data-current])",
+    today: "&:is([data-today])",
+    placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
+    collapsed:
+      '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
+  },
+
   // NOTE: The theme references some CSS variables defined in global.css, this
   // is in order to provide some level of customisability for hosts who want to
   // override CSS with custom rules. Panda is primarily just there to wire it
