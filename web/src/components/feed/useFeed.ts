@@ -34,8 +34,6 @@ export function useFeed(
     const existingThreads = data?.threads ?? initialThreads ?? [];
     const newThreads = removeThread(id)(existingThreads);
 
-    console.log({ existingThreads, newThreads });
-
     mutate({
       threads: newThreads,
     });
@@ -44,6 +42,7 @@ export function useFeed(
   return {
     ready: true as const,
     data,
+    mutate,
     handlers: {
       handleDelete,
     },

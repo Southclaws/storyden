@@ -36,6 +36,17 @@ export const button = defineRecipe({
     kind: "neutral",
     size: "md",
   },
+  compoundVariants: [
+    {
+      // Blank buttons override some size settings which only apply to buttons
+      // with borders and fills etc.
+      kind: "blank",
+      css: {
+        px: "0",
+        color: "accent.text.50",
+      },
+    },
+  ],
   variants: {
     kind: {
       neutral: {
@@ -90,6 +101,11 @@ export const button = defineRecipe({
         _active: {
           backgroundColor: "rose.700",
         },
+        _disabled,
+      },
+      blank: {
+        backgroundColor: "none",
+        px: "0",
         _disabled,
       },
     },

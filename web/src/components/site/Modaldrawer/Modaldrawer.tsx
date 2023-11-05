@@ -1,14 +1,9 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import {
-  Box,
-  CloseButton,
-  HStack,
-  Heading,
-  UseDisclosureProps,
-  VStack,
-} from "src/theme/components";
+import { CloseButton, Heading, UseDisclosureProps } from "src/theme/components";
+
+import { Box, HStack, VStack } from "@/styled-system/jsx";
 
 type Props = {
   title?: string;
@@ -31,18 +26,20 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
           <Drawer.Overlay className="modaldrawer__overlay" />
           <Drawer.Content className="modaldrawer__content">
             <VStack
-              height={{ base: "full", md: "unset" }}
-              borderTopRadius="1em"
-              borderBottomRadius={{ base: "0", md: "1em" }}
+              minHeight={{ base: "full", md: "0" }}
+              minWidth={{ base: "full", md: "md" }}
+              maxWidth={{ base: "full", md: "prose" }}
+              borderTopRadius="xl"
+              borderBottomRadius={{ base: "none", md: "xl" }}
               bgColor="gray.100"
-              p={4}
+              p="4"
             >
               <HStack w="full" justify="space-between">
                 <Heading size="md">{props.title}</Heading>
                 <CloseButton onClick={props.onClose} />
               </HStack>
 
-              <Box h="full" w="full" pb={3}>
+              <Box h="full" w="full" pb="3">
                 {children}
               </Box>
             </VStack>
@@ -55,6 +52,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
           position: fixed;
           inset: 0;
           background-color: var(--chakra-colors-blackAlpha-600);
+          z-index: var(--z-index-overlay);
         }
 
         /* Modal mode - on desktop screens */
@@ -68,6 +66,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
             justify-content: center;
             align-items: center;
             position: fixed;
+            z-index: var(--z-index-modal);
           }
         }
 
@@ -82,6 +81,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
             position: fixed;
             margin-top: 3rem;
             max-height: 96%;
+            z-index: var(--z-index-modal);
           }
         }
       `}</style>

@@ -294,31 +294,26 @@ export const More = forwardRef(
   },
 );
 
-export const Bookmark = forwardRef(
-  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
-    return (
-      <ActionButton
-        ref={ref}
-        size="sm"
-        title="Save to collection"
-        aria-label={al ?? "save"}
-        {...props}
-        icon={<BookmarkIcon width="1.4em" />}
-      />
-    );
-  },
-);
+export type BookmarkProps = {
+  bookmarked: boolean;
+} & WithOptionalARIALabel;
 
-export const BookmarkSolid = forwardRef(
-  ({ "aria-label": al, ...props }: WithOptionalARIALabel, ref) => {
+export const Bookmark = forwardRef(
+  ({ "aria-label": al, bookmarked, ...props }: BookmarkProps, ref) => {
     return (
       <ActionButton
         ref={ref}
         size="sm"
-        title="Save to collection"
+        title={bookmarked ? "In collection" : "Save to collection"}
         aria-label={al ?? "save"}
         {...props}
-        icon={<BookmarkSolidIcon width="1.4em" />}
+        icon={
+          bookmarked ? (
+            <BookmarkSolidIcon width="1.4em" />
+          ) : (
+            <BookmarkIcon width="1.4em" />
+          )
+        }
       />
     );
   },

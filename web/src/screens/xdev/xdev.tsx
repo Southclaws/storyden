@@ -3,6 +3,7 @@
 import { groupBy, keys, partition } from "lodash";
 
 import { Button } from "src/theme/components/Button";
+import { Checkbox } from "src/theme/components/Checkbox";
 import { Link } from "src/theme/components/Link";
 import { getColourVariants } from "src/utils/colour";
 
@@ -116,6 +117,34 @@ export function Palette({ accent_colour, theme }: any) {
           <Link href="#" kind="secondary">
             Secondary
           </Link>
+        </VStack>
+      </HStack>
+
+      <HStack>
+        <VStack alignItems="start">
+          <Checkbox checked={false}>Unchecked</Checkbox>
+
+          <Checkbox size="sm" checked={true}>
+            Checked
+          </Checkbox>
+
+          <Checkbox checked="indeterminate">Indeterminate</Checkbox>
+
+          <Checkbox size="lg">Uncontrolled</Checkbox>
+        </VStack>
+
+        <VStack alignItems="start">
+          <Checkbox defaultChecked={false}>Unchecked</Checkbox>
+
+          <Checkbox size="sm" defaultChecked={true}>
+            Checked
+          </Checkbox>
+
+          <Checkbox size="md" defaultChecked="indeterminate">
+            Indeterminate
+          </Checkbox>
+
+          <Checkbox size="lg">Uncontrolled</Checkbox>
         </VStack>
       </HStack>
 

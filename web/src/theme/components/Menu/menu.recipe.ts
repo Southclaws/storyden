@@ -26,6 +26,7 @@ export const menu = defineSlotRecipe({
     itemGroupLabel: {
       fontWeight: "semibold",
       textStyle: "sm",
+      color: "fg.subtle",
     },
     content: {
       background: "bg.default",

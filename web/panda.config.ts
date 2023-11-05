@@ -5,6 +5,7 @@ import {
 } from "@pandacss/dev";
 
 import { button } from "src/theme/components/Button/button.recipe";
+import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
@@ -44,6 +45,7 @@ export default defineConfig({
       button: button,
       link: link,
       menu: menu,
+      checkbox: checkbox,
     },
     extend: {
       semanticTokens: defineSemanticTokens({
@@ -146,6 +148,18 @@ export default defineConfig({
           toast: { value: 1700 },
           tooltip: { value: 1800 },
         },
+        radii: {
+          none: { value: "0" },
+          xs: { value: "0.125rem" },
+          sm: { value: "0.25rem" },
+          md: { value: "0.375rem" },
+          lg: { value: "0.5rem" },
+          xl: { value: "0.75rem" },
+          "2xl": { value: "1rem" },
+          "3xl": { value: "1.5rem" },
+          full: { value: "9999px" },
+        },
+
         fontSizes: {
           sm: { value: "1rem" },
           md: { value: "1.125rem" },
