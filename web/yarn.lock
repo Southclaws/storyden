@@ -9396,10 +9396,10 @@ validator@^13.7.0:
   resolved "https://registry.yarnpkg.com/validator/-/validator-13.11.0.tgz#23ab3fd59290c61248364eabf4067f04955fbb1b"
   integrity sha512-Ii+sehpSfZy+At5nPdnyMhx78fEoPDkR2XW/zimHEL3MyGJQOCQ7WeP20jPYRz7ZCpcKLB21NxuXHF3bxjStBQ==
 
-vaul@^0.6.8:
-  version "0.6.8"
-  resolved "https://registry.yarnpkg.com/vaul/-/vaul-0.6.8.tgz#633bb2a0e352adb73f84c497d516c93673d4f01e"
-  integrity sha512-Fn7Pe8Zm/jqyIf8Nn/iBMoBzQ3L49xB2vXj7Kp8W7RCMRDg33X5rCp/K80g1Q35VNtKP8AgmFSM7lbticurXKA==
+vaul@^0.7.7:
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/vaul/-/vaul-0.7.7.tgz#a9b746d31d17b1f588ee4e863e16780f680dbc21"
+  integrity sha512-NAQTE8836Daxq+VC74srRfGqiOLQft4yc0x8YsO6Vowti0RC7LWzSpIxKd7RGegzgMMZOho+9ysH+uI6o+tUVw==
   dependencies:
     "@radix-ui/react-dialog" "^1.0.4"
 

@@ -39,7 +39,7 @@
     "slate-react": "^0.98.3",
     "swr": "^2.2.2",
     "unified": "^10.1.2",
-    "vaul": "^0.6.8",
+    "vaul": "^0.7.7",
     "zod": "^3.22.2"
   },
   "devDependencies": {
