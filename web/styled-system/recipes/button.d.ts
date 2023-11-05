@@ -4,7 +4,7 @@ import type { Pretty } from '../types/helpers';
 import type { DistributiveOmit } from '../types/system-types';
 
 interface ButtonVariant {
-  kind: "neutral" | "primary" | "secondary" | "destructive"
+  kind: "neutral" | "primary" | "secondary" | "destructive" | "blank"
 size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 
@@ -13,7 +13,7 @@ type ButtonVariantMap = {
 }
 
 export type ButtonVariantProps = {
-  [key in keyof ButtonVariant]?: ConditionalValue<ButtonVariant[key]>
+  [key in keyof ButtonVariant]?: ButtonVariant[key]
 }
 
 export interface ButtonRecipe {

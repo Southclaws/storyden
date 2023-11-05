@@ -4,14 +4,23 @@ import { createRecipe } from './create-recipe.mjs';
 const buttonFn = /* @__PURE__ */ createRecipe('button', {
   "kind": "neutral",
   "size": "md"
-}, [])
+}, [
+  {
+    "kind": "blank",
+    "css": {
+      "px": "0",
+      "color": "accent.text.50"
+    }
+  }
+])
 
 const buttonVariantMap = {
   "kind": [
     "neutral",
     "primary",
     "secondary",
-    "destructive"
+    "destructive",
+    "blank"
   ],
   "size": [
     "xs",

@@ -51,38 +51,6 @@ const tokens = {
     "value": "500ms",
     "variable": "var(--durations-slowest)"
   },
-  "radii.xs": {
-    "value": "0.125rem",
-    "variable": "var(--radii-xs)"
-  },
-  "radii.sm": {
-    "value": "0.25rem",
-    "variable": "var(--radii-sm)"
-  },
-  "radii.md": {
-    "value": "0.375rem",
-    "variable": "var(--radii-md)"
-  },
-  "radii.lg": {
-    "value": "0.5rem",
-    "variable": "var(--radii-lg)"
-  },
-  "radii.xl": {
-    "value": "0.75rem",
-    "variable": "var(--radii-xl)"
-  },
-  "radii.2xl": {
-    "value": "1rem",
-    "variable": "var(--radii-2xl)"
-  },
-  "radii.3xl": {
-    "value": "1.5rem",
-    "variable": "var(--radii-3xl)"
-  },
-  "radii.full": {
-    "value": "9999px",
-    "variable": "var(--radii-full)"
-  },
   "fontWeights.thin": {
     "value": "100",
     "variable": "var(--font-weights-thin)"
@@ -658,6 +626,42 @@ const tokens = {
   "zIndex.tooltip": {
     "value": 1800,
     "variable": "var(--z-index-tooltip)"
+  },
+  "radii.none": {
+    "value": "0",
+    "variable": "var(--radii-none)"
+  },
+  "radii.xs": {
+    "value": "0.125rem",
+    "variable": "var(--radii-xs)"
+  },
+  "radii.sm": {
+    "value": "0.25rem",
+    "variable": "var(--radii-sm)"
+  },
+  "radii.md": {
+    "value": "0.375rem",
+    "variable": "var(--radii-md)"
+  },
+  "radii.lg": {
+    "value": "0.5rem",
+    "variable": "var(--radii-lg)"
+  },
+  "radii.xl": {
+    "value": "0.75rem",
+    "variable": "var(--radii-xl)"
+  },
+  "radii.2xl": {
+    "value": "1rem",
+    "variable": "var(--radii-2xl)"
+  },
+  "radii.3xl": {
+    "value": "1.5rem",
+    "variable": "var(--radii-3xl)"
+  },
+  "radii.full": {
+    "value": "9999px",
+    "variable": "var(--radii-full)"
   },
   "fontSizes.2xs": {
     "value": "0.5rem",

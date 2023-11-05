@@ -39,6 +39,7 @@ import {
   Skeleton,
   SkeletonText,
   SlideFade,
+  Spinner,
   StackProps,
   Text,
   UseDisclosureProps,
@@ -85,22 +86,24 @@ export {
   Image,
   LinkBox,
   LinkOverlay,
+  Spinner,
   Skeleton,
   SkeletonText,
   SlideFade,
 };
 
+// Disclosure
+// TODO: Copy into our codebase:
+// https://github.com/chakra-ui/chakra-ui/blob/main/packages/hooks/use-disclosure/src/index.ts
+
+export { useDisclosure };
+export type { UseDisclosureProps };
+export type WithDisclosure<T> = UseDisclosureProps & T;
+
 // Hooks
 
-export { useClipboard, useDisclosure, useOutsideClick, useToast };
+export { useClipboard, useOutsideClick, useToast };
 
 // Types
 
-export type {
-  BoxProps,
-  CreateToastFnReturn,
-  FlexProps,
-  LinkProps,
-  StackProps,
-  UseDisclosureProps,
-};
+export type { BoxProps, CreateToastFnReturn, FlexProps, LinkProps, StackProps };

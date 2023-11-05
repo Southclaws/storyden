@@ -1,80 +1,51 @@
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { Portal } from "@ark-ui/react";
 
-import {
-  Box,
-  Checkbox,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-} from "src/theme/components";
+import { Bookmark } from "src/components/site/Action/Action";
+import { Menu, MenuPositioner, MenuTrigger } from "src/theme/components/Menu";
 
-import { Bookmark, BookmarkSolid } from "../../site/Action/Action";
+import { Box } from "@/styled-system/jsx";
 
+import { CollectionMenuItems } from "./CollectionMenuItems";
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 
 export function CollectionMenu(props: Props) {
   const {
+    ready,
     collections,
-    isAlreadySaved,
-    onSelect,
     multiSelect,
     onKeyDown,
     onKeyUp,
     isOpen,
     onOpen,
     onClose,
+    isAlreadySaved,
   } = useCollectionMenu(props);
 
-  if (!collections) return null;
+  if (!ready) return null;
 
   return (
     <Box onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={1}>
       <Menu
+        size="sm"
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onClose}
         closeOnSelect={!multiSelect}
-        preventOverflow={true}
-        modifiers={[
-          {
-            name: "preventOverflow",
-            options: {
-              altAxis: true,
-              offset: { bottom: 82 },
-              padding: { bottom: 82 },
-            },
-          },
-        ]}
+        userSelect="none"
       >
-        <MenuButton
-          title="Add to collections"
-          as={isAlreadySaved ? BookmarkSolid : Bookmark}
-        />
-        <MenuList>
-          <MenuGroup title="Add to collections">
-            <MenuDivider />
-            {collections.map((c) => (
-              <MenuItem
-                key={c.id}
-                icon={
-                  multiSelect ? (
-                    <Checkbox isChecked={c.hasPost} width="1.4em" />
-                  ) : c.hasPost ? (
-                    <MinusIcon width="1.4em" />
-                  ) : (
-                    <PlusIcon width="1.4em" />
-                  )
-                }
-                onClick={onSelect(c)}
-              >
-                {c.name}
-              </MenuItem>
-            ))}
-          </MenuGroup>
-        </MenuList>
+        <MenuTrigger asChild>
+          <Bookmark bookmarked={isAlreadySaved} />
+        </MenuTrigger>
+
+        <Portal>
+          <MenuPositioner>
+            <CollectionMenuItems
+              initialCollections={collections}
+              thread={props.thread}
+              multiSelect={multiSelect}
+            />
+          </MenuPositioner>
+        </Portal>
       </Menu>
     </Box>
   );
