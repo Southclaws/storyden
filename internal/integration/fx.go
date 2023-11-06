@@ -85,6 +85,8 @@ func application() fx.Option {
 		resources.Build(),
 		services.Build(),
 
+		// Tests can depend on Migrated to trigger migrations pre-test.
+		// This is not parallel safe.
 		fx.Provide(WithMigrated),
 	)
 }
