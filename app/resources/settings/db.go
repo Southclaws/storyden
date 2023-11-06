@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"go.uber.org/fx"
 	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/internal/ent"
@@ -16,12 +17,16 @@ type database struct {
 	db *ent.Client
 }
 
-func New(ctx context.Context, db *ent.Client) (Repository, error) {
+func New(ctx context.Context, lc fx.Lifecycle, db *ent.Client) (Repository, error) {
 	d := &database{db}
 
-	if err := d.Init(ctx); err != nil {
-		return nil, fault.Wrap(err)
-	}
+	lc.Append(fx.StartHook(func() error {
+		if err := d.Init(ctx); err != nil {
+			return fault.Wrap(err)
+		}
+
+		return nil
+	}))
 
 	return d, nil
 }
