@@ -28,7 +28,7 @@ func WithID(id AccountID) Option {
 
 func WithAdmin(admin bool) Option {
 	return func(a *Account) {
-		a.Admin = true
+		a.Admin = admin
 	}
 }
 
