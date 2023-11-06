@@ -8,11 +8,14 @@ import (
 	"testing"
 
 	"dario.cat/mergo"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 )
 
@@ -41,7 +44,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		}
 		defaultConfig.DatabaseURL = url
 	} else {
-		defaultConfig.DatabaseURL = "postgresql://default:default@localhost:5432/postgres"
+		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)"
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
@@ -81,6 +84,8 @@ func application() fx.Option {
 		infrastructure.Build(),
 		resources.Build(),
 		services.Build(),
+
+		fx.Provide(WithMigrated),
 	)
 }
 
@@ -100,4 +105,14 @@ func isMaybeProdDB(url string) bool {
 	}
 
 	return false
+}
+
+type Migrated interface{}
+
+func WithMigrated(ctx context.Context, client *ent.Client) (Migrated, error) {
+	if err := client.Schema.Create(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return 1, nil
 }
