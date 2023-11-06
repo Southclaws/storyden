@@ -17,6 +17,7 @@ func TestSettings(t *testing.T) {
 	ctx := context.Background()
 
 	integration.Test(t, nil, fx.Invoke(func(
+		_ integration.Migrated,
 		sr settings.Repository,
 	) {
 		r := require.New(t)
