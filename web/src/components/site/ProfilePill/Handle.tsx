@@ -2,7 +2,7 @@ import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 import { ProfileReference } from "src/api/openapi/schemas";
 
-import { Center, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 
 export type Props = {
   profileReference: ProfileReference;
@@ -21,9 +21,14 @@ export function Handle({ profileReference, size }: Props) {
       </styled.span>
 
       {profileReference.admin && (
-        <Center title="Admin">
+        <styled.span
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title="Admin"
+        >
           <CheckBadgeIcon height="1rem" />
-        </Center>
+        </styled.span>
       )}
     </styled.p>
   );
