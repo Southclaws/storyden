@@ -1,8 +1,9 @@
 export function isWebauthnAvailable() {
-  if (navigator === undefined) {
+  if (typeof window === "undefined") {
     return false;
   }
-  if (window === undefined) {
+
+  if (typeof navigator === "undefined") {
     return false;
   }
 
