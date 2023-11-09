@@ -11,7 +11,13 @@ import { Props, useLoginForm } from "./useLoginForm";
 
 export function LoginForm(props: Props) {
   const {
-    form: { register, handlePassword, handleWebauthn, errors },
+    form: {
+      register,
+      isWebauthnEnabled,
+      handlePassword,
+      handleWebauthn,
+      errors,
+    },
   } = useLoginForm();
 
   return (
@@ -41,9 +47,10 @@ export function LoginForm(props: Props) {
           size="sm"
           textAlign="center"
           placeholder="password"
+          autoComplete="current-password"
           {...register("token")}
         />
-        {props.webauthn && (
+        {props.webauthn && isWebauthnEnabled && (
           <>
             <styled.span>or</styled.span>
 
@@ -51,6 +58,7 @@ export function LoginForm(props: Props) {
               w="full"
               kind="secondary"
               size="sm"
+              type="button"
               onClick={handleWebauthn}
             >
               <styled.span display="flex" gap="1" alignItems="center" px="4">

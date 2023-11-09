@@ -9,7 +9,9 @@ import { useAccountGet } from "src/api/openapi/accounts";
 import { authPasswordSignin } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
 import { passkeyLogin } from "src/components/auth/webauthn/utils";
-import { deriveError, zodFormError } from "src/utils/error";
+import { deriveError } from "src/utils/error";
+
+import { isWebauthnAvailable } from "../utils";
 
 export type Props = {
   webauthn: boolean;
@@ -50,6 +52,8 @@ export function useLoginForm() {
   const { push } = useRouter();
   const { mutate } = useAccountGet();
 
+  const isWebauthnEnabled = isWebauthnAvailable();
+
   function handler(kind: Kind) {
     return handleSubmit((payload) => {
       switch (kind) {
@@ -63,9 +67,20 @@ export function useLoginForm() {
 
   async function handlePassword(payload: Form) {
     const parsed = FormPasswordSchema.safeParse(payload);
-    console.log(parsed);
     if (!parsed.success) {
-      return setError("root", zodFormError(parsed.error));
+      if (parsed.error.formErrors.fieldErrors.identifier) {
+        setError("identifier", {
+          message: parsed.error.formErrors.fieldErrors.identifier?.join(", "),
+        });
+      }
+
+      if (parsed.error.formErrors.fieldErrors.token) {
+        setError("token", {
+          message: parsed.error.formErrors.fieldErrors.token?.join(", "),
+        });
+      }
+
+      return;
     }
 
     await authPasswordSignin(parsed.data)
@@ -89,6 +104,7 @@ export function useLoginForm() {
   return {
     form: {
       register,
+      isWebauthnEnabled,
       handlePassword: handler("password"),
       handleWebauthn: handler("webauthn"),
       errors,
