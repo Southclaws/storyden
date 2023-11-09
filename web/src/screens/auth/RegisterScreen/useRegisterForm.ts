@@ -11,6 +11,7 @@ import { APIError } from "src/api/openapi/schemas";
 import { passkeyRegister } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 
+import { PasswordSchema, UsernameSchema } from "../schemas";
 import { isWebauthnAvailable } from "../utils";
 
 export type Props = {
@@ -19,20 +20,6 @@ export type Props = {
 
 const KindSchema = z.enum(["password", "webauthn"]);
 type Kind = z.infer<typeof KindSchema>;
-
-const UsernameSchema = z
-  .string()
-  .min(1, "Please enter a username.")
-  .max(30, "Maximum length is 30 characters.")
-  .toLowerCase()
-  .regex(
-    /^[a-z0-9_-]+$/g,
-    "Username can only contain latin letters, numbers, dashes and underscores.",
-  );
-
-const PasswordSchema = z
-  .string()
-  .min(8, "Password must be at least 8 characters.");
 
 const FormSchema = z.object({
   identifier: UsernameSchema,
