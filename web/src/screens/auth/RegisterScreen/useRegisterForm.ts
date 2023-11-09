@@ -11,6 +11,8 @@ import { APIError } from "src/api/openapi/schemas";
 import { passkeyRegister } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 
+import { isWebauthnAvailable } from "../utils";
+
 export type Props = {
   webauthn: boolean;
 };
@@ -54,6 +56,8 @@ export function useRegisterForm() {
   const { push } = useRouter();
   const { mutate } = useAccountGet();
 
+  const isWebauthnEnabled = isWebauthnAvailable();
+
   function handler(kind: Kind) {
     return handleSubmit((payload) => {
       switch (kind) {
@@ -68,7 +72,19 @@ export function useRegisterForm() {
   async function handlePassword(payload: Form) {
     const parsed = FormPasswordSchema.safeParse(payload);
     if (!parsed.success) {
-      return setError("root", parsed.error);
+      if (parsed.error.formErrors.fieldErrors.identifier) {
+        setError("identifier", {
+          message: parsed.error.formErrors.fieldErrors.identifier?.join(", "),
+        });
+      }
+
+      if (parsed.error.formErrors.fieldErrors.token) {
+        setError("token", {
+          message: parsed.error.formErrors.fieldErrors.token?.join(", "),
+        });
+      }
+
+      return;
     }
 
     await authPasswordSignup(parsed.data)
@@ -93,6 +109,7 @@ export function useRegisterForm() {
   return {
     form: {
       register,
+      isWebauthnEnabled,
       handlePassword: handler("password"),
       handleWebauthn: handler("webauthn"),
       errors,

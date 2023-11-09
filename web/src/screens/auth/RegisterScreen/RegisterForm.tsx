@@ -11,8 +11,16 @@ import { Props, useRegisterForm } from "./useRegisterForm";
 
 export function RegisterForm(props: Props) {
   const {
-    form: { register, handlePassword, handleWebauthn, errors },
+    form: {
+      register,
+      isWebauthnEnabled,
+      handlePassword,
+      handleWebauthn,
+      errors,
+    },
   } = useRegisterForm();
+
+  console.log(errors);
 
   return (
     <styled.form
@@ -41,9 +49,10 @@ export function RegisterForm(props: Props) {
           size="sm"
           textAlign="center"
           placeholder="password"
+          autoComplete="new-password"
           {...register("token")}
         />
-        {props.webauthn && (
+        {props.webauthn && isWebauthnEnabled && (
           <>
             <styled.span>or</styled.span>
 
@@ -51,6 +60,7 @@ export function RegisterForm(props: Props) {
               w="full"
               kind="secondary"
               size="sm"
+              type="button"
               onClick={handleWebauthn}
             >
               <styled.span display="flex" gap="1" alignItems="center" px="4">
