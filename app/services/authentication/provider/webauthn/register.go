@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/rs/xid"
@@ -29,8 +30,21 @@ func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return t.crede
 func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
 	t := temporary{handle: handle}
 
-	// TODO: Check if handle already exists
-	// if it exists, maybe we can short circuit the flow and switch to login?
+	_, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if exists {
+		// TODO: maybe we can short circuit the flow and switch to login?
+		return nil, nil, fault.Wrap(ErrAccountExists,
+			fctx.With(ctx),
+			ftag.With(ftag.AlreadyExists),
+			fmsg.WithDesc(
+				"already exists",
+				"An account with this handle has already been registered.",
+			),
+		)
+	}
 
 	credentialOptions, sessionData, err := p.wa.BeginRegistration(&t,
 		webauthn.WithAuthenticatorSelection(
