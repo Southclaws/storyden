@@ -22,6 +22,7 @@ export const button = defineRecipe({
     display: "inline-flex",
     fontWeight: "semibold",
     minWidth: "0",
+    width: "min-content",
     justifyContent: "center",
     outline: "none",
     position: "relative",
