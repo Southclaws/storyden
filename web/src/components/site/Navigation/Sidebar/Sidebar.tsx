@@ -55,7 +55,17 @@ export function Sidebar() {
               borderColor="oklch(0 0 0deg / 5%)"
             />
 
-            <Box overflowY="scroll" width="full">
+            <Box
+              overflowY="scroll"
+              width="full"
+              css={{
+                touchAction: "none",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
               <CategoryList />
             </Box>
 
