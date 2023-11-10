@@ -24,7 +24,6 @@ export async function LoginScreen() {
   return (
     <VStack
       minH="dvh"
-      justify="center"
       p="12"
       background={
         "linear-gradient(180deg, var(--accent-colour-flat-fill-100) 0%, var(--accent-colour-flat-fill-200) 100%)" as any
