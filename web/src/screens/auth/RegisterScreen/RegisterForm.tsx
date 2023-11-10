@@ -20,8 +20,6 @@ export function RegisterForm(props: Props) {
     },
   } = useRegisterForm();
 
-  console.log(errors);
-
   return (
     <styled.form
       w="full"
