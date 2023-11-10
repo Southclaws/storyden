@@ -4,6 +4,7 @@ import {
   defineTokens,
 } from "@pandacss/dev";
 
+import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
@@ -41,6 +42,7 @@ export default defineConfig({
   // by Panda, this is best avoided but it's some leftovers from the early days.
   theme: {
     recipes: {
+      admonition: admonition,
       input: input,
       button: button,
       link: link,
