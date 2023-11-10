@@ -38,6 +38,8 @@
     calc(var(--font-size-h6) / 4) + 4vw,
     var(--font-size-h6)
   );
+
+  color-scheme: only light;
 }
 
 html,

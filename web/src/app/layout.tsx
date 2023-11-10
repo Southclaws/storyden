@@ -35,6 +35,7 @@ export async function generateViewport(): Promise<Viewport> {
 
   return {
     themeColor: themeColour,
+    colorScheme: "only light",
   };
 }
 
