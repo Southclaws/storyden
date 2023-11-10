@@ -84,8 +84,7 @@ export function useRegisterForm() {
 
   async function handleWebauthn(payload: Form) {
     try {
-      passkeyRegister(payload.identifier);
-
+      await passkeyRegister(payload.identifier);
       push("/");
       mutate();
     } catch (error) {
