@@ -1,18 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { useAccountGet } from "src/api/openapi/accounts";
 import { authPasswordUpdate } from "src/api/openapi/auth";
 import { APIError } from "src/api/openapi/schemas";
-import { PasswordSchema } from "src/screens/auth/schemas";
+import {
+  ExistingPasswordSchema,
+  PasswordSchema,
+} from "src/screens/auth/schemas";
 import { deriveError } from "src/utils/error";
 
 const FormSchema = z.object({
-  old: PasswordSchema,
+  old: ExistingPasswordSchema,
   new: PasswordSchema,
 });
 type Form = z.infer<typeof FormSchema>;
@@ -26,16 +29,20 @@ export function usePassword() {
   } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
-  const { push } = useRouter();
   const { mutate } = useAccountGet();
+  const [success, setSuccess] = useState(false);
 
   async function handlePasswordChange(payload: Form) {
     await authPasswordUpdate(payload)
       .then(() => {
-        push("/");
         mutate();
+        setSuccess(true);
       })
       .catch((e: APIError) => setError("root", { message: deriveError(e) }));
+  }
+
+  function handleCloseNotification() {
+    setSuccess(false);
   }
 
   return {
@@ -44,5 +51,7 @@ export function usePassword() {
       handlePasswordChange: handleSubmit(handlePasswordChange),
       errors,
     },
+    success,
+    handleCloseNotification,
   };
 }

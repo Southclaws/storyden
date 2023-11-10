@@ -13,3 +13,7 @@ export const UsernameSchema = z
 export const PasswordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters.");
+
+export const ExistingPasswordSchema = z
+  .string()
+  .min(1, "Please enter your current password.");

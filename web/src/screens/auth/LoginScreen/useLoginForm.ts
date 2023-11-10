@@ -11,7 +11,7 @@ import { APIError } from "src/api/openapi/schemas";
 import { passkeyLogin } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 
-import { PasswordSchema, UsernameSchema } from "../schemas";
+import { ExistingPasswordSchema, UsernameSchema } from "../schemas";
 import { isWebauthnAvailable } from "../utils";
 
 export type Props = {
@@ -27,7 +27,7 @@ const FormSchema = z.object({
 });
 const FormPasswordSchema = z.object({
   identifier: UsernameSchema,
-  token: PasswordSchema,
+  token: ExistingPasswordSchema,
 });
 type Form = z.infer<typeof FormSchema>;
 
