@@ -15,7 +15,6 @@ export function Toolpill({
       position="fixed"
       left="0"
       bottom="safeBottom"
-      pb="2"
       width="screen"
       height="dvh"
       pointerEvents="none"
@@ -24,7 +23,8 @@ export function Toolpill({
       <Flex
         id="toolpill-flex-outer-container"
         height="full"
-        p="4"
+        px="2"
+        pb="4"
         justifyContent="end"
         alignItems="center"
         flexDir="column"
