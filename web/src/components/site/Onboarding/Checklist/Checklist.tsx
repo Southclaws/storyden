@@ -2,14 +2,9 @@
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
-import {
-  Button,
-  Heading,
-  Link,
-  OrderedList,
-  Text,
-  VStack,
-} from "src/theme/components";
+import { Button, Heading, Link, OrderedList, Text } from "src/theme/components";
+
+import { VStack } from "@/styled-system/jsx";
 
 import { Card } from "./Card";
 import { isComplete, useChecklist } from "./useChecklist";
@@ -23,7 +18,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
   const { onOpen, isOpen, onClose, isLoggedIn } = useChecklist();
 
   return (
-    <VStack width="full" height="full" justify="start" pt={4} pb={16}>
+    <VStack width="full" height="full" justify="start" pt="4" pb="16">
       <Heading size="lg">Welcome to Storyden!</Heading>
       <Text p={2} textAlign="center">
         Get your community set up
@@ -74,7 +69,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           </Text>
         </Card>
 
-        <VStack textAlign="center" px="20%">
+        <VStack textAlign="center" px="2">
           <Heading size="md">Invite your people</Heading>
           <Text>
             And you&apos;re ready to go! Spread the word and let the posts flow.{" "}

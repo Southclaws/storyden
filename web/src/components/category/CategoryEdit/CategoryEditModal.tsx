@@ -4,10 +4,10 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
-  VStack,
 } from "src/theme/components";
+
+import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useCategoryEdit } from "./useCategoryEdit";
 
@@ -20,10 +20,11 @@ export function CategoryEditModal(props: Props) {
       onClose={props.onClose}
       title="Edit category"
     >
-      <VStack
-        as="form"
-        justify="space-between"
-        align="start"
+      <styled.form
+        display="flex"
+        flexDir="column"
+        justifyContent="space-between"
+        alignItems="start"
         height="full"
         onSubmit={onSubmit}
       >
@@ -43,7 +44,7 @@ export function CategoryEditModal(props: Props) {
           </FormControl>
         </VStack>
 
-        <HStack w="full" align="center" justify="end" pb={3} gap={4}>
+        <HStack w="full" alignItems="center" justify="end" pb="3" gap="4">
           <Button variant="outline" size="sm" onClick={props.onClose}>
             Cancel
           </Button>
@@ -51,7 +52,7 @@ export function CategoryEditModal(props: Props) {
             Save
           </Button>
         </HStack>
-      </VStack>
+      </styled.form>
     </ModalDrawer>
   );
 }

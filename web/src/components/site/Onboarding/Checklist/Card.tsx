@@ -5,15 +5,14 @@ import { PropsWithChildren } from "react";
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
 import {
-  Box,
   Button,
-  Circle,
-  HStack,
   Heading,
   ListIcon,
   ListItem,
   Text,
 } from "src/theme/components";
+
+import { Box, Circle, HStack } from "@/styled-system/jsx";
 
 import { Step, isComplete, statusToStep } from "./useChecklist";
 
@@ -34,7 +33,7 @@ export function Card(props: PropsWithChildren<CardProps>) {
       borderRadius="2xl"
       bgColor={complete ? "green.200" : "gray.100"}
     >
-      <HStack gap={1}>
+      <HStack gap="1">
         <ListIcon
           id="list-icon"
           p={0}
@@ -42,9 +41,10 @@ export function Card(props: PropsWithChildren<CardProps>) {
           as={() => (
             <Circle
               id="list-icon-circle"
-              as="span"
-              bgColor={complete ? "none" : "gray.200"}
-              size={7}
+              size="7"
+              style={{
+                backgroundColor: complete ? "none" : "gray.200",
+              }}
             >
               {complete ? (
                 <CheckCircle width="2em" height="2em" />

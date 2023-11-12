@@ -26,6 +26,7 @@ export function ComposeForm(props: Props) {
       flexDir="column"
       alignItems="start"
       w="full"
+      h="full"
       gap="2"
       onSubmit={onPublish}
     >
@@ -68,7 +69,7 @@ export function ComposeForm(props: Props) {
         </HStack>
 
         <BodyInput onAssetUpload={onAssetUpload}>
-          <Toolpill w="min-content" display={{ base: "flex", md: "none" }}>
+          <Toolpill w="min" display={{ base: "flex", md: "none" }}>
             <VStack>
               <HStack>
                 <Bold />

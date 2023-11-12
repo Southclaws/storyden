@@ -2,7 +2,7 @@ import { PropsWithChildren, useCallback } from "react";
 import { Transforms } from "slate";
 import { Editable, Slate } from "slate-react";
 
-import { Box, BoxProps } from "src/theme/components";
+import { Box } from "@/styled-system/jsx";
 
 import { FileDrop } from "./components/FileDrop/FileDrop";
 import { Element } from "./render/Element";
@@ -13,7 +13,7 @@ export function ContentComposer({
   disabled,
   children,
   ...props
-}: PropsWithChildren<Props & Omit<BoxProps, "onChange">>) {
+}: PropsWithChildren<Props>) {
   const { editor, initialValue, onChange } = useContentComposer(props);
 
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
@@ -24,6 +24,7 @@ export function ContentComposer({
       id="rich-text-editor"
       className="typography"
       w="full"
+      h="full"
       onDragOver={(e) => e.preventDefault()}
     >
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
@@ -55,7 +56,7 @@ export function ContentComposer({
             readOnly={disabled}
             placeholder="Write your heart out..."
             style={{
-              minHeight: props.minHeight ?? "24em",
+              minHeight: props.minHeight ?? "8em",
               outline: "0px solid transparent",
               opacity: disabled ? 0.5 : 1,
             }}

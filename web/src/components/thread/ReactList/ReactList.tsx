@@ -1,7 +1,6 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 import {
-  Box,
   Button,
   IconButton,
   List,
@@ -12,6 +11,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "src/theme/components";
+
+import { Box } from "@/styled-system/jsx";
 
 import { Props, emojiPickerContainerID, useReactList } from "./useReactList";
 

@@ -4,7 +4,7 @@ import { Link } from "src/theme/components/Link";
 
 export function HomeAction() {
   return (
-    <Link href="/" kind="ghost" size="sm" p="0" paddingInline="0">
+    <Link href="/" kind="ghost" size="sm" p="0">
       <HomeIcon />
     </Link>
   );

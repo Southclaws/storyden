@@ -1,11 +1,12 @@
 import { useSession } from "src/auth";
 import { Bell, Create, Home, Login } from "src/components/site/Action/Action";
-import { HStack } from "src/theme/components";
+
+import { HStack } from "@/styled-system/jsx";
 
 export function Toolbar() {
   const account = useSession();
   return (
-    <HStack gap={2} pb={2}>
+    <HStack gap="2" pb="2">
       {account ? (
         <>
           <Home />

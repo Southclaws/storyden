@@ -3,7 +3,9 @@
 import { PropsWithChildren } from "react";
 
 import { APIError } from "src/api/openapi/schemas";
-import { Flex, SkeletonText } from "src/theme/components";
+import { SkeletonText } from "src/theme/components";
+
+import { Flex } from "@/styled-system/jsx";
 
 import ErrorBanner from "./ErrorBanner";
 
@@ -14,8 +16,8 @@ export function Unready(props: PropsWithChildren<Partial<APIError>>) {
         flexDirection="column"
         width="full"
         justifyContent="center"
-        p={4}
-        gap={4}
+        p="4"
+        gap="4"
       >
         {props.children ?? (
           <>

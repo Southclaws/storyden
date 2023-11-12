@@ -25,8 +25,6 @@ export function BodyInput({
             onChange={field.onChange}
             onAssetUpload={onAssetUpload}
             initialValue={formState.defaultValues?.["body"]}
-            minHeight="24em"
-            height="full"
           >
             {children}
           </ContentComposer>
