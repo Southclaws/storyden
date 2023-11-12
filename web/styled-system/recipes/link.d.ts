@@ -4,7 +4,7 @@ import type { Pretty } from '../types/helpers';
 import type { DistributiveOmit } from '../types/system-types';
 
 interface LinkVariant {
-  kind: "neutral" | "primary" | "secondary"
+  kind: "neutral" | "primary" | "secondary" | "ghost"
 size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 

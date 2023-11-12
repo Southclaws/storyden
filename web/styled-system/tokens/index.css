@@ -518,7 +518,8 @@
   --colors-border-subtle: var(--colors-gray-300);
   --colors-border-disabled: var(--colors-gray-400);
   --colors-border-outline: var(--colors-black-alpha-50);
-  --colors-border-accent: var(--colors-accent-default)
+  --colors-border-accent: var(--colors-accent-default);
+  --spacing-safe-bottom: env(safe-area-inset-bottom)
 }
 
 .dark {

@@ -66,6 +66,14 @@ export const link = defineRecipe({
           backgroundColor: "gray.400",
         },
       },
+      ghost: {
+        _hover: {
+          backgroundColor: "gray.200",
+        },
+        _active: {
+          backgroundColor: "gray.300",
+        },
+      },
     },
 
     size: {
@@ -73,7 +81,7 @@ export const link = defineRecipe({
         h: "8",
         minW: "8",
         textStyle: "xs",
-        px: "3",
+        px: "1",
         gap: "2",
         "& svg": {
           fontSize: "md",
@@ -85,11 +93,11 @@ export const link = defineRecipe({
         h: "9",
         minW: "9",
         textStyle: "sm",
-        px: "3.5",
+        px: "2",
         gap: "2",
         "& svg": {
-          width: "3",
-          height: "3",
+          width: "5",
+          height: "5",
         },
       },
       md: {

@@ -4,7 +4,7 @@ import type { Pretty } from '../types/helpers';
 import type { DistributiveOmit } from '../types/system-types';
 
 interface ButtonVariant {
-  kind: "neutral" | "primary" | "secondary" | "destructive" | "blank"
+  kind: "neutral" | "primary" | "secondary" | "destructive" | "ghost" | "blank"
 size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 

@@ -1,19 +1,24 @@
 "use client";
 
+import { Presence } from "@ark-ui/react";
+
 import {
   Admin,
-  Bell,
   Close,
-  Create,
-  Dashboard,
-  Home,
   Login,
   Logout,
   Settings,
 } from "src/components/site/Action/Action";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
-import { HStack, Input, SlideFade } from "src/theme/components";
+import { Input } from "src/theme/components/Input";
+
+import { ComposeAction } from "../../Action/Compose";
+import { DashboardAction } from "../../Action/Dashboard";
+import { HomeAction } from "../../Action/Home";
+import { NotificationsAction } from "../../Action/Notifications";
+
+import { HStack, styled } from "@/styled-system/jsx";
 
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";
@@ -31,56 +36,49 @@ export function Navpill() {
   } = useNavpill();
   return (
     <Toolpill onClickOutside={onClose}>
-      <SlideFade
-        in={isExpanded}
-        style={{
-          maxHeight: "100%",
-          width: "100%",
-          display: isExpanded ? "flex" : "none",
-          flexDirection: "column",
-        }}
-      >
-        <HStack justify="space-between">
-          {account ? (
-            <>
-              <HStack>
-                <Home />
-                <Bell />
-                <Logout />
-              </HStack>
-              <HStack>
-                {account.admin && (
-                  <>
-                    <Admin />
-                  </>
-                )}
-                <Settings />
-              </HStack>
-            </>
-          ) : (
-            <Login />
-          )}
-        </HStack>
+      <Presence present={isExpanded}>
+        <styled.div w="full">
+          <HStack w="full" justify="space-between">
+            {account ? (
+              <>
+                <HStack>
+                  <HomeAction />
+                  <NotificationsAction />
+                  <Logout />
+                </HStack>
+                <HStack>
+                  {account.admin && (
+                    <>
+                      <Admin />
+                    </>
+                  )}
+                  <Settings />
+                </HStack>
+              </>
+            ) : (
+              <Login />
+            )}
+          </HStack>
 
-        {searchResults.length ? (
-          <SearchResults results={searchResults} />
-        ) : (
-          <Menu />
-        )}
-      </SlideFade>
+          {searchResults.length ? (
+            <SearchResults results={searchResults} />
+          ) : (
+            <Menu />
+          )}
+        </styled.div>
+      </Presence>
 
       {account ? (
-        <HStack gap={4} w="full" justifyContent="space-between">
+        <HStack gap="4" w="full" justifyContent="space-between">
           {isExpanded ? (
             <>
               <ProfilePill profileReference={account} showHandle={false} />
 
               <Input
-                variant="outline"
                 border="none"
                 size="sm"
                 placeholder="Search disabled..."
-                isDisabled
+                disabled
                 value={searchQuery}
                 onChange={onSearch}
               />
@@ -89,23 +87,22 @@ export function Navpill() {
           ) : (
             <>
               <ProfilePill profileReference={account} showHandle={false} />
-              <Home />
-              <Create />
-              <Bell />
-              <Dashboard onClick={onExpand} />
+              <HomeAction />
+              <ComposeAction />
+              <NotificationsAction />
+              <DashboardAction onClick={onExpand} />
             </>
           )}
         </HStack>
       ) : (
-        <HStack gap={4} w="full" justifyContent="space-between">
+        <HStack gap="4" w="full" justifyContent="space-between">
           {isExpanded ? (
             <>
-              <Home />
+              <HomeAction />
               <Input
-                variant="outline"
                 border="none"
                 placeholder="Search disabled..."
-                isDisabled
+                disabled
                 value={searchQuery}
                 onChange={onSearch}
               />
@@ -113,9 +110,9 @@ export function Navpill() {
             </>
           ) : (
             <>
-              <Home />
+              <HomeAction />
               <Login />
-              <Dashboard onClick={onExpand} />
+              <DashboardAction onClick={onExpand} />
             </>
           )}
         </HStack>

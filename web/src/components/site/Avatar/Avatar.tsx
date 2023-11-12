@@ -1,4 +1,7 @@
-import { Box, BoxProps, Image } from "src/theme/components";
+import Image from "next/image";
+
+import { css } from "@/styled-system/css";
+import { Box, BoxProps } from "@/styled-system/jsx";
 
 import { useAvatar } from "./useAvatar";
 
@@ -9,8 +12,16 @@ type Props = {
 export function Avatar({ handle, ...props }: Props) {
   const { src } = useAvatar(handle);
   return (
-    <Box width={6} {...props}>
-      <Image borderRadius="full" src={src} alt={`${handle}'s avatar`} />
+    <Box width="8" {...props}>
+      <Image
+        className={css({
+          borderRadius: "md",
+        })}
+        src={src}
+        width={32}
+        height={32}
+        alt={`${handle}'s avatar`}
+      />
     </Box>
   );
 }
