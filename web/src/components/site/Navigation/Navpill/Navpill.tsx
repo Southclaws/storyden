@@ -15,8 +15,6 @@ import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { HStack, Input, SlideFade } from "src/theme/components";
 
-import { CategoryCreate } from "../Sidebar/components/CategoryCreate/CategoryCreate";
-
 import { Menu } from "./components/Menu";
 import { SearchResults } from "./components/SearchResults";
 import { useNavpill } from "./useNavpill";
@@ -53,7 +51,6 @@ export function Navpill() {
               <HStack>
                 {account.admin && (
                   <>
-                    <CategoryCreate action="icon" />
                     <Admin />
                   </>
                 )}
