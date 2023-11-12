@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { Box, Flex, FlexProps } from "src/theme/components";
+import { Box, Flex, FlexProps } from "@/styled-system/jsx";
 
 import { Props, useToolpill } from "./useToolpill";
 
@@ -13,18 +13,18 @@ export function Toolpill({
     <Box
       id="toolpill-overlay"
       position="fixed"
-      left={0}
-      bottom="env(safe-area-inset-bottom)"
-      pb={2}
-      width="100vw"
-      height="100vh"
+      left="0"
+      bottom="safeBottom"
+      pb="2"
+      width="screen"
+      height="dvh"
       pointerEvents="none"
       zIndex="overlay"
     >
       <Flex
         id="toolpill-flex-outer-container"
         height="full"
-        p="min(4vh, 1em)"
+        p="4"
         justifyContent="end"
         alignItems="center"
         flexDir="column"
@@ -32,20 +32,20 @@ export function Toolpill({
         <Flex
           id="toolpill-content-container"
           ref={ref}
-          p={1}
-          gap={2}
+          p="1"
+          gap="2"
           flexDirection="column"
-          borderRadius={20}
-          backdropFilter="blur(4px)"
+          borderRadius="xl"
+          backdropBlur="lg"
+          backdropFilter="auto"
           transitionProperty="background-color"
-          transitionDuration="0.5s"
-          backgroundColor="hsla(210, 38.5%, 94.9%, 0.8)"
-          border="1px solid hsla(209, 100%, 20%, 0.02)"
+          transitionDuration="fast"
+          backgroundColor="whiteAlpha.900"
+          borderWidth="thin"
+          borderStyle="solid"
+          borderColor="blackAlpha.50"
           width="full"
-          maxW={{
-            base: "23em",
-            md: "40em",
-          }}
+          maxW="96"
           justifyContent="space-between"
           alignItems="center"
           pointerEvents="auto"

@@ -29,18 +29,19 @@ export function ProfilePill({
       title={title}
       href={`/p/${profileReference.handle}`}
       className={css({
+        flexShrink: 0,
         p: "1",
         pr: showHandle ? "2" : "1",
-        borderRadius: "full",
-        _hover: { backgroundColor: "blackAlpha.100" },
+        borderRadius: "lg",
+        _hover: { backgroundColor: "gray.200", textDecoration: "none" },
         minW: "0",
       })}
     >
-      <HStack>
+      <HStack gap="1">
         <Avatar
           flexShrink={0}
           handle={profileReference.handle}
-          width={large ? 8 : 6}
+          width={large ? "8" : "6"}
         />
         {showHandle && (
           <Box minW="0" flexShrink={1}>

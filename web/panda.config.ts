@@ -134,6 +134,9 @@ export default defineConfig({
             accent: { value: "{colors.accent.default}" },
           },
         },
+        spacing: {
+          safeBottom: { value: "env(safe-area-inset-bottom)" },
+        },
       }),
       tokens: defineTokens({
         zIndex: {

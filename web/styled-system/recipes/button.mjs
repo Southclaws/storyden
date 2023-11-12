@@ -20,6 +20,7 @@ const buttonVariantMap = {
     "primary",
     "secondary",
     "destructive",
+    "ghost",
     "blank"
   ],
   "size": [

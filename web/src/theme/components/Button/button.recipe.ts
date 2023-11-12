@@ -104,6 +104,14 @@ export const button = defineRecipe({
         },
         _disabled,
       },
+      ghost: {
+        _hover: {
+          backgroundColor: "gray.200",
+        },
+        _active: {
+          backgroundColor: "gray.300",
+        },
+      },
       blank: {
         backgroundColor: "none",
         px: "0",
@@ -116,7 +124,7 @@ export const button = defineRecipe({
         h: "8",
         minW: "8",
         textStyle: "xs",
-        px: "3",
+        px: "1",
         gap: "2",
         "& svg": {
           fontSize: "md",
@@ -128,11 +136,11 @@ export const button = defineRecipe({
         h: "9",
         minW: "9",
         textStyle: "sm",
-        px: "3.5",
+        px: "2",
         gap: "2",
         "& svg": {
-          width: "4",
-          height: "4",
+          width: "5",
+          height: "5",
         },
       },
       md: {

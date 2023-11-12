@@ -2075,6 +2075,10 @@ const tokens = {
     "value": "var(--colors-border-accent)",
     "variable": "var(--colors-border-accent)"
   },
+  "spacing.safeBottom": {
+    "value": "var(--spacing-safe-bottom)",
+    "variable": "var(--spacing-safe-bottom)"
+  },
   "spacing.-1": {
     "value": "calc(var(--spacing-1) * -1)",
     "variable": "var(--spacing-1)"
@@ -2206,6 +2210,10 @@ const tokens = {
   "spacing.-3.5": {
     "value": "calc(var(--spacing-3\\.5) * -1)",
     "variable": "var(--spacing-3\\.5)"
+  },
+  "spacing.-safeBottom": {
+    "value": "var(--spacing-safe-bottom)",
+    "variable": "var(--spacing-safe-bottom)"
   },
   "colors.colorPalette.50": {
     "value": "var(--colors-color-palette-50)",

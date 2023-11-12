@@ -18,7 +18,7 @@
     "@dnd-kit/sortable": "^7.0.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.10.5",
-    "@heroicons/react": "^2.0.13",
+    "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.1",
     "@simplewebauthn/browser": "^8.0.2",
     "colorjs.io": "^0.4.5",
