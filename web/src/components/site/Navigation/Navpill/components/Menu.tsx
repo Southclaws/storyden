@@ -1,6 +1,6 @@
+import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
+import { CategoryList } from "src/components/category/CategoryList/CategoryList";
 import { Flex, VStack } from "src/theme/components";
-
-import { CategoryList } from "../../Sidebar/components/CategoryList/CategoryList";
 
 export function Menu() {
   return (
@@ -16,6 +16,7 @@ export function Menu() {
         gap={2}
       >
         <CategoryList />
+        <CategoryCreateTrigger />
       </Flex>
     </VStack>
   );

@@ -1,14 +1,14 @@
 "use client";
 
+import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
 import { Divider } from "src/theme/components";
 
+import { CategoryList } from "../../../category/CategoryList/CategoryList";
 import { useNavigation } from "../useNavigation";
 
 import { Box, VStack, styled } from "@/styled-system/jsx";
 
 import { Authbar } from "./components/Authbar";
-import { CategoryCreate } from "./components/CategoryCreate/CategoryCreate";
-import { CategoryList } from "./components/CategoryList/CategoryList";
 import { Title } from "./components/Title";
 import { Toolbar } from "./components/Toolbar";
 
@@ -69,7 +69,7 @@ export function Sidebar() {
               <CategoryList />
             </Box>
 
-            {isAdmin && <CategoryCreate action="text" />}
+            {isAdmin && <CategoryCreateTrigger />}
           </VStack>
 
           <VStack alignItems="start">

@@ -1,7 +1,7 @@
 "use client";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
-import { CategoryCreateModal } from "src/components/site/Navigation/Sidebar/components/CategoryCreate/CategoryCreateModal";
+import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
 import {
   Button,
   Heading,
