@@ -7,7 +7,7 @@ export function Header(props: PublicProfile) {
   return (
     <VStack alignItems="start">
       <HStack justifyContent="start">
-        <Avatar handle={props.handle} width={{ base: "4rem", md: "6rem" }} />
+        <Avatar handle={props.handle} />
 
         <VStack alignItems="start" spacing={1}>
           <Heading>{props.name}</Heading>

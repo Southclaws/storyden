@@ -24,7 +24,6 @@ export function ReplyBox(props: Thread) {
     >
       <ContentComposer
         onChange={onChange}
-        minHeight="8em"
         disabled={isLoading}
         resetKey={resetKey}
       >

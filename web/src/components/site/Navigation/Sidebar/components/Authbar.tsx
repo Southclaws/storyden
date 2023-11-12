@@ -1,7 +1,8 @@
 import { useSession } from "src/auth";
 import { Admin, Logout, Settings } from "src/components/site/Action/Action";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
-import { HStack, VStack } from "src/theme/components";
+
+import { HStack, VStack } from "@/styled-system/jsx";
 
 export function Authbar() {
   const account = useSession();

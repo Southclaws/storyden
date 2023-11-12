@@ -1,18 +1,14 @@
 import {
-  Box,
   BoxProps,
   Button,
   Checkbox,
-  Circle,
   CloseButton,
   CreateToastFnReturn,
   Divider,
-  Flex,
   FlexProps,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Heading,
   IconButton,
   Image,
@@ -43,7 +39,6 @@ import {
   StackProps,
   Text,
   UseDisclosureProps,
-  VStack,
   useClipboard,
   useDisclosure,
   useOutsideClick,
@@ -51,9 +46,6 @@ import {
 } from "@chakra-ui/react";
 
 // NOTE: These are being replaced gradually, so these are being re-exported.
-
-// Layout
-export { Box, Circle, Flex, HStack, VStack };
 
 // Form
 
@@ -86,10 +78,10 @@ export {
   Image,
   LinkBox,
   LinkOverlay,
-  Spinner,
   Skeleton,
   SkeletonText,
   SlideFade,
+  Spinner,
 };
 
 // Disclosure
