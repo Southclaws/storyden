@@ -2,10 +2,12 @@ package bindings
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
@@ -48,7 +50,12 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 	}
 
 	if v := request.Params.Page; v != nil {
-		opts = append(opts, link.WithPage(int(*v), 50))
+		pageNumber, err := strconv.ParseInt(*v, 10, 32)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		opts = append(opts, link.WithPage(int(pageNumber), 50))
 	} else {
 		opts = append(opts, link.WithPage(0, 50))
 	}
