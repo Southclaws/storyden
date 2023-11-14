@@ -9,4 +9,4 @@
 /**
  * Pagination query parameters.
  */
-export type PaginationQueryParameter = number;
+export type PaginationQueryParameter = string;

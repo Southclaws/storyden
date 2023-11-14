@@ -1128,7 +1128,7 @@ components:
       in: query
       required: false
       schema:
-        type: number
+        type: string
 
     AssetPath:
       description: Asset ID.
