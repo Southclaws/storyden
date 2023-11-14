@@ -40,3 +40,20 @@ func (d *database) Store(ctx context.Context, url, title, description string, op
 
 	return link, nil
 }
+
+func (d *database) Search(ctx context.Context, filters ...Filter) ([]*Link, error) {
+	query := d.db.Link.Query()
+
+	for _, fn := range filters {
+		fn(query)
+	}
+
+	r, err := query.All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	links := MapA(r)
+
+	return links, nil
+}
