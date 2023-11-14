@@ -77,6 +77,7 @@ type Bindings struct {
 	Collections
 	Clusters
 	Items
+	Links
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -101,6 +102,7 @@ func bindingsProviders() fx.Option {
 		NewCollections,
 		NewClusters,
 		NewItems,
+		NewLinks,
 	)
 }
 

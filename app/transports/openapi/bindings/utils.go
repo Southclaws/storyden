@@ -166,9 +166,9 @@ func tagsIDs(i openapi.TagListIDs) []xid.ID {
 	return dt.Map(i, deserialiseID)
 }
 
-func serialiseLink(in link.Link) openapi.Link {
+func serialiseLink(in *link.Link) openapi.Link {
 	return openapi.Link{
-		Url:         &in.URL,
+		Url:         in.URL,
 		Title:       in.Title.Ptr(),
 		Description: in.Description.Ptr(),
 	}
