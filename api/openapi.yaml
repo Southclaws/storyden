@@ -3025,7 +3025,7 @@ components:
       description: |
         A web address with content information such as title, description, etc.
       type: object
-      required: [url]
+      required: [url, assets]
       properties:
         url: { $ref: "#/components/schemas/URL" }
         title: { $ref: "#/components/schemas/LinkTitle" }
