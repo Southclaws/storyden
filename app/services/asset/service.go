@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -95,9 +94,9 @@ func (s *service) Upload(ctx context.Context, r io.Reader, size int64) (*asset.A
 
 	hash := sha1.Sum(buf)
 	assetID := hex.EncodeToString(hash[:])
-	filePath := filepath.Join(assetsSubdirectory, assetID)
+	storagepath := path.Join(assetsSubdirectory, assetID)
 
-	if err := s.os.Write(ctx, filePath, r, size); err != nil {
+	if err := s.os.Write(ctx, storagepath, r, size); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -124,7 +123,7 @@ func (s *service) Get(ctx context.Context, assetID string) (*asset.Asset, io.Rea
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	path := filepath.Join(assetsSubdirectory, assetID)
+	path := path.Join(assetsSubdirectory, assetID)
 	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", assetID)
 
 	r, size, err := s.os.Read(ctx, path)

@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
 type database struct {
@@ -32,6 +33,14 @@ func (d *database) Store(ctx context.Context, url, title, description string, op
 	create.OnConflictColumns("url").UpdateNewValues()
 
 	r, err := create.Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err = d.db.Link.Query().
+		WithAssets().
+		Where(link.ID(r.ID)).
+		First(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

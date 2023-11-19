@@ -171,5 +171,6 @@ func serialiseLink(in *link.Link) openapi.Link {
 		Url:         in.URL,
 		Title:       in.Title.Ptr(),
 		Description: in.Description.Ptr(),
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 	}
 }
