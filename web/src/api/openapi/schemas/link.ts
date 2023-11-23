@@ -18,5 +18,5 @@ export interface Link {
   url: Url;
   title?: LinkTitle;
   description?: LinkDescription;
-  assets?: AssetList;
+  assets: AssetList;
 }

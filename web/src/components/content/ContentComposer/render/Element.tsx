@@ -1,7 +1,25 @@
 import { PropsWithChildren } from "react";
-import { RenderElementProps } from "slate-react";
+import { BaseEditor } from "slate";
+import { ReactEditor, RenderElementProps } from "slate-react";
+
+import { RichLink } from "../components/RichLink/RichLink";
+import { getURL } from "../utils";
 
 import { styled } from "@/styled-system/jsx";
+
+export const withEmbeds = (editor: BaseEditor & ReactEditor) => {
+  const { isVoid } = editor;
+
+  editor.isVoid = (element) => {
+    if (getURL(element)) {
+      return true;
+    }
+
+    return isVoid(element);
+  };
+
+  return editor;
+};
 
 export function Element({
   attributes,
@@ -9,8 +27,14 @@ export function Element({
   element,
 }: PropsWithChildren<RenderElementProps>) {
   switch (element.type) {
-    case "paragraph":
+    case "paragraph": {
+      const url = getURL(element);
+      if (url) {
+        return <RichLink href={url}>{children}</RichLink>;
+      }
+
       return <styled.p {...attributes}>{children}</styled.p>;
+    }
 
     case "link":
       return (
