@@ -12,7 +12,9 @@ import { ReactEditor, withReact } from "slate-react";
 
 import { Asset } from "src/api/openapi/schemas";
 
+import { withEmbeds } from "./render/Element";
 import { deserialise, serialise } from "./serialisation";
+import { withCorrectVoidBehavior } from "./utils";
 
 export type Props = {
   resetKey?: string;
@@ -33,7 +35,9 @@ const defaultValue: Descendant[] = [
 export function useContentComposer(props: Props) {
   const editorRef = useRef<BaseEditor & ReactEditor>();
   if (!editorRef.current) {
-    editorRef.current = withReact(createEditor());
+    editorRef.current = withCorrectVoidBehavior(
+      withEmbeds(withReact(createEditor())),
+    );
   }
   const editor = editorRef.current;
 
