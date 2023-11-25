@@ -1,25 +1,10 @@
 import { PropsWithChildren } from "react";
-import { BaseEditor } from "slate";
-import { ReactEditor, RenderElementProps } from "slate-react";
+import { RenderElementProps } from "slate-react";
 
 import { RichLink } from "../components/RichLink/RichLink";
 import { getURL } from "../utils";
 
 import { styled } from "@/styled-system/jsx";
-
-export const withEmbeds = (editor: BaseEditor & ReactEditor) => {
-  const { isVoid } = editor;
-
-  editor.isVoid = (element) => {
-    if (getURL(element)) {
-      return true;
-    }
-
-    return isVoid(element);
-  };
-
-  return editor;
-};
 
 export function Element({
   attributes,
