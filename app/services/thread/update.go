@@ -40,7 +40,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	opts := partial.Opts()
 
-	opts = append(opts, s.hydrateLink(ctx, partial)...)
+	opts = append(opts, s.hydrate(ctx, partial)...)
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)
 	if err != nil {

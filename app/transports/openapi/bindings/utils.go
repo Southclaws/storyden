@@ -95,6 +95,7 @@ func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Links:     dt.Map(p.Links, serialiseLink),
 	}, nil
 }
 

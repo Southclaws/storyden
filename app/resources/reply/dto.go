@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -27,6 +28,7 @@ type Reply struct {
 	Reacts         []*react.React
 	Meta           map[string]any
 	Assets         []*asset.Asset
+	Links          []*link.Link
 	URL            opt.Optional[string]
 
 	CreatedAt time.Time
@@ -37,7 +39,7 @@ type Reply struct {
 func (*Reply) GetResourceName() string { return "post" }
 
 func (p Reply) String() string {
-	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, post.MakeShortBody(p.Body))
+	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Short)
 }
 
 func replyTo(m *ent.Post) opt.Optional[post.ID] {
@@ -71,6 +73,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,
 		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
+		Links:   dt.Map(m.Edges.Links, link.Map),
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

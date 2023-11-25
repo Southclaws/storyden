@@ -3,10 +3,12 @@ package reply
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -49,8 +51,14 @@ func WithMeta(meta map[string]any) Option {
 	}
 }
 
-func WithAssets(ids ...string) Option {
+func WithAssets(ids ...asset.AssetID) Option {
 	return func(m *ent.PostMutation) {
-		m.AddAssetIDs(ids...)
+		m.AddAssetIDs(dt.Map(ids, func(id asset.AssetID) string { return string(id) })...)
+	}
+}
+
+func WithLinks(ids ...xid.ID) Option {
+	return func(pm *ent.PostMutation) {
+		pm.AddLinkIDs(ids...)
 	}
 }
