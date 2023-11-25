@@ -50,6 +50,15 @@ func New(
 }
 
 func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
+	r, err := s.lr.Search(ctx, link.WithURL(url))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if len(r) > 0 {
+		// TODO: revalidate stale link async
+		return r[0], nil
+	}
+
 	wc, err := s.sc.Scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
