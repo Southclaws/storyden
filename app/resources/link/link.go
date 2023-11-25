@@ -29,11 +29,13 @@ func (l *Link) AssetIDs() []asset.AssetID {
 
 type Repository interface {
 	Store(ctx context.Context, url, title, description string, opts ...Option) (*Link, error)
-	Search(ctx context.Context,  filters ...Filter) ([]*Link, error)
+	Search(ctx context.Context, filters ...Filter) ([]*Link, error)
 }
 
-type Option func(*ent.LinkMutation)
-type Filter func(*ent.LinkQuery)
+type (
+	Option func(*ent.LinkMutation)
+	Filter func(*ent.LinkQuery)
+)
 
 func WithPosts(ids ...xid.ID) Option {
 	return func(lm *ent.LinkMutation) {
@@ -56,6 +58,12 @@ func WithItems(ids ...xid.ID) Option {
 func WithAssets(ids ...string) Option {
 	return func(lm *ent.LinkMutation) {
 		lm.AddAssetIDs(ids...)
+	}
+}
+
+func WithURL(s string) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Where(link.URLContainsFold(s))
 	}
 }
 
