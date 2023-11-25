@@ -35,8 +35,6 @@ func (d *database) Create(
 	meta map[string]any,
 	opts ...Option,
 ) (*Reply, error) {
-	short := post.MakeShortBody(string(body))
-
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -53,7 +51,6 @@ func (d *database) Create(
 	q := d.db.Post.
 		Create().
 		SetBody(string(body)).
-		SetShort(short).
 		SetFirst(false).
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))

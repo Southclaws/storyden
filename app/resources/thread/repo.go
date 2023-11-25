@@ -67,6 +67,12 @@ func WithTitle(v string) Option {
 	}
 }
 
+func WithSummary(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetShort(v)
+	}
+}
+
 func WithBody(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(v)

@@ -134,17 +134,12 @@ func (s *service) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagr
 }
 
 func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []item.Option) {
-	v, ok := partial.URL.Get()
-	if !ok {
+	text, textOK := partial.Content.Get()
+	url, urlOK := partial.URL.Get()
+
+	if !textOK && !urlOK {
 		return
 	}
 
-	opts, err := s.hydrator.HydrateItem(ctx, v)
-	if err != nil {
-		s.l.Warn("failed to hydrate URL",
-			zap.String("url", v),
-			zap.Error(err))
-	}
-
-	return
+	return s.hydrator.HydrateItem(ctx, text, url)
 }

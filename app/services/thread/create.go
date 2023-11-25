@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -45,7 +44,7 @@ func (s *service) Create(ctx context.Context,
 		thread.WithMeta(meta),
 	)
 
-	opts = append(opts, s.hydrateLink(ctx, partial)...)
+	opts = append(opts, s.hydrate(ctx, partial)...)
 
 	thr, err := s.thread_repo.Create(ctx,
 		title,
@@ -62,18 +61,13 @@ func (s *service) Create(ctx context.Context,
 	return thr, nil
 }
 
-func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []thread.Option) {
-	v, ok := partial.URL.Get()
-	if !ok {
+func (s *service) hydrate(ctx context.Context, partial Partial) (opts []thread.Option) {
+	body, bodyOK := partial.Body.Get()
+	url, urlOK := partial.URL.Get()
+
+	if !bodyOK && !urlOK {
 		return
 	}
 
-	opts, err := s.hydrator.HydrateThread(ctx, v)
-	if err != nil {
-		s.l.Warn("failed to hydrate URL",
-			zap.String("url", v),
-			zap.Error(err))
-	}
-
-	return
+	return s.hydrator.HydrateThread(ctx, body, url)
 }

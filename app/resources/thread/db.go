@@ -70,7 +70,6 @@ func (d *database) Create(
 	}
 
 	mutate.SetTitle(title)
-	mutate.SetShort(post.MakeShortBody(body))
 	mutate.SetFirst(true)
 	mutate.SetBody(body)
 	mutate.SetAuthorID(xid.ID(authorID))

@@ -1,9 +1,10 @@
-package post
+package extractor
 
 import (
 	"bytes"
 	"fmt"
 	"math"
+	"net/url"
 	"strings"
 	"unicode"
 
@@ -14,31 +15,48 @@ import (
 // MaxShortBodyLength is the maximum length of the short summary text
 const MaxShortBodyLength = 128
 
-// MakeShortBody produces a short summary of a long piece of markdown content.
-func MakeShortBody(long string) string {
+type EnrichedProperties struct {
+	Short string
+	Links []string
+}
+
+// Destructure will pull out any meaningful structured information from markdown
+// document this includes a summary of the text and all link URLs for hydrating.
+func Destructure(markdown string) EnrichedProperties {
 	textonly := strings.Builder{}
 	p := parser.New()
-	tree := p.Parse([]byte(long))
+	tree := p.Parse([]byte(markdown))
+
+	var short string
+	links := []string{}
 
 	var walk func(n ast.Node)
 	walk = func(n ast.Node) {
-		para, ok := n.(*ast.Paragraph)
-		if ok {
-			for _, c := range para.Children {
-				text, ok := c.(*ast.Text)
-				if ok && len(text.Literal) > 0 {
-					oneline := bytes.ReplaceAll(text.Literal, []byte("\n"), []byte(" "))
-					textonly.Write(oneline)
-					textonly.WriteByte(' ')
+		switch node := n.(type) {
+		case *ast.Text:
+			if len(node.Literal) == 0 {
+				return
+			}
+
+			oneline := bytes.ReplaceAll(node.Literal, []byte("\n"), []byte(" "))
+			textonly.Write(oneline)
+			textonly.WriteByte(' ')
+
+			if strings.HasPrefix(string(oneline), "http") {
+				if parsed, err := url.Parse(string(oneline)); err == nil {
+					links = append(links, parsed.String())
 				}
 			}
-		} else {
+
+		default:
 			container := n.AsContainer()
-			if container != nil {
-				children := container.Children
-				for _, c := range children {
-					walk(c)
-				}
+			if container == nil {
+				return
+			}
+
+			children := container.Children
+			for _, c := range children {
+				walk(c)
 			}
 		}
 	}
@@ -53,6 +71,7 @@ func MakeShortBody(long string) string {
 				break
 			}
 		}
+
 		// If stopped on a punctuation (like a comma) continue to walk backwards
 		// until a letter is found. Since this function finally places an
 		// elipsis at the end, a string ending like `hello, john` would output
@@ -69,8 +88,13 @@ func MakeShortBody(long string) string {
 			}
 		}
 
-		return fmt.Sprint(string(paragraphs[:end]), "...")
+		short = fmt.Sprint(string(paragraphs[:end]), "...")
+	} else {
+		short = string(paragraphs)
 	}
 
-	return string(paragraphs)
+	return EnrichedProperties{
+		Short: short,
+		Links: links,
+	}
 }

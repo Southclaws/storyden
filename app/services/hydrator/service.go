@@ -3,21 +3,23 @@ package hydrator
 import (
 	"context"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/services/hydrator/extractor"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
 type Service interface {
-	HydrateThread(ctx context.Context, url string) ([]thread.Option, error)
-	HydrateCluster(ctx context.Context, url string) ([]cluster.Option, error)
-	HydrateItem(ctx context.Context, url string) ([]item.Option, error)
+	HydrateThread(ctx context.Context, body, url string) []thread.Option
+	HydrateCluster(ctx context.Context, body, url string) []cluster.Option
+	HydrateItem(ctx context.Context, body, url string) []item.Option
 }
 
 func Build() fx.Option {
@@ -48,38 +50,64 @@ func New(
 	}
 }
 
-func (s *service) HydrateThread(ctx context.Context, url string) ([]thread.Option, error) {
-	ln, err := s.f.Fetch(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+func (s *service) HydrateThread(ctx context.Context, body, url string) []thread.Option {
+	short, links, assets := s.hydrate(ctx, body, url)
 
 	return []thread.Option{
-		thread.WithAssets(ln.AssetIDs()),
-		thread.WithLinks(ln.ID),
-	}, nil
+		thread.WithAssets(assets),
+		thread.WithLinks(links...),
+		thread.WithSummary(short),
+	}
 }
 
-func (s *service) HydrateCluster(ctx context.Context, url string) ([]cluster.Option, error) {
-	ln, err := s.f.Fetch(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+func (s *service) HydrateReply(ctx context.Context, body, url string) []reply.Option {
+	_, links, assets := s.hydrate(ctx, body, url)
+
+	return []reply.Option{
+		reply.WithAssets(assets...),
+		reply.WithLinks(links...),
 	}
+}
+
+func (s *service) HydrateCluster(ctx context.Context, body, url string) []cluster.Option {
+	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []cluster.Option{
-		cluster.WithAssets(ln.AssetIDs()),
-		cluster.WithLinks(ln.ID),
-	}, nil
+		cluster.WithAssets(assets),
+		cluster.WithLinks(links...),
+	}
 }
 
-func (s *service) HydrateItem(ctx context.Context, url string) ([]item.Option, error) {
-	ln, err := s.f.Fetch(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+func (s *service) HydrateItem(ctx context.Context, body, url string) []item.Option {
+	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []item.Option{
-		item.WithAssets(ln.AssetIDs()),
-		item.WithLinks(ln.ID),
-	}, nil
+		item.WithAssets(assets),
+		item.WithLinks(links...),
+	}
+}
+
+// hydrate takes the body and primary URL of a piece of content and fetches all
+// the links and produces a short summary of the post's body text.
+func (s *service) hydrate(ctx context.Context, body, url string) (string, []xid.ID, []asset.AssetID) {
+	structured := extractor.Destructure(body)
+
+	urls := append([]string{url}, structured.Links...)
+
+	links := []xid.ID{}
+	assets := []asset.AssetID{}
+
+	for _, l := range urls {
+		// TODO: async
+
+		ln, err := s.f.Fetch(ctx, l)
+		if err != nil {
+			continue
+		}
+
+		links = append(links, ln.ID)
+		assets = append(assets, ln.AssetIDs()...)
+	}
+
+	return structured.Short, links, assets
 }
