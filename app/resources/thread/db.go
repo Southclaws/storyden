@@ -240,6 +240,9 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 				WithReacts().
 				WithAuthor().
 				WithAssets().
+				WithLinks(func(lq *ent.LinkQuery) {
+					lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+				}).
 				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
 		WithAuthor().
