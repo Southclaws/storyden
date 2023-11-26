@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
 type database struct {
@@ -36,7 +37,34 @@ func (d *database) Store(ctx context.Context, url, title, description string, op
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	r, err = d.db.Link.Query().
+		WithAssets().
+		Where(link.ID(r.ID)).
+		First(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	link := Map(r)
 
 	return link, nil
+}
+
+func (d *database) Search(ctx context.Context, filters ...Filter) ([]*Link, error) {
+	query := d.db.Link.Query()
+
+	for _, fn := range filters {
+		fn(query)
+	}
+
+	query.WithAssets()
+
+	r, err := query.All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	links := MapA(r)
+
+	return links, nil
 }

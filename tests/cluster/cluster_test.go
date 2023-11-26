@@ -56,7 +56,7 @@ func TestClustersHappyPath(t *testing.T) {
 			a.Equal("testing clusters api", clus1.JSON200.Description)
 			a.Equal(content1, *clus1.JSON200.Content)
 			a.Equal(iurl1, *clus1.JSON200.ImageUrl)
-			a.Equal(url1, *clus1.JSON200.Link.Url)
+			a.Equal(url1, clus1.JSON200.Link.Url)
 			a.Equal(acc.ID.String(), string(clus1.JSON200.Owner.Id))
 
 			// Get the one just created
@@ -100,7 +100,7 @@ func TestClustersHappyPath(t *testing.T) {
 			a.Equal(desc1, clus1update.JSON200.Description)
 			a.Equal(cont1, *clus1update.JSON200.Content)
 			a.Equal(iurl1, *clus1update.JSON200.ImageUrl)
-			a.Equal(url1, *clus1update.JSON200.Link.Url)
+			a.Equal(url1, clus1update.JSON200.Link.Url)
 			a.Equal(prop1, clus1update.JSON200.Properties)
 
 			// List all root level clusters

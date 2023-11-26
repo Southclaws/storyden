@@ -13,6 +13,7 @@ import { ReactEditor, withReact } from "slate-react";
 import { Asset } from "src/api/openapi/schemas";
 
 import { deserialise, serialise } from "./serialisation";
+import { withExtensions } from "./utils";
 
 export type Props = {
   resetKey?: string;
@@ -33,7 +34,7 @@ const defaultValue: Descendant[] = [
 export function useContentComposer(props: Props) {
   const editorRef = useRef<BaseEditor & ReactEditor>();
   if (!editorRef.current) {
-    editorRef.current = withReact(createEditor());
+    editorRef.current = withExtensions(withReact(createEditor()));
   }
   const editor = editorRef.current;
 

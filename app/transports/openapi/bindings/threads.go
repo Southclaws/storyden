@@ -55,27 +55,22 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
-		request.Body.Body,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,
 		tags.OrZero(),
 		meta,
 		thread_service.Partial{
-			URL: opt.NewPtr(request.Body.Url),
+			Body: opt.New(request.Body.Body),
+			URL:  opt.NewPtr(request.Body.Url),
 		},
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sp, err := serialiseThread(thread)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.ThreadCreate200JSONResponse{
-		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(*sp),
+		ThreadCreateOKJSONResponse: openapi.ThreadCreateOKJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 
@@ -101,13 +96,8 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sp, err := serialiseThread(thread)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.ThreadUpdate200JSONResponse{
-		ThreadUpdateOKJSONResponse: openapi.ThreadUpdateOKJSONResponse(*sp),
+		ThreadUpdateOKJSONResponse: openapi.ThreadUpdateOKJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 
@@ -172,13 +162,8 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sp, err := serialiseThread(thread)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.ThreadGet200JSONResponse{
-		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(*sp),
+		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(serialiseThread(thread)),
 	}, nil
 }
 

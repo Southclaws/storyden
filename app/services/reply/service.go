@@ -12,18 +12,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/services/hydrator"
 )
 
 type Service interface {
 	// Create a new thread in the specified category.
 	Create(
 		ctx context.Context,
-		body string,
 		authorID account.AccountID,
 		parentID post.ID,
-		replyToID opt.Optional[post.ID],
-		meta map[string]any,
-		opts ...reply.Option,
+		partial Partial,
 	) (*reply.Reply, error)
 
 	Update(ctx context.Context, threadID post.ID, partial Partial) (*reply.Reply, error)
@@ -32,8 +30,16 @@ type Service interface {
 }
 
 type Partial struct {
-	Body opt.Optional[string]
-	Meta opt.Optional[map[string]any]
+	Body    opt.Optional[string]
+	ReplyTo opt.Optional[post.ID]
+	Meta    opt.Optional[map[string]any]
+}
+
+func (p Partial) Opts() (opts []reply.Option) {
+	p.Body.Call(func(v string) { opts = append(opts, reply.WithBody(v)) })
+	p.ReplyTo.Call(func(v post.ID) { opts = append(opts, reply.WithReplyTo(v)) })
+	p.Meta.Call(func(v map[string]any) { opts = append(opts, reply.WithMeta(v)) })
+	return
 }
 
 func Build() fx.Option {
@@ -46,6 +52,7 @@ type service struct {
 
 	account_repo account.Repository
 	post_repo    reply.Repository
+	hydrator     hydrator.Service
 }
 
 func New(
@@ -54,11 +61,22 @@ func New(
 
 	account_repo account.Repository,
 	post_repo reply.Repository,
+	hydrator hydrator.Service,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "reply")),
 		rbac:         rbac,
 		account_repo: account_repo,
 		post_repo:    post_repo,
+		hydrator:     hydrator,
 	}
+}
+
+func (s *service) hydrate(ctx context.Context, partial Partial) (opts []reply.Option) {
+	body, bodyOK := partial.Body.Get()
+	if !bodyOK {
+		return
+	}
+
+	return s.hydrator.HydrateReply(ctx, body, "")
 }

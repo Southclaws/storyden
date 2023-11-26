@@ -2,26 +2,25 @@ package hydrator
 
 import (
 	"context"
-	"net/http"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	asset_svc "github.com/Southclaws/storyden/app/services/asset"
-	"github.com/Southclaws/storyden/app/services/url"
+	"github.com/Southclaws/storyden/app/services/hydrator/extractor"
+	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
 type Service interface {
-	HydrateThread(ctx context.Context, url string) ([]thread.Option, error)
-	HydrateCluster(ctx context.Context, url string) ([]cluster.Option, error)
-	HydrateItem(ctx context.Context, url string) ([]item.Option, error)
+	HydrateThread(ctx context.Context, body, url string) []thread.Option
+	HydrateReply(ctx context.Context, body, url string) []reply.Option
+	HydrateCluster(ctx context.Context, body, url string) []cluster.Option
+	HydrateItem(ctx context.Context, body, url string) []item.Option
 }
 
 func Build() fx.Option {
@@ -30,110 +29,87 @@ func Build() fx.Option {
 
 type service struct {
 	l  *zap.Logger
-	as asset_svc.Service
 	tr thread.Repository
 	cr cluster.Repository
 	ir item.Repository
-	lr link.Repository
-	sc url.Scraper
+	f  fetcher.Service
 }
 
 func New(
 	l *zap.Logger,
-	as asset_svc.Service,
 	tr thread.Repository,
 	cr cluster.Repository,
 	ir item.Repository,
-	lr link.Repository,
-	sc url.Scraper,
+	f fetcher.Service,
 ) Service {
 	return &service{
 		l:  l.With(zap.String("service", "hydrator")),
-		as: as,
 		tr: tr,
 		cr: cr,
 		ir: ir,
-		lr: lr,
-		sc: sc,
+		f:  f,
 	}
 }
 
-func (s *service) HydrateThread(ctx context.Context, url string) ([]thread.Option, error) {
-	ln, err := s.scrape(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+func (s *service) HydrateThread(ctx context.Context, body, url string) []thread.Option {
+	short, links, assets := s.hydrate(ctx, body, url)
 
 	return []thread.Option{
-		thread.WithAssets(ln.AssetIDs()),
-		thread.WithLinks(ln.ID),
-	}, nil
+		thread.WithAssets(assets),
+		thread.WithLinks(links...),
+		thread.WithSummary(short),
+	}
 }
 
-func (s *service) HydrateCluster(ctx context.Context, url string) ([]cluster.Option, error) {
-	ln, err := s.scrape(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+func (s *service) HydrateReply(ctx context.Context, body, url string) []reply.Option {
+	short, links, assets := s.hydrate(ctx, body, url)
+
+	return []reply.Option{
+		reply.WithAssets(assets...),
+		reply.WithShort(short),
+		reply.WithLinks(links...),
 	}
+}
+
+func (s *service) HydrateCluster(ctx context.Context, body, url string) []cluster.Option {
+	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []cluster.Option{
-		cluster.WithAssets(ln.AssetIDs()),
-		cluster.WithLinks(ln.ID),
-	}, nil
+		cluster.WithAssets(assets),
+		cluster.WithLinks(links...),
+	}
 }
 
-func (s *service) HydrateItem(ctx context.Context, url string) ([]item.Option, error) {
-	ln, err := s.scrape(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+func (s *service) HydrateItem(ctx context.Context, body, url string) []item.Option {
+	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []item.Option{
-		item.WithAssets(ln.AssetIDs()),
-		item.WithLinks(ln.ID),
-	}, nil
+		item.WithAssets(assets),
+		item.WithLinks(links...),
+	}
 }
 
-func (s *service) scrape(ctx context.Context, url string) (*link.Link, error) {
-	wc, err := s.sc.Scrape(ctx, url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+// hydrate takes the body and primary URL of a piece of content and fetches all
+// the links and produces a short summary of the post's body text.
+func (s *service) hydrate(ctx context.Context, body, url string) (string, []xid.ID, []asset.AssetID) {
+	structured := extractor.Destructure(body)
 
-	opts := []link.Option{}
+	urls := append([]string{url}, structured.Links...)
 
-	var a *asset.Asset
-	if wc.Image != "" {
-		a, err = s.copy(ctx, wc.Image)
+	links := []xid.ID{}
+	assets := []asset.AssetID{}
+
+	for _, l := range urls {
+		// TODO: async
+
+		ln, err := s.f.Fetch(ctx, l)
 		if err != nil {
-			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", url))
-		} else {
-			opts = append(opts, link.WithAssets(string(a.ID)))
+			continue
 		}
+
+		links = append(links, ln.ID)
+		assets = append(assets, ln.AssetIDs()...)
 	}
 
-	ln, err := s.lr.Store(ctx, url, wc.Title, wc.Description, opts...)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if a != nil {
-		ln.Assets = append(ln.Assets, a)
-	}
-
-	return ln, nil
-}
-
-func (s *service) copy(ctx context.Context, url string) (*asset.Asset, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	a, err := s.as.Upload(ctx, resp.Body, resp.ContentLength)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return a, nil
+	return structured.Short, links, assets
 }

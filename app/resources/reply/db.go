@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -28,15 +27,10 @@ func New(db *ent.Client) Repository {
 
 func (d *database) Create(
 	ctx context.Context,
-	body string,
 	authorID account.AccountID,
 	parentID post.ID,
-	replyToID opt.Optional[post.ID],
-	meta map[string]any,
 	opts ...Option,
 ) (*Reply, error) {
-	short := post.MakeShortBody(string(body))
-
 	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -52,8 +46,6 @@ func (d *database) Create(
 
 	q := d.db.Post.
 		Create().
-		SetBody(string(body)).
-		SetShort(short).
 		SetFirst(false).
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))
@@ -61,10 +53,6 @@ func (d *database) Create(
 	for _, fn := range opts {
 		fn(q.Mutation())
 	}
-
-	replyToID.Call(func(value post.ID) {
-		q.SetReplyToID(xid.ID(value))
-	})
 
 	p, err := q.Save(ctx)
 	if err != nil {

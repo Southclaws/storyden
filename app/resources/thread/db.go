@@ -38,7 +38,6 @@ func New(db *ent.Client) Repository {
 func (d *database) Create(
 	ctx context.Context,
 	title string,
-	body string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	tags []string,
@@ -70,9 +69,7 @@ func (d *database) Create(
 	}
 
 	mutate.SetTitle(title)
-	mutate.SetShort(post.MakeShortBody(body))
 	mutate.SetFirst(true)
-	mutate.SetBody(body)
 	mutate.SetAuthorID(xid.ID(authorID))
 	mutate.SetTitle(title)
 	mutate.SetCategoryID(cat.ID)
@@ -241,6 +238,9 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 				WithReacts().
 				WithAuthor().
 				WithAssets().
+				WithLinks(func(lq *ent.LinkQuery) {
+					lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+				}).
 				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
 		WithAuthor().

@@ -57,6 +57,8 @@ tags:
     description: Arbitrary item grouping pages for indexing structured content.
   - name: items
     description: Arbitrary item pages for indexing structured content.
+  - name: links
+    description: Social bookmarks.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -997,6 +999,50 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ItemUpdateOK" }
 
+  #
+  # 888 d8b          888
+  # 888 Y8P          888
+  # 888              888
+  # 888 888 88888b.  888  888 .d8888b
+  # 888 888 888 "88b 888 .88P 88K
+  # 888 888 888  888 888888K  "Y8888b.
+  # 888 888 888  888 888 "88b      X88
+  # 888 888 888  888 888  888  88888P'
+  #
+
+  /v1/links:
+    post:
+      operationId: LinkCreate
+      description: |
+        Add a link to the community bookmarks. This will also scrape the content
+        at the site the link points to, if possible. If the submitted link is an
+        invalid link for whatever reason (invalid URL structure or page is dead)
+        then the API will fail. The metadata for the link is indexed on success.
+
+        If the submitted link already exists it will be an idempotent operation,
+        unless the body contains additional metadata. In these cases, the link's
+        metadata will be updated with the new metadata and the URL is unchanged.
+
+        When a link is submitted, it is first "cleaned" to remove any fragments.
+      tags: [links]
+      requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/LinkCreateOK" }
+    get:
+      operationId: LinkList
+      description: List all links using the filtering options.
+      tags: [links]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/LinkListOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -1071,6 +1117,14 @@ components:
     SearchQuery:
       description: Search query string.
       name: q
+      in: query
+      required: false
+      schema:
+        type: string
+
+    PaginationQuery:
+      description: Pagination query parameters.
+      name: page
       in: query
       required: false
       schema:
@@ -1269,6 +1323,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ItemMutableProps" }
+
+    LinkCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/LinkInitialProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -1617,6 +1676,23 @@ components:
           schema:
             $ref: "#/components/schemas/Item"
 
+    LinkCreateOK:
+      description: Link indexed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Link"
+
+    LinkListOK:
+      description: Link list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [links]
+            properties:
+              links: { $ref: "#/components/schemas/LinkList" }
+
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
   # d88P  Y88b d88P  Y88b 888    888 888        8888b   d8888       d88888 d88P  Y88b
@@ -1781,18 +1857,6 @@ components:
       description: A web address
       type: string
       format: url
-
-    Link:
-      description: |
-        A web address with content information such as title, description, etc.
-      type: object
-      properties:
-        url: { $ref: "#/components/schemas/URL" }
-        title:
-          type: string
-        description:
-          type: string
-        assets: { $ref: "#/components/schemas/AssetList" }
 
     AccountName:
       type: string
@@ -2555,7 +2619,7 @@ components:
 
     PostCommonProps:
       type: object
-      required: [root_id, root_slug, body, author, reacts, assets]
+      required: [root_id, root_slug, body, author, reacts, assets, links]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
@@ -2565,7 +2629,7 @@ components:
         reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
         assets: { $ref: "#/components/schemas/AssetList" }
-        link: { $ref: "#/components/schemas/Link" }
+        links: { $ref: "#/components/schemas/LinkList" }
 
     PostInitialProps:
       type: object
@@ -2937,6 +3001,48 @@ components:
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         properties: { $ref: "#/components/schemas/Properties" }
+
+    #
+    # 888      d8b          888
+    # 888      Y8P          888
+    # 888                   888
+    # 888      888 88888b.  888  888
+    # 888      888 888 "88b 888 .88P
+    # 888      888 888  888 888888K
+    # 888      888 888  888 888 "88b
+    # 88888888 888 888  888 888  888
+    #
+
+    LinkTitle:
+      type: string
+      example: "The Open Graph Protocol"
+
+    LinkDescription:
+      type: string
+      example: "The Open Graph protocol enables any web page to become a rich object in a social graph."
+
+    Link:
+      description: |
+        A web address with content information such as title, description, etc.
+      type: object
+      required: [url, assets]
+      properties:
+        url: { $ref: "#/components/schemas/URL" }
+        title: { $ref: "#/components/schemas/LinkTitle" }
+        description: { $ref: "#/components/schemas/LinkDescription" }
+        assets: { $ref: "#/components/schemas/AssetList" }
+
+    LinkList:
+      type: array
+      items: { $ref: "#/components/schemas/Link" }
+
+    LinkInitialProps:
+      type: object
+      required: [url]
+      properties:
+        url: { $ref: "#/components/schemas/URL" }
+        title: { $ref: "#/components/schemas/LinkTitle" }
+        description: { $ref: "#/components/schemas/LinkDescription" }
 
   securitySchemes:
     browser:
