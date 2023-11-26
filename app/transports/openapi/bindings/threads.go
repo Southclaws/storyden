@@ -55,14 +55,14 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
-		request.Body.Body,
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,
 		tags.OrZero(),
 		meta,
 		thread_service.Partial{
-			URL: opt.NewPtr(request.Body.Url),
+			Body: opt.New(request.Body.Body),
+			URL:  opt.NewPtr(request.Body.Url),
 		},
 	)
 	if err != nil {
