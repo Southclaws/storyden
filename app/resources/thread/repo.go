@@ -30,7 +30,6 @@ type Repository interface {
 	Create(
 		ctx context.Context,
 		title string,
-		body string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		tags []string,

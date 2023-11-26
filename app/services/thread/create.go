@@ -17,7 +17,6 @@ import (
 
 func (s *service) Create(ctx context.Context,
 	title string,
-	body string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
 	status post.Status,
@@ -49,7 +48,6 @@ func (s *service) Create(ctx context.Context,
 
 	thr, err := s.thread_repo.Create(ctx,
 		title,
-		body,
 		authorID,
 		categoryID,
 		tags,
