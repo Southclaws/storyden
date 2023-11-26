@@ -302,11 +302,9 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 
 		for _, p := range t.Posts[1:] {
 			p, err = pr.Create(ctx,
-				p.Body,
 				p.Author.ID,
 				th.ID,
-				nil,
-				nil,
+				reply.WithBody(p.Body),
 				reply.WithID(p.ID))
 			if err != nil {
 				if ent.IsConstraintError(err) {

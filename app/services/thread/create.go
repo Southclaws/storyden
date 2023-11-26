@@ -44,6 +44,7 @@ func (s *service) Create(ctx context.Context,
 		thread.WithMeta(meta),
 	)
 
+	// BUG: partial does not have body set
 	opts = append(opts, s.hydrate(ctx, partial)...)
 
 	thr, err := s.thread_repo.Create(ctx,

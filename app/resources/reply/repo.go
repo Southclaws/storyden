@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -18,11 +17,8 @@ type Option func(*ent.PostMutation)
 type Repository interface {
 	Create(
 		ctx context.Context,
-		body string,
 		authorID account.AccountID,
 		parentID post.ID,
-		replyToID opt.Optional[post.ID],
-		meta map[string]any,
 		opts ...Option,
 	) (*Reply, error)
 
@@ -42,6 +38,18 @@ func WithID(id post.ID) Option {
 func WithBody(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(string(v))
+	}
+}
+
+func WithShort(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetShort(v)
+	}
+}
+
+func WithReplyTo(v post.ID) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetReplyToID(xid.ID(v))
 	}
 }
 
