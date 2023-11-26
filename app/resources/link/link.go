@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
 type ID = xid.ID
@@ -28,9 +29,13 @@ func (l *Link) AssetIDs() []asset.AssetID {
 
 type Repository interface {
 	Store(ctx context.Context, url, title, description string, opts ...Option) (*Link, error)
+	Search(ctx context.Context, filters ...Filter) ([]*Link, error)
 }
 
-type Option func(*ent.LinkMutation)
+type (
+	Option func(*ent.LinkMutation)
+	Filter func(*ent.LinkQuery)
+)
 
 func WithPosts(ids ...xid.ID) Option {
 	return func(lm *ent.LinkMutation) {
@@ -53,6 +58,28 @@ func WithItems(ids ...xid.ID) Option {
 func WithAssets(ids ...string) Option {
 	return func(lm *ent.LinkMutation) {
 		lm.AddAssetIDs(ids...)
+	}
+}
+
+func WithURL(s string) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Where(link.URLContainsFold(s))
+	}
+}
+
+func WithPage(page, size int) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Limit(size).Offset(page * size)
+	}
+}
+
+func WithKeyword(s string) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Where(link.Or(
+			link.TitleContainsFold(s),
+			link.DescriptionContainsFold(s),
+			link.URLContainsFold(s),
+		))
 	}
 }
 
@@ -88,12 +115,12 @@ func Map(in *ent.Link) *Link {
 
 type Links []*Link
 
-func (l Links) Latest() opt.Optional[Link] {
+func (l Links) Latest() opt.Optional[*Link] {
 	if len(l) == 0 {
-		return opt.NewEmpty[Link]()
+		return opt.NewEmpty[*Link]()
 	}
 
-	return opt.New(*l[0])
+	return opt.New(l[0])
 }
 
 func (a Links) Len() int           { return len(a) }

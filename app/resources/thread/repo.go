@@ -30,7 +30,6 @@ type Repository interface {
 	Create(
 		ctx context.Context,
 		title string,
-		body string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		tags []string,
@@ -64,6 +63,12 @@ func WithID(id post.ID) Option {
 func WithTitle(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetTitle(v)
+	}
+}
+
+func WithSummary(v string) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetShort(v)
 	}
 }
 

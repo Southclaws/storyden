@@ -1,20 +1,32 @@
 import { PropsWithChildren } from "react";
 import { RenderElementProps } from "slate-react";
 
+import { RichLink } from "../components/RichLink/RichLink";
+import { getURL } from "../utils";
+
 import { styled } from "@/styled-system/jsx";
 
 export function Element({
-  attributes,
   children,
-  element,
+  ...props
 }: PropsWithChildren<RenderElementProps>) {
-  switch (element.type) {
-    case "paragraph":
-      return <styled.p {...attributes}>{children}</styled.p>;
+  switch (props.element.type) {
+    case "paragraph": {
+      const url = getURL(props.element);
+      if (url) {
+        return (
+          <RichLink {...props} href={url}>
+            {children}
+          </RichLink>
+        );
+      }
+
+      return <styled.p {...props.attributes}>{children}</styled.p>;
+    }
 
     case "link":
       return (
-        <a href={element.link} {...attributes}>
+        <a href={props.element.link} {...props.attributes}>
           {children}
         </a>
       );
@@ -38,24 +50,26 @@ export function Element({
       return <h6>{children}</h6>;
 
     case "ol_list":
-      return <styled.ol {...attributes}>{children}</styled.ol>;
+      return <styled.ol {...props.attributes}>{children}</styled.ol>;
 
     case "ul_list":
-      return <styled.ul {...attributes}>{children}</styled.ul>;
+      return <styled.ul {...props.attributes}>{children}</styled.ul>;
 
     case "list_item":
-      return <styled.li {...attributes}>{children}</styled.li>;
+      return <styled.li {...props.attributes}>{children}</styled.li>;
 
     case "image":
       return (
         <>
-          <styled.img src={element.link} alt="" {...attributes} />
+          <styled.img src={props.element.link} alt="" {...props.attributes} />
           {children}
         </>
       );
 
     case "block_quote":
-      return <styled.blockquote {...attributes}>{children}</styled.blockquote>;
+      return (
+        <styled.blockquote {...props.attributes}>{children}</styled.blockquote>
+      );
 
     case "code_block":
       return (
@@ -68,7 +82,7 @@ export function Element({
       return <hr />;
 
     default:
-      console.error("Unknown markdown element rendered", element);
+      console.error("Unknown markdown element rendered", props.element);
       return null;
   }
 }
