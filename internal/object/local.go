@@ -30,6 +30,9 @@ func NewLocalStorer(cfg config.Config) Storer {
 	if err := os.MkdirAll(path, 0o755); err != nil {
 		panic(err)
 	}
+	if err := os.MkdirAll(filepath.Join(path, "assets"), 0o755); err != nil {
+		panic(err)
+	}
 
 	s := os.DirFS(path)
 
@@ -70,7 +73,7 @@ func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size 
 
 	f, err := os.OpenFile(fullpath,
 		os.O_CREATE|os.O_WRONLY,
-		0o666,
+		0o755,
 	)
 	if err != nil {
 		if os.IsNotExist(err) {
