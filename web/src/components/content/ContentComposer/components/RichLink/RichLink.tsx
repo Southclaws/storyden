@@ -1,18 +1,28 @@
 import { PropsWithChildren } from "react";
-import { useFocused, useSelected } from "slate-react";
+import { RenderElementProps, useFocused, useSelected } from "slate-react";
 
-import { Box, styled } from "@/styled-system/jsx";
+import { Box, Flex, styled } from "@/styled-system/jsx";
 
 import { Props, useRichLink } from "./useRichLink";
 
-export function RichLink(props: PropsWithChildren<Props>) {
+export function RichLink(props: PropsWithChildren<Props & RenderElementProps>) {
   const selected = useSelected();
   const focused = useFocused();
   const { link } = useRichLink(props);
 
   if (!link) {
     return (
-      <styled.a bgColor="accent.100" borderRadius="sm" px="1" href={props.href}>
+      <styled.a
+        bgColor="zinc.100"
+        borderRadius="sm"
+        color="gray.500"
+        lineClamp={1}
+        px="1"
+        contentEditable={true}
+        suppressContentEditableWarning
+        href={props.href}
+        {...props.attributes}
+      >
         {props.href} {props.children}
       </styled.a>
     );
@@ -25,13 +35,15 @@ export function RichLink(props: PropsWithChildren<Props>) {
       contentEditable={false}
       data-selected={selected && focused}
       display="flex"
+      flexDir="column"
+      gap="1"
       w="full"
-      bgColor="accent.100"
+      bgColor="zinc.100"
       borderRadius="md"
       overflow="hidden"
       outlineStyle="solid"
       outlineWidth="medium"
-      outlineColor="accent.100"
+      outlineColor="gray.100"
       mb="2"
       css={{
         "&[data-selected=true]": {
@@ -41,47 +53,52 @@ export function RichLink(props: PropsWithChildren<Props>) {
           outlineColor: "accent.200",
         },
       }}
+      {...props.attributes}
     >
       <styled.span
-        color="gray.600"
+        color="gray.500"
         lineClamp={1}
+        px="1"
         contentEditable={true}
         suppressContentEditableWarning
       >
-        {props.children}
+        {props.href} {props.children}
       </styled.span>
 
-      {asset && (
-        <Box flexGrow="1" flexShrink="0" width="32">
-          <styled.img
-            src={asset.url}
-            height="full"
-            width="full"
-            objectPosition="center"
-            objectFit="cover"
-          />
-        </Box>
-      )}
+      <Flex gap="2">
+        {asset && (
+          <Box flexGrow="1" flexShrink="0" width="32">
+            <styled.img
+              src={asset.url}
+              height="full"
+              width="full"
+              objectPosition="center"
+              objectFit="cover"
+            />
+          </Box>
+        )}
 
-      <styled.p
-        display="flex"
-        flexDir="column"
-        w="full"
-        justifyContent="space-evenly"
-        gap="0"
-        p="2"
-      >
-        <styled.span lineClamp={1} fontSize="md" fontWeight="bold">
-          <styled.a href={link.url} target="=_blank">
-            {link.title || link.url}
-          </styled.a>
-        </styled.span>
+        <styled.p
+          display="flex"
+          flexDir="column"
+          justifyContent="space-evenly"
+          alignItems="start"
+          w="full"
+          h="full"
+          gap="1"
+        >
+          <styled.span lineClamp={1} fontSize="md" fontWeight="bold">
+            <styled.a href={link.url} target="=_blank">
+              {link.title || link.url}
+            </styled.a>
+          </styled.span>
 
-        <styled.span lineClamp={2}>
-          {link.description || "(No description)"} <br />
-          <br />
-        </styled.span>
-      </styled.p>
+          <styled.span lineClamp={2}>
+            {link.description || "(No description)"} <br />
+            <br />
+          </styled.span>
+        </styled.p>
+      </Flex>
     </styled.article>
   );
 }

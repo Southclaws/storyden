@@ -1,5 +1,4 @@
 import { PropsWithChildren, useCallback } from "react";
-import { Editor, Transforms } from "slate";
 import { Editable, Slate } from "slate-react";
 
 import { Box } from "@/styled-system/jsx";
@@ -8,7 +7,6 @@ import { FileDrop } from "./components/FileDrop/FileDrop";
 import { Element } from "./render/Element";
 import { Leaf } from "./render/Leaf";
 import { Props, useContentComposer } from "./useContentComposer";
-import { getURL } from "./utils";
 
 export function ContentComposer({
   disabled,
@@ -35,27 +33,6 @@ export function ContentComposer({
           <Editable
             renderLeaf={renderLeaf}
             renderElement={renderElement}
-            // onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
-            //   // NOTE: this hook prevents Slate from duplicating the previous
-            //   // node (which results in images being duplicated.)
-
-            //   if (event.key === "Enter") {
-            //     event.preventDefault();
-
-            //     console.log("enter", editor.selection);
-
-            //     Transforms.insertNodes(editor, [
-            //       {
-            //         type: "paragraph",
-            //         children: [
-            //           {
-            //             text: "",
-            //           },
-            //         ],
-            //       },
-            //     ]);
-            //   }
-            // }}
             readOnly={disabled}
             placeholder="Write your heart out..."
             style={{
