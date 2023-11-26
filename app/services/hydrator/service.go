@@ -18,6 +18,7 @@ import (
 
 type Service interface {
 	HydrateThread(ctx context.Context, body, url string) []thread.Option
+	HydrateReply(ctx context.Context, body, url string) []reply.Option
 	HydrateCluster(ctx context.Context, body, url string) []cluster.Option
 	HydrateItem(ctx context.Context, body, url string) []item.Option
 }
@@ -61,10 +62,11 @@ func (s *service) HydrateThread(ctx context.Context, body, url string) []thread.
 }
 
 func (s *service) HydrateReply(ctx context.Context, body, url string) []reply.Option {
-	_, links, assets := s.hydrate(ctx, body, url)
+	short, links, assets := s.hydrate(ctx, body, url)
 
 	return []reply.Option{
 		reply.WithAssets(assets...),
+		reply.WithShort(short),
 		reply.WithLinks(links...),
 	}
 }

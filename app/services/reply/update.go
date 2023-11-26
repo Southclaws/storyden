@@ -38,10 +38,9 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
 	}
 
-	opts := []reply.Option{}
+	opts := partial.Opts()
 
-	partial.Body.Call(func(v string) { opts = append(opts, reply.WithBody(v)) })
-	partial.Meta.Call(func(v map[string]any) { opts = append(opts, reply.WithMeta(v)) })
+	opts = append(opts, s.hydrate(ctx, partial)...)
 
 	p, err = s.post_repo.Update(ctx, threadID, opts...)
 	if err != nil {

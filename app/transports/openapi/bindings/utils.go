@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -56,13 +55,8 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 	}
 }
 
-func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
-	posts, err := dt.MapErr(t.Posts, serialisePost)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	return &openapi.Thread{
+func serialiseThread(t *thread.Thread) openapi.Thread {
+	return openapi.Thread{
 		Author:    serialiseProfileReference(t.Author),
 		Category:  serialiseCategoryReference(&t.Category),
 		CreatedAt: t.CreatedAt,
@@ -74,15 +68,15 @@ func serialiseThread(t *thread.Thread) (*openapi.Thread, error) {
 		Short:     &t.Short,
 		Slug:      t.Slug,
 		Tags:      t.Tags,
-		Posts:     posts,
+		Posts:     dt.Map(t.Posts, serialisePost),
 		Title:     t.Title,
 		UpdatedAt: t.UpdatedAt,
 		Assets:    dt.Map(t.Assets, serialiseAssetReference),
 		Link:      opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
-	}, nil
+	}
 }
 
-func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
+func serialisePost(p *reply.Reply) openapi.PostProps {
 	return openapi.PostProps{
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
@@ -96,7 +90,7 @@ func serialisePost(p *reply.Reply) (openapi.PostProps, error) {
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
 		Links:     dt.Map(p.Links, serialiseLink),
-	}, nil
+	}
 }
 
 func serialiseProfileReference(a profile.Profile) openapi.ProfileReference {

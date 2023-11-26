@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -48,36 +47,23 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	var mentionReply opt.Optional[post.ID]
-
-	if request.Body.ReplyTo != nil {
-		tm := openapi.ParseID(*request.Body.ReplyTo)
-		mentionReply = opt.New(post.ID(tm))
-	}
-
-	var meta map[string]any
-	if request.Body.Meta != nil {
-		meta = *request.Body.Meta
+	partial := reply_service.Partial{
+		Body:    opt.New(request.Body.Body),
+		ReplyTo: opt.Map(opt.NewPtr(request.Body.ReplyTo), deserialisePostID),
+		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
 	post, err := p.reply_svc.Create(ctx,
-		request.Body.Body,
 		accountID,
 		postID,
-		mentionReply,
-		meta,
+		partial,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sp, err := serialisePost(post)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return openapi.PostCreate200JSONResponse{
-		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(sp),
+		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(serialisePost(post)),
 	}, nil
 }
 
@@ -87,25 +73,18 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	jsonBody, err := json.Marshal(request.Body.Body)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	partial := reply_service.Partial{
+		Body: opt.NewPtr(request.Body.Body),
+		Meta: opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
-	post, err := p.reply_svc.Update(ctx, postID, reply_service.Partial{
-		Body: opt.New(string(jsonBody)),
-	})
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	sp, err := serialisePost(post)
+	post, err := p.reply_svc.Update(ctx, postID, partial)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.PostUpdate200JSONResponse{
-		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(sp),
+		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(serialisePost(post)),
 	}, nil
 }
 
@@ -140,10 +119,7 @@ func (p *Posts) PostSearch(ctx context.Context, request openapi.PostSearchReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	results, err := dt.MapErr(posts, serialisePost)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	results := dt.Map(posts, serialisePost)
 
 	return openapi.PostSearch200JSONResponse{
 		PostSearchOKJSONResponse: openapi.PostSearchOKJSONResponse{
@@ -151,6 +127,10 @@ func (p *Posts) PostSearch(ctx context.Context, request openapi.PostSearchReques
 			Results: results,
 		},
 	}, nil
+}
+
+func deserialisePostID(s string) post.ID {
+	return post.ID(openapi.ParseID(s))
 }
 
 func deserialiseContentKinds(in openapi.ContentKinds) ([]post_search.Kind, error) {
