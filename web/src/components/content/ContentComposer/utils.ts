@@ -97,6 +97,9 @@ export const withExtensions = (editor: BaseEditor & ReactEditor) => {
         },
       );
 
+      Transforms.deselect(editor);
+      Transforms.select(editor, nextNodePath);
+
       return;
     }
 
