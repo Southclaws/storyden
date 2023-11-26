@@ -33,6 +33,12 @@ func (lu *LinkUpdate) Where(ps ...predicate.Link) *LinkUpdate {
 	return lu
 }
 
+// SetDomain sets the "domain" field.
+func (lu *LinkUpdate) SetDomain(s string) *LinkUpdate {
+	lu.mutation.SetDomain(s)
+	return lu
+}
+
 // SetTitle sets the "title" field.
 func (lu *LinkUpdate) SetTitle(s string) *LinkUpdate {
 	lu.mutation.SetTitle(s)
@@ -235,6 +241,9 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := lu.mutation.Domain(); ok {
+		_spec.SetField(link.FieldDomain, field.TypeString, value)
 	}
 	if value, ok := lu.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)
@@ -442,6 +451,12 @@ type LinkUpdateOne struct {
 	hooks     []Hook
 	mutation  *LinkMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetDomain sets the "domain" field.
+func (luo *LinkUpdateOne) SetDomain(s string) *LinkUpdateOne {
+	luo.mutation.SetDomain(s)
+	return luo
 }
 
 // SetTitle sets the "title" field.
@@ -676,6 +691,9 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := luo.mutation.Domain(); ok {
+		_spec.SetField(link.FieldDomain, field.TypeString, value)
 	}
 	if value, ok := luo.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)

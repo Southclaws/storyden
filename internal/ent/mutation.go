@@ -7724,6 +7724,8 @@ type LinkMutation struct {
 	id              *xid.ID
 	created_at      *time.Time
 	url             *string
+	slug            *string
+	domain          *string
 	title           *string
 	description     *string
 	clearedFields   map[string]struct{}
@@ -7918,6 +7920,78 @@ func (m *LinkMutation) OldURL(ctx context.Context) (v string, err error) {
 // ResetURL resets all changes to the "url" field.
 func (m *LinkMutation) ResetURL() {
 	m.url = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *LinkMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *LinkMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *LinkMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetDomain sets the "domain" field.
+func (m *LinkMutation) SetDomain(s string) {
+	m.domain = &s
+}
+
+// Domain returns the value of the "domain" field in the mutation.
+func (m *LinkMutation) Domain() (r string, exists bool) {
+	v := m.domain
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDomain returns the old "domain" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldDomain(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDomain is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDomain requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDomain: %w", err)
+	}
+	return oldValue.Domain, nil
+}
+
+// ResetDomain resets all changes to the "domain" field.
+func (m *LinkMutation) ResetDomain() {
+	m.domain = nil
 }
 
 // SetTitle sets the "title" field.
@@ -8242,12 +8316,18 @@ func (m *LinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LinkMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, link.FieldCreatedAt)
 	}
 	if m.url != nil {
 		fields = append(fields, link.FieldURL)
+	}
+	if m.slug != nil {
+		fields = append(fields, link.FieldSlug)
+	}
+	if m.domain != nil {
+		fields = append(fields, link.FieldDomain)
 	}
 	if m.title != nil {
 		fields = append(fields, link.FieldTitle)
@@ -8267,6 +8347,10 @@ func (m *LinkMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case link.FieldURL:
 		return m.URL()
+	case link.FieldSlug:
+		return m.Slug()
+	case link.FieldDomain:
+		return m.Domain()
 	case link.FieldTitle:
 		return m.Title()
 	case link.FieldDescription:
@@ -8284,6 +8368,10 @@ func (m *LinkMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case link.FieldURL:
 		return m.OldURL(ctx)
+	case link.FieldSlug:
+		return m.OldSlug(ctx)
+	case link.FieldDomain:
+		return m.OldDomain(ctx)
 	case link.FieldTitle:
 		return m.OldTitle(ctx)
 	case link.FieldDescription:
@@ -8310,6 +8398,20 @@ func (m *LinkMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetURL(v)
+		return nil
+	case link.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case link.FieldDomain:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDomain(v)
 		return nil
 	case link.FieldTitle:
 		v, ok := value.(string)
@@ -8379,6 +8481,12 @@ func (m *LinkMutation) ResetField(name string) error {
 		return nil
 	case link.FieldURL:
 		m.ResetURL()
+		return nil
+	case link.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case link.FieldDomain:
+		m.ResetDomain()
 		return nil
 	case link.FieldTitle:
 		m.ResetTitle()

@@ -206,6 +206,8 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "url", Type: field.TypeString, Unique: true},
+		{Name: "slug", Type: field.TypeString, Unique: true},
+		{Name: "domain", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
 	}

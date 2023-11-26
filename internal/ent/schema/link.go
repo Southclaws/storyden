@@ -20,6 +20,10 @@ func (Link) Fields() []ent.Field {
 		field.String("url").
 			Unique().
 			Immutable(),
+		field.String("slug").
+			Unique().
+			Immutable(),
+		field.String("domain"),
 		field.String("title"),
 		field.String("description"),
 	}
