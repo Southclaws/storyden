@@ -27,6 +27,10 @@ func NewLocalStorer(cfg config.Config) Storer {
 		path = "./data"
 	}
 
+	if err := os.MkdirAll(path, 0o755); err != nil {
+		panic(err)
+	}
+
 	s := os.DirFS(path)
 
 	return &localStorer{s, path}
