@@ -22,6 +22,10 @@ type Link struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
+	// Slug holds the value of the "slug" field.
+	Slug string `json:"slug,omitempty"`
+	// Domain holds the value of the "domain" field.
+	Domain string `json:"domain,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
@@ -88,7 +92,7 @@ func (*Link) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case link.FieldURL, link.FieldTitle, link.FieldDescription:
+		case link.FieldURL, link.FieldSlug, link.FieldDomain, link.FieldTitle, link.FieldDescription:
 			values[i] = new(sql.NullString)
 		case link.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -126,6 +130,18 @@ func (l *Link) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
 				l.URL = value.String
+			}
+		case link.FieldSlug:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field slug", values[i])
+			} else if value.Valid {
+				l.Slug = value.String
+			}
+		case link.FieldDomain:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field domain", values[i])
+			} else if value.Valid {
+				l.Domain = value.String
 			}
 		case link.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -200,6 +216,12 @@ func (l *Link) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(l.URL)
+	builder.WriteString(", ")
+	builder.WriteString("slug=")
+	builder.WriteString(l.Slug)
+	builder.WriteString(", ")
+	builder.WriteString("domain=")
+	builder.WriteString(l.Domain)
 	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(l.Title)

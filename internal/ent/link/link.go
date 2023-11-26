@@ -19,6 +19,10 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
+	// FieldSlug holds the string denoting the slug field in the database.
+	FieldSlug = "slug"
+	// FieldDomain holds the string denoting the domain field in the database.
+	FieldDomain = "domain"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -60,6 +64,8 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldURL,
+	FieldSlug,
+	FieldDomain,
 	FieldTitle,
 	FieldDescription,
 }
@@ -114,6 +120,16 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
+}
+
+// ByDomain orders the results by the domain field.
+func ByDomain(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDomain, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.

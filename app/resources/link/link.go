@@ -18,6 +18,7 @@ type ID = xid.ID
 type Link struct {
 	ID          ID
 	URL         string
+	Slug        string
 	Title       opt.Optional[string]
 	Description opt.Optional[string]
 	Assets      []*asset.Asset
@@ -107,6 +108,7 @@ func Map(in *ent.Link) *Link {
 	return &Link{
 		ID:          in.ID,
 		URL:         in.URL,
+		Slug:        in.Slug,
 		Title:       opt.New(in.Title),
 		Description: opt.New(in.Description),
 		Assets:      dt.Map(in.Edges.Assets, asset.FromModel),

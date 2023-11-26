@@ -48,6 +48,18 @@ func (lc *LinkCreate) SetURL(s string) *LinkCreate {
 	return lc
 }
 
+// SetSlug sets the "slug" field.
+func (lc *LinkCreate) SetSlug(s string) *LinkCreate {
+	lc.mutation.SetSlug(s)
+	return lc
+}
+
+// SetDomain sets the "domain" field.
+func (lc *LinkCreate) SetDomain(s string) *LinkCreate {
+	lc.mutation.SetDomain(s)
+	return lc
+}
+
 // SetTitle sets the "title" field.
 func (lc *LinkCreate) SetTitle(s string) *LinkCreate {
 	lc.mutation.SetTitle(s)
@@ -187,6 +199,12 @@ func (lc *LinkCreate) check() error {
 	if _, ok := lc.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Link.url"`)}
 	}
+	if _, ok := lc.mutation.Slug(); !ok {
+		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Link.slug"`)}
+	}
+	if _, ok := lc.mutation.Domain(); !ok {
+		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required field "Link.domain"`)}
+	}
 	if _, ok := lc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Link.title"`)}
 	}
@@ -241,6 +259,14 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 	if value, ok := lc.mutation.URL(); ok {
 		_spec.SetField(link.FieldURL, field.TypeString, value)
 		_node.URL = value
+	}
+	if value, ok := lc.mutation.Slug(); ok {
+		_spec.SetField(link.FieldSlug, field.TypeString, value)
+		_node.Slug = value
+	}
+	if value, ok := lc.mutation.Domain(); ok {
+		_spec.SetField(link.FieldDomain, field.TypeString, value)
+		_node.Domain = value
 	}
 	if value, ok := lc.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)
@@ -366,6 +392,18 @@ type (
 	}
 )
 
+// SetDomain sets the "domain" field.
+func (u *LinkUpsert) SetDomain(v string) *LinkUpsert {
+	u.Set(link.FieldDomain, v)
+	return u
+}
+
+// UpdateDomain sets the "domain" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateDomain() *LinkUpsert {
+	u.SetExcluded(link.FieldDomain)
+	return u
+}
+
 // SetTitle sets the "title" field.
 func (u *LinkUpsert) SetTitle(v string) *LinkUpsert {
 	u.Set(link.FieldTitle, v)
@@ -413,6 +451,9 @@ func (u *LinkUpsertOne) UpdateNewValues() *LinkUpsertOne {
 		if _, exists := u.create.mutation.URL(); exists {
 			s.SetIgnore(link.FieldURL)
 		}
+		if _, exists := u.create.mutation.Slug(); exists {
+			s.SetIgnore(link.FieldSlug)
+		}
 	}))
 	return u
 }
@@ -442,6 +483,20 @@ func (u *LinkUpsertOne) Update(set func(*LinkUpsert)) *LinkUpsertOne {
 		set(&LinkUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetDomain sets the "domain" field.
+func (u *LinkUpsertOne) SetDomain(v string) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetDomain(v)
+	})
+}
+
+// UpdateDomain sets the "domain" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateDomain() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateDomain()
+	})
 }
 
 // SetTitle sets the "title" field.
@@ -661,6 +716,9 @@ func (u *LinkUpsertBulk) UpdateNewValues() *LinkUpsertBulk {
 			if _, exists := b.mutation.URL(); exists {
 				s.SetIgnore(link.FieldURL)
 			}
+			if _, exists := b.mutation.Slug(); exists {
+				s.SetIgnore(link.FieldSlug)
+			}
 		}
 	}))
 	return u
@@ -691,6 +749,20 @@ func (u *LinkUpsertBulk) Update(set func(*LinkUpsert)) *LinkUpsertBulk {
 		set(&LinkUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetDomain sets the "domain" field.
+func (u *LinkUpsertBulk) SetDomain(v string) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetDomain(v)
+	})
+}
+
+// UpdateDomain sets the "domain" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateDomain() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateDomain()
+	})
 }
 
 // SetTitle sets the "title" field.

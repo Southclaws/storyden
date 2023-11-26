@@ -7,7 +7,7 @@
  */
 import type { AssetList } from "./assetList";
 import type { Identifier } from "./identifier";
-import type { Link } from "./link";
+import type { LinkList } from "./linkList";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
@@ -23,5 +23,5 @@ export interface PostCommonProps {
   reacts: ReactList;
   reply_to?: Identifier;
   assets: AssetList;
-  link?: Link;
+  links: LinkList;
 }
