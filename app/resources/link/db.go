@@ -57,6 +57,8 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*Link, erro
 		fn(query)
 	}
 
+	query.WithAssets()
+
 	r, err := query.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
