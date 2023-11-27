@@ -19,6 +19,7 @@ type Link struct {
 	ID          ID
 	URL         string
 	Slug        string
+	Domain      string
 	Title       opt.Optional[string]
 	Description opt.Optional[string]
 	Assets      []*asset.Asset
@@ -109,6 +110,7 @@ func Map(in *ent.Link) *Link {
 		ID:          in.ID,
 		URL:         in.URL,
 		Slug:        in.Slug,
+		Domain:      in.Domain,
 		Title:       opt.New(in.Title),
 		Description: opt.New(in.Description),
 		Assets:      dt.Map(in.Edges.Assets, asset.FromModel),
