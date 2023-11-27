@@ -55,7 +55,7 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 
-		opts = append(opts, link.WithPage(int(pageNumber), 50))
+		opts = append(opts, link.WithPage(int(pageNumber-1), 50))
 	} else {
 		opts = append(opts, link.WithPage(0, 50))
 	}
