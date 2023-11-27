@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/link_graph"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -17,15 +18,18 @@ import (
 type Links struct {
 	fr fetcher.Service
 	lr link.Repository
+	lg link_graph.Repository
 }
 
 func NewLinks(
 	fr fetcher.Service,
 	lr link.Repository,
+	lg link_graph.Repository,
 ) Links {
 	return Links{
 		fr: fr,
 		lr: lr,
+		lg: lg,
 	}
 }
 
@@ -70,4 +74,30 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 			Links: dt.Map(links, serialiseLink),
 		},
 	}, nil
+}
+
+func (i *Links) LinkGet(ctx context.Context, request openapi.LinkGetRequestObject) (openapi.LinkGetResponseObject, error) {
+	l, err := i.lg.Get(ctx, request.LinkSlug)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.LinkGet200JSONResponse{
+		LinkGetOKJSONResponse: openapi.LinkGetOKJSONResponse(serialiseLinkWithRefs(l)),
+	}, nil
+}
+
+func serialiseLinkWithRefs(in *link_graph.WithRefs) openapi.LinkWithRefs {
+	return openapi.LinkWithRefs{
+		Url:         in.URL,
+		Title:       in.Title.Ptr(),
+		Description: in.Description.Ptr(),
+		Slug:        in.Slug,
+		Domain:      in.Domain,
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
+		Threads:     dt.Map(in.Threads, serialiseThreadReference),
+		Posts:       dt.Map(in.Replies, serialisePost),
+		Clusters:    dt.Map(in.Clusters, serialiseCluster),
+		Items:       dt.Map(in.Items, serialiseItemWithParents),
+	}
 }

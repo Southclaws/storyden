@@ -1,14 +1,14 @@
 "use client";
 
+import { LinkView } from "src/components/directory/links/LinkView";
 import { Unready } from "src/components/site/Unready";
 
-import { LinkResultList } from "./components/LinkResultList/LinkResultList";
-import { Props, useLinkIndexScreen } from "./useLinkScreen";
+import { Props, useLinkScreen } from "./useLinkScreen";
 
 export function Client(props: Props) {
-  const { ready, data, error } = useLinkIndexScreen(props);
+  const { ready, data, error } = useLinkScreen(props);
 
   if (!ready) return <Unready {...error} />;
 
-  return <LinkResultList links={data} />;
+  return <LinkView link={data} />;
 }

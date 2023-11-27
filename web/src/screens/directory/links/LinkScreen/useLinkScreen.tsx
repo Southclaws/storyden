@@ -1,22 +1,15 @@
-import { useLinkList } from "src/api/openapi/links";
-import { Link } from "src/api/openapi/schemas";
+import { useLinkGet } from "src/api/openapi/links";
+import { LinkWithRefs } from "src/api/openapi/schemas";
 
 export type Props = {
   slug: string;
+  link: LinkWithRefs;
 };
 
-export function LinkScreen(props: Props) {
-  const { data, error } = useLink(
-    {
-      q: props.query,
-      page: props.page?.toString(),
-    },
-    {
-      swr: {
-        fallbackData: { links: props.links },
-      },
-    },
-  );
+export function useLinkScreen(props: Props) {
+  const { data, error } = useLinkGet(props.slug, {
+    swr: { fallbackData: props.link },
+  });
 
   if (!data) {
     return {
@@ -27,6 +20,6 @@ export function LinkScreen(props: Props) {
 
   return {
     ready: true as const,
-    data: data.links,
+    data: data,
   };
 }

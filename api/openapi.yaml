@@ -1043,6 +1043,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/LinkListOK" }
 
+  /v1/links/{link_slug}:
+    get:
+      operationId: LinkGet
+      description: |
+        Get the details for a specific link. Such as where it's been posted,
+        which resources it's linked to and how many times it's been opened.
+      tags: [links]
+      security: []
+      parameters: [{ $ref: "#/components/parameters/LinkSlugParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/LinkGetOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -1177,6 +1191,14 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    LinkSlugParam:
+      description: Unique link Slug.
+      name: link_slug
+      in: path
+      required: true
+      schema:
+        type: string
 
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
@@ -1692,6 +1714,13 @@ components:
             required: [links]
             properties:
               links: { $ref: "#/components/schemas/LinkList" }
+
+    LinkGetOK:
+      description: Link data.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LinkWithRefs"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -2587,9 +2616,7 @@ components:
           required:
             [title, slug, short, pinned, author, tags, posts, category, reacts]
           properties:
-            posts:
-              type: array
-              items: { $ref: "#/components/schemas/PostProps" }
+            posts: { $ref: "#/components/schemas/PostList" }
 
     #
     # 8888888b.                   888
@@ -2611,6 +2638,10 @@ components:
       allOf:
         - { $ref: "#/components/schemas/PostMetadata" }
         - { $ref: "#/components/schemas/PostCommonProps" }
+
+    PostList:
+      type: array
+      items: { $ref: "#/components/schemas/PostProps" }
 
     PostMetadata:
       type: object
@@ -3041,6 +3072,17 @@ components:
         slug: { $ref: "#/components/schemas/LinkSlug" }
         domain: { $ref: "#/components/schemas/LinkDomain" }
         assets: { $ref: "#/components/schemas/AssetList" }
+
+    LinkWithRefs:
+      allOf:
+        - $ref: "#/components/schemas/Link"
+        - required: [threads, posts, clusters, items, collections]
+          properties:
+            threads: { $ref: "#/components/schemas/ThreadList" }
+            posts: { $ref: "#/components/schemas/PostList" }
+            clusters: { $ref: "#/components/schemas/ClusterList" }
+            items: { $ref: "#/components/schemas/ItemList" }
+            collections: { $ref: "#/components/schemas/CollectionList" }
 
     LinkList:
       type: array
