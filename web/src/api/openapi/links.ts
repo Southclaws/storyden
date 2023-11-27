@@ -14,6 +14,7 @@ import type {
   InternalServerErrorResponse,
   LinkCreateBody,
   LinkCreateOKResponse,
+  LinkGetOKResponse,
   LinkListOKResponse,
   LinkListParams,
   NotFoundResponse,
@@ -81,6 +82,56 @@ export const useLinkList = <
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getLinkListKey(params) : null));
   const swrFn = () => linkList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+
+/**
+ * Get the details for a specific link. Such as where it's been posted,
+which resources it's linked to and how many times it's been opened.
+
+ */
+export const linkGet = (linkSlug: string) => {
+  return fetcher<LinkGetOKResponse>({
+    url: `/v1/links/${linkSlug}`,
+    method: "get",
+  });
+};
+
+export const getLinkGetKey = (linkSlug: string) =>
+  [`/v1/links/${linkSlug}`] as const;
+
+export type LinkGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof linkGet>>
+>;
+export type LinkGetQueryError = NotFoundResponse | InternalServerErrorResponse;
+
+export const useLinkGet = <
+  TError = NotFoundResponse | InternalServerErrorResponse,
+>(
+  linkSlug: string,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof linkGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!linkSlug;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getLinkGetKey(linkSlug) : null));
+  const swrFn = () => linkGet(linkSlug);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

@@ -1,4 +1,4 @@
-import { LinkScreen } from "src/screens/directory/links/LinkScreen/useLinkScreen";
+import { LinkScreen } from "src/screens/directory/links/LinkScreen/LinkScreen";
 
 type Props = {
   params: {
