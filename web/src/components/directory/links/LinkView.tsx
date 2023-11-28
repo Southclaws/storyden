@@ -4,7 +4,13 @@ import { LinkWithRefs } from "src/api/openapi/schemas";
 import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 import { Link } from "src/theme/components/Link";
 
-import { Flex, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
+import {
+  Flex,
+  HStack,
+  LinkBox,
+  LinkOverlay,
+  styled,
+} from "@/styled-system/jsx";
 
 type Props = {
   link: LinkWithRefs;
@@ -19,20 +25,34 @@ export function LinkView({ link }: Props) {
   return (
     <Flex flexDir="column" gap="2">
       <LinkBox>
-        <LinkOverlay
-          display="flex"
-          alignItems="center"
-          color="fg.subtle"
-          href={link.url}
-        >
-          {link.domain}&nbsp;
-          <ArrowTopRightOnSquareIcon height="1rem" />
-        </LinkOverlay>
+        <HStack justify="space-between">
+          <LinkOverlay
+            display="flex"
+            alignItems="center"
+            color="fg.subtle"
+            href={link.url}
+          >
+            {link.domain}&nbsp;
+            <ArrowTopRightOnSquareIcon height="1rem" />
+          </LinkOverlay>
 
-        <styled.h1 fontSize="heading.variable.2">{link.title}</styled.h1>
+          <Link w="min" size="xs" href={domainSearch}>
+            More from this site
+          </Link>
+        </HStack>
+
+        {link.title ? (
+          <styled.h1 fontSize="heading.variable.2">{link.title}</styled.h1>
+        ) : (
+          <styled.h1 fontSize="heading.variable.2" lineClamp={1}>
+            (no title) {link.slug}
+          </styled.h1>
+        )}
       </LinkBox>
 
-      <styled.p color="fg.muted">{link.description}</styled.p>
+      <styled.p color="fg.muted">
+        {link.description || "No description was found at this link's site."}
+      </styled.p>
 
       <Flex flexDir={{ base: "column", md: "row" }}>
         {mainImage && (
@@ -50,15 +70,11 @@ export function LinkView({ link }: Props) {
         {images?.map((v) => <>{v}</>)}
       </Flex>
 
-      <Link w="min" size="xs" href={domainSearch}>
-        More from this site
-      </Link>
-
       <styled.h2 fontSize="heading.variable.3">Shared in</styled.h2>
-      <PostRefList items={link.threads} />
+      <PostRefList items={link.threads} emptyText="not shared anywhere" />
 
       <styled.h2 fontSize="heading.variable.3">Mentioned in replies</styled.h2>
-      <PostRefList items={link.posts} />
+      <PostRefList items={link.posts} emptyText="not mentioned in any posts" />
     </Flex>
   );
 }
