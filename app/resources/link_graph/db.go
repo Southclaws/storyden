@@ -24,6 +24,7 @@ func (d *database) Get(ctx context.Context, slug string) (*WithRefs, error) {
 		WithAssets().
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
+			pq.WithCategory()
 		}).
 		WithClusters().
 		WithItems()
