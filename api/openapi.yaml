@@ -1133,8 +1133,10 @@ components:
       name: q
       in: query
       required: false
+      allowEmptyValue: true
       schema:
         type: string
+        minLength: 0
 
     PaginationQuery:
       description: Pagination query parameters.
