@@ -7,15 +7,15 @@ import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { Input } from "src/theme/components/Input";
 
 import { Close } from "../../Action/Action";
-import { AdminAction } from "../../Action/Admin";
-import { ComposeAction } from "../../Action/Compose";
-import { DashboardAction } from "../../Action/Dashboard";
-import { HomeAction } from "../../Action/Home";
-import { LinksAction } from "../../Action/Links";
-import { LoginAction } from "../../Action/Login";
-import { LogoutAction } from "../../Action/Logout";
-import { NotificationsAction } from "../../Action/Notifications";
-import { SettingsAction } from "../../Action/Settings";
+import { AdminAction } from "../Anchors/Admin";
+import { ComposeAction } from "../Anchors/Compose";
+import { DashboardAction } from "../Anchors/Dashboard";
+import { HomeAction } from "../Anchors/Home";
+import { LinksAction } from "../Anchors/Links";
+import { LoginAction } from "../Anchors/Login";
+import { LogoutAction } from "../Anchors/Logout";
+import { NotificationsAction } from "../Anchors/Notifications";
+import { SettingsAction } from "../Anchors/Settings";
 
 import { HStack, styled } from "@/styled-system/jsx";
 

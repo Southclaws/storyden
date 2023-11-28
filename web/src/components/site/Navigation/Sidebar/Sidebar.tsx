@@ -79,7 +79,7 @@ export function Sidebar() {
               borderColor="oklch(0 0 0deg / 5%)"
             />
 
-            <Link w="full" size="sm" href="/l">
+            <Link w="full" size="xs" href="/l">
               <LinkIcon />
               Link directory
             </Link>
