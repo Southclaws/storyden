@@ -1,8 +1,7 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 import { LinkWithRefs } from "src/api/openapi/schemas";
-import { TextPostList } from "src/components/feed/text/TextPostList";
-import { PostListView } from "src/components/thread/PostList";
+import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 import { Link } from "src/theme/components/Link";
 
 import { Flex, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
@@ -55,13 +54,11 @@ export function LinkView({ link }: Props) {
         More from this site
       </Link>
 
-      {/* TODO: Post reference and list components for this use case */}
-
       <styled.h2 fontSize="heading.variable.3">Shared in</styled.h2>
-      <TextPostList posts={link.threads} />
+      <PostRefList items={link.threads} />
 
       <styled.h2 fontSize="heading.variable.3">Mentioned in replies</styled.h2>
-      <PostListView posts={link.posts} />
+      <PostRefList items={link.posts} />
     </Flex>
   );
 }

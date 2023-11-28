@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -62,7 +63,22 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	replies, err := dt.MapErr(dt.Filter(postEdge, func(p *ent.Post) bool { return !p.First }), reply.FromModel)
+	replies, err := dt.MapErr(dt.Filter(postEdge, func(p *ent.Post) bool { return !p.First }), func(p *ent.Post) (*reply.Reply, error) {
+		root, err := p.Edges.RootOrErr()
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		rep, err := reply.FromModel(p)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		rep.RootThreadMark = root.Slug
+		rep.RootPostID = post.ID(root.ID)
+
+		return rep, nil
+	})
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
