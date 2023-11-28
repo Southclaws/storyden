@@ -28,22 +28,38 @@ func (t *temporary) WebAuthnIcon() string                       { return "" }
 func (t *temporary) WebAuthnCredentials() []webauthn.Credential { return t.credentials }
 
 func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*protocol.CredentialCreation, *webauthn.SessionData, error) {
+	accountID := session.GetOptAccountID(ctx)
+
 	t := temporary{handle: handle}
 
-	_, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if exists {
-		// TODO: maybe we can short circuit the flow and switch to login?
-		return nil, nil, fault.Wrap(ErrAccountExists,
-			fctx.With(ctx),
-			ftag.With(ftag.AlreadyExists),
-			fmsg.WithDesc(
-				"already exists",
-				"An account with this handle has already been registered.",
-			),
-		)
+		id, ok := accountID.Get()
+		if !ok {
+			// TODO: maybe we can short circuit the flow and switch to login?
+			return nil, nil, fault.Wrap(ErrAccountExists,
+				fctx.With(ctx),
+				ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc(
+					"already exists",
+					"An account with this handle has already been registered.",
+				),
+			)
+		}
+
+		if id != acc.ID {
+			return nil, nil, fault.Wrap(ErrExistsOnAnotherAccount,
+				fctx.With(ctx),
+				ftag.With(ftag.PermissionDenied),
+				fmsg.WithDesc(
+					"account id mismatch",
+					"The specified handle does not match the authenticated account so the credential cannot be linked.",
+				),
+			)
+		}
 	}
 
 	credentialOptions, sessionData, err := p.wa.BeginRegistration(&t,
