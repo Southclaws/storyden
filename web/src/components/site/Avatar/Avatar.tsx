@@ -15,7 +15,7 @@ export function Avatar({ handle, ...props }: Props) {
     <Box width="8" {...props}>
       <Image
         className={css({
-          borderRadius: "md",
+          borderRadius: "full",
         })}
         src={src}
         width={32}

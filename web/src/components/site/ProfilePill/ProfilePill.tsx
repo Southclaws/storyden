@@ -32,7 +32,7 @@ export function ProfilePill({
         flexShrink: 0,
         p: "1",
         pr: showHandle ? "2" : "1",
-        borderRadius: "lg",
+        borderRadius: "full",
         _hover: { backgroundColor: "gray.200", textDecoration: "none" },
         minW: "0",
       })}
