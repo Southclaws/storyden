@@ -13,7 +13,7 @@ import { Flex, HStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
-  onDelete: () => void;
+  onDelete?: () => void;
 };
 
 export function TextPost(props: Props) {
@@ -43,7 +43,9 @@ export function TextPost(props: Props) {
 
           <HStack>
             {session && <CollectionMenu thread={props.thread} />}
-            <FeedItemMenu thread={props.thread} onDelete={props.onDelete} />
+            {props.onDelete && (
+              <FeedItemMenu thread={props.thread} onDelete={props.onDelete} />
+            )}
           </HStack>
         </Flex>
       </FeedItem>

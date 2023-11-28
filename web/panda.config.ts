@@ -120,9 +120,9 @@ export default defineConfig({
           },
           fg: {
             default: { value: "{colors.gray.900}" },
-            muted: { value: "{colors.gray.800}" },
-            subtle: { value: "{colors.gray.700}" },
-            disabled: { value: "{colors.gray.500}" },
+            muted: { value: "{colors.gray.600}" },
+            subtle: { value: "{colors.gray.500}" },
+            disabled: { value: "{colors.gray.400}" },
           },
           border: {
             default: { value: "{colors.gray.400}" },

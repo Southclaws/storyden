@@ -55,10 +55,15 @@ func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if len(r) > 0 {
-		// TODO: revalidate stale link async
+		// revalidate stale data asynchronously
+		go s.scrapeAndStore(ctx, url)
 		return r[0], nil
 	}
 
+	return s.scrapeAndStore(ctx, url)
+}
+
+func (s *service) scrapeAndStore(ctx context.Context, url string) (*link.Link, error) {
 	wc, err := s.sc.Scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
