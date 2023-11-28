@@ -1,10 +1,9 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
+import { LinkRefList } from "src/components/directory/links/LinkRefList";
 import { Unready } from "src/components/site/Unready";
 import { Button } from "src/theme/components/Button";
 import { Input } from "src/theme/components/Input";
-
-import { LinkResultList } from "../LinkResultList/LinkResultList";
 
 import { VStack, styled } from "@/styled-system/jsx";
 
@@ -54,7 +53,7 @@ export function LinkIndexView(props: Props) {
         </Button>
       </styled.form>
 
-      <LinkResultList links={data.links} />
+      <LinkRefList links={data.links} />
     </VStack>
   );
 }

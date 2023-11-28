@@ -1,27 +1,19 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 
-import { LinkList, Link as LinkSchema } from "src/api/openapi/schemas";
+import { Link as LinkSchema } from "src/api/openapi/schemas";
 import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Link } from "src/theme/components/Link";
 
-import { Box, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
+import {
+  Box,
+  Flex,
+  LinkBox,
+  LinkOverlay,
+  VStack,
+  styled,
+} from "@/styled-system/jsx";
 
-export function LinkResultList(props: { links: LinkList }) {
-  if (props.links.length === 0) {
-    return <Empty>no links were found</Empty>;
-  }
-
-  return (
-    <styled.ol display="flex" flexDir="column" gap="4">
-      {props.links.map((v) => (
-        <styled.li key={v.url}>
-          <LinkResultListItem {...v} />
-        </styled.li>
-      ))}
-    </styled.ol>
-  );
-}
-
-function LinkResultListItem(props: LinkSchema) {
+export function LinkRef(props: LinkSchema) {
   const asset = props.assets?.[0] ?? undefined;
 
   return (
@@ -31,7 +23,7 @@ function LinkResultListItem(props: LinkSchema) {
       w="full"
       overflow="hidden"
       boxShadow="md"
-      borderRadius="md"
+      borderRadius="lg"
       backgroundColor="white"
       css={{
         "&[data-selected=true]": {
@@ -42,26 +34,32 @@ function LinkResultListItem(props: LinkSchema) {
         },
       }}
     >
-      <styled.h2 color="gray.500" px="1">
-        <styled.a
-          display="flex"
-          alignItems="center"
-          flexWrap="nowrap"
-          gap="1"
-          _hover={{ textDecoration: "underline" }}
-          href={props.url}
-          target="=_blank"
-        >
-          <ArrowTopRightOnSquareIcon height="1em" />
-          <styled.span lineClamp={1} wordBreak="break-all">
-            {props.url}
-          </styled.span>
-        </styled.a>
-      </styled.h2>
+      <Flex color="gray.500" p="1" w="full" justify="space-between">
+        <styled.h2 color="gray.500">
+          <styled.a
+            display="flex"
+            alignItems="center"
+            flexWrap="nowrap"
+            gap="1"
+            _hover={{ textDecoration: "underline" }}
+            href={props.url}
+            target="=_blank"
+          >
+            <ArrowTopRightOnSquareIcon height="1em" />
+            <styled.span lineClamp={1} wordBreak="break-all">
+              {props.url}
+            </styled.span>
+          </styled.a>
+        </styled.h2>
+
+        <Link flexShrink="0" kind="ghost" size="xs" href={`/l/${props.slug}`}>
+          {props.domain}
+        </Link>
+      </Flex>
 
       <LinkBox display="flex" gap="0" maxH="24">
-        {asset && (
-          <Box flexGrow="1" flexShrink="0" width="32">
+        <Box flexGrow="1" flexShrink="0" width="32">
+          {asset ? (
             <styled.img
               src={asset.url}
               height="full"
@@ -69,8 +67,18 @@ function LinkResultListItem(props: LinkSchema) {
               objectPosition="center"
               objectFit="cover"
             />
-          </Box>
-        )}
+          ) : (
+            <VStack
+              justify="center"
+              bgColor="gray.50"
+              borderRadius="sm"
+              w="full"
+              h="full"
+            >
+              <Empty>no image</Empty>
+            </VStack>
+          )}
+        </Box>
 
         <styled.div
           display="flex"
