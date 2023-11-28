@@ -3,7 +3,6 @@ import { defineRecipe } from "@pandacss/dev";
 export const link = defineRecipe({
   className: "link",
   base: {
-    color: "blue.500",
     alignItems: "center",
     appearance: "none",
     borderRadius: "lg",
