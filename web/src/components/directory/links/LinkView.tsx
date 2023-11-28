@@ -1,26 +1,67 @@
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+
 import { LinkWithRefs } from "src/api/openapi/schemas";
+import { TextPostList } from "src/components/feed/text/TextPostList";
+import { PostListView } from "src/components/thread/PostList";
 import { Link } from "src/theme/components/Link";
 
-import { Flex, styled } from "@/styled-system/jsx";
+import { Flex, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {
   link: LinkWithRefs;
 };
 
 export function LinkView({ link }: Props) {
+  const mainImage = link.assets[0]?.url;
+  const images = mainImage ? link.assets.slice(1).map((v) => v.url) : undefined;
+
+  const domainSearch = `/l?q=${link.domain}`;
+
   return (
-    <Flex flexDir="column">
-      <styled.h1 fontSize="lg">{link.title}</styled.h1>
-      <p>{link.description}</p>
-      <a href={link.url}>{link.url}</a>
-      <Link href={`/l?q=${link.domain}`}>{link.domain}</Link>
-      <pre>{link.slug}</pre>
-      {link.threads.map((v) => (
-        <>{v.title}</>
-      ))}
-      {link.assets.map((v) => (
-        <>{v.url}</>
-      ))}
+    <Flex flexDir="column" gap="2">
+      <LinkBox>
+        <LinkOverlay
+          display="flex"
+          alignItems="center"
+          color="fg.subtle"
+          href={link.url}
+        >
+          {link.domain}&nbsp;
+          <ArrowTopRightOnSquareIcon height="1rem" />
+        </LinkOverlay>
+
+        <styled.h1 fontSize="heading.variable.2">{link.title}</styled.h1>
+      </LinkBox>
+
+      <styled.p color="fg.muted">{link.description}</styled.p>
+
+      <Flex flexDir={{ base: "column", md: "row" }}>
+        {mainImage && (
+          <styled.img
+            width="full"
+            maxWidth="96"
+            maxHeight="48"
+            objectFit="cover"
+            aspectRatio="wide"
+            borderRadius="lg"
+            src={mainImage}
+          />
+        )}
+
+        {images?.map((v) => <>{v}</>)}
+      </Flex>
+
+      <Link w="min" size="xs" href={domainSearch}>
+        More from this site
+      </Link>
+
+      {/* TODO: Post reference and list components for this use case */}
+
+      <styled.h2 fontSize="heading.variable.3">Shared in</styled.h2>
+      <TextPostList posts={link.threads} />
+
+      <styled.h2 fontSize="heading.variable.3">Mentioned in replies</styled.h2>
+      <PostListView posts={link.posts} />
     </Flex>
   );
 }
