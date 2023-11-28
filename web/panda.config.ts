@@ -127,7 +127,7 @@ export default defineConfig({
             disabled: { value: "{colors.gray.400}" },
           },
           border: {
-            default: { value: "{colors.gray.400}" },
+            default: { value: "{colors.blackAlpha.200}" },
             muted: { value: "{colors.gray.500}" },
             subtle: { value: "{colors.gray.300}" },
             disabled: { value: "{colors.gray.400}" },

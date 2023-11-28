@@ -1,7 +1,7 @@
 import { useSession } from "src/auth";
-import { AdminAction } from "src/components/site/Action/Admin";
-import { LogoutAction } from "src/components/site/Action/Logout";
-import { SettingsAction } from "src/components/site/Action/Settings";
+import { AdminAction } from "src/components/site/Navigation/Anchors/Admin";
+import { LogoutAction } from "src/components/site/Navigation/Anchors/Logout";
+import { SettingsAction } from "src/components/site/Navigation/Anchors/Settings";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
 import { HStack, VStack } from "@/styled-system/jsx";

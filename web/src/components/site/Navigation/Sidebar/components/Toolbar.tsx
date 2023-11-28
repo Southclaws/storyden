@@ -1,8 +1,8 @@
 import { useSession } from "src/auth";
-import { ComposeAction } from "src/components/site/Action/Compose";
-import { HomeAction } from "src/components/site/Action/Home";
-import { LoginAction } from "src/components/site/Action/Login";
-import { NotificationsAction } from "src/components/site/Action/Notifications";
+import { ComposeAction } from "src/components/site/Navigation/Anchors/Compose";
+import { HomeAction } from "src/components/site/Navigation/Anchors/Home";
+import { LoginAction } from "src/components/site/Navigation/Anchors/Login";
+import { NotificationsAction } from "src/components/site/Navigation/Anchors/Notifications";
 
 import { HStack } from "@/styled-system/jsx";
 
