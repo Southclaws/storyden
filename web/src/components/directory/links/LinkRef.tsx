@@ -95,14 +95,6 @@ export function LinkRef(props: LinkSchema) {
           </styled.h1>
 
           <styled.p lineClamp={2}>
-            <styled.a
-              color="gray.500"
-              _hover={{ textDecoration: "underline" }}
-              href={`/l?q=${props.domain}`}
-            >
-              {props.domain}
-            </styled.a>
-            <styled.span>&nbsp;•&nbsp;</styled.span>
             {props.description || "(No description)"} <br />
             <br />
           </styled.p>
