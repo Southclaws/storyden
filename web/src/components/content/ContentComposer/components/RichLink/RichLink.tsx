@@ -1,6 +1,8 @@
 import { PropsWithChildren } from "react";
 import { RenderElementProps, useFocused, useSelected } from "slate-react";
 
+import { Link } from "src/theme/components/Link";
+
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
 import { Props, useRichLink } from "./useRichLink";
@@ -55,17 +57,29 @@ export function RichLink(props: PropsWithChildren<Props & RenderElementProps>) {
       }}
       {...props.attributes}
     >
-      <styled.span
-        color="gray.500"
-        lineClamp={1}
-        px="1"
-        contentEditable={true}
-        suppressContentEditableWarning
-      >
-        {props.href} {props.children}
-      </styled.span>
+      <Flex color="gray.500" pl="1" w="full" justify="space-between">
+        <styled.span
+          display="none"
+          contentEditable={true}
+          suppressContentEditableWarning
+        >
+          {props.children}
+        </styled.span>
 
-      <Flex gap="2">
+        <styled.span
+          _focusVisible={{ outline: "none" }}
+          contentEditable={false}
+          lineClamp={1}
+        >
+          {props.href}
+        </styled.span>
+
+        <Link flexShrink="0" kind="ghost" size="xs" href={`/l/${link.slug}`}>
+          View in directory
+        </Link>
+      </Flex>
+
+      <Flex>
         {asset && (
           <Box flexGrow="1" flexShrink="0" width="32">
             <styled.img
@@ -86,6 +100,7 @@ export function RichLink(props: PropsWithChildren<Props & RenderElementProps>) {
           w="full"
           h="full"
           gap="1"
+          px="1"
         >
           <styled.span lineClamp={1} fontSize="md" fontWeight="bold">
             <styled.a href={link.url} target="=_blank">
