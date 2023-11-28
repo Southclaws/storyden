@@ -1,10 +1,5 @@
 import { Link, LinkProps } from "@chakra-ui/next-js";
-import {
-  Link as DumbLink,
-  IconButton,
-  IconButtonProps,
-  forwardRef,
-} from "@chakra-ui/react";
+import { IconButton, IconButtonProps, forwardRef } from "@chakra-ui/react";
 import {
   ArrowLeftIcon,
   Bars3Icon,
@@ -21,9 +16,7 @@ import {
 import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
-import { CrownIcon } from "../../graphics/CrownIcon";
 import { LoginIcon } from "../../graphics/LoginIcon";
-import { LogoutIcon } from "../../graphics/LogoutIcon";
 import { SendIcon } from "../../graphics/SendIcon";
 import { SpeechPlusIcon } from "../../graphics/SpeechPlusIcon";
 
@@ -118,23 +111,6 @@ export function Login({ href = "/register", ...props }: WithOptionalURL) {
   );
 }
 
-export function Logout({ href = "/logout", ...props }: WithOptionalURL) {
-  // We need to use a regular link here (Chakra styled anchor tag) because the
-  // anchor tag provided by Next.js is too clever for logouts! Because the Link
-  // component from Next.js pre-loads pages when the user hovers, this results
-  // in unexpected logouts just from hovering over the logout button, not ideal!
-  return (
-    <DumbLink
-      href={href}
-      title="Log out of your session"
-      {...actionStyles}
-      {...props}
-    >
-      <LogoutIcon width="1.5em" />
-    </DumbLink>
-  );
-}
-
 export function Create({ href = "/new", ...props }: WithOptionalURL) {
   return (
     <Action href={href} title="New thread" {...props}>
@@ -165,22 +141,6 @@ export const Settings = forwardRef(
         {...props}
       >
         <Cog6ToothIcon width="1.25em" />
-      </Action>
-    );
-  },
-);
-
-export const Admin = forwardRef(
-  ({ "aria-label": al, href = "/admin", ...props }: WithOptionalURL, ref) => {
-    return (
-      <Action
-        ref={ref}
-        title="Administration"
-        aria-label={al ?? "administration"}
-        href={href}
-        {...props}
-      >
-        <CrownIcon width="1.25em" />
       </Action>
     );
   },

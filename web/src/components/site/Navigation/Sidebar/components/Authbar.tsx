@@ -1,5 +1,7 @@
 import { useSession } from "src/auth";
-import { Admin, Logout, Settings } from "src/components/site/Action/Action";
+import { AdminAction } from "src/components/site/Action/Admin";
+import { LogoutAction } from "src/components/site/Action/Logout";
+import { SettingsAction } from "src/components/site/Action/Settings";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
 import { HStack, VStack } from "@/styled-system/jsx";
@@ -14,9 +16,9 @@ export function Authbar() {
       <VStack alignItems="start">
         <ProfilePill profileReference={account} size="lg" />
         <HStack>
-          <Logout />
-          <Settings />
-          {account.admin && <Admin />}
+          <LogoutAction />
+          <SettingsAction />
+          {account.admin && <AdminAction />}
         </HStack>
       </VStack>
     </HStack>

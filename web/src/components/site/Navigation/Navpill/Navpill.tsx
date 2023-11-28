@@ -2,22 +2,20 @@
 
 import { Presence } from "@ark-ui/react";
 
-import {
-  Admin,
-  Close,
-  Login,
-  Logout,
-  Settings,
-} from "src/components/site/Action/Action";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { Input } from "src/theme/components/Input";
 
+import { Close } from "../../Action/Action";
+import { AdminAction } from "../../Action/Admin";
 import { ComposeAction } from "../../Action/Compose";
 import { DashboardAction } from "../../Action/Dashboard";
 import { HomeAction } from "../../Action/Home";
 import { LinksAction } from "../../Action/Links";
+import { LoginAction } from "../../Action/Login";
+import { LogoutAction } from "../../Action/Logout";
 import { NotificationsAction } from "../../Action/Notifications";
+import { SettingsAction } from "../../Action/Settings";
 
 import { HStack, styled } from "@/styled-system/jsx";
 
@@ -46,19 +44,19 @@ export function Navpill() {
                   <HomeAction />
                   <NotificationsAction />
                   <LinksAction />
-                  <Logout />
+                  <LogoutAction />
                 </HStack>
                 <HStack>
                   {account.admin && (
                     <>
-                      <Admin />
+                      <AdminAction />
                     </>
                   )}
-                  <Settings />
+                  <SettingsAction />
                 </HStack>
               </>
             ) : (
-              <Login />
+              <LoginAction />
             )}
           </HStack>
 
@@ -113,7 +111,7 @@ export function Navpill() {
           ) : (
             <>
               <HomeAction />
-              <Login />
+              <LoginAction />
               <DashboardAction onClick={onExpand} />
             </>
           )}
