@@ -1,19 +1,20 @@
 import { PostProps, ThreadReference } from "src/api/openapi/schemas";
-import { EmptyState } from "src/components/feed/EmptyState";
 
 import { styled } from "@/styled-system/jsx";
 
+import { Empty } from "./Empty";
 import { PostRef } from "./PostRef";
 
 type Either = PostProps | ThreadReference;
 
 type Props = {
   items: Either[];
+  emptyText?: string;
 };
 
-export function PostRefList({ items }: Props) {
+export function PostRefList({ items, emptyText }: Props) {
   if (items.length === 0) {
-    return <EmptyState />;
+    return <Empty>{emptyText}</Empty>;
   }
 
   return (
