@@ -10,6 +10,7 @@ import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
+import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
 
 export default defineConfig({
   preflight: true,
@@ -48,6 +49,7 @@ export default defineConfig({
       link: link,
       menu: menu,
       checkbox: checkbox,
+      skeleton: skeleton,
     },
     extend: {
       semanticTokens: defineSemanticTokens({
@@ -217,6 +219,11 @@ export default defineConfig({
           },
         }),
       }),
+    },
+    keyframes: {
+      shimmer: {
+        "100%": { transform: "translateX(100%)" },
+      },
     },
   },
 

@@ -32,8 +32,6 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
-  Skeleton,
-  SkeletonText,
   SlideFade,
   Spinner,
   StackProps,
@@ -73,16 +71,7 @@ export { Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger };
 
 // Other stuff
 
-export {
-  CloseButton,
-  Image,
-  LinkBox,
-  LinkOverlay,
-  Skeleton,
-  SkeletonText,
-  SlideFade,
-  Spinner,
-};
+export { CloseButton, Image, LinkBox, LinkOverlay, SlideFade, Spinner };
 
 // Disclosure
 // TODO: Copy into our codebase:
