@@ -34,8 +34,8 @@ export function LinkRef(props: LinkSchema) {
         },
       }}
     >
-      <Flex color="gray.500" p="1" w="full" justify="space-between">
-        <styled.h2 color="gray.500">
+      <Flex bgColor="gray.50" p="1" w="full" justify="space-between">
+        <styled.h2 color="gray.500" pl="1">
           <styled.a
             display="flex"
             alignItems="center"
@@ -68,13 +68,7 @@ export function LinkRef(props: LinkSchema) {
               objectFit="cover"
             />
           ) : (
-            <VStack
-              justify="center"
-              bgColor="gray.50"
-              borderRadius="sm"
-              w="full"
-              h="full"
-            >
+            <VStack justify="center" w="full" h="full">
               <Empty>no image</Empty>
             </VStack>
           )}
