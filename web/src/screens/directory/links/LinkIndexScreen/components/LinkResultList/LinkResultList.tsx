@@ -1,14 +1,21 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 
 import { LinkList, Link as LinkSchema } from "src/api/openapi/schemas";
+import { Empty } from "src/components/feed/common/PostRef/Empty";
 
 import { Box, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
 
 export function LinkResultList(props: { links: LinkList }) {
+  if (props.links.length === 0) {
+    return <Empty>no links were found</Empty>;
+  }
+
   return (
     <styled.ol display="flex" flexDir="column" gap="4">
       {props.links.map((v) => (
-        <LinkResultListItem key={v.url} {...v} />
+        <styled.li key={v.url}>
+          <LinkResultListItem {...v} />
+        </styled.li>
       ))}
     </styled.ol>
   );
