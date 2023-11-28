@@ -1,7 +1,10 @@
 "use client";
 
+import { LinkIcon } from "@heroicons/react/24/outline";
+
 import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
 import { Divider } from "src/theme/components";
+import { Link } from "src/theme/components/Link";
 
 import { CategoryList } from "../../../category/CategoryList/CategoryList";
 import { useNavigation } from "../useNavigation";
@@ -70,6 +73,16 @@ export function Sidebar() {
             </Box>
 
             {isAdmin && <CategoryCreateTrigger />}
+
+            <Divider
+              // TODO: make this clever based on accent colour.
+              borderColor="oklch(0 0 0deg / 5%)"
+            />
+
+            <Link w="full" size="sm" href="/l">
+              <LinkIcon />
+              Link directory
+            </Link>
           </VStack>
 
           <VStack alignItems="start">
