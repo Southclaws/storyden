@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type Thread struct {
@@ -44,10 +43,17 @@ type Thread struct {
 func (*Thread) GetResourceName() string { return "thread" }
 
 func FromModel(m *ent.Post) (*Thread, error) {
+	categoryEdge, err := m.Edges.CategoryOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	authorEdge, err := m.Edges.AuthorOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
+
+	category := category.FromModel(categoryEdge)
 
 	pro, err := profile.FromModel(authorEdge)
 	if err != nil {
@@ -106,7 +112,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Pinned:      m.Pinned,
 		Author:      *pro,
 		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
-		Category:    utils.Deref(category.FromModel(m.Edges.Category)),
+		Category:    *category,
 		Status:      post.NewStatusFromEnt(m.Status),
 		Posts:       posts,
 		Reacts:      dt.Map(m.Edges.Reacts, react.FromModel),
