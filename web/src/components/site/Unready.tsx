@@ -3,7 +3,7 @@
 import { PropsWithChildren } from "react";
 
 import { APIError } from "src/api/openapi/schemas";
-import { SkeletonText } from "src/theme/components";
+import { Skeleton } from "src/theme/components/Skeleton";
 
 import { Flex } from "@/styled-system/jsx";
 
@@ -21,9 +21,9 @@ export function Unready(props: PropsWithChildren<Partial<APIError>>) {
       >
         {props.children ?? (
           <>
-            <SkeletonText noOfLines={4} />
-            <SkeletonText noOfLines={4} />
-            <SkeletonText noOfLines={4} />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton />
           </>
         )}
       </Flex>

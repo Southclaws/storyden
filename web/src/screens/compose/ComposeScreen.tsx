@@ -1,6 +1,5 @@
-import { Skeleton, SkeletonText } from "@chakra-ui/react";
-
 import { Unready } from "src/components/site/Unready";
+import { Skeleton } from "src/theme/components/Skeleton";
 
 import { VStack } from "@/styled-system/jsx";
 
@@ -13,8 +12,7 @@ export function ComposeScreen(props: Props) {
   if (loadingDraft)
     return (
       <Unready>
-        <Skeleton height={8} />
-        <SkeletonText noOfLines={3} />
+        <Skeleton />
       </Unready>
     );
 

@@ -2,13 +2,9 @@ import { Link, LinkProps } from "@chakra-ui/next-js";
 import { IconButton, IconButtonProps, forwardRef } from "@chakra-ui/react";
 import {
   ArrowLeftIcon,
-  Bars3Icon,
-  BellIcon,
   BookmarkIcon,
   CloudArrowUpIcon,
-  Cog6ToothIcon,
   EllipsisHorizontalIcon,
-  HomeIcon,
   PencilIcon,
   PlusIcon,
   XMarkIcon,
@@ -16,9 +12,7 @@ import {
 import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
 import { MouseEvent, MouseEventHandler, useCallback } from "react";
 
-import { LoginIcon } from "../../graphics/LoginIcon";
 import { SendIcon } from "../../graphics/SendIcon";
-import { SpeechPlusIcon } from "../../graphics/SpeechPlusIcon";
 
 const actionStyles = {
   width: 8,
@@ -86,65 +80,6 @@ export const ActionButton = forwardRef<IconButtonProps, "button">(
 type WithOptionalURL = Omit<LinkProps, "href"> & {
   href?: string | undefined;
 };
-
-export function Bell({ href = "/notifications", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} {...props}>
-      <BellIcon width="1.25em" />
-    </Action>
-  );
-}
-
-export function Home({ href = "/", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} title="Home" {...props}>
-      <HomeIcon width="1.25em" />
-    </Action>
-  );
-}
-
-export function Login({ href = "/register", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} title="Sign up or Log in" {...props}>
-      <LoginIcon width="1.5em" />
-    </Action>
-  );
-}
-
-export function Create({ href = "/new", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} title="New thread" {...props}>
-      <SpeechPlusIcon width="1.25em" />
-    </Action>
-  );
-}
-
-export function Dashboard({ href = "/dashboard", ...props }: WithOptionalURL) {
-  return (
-    <Action href={href} title="Dashboard" {...props}>
-      <Bars3Icon width="1.25em" />
-    </Action>
-  );
-}
-
-export const Settings = forwardRef(
-  (
-    { "aria-label": al, href = "/settings", ...props }: WithOptionalURL,
-    ref,
-  ) => {
-    return (
-      <Action
-        ref={ref}
-        title="Settings"
-        aria-label={al ?? "settings"}
-        href={href}
-        {...props}
-      >
-        <Cog6ToothIcon width="1.25em" />
-      </Action>
-    );
-  },
-);
 
 export type WithOptionalARIALabel = Omit<IconButtonProps, "aria-label"> & {
   "aria-label"?: string | undefined;
