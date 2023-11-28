@@ -1,4 +1,4 @@
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 import { ProfileReference } from "src/api/openapi/schemas";
 
@@ -11,7 +11,7 @@ export type Props = {
 
 export function Handle({ profileReference, size }: Props) {
   return (
-    <styled.p fontSize={size === "lg" ? "md" : "sm"} display="flex">
+    <styled.p fontSize={size === "lg" ? "md" : "sm"} display="flex" gap="1">
       <styled.span
         whiteSpace="nowrap"
         textOverflow="ellipsis"
@@ -27,7 +27,7 @@ export function Handle({ profileReference, size }: Props) {
           alignItems="center"
           title="Admin"
         >
-          <CheckBadgeIcon height="1rem" />
+          <ShieldCheckIcon height="1rem" />
         </styled.span>
       )}
     </styled.p>
