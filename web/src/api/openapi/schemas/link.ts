@@ -7,6 +7,8 @@
  */
 import type { AssetList } from "./assetList";
 import type { LinkDescription } from "./linkDescription";
+import type { LinkDomain } from "./linkDomain";
+import type { LinkSlug } from "./linkSlug";
 import type { LinkTitle } from "./linkTitle";
 import type { Url } from "./url";
 
@@ -18,5 +20,7 @@ export interface Link {
   url: Url;
   title?: LinkTitle;
   description?: LinkDescription;
+  slug: LinkSlug;
+  domain: LinkDomain;
   assets: AssetList;
 }

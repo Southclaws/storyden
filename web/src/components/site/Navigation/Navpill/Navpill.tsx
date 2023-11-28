@@ -16,6 +16,7 @@ import { Input } from "src/theme/components/Input";
 import { ComposeAction } from "../../Action/Compose";
 import { DashboardAction } from "../../Action/Dashboard";
 import { HomeAction } from "../../Action/Home";
+import { LinksAction } from "../../Action/Links";
 import { NotificationsAction } from "../../Action/Notifications";
 
 import { HStack, styled } from "@/styled-system/jsx";
@@ -44,6 +45,7 @@ export function Navpill() {
                 <HStack>
                   <HomeAction />
                   <NotificationsAction />
+                  <LinksAction />
                   <Logout />
                 </HStack>
                 <HStack>
