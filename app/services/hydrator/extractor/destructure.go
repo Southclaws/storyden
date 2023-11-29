@@ -33,6 +33,11 @@ func Destructure(markdown string) EnrichedProperties {
 	var walk func(n ast.Node)
 	walk = func(n ast.Node) {
 		switch node := n.(type) {
+		case *ast.Link:
+			if parsed, err := url.Parse(string(node.Destination)); err == nil {
+				links = append(links, parsed.String())
+			}
+
 		case *ast.Text:
 			if len(node.Literal) == 0 {
 				return
@@ -41,12 +46,6 @@ func Destructure(markdown string) EnrichedProperties {
 			oneline := bytes.ReplaceAll(node.Literal, []byte("\n"), []byte(" "))
 			textonly.Write(oneline)
 			textonly.WriteByte(' ')
-
-			if strings.HasPrefix(string(oneline), "http") {
-				if parsed, err := url.Parse(string(oneline)); err == nil {
-					links = append(links, parsed.String())
-				}
-			}
 
 		default:
 			container := n.AsContainer()

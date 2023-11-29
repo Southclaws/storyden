@@ -135,11 +135,10 @@ func (s *service) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagr
 
 func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []item.Option) {
 	text, textOK := partial.Content.Get()
-	url, urlOK := partial.URL.Get()
 
-	if !textOK && !urlOK {
+	if !textOK && !partial.URL.Ok() {
 		return
 	}
 
-	return s.hydrator.HydrateItem(ctx, text, url)
+	return s.hydrator.HydrateItem(ctx, text, partial.URL)
 }
