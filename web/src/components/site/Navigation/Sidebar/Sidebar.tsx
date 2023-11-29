@@ -48,7 +48,7 @@ export function Sidebar() {
           justifyContent="space-between"
           alignItems="start"
         >
-          <VStack width="full" alignItems="start" overflow="hidden">
+          <VStack width="full" alignItems="start">
             <Title>{title}</Title>
 
             <Toolbar />
