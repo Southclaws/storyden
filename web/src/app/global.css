@@ -159,3 +159,10 @@ body {
     padding-top: var(--spacing-2);
   }
 }
+
+/* Chakra makes this impossible to remove so we gotta break out !important... */
+*,
+*::before,
+&::after {
+  border-color: var(--colors-black-alpha-200) !important;
+}
