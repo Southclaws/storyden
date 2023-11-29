@@ -1,11 +1,10 @@
 "use client";
 
 import { CacheProvider } from "@chakra-ui/next-js";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
 import { AuthProvider } from "src/auth/AuthProvider";
-import { extended } from "src/theme";
 
 // Force chakra to always be light mode - because we're removing it eventually.
 type ColourMode = "light" | "dark";
@@ -24,7 +23,25 @@ export function Providers({ children }: PropsWithChildren) {
   return (
     <CacheProvider>
       <ChakraProvider
-        theme={extended}
+        theme={extendTheme({
+          styles: {
+            // Remove the Chakra defaults - we don't need them with Panda.
+            // https://chakra-ui.com/docs/styled-system/global-styles#default-styles
+            global: {
+              body: {
+                fontFamily: "unset",
+                color: "unset",
+                bg: "unset",
+                lineHeight: "unset",
+              },
+
+              "*, *::before, &::after": {
+                borderColor: "unset",
+                wordWrap: "unset",
+              },
+            },
+          },
+        })}
         // We're not using Chakra's reset, instead we're using Panda CSS.
         resetCSS={false}
         colorModeManager={noopColourModeManager}

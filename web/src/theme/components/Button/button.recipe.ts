@@ -18,6 +18,7 @@ export const button = defineRecipe({
     alignItems: "center",
     appearance: "none",
     borderRadius: "lg",
+    boxShadow: "xs",
     cursor: "pointer",
     display: "inline-flex",
     fontWeight: "semibold",
@@ -51,10 +52,13 @@ export const button = defineRecipe({
   variants: {
     kind: {
       neutral: {
-        borderWidth: "1px",
-        borderColor: "border.default",
+        // TODO: Add back when chakra is removed.
+        // borderWidth: "1px",
+        // borderColor: "border.default",
+        backgroundColor: "blackAlpha.100",
         _hover: {
           background: "gray.100",
+          boxShadow: "md",
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -71,6 +75,7 @@ export const button = defineRecipe({
         color: "accent.text.500",
         _hover: {
           backgroundColor: "accent.400",
+          boxShadow: "md",
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -87,6 +92,7 @@ export const button = defineRecipe({
         color: "accent.text.200",
         _hover: {
           backgroundColor: "gray.300",
+          boxShadow: "md",
         },
         _active: {
           backgroundColor: "gray.400",
@@ -98,6 +104,7 @@ export const button = defineRecipe({
         color: "white",
         _hover: {
           backgroundColor: "rose.500",
+          boxShadow: "md",
         },
         _active: {
           backgroundColor: "rose.700",
@@ -107,6 +114,7 @@ export const button = defineRecipe({
       ghost: {
         _hover: {
           backgroundColor: "gray.200",
+          boxShadow: "md",
         },
         _active: {
           backgroundColor: "gray.300",

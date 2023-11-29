@@ -6,6 +6,7 @@ export const link = defineRecipe({
     alignItems: "center",
     appearance: "none",
     borderRadius: "lg",
+    boxShadow: "xs",
     cursor: "pointer",
     display: "inline-flex",
     fontWeight: "semibold",
@@ -27,10 +28,13 @@ export const link = defineRecipe({
   variants: {
     kind: {
       neutral: {
-        borderWidth: "1px",
-        borderColor: "border.default",
+        // TODO: Add back when chakra is removed.
+        // borderWidth: "1px",
+        // borderColor: "border.default",
+        background: "blackAlpha.100",
         _hover: {
           background: "gray.100",
+          boxShadow: "md",
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -46,6 +50,7 @@ export const link = defineRecipe({
         color: "accent.text.500",
         _hover: {
           backgroundColor: "accent.400",
+          boxShadow: "md",
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -61,6 +66,7 @@ export const link = defineRecipe({
         color: "accent.text.200",
         _hover: {
           backgroundColor: "gray.300",
+          boxShadow: "md",
         },
         _active: {
           backgroundColor: "gray.400",
@@ -69,6 +75,7 @@ export const link = defineRecipe({
       ghost: {
         _hover: {
           backgroundColor: "gray.200",
+          boxShadow: "md",
         },
         _active: {
           backgroundColor: "gray.300",
@@ -81,7 +88,7 @@ export const link = defineRecipe({
         h: "6",
         minW: "8",
         textStyle: "xs",
-        px: "1",
+        px: "2",
         gap: "2",
         "& svg": {
           fontSize: "md",
