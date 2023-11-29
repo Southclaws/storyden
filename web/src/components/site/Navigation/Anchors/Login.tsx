@@ -1,10 +1,19 @@
-import { LoginIcon } from "src/components/graphics/LoginIcon";
 import { Link } from "src/theme/components/Link";
 
-export function LoginAction() {
+import { StyleProps } from "@/styled-system/types";
+
+export function LoginAction(props: StyleProps) {
   return (
-    <Link href="/register" kind="ghost" size="sm" p="0">
-      <LoginIcon width="1.5em" />
+    <Link href="/login" kind="secondary" size="sm" {...props}>
+      Login
+    </Link>
+  );
+}
+
+export function RegisterAction(props: StyleProps) {
+  return (
+    <Link href="/register" kind="primary" size="sm" {...props}>
+      Register
     </Link>
   );
 }

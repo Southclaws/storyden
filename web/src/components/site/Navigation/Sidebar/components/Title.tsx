@@ -1,11 +1,12 @@
+import Link from "next/link";
 import { PropsWithChildren } from "react";
 
-import { Heading } from "src/theme/components";
+import { styled } from "@/styled-system/jsx";
 
 export function Title({ children }: PropsWithChildren) {
   return (
-    <Heading size="sm" role="navigation" wordBreak="keep-all">
-      {children}
-    </Heading>
+    <styled.h1 fontSize="lg" fontWeight="bold" wordBreak="keep-all">
+      <Link href="/">{children}</Link>
+    </styled.h1>
   );
 }
