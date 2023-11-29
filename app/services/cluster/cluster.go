@@ -138,11 +138,10 @@ func (s *service) Archive(ctx context.Context, slug datagraph.ClusterSlug) (*dat
 
 func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []cluster.Option) {
 	text, textOK := partial.Content.Get()
-	url, urlOK := partial.URL.Get()
 
-	if !textOK && !urlOK {
+	if !textOK && !partial.URL.Ok() {
 		return
 	}
 
-	return s.hydrator.HydrateCluster(ctx, text, url)
+	return s.hydrator.HydrateCluster(ctx, text, partial.URL)
 }

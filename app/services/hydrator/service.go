@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"
@@ -17,10 +18,10 @@ import (
 )
 
 type Service interface {
-	HydrateThread(ctx context.Context, body, url string) []thread.Option
-	HydrateReply(ctx context.Context, body, url string) []reply.Option
-	HydrateCluster(ctx context.Context, body, url string) []cluster.Option
-	HydrateItem(ctx context.Context, body, url string) []item.Option
+	HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option
+	HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option
+	HydrateCluster(ctx context.Context, body string, url opt.Optional[string]) []cluster.Option
+	HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option
 }
 
 func Build() fx.Option {
@@ -51,7 +52,7 @@ func New(
 	}
 }
 
-func (s *service) HydrateThread(ctx context.Context, body, url string) []thread.Option {
+func (s *service) HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option {
 	short, links, assets := s.hydrate(ctx, body, url)
 
 	return []thread.Option{
@@ -61,7 +62,7 @@ func (s *service) HydrateThread(ctx context.Context, body, url string) []thread.
 	}
 }
 
-func (s *service) HydrateReply(ctx context.Context, body, url string) []reply.Option {
+func (s *service) HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option {
 	short, links, assets := s.hydrate(ctx, body, url)
 
 	return []reply.Option{
@@ -71,7 +72,7 @@ func (s *service) HydrateReply(ctx context.Context, body, url string) []reply.Op
 	}
 }
 
-func (s *service) HydrateCluster(ctx context.Context, body, url string) []cluster.Option {
+func (s *service) HydrateCluster(ctx context.Context, body string, url opt.Optional[string]) []cluster.Option {
 	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []cluster.Option{
@@ -80,7 +81,7 @@ func (s *service) HydrateCluster(ctx context.Context, body, url string) []cluste
 	}
 }
 
-func (s *service) HydrateItem(ctx context.Context, body, url string) []item.Option {
+func (s *service) HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option {
 	_, links, assets := s.hydrate(ctx, body, url)
 
 	return []item.Option{
@@ -91,10 +92,10 @@ func (s *service) HydrateItem(ctx context.Context, body, url string) []item.Opti
 
 // hydrate takes the body and primary URL of a piece of content and fetches all
 // the links and produces a short summary of the post's body text.
-func (s *service) hydrate(ctx context.Context, body, url string) (string, []xid.ID, []asset.AssetID) {
+func (s *service) hydrate(ctx context.Context, body string, urls opt.Optional[string]) (string, []xid.ID, []asset.AssetID) {
 	structured := extractor.Destructure(body)
 
-	urls := append([]string{url}, structured.Links...)
+	urls = append(urls, structured.Links...)
 
 	links := []xid.ID{}
 	assets := []asset.AssetID{}
