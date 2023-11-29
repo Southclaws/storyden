@@ -61,11 +61,10 @@ func (s *service) Create(ctx context.Context,
 
 func (s *service) hydrate(ctx context.Context, partial Partial) (opts []thread.Option) {
 	body, bodyOK := partial.Body.Get()
-	url, urlOK := partial.URL.Get()
 
-	if !bodyOK && !urlOK {
+	if !bodyOK && !partial.URL.Ok() {
 		return
 	}
 
-	return s.hydrator.HydrateThread(ctx, body, url)
+	return s.hydrator.HydrateThread(ctx, body, partial.URL)
 }

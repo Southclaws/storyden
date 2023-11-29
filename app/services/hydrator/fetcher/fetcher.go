@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -17,6 +18,8 @@ import (
 	asset_svc "github.com/Southclaws/storyden/app/services/asset"
 	"github.com/Southclaws/storyden/app/services/url"
 )
+
+var errEmptyLink = fault.New("empty link")
 
 type Service interface {
 	Fetch(ctx context.Context, url string) (*link.Link, error)
@@ -50,6 +53,10 @@ func New(
 }
 
 func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
+	if url == "" {
+		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	r, err := s.lr.Search(ctx, link.WithURL(url))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -78,5 +78,5 @@ func (s *service) hydrate(ctx context.Context, partial Partial) (opts []reply.Op
 		return
 	}
 
-	return s.hydrator.HydrateReply(ctx, body, "")
+	return s.hydrator.HydrateReply(ctx, body, opt.NewEmpty[string]())
 }
