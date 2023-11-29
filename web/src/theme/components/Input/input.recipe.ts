@@ -7,20 +7,25 @@ export const input = defineRecipe({
     backgroundColor: "whiteAlpha.600",
     borderColor: "blackAlpha.50",
     borderRadius: "lg",
-    borderWidth: "1px",
+    // TODO: Add back when chakra is removed.
+    // borderWidth: "1px",
+    boxShadow: "xs",
     outline: 0,
     position: "relative",
     transitionDuration: "normal",
     transitionProperty: "box-shadow, border-color",
     transitionTimingFunction: "default",
     width: "full",
+    _placeholderShown: {
+      color: "fg.subtle",
+    },
     _disabled: {
       opacity: 0.4,
       cursor: "not-allowed",
     },
     _focus: {
       borderColor: "border.accent",
-      boxShadow: "accent",
+      boxShadow: "md",
     },
   },
   defaultVariants: {
