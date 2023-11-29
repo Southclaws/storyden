@@ -70,7 +70,12 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   const doPublish = async ({ title, body, category, url }: FormShape) => {
     if (editing) {
       const { slug } = await threadUpdate(editing, {
+        title,
+        body,
+        category,
         status: ThreadStatus.published,
+        tags: [],
+        url,
       });
       router.push(`/t/${slug}`);
     } else {
