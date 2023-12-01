@@ -283,6 +283,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			assetIDs = append(assetIDs, a.ID)
 		}
 
+		// TODO: Seed from externally via service or API.
 		th, err := tr.Create(ctx,
 			t.Title,
 			t.Author.ID,
@@ -290,6 +291,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			t.Tags,
 			thread.WithID(t.ID),
 			thread.WithBody(first.Body),
+			thread.WithSummary(first.Body),
 			thread.WithStatus(post.StatusPublished),
 			thread.WithAssets(assetIDs),
 		)
@@ -305,6 +307,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 				p.Author.ID,
 				th.ID,
 				reply.WithBody(p.Body),
+				reply.WithShort(p.Short),
 				reply.WithID(p.ID))
 			if err != nil {
 				if ent.IsConstraintError(err) {

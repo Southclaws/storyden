@@ -42,7 +42,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Author: serialiseProfileReference(t.Author),
 		Slug:   t.Slug,
 		Short:  &t.Short,
-		Meta:   t.Meta,
+		Meta:   (*openapi.Metadata)(&t.Meta),
 
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
@@ -62,7 +62,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		CreatedAt: t.CreatedAt,
 		// DeletedAt: t.DeletedAt,
 		Id:        openapi.Identifier(t.ID.String()),
-		Meta:      t.Meta,
+		Meta:      (*openapi.Metadata)(&t.Meta),
 		Pinned:    t.Pinned,
 		Reacts:    dt.Map(t.Reacts, serialiseReact),
 		Short:     &t.Short,
@@ -112,7 +112,7 @@ func serialiseCategory(c *category.Category) openapi.Category {
 		PostCount:   c.PostCount,
 		Admin:       c.Admin,
 		Sort:        c.Sort,
-		Meta:        c.Metadata,
+		Meta:        (*openapi.Metadata)(&c.Metadata),
 	}
 }
 
@@ -125,7 +125,7 @@ func serialiseCategoryReference(c *category.Category) openapi.CategoryReference 
 		Colour:      c.Colour,
 		Description: c.Description,
 		Sort:        c.Sort,
-		Meta:        (openapi.Metadata)(c.Metadata),
+		Meta:        (*openapi.Metadata)(&c.Metadata),
 	}
 }
 

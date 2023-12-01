@@ -30,7 +30,7 @@ export type ThreadReferenceAllOf = {
   readonly post_count: number;
   category: CategoryReference;
   reacts: ReactList;
-  meta: Metadata;
+  meta?: Metadata;
   assets: AssetList;
   collections: CollectionList;
   link?: Link;
