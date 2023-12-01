@@ -3,11 +3,11 @@ package hydrator
 import (
 	"context"
 
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"

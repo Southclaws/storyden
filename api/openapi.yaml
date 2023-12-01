@@ -2391,7 +2391,7 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [id, handle, name, createdAt, interests]
+        - required: [handle, name, createdAt, interests]
           properties:
             handle:
               $ref: "#/components/schemas/AccountHandle"
@@ -2435,7 +2435,7 @@ components:
 
     CategoryCommonProps:
       type: object
-      required: [name, slug, description, colour, sort, admin, meta]
+      required: [name, slug, description, colour, sort, admin]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -2571,7 +2571,6 @@ components:
             - post_count
             - category
             - reacts
-            - meta
             - assets
             - collections
           properties:
@@ -2615,8 +2614,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/ThreadReference"
         - type: object
-          required:
-            [title, slug, short, pinned, author, tags, posts, category, reacts]
+          required: [posts]
           properties:
             posts: { $ref: "#/components/schemas/PostList" }
 

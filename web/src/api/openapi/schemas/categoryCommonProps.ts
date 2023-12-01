@@ -16,5 +16,5 @@ export interface CategoryCommonProps {
   colour: string;
   sort: number;
   admin: boolean;
-  meta: Metadata;
+  meta?: Metadata;
 }
