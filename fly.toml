@@ -1,4 +1,4 @@
-# fly.toml file generated for storyden on 2022-09-07T20:39:55+01:00
+# Storyden's primary live site is also Makeroom's home page!
 
 app          = "storyden"
 kill_signal  = "SIGINT"
@@ -6,9 +6,9 @@ kill_timeout = 5
 processes    = []
 
 [env]
-  COOKIE_DOMAIN      = "demo.storyden.org"
+  COOKIE_DOMAIN      = "makeroom.club"
   PUBLIC_API_ADDRESS = "https://storyden.fly.dev"
-  PUBLIC_WEB_ADDRESS = "https://demo.storyden.org"
+  PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
   # S3 credentials are specified via Fly secrets.
   ASSET_STORAGE_TYPE = "s3"
