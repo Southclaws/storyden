@@ -19,6 +19,11 @@ export function AuthMethodSettings() {
   return (
     <SettingsSection gap="4">
       <Heading size="md">Authentication methods</Heading>
+      <p>
+        We recommend you add more than one method of authentication to your
+        account. This will help you recover your account if you lose access to
+        one of your devices.
+      </p>
       {available.password && <Password active={active.password.length > 0} />}
       {available.webauthn && <Devices active={active.webauthn} />}
       <OAuth active={active.methods} available={available.oauth} />
