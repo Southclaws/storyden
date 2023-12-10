@@ -10,8 +10,9 @@ import (
 
 // Config represents environment variable configuration parameters
 type Config struct {
-	Production bool          `envconfig:"PRODUCTION" default:"false"`
-	LogLevel   zapcore.Level `envconfig:"LOG_LEVEL"  default:"info"`
+	Production  bool          `envconfig:"PRODUCTION"   default:"false"`
+	LogLevel    zapcore.Level `envconfig:"LOG_LEVEL"    default:"info"`
+	RunFrontend string        `envconfig:"RUN_FRONTEND" default:""`
 
 	DatabaseURL      string `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
 	ListenAddr       string `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`

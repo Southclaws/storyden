@@ -74,5 +74,7 @@ ENV HOSTNAME "0.0.0.0"
 
 VOLUME [ "/data" ]
 
-COPY ./docker/all/docker-entrypoint.sh ./
-ENTRYPOINT ["sh", "./docker-entrypoint.sh"]
+# Instruct the Go process to run the Next.js server too.
+ENV RUN_FRONTEND "server.js"
+
+ENTRYPOINT ["./backend"]
