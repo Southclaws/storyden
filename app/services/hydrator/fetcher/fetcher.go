@@ -106,6 +106,11 @@ func (s *service) copy(ctx context.Context, url string) (*asset.Asset, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		ctx = fctx.WithMeta(ctx, "status", resp.Status)
+		return nil, fault.Wrap(fault.New("failed to get"), fctx.With(ctx))
+	}
+
 	a, err := s.as.Upload(ctx, resp.Body, resp.ContentLength)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
