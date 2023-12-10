@@ -226,6 +226,19 @@ paths:
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/password:
+    post:
+      operationId: AuthPasswordCreate
+      description: |
+        Given the requesting account does not have a password authentication,
+        add a password authentication method to it with the given password.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthPasswordCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
     patch:
       operationId: AuthPasswordUpdate
       description: |
@@ -1225,6 +1238,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPair" }
 
+    AuthPasswordCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthPasswordInitialProps" }
+
     AuthPasswordUpdate:
       content:
         application/json:
@@ -2019,6 +2037,14 @@ components:
           type: string
         token:
           example: "password"
+          type: string
+
+    AuthPasswordInitialProps:
+      type: object
+      required: [password]
+      properties:
+        password:
+          example: "password123"
           type: string
 
     AuthPasswordMutableProps:

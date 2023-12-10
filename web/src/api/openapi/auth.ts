@@ -12,6 +12,7 @@ import { fetcher } from "../client";
 
 import type {
   AuthPasswordBody,
+  AuthPasswordCreateBody,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
@@ -102,6 +103,22 @@ export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
     method: "post",
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
+  });
+};
+
+/**
+ * Given the requesting account does not have a password authentication,
+add a password authentication method to it with the given password.
+
+ */
+export const authPasswordCreate = (
+  authPasswordCreateBody: AuthPasswordCreateBody,
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/password`,
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    data: authPasswordCreateBody,
   });
 };
 

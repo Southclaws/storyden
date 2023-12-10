@@ -19,7 +19,7 @@ export function AuthMethodSettings() {
   return (
     <SettingsSection gap="4">
       <Heading size="md">Authentication methods</Heading>
-      {available.password && <Password />}
+      {available.password && <Password active={active.password.length > 0} />}
       {available.webauthn && <Devices active={active.webauthn} />}
       <OAuth active={active.methods} available={available.oauth} />
     </SettingsSection>

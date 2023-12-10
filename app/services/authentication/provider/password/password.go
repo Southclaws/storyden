@@ -20,6 +20,7 @@ var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
 	ErrNoPassword           = errors.New("password not enabled")
+	ErrPasswordAlreadySet   = errors.New("password already enabled")
 	ErrPasswordTooShort     = errors.New("password too short")
 	ErrNotFound             = errors.New("account not found")
 )
@@ -68,14 +69,8 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
 
-	hashed, err := argon2id.CreateHash(password, argon2id.DefaultParams)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
-	}
-
-	_, err = b.auth.Create(ctx, account.ID, id, xid.New().String(), string(hashed), nil)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
+	if err := b.addPasswordAuth(ctx, account.ID, password); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return account, nil
@@ -133,6 +128,38 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 	return &a.Account, nil
 }
 
+func (b *Provider) Create(ctx context.Context, aid account.AccountID, password string) (*account.Account, error) {
+	if len(password) < 8 {
+		return nil, fault.Wrap(ErrPasswordTooShort,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
+	}
+
+	acc, err := b.ar.GetByID(ctx, aid)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
+	}
+
+	_, exists, err := b.auth.LookupByHandle(ctx, id, acc.Handle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if exists {
+		return nil, fault.Wrap(ErrPasswordAlreadySet,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("already has password", "The specified account already uses password authentication."))
+	}
+
+	if err := b.addPasswordAuth(ctx, acc.ID, password); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return acc, nil
+}
+
 func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpassword, newpassword string) (*account.Account, error) {
 	if len(newpassword) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
@@ -181,4 +208,18 @@ func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpasswor
 	}
 
 	return &auth.Account, nil
+}
+
+func (b *Provider) addPasswordAuth(ctx context.Context, accountID account.AccountID, password string) error {
+	hashed, err := argon2id.CreateHash(password, argon2id.DefaultParams)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
+	}
+
+	_, err = b.auth.Create(ctx, accountID, id, xid.New().String(), string(hashed), nil)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
+	}
+
+	return nil
 }
