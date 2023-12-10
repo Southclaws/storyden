@@ -20,7 +20,7 @@ const FormSchema = z.object({
 });
 type Form = z.infer<typeof FormSchema>;
 
-export function usePassword() {
+export function usePasswordUpdate() {
   const {
     register,
     handleSubmit,

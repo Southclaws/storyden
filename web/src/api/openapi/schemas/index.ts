@@ -36,6 +36,8 @@ export * from "./assetUploadOKResponse";
 export * from "./attestationConveyancePreference";
 export * from "./authPair";
 export * from "./authPasswordBody";
+export * from "./authPasswordCreateBody";
+export * from "./authPasswordInitialProps";
 export * from "./authPasswordMutableProps";
 export * from "./authPasswordUpdateBody";
 export * from "./authProvider";
