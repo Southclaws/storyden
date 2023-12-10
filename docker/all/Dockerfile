@@ -3,10 +3,16 @@ FROM golang:latest as api-builder
 RUN git config --global --add safe.directory /server
 
 WORKDIR /server
-ADD . .
 
-RUN go install github.com/go-task/task/v3/cmd/task@latest
-RUN task backend
+COPY go.mod go.sum ./
+RUN go mod download
+
+ADD ./app ./app
+ADD ./cmd ./cmd
+ADD ./internal ./internal
+ADD ./Taskfile.yml .
+
+RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/backend
 
 FROM node:18-alpine AS base
 
@@ -32,6 +38,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY ./web .
 
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_BUILD_STANDALONE true
 
 RUN yarn build
 
@@ -46,26 +53,26 @@ ENV NODE_ENV production
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 storyden
+RUN adduser --system --uid 1001 storyden
+RUN chown storyden:storyden /app
+USER storyden
 
 COPY --from=builder /app/public ./public
 
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+RUN mkdir .next && mkdir data
 
-COPY --from=api-builder --chown=nextjs:nodejs /server/backend.exe ./backend.exe
+COPY --from=api-builder --chown=storyden:storyden /server/backend ./backend
+COPY --from=builder --chown=storyden:storyden /app/.next/standalone ./
+COPY --from=builder --chown=storyden:storyden /app/.next/static ./.next/static
 
-# Not enabled currently.
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# TODO: Spin up the backend server here too.
-CMD ["node", "server.js"]
+VOLUME [ "/data" ]
+
+COPY ./docker/all/docker-entrypoint.sh ./
+ENTRYPOINT ["sh", "./docker-entrypoint.sh"]

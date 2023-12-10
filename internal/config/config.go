@@ -13,7 +13,7 @@ type Config struct {
 	Production bool          `envconfig:"PRODUCTION" default:"false"`
 	LogLevel   zapcore.Level `envconfig:"LOG_LEVEL"  default:"info"`
 
-	DatabaseURL      string `envconfig:"DATABASE_URL"           default:"sqlite://data.db?_pragma=foreign_keys(1)"`
+	DatabaseURL      string `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
 	ListenAddr       string `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
 	CookieDomain     string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
 	SessionKey       string `envconfig:"SESSION_KEY"            default:"0000000000000000"`
