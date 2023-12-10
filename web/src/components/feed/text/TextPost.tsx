@@ -31,7 +31,7 @@ export function TextPost(props: Props) {
           </Heading>
         </Flex>
 
-        <styled.p maxLines={3}>{props.thread.short}</styled.p>
+        <styled.p lineClamp={3}>{props.thread.short}</styled.p>
 
         <Flex justifyContent="space-between">
           <Byline

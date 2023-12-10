@@ -40,10 +40,8 @@ export function LinkView({ link, asset }: Props) {
             {link.title}
           </LinkOverlay>
         </styled.h2>
-        <Box maxLines={1} overflow="hidden">
-          <styled.p maxLines={2} lineClamp={2}>
-            {link.description}
-          </styled.p>
+        <Box lineClamp={1} overflow="hidden">
+          <styled.p lineClamp={2}>{link.description}</styled.p>
           <br />
         </Box>
       </VStack>
