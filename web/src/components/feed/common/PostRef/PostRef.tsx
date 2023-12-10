@@ -53,7 +53,7 @@ export function PostRef({ kind, item }: Props) {
           </Heading>
         </Flex>
 
-        <styled.p maxLines={3}>{data.short}</styled.p>
+        <styled.p lineClamp={3}>{data.short}</styled.p>
 
         <Flex justifyContent="space-between">
           <Byline
