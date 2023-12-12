@@ -5,6 +5,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/db"
+	"github.com/Southclaws/storyden/internal/frontend"
 	"github.com/Southclaws/storyden/internal/logger"
 	"github.com/Southclaws/storyden/internal/object"
 	"github.com/Southclaws/storyden/internal/securecookie"
@@ -20,5 +21,6 @@ func Build() fx.Option {
 		sms.Build(),
 		fx.Provide(webauthn.New),
 		object.Build(),
+		frontend.Build(),
 	)
 }
