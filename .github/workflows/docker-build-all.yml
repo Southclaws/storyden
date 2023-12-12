@@ -7,10 +7,10 @@ env:
   REGISTRY: ghcr.io
   DOCKERFILE: ./docker/all/Dockerfile
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_KIND: backend-only
+  IMAGE_KIND: fullstack
 
 jobs:
-  backend-build:
+  fullstack-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
         with:
           flavor: |
             latest=auto
-            suffix=${{ env.IMAGE_KIND }},onlatest=true
+            suffix=-${{ env.IMAGE_KIND }},onlatest=true
 
           tags: |
             type=sha
