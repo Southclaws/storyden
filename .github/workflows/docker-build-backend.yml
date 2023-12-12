@@ -20,13 +20,14 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           flavor: |
-            latest=false
+            latest=auto
             suffix=-${{ env.IMAGE_KIND }},onlatest=true
 
           tags: |
             type=sha
             type=edge,branch=main
             type=raw,value={{date 'YYYY-MM-DD-HH-mm'}},enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_default_branch}}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Set up QEMU
