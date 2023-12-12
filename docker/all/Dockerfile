@@ -40,7 +40,10 @@ COPY ./web .
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NEXT_BUILD_STANDALONE true
 
-RUN yarn build
+# NOTE: A regular Next.js build will attempt to do static generation for every
+# page. But we don't want to constantly be adding force-dynamic to every page so
+# this ensures no SSG runs during the Docker build.
+RUN yarn next experimental-compile
 
 #
 # RUNTIME IMAGE
