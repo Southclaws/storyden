@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   DOCKERFILE: ./docker/api/Dockerfile
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_KIND: backend-only
+  IMAGE_KIND: backend
 
 jobs:
   backend-build:
