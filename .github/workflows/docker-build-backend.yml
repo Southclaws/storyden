@@ -1,11 +1,13 @@
-name: Build backend
+name: Build backend image
 
 on:
   push:
 
 env:
   REGISTRY: ghcr.io
+  DOCKERFILE: ./docker/api/Dockerfile
   IMAGE_NAME: ${{ github.repository }}
+  IMAGE_KIND: backend
 
 jobs:
   backend-build:
@@ -17,6 +19,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
+          flavor: |
+            latest=false
+            suffix=-${{ env.IMAGE_KIND }},onlatest=true
+
           tags: |
             type=sha
             type=edge,branch=main
@@ -48,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
+          file: ${{ env.DOCKERFILE }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache

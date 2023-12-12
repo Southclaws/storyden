@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 
+const isStandalone = process.env.NEXT_BUILD_STANDALONE === "true";
+
 const nextConfig = {
+  output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
   swcMinify: true,
   async rewrites() {

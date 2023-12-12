@@ -1,14 +1,15 @@
 home/
+web/
 
 .env
 .task
 
 data/
-web/node_modules/
+node_modules/
 
 *.exe
 *.db
 
 .DS_Store
 
-__debug_bin*
+__debug_bin
