@@ -21,8 +21,7 @@ jobs:
         with:
           flavor: |
             latest=auto
-            suffix=-${{ env.IMAGE_KIND }},onlatest=true
-
+            suffix=-${{ env.IMAGE_KIND }},onlatest=false
           tags: |
             type=sha
             type=edge,branch=main
