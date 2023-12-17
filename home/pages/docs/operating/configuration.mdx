@@ -7,9 +7,11 @@ description: Reference for configuring Storyden with environment variables.
 
 "Configuration" throughout the documentation and codebase refers to these variables which are statically set when the process launches. Changing them requires a restart, however they don't need to be changed much once set.
 
-## Environment variables
-
 Configuration is done via environment variables. The following variables are available:
+
+## Core parameters
+
+These settings are necessary to customise for pretty much all production installations.
 
 ### `PRODUCTION`
 
@@ -22,20 +24,6 @@ When true:
 - emails will be logged instead of sent.
 - SMS messages will be logged instead of sent.
 - other behaviour that, generally, only developers of Storyden will care about.
-
-### `LOG_LEVEL`
-
-> default: `info`
-
-See [`zapcore.Level`](https://pkg.go.dev/go.uber.org/zap/zapcore#Level).
-
-### `RUN_FRONTEND`
-
-> default: (empty)
-
-Internal or advanced use only. A directory path that, when non-empty, be used to run the frontend Next.js app from.
-
-The all-in-one Docker image uses this to ensure the frontend process is a child process of the backend process and they start/stop together. If you're self-hosting outside of Docker, you should not need to use this because it's simpler to use your preferred job management solution (such as systemd) to manage both processes independently.
 
 ### `DATABASE_URL`
 
@@ -55,40 +43,59 @@ The interface bind address. Usually you won't ever need to change this.
 
 This is important as it affects the ability for users to authenticate. It's used for both cookies and WebAuthn.
 
+
 Warning: Changing this will break WebAuthn/Passkey sessions. There's a planned workaround coming but currently it's not recommended you switch domains if you allow users to authenticate with WebAuthn/Passkey.
 
 ### `SESSION_KEY`
 
-(todo)
+> default: `0000000000000000`
+
+An encryption key for secure cookies. Do not leave this as the default value for production installations. Changing this value will invalidate all active sessions.
 
 ### `PUBLIC_WEB_ADDRESS`
 
-(todo)
+> default: `http://localhost:3000`
+
+The public address for the frontend application. Change this to your production frontend URL with which you access the web application from via a browser. In production it should not have a port number and should use https.
+
+## Optional
 
 ### `ASSET_STORAGE_TYPE`
 
-(todo)
+> default: empty string - local filesystem storage
+
+When unset, all persistent storage of files (avatars, uploads, assets, etc) will use the local filesystem.
+
+When set to `s3`, the other `S3_` prefixed variables are required and all persistent storage of files will use S3.
 
 ### `ASSET_STORAGE_LOCAL_PATH`
 
-(todo)
+When `ASSET_STORAGE_TYPE` specifies local file storage, this variable controls where the files are stored.
 
-### `S3_ENDPOINT`
+### S3 Configuration
 
-(todo)
+The following variables are required when `ASSET_STORAGE_TYPE` is set to `s3`.
 
-### `S3_BUCKET`
+- `S3_ENDPOINT`
+- `S3_BUCKET`
+- `S3_REGION`
+- `S3_ACCESS_KEY`
+- `S3_SECRET_KEY`
 
-(todo)
+## Internal
 
-### `S3_REGION`
+These are often used during development of Storyden itself, plugins or frontends and rarely need to be set by end-users.
 
-(todo)
+### `LOG_LEVEL`
 
-### `S3_ACCESS_KEY`
+> default: `info`
 
-(todo)
+See [`zapcore.Level`](https://pkg.go.dev/go.uber.org/zap/zapcore#Level).
 
-### `S3_SECRET_KEY`
+### `RUN_FRONTEND`
 
-(todo)
+> default: (empty)
+
+Internal or advanced use only. A directory path that, when non-empty, be used to run the frontend Next.js app from.
+
+The all-in-one Docker image uses this to ensure the frontend process is a child process of the backend process and they start/stop together. If you're self-hosting outside of Docker, you should not need to use this because it's simpler to use your preferred job management solution (such as systemd) to manage both processes independently.
