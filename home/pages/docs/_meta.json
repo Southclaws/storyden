@@ -1,4 +1,9 @@
 {
+    "index": "Introduction",
     "quickstart": "Quickstart",
-    "configuration": "Configuration"
+    "operating": "Operating Storyden",
+    "--Reference": {
+        "type": "separator",
+        "title": "Reference"
+    }
 }

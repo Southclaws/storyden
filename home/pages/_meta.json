@@ -1,7 +1,11 @@
 {
-    "index": "Storyden",
+    "index": {
+        "title": "Storyden",
+        "display": "hidden"
+    },
     "docs": {
-        "title": "Introduction"
+        "type": "page",
+        "title": "Documentation"
     },
     "blog": {
         "title": "Articles",

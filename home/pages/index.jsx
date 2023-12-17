@@ -206,7 +206,7 @@ function Hero() {
           </Grid>
 
           <HStack gap={4}>
-            <Link href="https://airtable.com/shrLY0jDp9CuXPB2X">
+            <Link href="/docs">
               <Button size={{ base: "sm", sm: "md", lg: "lg" }}>
                 Get started
               </Button>
