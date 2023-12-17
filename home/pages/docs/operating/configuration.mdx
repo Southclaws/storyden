@@ -1,0 +1,94 @@
+---
+title: Configuration via Environment Variables
+description: Reference for configuring Storyden with environment variables.
+---
+
+# Configuration
+
+"Configuration" throughout the documentation and codebase refers to these variables which are statically set when the process launches. Changing them requires a restart, however they don't need to be changed much once set.
+
+## Environment variables
+
+Configuration is done via environment variables. The following variables are available:
+
+### `PRODUCTION`
+
+> default: `false`
+
+Used for logging and switching some behaviour to use mocks instead of real services.
+
+When true:
+- logs will be output in JSON.
+- emails will be logged instead of sent.
+- SMS messages will be logged instead of sent.
+- other behaviour that, generally, only developers of Storyden will care about.
+
+### `LOG_LEVEL`
+
+> default: `info`
+
+See [`zapcore.Level`](https://pkg.go.dev/go.uber.org/zap/zapcore#Level).
+
+### `RUN_FRONTEND`
+
+> default: (empty)
+
+Internal or advanced use only. A directory path that, when non-empty, be used to run the frontend Next.js app from.
+
+The all-in-one Docker image uses this to ensure the frontend process is a child process of the backend process and they start/stop together. If you're self-hosting outside of Docker, you should not need to use this because it's simpler to use your preferred job management solution (such as systemd) to manage both processes independently.
+
+### `DATABASE_URL`
+
+> default: a SQLite file located at `./data/data.db`
+
+This specifies the primary database Storyden will persist all its main data in. It can accept Postgres or SQLite URL-style strings.
+
+### `LISTEN_ADDR`
+
+> default: `0.0.0.0:8000`
+
+The interface bind address. Usually you won't ever need to change this.
+
+### `COOKIE_DOMAIN`
+
+> default: `localhost`
+
+This is important as it affects the ability for users to authenticate. It's used for both cookies and WebAuthn.
+
+Warning: Changing this will break WebAuthn/Passkey sessions. There's a planned workaround coming but currently it's not recommended you switch domains if you allow users to authenticate with WebAuthn/Passkey.
+
+### `SESSION_KEY`
+
+(todo)
+
+### `PUBLIC_WEB_ADDRESS`
+
+(todo)
+
+### `ASSET_STORAGE_TYPE`
+
+(todo)
+
+### `ASSET_STORAGE_LOCAL_PATH`
+
+(todo)
+
+### `S3_ENDPOINT`
+
+(todo)
+
+### `S3_BUCKET`
+
+(todo)
+
+### `S3_REGION`
+
+(todo)
+
+### `S3_ACCESS_KEY`
+
+(todo)
+
+### `S3_SECRET_KEY`
+
+(todo)
