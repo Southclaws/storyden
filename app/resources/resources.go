@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link_graph"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post_search"
+	"github.com/Southclaws/storyden/app/resources/profile_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
@@ -46,6 +47,7 @@ func Build() fx.Option {
 			item_search.New,
 			link.New,
 			link_graph.New,
+			profile_search.New,
 		),
 	)
 }

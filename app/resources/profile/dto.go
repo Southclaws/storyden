@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"time"
+
 	"github.com/Southclaws/dt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -9,7 +11,8 @@ import (
 )
 
 type Profile struct {
-	ID account.AccountID
+	ID      account.AccountID
+	Created time.Time
 
 	Handle    string
 	Name      string
@@ -28,6 +31,7 @@ func FromModel(a *ent.Account) (*Profile, error) {
 
 	return &Profile{
 		ID:        account.AccountID(a.ID),
+		Created:   a.CreatedAt,
 		Handle:    a.Handle,
 		Name:      a.Name,
 		Bio:       a.Bio,
