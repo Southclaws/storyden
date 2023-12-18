@@ -17,7 +17,7 @@ export const checkbox = defineSlotRecipe({
       alignItems: "center",
       borderColor: "border.default",
       borderWidth: "1px",
-      color: "accent.fg",
+      color: "fg.muted",
       cursor: "pointer",
       display: "flex",
       justifyContent: "center",
@@ -28,10 +28,10 @@ export const checkbox = defineSlotRecipe({
         background: "bg.subtle",
       },
       _checked: {
-        background: "accent.default",
+        background: "accent.100",
         borderColor: "border.accent",
         _hover: {
-          background: "accent.default",
+          background: "accent.50",
         },
       },
     },

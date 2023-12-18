@@ -1891,6 +1891,10 @@ const tokens = {
     "value": "var(--colors-accent-900)",
     "variable": "var(--colors-accent-900)"
   },
+  "colors.accent": {
+    "value": "var(--colors-accent)",
+    "variable": "var(--colors-accent)"
+  },
   "colors.accent.text.50": {
     "value": "var(--colors-accent-text-50)",
     "variable": "var(--colors-accent-text-50)"
@@ -1930,6 +1934,10 @@ const tokens = {
   "colors.accent.text.900": {
     "value": "var(--colors-accent-text-900)",
     "variable": "var(--colors-accent-text-900)"
+  },
+  "colors.accent.text": {
+    "value": "var(--colors-accent-text)",
+    "variable": "var(--colors-accent-text)"
   },
   "colors.accent.dark.50": {
     "value": "var(--colors-accent-dark-50)",
@@ -1971,6 +1979,10 @@ const tokens = {
     "value": "var(--colors-accent-dark-900)",
     "variable": "var(--colors-accent-dark-900)"
   },
+  "colors.accent.dark": {
+    "value": "var(--colors-accent-dark)",
+    "variable": "var(--colors-accent-dark)"
+  },
   "colors.accent.dark.text.50": {
     "value": "var(--colors-accent-dark-text-50)",
     "variable": "var(--colors-accent-dark-text-50)"
@@ -2010,6 +2022,10 @@ const tokens = {
   "colors.accent.dark.text.900": {
     "value": "var(--colors-accent-dark-text-900)",
     "variable": "var(--colors-accent-dark-text-900)"
+  },
+  "colors.accent.dark.text": {
+    "value": "var(--colors-accent-dark-text)",
+    "variable": "var(--colors-accent-dark-text)"
   },
   "colors.bg.canvas": {
     "value": "var(--colors-bg-canvas)",
@@ -2299,6 +2315,10 @@ const tokens = {
     "value": "var(--colors-color-palette-text-900)",
     "variable": "var(--colors-color-palette-text-900)"
   },
+  "colors.colorPalette.text": {
+    "value": "var(--colors-color-palette-text)",
+    "variable": "var(--colors-color-palette-text)"
+  },
   "colors.colorPalette.dark.50": {
     "value": "var(--colors-color-palette-dark-50)",
     "variable": "var(--colors-color-palette-dark-50)"
@@ -2339,6 +2359,10 @@ const tokens = {
     "value": "var(--colors-color-palette-dark-900)",
     "variable": "var(--colors-color-palette-dark-900)"
   },
+  "colors.colorPalette.dark": {
+    "value": "var(--colors-color-palette-dark)",
+    "variable": "var(--colors-color-palette-dark)"
+  },
   "colors.colorPalette.dark.text.50": {
     "value": "var(--colors-color-palette-dark-text-50)",
     "variable": "var(--colors-color-palette-dark-text-50)"
@@ -2378,6 +2402,10 @@ const tokens = {
   "colors.colorPalette.dark.text.900": {
     "value": "var(--colors-color-palette-dark-text-900)",
     "variable": "var(--colors-color-palette-dark-text-900)"
+  },
+  "colors.colorPalette.dark.text": {
+    "value": "var(--colors-color-palette-dark-text)",
+    "variable": "var(--colors-color-palette-dark-text)"
   },
   "colors.colorPalette.canvas": {
     "value": "var(--colors-color-palette-canvas)",
