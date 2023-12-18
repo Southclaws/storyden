@@ -464,6 +464,21 @@ paths:
   # 888
   #
 
+  /v1/profiles:
+    get:
+      operationId: ProfileList
+      description: Query and search profiles.
+      tags: [profiles]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ProfileListOK" }
+
   /v1/profiles/{account_handle}:
     get:
       operationId: ProfileGet
@@ -1482,6 +1497,13 @@ components:
             type: string
             format: binary
 
+    ProfileListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PublicProfileListResult"
+
     ProfileGetOK:
       description: OK
       content:
@@ -2431,6 +2453,26 @@ components:
               type: string
             interests:
               $ref: "#/components/schemas/TagList"
+
+    PublicProfileListResult:
+      type: object
+      required: [page_size, results, total_pages, current_page, profiles]
+      properties:
+        page_size:
+          type: integer
+        results:
+          type: integer
+        total_pages:
+          type: integer
+        current_page:
+          type: integer
+        next_page:
+          type: integer
+        profiles: { $ref: "#/components/schemas/PublicProfileList" }
+
+    PublicProfileList:
+      type: array
+      items: { $ref: "#/components/schemas/PublicProfile" }
 
     #
     #  .d8888b.           888

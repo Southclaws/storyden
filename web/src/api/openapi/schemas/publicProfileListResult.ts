@@ -9,6 +9,7 @@ import type { PublicProfileList } from "./publicProfileList";
 
 export interface PublicProfileListResult {
   page_size: number;
+  results: number;
   total_pages: number;
   current_page: number;
   next_page?: number;

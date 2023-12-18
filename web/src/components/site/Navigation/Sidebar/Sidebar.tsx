@@ -1,6 +1,6 @@
 "use client";
 
-import { LinkIcon } from "@heroicons/react/24/outline";
+import { LinkIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
 import { Divider } from "src/theme/components";
@@ -82,6 +82,11 @@ export function Sidebar() {
             <Link w="full" size="xs" href="/l">
               <LinkIcon />
               Link directory
+            </Link>
+
+            <Link w="full" size="xs" href="/p">
+              <UsersIcon />
+              Member directory
             </Link>
           </VStack>
 
