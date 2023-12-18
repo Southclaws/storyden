@@ -473,6 +473,7 @@
   --colors-accent-700: var(--accent-colour-flat-fill-700);
   --colors-accent-800: var(--accent-colour-flat-fill-800);
   --colors-accent-900: var(--accent-colour-flat-fill-900);
+  --colors-accent: var(--accent-colour-flat-fill-500);
   --colors-accent-text-50: var(--accent-colour-flat-text-50);
   --colors-accent-text-100: var(--accent-colour-flat-text-100);
   --colors-accent-text-200: var(--accent-colour-flat-text-200);
@@ -483,6 +484,7 @@
   --colors-accent-text-700: var(--accent-colour-flat-text-700);
   --colors-accent-text-800: var(--accent-colour-flat-text-800);
   --colors-accent-text-900: var(--accent-colour-flat-text-900);
+  --colors-accent-text: var(--accent-colour-flat-text-500);
   --colors-accent-dark-50: var(--accent-colour-dark-fill-50);
   --colors-accent-dark-100: var(--accent-colour-dark-fill-100);
   --colors-accent-dark-200: var(--accent-colour-dark-fill-200);
@@ -493,6 +495,7 @@
   --colors-accent-dark-700: var(--accent-colour-dark-fill-700);
   --colors-accent-dark-800: var(--accent-colour-dark-fill-800);
   --colors-accent-dark-900: var(--accent-colour-dark-fill-900);
+  --colors-accent-dark: var(--accent-colour-dark-fill-500);
   --colors-accent-dark-text-50: var(--accent-colour-dark-text-50);
   --colors-accent-dark-text-100: var(--accent-colour-dark-text-100);
   --colors-accent-dark-text-200: var(--accent-colour-dark-text-200);
@@ -503,6 +506,7 @@
   --colors-accent-dark-text-700: var(--accent-colour-dark-text-700);
   --colors-accent-dark-text-800: var(--accent-colour-dark-text-800);
   --colors-accent-dark-text-900: var(--accent-colour-dark-text-900);
+  --colors-accent-dark-text: var(--accent-colour-dark-text-500);
   --colors-bg-canvas: var(--colors-gray-100);
   --colors-bg-default: var(--colors-white);
   --colors-bg-subtle: var(--colors-gray-200);

@@ -14,12 +14,70 @@ import type {
   InternalServerErrorResponse,
   NotFoundResponse,
   ProfileGetOKResponse,
+  ProfileListOKResponse,
+  ProfileListParams,
   UnauthorisedResponse,
 } from "./schemas";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
+/**
+ * Query and search profiles.
+ */
+export const profileList = (params?: ProfileListParams) => {
+  return fetcher<ProfileListOKResponse>({
+    url: `/v1/profiles`,
+    method: "get",
+    params,
+  });
+};
+
+export const getProfileListKey = (params?: ProfileListParams) =>
+  [`/v1/profiles`, ...(params ? [params] : [])] as const;
+
+export type ProfileListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof profileList>>
+>;
+export type ProfileListQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useProfileList = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  params?: ProfileListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof profileList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getProfileListKey(params) : null));
+  const swrFn = () => profileList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 
 /**
  * Get a public profile by ID.
