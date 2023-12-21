@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/internal/object"
 	"github.com/Southclaws/storyden/internal/securecookie"
 	"github.com/Southclaws/storyden/internal/sms"
+	"github.com/Southclaws/storyden/internal/weaviate"
 	"github.com/Southclaws/storyden/internal/webauthn"
 )
 
@@ -22,5 +23,6 @@ func Build() fx.Option {
 		fx.Provide(webauthn.New),
 		object.Build(),
 		frontend.Build(),
+		weaviate.Build(),
 	)
 }

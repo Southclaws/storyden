@@ -56,6 +56,10 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
+	if err := s.semdex.Index(ctx, thr); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to index thread"))
+	}
+
 	return thr, nil
 }
 
