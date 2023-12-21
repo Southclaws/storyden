@@ -10,6 +10,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile"
 )
 
+type Indexable interface {
+	Text() string
+	Props() any
+}
+
 type (
 	ClusterID   xid.ID
 	ClusterSlug string
