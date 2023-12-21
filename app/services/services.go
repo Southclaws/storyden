@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
+	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/services/url"
@@ -44,6 +45,7 @@ func Build() fx.Option {
 		url.Build(),
 		hydrator.Build(),
 		fetcher.Build(),
+		fx.Provide(semdex.New),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(cluster.New, clustertree.New),
 		fx.Provide(item_crud.New, item_tree.New),

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/hydrator"
+	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type Service interface {
@@ -82,6 +83,7 @@ type service struct {
 	account_repo account.Repository
 	thread_repo  thread.Repository
 	hydrator     hydrator.Service
+	semdex       semdex.Service
 }
 
 func New(
@@ -91,6 +93,7 @@ func New(
 	account_repo account.Repository,
 	thread_repo thread.Repository,
 	hydrator hydrator.Service,
+	semdex semdex.Service,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "thread")),
@@ -98,5 +101,6 @@ func New(
 		account_repo: account_repo,
 		thread_repo:  thread_repo,
 		hydrator:     hydrator,
+		semdex:       semdex,
 	}
 }
