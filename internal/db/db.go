@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -50,6 +51,10 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 	return d, x, nil
 }
 
+// This is only used in tests to allow simple concurrent tests without needing
+// to write too much test-specific code for DB stuff. We should use enttest tbh.
+var schema = sync.Mutex{}
+
 func newEntClient(lc fx.Lifecycle, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
@@ -61,6 +66,9 @@ func newEntClient(lc fx.Lifecycle, cfg config.Config, db *sql.DB) (*ent.Client, 
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			schema.Lock()
+			defer schema.Unlock()
+
 			// Run create-only migrations after initialisation.
 			// This is done in tests and scripts too.
 			if err := client.Schema.Create(ctx); err != nil {
