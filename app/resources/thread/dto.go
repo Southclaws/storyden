@@ -42,6 +42,10 @@ type Thread struct {
 
 func (*Thread) GetResourceName() string { return "thread" }
 
+func (t *Thread) Text() string { return t.Posts[0].Body }
+
+func (t *Thread) Props() any { return t.Meta }
+
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()
 	if err != nil {
