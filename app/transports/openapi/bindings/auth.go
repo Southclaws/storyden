@@ -80,8 +80,13 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 
 	// Then look up the account.
 	// TODO: Cache this.
-	_, err = i.ar.GetByID(ctx, aid)
+	a, err := i.ar.GetByID(ctx, aid)
 	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// Reject any requests from suspended accounts.
+	if err := a.RejectSuspended(); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

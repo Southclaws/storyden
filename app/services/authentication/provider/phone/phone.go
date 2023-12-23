@@ -65,6 +65,10 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 
 	var acc *account.Account
 	if exists {
+		if err := acc.RejectSuspended(); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
 		acc = &authrecord.Account
 		if acc.Handle != handle {
 			return nil, fault.Wrap(errHandleMismatch,
@@ -160,6 +164,10 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 			fctx.With(ctx),
 			ftag.With(ftag.NotFound),
 			fmsg.WithDesc("not found", "No account was found with the provided handle."))
+	}
+
+	if err := acc.RejectSuspended(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	auths, err := p.auth.GetAuthMethods(ctx, acc.ID)
