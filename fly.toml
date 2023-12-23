@@ -5,6 +5,9 @@ kill_signal  = "SIGINT"
 kill_timeout = 5
 processes    = []
 
+[build]
+  dockerfile = "docker/api/Dockerfile"
+
 [env]
   COOKIE_DOMAIN      = "makeroom.club"
   PUBLIC_API_ADDRESS = "https://storyden.fly.dev"
