@@ -20,7 +20,8 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
       <Drawer.Root
         open={props.isOpen}
         onOpenChange={onOpenChange}
-        shouldScaleBackground
+        // TODO: Scale background only on mobile.
+        shouldScaleBackground={false}
       >
         <Drawer.Portal>
           <Drawer.Overlay className="modaldrawer__overlay" />
