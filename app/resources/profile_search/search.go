@@ -2,6 +2,7 @@ package profile_search
 
 import (
 	"context"
+	"math"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -74,6 +75,10 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 
 	nextPage := opt.NewSafe(page+1, len(r) >= size)
 
+	if len(r) > 1 {
+		r = r[:len(r)-1]
+	}
+
 	profiles, err := dt.MapErr(r, profile.FromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -82,7 +87,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 	return &Result{
 		PageSize:    size,
 		Results:     len(profiles),
-		TotalPages:  total / size,
+		TotalPages:  int(math.Ceil(float64(total) / float64(size))),
 		CurrentPage: page,
 		NextPage:    nextPage,
 		Profiles:    profiles,
