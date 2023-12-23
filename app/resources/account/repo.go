@@ -2,6 +2,7 @@ package account
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -73,5 +74,15 @@ func SetAdmin(status bool) Mutation {
 func SetInterests(interests []xid.ID) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.ClearTags().AddTagIDs(interests...)
+	}
+}
+
+func SetDeleted(t opt.Optional[time.Time]) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		if v, ok := t.Get(); ok {
+			u.SetDeletedAt(v)
+		} else {
+			u.ClearDeletedAt()
+		}
 	}
 }
