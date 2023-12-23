@@ -113,6 +113,10 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
 	}
 
+	if err := a.Account.RejectSuspended(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	match, _, err := argon2id.CheckHash(password, a.Token)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to compare secure password hash"))
@@ -183,6 +187,10 @@ func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpasswor
 			fctx.With(ctx),
 			ftag.With(ftag.InvalidArgument),
 			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
+	}
+
+	if err := a.RejectSuspended(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	match, _, err := argon2id.CheckHash(oldpassword, auth.Token)

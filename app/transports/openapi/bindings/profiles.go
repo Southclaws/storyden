@@ -92,22 +92,24 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Id:        openapi.Identifier(acc.ID.String()),
+			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
+			DeletedAt: acc.DeletedAt.Ptr(),
 			Bio:       utils.Ref(acc.Bio.OrZero()),
 			Handle:    acc.Handle,
 			Image:     &avatarURL,
 			Name:      acc.Name,
-			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
 		},
 	}, nil
 }
 
 func serialiseProfile(in *profile.Profile) openapi.PublicProfile {
 	return openapi.PublicProfile{
-		Id:     openapi.Identifier(in.ID.String()),
-		Bio:    &in.Bio,
-		Handle: in.Handle,
-		// Image:     &avatarURL,
-		Name:      in.Name,
+		Id:        openapi.Identifier(in.ID.String()),
 		CreatedAt: in.Created.Format(time.RFC3339),
+		DeletedAt: in.Deleted.Ptr(),
+		Bio:       &in.Bio,
+		Handle:    in.Handle,
+		// Image:     &avatarURL,
+		Name: in.Name,
 	}
 }

@@ -29,6 +29,10 @@ func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.Cre
 			fmsg.WithDesc("not found", "No account was found with the provided handle."))
 	}
 
+	if err := acc.RejectSuspended(); err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	ams, err := p.auth_repo.GetAuthMethods(ctx, acc.ID)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
@@ -79,6 +83,10 @@ func (p *Provider) FinishLogin(ctx context.Context,
 			fctx.With(ctx),
 			ftag.With(ftag.NotFound),
 			fmsg.WithDesc("not found", "No account was found with the provided handle."))
+	}
+
+	if err := acc.RejectSuspended(); err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	ams, err := p.auth_repo.GetAuthMethods(ctx, acc.ID)
