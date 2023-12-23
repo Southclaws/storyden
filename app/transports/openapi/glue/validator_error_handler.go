@@ -94,7 +94,7 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 
 			return fault.Wrap(wrapped,
 				fctx.With(ctx),
-				ftag.With(ftag.PermissionDenied),
+				ftag.With(ftag.Unauthenticated),
 				fmsg.WithDesc(sr.Error(), "The request did not contain any authentication information, please check to make sure you are logged in."),
 			)
 		}
