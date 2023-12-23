@@ -513,10 +513,12 @@
   --colors-bg-muted: var(--colors-gray-300);
   --colors-bg-emphasized: var(--colors-gray-400);
   --colors-bg-disabled: var(--colors-gray-300);
+  --colors-bg-destructive: var(--colors-red-300);
   --colors-fg-default: var(--colors-gray-900);
   --colors-fg-muted: var(--colors-gray-600);
   --colors-fg-subtle: var(--colors-gray-500);
   --colors-fg-disabled: var(--colors-gray-400);
+  --colors-fg-destructive: var(--colors-red-500);
   --colors-border-default: var(--colors-black-alpha-200);
   --colors-border-muted: var(--colors-gray-500);
   --colors-border-subtle: var(--colors-gray-300);
@@ -531,7 +533,9 @@
   --colors-bg-subtle: var(--colors-gray-300);
   --colors-bg-muted: var(--colors-gray-400);
   --colors-bg-emphasized: var(--colors-gray-500);
-  --colors-bg-disabled: var(--colors-gray-400)
+  --colors-bg-disabled: var(--colors-gray-400);
+  --colors-bg-destructive: var(--colors-red-400);
+  --colors-fg-destructive: var(--colors-red-400)
 }
   }
   

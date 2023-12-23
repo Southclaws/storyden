@@ -2051,6 +2051,10 @@ const tokens = {
     "value": "var(--colors-bg-disabled)",
     "variable": "var(--colors-bg-disabled)"
   },
+  "colors.bg.destructive": {
+    "value": "var(--colors-bg-destructive)",
+    "variable": "var(--colors-bg-destructive)"
+  },
   "colors.fg.default": {
     "value": "var(--colors-fg-default)",
     "variable": "var(--colors-fg-default)"
@@ -2066,6 +2070,10 @@ const tokens = {
   "colors.fg.disabled": {
     "value": "var(--colors-fg-disabled)",
     "variable": "var(--colors-fg-disabled)"
+  },
+  "colors.fg.destructive": {
+    "value": "var(--colors-fg-destructive)",
+    "variable": "var(--colors-fg-destructive)"
   },
   "colors.border.default": {
     "value": "var(--colors-border-default)",
@@ -2430,6 +2438,10 @@ const tokens = {
   "colors.colorPalette.disabled": {
     "value": "var(--colors-color-palette-disabled)",
     "variable": "var(--colors-color-palette-disabled)"
+  },
+  "colors.colorPalette.destructive": {
+    "value": "var(--colors-color-palette-destructive)",
+    "variable": "var(--colors-color-palette-destructive)"
   },
   "colors.colorPalette.outline": {
     "value": "var(--colors-color-palette-outline)",
