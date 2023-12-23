@@ -123,12 +123,18 @@ export default defineConfig({
             disabled: {
               value: { base: "{colors.gray.300}", _dark: "{colors.gray.400}" },
             },
+            destructive: {
+              value: { base: "{colors.red.300}", _dark: "{colors.red.400}" },
+            },
           },
           fg: {
             default: { value: "{colors.gray.900}" },
             muted: { value: "{colors.gray.600}" },
             subtle: { value: "{colors.gray.500}" },
             disabled: { value: "{colors.gray.400}" },
+            destructive: {
+              value: { base: "{colors.red.500}", _dark: "{colors.red.400}" },
+            },
           },
           border: {
             default: { value: "{colors.blackAlpha.200}" },
