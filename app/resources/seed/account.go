@@ -25,6 +25,7 @@ var (
 	Account_010_Víðarr    = account.Account{ID: account.AccountID(id("00000000000000000100")), Name: "Víðarr", Handle: "víðarr"}
 	Account_011_Váli      = account.Account{ID: account.AccountID(id("00000000000000000110")), Name: "Váli", Handle: "váli"}
 	Account_012_Njörðr    = account.Account{ID: account.AccountID(id("00000000000000000120")), Name: "Njörðr", Handle: "njörðr"}
+	Account_013_Annoying  = account.Account{ID: account.AccountID(id("00000000000000000130")), Name: "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", Handle: "wwwwwwwwwwwwwwwwwwwwwwwwwwwwww"}
 
 	Accounts = []account.Account{
 		Account_001_Odin,
@@ -39,6 +40,7 @@ var (
 		Account_010_Víðarr,
 		Account_011_Váli,
 		Account_012_Njörðr,
+		Account_013_Annoying,
 	}
 )
 
@@ -46,24 +48,51 @@ func accounts(r account.Repository, auth authentication.Repository) {
 	ctx := context.Background()
 
 	for _, v := range Accounts {
-		acc, err := r.Create(ctx, v.Handle,
-			account.WithID(v.ID),
-			account.WithName(v.Name),
-			account.WithBio(v.Bio.OrZero()),
-			account.WithAdmin(v.Admin),
-		)
-		if err != nil {
-			panic(err)
-		}
+		SeedAccount(ctx, r, auth, v)
+	}
 
-		// TODO: email+password auth provider.
-		// email := acc.Handle + "@storyd.en"
-
-		if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
-			panic(err)
-		}
-
+	for i := 0; i < 100; i++ {
+		SeedAccount(ctx, r, auth, account.Account{
+			ID:     account.AccountID(xid.New()),
+			Name:   fmt.Sprintf("Acc%d", i),
+			Handle: fmt.Sprintf("acc%d", i),
+		})
 	}
 
 	fmt.Println("created seed users")
+}
+
+func SeedAccount(ctx context.Context, r account.Repository, auth authentication.Repository, v account.Account) {
+	acc, err := r.Create(ctx, v.Handle,
+		account.WithID(v.ID),
+		account.WithName(v.Name),
+		account.WithBio(v.Bio.OrZero()),
+		account.WithAdmin(v.Admin),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: email+password auth provider.
+	// email := acc.Handle + "@storyd.en"
+
+	if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
+		panic(err)
+	}
+}
+
+func SeedAccountUnique(ctx context.Context, r account.Repository, auth authentication.Repository, opts ...account.Option) {
+	id := account.AccountID(xid.New())
+	handle := fmt.Sprintf("acc%s", id.String())
+
+	opts = append(opts, account.WithID(id), account.WithName(handle))
+
+	acc, err := r.Create(ctx, handle, opts...)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
+		panic(err)
+	}
 }
