@@ -4,11 +4,15 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/ent"
 )
+
+var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
 
 type AccountID xid.ID
 
@@ -25,6 +29,18 @@ type Account struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
+}
+
+func (a *Account) IsSuspended() bool {
+	return a.DeletedAt.Ok()
+}
+
+func (a *Account) RejectSuspended() error {
+	if a.IsSuspended() {
+		return fault.Wrap(errSuspended, ftag.With(ftag.PermissionDenied))
+	}
+
+	return nil
 }
 
 // Name is the role/resource name.
