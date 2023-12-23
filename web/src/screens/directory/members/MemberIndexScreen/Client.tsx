@@ -6,9 +6,16 @@ import { Unready } from "src/components/site/Unready";
 import { Props, useMemberIndexScreen } from "./useMemberIndexScreen";
 
 export function Client(props: Props) {
-  const { ready, data, error } = useMemberIndexScreen(props);
+  const { ready, data, mutate, error } = useMemberIndexScreen(props);
 
   if (!ready) return <Unready {...error} />;
 
-  return <MemberIndexView profiles={data} query={props.query} />;
+  return (
+    <MemberIndexView
+      profiles={data}
+      mutate={mutate}
+      query={props.query}
+      page={props.page}
+    />
+  );
 }

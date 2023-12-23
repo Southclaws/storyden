@@ -8,7 +8,7 @@ export type Props = {
 };
 
 export function useMemberIndexScreen(props: Props) {
-  const { data, error } = useProfileList(
+  const { data, mutate, error } = useProfileList(
     {
       q: props.query,
       page: props.page?.toString(),
@@ -30,5 +30,6 @@ export function useMemberIndexScreen(props: Props) {
   return {
     ready: true as const,
     data,
+    mutate,
   };
 }

@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/services/account"
+	"github.com/Southclaws/storyden/app/services/account_suspension"
 	"github.com/Southclaws/storyden/app/services/asset"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
@@ -32,6 +33,7 @@ func Build() fx.Option {
 		icon.Build(),
 		onboarding.Build(),
 		account.Build(),
+		account_suspension.Build(),
 		authentication.Build(),
 		category.Build(),
 		thread.Build(),
