@@ -1,8 +1,13 @@
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-
 import { PublicProfile } from "src/api/openapi/schemas";
 import { MixedPostList } from "src/components/feed/mixed/MixedPostList";
 import { Unready } from "src/components/site/Unready";
+import {
+  Tabs,
+  TabsContent,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "src/theme/components/Tabs";
 
 import { CollectionList } from "../CollectionList/CollectionList";
 import { PostList } from "../PostList/PostList";
@@ -18,30 +23,32 @@ export function Content(props: PublicProfile) {
 
   return (
     <VStack alignItems="start" w="full">
-      <Tabs width="full" variant="soft-rounded">
-        <TabList>
-          <Tab>Posts</Tab>
-          <Tab>Replies</Tab>
-          <Tab>Collections</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <MixedPostList
-              posts={content.data.threads}
-              onDelete={content.handlers.handleDelete}
-            />
-          </TabPanel>
-          <TabPanel>
-            <Box>
-              <PostList posts={content.data.posts} />
-            </Box>
-          </TabPanel>
-          <TabPanel>
-            <Box>
-              <CollectionList collections={content.data.collections} />
-            </Box>
-          </TabPanel>
-        </TabPanels>
+      <Tabs width="full" variant="line" defaultValue="posts">
+        <TabsList>
+          <TabsTrigger value="posts">Posts</TabsTrigger>
+          <TabsTrigger value="replies">Replies</TabsTrigger>
+          <TabsTrigger value="collections">Collections</TabsTrigger>
+          <TabsIndicator />
+        </TabsList>
+
+        <TabsContent value="posts">
+          <MixedPostList
+            posts={content.data.threads}
+            onDelete={content.handlers.handleDelete}
+          />
+        </TabsContent>
+
+        <TabsContent value="replies">
+          <Box>
+            <PostList posts={content.data.posts} />
+          </Box>
+        </TabsContent>
+
+        <TabsContent value="collections">
+          <Box>
+            <CollectionList collections={content.data.collections} />
+          </Box>
+        </TabsContent>
       </Tabs>
     </VStack>
   );

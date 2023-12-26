@@ -14,6 +14,7 @@ import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
+import { tabs } from "src/theme/components/Tabs/tabs.recipe";
 import { titleInput } from "src/theme/components/TitleInput/titleInput.recipe";
 
 // TODO: Dark mode = 40%
@@ -69,6 +70,7 @@ export default defineConfig({
       button: button,
       link: link,
       menu: menu,
+      tabs: tabs,
       checkbox: checkbox,
       skeleton: skeleton,
     },
