@@ -1,12 +1,6 @@
+import { Popover } from "@ark-ui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import {
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-} from "src/theme/components";
 import { Button } from "src/theme/components/Button";
 
 import { Box, styled } from "@/styled-system/jsx";
@@ -32,21 +26,23 @@ export function ReactList(props: Props) {
       ))}
 
       {authenticated && (
-        <Popover onOpen={onOpen}>
-          <PopoverTrigger>
+        <Popover.Root onOpen={onOpen} portalled>
+          <Popover.Trigger>
             <Button size="xs" aria-label="add">
               <PlusIcon width="1.25em" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverBody m={0} p={0}>
-              <Box id={`${emojiPickerContainerID}-${props.id}`}>
+          </Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Content lazyMount>
+              <Box
+                id={`${emojiPickerContainerID}-${props.id}`}
+                zIndex="dropdown"
+              >
                 [emoji picker]
               </Box>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
+            </Popover.Content>
+          </Popover.Positioner>
+        </Popover.Root>
       )}
     </styled.ul>
   );
