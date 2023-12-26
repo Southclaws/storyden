@@ -55,7 +55,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
         .modaldrawer__overlay {
           position: fixed;
           inset: 0;
-          background-color: var(--chakra-colors-blackAlpha-600);
+          background-color: var(--colors-blackAlpha-600);
           z-index: var(--z-index-overlay);
         }
 

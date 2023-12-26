@@ -52,9 +52,6 @@ export const button = defineRecipe({
   variants: {
     kind: {
       neutral: {
-        // TODO: Add back when chakra is removed.
-        // borderWidth: "1px",
-        // borderColor: "border.default",
         backgroundColor: "blackAlpha.100",
         _hover: {
           background: "gray.100",

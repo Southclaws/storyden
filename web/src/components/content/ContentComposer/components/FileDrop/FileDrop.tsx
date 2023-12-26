@@ -20,9 +20,7 @@ export function FileDrop({ children, ...props }: PropsWithChildren<Props>) {
       onDragOver={(e) => e.preventDefault()}
       style={{
         backgroundColor: dragging ? "gray.50" : undefined,
-        outline: dragging
-          ? "2px var(--chakra-colors-red-200) dashed"
-          : undefined,
+        outline: dragging ? "2px var(--colors-red-200) dashed" : undefined,
         outlineOffset: dragging ? "0.5" : undefined,
       }}
     >
