@@ -21,6 +21,7 @@
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.1",
     "@simplewebauthn/browser": "^8.0.2",
+    "@uidotdev/usehooks": "^2.4.1",
     "colorjs.io": "^0.4.5",
     "date-fns": "^2.29.3",
     "framer-motion": "^10.16.4",
