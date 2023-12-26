@@ -8,3 +8,4 @@ export * from './link';
 export * from './menu';
 export * from './checkbox';
 export * from './skeleton';
+export * from './select';

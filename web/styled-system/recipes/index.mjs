@@ -7,3 +7,4 @@ export * from './link.mjs';
 export * from './menu.mjs';
 export * from './checkbox.mjs';
 export * from './skeleton.mjs';
+export * from './select.mjs';
