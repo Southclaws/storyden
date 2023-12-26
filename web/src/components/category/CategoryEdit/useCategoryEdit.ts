@@ -6,15 +6,16 @@ import { categoryUpdate, useCategoryList } from "src/api/openapi/categories";
 import { useGetInfo } from "src/api/openapi/misc";
 import { APIError, Category } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/site/ErrorBanner";
-import { UseDisclosureProps, useToast } from "src/theme/components";
+import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { useToast } from "src/utils/useToast";
 
 export type Props = {
   category: Category;
 } & UseDisclosureProps;
 
 export const FormSchema = z.object({
-  name: z.string(),
-  description: z.string(),
+  name: z.string().min(1),
+  description: z.string().min(1),
   colour: z.string().default("#fff"), // not implemented yet
   admin: z.boolean().default(false), // not implemented yet
 });

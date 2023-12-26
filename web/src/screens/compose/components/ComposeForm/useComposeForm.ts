@@ -1,4 +1,3 @@
-import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import {
 } from "src/api/openapi/schemas";
 import { threadCreate, threadUpdate } from "src/api/openapi/threads";
 import { errorToast } from "src/components/site/ErrorBanner";
+import { useToast } from "src/utils/useToast";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 

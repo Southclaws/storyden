@@ -1,11 +1,12 @@
-import { Divider, OrderedList, VStack } from "@chakra-ui/react";
 import { Fragment } from "react";
 
 import { Collection } from "src/api/openapi/schemas";
+import { CollectionCreateTrigger } from "src/components/content/CollectionCreate/CollectionCreateTrigger";
 
 import { useProfileContext } from "../../context";
 
-import { CollectionCreate } from "./CollectionCreate/CollectionCreate";
+import { Divider, VStack, styled } from "@/styled-system/jsx";
+
 import { CollectionListItem } from "./CollectionListItem";
 
 type Props = {
@@ -17,16 +18,16 @@ export function CollectionList(props: Props) {
   return (
     <VStack alignItems="start">
       {/* TODO: Actually design this lol */}
-      {isSelf && <CollectionCreate />}
+      {isSelf && <CollectionCreateTrigger />}
 
-      <OrderedList gap={4} display="flex" flexDir="column" width="full" m={0}>
+      <styled.ol gap="4" display="flex" flexDir="column" width="full" m="0">
         {props.collections.map((c) => (
           <Fragment key={c.id}>
             <Divider />
             <CollectionListItem {...c} />
           </Fragment>
         ))}
-      </OrderedList>
+      </styled.ol>
     </VStack>
   );
 }

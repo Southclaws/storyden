@@ -1,11 +1,11 @@
-import { UseDisclosureProps, useToast } from "@chakra-ui/react";
-
 import {
   accountAuthMethodDelete,
   useAccountAuthProviderList,
 } from "src/api/openapi/accounts";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/site/ErrorBanner";
+import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { useToast } from "src/utils/useToast";
 
 export type Props = {
   id: string;

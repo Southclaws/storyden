@@ -1,7 +1,7 @@
-import { useDisclosure } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
 import { Button } from "src/theme/components/Button";
+import { useDisclosure } from "src/utils/useDisclosure";
 
 import { DeleteDeviceModal } from "./DeleteDeviceModal";
 import { Props } from "./useDeleteDeviceScreen";

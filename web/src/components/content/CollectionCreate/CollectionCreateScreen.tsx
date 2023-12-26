@@ -1,12 +1,9 @@
-import { FormHelperText } from "@chakra-ui/react";
-
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  UseDisclosureProps,
-} from "src/theme/components";
 import { Button } from "src/theme/components/Button";
+import { FormControl } from "src/theme/components/FormControl";
+import { FormHelperText } from "src/theme/components/FormHelperText";
+import { FormLabel } from "src/theme/components/FormLabel";
+import { Input } from "src/theme/components/Input";
+import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 

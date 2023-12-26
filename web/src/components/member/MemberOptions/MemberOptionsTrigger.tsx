@@ -1,7 +1,7 @@
-import { useDisclosure } from "@chakra-ui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 
 import { Button } from "src/theme/components/Button";
+import { useDisclosure } from "src/utils/useDisclosure";
 
 import { Box } from "@/styled-system/jsx";
 

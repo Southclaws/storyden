@@ -1,7 +1,10 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import { CloseButton, Heading, UseDisclosureProps } from "src/theme/components";
+import { Heading1 } from "src/theme/components/Heading/Index";
+import { UseDisclosureProps } from "src/utils/useDisclosure";
+
+import { CloseAction } from "../Action/Close";
 
 import { Box, HStack, VStack } from "@/styled-system/jsx";
 
@@ -36,8 +39,8 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               p="4"
             >
               <HStack w="full" justify="space-between">
-                <Heading size="md">{props.title}</Heading>
-                <CloseButton onClick={props.onClose} />
+                <Heading1 size="md">{props.title}</Heading1>
+                <CloseAction onClick={props.onClose} />
               </HStack>
 
               <Box h="full" w="full" pb="3">

@@ -1,6 +1,5 @@
-import { Heading } from "@chakra-ui/react";
-
 import { Unready } from "src/components/site/Unready";
+import { Heading2 } from "src/theme/components/Heading/Index";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
@@ -18,7 +17,7 @@ export function AuthMethodSettings() {
 
   return (
     <SettingsSection gap="4">
-      <Heading size="md">Authentication methods</Heading>
+      <Heading2 size="md">Authentication methods</Heading2>
       <p>
         We recommend you add more than one method of authentication to your
         account. This will help you recover your account if you lose access to

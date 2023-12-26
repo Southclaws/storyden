@@ -1,4 +1,4 @@
-import { Heading } from "@chakra-ui/react";
+import { Heading3 } from "src/theme/components/Heading/Index";
 
 import { VStack } from "@/styled-system/jsx";
 
@@ -12,7 +12,7 @@ export type Props = {
 export function Password(props: Props) {
   return (
     <VStack w="full" alignItems="start">
-      <Heading size="sm">Password</Heading>
+      <Heading3 size="sm">Password</Heading3>
       {props.active ? <PasswordUpdateForm /> : <PasswordCreateForm />}
     </VStack>
   );

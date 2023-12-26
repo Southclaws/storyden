@@ -1,5 +1,5 @@
-import { WithDisclosure } from "src/theme/components";
 import { Button } from "src/theme/components/Button";
+import { WithDisclosure } from "src/utils/useDisclosure";
 
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 

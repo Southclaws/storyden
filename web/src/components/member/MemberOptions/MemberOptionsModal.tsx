@@ -1,5 +1,5 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { WithDisclosure } from "src/theme/components";
+import { WithDisclosure } from "src/utils/useDisclosure";
 
 import { MemberMenuOptionsScreen } from "./MemberOptionsScreen";
 import { Props } from "./useMemberOptionsScreen";

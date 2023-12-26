@@ -1,8 +1,10 @@
-import { Flex, Heading, LinkBox, LinkOverlay, Text } from "@chakra-ui/react";
-import NextLink from "next/link";
+import Link from "next/link";
 
 import { CollectionItem } from "src/api/openapi/schemas";
 import { Byline } from "src/components/content/Byline";
+import { Heading1 } from "src/theme/components/Heading/Index";
+
+import { Flex, styled } from "@/styled-system/jsx";
 
 type Props = { item: CollectionItem };
 
@@ -10,18 +12,16 @@ export function CollectionItemListItem(props: Props) {
   const permalink = `/t/${props.item.slug}`;
 
   return (
-    <Flex as="section" flexDir="column" py={2} width="full" gap={2}>
-      <LinkBox as="article">
+    <styled.section display="flex" flexDir="column" py="2" width="full" gap="2">
+      <styled.article>
         <Flex justifyContent="space-between">
-          <Heading size="sm">
-            <LinkOverlay as={NextLink} href={permalink}>
-              {props.item.title}
-            </LinkOverlay>
-          </Heading>
+          <Heading1 size="sm">
+            <Link href={permalink}>{props.item.title}</Link>
+          </Heading1>
         </Flex>
 
-        <Text noOfLines={3}>{props.item.short}</Text>
-      </LinkBox>
+        <styled.p lineClamp={3}>{props.item.short}</styled.p>
+      </styled.article>
 
       <Flex justifyContent="space-between">
         <Byline
@@ -31,6 +31,6 @@ export function CollectionItemListItem(props: Props) {
           updated={new Date(props.item.updatedAt)}
         />
       </Flex>
-    </Flex>
+    </styled.section>
   );
 }

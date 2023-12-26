@@ -1,9 +1,10 @@
 "use client";
 
-import { Heading, VStack } from "@chakra-ui/react";
-
 import ErrorBanner from "src/components/site/ErrorBanner";
 import { Unready } from "src/components/site/Unready";
+import { Heading1 } from "src/theme/components/Heading/Index";
+
+import { VStack } from "@/styled-system/jsx";
 
 import { BrandSettings } from "./components/BrandSettings/BrandSettings";
 import { useAdminScreen } from "./useAdminScreen";
@@ -16,8 +17,8 @@ export function AdminScreen() {
     return <ErrorBanner message="Not authorised to view this page" />;
 
   return (
-    <VStack alignItems="start" gap={4}>
-      <Heading>Administration</Heading>
+    <VStack alignItems="start" gap="4">
+      <Heading1 size="lg">Administration</Heading1>
 
       <BrandSettings />
     </VStack>

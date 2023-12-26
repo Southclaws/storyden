@@ -1,4 +1,3 @@
-import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
@@ -7,7 +6,8 @@ import { z } from "zod";
 import { categoryCreate, getCategoryListKey } from "src/api/openapi/categories";
 import { APIError } from "src/api/openapi/schemas";
 import { errorToast } from "src/components/site/ErrorBanner";
-import { UseDisclosureProps } from "src/theme/components";
+import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { useToast } from "src/utils/useToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),

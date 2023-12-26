@@ -1,6 +1,6 @@
 import { Portal } from "@ark-ui/react";
 
-import { Bookmark } from "src/components/site/Action/Action";
+import { BookmarkAction } from "src/components/site/Action/Bookmark";
 import { Menu, MenuPositioner, MenuTrigger } from "src/theme/components/Menu";
 
 import { Box } from "@/styled-system/jsx";
@@ -34,7 +34,7 @@ export function CollectionMenu(props: Props) {
         userSelect="none"
       >
         <MenuTrigger asChild>
-          <Bookmark bookmarked={isAlreadySaved} />
+          <BookmarkAction bookmarked={isAlreadySaved} />
         </MenuTrigger>
 
         <Portal>

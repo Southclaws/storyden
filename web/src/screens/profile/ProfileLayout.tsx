@@ -1,7 +1,8 @@
-import { Text, VStack } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
 import { Unready } from "src/components/site/Unready";
+
+import { VStack } from "@/styled-system/jsx";
 
 import { Header } from "./components/Header";
 import { Metadata } from "./components/Metadata";
@@ -12,10 +13,10 @@ export function ProfileLayout(props: PropsWithChildren<Props>) {
   if (!profile.ready) return <Unready {...profile.error} />;
 
   return (
-    <VStack py={4} width="full" alignItems="start" gap={2}>
+    <VStack py="4" width="full" alignItems="start" gap="2">
       <Header {...profile.data} />
       <Metadata {...profile.data} />
-      <Text>{profile.data.bio}</Text>
+      <p>{profile.data.bio}</p>
       {props.children}
     </VStack>
   );

@@ -1,7 +1,8 @@
-import { Button, HStack, VStack } from "@chakra-ui/react";
 import AvatarEditor from "react-avatar-editor";
 
-import { styled } from "@/styled-system/jsx";
+import { Button } from "src/theme/components/Button";
+
+import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useIconEditor } from "./useIconEditor";
 
@@ -12,8 +13,8 @@ export function IconEditor(props: Props) {
     useIconEditor(props);
 
   return (
-    <VStack align="start">
-      <HStack justify="start" align="end">
+    <VStack alignItems="start">
+      <HStack justify="start" alignItems="end">
         <AvatarEditor
           ref={ref}
           image={file}
@@ -27,7 +28,7 @@ export function IconEditor(props: Props) {
           position={position}
           onPositionChange={saving ? undefined : setPosition}
         />
-        <VStack align="start">
+        <VStack alignItems="start">
           <HStack>
             <AvatarEditor
               image={file}
@@ -78,15 +79,8 @@ export function IconEditor(props: Props) {
           onChange={onFileChange}
         />
         <HStack>
-          <Button
-            as="label"
-            htmlFor="file-input"
-            isDisabled={saving}
-            variant="outline"
-          >
-            Edit icon
-          </Button>
-          <Button onClick={onSave} isLoading={saving}>
+          <styled.label htmlFor="file-input">Edit icon</styled.label>
+          <Button onClick={onSave} disabled={saving}>
             Save icon
           </Button>
         </HStack>
