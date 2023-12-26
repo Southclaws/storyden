@@ -25,13 +25,22 @@ type Link struct {
 	Assets      []*asset.Asset
 }
 
+type Result struct {
+	PageSize    int
+	Results     int
+	TotalPages  int
+	CurrentPage int
+	NextPage    opt.Optional[int]
+	Links       []*Link
+}
+
 func (l *Link) AssetIDs() []asset.AssetID {
 	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })
 }
 
 type Repository interface {
 	Store(ctx context.Context, url, title, description string, opts ...Option) (*Link, error)
-	Search(ctx context.Context, filters ...Filter) ([]*Link, error)
+	Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error)
 }
 
 type (
@@ -66,12 +75,6 @@ func WithAssets(ids ...string) Option {
 func WithURL(s string) Filter {
 	return func(lq *ent.LinkQuery) {
 		lq.Where(link.URLContainsFold(s))
-	}
-}
-
-func WithPage(page, size int) Filter {
-	return func(lq *ent.LinkQuery) {
-		lq.Limit(size).Offset(page * size)
 	}
 }
 

@@ -5,9 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { LinkListResult } from "./linkListResult";
+import type { PublicProfileList } from "./publicProfileList";
 
-/**
- * Link list.
- */
-export type LinkListOKResponse = LinkListResult;
+export type PublicProfileListResultAllOf = {
+  profiles: PublicProfileList;
+};

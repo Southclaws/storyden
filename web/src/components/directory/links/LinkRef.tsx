@@ -15,6 +15,7 @@ import {
 
 export function LinkRef(props: LinkSchema) {
   const asset = props.assets?.[0] ?? undefined;
+  const domainSearch = `/l?q=${props.domain}`;
 
   return (
     <styled.article
@@ -52,7 +53,7 @@ export function LinkRef(props: LinkSchema) {
           </styled.a>
         </styled.h2>
 
-        <Link flexShrink="0" kind="ghost" size="xs" href={`/l/${props.slug}`}>
+        <Link flexShrink="0" kind="ghost" size="xs" href={domainSearch}>
           {props.domain}
         </Link>
       </Flex>

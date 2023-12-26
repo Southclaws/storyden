@@ -32,6 +32,7 @@ func (Link) Fields() []ent.Field {
 func (Link) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("url"),
+		index.Fields("slug"),
 	}
 }
 

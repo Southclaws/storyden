@@ -222,6 +222,11 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{LinksColumns[2]},
 			},
+			{
+				Name:    "link_slug",
+				Unique:  false,
+				Columns: []*schema.Column{LinksColumns[3]},
+			},
 		},
 	}
 	// NotificationsColumns holds the columns for the "notifications" table.

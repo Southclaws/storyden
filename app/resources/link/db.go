@@ -3,11 +3,13 @@ package link
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/url"
 	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/internal/ent"
@@ -43,7 +45,7 @@ func (d *database) Store(ctx context.Context, address, title, description string
 		fn(mutate)
 	}
 
-	create.OnConflictColumns("url").UpdateNewValues()
+	create.OnConflictColumns("url", "slug").UpdateNewValues()
 
 	r, err := create.Save(ctx)
 	if err != nil {
@@ -63,8 +65,16 @@ func (d *database) Store(ctx context.Context, address, title, description string
 	return link, nil
 }
 
-func (d *database) Search(ctx context.Context, filters ...Filter) ([]*Link, error) {
-	query := d.db.Link.Query()
+func (d *database) Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error) {
+	total, err := d.db.Link.Query().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	query := d.db.Link.Query().
+		Limit(size + 1).
+		Offset(page * size).
+		Order(ent.Desc(link.FieldCreatedAt))
 
 	for _, fn := range filters {
 		fn(query)
@@ -77,9 +87,22 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*Link, erro
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	nextPage := opt.NewSafe(page+1, len(r) >= size)
+
+	if len(r) > 1 {
+		r = r[:len(r)-1]
+	}
+
 	links := MapA(r)
 
-	return links, nil
+	return &Result{
+		PageSize:    size,
+		Results:     len(links),
+		TotalPages:  int(math.Ceil(float64(total) / float64(size))),
+		CurrentPage: page,
+		NextPage:    nextPage,
+		Links:       links,
+	}, nil
 }
 
 func getLinkAttrs(u url.URL) (string, string) {

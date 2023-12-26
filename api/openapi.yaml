@@ -1777,11 +1777,7 @@ components:
       description: Link list.
       content:
         application/json:
-          schema:
-            type: object
-            required: [links]
-            properties:
-              links: { $ref: "#/components/schemas/LinkList" }
+          schema: { $ref: "#/components/schemas/LinkListResult" }
 
     LinkGetOK:
       description: Link data.
@@ -1949,6 +1945,22 @@ components:
       type: object
       additionalProperties: true
       x-go-type: any
+
+    PaginatedResult:
+      description: To be composed with paginated resource responses.
+      type: object
+      required: [page_size, results, total_pages, current_page]
+      properties:
+        page_size:
+          type: integer
+        results:
+          type: integer
+        total_pages:
+          type: integer
+        current_page:
+          type: integer
+        next_page:
+          type: integer
 
     URL:
       description: A web address
@@ -2481,20 +2493,12 @@ components:
               $ref: "#/components/schemas/TagList"
 
     PublicProfileListResult:
-      type: object
-      required: [page_size, results, total_pages, current_page, profiles]
-      properties:
-        page_size:
-          type: integer
-        results:
-          type: integer
-        total_pages:
-          type: integer
-        current_page:
-          type: integer
-        next_page:
-          type: integer
-        profiles: { $ref: "#/components/schemas/PublicProfileList" }
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [profiles]
+          properties:
+            profiles: { $ref: "#/components/schemas/PublicProfileList" }
 
     PublicProfileList:
       type: array
@@ -3181,6 +3185,14 @@ components:
     LinkList:
       type: array
       items: { $ref: "#/components/schemas/Link" }
+
+    LinkListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [links]
+          properties:
+            links: { $ref: "#/components/schemas/LinkList" }
 
     LinkInitialProps:
       type: object

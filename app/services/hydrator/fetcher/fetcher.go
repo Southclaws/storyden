@@ -57,14 +57,14 @@ func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	r, err := s.lr.Search(ctx, link.WithURL(url))
+	r, err := s.lr.Search(ctx, 0, 1, link.WithURL(url))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	if len(r) > 0 {
+	if len(r.Links) > 0 {
 		// revalidate stale data asynchronously
 		go s.scrapeAndStore(ctx, url)
-		return r[0], nil
+		return r.Links[0], nil
 	}
 
 	return s.scrapeAndStore(ctx, url)

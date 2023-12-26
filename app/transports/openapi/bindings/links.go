@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link_graph"
@@ -47,31 +47,42 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 }
 
 func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObject) (openapi.LinkListResponseObject, error) {
+	pageSize := 50
+
+	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
+		v, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return 0
+		}
+
+		return max(1, int(v))
+	}).Or(1)
+
 	opts := []link.Filter{}
 
 	if v := request.Params.Q; v != nil {
 		opts = append(opts, link.WithKeyword(*v))
 	}
 
-	if v := request.Params.Page; v != nil {
-		pageNumber, err := strconv.ParseInt(*v, 10, 32)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-		}
+	// API is 1-indexed, internally it's 0-indexed.
+	page = max(0, page-1)
 
-		opts = append(opts, link.WithPage(int(pageNumber-1), 50))
-	} else {
-		opts = append(opts, link.WithPage(0, 50))
-	}
-
-	links, err := i.lr.Search(ctx, opts...)
+	result, err := i.lr.Search(ctx, page, pageSize, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// API is 1-indexed, internally it's 0-indexed.
+	page = result.CurrentPage + 1
+
 	return openapi.LinkList200JSONResponse{
 		LinkListOKJSONResponse: openapi.LinkListOKJSONResponse{
-			Links: dt.Map(links, serialiseLink),
+			PageSize:    pageSize,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+			CurrentPage: page,
+			NextPage:    result.NextPage.Ptr(),
+			Links:       dt.Map(result.Links, serialiseLink),
 		},
 	}, nil
 }

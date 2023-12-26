@@ -13,5 +13,5 @@ export async function LinkIndexScreen(props: Omit<Props, "links">) {
     } as LinkListParams,
   });
 
-  return <Client {...props} links={response.links} />;
+  return <Client {...props} links={response} />;
 }
