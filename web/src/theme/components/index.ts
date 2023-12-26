@@ -1,10 +1,4 @@
 import {
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
-  MenuList,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -13,10 +7,6 @@ import {
 } from "@chakra-ui/react";
 
 // NOTE: These are being replaced gradually, so these are being re-exported.
-
-// Menu
-
-export { Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList };
 
 // Popover
 
