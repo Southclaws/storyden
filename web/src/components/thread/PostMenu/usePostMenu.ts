@@ -1,5 +1,6 @@
 "use client";
 
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
@@ -7,8 +8,8 @@ import { postDelete } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
-import { useClipboard, useToast } from "src/theme/components";
 import { isShareEnabled } from "src/utils/client";
+import { useToast } from "src/utils/useToast";
 
 import { useThreadScreenContext } from "../context/context";
 import { getPermalinkForPost } from "../utils";
@@ -18,16 +19,16 @@ export function usePostMenu(props: PostProps) {
   const toast = useToast();
   const account = useSession();
   const { thread, setEditingPostID } = useThreadScreenContext();
-  const { onCopy } = useClipboard(
-    getPermalinkForPost(props.root_slug, props.id),
-  );
+  const [, copyToClipboard] = useCopyToClipboard();
+
+  const permalink = getPermalinkForPost(props.root_slug, props.id);
 
   const shareEnabled = isShareEnabled();
   const editEnabled = account?.id === props.author.id;
   const deleteEnabled = account?.id === props.author.id;
 
   async function onCopyLink() {
-    onCopy();
+    copyToClipboard(permalink);
   }
 
   async function onShare() {

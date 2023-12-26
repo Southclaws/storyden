@@ -1,9 +1,10 @@
 "use client";
 
+import { useCopyToClipboard } from "@uidotdev/usehooks";
+
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
-import { useClipboard } from "src/theme/components";
 import { isShareEnabled } from "src/utils/client";
 
 export type Props = {
@@ -13,14 +14,15 @@ export type Props = {
 
 export function useFeedItemMenu(props: Props) {
   const account = useSession();
-  const { onCopy } = useClipboard(getPermalinkForThread(props.thread.slug));
+  const permalink = getPermalinkForThread(props.thread.slug);
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const shareEnabled = isShareEnabled();
   const deleteEnabled =
     account?.admin || account?.id === props.thread.author.id;
 
   async function onCopyLink() {
-    onCopy();
+    copyToClipboard(permalink);
   }
 
   async function onShare() {
