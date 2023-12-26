@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { LinkRefList } from "src/components/directory/links/LinkRefList";
+import { LinkCardList } from "src/components/directory/links/LinkCardList";
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 import { Button } from "src/theme/components/Button";
@@ -63,7 +63,7 @@ export function LinkIndexView(props: Props) {
         pageSize={data.links.page_size}
       />
 
-      <LinkRefList result={data.links} />
+      <LinkCardList result={data.links} />
     </VStack>
   );
 }

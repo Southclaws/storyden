@@ -13,7 +13,7 @@ import {
   styled,
 } from "@/styled-system/jsx";
 
-export function LinkRef(props: LinkSchema) {
+export function LinkCard(props: LinkSchema) {
   const asset = props.assets?.[0] ?? undefined;
   const domainSearch = `/l?q=${props.domain}`;
 
