@@ -1,15 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { KeyedMutator } from "swr";
 import { z } from "zod";
 
-import { linkList } from "src/api/openapi/links";
-import { Link } from "src/api/openapi/schemas";
+import { LinkListResult } from "src/api/openapi/schemas";
 
 export type Props = {
-  links: Link[];
+  links: LinkListResult;
+  mutate?: KeyedMutator<LinkListResult>;
   query?: string;
+  page?: number;
 };
 
 export const FormSchema = z.object({
@@ -19,7 +20,6 @@ export type Form = z.infer<typeof FormSchema>;
 
 export function useLinkIndexView(props: Props) {
   const router = useRouter();
-  const [results, setResults] = useState<Link[]>(props.links);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -29,30 +29,34 @@ export function useLinkIndexView(props: Props) {
 
   const { q } = form.watch();
 
-  const handleSubmission = form.handleSubmit(async (payload) => {
-    const { links } = await linkList(payload);
+  const handlePage = async (page: number) => {
+    router.push(`/p?q=${q}&page=${page}`);
+  };
 
+  const handleSubmission = form.handleSubmit(async (payload) => {
     router.push(`/l?q=${payload.q}`);
-    setResults(links);
   });
 
   const handleReset = async () => {
-    const { links } = await linkList();
-
     form.reset();
     router.push("/l");
-    setResults(links);
+  };
+
+  const handleMutate = async () => {
+    await props.mutate?.();
   };
 
   return {
     form,
     data: {
       q,
-      links: results,
+      links: props.links,
     },
     handlers: {
+      handlePage,
       handleSubmission,
       handleReset,
+      handleMutate,
     },
   };
 }

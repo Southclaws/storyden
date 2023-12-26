@@ -62,7 +62,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 	q := d.db.Account.Query().
 		Limit(size + 1).
 		Offset(page * size).
-		Order(ent.Asc(account.FieldCreatedAt))
+		Order(ent.Desc(account.FieldCreatedAt))
 
 	for _, fn := range filters {
 		fn(q)

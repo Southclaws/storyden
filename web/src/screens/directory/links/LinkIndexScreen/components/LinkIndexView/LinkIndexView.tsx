@@ -1,6 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { LinkRefList } from "src/components/directory/links/LinkRefList";
+import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 import { Button } from "src/theme/components/Button";
 import { Input } from "src/theme/components/Input";
@@ -53,7 +54,16 @@ export function LinkIndexView(props: Props) {
         </Button>
       </styled.form>
 
-      <LinkRefList links={data.links} />
+      <PaginationControls
+        path="/l"
+        params={{ q: data.q }}
+        onClick={handlers.handlePage}
+        currentPage={props.page ?? 1}
+        totalPages={data.links.total_pages}
+        pageSize={data.links.page_size}
+      />
+
+      <LinkRefList result={data.links} />
     </VStack>
   );
 }
