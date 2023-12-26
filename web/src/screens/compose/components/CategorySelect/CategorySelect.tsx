@@ -1,14 +1,12 @@
-import {
-  FormControl,
-  FormErrorMessage,
-  Select,
-  SelectProps,
-} from "@chakra-ui/react";
 import { map } from "lodash/fp";
 import { Controller } from "react-hook-form";
 
 import { Category } from "src/api/openapi/schemas";
 import { Unready } from "src/components/site/Unready";
+import { FormControl } from "src/theme/components/FormControl";
+import { FormErrorText } from "src/theme/components/FormErrorText";
+
+import { styled } from "@/styled-system/jsx";
 
 import { useCategorySelect } from "./useCategorySelect";
 
@@ -18,23 +16,31 @@ const mapCategories = map((c: Category) => (
   </option>
 ));
 
-export function CategorySelect({ ...props }: SelectProps) {
+export function CategorySelect() {
   const { control, fieldError, categories, error } = useCategorySelect();
 
   if (!categories) return <Unready {...error} />;
 
   return (
-    <FormControl isInvalid={!!fieldError}>
+    <FormControl>
       <Controller
         render={() => (
-          <Select w="max-content" size="xs" borderRadius="lg" {...props}>
+          <styled.select
+            w="max"
+            backgroundColor="whiteAlpha.600"
+            borderColor="blackAlpha.50"
+            borderRadius="lg"
+            boxShadow="xs"
+            py="1"
+            px="2"
+          >
             {mapCategories(categories)}
-          </Select>
+          </styled.select>
         )}
         control={control}
         name="category"
       />
-      <FormErrorMessage>{fieldError?.message}</FormErrorMessage>
+      <FormErrorText>{fieldError?.message}</FormErrorText>
     </FormControl>
   );
 }
