@@ -1,5 +1,6 @@
 "use client";
 
+import { Portal } from "@ark-ui/react";
 import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import format from "date-fns/format";
@@ -8,12 +9,16 @@ import { PostProps } from "src/api/openapi/schemas";
 import { MoreAction } from "src/components/site/Action/More";
 import {
   Menu,
-  MenuButton,
-  MenuDivider,
-  MenuGroup,
+  MenuContent,
   MenuItem,
-  MenuList,
-} from "src/theme/components";
+  MenuItemGroup,
+  MenuItemGroupLabel,
+  MenuPositioner,
+  MenuSeparator,
+  MenuTrigger,
+} from "src/theme/components/Menu";
+
+import { HStack, styled } from "@/styled-system/jsx";
 
 import { usePostMenu } from "./usePostMenu";
 
@@ -29,42 +34,65 @@ export function PostMenu(props: PostProps) {
   } = usePostMenu(props);
 
   return (
-    <Menu>
-      <MenuButton>
+    <Menu size="sm">
+      <MenuTrigger>
         <MoreAction />
-      </MenuButton>
-      <MenuList>
-        <MenuGroup title={`Post by ${props.author.name}`}>
-          <MenuItem isDisabled>
-            {format(new Date(props.createdAt), "yyyy-mm-dd")}
-          </MenuItem>
-        </MenuGroup>
-        <MenuDivider />
+      </MenuTrigger>
 
-        <MenuItem icon={<LinkIcon width="1.4em" />} onClick={onCopyLink}>
-          Copy link
-        </MenuItem>
+      <Portal>
+        <MenuPositioner>
+          <MenuContent lazyMount minW="36">
+            <MenuItemGroup id="group">
+              <MenuItemGroupLabel
+                htmlFor="user"
+                display="flex"
+                flexDir="column"
+                userSelect="none"
+              >
+                <styled.span>{`Post by ${props.author.name}`}</styled.span>
 
-        {shareEnabled && (
-          <MenuItem icon={<ShareIcon width="1.4em" />} onClick={onShare}>
-            Share
-          </MenuItem>
-        )}
+                <styled.time fontWeight="normal">
+                  {format(new Date(props.createdAt), "yyyy-mm-dd")}
+                </styled.time>
+              </MenuItemGroupLabel>
 
-        {/* <MenuItem>Reply</MenuItem> */}
+              <MenuSeparator />
 
-        {editEnabled && (
-          <MenuItem icon={<PencilIcon width="1.4em" />} onClick={onEdit}>
-            Edit
-          </MenuItem>
-        )}
+              <MenuItem id="copy-link" onClick={onCopyLink}>
+                <HStack gap="1">
+                  <LinkIcon width="1.4em" /> Copy link
+                </HStack>
+              </MenuItem>
 
-        {deleteEnabled && (
-          <MenuItem icon={<TrashIcon width="1.4em" />} onClick={onDelete}>
-            Delete
-          </MenuItem>
-        )}
-      </MenuList>
+              {shareEnabled && (
+                <MenuItem id="share" onClick={onShare}>
+                  <HStack gap="1">
+                    <ShareIcon width="1.4em" /> Share
+                  </HStack>
+                </MenuItem>
+              )}
+
+              {/* <MenuItem>Reply</MenuItem> */}
+
+              {editEnabled && (
+                <MenuItem id="edit" onClick={onEdit}>
+                  <HStack gap="1">
+                    <PencilIcon width="1.4em" /> Edit
+                  </HStack>
+                </MenuItem>
+              )}
+
+              {deleteEnabled && (
+                <MenuItem id="delete" onClick={onDelete}>
+                  <HStack gap="1">
+                    <TrashIcon width="1.4em" /> Delete
+                  </HStack>
+                </MenuItem>
+              )}
+            </MenuItemGroup>
+          </MenuContent>
+        </MenuPositioner>
+      </Portal>
     </Menu>
   );
 }
