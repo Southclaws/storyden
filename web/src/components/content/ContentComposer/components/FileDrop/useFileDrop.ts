@@ -6,7 +6,6 @@ import { useSlate } from "slate-react";
 
 import { assetUpload } from "src/api/openapi/assets";
 import { Asset } from "src/api/openapi/schemas";
-import { useToast } from "src/utils/useToast";
 
 import { isSupportedImage } from "./utils";
 
@@ -17,7 +16,6 @@ export type Props = {
 export function useFileDrop(props: Props) {
   const [dragging, setDragging] = useState(false);
   const editor = useSlate();
-  const toast = useToast();
 
   function onDragStart() {
     setDragging(true);
@@ -75,10 +73,7 @@ export function useFileDrop(props: Props) {
     try {
       await handleEvent(e);
     } catch (e: unknown) {
-      toast({
-        title: "Image upload failed",
-        description: `${e}`,
-      });
+      console.error(e);
     } finally {
       setDragging(false);
     }

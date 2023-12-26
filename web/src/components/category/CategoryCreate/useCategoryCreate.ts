@@ -5,9 +5,8 @@ import { z } from "zod";
 
 import { categoryCreate, getCategoryListKey } from "src/api/openapi/categories";
 import { APIError } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/site/ErrorBanner";
+import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
-import { useToast } from "src/utils/useToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),
@@ -18,22 +17,17 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryCreate(props: UseDisclosureProps) {
-  const toast = useToast();
   const { register, handleSubmit } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const category = await categoryCreate(data);
+      await categoryCreate(data);
       props.onClose?.();
       mutate(getCategoryListKey());
-      toast({
-        title: "Category created",
-        description: `${category.name} is now ready to be filled with stuff!`,
-      });
     } catch (e: unknown) {
-      errorToast(toast)(e as APIError);
+      handleError(e as APIError);
     }
   });
 

@@ -5,11 +5,9 @@ import { FormEvent, useState } from "react";
 import { postCreate } from "src/api/openapi/posts";
 import { Thread } from "src/api/openapi/schemas";
 import { useThreadGet } from "src/api/openapi/threads";
-import { errorToast } from "src/components/site/ErrorBanner";
-import { useToast } from "src/utils/useToast";
+import { handleError } from "src/components/site/ErrorBanner";
 
 export function useReplyBox(thread: Thread) {
-  const toast = useToast();
   const { mutate } = useThreadGet(thread.slug);
   const [isLoading, setLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -22,7 +20,7 @@ export function useReplyBox(thread: Thread) {
   async function doReply() {
     setLoading(true);
     await postCreate(thread.id, { body: value })
-      .catch(errorToast(toast))
+      .catch(handleError)
       .then(async () => {
         await mutate();
         setValue("");

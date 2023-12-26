@@ -8,9 +8,8 @@ import {
   getCollectionListKey,
 } from "src/api/openapi/collections";
 import { APIError } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/site/ErrorBanner";
+import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
-import { useToast } from "src/utils/useToast";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the collection."),
@@ -19,22 +18,17 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCollectionCreate(props: UseDisclosureProps) {
-  const toast = useToast();
   const { register, handleSubmit } = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const collection = await collectionCreate(data);
+      await collectionCreate(data);
       props.onClose?.();
       mutate(getCollectionListKey());
-      toast({
-        title: "Collection created",
-        description: `${collection.name} is now ready to be filled with stuff!`,
-      });
     } catch (e: unknown) {
-      errorToast(toast)(e as APIError);
+      handleError(e as APIError);
     }
   });
 

@@ -10,8 +10,7 @@ import {
   ThreadStatus,
 } from "src/api/openapi/schemas";
 import { threadCreate, threadUpdate } from "src/api/openapi/threads";
-import { errorToast } from "src/components/site/ErrorBanner";
-import { useToast } from "src/utils/useToast";
+import { handleError } from "src/components/site/ErrorBanner";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -27,7 +26,7 @@ export type FormShape = z.infer<typeof FormShapeSchema>;
 
 export function useComposeForm({ initialDraft, editing }: Props) {
   const router = useRouter();
-  const toast = useToast();
+
   const { data } = useCategoryList();
   const formContext = useForm<FormShape>({
     resolver: zodResolver(FormShapeSchema),
@@ -93,12 +92,12 @@ export function useComposeForm({ initialDraft, editing }: Props) {
 
   const onAssetUpload = async () => {
     const state = formContext.getValues();
-    await doSave(state).catch(errorToast(toast));
+    await doSave(state).catch(handleError);
   };
 
   const onAssetDelete = async () => {
     const state = formContext.getValues();
-    await doSave(state).catch(errorToast(toast));
+    await doSave(state).catch(handleError);
   };
 
   function onBack() {
@@ -106,11 +105,11 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   }
 
   const onSave = formContext.handleSubmit((data) =>
-    doSave(data).catch(errorToast(toast)),
+    doSave(data).catch(handleError),
   );
 
   const onPublish = formContext.handleSubmit((data) =>
-    doPublish(data).catch(errorToast(toast)),
+    doPublish(data).catch(handleError),
   );
 
   return {

@@ -5,9 +5,8 @@ import { z } from "zod";
 import { categoryUpdate, useCategoryList } from "src/api/openapi/categories";
 import { useGetInfo } from "src/api/openapi/misc";
 import { APIError, Category } from "src/api/openapi/schemas";
-import { errorToast } from "src/components/site/ErrorBanner";
+import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
-import { useToast } from "src/utils/useToast";
 
 export type Props = {
   category: Category;
@@ -22,7 +21,6 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
-  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -51,11 +49,8 @@ export function useCategoryEdit(props: Props) {
       );
 
       props.onClose?.();
-      toast({
-        title: "Category updated",
-      });
     } catch (e: unknown) {
-      errorToast(toast)(e as APIError);
+      handleError(e as APIError);
     }
   });
 

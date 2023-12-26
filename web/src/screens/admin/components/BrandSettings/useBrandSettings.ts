@@ -8,7 +8,6 @@ import { adminSettingsUpdate } from "src/api/openapi/admin";
 import { getGetInfoKey, iconUpload } from "src/api/openapi/misc";
 import { Info } from "src/api/openapi/schemas";
 import { getColourVariants } from "src/utils/colour";
-import { useToast } from "src/utils/useToast";
 
 export type Props = Info;
 
@@ -20,7 +19,6 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useBrandSettings(props: Props) {
-  const toast = useToast();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -65,21 +63,15 @@ export function useBrandSettings(props: Props) {
       accent_colour: data.accentColour,
     });
     mutate(getGetInfoKey());
-    toast({ title: "Settings updated!" });
   });
 
   const onSaveIcon = async (file: Blob | null) => {
     if (!file) {
-      toast({
-        title: "Unable to access image",
-        status: "error",
-      });
       return;
     }
 
     await iconUpload(file);
     mutate(getGetInfoKey());
-    toast({ title: "Icon updated!" });
   };
 
   const onColourChangePreview = (colour: string) => {
