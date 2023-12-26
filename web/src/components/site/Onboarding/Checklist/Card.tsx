@@ -4,15 +4,10 @@ import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
-import {
-  Button,
-  Heading,
-  ListIcon,
-  ListItem,
-  Text,
-} from "src/theme/components";
+import { Heading1 } from "src/theme/components/Heading/Index";
+import { Link } from "src/theme/components/Link";
 
-import { Box, Circle, HStack } from "@/styled-system/jsx";
+import { Box, Circle, HStack, styled } from "@/styled-system/jsx";
 
 import { Step, isComplete, statusToStep } from "./useChecklist";
 
@@ -28,53 +23,46 @@ export function Card(props: PropsWithChildren<CardProps>) {
   const complete = isComplete(props.step, props.current);
   const isCurrent = statusToStep[props.current] === props.step;
   return (
-    <ListItem
-      p={4}
+    <styled.li
+      p="4"
       borderRadius="2xl"
       bgColor={complete ? "green.200" : "gray.100"}
     >
       <HStack gap="1">
-        <ListIcon
-          id="list-icon"
-          p={0}
-          m={0}
-          as={() => (
-            <Circle
-              id="list-icon-circle"
-              size="7"
-              style={{
-                backgroundColor: complete ? "none" : "gray.200",
-              }}
-            >
-              {complete ? (
-                <CheckCircle width="2em" height="2em" />
-              ) : (
-                <Text fontWeight="bold">{props.step}</Text>
-              )}
-            </Circle>
-          )}
-          fontSize="3xl"
-        />
+        <Box>
+          <Circle
+            id="list-icon-circle"
+            size="7"
+            style={{
+              backgroundColor: complete ? "none" : "gray.200",
+            }}
+          >
+            {complete ? (
+              <CheckCircle width="2em" height="2em" />
+            ) : (
+              <styled.p fontWeight="bold">{props.step}</styled.p>
+            )}
+          </Circle>
+        </Box>
 
         <Box>
           <HStack justify="space-between">
-            <Heading size="md">{props.title}</Heading>
+            <Heading1 size="md">{props.title}</Heading1>
 
             {!complete && isCurrent && (
-              <Button
-                as="a"
-                href={props.url}
+              <Link
+                href={props.url ?? ""}
                 bgColor="green.200"
                 size="xs"
                 onClick={props.onClick}
               >
                 Complete
-              </Button>
+              </Link>
             )}
           </HStack>
           {props.children}
         </Box>
       </HStack>
-    </ListItem>
+    </styled.li>
   );
 }
