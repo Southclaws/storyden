@@ -1,7 +1,6 @@
 import { postUpdate } from "src/api/openapi/posts";
 import { PostProps } from "src/api/openapi/schemas";
 import { threadUpdate, useThreadGet } from "src/api/openapi/threads";
-import { useToast } from "src/utils/useToast";
 
 import { useThreadScreenContext } from "../context/context";
 
@@ -14,7 +13,7 @@ export function usePostView(props: PostProps) {
     editingContent,
     setEditingContent,
   } = useThreadScreenContext();
-  const toast = useToast();
+
   const { mutate } = useThreadGet(thread!.slug);
 
   const isEditing = editingPostID === props.id;
@@ -35,11 +34,11 @@ export function usePostView(props: PostProps) {
       await threadUpdate(editingPostID, {
         title: editingTitle,
         body: editingContent,
-      }).then(() => toast({ title: "Thread updated" }));
+      });
     } else {
       await postUpdate(editingPostID, {
         body: editingContent,
-      }).then(() => toast({ title: "Post updated" }));
+      });
     }
 
     await mutate();

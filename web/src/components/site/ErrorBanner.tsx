@@ -1,7 +1,6 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { APIError } from "src/api/openapi/schemas";
-import { CreateToastFnReturn } from "src/theme/components";
 
 import { Flex, styled } from "@/styled-system/jsx";
 
@@ -42,11 +41,6 @@ export default function ErrorBanner({
   );
 }
 
-export const errorToast = (toast: CreateToastFnReturn) => (e: APIError) => {
+export const handleError = (e: APIError) => {
   console.error(e);
-  toast({
-    title: "Error",
-    status: "error",
-    description: e.message,
-  });
 };

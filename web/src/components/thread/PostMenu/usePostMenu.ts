@@ -9,14 +9,13 @@ import { PostProps } from "src/api/openapi/schemas";
 import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { isShareEnabled } from "src/utils/client";
-import { useToast } from "src/utils/useToast";
 
 import { useThreadScreenContext } from "../context/context";
 import { getPermalinkForPost } from "../utils";
 
 export function usePostMenu(props: PostProps) {
   const router = useRouter();
-  const toast = useToast();
+
   const account = useSession();
   const { thread, setEditingPostID } = useThreadScreenContext();
   const [, copyToClipboard] = useCopyToClipboard();
@@ -46,11 +45,9 @@ export function usePostMenu(props: PostProps) {
   async function onDelete() {
     if (props.id === thread?.id) {
       await threadDelete(thread.id);
-      toast({ title: "Thread deleted" });
       router.push("/");
     } else {
       await postDelete(props.id);
-      toast({ title: "Post deleted" });
       mutate(getThreadGetKey(thread?.slug ?? props.id));
     }
   }
