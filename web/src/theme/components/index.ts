@@ -33,7 +33,6 @@ import {
   Spinner,
   StackProps,
   Text,
-  useToast,
 } from "@chakra-ui/react";
 
 // NOTE: These are being replaced gradually, so these are being re-exported.
@@ -57,10 +56,6 @@ export { Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger };
 // Other stuff
 
 export { CloseButton, Image, LinkBox, LinkOverlay, SlideFade, Spinner };
-
-// Hooks
-
-export { useToast };
 
 // Types
 

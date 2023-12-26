@@ -6,7 +6,7 @@ import { postCreate } from "src/api/openapi/posts";
 import { Thread } from "src/api/openapi/schemas";
 import { useThreadGet } from "src/api/openapi/threads";
 import { errorToast } from "src/components/site/ErrorBanner";
-import { useToast } from "src/theme/components";
+import { useToast } from "src/utils/useToast";
 
 export function useReplyBox(thread: Thread) {
   const toast = useToast();

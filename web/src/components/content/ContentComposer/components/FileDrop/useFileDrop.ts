@@ -6,7 +6,7 @@ import { useSlate } from "slate-react";
 
 import { assetUpload } from "src/api/openapi/assets";
 import { Asset } from "src/api/openapi/schemas";
-import { useToast } from "src/theme/components";
+import { useToast } from "src/utils/useToast";
 
 import { isSupportedImage } from "./utils";
 
