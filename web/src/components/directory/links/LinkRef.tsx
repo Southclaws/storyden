@@ -70,7 +70,7 @@ export function LinkRef(props: LinkSchema) {
             />
           ) : (
             <VStack justify="center" w="full" h="full">
-              <Empty>no image</Empty>
+              <Empty />
             </VStack>
           )}
         </Box>

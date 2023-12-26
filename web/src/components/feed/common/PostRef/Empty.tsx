@@ -9,7 +9,7 @@ export function Empty({ children }: PropsWithChildren) {
     <HStack alignItems="center">
       <CubeTransparentIcon className={css({ width: "6", color: "bg.muted" })} />
       <styled.p fontStyle="italic" color="gray.500">
-        {children ?? "no posts"}
+        {children}
       </styled.p>
     </HStack>
   );
