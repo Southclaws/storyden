@@ -1,12 +1,4 @@
-import {
-  Box,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  VStack,
-} from "@chakra-ui/react";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 
 import { PublicProfile } from "src/api/openapi/schemas";
 import { MixedPostList } from "src/components/feed/mixed/MixedPostList";
@@ -14,6 +6,8 @@ import { Unready } from "src/components/site/Unready";
 
 import { CollectionList } from "../CollectionList/CollectionList";
 import { PostList } from "../PostList/PostList";
+
+import { Box, VStack } from "@/styled-system/jsx";
 
 import { useContent } from "./useContent";
 

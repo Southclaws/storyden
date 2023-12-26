@@ -3,14 +3,33 @@ import {
   defineSemanticTokens,
   defineTokens,
 } from "@pandacss/dev";
+import { range } from "lodash";
+import { map } from "lodash/fp";
 
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
+import { heading } from "src/theme/components/Heading/heading.recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
+import { titleInput } from "src/theme/components/TitleInput/titleInput.recipe";
+
+// TODO: Dark mode = 40%
+const L = "80%";
+
+const C = "0.15";
+
+const lch = (hue: number) => `oklch(${L} ${C} ${hue})`;
+
+const stops = map(lch)(range(0, 361, 10));
+
+const conicGradient = `
+conic-gradient(
+    ${stops.join(",\n")}
+);
+`;
 
 export default defineConfig({
   preflight: true,
@@ -45,6 +64,8 @@ export default defineConfig({
     recipes: {
       admonition: admonition,
       input: input,
+      titleInput: titleInput,
+      heading: heading,
       button: button,
       link: link,
       menu: menu,
@@ -144,6 +165,9 @@ export default defineConfig({
 
             outline: { value: "{colors.blackAlpha.50}" },
             accent: { value: "{colors.accent.default}" },
+          },
+          conicGradient: {
+            value: conicGradient,
           },
         },
         spacing: {

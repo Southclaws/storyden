@@ -1,6 +1,8 @@
 /* eslint-disable */
 export * from './admonition';
 export * from './input';
+export * from './title-input';
+export * from './heading';
 export * from './button';
 export * from './link';
 export * from './menu';

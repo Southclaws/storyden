@@ -1,21 +1,16 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  HStack,
-  Heading,
-  Input,
-  Stack,
-  VStack,
-} from "@chakra-ui/react";
-
 import { useGetInfo } from "src/api/openapi/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 import { Unready } from "src/components/site/Unready";
+import { Button } from "src/theme/components/Button";
+import { FormControl } from "src/theme/components/FormControl";
+import { FormHelperText } from "src/theme/components/FormHelperText";
+import { FormLabel } from "src/theme/components/FormLabel";
+import { Heading2 } from "src/theme/components/Heading/Index";
+import { Input } from "src/theme/components/Input";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
+
+import { Box, HStack, Stack, styled } from "@/styled-system/jsx";
 
 import { IconEditor } from "./IconEditor/IconEditor";
 import { Props, useBrandSettings } from "./useBrandSettings";
@@ -32,11 +27,18 @@ function BrandSettingsForm(props: Props) {
 
   return (
     <SettingsSection>
-      <Heading size="md">Brand settings</Heading>
+      <Heading2 size="md">Brand settings</Heading2>
 
-      <VStack as="form" width="full" gap={4} align="start" onSubmit={onSubmit}>
+      <styled.form
+        width="full"
+        display="flex"
+        flexDirection="column"
+        gap="4"
+        alignItems="start"
+        onSubmit={onSubmit}
+      >
         <Stack
-          gap={4}
+          gap="4"
           direction={{
             base: "column",
             lg: "row",
@@ -75,7 +77,7 @@ function BrandSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Colour</FormLabel>
-          <HStack align="start">
+          <HStack>
             <Box>
               <ColourField
                 defaultValue={props.accent_colour}
@@ -126,7 +128,7 @@ function BrandSettingsForm(props: Props) {
         <HStack justify="end">
           <Button type="submit">Save</Button>
         </HStack>
-      </VStack>
+      </styled.form>
     </SettingsSection>
   );
 }

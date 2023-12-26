@@ -2099,6 +2099,10 @@ const tokens = {
     "value": "var(--colors-border-accent)",
     "variable": "var(--colors-border-accent)"
   },
+  "colors.conicGradient": {
+    "value": "var(--colors-conic-gradient)",
+    "variable": "var(--colors-conic-gradient)"
+  },
   "spacing.safeBottom": {
     "value": "var(--spacing-safe-bottom)",
     "variable": "var(--spacing-safe-bottom)"

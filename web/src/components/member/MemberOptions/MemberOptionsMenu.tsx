@@ -3,7 +3,6 @@ import { PropsWithChildren } from "react";
 
 import { useSession } from "src/auth";
 import { Avatar } from "src/components/site/Avatar/Avatar";
-import { WithDisclosure } from "src/theme/components";
 import {
   MenuContent,
   MenuItem,
@@ -12,6 +11,7 @@ import {
   MenuSeparator,
 } from "src/theme/components/Menu";
 import { Menu, MenuPositioner, MenuTrigger } from "src/theme/components/Menu";
+import { WithDisclosure } from "src/utils/useDisclosure";
 
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
 

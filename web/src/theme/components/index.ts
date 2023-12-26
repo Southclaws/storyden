@@ -6,9 +6,6 @@ import {
   CreateToastFnReturn,
   Divider,
   FlexProps,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
   IconButton,
   Image,
@@ -36,9 +33,7 @@ import {
   Spinner,
   StackProps,
   Text,
-  UseDisclosureProps,
   useClipboard,
-  useDisclosure,
   useOutsideClick,
   useToast,
 } from "@chakra-ui/react";
@@ -47,15 +42,7 @@ import {
 
 // Form
 
-export {
-  Button,
-  Checkbox,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  IconButton,
-  Input,
-};
+export { Button, Checkbox, IconButton, Input };
 
 // Typography
 
@@ -72,14 +59,6 @@ export { Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger };
 // Other stuff
 
 export { CloseButton, Image, LinkBox, LinkOverlay, SlideFade, Spinner };
-
-// Disclosure
-// TODO: Copy into our codebase:
-// https://github.com/chakra-ui/chakra-ui/blob/main/packages/hooks/use-disclosure/src/index.ts
-
-export { useDisclosure };
-export type { UseDisclosureProps };
-export type WithDisclosure<T> = UseDisclosureProps & T;
 
 // Hooks
 

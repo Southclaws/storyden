@@ -1,14 +1,18 @@
-import NextLink from "next/link";
-
 import { PostProps, ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
+import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { FeedItem } from "../FeedItem/FeedItem";
 
-import { Flex, HStack, styled } from "@/styled-system/jsx";
+import {
+  Flex,
+  HStack,
+  LinkBox,
+  LinkOverlay,
+  styled,
+} from "@/styled-system/jsx";
 
 type Props =
   | {
@@ -46,11 +50,12 @@ export function PostRef({ kind, item }: Props) {
     <LinkBox>
       <FeedItem>
         <Flex justifyContent="space-between">
-          <Heading size="sm">
-            <LinkOverlay as={NextLink} href={data.permalink}>
+          <Heading1 size="sm">
+            <LinkOverlay href={data.permalink}>
+              {/* TODO: Next.js Link */}
               {data.title}
             </LinkOverlay>
-          </Heading>
+          </Heading1>
         </Flex>
 
         <styled.p lineClamp={3}>{data.short}</styled.p>

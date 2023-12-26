@@ -3,8 +3,9 @@ import { FormProvider } from "react-hook-form";
 
 import { Bold } from "src/components/content/ContentComposer/controls/Bold";
 import { Italic } from "src/components/content/ContentComposer/controls/Italic";
-import { Save, Send } from "src/components/site/Action/Action";
 import { BackAction } from "src/components/site/Action/Back";
+import { SaveAction } from "src/components/site/Action/Save";
+import { SendAction } from "src/components/site/Action/Send";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { Button } from "src/theme/components/Button";
 
@@ -78,8 +79,8 @@ export function ComposeForm(props: Props) {
               </HStack>
               <HStack>
                 <BackAction href="/" onClick={onBack} />
-                <Send onClick={onPublish} />
-                <Save onClick={onSave} />
+                <SendAction onClick={onPublish} />
+                <SaveAction onClick={onSave} />
               </HStack>
             </VStack>
           </Toolpill>

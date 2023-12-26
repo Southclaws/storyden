@@ -1,4 +1,3 @@
-import { useToast } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,6 +8,7 @@ import { adminSettingsUpdate } from "src/api/openapi/admin";
 import { getGetInfoKey, iconUpload } from "src/api/openapi/misc";
 import { Info } from "src/api/openapi/schemas";
 import { getColourVariants } from "src/utils/colour";
+import { useToast } from "src/utils/useToast";
 
 export type Props = Info;
 

@@ -5,7 +5,7 @@ import { ShareIcon } from "@heroicons/react/24/solid";
 import format from "date-fns/format";
 
 import { PostProps } from "src/api/openapi/schemas";
-import { More } from "src/components/site/Action/Action";
+import { MoreAction } from "src/components/site/Action/More";
 import {
   Menu,
   MenuButton,
@@ -30,7 +30,9 @@ export function PostMenu(props: PostProps) {
 
   return (
     <Menu>
-      <MenuButton as={More} />
+      <MenuButton>
+        <MoreAction />
+      </MenuButton>
       <MenuList>
         <MenuGroup title={`Post by ${props.author.name}`}>
           <MenuItem isDisabled>

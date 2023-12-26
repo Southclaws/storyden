@@ -6,7 +6,7 @@ import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { Input } from "src/theme/components/Input";
 
-import { Close } from "../../Action/Action";
+import { CloseAction } from "../../Action/Close";
 import { AdminAction } from "../Anchors/Admin";
 import { ComposeAction } from "../Anchors/Compose";
 import { DashboardAction } from "../Anchors/Dashboard";
@@ -82,7 +82,7 @@ export function Navpill() {
                 value={searchQuery}
                 onChange={onSearch}
               />
-              <Close onClick={onClose} />
+              <CloseAction onClick={onClose} />
             </>
           ) : (
             <>
@@ -106,7 +106,7 @@ export function Navpill() {
                 value={searchQuery}
                 onChange={onSearch}
               />
-              <Close onClick={onClose} />
+              <CloseAction onClick={onClose} />
             </>
           ) : (
             <>

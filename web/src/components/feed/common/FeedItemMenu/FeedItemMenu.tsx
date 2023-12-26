@@ -1,7 +1,7 @@
 import { Portal } from "@ark-ui/react";
 import format from "date-fns/format";
 
-import { More } from "src/components/site/Action/Action";
+import { MoreAction } from "src/components/site/Action/More";
 import {
   Menu,
   MenuContent,
@@ -24,7 +24,7 @@ export function FeedItemMenu(props: Props) {
   return (
     <Menu size="sm">
       <MenuTrigger asChild>
-        <More />
+        <MoreAction />
       </MenuTrigger>
       <Portal>
         <MenuPositioner>

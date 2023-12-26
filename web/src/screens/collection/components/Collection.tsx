@@ -1,9 +1,11 @@
-import { Flex, Heading, Text, VStack } from "@chakra-ui/react";
 import { differenceInSeconds, formatDistanceToNow } from "date-fns";
 
 import { CollectionWithItems } from "src/api/openapi/schemas";
 import { Timestamp } from "src/components/site/Timestamp";
+import { Heading1 } from "src/theme/components/Heading/Index";
 import { formatDistanceDefaults } from "src/utils/date";
+
+import { Flex, VStack, styled } from "@/styled-system/jsx";
 
 import { CollectionItemList } from "./CollectionItemList";
 
@@ -19,21 +21,21 @@ export function Collection(props: CollectionWithItems) {
 
   return (
     <VStack alignItems="start">
-      <Heading size="md">{props.name}</Heading>
+      <Heading1 size="md">{props.name}</Heading1>
       <Flex alignItems="center">
-        <Text as="span">{props.description}</Text>
-        <Text color="gray.500" fontSize="sm">
-          <Text as="span" px={2}>
-            •
-          </Text>
-          <Text as="span">
+        <styled.p fontSize="sm">
+          <styled.span>{props.description}</styled.span>
+
+          <styled.span px="2">•</styled.span>
+
+          <styled.span>
             <Timestamp
               created={created}
               updated={updated}
               href={`/p/${props.owner.handle}/collections/${props.id}`}
             />
-          </Text>
-        </Text>
+          </styled.span>
+        </styled.p>
       </Flex>
 
       <CollectionItemList items={props.items} />

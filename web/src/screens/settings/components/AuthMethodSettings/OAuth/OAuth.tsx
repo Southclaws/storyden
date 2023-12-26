@@ -1,6 +1,5 @@
-import { Heading } from "@chakra-ui/react";
-
 import { AccountAuthMethod, AuthProvider } from "src/api/openapi/schemas";
+import { Heading3 } from "src/theme/components/Heading/Index";
 import { Link } from "src/theme/components/Link";
 
 import { VStack, styled } from "@/styled-system/jsx";
@@ -13,14 +12,14 @@ type Props = {
 export function OAuth({ active, available }: Props) {
   return (
     <VStack alignItems="start">
-      <Heading size="sm">Linked accounts</Heading>
+      <Heading3 size="sm">Linked accounts</Heading3>
 
       <styled.p>
         You can link as many accounts as you want to. Linked accounts allow you
         to log in easily and may also provide additional features.
       </styled.p>
 
-      <Heading size="xs">Active</Heading>
+      <Heading3 size="xs">Active</Heading3>
 
       {active.length ? (
         <styled.ul display="flex" flexDir="column" gap="2" w="full">
@@ -34,7 +33,7 @@ export function OAuth({ active, available }: Props) {
         <styled.p>You currently have no linked accounts.</styled.p>
       )}
 
-      <Heading size="xs">Available</Heading>
+      <Heading3 size="xs">Available</Heading3>
 
       <styled.ul display="flex" flexDir="column" gap="2" w="full">
         {available.map((v) => (

@@ -10,14 +10,14 @@ export type LinkProps = Partial<LinkVariant> & NextLinkProps & StyleProps;
 
 export function Link({ children, ...props }: PropsWithChildren<LinkProps>) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, stripped] = link.splitVariantProps(props);
+  const [, stripped] = link.splitVariantProps(props);
 
   const cn = cx(link(props), css(stripped));
 
   const isExternal = !props.href.toString().startsWith("/");
 
   return (
-    <NextLink className={cn} {...(stripped as NextLinkProps)}>
+    <NextLink className={cn} href={stripped.href}>
       {children}
       {isExternal && <ArrowTopRightOnSquareIcon />}
     </NextLink>

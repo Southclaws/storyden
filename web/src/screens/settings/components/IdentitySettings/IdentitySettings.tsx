@@ -1,7 +1,7 @@
-import { Heading, Input, Text } from "@chakra-ui/react";
-
 import { useSession } from "src/auth";
 import { Unready } from "src/components/site/Unready";
+import { Heading2 } from "src/theme/components/Heading/Index";
+import { Input } from "src/theme/components/Input";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
@@ -12,9 +12,9 @@ export function IdentitySettings() {
 
   return (
     <SettingsSection>
-      <Heading size="sm">Identity</Heading>
+      <Heading2 size="md">Identity</Heading2>
 
-      <Text>You cannot yet change your handle but this is coming soon!</Text>
+      <p>You cannot yet change your handle but this is coming soon!</p>
 
       <Input disabled placeholder="@handle" value={account.handle} />
     </SettingsSection>

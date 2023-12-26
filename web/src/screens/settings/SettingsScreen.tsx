@@ -1,14 +1,16 @@
 "use client";
 
-import { Heading, VStack } from "@chakra-ui/react";
+import { Heading1 } from "src/theme/components/Heading/Index";
+
+import { VStack } from "@/styled-system/jsx";
 
 import { AuthMethodSettings } from "./components/AuthMethodSettings/AuthMethodSettings";
 import { IdentitySettings } from "./components/IdentitySettings/IdentitySettings";
 
 export function SettingsScreen() {
   return (
-    <VStack alignItems="start" gap={4}>
-      <Heading>Settings</Heading>
+    <VStack alignItems="start" gap="4">
+      <Heading1 size="lg">Settings</Heading1>
 
       <IdentitySettings />
 

@@ -1,6 +1,6 @@
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
-import { useDisclosure } from "src/theme/components";
+import { useDisclosure } from "src/utils/useDisclosure";
 
 export type Step = 1 | 2 | 3 | 4 | 5;
 

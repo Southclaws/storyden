@@ -525,6 +525,46 @@
   --colors-border-disabled: var(--colors-gray-400);
   --colors-border-outline: var(--colors-black-alpha-50);
   --colors-border-accent: var(--colors-accent-default);
+  --colors-conic-gradient: 
+conic-gradient(
+    oklch(80% 0.15 0),
+oklch(80% 0.15 10),
+oklch(80% 0.15 20),
+oklch(80% 0.15 30),
+oklch(80% 0.15 40),
+oklch(80% 0.15 50),
+oklch(80% 0.15 60),
+oklch(80% 0.15 70),
+oklch(80% 0.15 80),
+oklch(80% 0.15 90),
+oklch(80% 0.15 100),
+oklch(80% 0.15 110),
+oklch(80% 0.15 120),
+oklch(80% 0.15 130),
+oklch(80% 0.15 140),
+oklch(80% 0.15 150),
+oklch(80% 0.15 160),
+oklch(80% 0.15 170),
+oklch(80% 0.15 180),
+oklch(80% 0.15 190),
+oklch(80% 0.15 200),
+oklch(80% 0.15 210),
+oklch(80% 0.15 220),
+oklch(80% 0.15 230),
+oklch(80% 0.15 240),
+oklch(80% 0.15 250),
+oklch(80% 0.15 260),
+oklch(80% 0.15 270),
+oklch(80% 0.15 280),
+oklch(80% 0.15 290),
+oklch(80% 0.15 300),
+oklch(80% 0.15 310),
+oklch(80% 0.15 320),
+oklch(80% 0.15 330),
+oklch(80% 0.15 340),
+oklch(80% 0.15 350),
+oklch(80% 0.15 360)
+);
   --spacing-safe-bottom: env(safe-area-inset-bottom)
 }
 

@@ -1,8 +1,8 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { PropsWithChildren } from "react";
 
-import { useDisclosure } from "src/theme/components";
 import { Button } from "src/theme/components/Button";
+import { useDisclosure } from "src/utils/useDisclosure";
 
 import { ButtonVariantProps } from "@/styled-system/recipes";
 

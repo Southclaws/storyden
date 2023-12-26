@@ -3,7 +3,7 @@ import { KeyboardEvent, useState } from "react";
 import { useCollectionList } from "src/api/openapi/collections";
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
-import { useDisclosure } from "src/theme/components";
+import { useDisclosure } from "src/utils/useDisclosure";
 
 export type Props = {
   thread: ThreadReference;

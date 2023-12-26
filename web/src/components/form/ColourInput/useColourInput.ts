@@ -1,6 +1,4 @@
 import Color from "colorjs.io";
-import { range } from "lodash";
-import { map } from "lodash/fp";
 import { useEffect, useRef, useState } from "react";
 
 export type Props = {
@@ -15,14 +13,6 @@ export const L = "80%";
 export const C = "0.15";
 
 export const lch = (hue: number) => `oklch(${L} ${C} ${hue})`;
-
-const stops = map(lch)(range(0, 361, 10));
-
-export const conicGradient = `
-conic-gradient(
-    ${stops.join(",\n")}
-);
-`;
 
 const hueToAngle = (input: number) => {
   const shifted = input + 90;

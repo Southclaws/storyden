@@ -1,7 +1,7 @@
-import { Heading } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 
 import { Button } from "src/theme/components/Button";
+import { Heading2, Heading3 } from "src/theme/components/Heading/Index";
 
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
@@ -13,7 +13,7 @@ export function Devices(props: Props) {
 
   return (
     <VStack w="full" alignItems="start">
-      <Heading size="sm">Devices</Heading>
+      <Heading2 size="sm">Devices</Heading2>
 
       <p>
         You can use certain support devices with biometric authentication. You
@@ -36,7 +36,7 @@ export function Devices(props: Props) {
             minW="0"
           >
             <HStack justify="space-between">
-              <Heading size="xs">{v.name}</Heading>
+              <Heading3 size="xs">{v.name}</Heading3>
             </HStack>
 
             <styled.p
