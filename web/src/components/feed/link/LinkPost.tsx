@@ -1,14 +1,20 @@
-import NextLink from "next/link";
-
 import { Link, ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
+import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
-import { Box, Flex, HStack, VStack, styled } from "@/styled-system/jsx";
+import {
+  Box,
+  Flex,
+  HStack,
+  LinkBox,
+  LinkOverlay,
+  VStack,
+  styled,
+} from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
@@ -54,11 +60,12 @@ export function LinkPost(props: Props) {
             p="2"
           >
             <Flex width="full" justifyContent="space-between">
-              <Heading size="sm">
-                <LinkOverlay as={NextLink} href={permalink}>
+              <Heading1 size="sm">
+                <LinkOverlay href={permalink}>
+                  {/* TODO: Next.js Link */}
                   {props.thread.title}
                 </LinkOverlay>
-              </Heading>
+              </Heading1>
             </Flex>
 
             <styled.p lineClamp={2}>

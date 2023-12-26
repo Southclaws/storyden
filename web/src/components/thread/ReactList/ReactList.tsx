@@ -1,8 +1,6 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 import {
-  List,
-  ListItem,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -11,26 +9,26 @@ import {
 } from "src/theme/components";
 import { Button } from "src/theme/components/Button";
 
-import { Box } from "@/styled-system/jsx";
+import { Box, styled } from "@/styled-system/jsx";
 
 import { Props, emojiPickerContainerID, useReactList } from "./useReactList";
 
 export function ReactList(props: Props) {
   const { onOpen, authenticated } = useReactList(props);
   return (
-    <List
+    <styled.ul
       display="flex"
       flexDirection="row"
-      gap={1}
+      gap="1"
       alignItems="center"
       alignContent="center"
       flexWrap="wrap"
-      margin={0}
+      margin="0"
     >
       {props.reacts?.map((r) => (
-        <ListItem key={r.id}>
+        <styled.li key={r.id}>
           <Button size="xs">{r.emoji}</Button>
-        </ListItem>
+        </styled.li>
       ))}
 
       {authenticated && (
@@ -50,6 +48,6 @@ export function ReactList(props: Props) {
           </PopoverContent>
         </Popover>
       )}
-    </List>
+    </styled.ul>
   );
 }
