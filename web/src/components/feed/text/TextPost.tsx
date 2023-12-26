@@ -1,15 +1,19 @@
-import NextLink from "next/link";
-
 import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Heading, LinkBox, LinkOverlay } from "src/theme/components";
+import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { FeedItem } from "../common/FeedItem/FeedItem";
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
-import { Flex, HStack, styled } from "@/styled-system/jsx";
+import {
+  Flex,
+  HStack,
+  LinkBox,
+  LinkOverlay,
+  styled,
+} from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
@@ -24,11 +28,14 @@ export function TextPost(props: Props) {
     <LinkBox>
       <FeedItem>
         <Flex justifyContent="space-between">
-          <Heading size="sm">
-            <LinkOverlay as={NextLink} href={permalink}>
+          <Heading1 size="sm">
+            <LinkOverlay
+              //as={NextLink} // TODO
+              href={permalink}
+            >
               {props.thread.title}
             </LinkOverlay>
-          </Heading>
+          </Heading1>
         </Flex>
 
         <styled.p lineClamp={3}>{props.thread.short}</styled.p>

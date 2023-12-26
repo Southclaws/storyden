@@ -3,13 +3,12 @@
 import { LinkIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
-import { Divider } from "src/theme/components";
 import { Link } from "src/theme/components/Link";
 
 import { CategoryList } from "../../../category/CategoryList/CategoryList";
 import { useNavigation } from "../useNavigation";
 
-import { Box, VStack, styled } from "@/styled-system/jsx";
+import { Box, Divider, VStack, styled } from "@/styled-system/jsx";
 
 import { Authbar } from "./components/Authbar";
 import { Title } from "./components/Title";
@@ -53,10 +52,7 @@ export function Sidebar() {
 
             <Toolbar />
 
-            <Divider
-              // TODO: make this clever based on accent colour.
-              borderColor="oklch(0 0 0deg / 5%)"
-            />
+            <Divider />
 
             <Box
               overflowY="scroll"
@@ -74,10 +70,7 @@ export function Sidebar() {
 
             {isAdmin && <CategoryCreateTrigger />}
 
-            <Divider
-              // TODO: make this clever based on accent colour.
-              borderColor="oklch(0 0 0deg / 5%)"
-            />
+            <Divider />
 
             <Link w="full" size="xs" href="/l">
               <LinkIcon />

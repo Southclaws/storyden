@@ -2,24 +2,17 @@ import {
   BoxProps,
   CloseButton,
   CreateToastFnReturn,
-  Divider,
   FlexProps,
-  Heading,
   Image,
-  Link,
   LinkBox,
   LinkOverlay,
   LinkProps,
-  List,
-  ListIcon,
-  ListItem,
   Menu,
   MenuButton,
   MenuDivider,
   MenuGroup,
   MenuItem,
   MenuList,
-  OrderedList,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -28,14 +21,9 @@ import {
   SlideFade,
   Spinner,
   StackProps,
-  Text,
 } from "@chakra-ui/react";
 
 // NOTE: These are being replaced gradually, so these are being re-exported.
-
-// Typography
-
-export { Divider, Heading, Link, List, ListIcon, ListItem, OrderedList, Text };
 
 // Menu
 

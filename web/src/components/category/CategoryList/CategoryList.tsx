@@ -7,7 +7,8 @@ import { map } from "lodash/fp";
 
 import { Category } from "src/api/openapi/schemas";
 import { Unready } from "src/components/site/Unready";
-import { List } from "src/theme/components";
+
+import { styled } from "@/styled-system/jsx";
 
 import { CategoryListItem } from "./CategoryListItem";
 import { useCategoryList } from "./useCategoryList";
@@ -29,12 +30,12 @@ export function CategoryList() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <List
+      <styled.ul
         overflow="hidden"
-        margin={0}
+        margin="0"
         display="flex"
         flexDirection="column"
-        gap={2}
+        gap="2"
         width="full"
         css={{
           touchAction: "none",
@@ -43,7 +44,7 @@ export function CategoryList() {
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           {mapCategories(isAdmin)(categories)}
         </SortableContext>
-      </List>
+      </styled.ul>
     </DndContext>
   );
 }
