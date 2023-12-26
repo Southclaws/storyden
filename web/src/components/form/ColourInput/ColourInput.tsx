@@ -12,9 +12,6 @@ export function ColourInput(props: Props) {
   const { onPointerDown, onPointerUp, hue, ref, angle, value, grabbing } =
     useColourInput(props);
 
-  // NOTE: we use React's primitive `style` prop here and not "style props" from
-  // Chakra because this is going to change on every frame while dragging and we
-  // don't want Emotion.js to generate a whole new stylesheet when these change!
   const styles = {
     backgroundColor: value,
     "--angle": `${angle}deg`,

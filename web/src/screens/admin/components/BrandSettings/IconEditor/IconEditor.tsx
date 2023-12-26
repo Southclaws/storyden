@@ -6,7 +6,7 @@ import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useIconEditor } from "./useIconEditor";
 
-const editorStyle = { backgroundColor: "var(--chakra-colors-gray-100)" };
+const editorStyle = { backgroundColor: "var(--colors-gray-100)" };
 
 export function IconEditor(props: Props) {
   const { ref, position, setPosition, onFileChange, onSave, saving, file } =
