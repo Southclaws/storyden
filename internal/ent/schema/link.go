@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/index"
 )
 
 type Link struct {
@@ -26,13 +25,6 @@ func (Link) Fields() []ent.Field {
 		field.String("domain"),
 		field.String("title"),
 		field.String("description"),
-	}
-}
-
-func (Link) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("url"),
-		index.Fields("slug"),
 	}
 }
 

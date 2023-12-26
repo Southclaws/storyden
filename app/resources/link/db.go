@@ -32,7 +32,7 @@ func (d *database) Store(ctx context.Context, address, title, description string
 
 	slug, domain := getLinkAttrs(*u)
 
-	create := d.db.Link.Create()
+	create := d.db.Debug().Link.Create()
 	mutate := create.Mutation()
 
 	mutate.SetURL(address)
@@ -45,7 +45,8 @@ func (d *database) Store(ctx context.Context, address, title, description string
 		fn(mutate)
 	}
 
-	create.OnConflictColumns("url", "slug").UpdateNewValues()
+	create.OnConflictColumns("url").UpdateNewValues()
+	create.OnConflictColumns("slug").UpdateNewValues()
 
 	r, err := create.Save(ctx)
 	if err != nil {
