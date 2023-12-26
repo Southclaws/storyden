@@ -1,8 +1,8 @@
 "use client";
 
+import { LinkIndexView } from "src/components/directory/links/LinkIndexView/LinkIndexView";
 import { Unready } from "src/components/site/Unready";
 
-import { LinkIndexView } from "./components/LinkIndexView/LinkIndexView";
 import { Props, useLinkIndexScreen } from "./useLinkIndexScreen";
 
 export function Client(props: Props) {
