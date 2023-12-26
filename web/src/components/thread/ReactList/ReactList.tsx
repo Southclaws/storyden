@@ -1,8 +1,6 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 import {
-  Button,
-  IconButton,
   List,
   ListItem,
   Popover,
@@ -11,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "src/theme/components";
+import { Button } from "src/theme/components/Button";
 
 import { Box } from "@/styled-system/jsx";
 
@@ -37,11 +36,9 @@ export function ReactList(props: Props) {
       {authenticated && (
         <Popover onOpen={onOpen}>
           <PopoverTrigger>
-            <IconButton
-              size="xs"
-              aria-label="add"
-              icon={<PlusIcon width="1.25em" />}
-            />
+            <Button size="xs" aria-label="add">
+              <PlusIcon width="1.25em" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent>
             <PopoverArrow />

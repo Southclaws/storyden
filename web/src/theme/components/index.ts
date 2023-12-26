@@ -1,15 +1,11 @@
 import {
   BoxProps,
-  Button,
-  Checkbox,
   CloseButton,
   CreateToastFnReturn,
   Divider,
   FlexProps,
   Heading,
-  IconButton,
   Image,
-  Input,
   Link,
   LinkBox,
   LinkOverlay,
@@ -36,10 +32,6 @@ import {
 } from "@chakra-ui/react";
 
 // NOTE: These are being replaced gradually, so these are being re-exported.
-
-// Form
-
-export { Button, Checkbox, IconButton, Input };
 
 // Typography
 

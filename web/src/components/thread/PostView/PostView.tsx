@@ -1,7 +1,7 @@
 import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
-import { Button } from "src/theme/components";
+import { Button } from "src/theme/components/Button";
 
 import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
@@ -41,7 +41,7 @@ export function PostView(props: Props) {
           />
           <HStack>
             <Button onClick={onPublishEdit}>Update</Button>
-            <Button variant="outline" onClick={onCancelEdit}>
+            <Button kind="ghost" onClick={onCancelEdit}>
               Cancel
             </Button>
           </HStack>

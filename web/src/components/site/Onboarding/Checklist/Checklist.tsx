@@ -2,9 +2,11 @@
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
-import { Button, Heading, Link, OrderedList, Text } from "src/theme/components";
+import { Button } from "src/theme/components/Button";
+import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
+import { Link } from "src/theme/components/Link";
 
-import { VStack } from "@/styled-system/jsx";
+import { VStack, styled } from "@/styled-system/jsx";
 
 import { Card } from "./Card";
 import { isComplete, useChecklist } from "./useChecklist";
@@ -19,18 +21,18 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
 
   return (
     <VStack width="full" height="full" justify="start" pt="4" pb="16">
-      <Heading size="lg">Welcome to Storyden!</Heading>
-      <Text p={2} textAlign="center">
+      <Heading1 size="lg">Welcome to Storyden!</Heading1>
+      <styled.p p="2" textAlign="center">
         Get your community set up
         <br />
         with the following steps:
-      </Text>
-      <OrderedList
+      </styled.p>
+      <styled.ol
         display="flex"
         flexDir="column"
-        gap={4}
+        gap="4"
         listStyleType="none"
-        m={0}
+        m="0"
       >
         <Card
           step={1}
@@ -38,10 +40,10 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Create an account"
           url="/register"
         >
-          <Text>
+          <styled.p>
             Start by creating an account. The first registration is
             automatically given administrator rights!
-          </Text>
+          </styled.p>
         </Card>
 
         <Card
@@ -50,10 +52,10 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Create a category"
           onClick={onOpen}
         >
-          <Text>
+          <styled.p>
             Posts need to live somewhere! So create your first category, give it
             a name and set it up just how you like!
-          </Text>
+          </styled.p>
           <CategoryCreateModal onClose={onClose} isOpen={isOpen} />
         </Card>
 
@@ -63,21 +65,21 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Write your first post"
           url="/new"
         >
-          <Text>
+          <styled.p>
             An intro, a thesis, a manifesto, a set of rules or just a hi! Get
             started on your first post in your new category!
-          </Text>
+          </styled.p>
         </Card>
 
         <VStack textAlign="center" px="2">
-          <Heading size="md">Invite your people</Heading>
-          <Text>
+          <Heading2 size="md">Invite your people</Heading2>
+          <styled.p>
             And you&apos;re ready to go! Spread the word and let the posts flow.{" "}
             <Link color="blue.400" href="https://www.storyden.org/docs">
               Visit the docs
             </Link>{" "}
             for more info if you get stuck.
-          </Text>
+          </styled.p>
 
           {isLoggedIn && (
             <Button onClick={onFinish}>
@@ -85,7 +87,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
             </Button>
           )}
         </VStack>
-      </OrderedList>
+      </styled.ol>
     </VStack>
   );
 }

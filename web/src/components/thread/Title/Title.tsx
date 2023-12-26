@@ -1,5 +1,5 @@
 import { Thread } from "src/api/openapi/schemas";
-import { Input } from "src/theme/components";
+import { Input } from "src/theme/components/Input";
 
 import { CategoryPill } from "../CategoryPill";
 import { LinkView } from "../LinkView/LinkView";
