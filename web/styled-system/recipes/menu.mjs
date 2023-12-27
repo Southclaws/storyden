@@ -20,6 +20,10 @@ const menuSlotNames = [
     "menu__triggerItem"
   ],
   [
+    "indicator",
+    "menu__indicator"
+  ],
+  [
     "positioner",
     "menu__positioner"
   ],
@@ -46,6 +50,14 @@ const menuSlotNames = [
   [
     "optionItem",
     "menu__optionItem"
+  ],
+  [
+    "optionItemIndicator",
+    "menu__optionItemIndicator"
+  ],
+  [
+    "optionItemText",
+    "menu__optionItemText"
   ],
   [
     "itemGroupLabel",

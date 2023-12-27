@@ -1,4 +1,4 @@
-import { popoverAnatomy } from "@ark-ui/react";
+import { popoverAnatomy } from "@ark-ui/anatomy";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const popover = defineSlotRecipe({
@@ -7,9 +7,9 @@ export const popover = defineSlotRecipe({
   base: {
     positioner: {
       position: "relative",
-      zIndex: "popover",
     },
     content: {
+      zIndex: "popover",
       borderRadius: "lg",
       boxShadow: "lg",
       display: "flex",
