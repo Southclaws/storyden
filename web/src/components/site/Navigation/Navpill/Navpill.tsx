@@ -17,6 +17,7 @@ import { LogoutAction } from "../Anchors/Logout";
 import { NotificationsAction } from "../Anchors/Notifications";
 import { SettingsAction } from "../Anchors/Settings";
 
+import { css } from "@/styled-system/css";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { Menu } from "./components/Menu";
@@ -35,7 +36,7 @@ export function Navpill() {
   } = useNavpill();
   return (
     <Toolpill onClickOutside={onClose}>
-      <Presence present={isExpanded}>
+      <Presence present={isExpanded} className={css({ w: "full" })}>
         <styled.div w="full">
           <HStack w="full" justify="space-between">
             {account ? (
