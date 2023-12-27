@@ -33,7 +33,7 @@ export function ReactList(props: Props) {
       ))}
 
       {authenticated && (
-        <Popover closeOnInteractOutside closeOnEsc>
+        <Popover lazyMount>
           <PopoverTrigger asChild>
             <Button size="xs" aria-label="add">
               <PlusIcon width="1.25em" />
