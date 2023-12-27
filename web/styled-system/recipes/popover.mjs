@@ -22,6 +22,10 @@ const popoverSlotNames = [
     "popover__trigger"
   ],
   [
+    "indicator",
+    "popover__indicator"
+  ],
+  [
     "positioner",
     "popover__positioner"
   ],

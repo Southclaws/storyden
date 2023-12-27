@@ -21,7 +21,7 @@ export function useCollectionMenu({ thread }: Props) {
     setSelected(0);
   };
 
-  const { isOpen, onOpen, onClose, onToggle } = useDisclosure({
+  const { isOpen, onOpenChange, onToggle } = useDisclosure({
     onClose: onReset,
   });
 
@@ -54,9 +54,8 @@ export function useCollectionMenu({ thread }: Props) {
     collections: collections.collections,
     onKeyDown,
     onKeyUp,
+    onOpenChange,
     multiSelect,
     isOpen,
-    onOpen,
-    onClose,
   };
 }

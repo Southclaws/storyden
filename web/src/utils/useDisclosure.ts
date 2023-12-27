@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
+export interface OpenChangeEvent {
+  open: boolean;
+}
+
 export interface UseDisclosureProps {
   isOpen?: boolean;
   defaultIsOpen?: boolean;
   onClose?(): void;
   onOpen?(): void;
+  onOpenChange?(e: OpenChangeEvent): void;
   id?: string;
 }
 
@@ -68,6 +73,17 @@ export function useDisclosure(props: UseDisclosureProps = {}) {
     }
   }, [isOpen, onOpen, onClose]);
 
+  const onOpenChange = useCallback(
+    (event: OpenChangeEvent) => {
+      if (event.open) {
+        onClose();
+      } else {
+        onOpen();
+      }
+    },
+    [onOpen, onClose],
+  );
+
   function getButtonProps(props: HTMLProps = {}): HTMLProps {
     return {
       ...props,
@@ -92,6 +108,7 @@ export function useDisclosure(props: UseDisclosureProps = {}) {
     isOpen,
     onOpen,
     onClose,
+    onOpenChange,
     onToggle,
     isControlled,
     getButtonProps,

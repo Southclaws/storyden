@@ -17,7 +17,7 @@ export type MenuVariantProps = {
 
 export interface MenuRecipe {
   __type: MenuVariantProps
-  (props?: MenuVariantProps): Pretty<Record<"contextTrigger" | "trigger" | "triggerItem" | "positioner" | "arrow" | "arrowTip" | "content" | "separator" | "item" | "optionItem" | "itemGroupLabel" | "itemGroup", string>>
+  (props?: MenuVariantProps): Pretty<Record<"contextTrigger" | "trigger" | "triggerItem" | "indicator" | "positioner" | "arrow" | "arrowTip" | "content" | "separator" | "item" | "optionItem" | "optionItemIndicator" | "optionItemText" | "itemGroupLabel" | "itemGroup", string>>
   raw: (props?: MenuVariantProps) => MenuVariantProps
   variantMap: MenuVariantMap
   variantKeys: Array<keyof MenuVariant>

@@ -22,13 +22,13 @@ export function FeedItemMenu(props: Props) {
     useFeedItemMenu(props);
 
   return (
-    <Menu size="sm">
+    <Menu size="sm" lazyMount>
       <MenuTrigger asChild>
         <MoreAction />
       </MenuTrigger>
       <Portal>
         <MenuPositioner>
-          <MenuContent lazyMount minW="36">
+          <MenuContent minW="36">
             <MenuItemGroup id="user">
               <MenuItemGroupLabel
                 htmlFor="user"
