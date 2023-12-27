@@ -43,7 +43,12 @@ export function ReactList(props: Props) {
 
           <PopoverPositioner ref={ref}>
             <PopoverContent>
-              <Picker data={data} onEmojiSelect={handlers.handleSelect} />
+              <Picker
+                data={data}
+                onEmojiSelect={handlers.handleSelect}
+                // TODO: When we do dark mode, this needs to be updated!
+                theme="light"
+              />
             </PopoverContent>
           </PopoverPositioner>
         </Popover>
