@@ -35,7 +35,7 @@ export function PostMenu(props: PostProps) {
 
   return (
     <Menu size="sm">
-      <MenuTrigger>
+      <MenuTrigger asChild>
         <MoreAction />
       </MenuTrigger>
 
