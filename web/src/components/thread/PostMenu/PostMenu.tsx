@@ -34,14 +34,14 @@ export function PostMenu(props: PostProps) {
   } = usePostMenu(props);
 
   return (
-    <Menu size="sm">
+    <Menu size="sm" lazyMount>
       <MenuTrigger asChild>
         <MoreAction />
       </MenuTrigger>
 
       <Portal>
         <MenuPositioner>
-          <MenuContent lazyMount minW="36">
+          <MenuContent minW="36">
             <MenuItemGroup id="group">
               <MenuItemGroupLabel
                 htmlFor="user"

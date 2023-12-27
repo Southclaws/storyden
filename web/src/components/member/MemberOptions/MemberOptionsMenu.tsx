@@ -28,12 +28,7 @@ export function MemberOptionsMenu({
   const showAdminOptions = session?.admin && props.handle !== session.handle;
 
   return (
-    <Menu
-      size="sm"
-      userSelect="none"
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-    >
+    <Menu size="sm" userSelect="none" onOpenChange={props.onOpenChange}>
       <MenuTrigger asChild>{children}</MenuTrigger>
 
       <Portal>
