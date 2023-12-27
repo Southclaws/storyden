@@ -1,18 +1,23 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 
 import { Navpill } from "src/components/site/Navigation/Navpill/Navpill";
-import { Sidebar } from "src/components/site/Navigation/Sidebar/Sidebar";
+
+import styles from "./navigation.module.css";
 
 import { Box } from "@/styled-system/jsx";
+
+import { Left } from "./Left/Left";
+import { Top } from "./Top/Top";
 
 const ROUTES_WITHOUT_NAVPILL = ["/new"];
 
 const isNavpillShown = (path: string | null) =>
   ROUTES_WITHOUT_NAVPILL.includes(path ?? "");
 
-export function Navigation() {
+export function Navigation({ children }: PropsWithChildren) {
   const pathname = usePathname();
 
   return (
@@ -22,9 +27,15 @@ export function Navigation() {
         id="mobile-nav-container"
         display={{
           base: isNavpillShown(pathname) ? "none" : "unset",
-          md: "none",
+          lg: "none",
         }}
       >
+        <Box p="3">
+          {/*  */}
+          {children}
+          {/*  */}
+        </Box>
+
         <Navpill />
       </Box>
 
@@ -33,23 +44,41 @@ export function Navigation() {
         id="desktop-nav-container"
         display={{
           base: "none",
-          md: "flex",
+          lg: "block",
         }}
-        height="dvh"
-        // The sidebar width is identical in both this container and the sidebar
-        // itself. The reason for this is the sidebar is "position: fixed" which
-        // means it cannot inherit the width from a parent since its true parent
-        // is the viewport, and to get around this, the default layout positions
-        // an empty box to the left of the viewport in order to push the content
-        // right and then the actual sidebar is rendered on top of this with the
-        // same width sizing configuration.
-        minWidth={{
-          md: "1/4",
-          lg: "1/3",
-        }}
-        boxShadow="md"
+        w="full"
       >
-        <Sidebar />
+        <Box id="navigation__scroll" className={styles["navgrid"]}>
+          <Box className={styles["main"]}>
+            {/*  */}
+            {children}
+            {/*  */}
+          </Box>
+        </Box>
+
+        <Box
+          id="navigation__fixed"
+          position="fixed"
+          zIndex="overlay"
+          top="0"
+          left="0"
+          height="dvh"
+          className={styles["navgrid"]}
+          pointerEvents="none"
+        >
+          <Box className={styles["topbar"]}>
+            <Top />
+          </Box>
+
+          <Box className={styles["leftbar"]} pb="2">
+            <Left />
+          </Box>
+
+          <Box className={styles["rightbar"]}>
+            {/* RIGHT BAR NOT DONE YET */}
+            {/* <Right /> */}
+          </Box>
+        </Box>
       </Box>
     </>
   );

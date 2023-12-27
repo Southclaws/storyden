@@ -6,39 +6,30 @@ import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/Ca
 import { Link } from "src/theme/components/Link";
 
 import { CategoryList } from "../../../category/CategoryList/CategoryList";
+import { navbarStyles } from "../common";
+import { Authbar } from "../components/Authbar";
 import { useNavigation } from "../useNavigation";
 
 import { Box, Divider, VStack, styled } from "@/styled-system/jsx";
 
-import { Authbar } from "./components/Authbar";
-import { Title } from "./components/Title";
-import { Toolbar } from "./components/Toolbar";
+export function Left2() {
+  return (
+    <VStack className={navbarStyles} justify="space-between" px="4"></VStack>
+  );
+}
 
-export function Sidebar() {
-  const { isAdmin, title } = useNavigation();
+export function Left() {
+  const { isAdmin } = useNavigation();
 
   return (
     <styled.header
       display="flex"
-      position="fixed"
-      width={{
-        md: "1/4",
-        lg: "1/3",
-      }}
       height="full"
       justifyContent="end"
       bgColor="accent.200"
+      className={navbarStyles}
     >
-      <Box
-        id="desktop-nav-box"
-        maxWidth="xs"
-        minWidth={{
-          base: "full",
-          lg: "xs",
-        }}
-        height="full"
-        p="4"
-      >
+      <Box id="desktop-nav-box" w="full" height="full" p="4">
         <styled.nav
           display="flex"
           flexDir="column"
@@ -48,12 +39,6 @@ export function Sidebar() {
           alignItems="start"
         >
           <VStack width="full" alignItems="start">
-            <Title>{title}</Title>
-
-            <Toolbar />
-
-            <Divider />
-
             <Box
               overflowY="scroll"
               width="full"

@@ -13,20 +13,12 @@ export function Default(props: PropsWithChildren) {
       backgroundColor="accent.50"
       vaul-drawer-wrapper=""
     >
-      <Navigation />
-
-      <styled.main
-        width="full"
-        minW="0"
-        maxW={{
-          base: "full",
-          lg: "3xl",
-        }}
-        p="4"
-      >
-        {props.children}
-        <Box height="24"></Box>
-      </styled.main>
+      <Navigation>
+        <styled.main width="full" minW="0">
+          {props.children}
+          <Box height="24"></Box>
+        </styled.main>
+      </Navigation>
     </Flex>
   );
 }

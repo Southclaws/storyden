@@ -1,0 +1,77 @@
+/*
+  Navgrid sets up the grid for content, top, left and right navigation elements.
+
+  It's done in pure CSS because it's just so much easier to read and write.
+
+  We're using a grid layout here in two places in order to make the sticky parts
+  easier to deal with. The first place it's used is the actual in-flow layout,
+  which only defines the scrollable content. This content is placed in to the
+  ".main" grid area and the other areas remain completely empty. Then the second
+  usage is for the sticky elements, which occupy the areas specified by classes
+  ".topbar", ".leftbar" and ".rightbar". This results in two instances of this
+  grid being overlayed on top of each other, making layout adjustments easier.
+*/
+
+.navgrid {
+  --grid-padding-outer: var(--spacing-5);
+  --grid-padding-inner: var(--spacing-3);
+  --grid-padding-inner-right: 0px;
+  --navgrid-right-bar-width: 0px;
+  --navgrid-right-bar-display: none;
+}
+
+/* 1280px
+768px */
+
+@media screen and (min-width: 1280px) {
+  .navgrid {
+    --grid-padding-inner-right: var(--spacing-3);
+    --navgrid-right-bar-width: 18rem;
+    --navgrid-right-bar-display: block;
+  }
+}
+
+.navgrid {
+  display: grid;
+
+  grid-template-rows:
+    var(--grid-padding-outer)
+    4rem
+    var(--grid-padding-inner)
+    1fr;
+
+  grid-template-columns:
+    minmax(var(--grid-padding-outer), 1fr)
+    18rem
+    var(--grid-padding-inner)
+    minmax(0, var(--sizes-breakpoint-lg))
+    var(--grid-padding-inner-right)
+    var(--navgrid-right-bar-width)
+    minmax(var(--grid-padding-outer), 1fr);
+
+  grid-template-areas:
+    " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
+    " padleft  topbar    topbar   topbar   topbar   topbar    padright "
+    " padleft  padmid    padmid   padmid   padmid   padmid    padright "
+    " padbl    leftbar   .        main     .        rightbar  padbr    ";
+}
+
+.topbar {
+  grid-area: topbar;
+  pointer-events: all;
+}
+
+.leftbar {
+  grid-area: leftbar;
+  pointer-events: all;
+}
+
+.rightbar {
+  display: var(--navgrid-right-bar-display);
+  grid-area: rightbar;
+  pointer-events: all;
+}
+
+.main {
+  grid-area: main;
+}
