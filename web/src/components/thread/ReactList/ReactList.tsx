@@ -5,6 +5,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "src/theme/components/Button";
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverPositioner,
   PopoverTrigger,
@@ -15,7 +16,7 @@ import { styled } from "@/styled-system/jsx";
 import { Props, useReactList } from "./useReactList";
 
 export function ReactList(props: Props) {
-  const { authenticated, handlers } = useReactList(props);
+  const { authenticated, ref, isOpen, handlers } = useReactList(props);
   return (
     <styled.ul
       display="flex"
@@ -33,19 +34,16 @@ export function ReactList(props: Props) {
       ))}
 
       {authenticated && (
-        <Popover lazyMount>
-          <PopoverTrigger asChild>
-            <Button size="xs" aria-label="add">
+        <Popover open={isOpen} lazyMount closeOnInteractOutside={false}>
+          <PopoverAnchor>
+            <Button size="xs" aria-label="add" onClick={handlers.handleTrigger}>
               <PlusIcon width="1.25em" />
             </Button>
-          </PopoverTrigger>
+          </PopoverAnchor>
 
-          <PopoverPositioner>
+          <PopoverPositioner ref={ref}>
             <PopoverContent>
-              <Picker
-                data={data} //
-                onEmojiSelect={handlers.onSelect}
-              />
+              <Picker data={data} onEmojiSelect={handlers.handleSelect} />
             </PopoverContent>
           </PopoverPositioner>
         </Popover>
