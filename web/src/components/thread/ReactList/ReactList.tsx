@@ -8,7 +8,6 @@ import {
   PopoverAnchor,
   PopoverContent,
   PopoverPositioner,
-  PopoverTrigger,
 } from "src/theme/components/Popover";
 
 import { styled } from "@/styled-system/jsx";
