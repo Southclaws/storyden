@@ -1,14 +1,21 @@
-import { Popover } from "@ark-ui/react";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 import { Button } from "src/theme/components/Button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverPositioner,
+  PopoverTrigger,
+} from "src/theme/components/Popover";
 
-import { Box, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 
-import { Props, emojiPickerContainerID, useReactList } from "./useReactList";
+import { Props, useReactList } from "./useReactList";
 
 export function ReactList(props: Props) {
-  const { onOpen, authenticated } = useReactList(props);
+  const { authenticated, handlers } = useReactList(props);
   return (
     <styled.ul
       display="flex"
@@ -26,23 +33,22 @@ export function ReactList(props: Props) {
       ))}
 
       {authenticated && (
-        <Popover.Root onOpen={onOpen} portalled>
-          <Popover.Trigger>
+        <Popover closeOnInteractOutside closeOnEsc>
+          <PopoverTrigger asChild>
             <Button size="xs" aria-label="add">
               <PlusIcon width="1.25em" />
             </Button>
-          </Popover.Trigger>
-          <Popover.Positioner>
-            <Popover.Content lazyMount>
-              <Box
-                id={`${emojiPickerContainerID}-${props.id}`}
-                zIndex="dropdown"
-              >
-                [emoji picker]
-              </Box>
-            </Popover.Content>
-          </Popover.Positioner>
-        </Popover.Root>
+          </PopoverTrigger>
+
+          <PopoverPositioner>
+            <PopoverContent>
+              <Picker
+                data={data} //
+                onEmojiSelect={handlers.onSelect}
+              />
+            </PopoverContent>
+          </PopoverPositioner>
+        </Popover>
       )}
     </styled.ul>
   );
