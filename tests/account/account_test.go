@@ -43,7 +43,7 @@ func TestAccountAuth(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(a1)
-			r.Equal(200, a1.StatusCode())
+			r.Equal(http.StatusOK, a1.StatusCode())
 
 			id1, err := xid.FromString(a1.JSON200.Id)
 			r.NoError(err)
@@ -55,7 +55,7 @@ func TestAccountAuth(t *testing.T) {
 			get1, err := cl.AccountGetWithResponse(root, e2e.WithSession(ctx1, cj))
 			r.NoError(err)
 			r.NotNil(get1)
-			r.Equal(200, get1.StatusCode())
+			r.Equal(http.StatusOK, get1.StatusCode())
 
 			a.Equal(hand1, get1.JSON200.Handle)
 
@@ -67,7 +67,7 @@ func TestAccountAuth(t *testing.T) {
 			}, e2e.WithSession(ctx1, cj))
 			r.NoError(err)
 			r.NotNil(change1)
-			r.Equal(200, change1.StatusCode())
+			r.Equal(http.StatusOK, change1.StatusCode())
 
 			// Log in to the new account with the old password - fails
 
@@ -77,7 +77,7 @@ func TestAccountAuth(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(signin1)
-			r.Equal(403, signin1.StatusCode())
+			r.Equal(http.StatusForbidden, signin1.StatusCode())
 
 			// Log in to the new account with the new password - succeeds
 
@@ -87,7 +87,7 @@ func TestAccountAuth(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(signin2)
-			r.Equal(200, signin2.StatusCode())
+			r.Equal(http.StatusOK, signin2.StatusCode())
 		}))
 	}))
 }
@@ -113,7 +113,7 @@ func TestAccountAdmin(t *testing.T) {
 
 			admin, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: adminHandle, Token: "password"})
 			r.NoError(err)
-			r.Equal(200, admin.StatusCode())
+			r.Equal(http.StatusOK, admin.StatusCode())
 			adminID := account.AccountID(utils.Must(xid.FromString(admin.JSON200.Id)))
 			adminSession := e2e.WithSession(session.WithAccountID(root, adminID), cj)
 
@@ -121,13 +121,13 @@ func TestAccountAdmin(t *testing.T) {
 
 			victim, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: victimHandle, Token: "password"})
 			r.NoError(err)
-			r.Equal(200, victim.StatusCode())
+			r.Equal(http.StatusOK, victim.StatusCode())
 			victimID := account.AccountID(utils.Must(xid.FromString(victim.JSON200.Id)))
 			victimSession := e2e.WithSession(session.WithAccountID(root, victimID), cj)
 
 			random, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: randomHandle, Token: "password"})
 			r.NoError(err)
-			r.Equal(200, random.StatusCode())
+			r.Equal(http.StatusOK, random.StatusCode())
 			randomID := account.AccountID(utils.Must(xid.FromString(random.JSON200.Id)))
 			randomSession := e2e.WithSession(session.WithAccountID(root, randomID), cj)
 

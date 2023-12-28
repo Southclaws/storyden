@@ -2,6 +2,7 @@ package account_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/rs/xid"
@@ -44,7 +45,7 @@ func TestPublicProfiles(t *testing.T) {
 			list1, err := cl.ProfileListWithResponse(root, nil)
 			r.NoError(err)
 			r.NotNil(list1)
-			r.Equal(200, list1.StatusCode())
+			r.Equal(http.StatusOK, list1.StatusCode())
 
 			a.Equal(1, list1.JSON200.CurrentPage)
 			a.GreaterOrEqual(len(list1.JSON200.Profiles), 5)
@@ -56,7 +57,7 @@ func TestPublicProfiles(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(list2)
-			r.Equal(200, list2.StatusCode())
+			r.Equal(http.StatusOK, list2.StatusCode())
 
 			a.Equal(1, list1.JSON200.CurrentPage)
 			a.Equal(50, list1.JSON200.PageSize)
@@ -69,7 +70,7 @@ func TestPublicProfiles(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(list3)
-			r.Equal(200, list3.StatusCode())
+			r.Equal(http.StatusOK, list3.StatusCode())
 
 			a.Equal(2147483647, list3.JSON200.CurrentPage)
 			a.Nil(list3.JSON200.NextPage)
@@ -89,7 +90,7 @@ func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithRespons
 	})
 	r.NoError(err)
 	r.NotNil(response)
-	r.Equal(200, response.StatusCode())
+	r.Equal(http.StatusOK, response.StatusCode())
 
 	acc, err := ar.GetByID(ctx, account.AccountID(utils.Must(xid.FromString(response.JSON200.Id))))
 	r.NoError(err)

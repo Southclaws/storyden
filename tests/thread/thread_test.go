@@ -2,6 +2,7 @@ package thread_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -46,7 +47,7 @@ func TestThreads(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cat1create)
-			r.Equal(200, cat1create.StatusCode())
+			r.Equal(http.StatusOK, cat1create.StatusCode())
 
 			a.Equal(cat1name, cat1create.JSON200.Name)
 			a.Equal("category testing", cat1create.JSON200.Description)
@@ -60,7 +61,7 @@ func TestThreads(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(thread1create)
-			r.Equal(200, thread1create.StatusCode())
+			r.Equal(http.StatusOK, thread1create.StatusCode())
 
 			a.Nil(thread1create.JSON200.DeletedAt)
 			a.Equal(acc.ID.String(), thread1create.JSON200.Author.Id)
@@ -78,7 +79,7 @@ func TestThreads(t *testing.T) {
 			threadlist, err := cl.ThreadListWithResponse(ctx, &openapi.ThreadListParams{})
 			r.NoError(err)
 			r.NotNil(threadlist)
-			r.Equal(200, threadlist.StatusCode())
+			r.Equal(http.StatusOK, threadlist.StatusCode())
 
 			ids := dt.Map(threadlist.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 			a.Contains(ids, thread1create.JSON200.Id)
@@ -90,14 +91,14 @@ func TestThreads(t *testing.T) {
 			}, e2e.WithSession(ctx2, cj))
 			r.NoError(err)
 			r.NotNil(reply1create)
-			r.Equal(200, reply1create.StatusCode())
+			r.Equal(http.StatusOK, reply1create.StatusCode())
 
 			a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
 
 			thread1get, err := cl.ThreadGetWithResponse(ctx, thread1create.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(thread1get)
-			r.Equal(200, thread1get.StatusCode())
+			r.Equal(http.StatusOK, thread1get.StatusCode())
 
 			a.Len(thread1get.JSON200.Posts, 2)
 			replyids := dt.Map(thread1get.JSON200.Posts, func(p openapi.PostProps) string { return p.Id })
