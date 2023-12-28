@@ -2,6 +2,7 @@ package item_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/Southclaws/dt"
@@ -49,7 +50,7 @@ func TestItemsHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
-			r.Equal(200, item1.StatusCode())
+			r.Equal(http.StatusOK, item1.StatusCode())
 
 			a.Equal(name1, item1.JSON200.Name)
 			a.Equal(slug1, item1.JSON200.Slug)
@@ -64,7 +65,7 @@ func TestItemsHappyPath(t *testing.T) {
 			item1get, err := cl.ItemGetWithResponse(ctx, item1.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(item1)
-			r.Equal(200, item1.StatusCode())
+			r.Equal(http.StatusOK, item1.StatusCode())
 
 			a.Equal(name1, item1get.JSON200.Name)
 			a.Equal(slug1, item1get.JSON200.Slug)
@@ -94,7 +95,7 @@ func TestItemsHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1update)
-			r.Equal(200, item1update.StatusCode())
+			r.Equal(http.StatusOK, item1update.StatusCode())
 
 			a.Equal(name1, item1update.JSON200.Name)
 			a.Equal(slug1, item1update.JSON200.Slug)
@@ -112,7 +113,7 @@ func TestItemsHappyPath(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(items1)
-			r.Equal(200, items1.StatusCode())
+			r.Equal(http.StatusOK, items1.StatusCode())
 
 			ids := dt.Map(items1.JSON200.Items, func(c openapi.ItemWithParents) string { return c.Id })
 			a.Contains(ids, item1.JSON200.Id)
@@ -122,7 +123,7 @@ func TestItemsHappyPath(t *testing.T) {
 			items2, err := cl.ItemListWithResponse(ctx, &openapi.ItemListParams{})
 			r.NoError(err)
 			r.NotNil(items2)
-			r.Equal(200, items2.StatusCode())
+			r.Equal(http.StatusOK, items2.StatusCode())
 
 			ids = dt.Map(items2.JSON200.Items, func(c openapi.ItemWithParents) string { return c.Id })
 			a.Contains(ids, item1.JSON200.Id)
@@ -146,25 +147,25 @@ func TestItemsErrors(t *testing.T) {
 
 			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
-			create401, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{})
+			create403, err := cl.ItemCreateWithResponse(ctx, openapi.ItemInitialProps{})
 			r.NoError(err)
-			r.NotNil(create401)
-			a.Equal(401, create401.StatusCode())
+			r.NotNil(create403)
+			a.Equal(http.StatusForbidden, create403.StatusCode())
 
 			get404, err := cl.ItemGetWithResponse(ctx, "nonexistent")
 			r.NoError(err)
 			r.NotNil(get404)
-			a.Equal(404, get404.StatusCode())
+			a.Equal(http.StatusNotFound, get404.StatusCode())
 
-			update401, err := cl.ItemUpdateWithResponse(ctx, "nonexistent", openapi.ItemMutableProps{})
+			update403, err := cl.ItemUpdateWithResponse(ctx, "nonexistent", openapi.ItemMutableProps{})
 			r.NoError(err)
-			r.NotNil(update401)
-			a.Equal(401, update401.StatusCode())
+			r.NotNil(update403)
+			a.Equal(http.StatusForbidden, update403.StatusCode())
 
 			update404, err := cl.ItemUpdateWithResponse(ctx, "nonexistent", openapi.ItemMutableProps{}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(update404)
-			a.Equal(404, update404.StatusCode())
+			a.Equal(http.StatusNotFound, update404.StatusCode())
 		}))
 	}))
 }

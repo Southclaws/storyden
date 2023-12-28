@@ -2,6 +2,7 @@ package cluster_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -49,7 +50,7 @@ func TestClustersHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
-			r.Equal(200, clus1.StatusCode())
+			r.Equal(http.StatusOK, clus1.StatusCode())
 
 			a.Equal(name1, clus1.JSON200.Name)
 			a.Equal(slug1, clus1.JSON200.Slug)
@@ -64,7 +65,7 @@ func TestClustersHappyPath(t *testing.T) {
 			clus1get, err := cl.ClusterGetWithResponse(ctx, slug1)
 			r.NoError(err)
 			r.NotNil(clus1get)
-			r.Equal(200, clus1get.StatusCode())
+			r.Equal(http.StatusOK, clus1get.StatusCode())
 
 			a.Equal(name1, clus1get.JSON200.Name)
 			a.Equal(slug1, clus1get.JSON200.Slug)
@@ -93,7 +94,7 @@ func TestClustersHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1update)
-			r.Equal(200, clus1update.StatusCode())
+			r.Equal(http.StatusOK, clus1update.StatusCode())
 
 			a.Equal(name1, clus1update.JSON200.Name)
 			a.Equal(slug1, clus1update.JSON200.Slug)
@@ -108,7 +109,7 @@ func TestClustersHappyPath(t *testing.T) {
 			clist, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{})
 			r.NoError(err)
 			r.NotNil(clist)
-			r.Equal(200, clist.StatusCode())
+			r.Equal(http.StatusOK, clist.StatusCode())
 
 			ids := dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 
@@ -126,12 +127,12 @@ func TestClustersHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
-			r.Equal(200, clus2.StatusCode())
+			r.Equal(http.StatusOK, clus2.StatusCode())
 
 			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
-			r.Equal(200, cadd.StatusCode())
+			r.Equal(http.StatusOK, cadd.StatusCode())
 			r.Equal(clus1.JSON200.Id, cadd.JSON200.Id)
 
 			// List all root level clusters
@@ -139,7 +140,7 @@ func TestClustersHappyPath(t *testing.T) {
 			clist2, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{})
 			r.NoError(err)
 			r.NotNil(clist2)
-			r.Equal(200, clist2.StatusCode())
+			r.Equal(http.StatusOK, clist2.StatusCode())
 
 			ids = dt.Map(clist2.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.Contains(ids, clus1.JSON200.Id)
@@ -161,12 +162,12 @@ func TestClustersHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
-			r.Equal(200, clus3.StatusCode())
+			r.Equal(http.StatusOK, clus3.StatusCode())
 
 			cadd, err = cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
-			r.Equal(200, cadd.StatusCode())
+			r.Equal(http.StatusOK, cadd.StatusCode())
 			r.Equal(clus2.JSON200.Id, cadd.JSON200.Id)
 
 			// List all root level clusters
@@ -174,7 +175,7 @@ func TestClustersHappyPath(t *testing.T) {
 			clist3, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{})
 			r.NoError(err)
 			r.NotNil(clist3)
-			r.Equal(200, clist3.StatusCode())
+			r.Equal(http.StatusOK, clist3.StatusCode())
 
 			ids = dt.Map(clist3.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.Contains(ids, clus1.JSON200.Id)
@@ -187,7 +188,7 @@ func TestClustersHappyPath(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(clist4)
-			r.Equal(200, clist4.StatusCode())
+			r.Equal(http.StatusOK, clist4.StatusCode())
 
 			ids = dt.Map(clist4.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.NotContains(ids, clus1.JSON200.Id, "must not contain clus1 as it's not a descendant of clus2")
@@ -199,7 +200,7 @@ func TestClustersHappyPath(t *testing.T) {
 			cremove, err := cl.ClusterRemoveClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cremove)
-			r.Equal(200, cremove.StatusCode())
+			r.Equal(http.StatusOK, cremove.StatusCode())
 			r.Equal(clus2.JSON200.Id, cremove.JSON200.Id)
 
 			clist5, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
@@ -207,7 +208,7 @@ func TestClustersHappyPath(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(clist5)
-			r.Equal(200, clist5.StatusCode())
+			r.Equal(http.StatusOK, clist5.StatusCode())
 
 			ids = dt.Map(clist5.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.NotContains(ids, clus1.JSON200.Id, "must not contain clus1 as it's not a descendant of clus2")
@@ -245,7 +246,7 @@ func TestClustersFiltering(t *testing.T) {
 			}, e2e.WithSession(ctx1, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
-			r.Equal(200, clus1.StatusCode())
+			r.Equal(http.StatusOK, clus1.StatusCode())
 
 			name2 := "test-cluster-owned-by-2"
 			slug2 := name2 + uuid.NewString()
@@ -258,14 +259,14 @@ func TestClustersFiltering(t *testing.T) {
 			}, e2e.WithSession(ctx2, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
-			r.Equal(200, clus1.StatusCode())
+			r.Equal(http.StatusOK, clus1.StatusCode())
 
 			clist, err := cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
 				Author: &acc1.Handle,
 			})
 			r.NoError(err)
 			r.NotNil(clist)
-			r.Equal(200, clist.StatusCode())
+			r.Equal(http.StatusOK, clist.StatusCode())
 
 			ids := dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 
@@ -277,7 +278,7 @@ func TestClustersFiltering(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(clist2)
-			r.Equal(200, clist2.StatusCode())
+			r.Equal(http.StatusOK, clist2.StatusCode())
 
 			ids2 := dt.Map(clist2.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 
@@ -306,17 +307,17 @@ func TestClustersErrors(t *testing.T) {
 			get404, err := cl.ClusterGetWithResponse(ctx, "nonexistent")
 			r.NoError(err)
 			r.NotNil(get404)
-			a.Equal(404, get404.StatusCode())
+			a.Equal(http.StatusNotFound, get404.StatusCode())
 
-			update401, err := cl.ClusterUpdateWithResponse(ctx, "nonexistent", openapi.ClusterMutableProps{})
+			update403, err := cl.ClusterUpdateWithResponse(ctx, "nonexistent", openapi.ClusterMutableProps{})
 			r.NoError(err)
-			r.NotNil(update401)
-			a.Equal(401, update401.StatusCode())
+			r.NotNil(update403)
+			a.Equal(http.StatusForbidden, update403.StatusCode())
 
 			update404, err := cl.ClusterUpdateWithResponse(ctx, "nonexistent", openapi.ClusterMutableProps{}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(update404)
-			a.Equal(404, update404.StatusCode())
+			a.Equal(http.StatusNotFound, update404.StatusCode())
 		}))
 	}))
 }

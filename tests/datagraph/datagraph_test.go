@@ -2,6 +2,7 @@ package datagraph_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -47,7 +48,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
-			r.Equal(200, clus1.StatusCode())
+			r.Equal(http.StatusOK, clus1.StatusCode())
 
 			a.Equal(name1, clus1.JSON200.Name)
 			a.Equal(slug1, clus1.JSON200.Slug)
@@ -66,12 +67,12 @@ func TestDatagraphHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
-			r.Equal(200, clus2.StatusCode())
+			r.Equal(http.StatusOK, clus2.StatusCode())
 
 			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
-			r.Equal(200, cadd.StatusCode())
+			r.Equal(http.StatusOK, cadd.StatusCode())
 			r.Equal(clus1.JSON200.Id, cadd.JSON200.Id)
 
 			// Add another child to this child
@@ -89,12 +90,12 @@ func TestDatagraphHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
-			r.Equal(200, clus3.StatusCode())
+			r.Equal(http.StatusOK, clus3.StatusCode())
 
 			cadd, err = cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
-			r.Equal(200, cadd.StatusCode())
+			r.Equal(http.StatusOK, cadd.StatusCode())
 			r.Equal(clus2.JSON200.Id, cadd.JSON200.Id)
 
 			// Create item
@@ -109,21 +110,21 @@ func TestDatagraphHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
-			r.Equal(200, item1.StatusCode())
+			r.Equal(http.StatusOK, item1.StatusCode())
 
 			// Add item to clus1
 
 			clus1added, err := cl.ClusterAddItemWithResponse(ctx, clus1.JSON200.Slug, item1.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1added)
-			r.Equal(200, clus1added.StatusCode())
+			r.Equal(http.StatusOK, clus1added.StatusCode())
 
 			// Get clus1
 
 			clus1get, err := cl.ClusterGetWithResponse(ctx, clus1.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus1get)
-			r.Equal(200, clus1get.StatusCode())
+			r.Equal(http.StatusOK, clus1get.StatusCode())
 
 			itemids := dt.Map(clus1get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
@@ -133,7 +134,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			clus2get, err := cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus2get)
-			r.Equal(200, clus2get.StatusCode())
+			r.Equal(http.StatusOK, clus2get.StatusCode())
 
 			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.NotContains(itemids, item1.JSON200.Id)
@@ -143,14 +144,14 @@ func TestDatagraphHappyPath(t *testing.T) {
 			clus2added, err := cl.ClusterAddItemWithResponse(ctx, clus2.JSON200.Slug, item1.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2added)
-			r.Equal(200, clus2added.StatusCode())
+			r.Equal(http.StatusOK, clus2added.StatusCode())
 
 			// Get clus2
 
 			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus2get)
-			r.Equal(200, clus2get.StatusCode())
+			r.Equal(http.StatusOK, clus2get.StatusCode())
 
 			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
@@ -167,21 +168,21 @@ func TestDatagraphHappyPath(t *testing.T) {
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item2)
-			r.Equal(200, item2.StatusCode())
+			r.Equal(http.StatusOK, item2.StatusCode())
 
 			// Add item2 to clus2
 
 			clus2added, err = cl.ClusterAddItemWithResponse(ctx, clus2.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2added)
-			r.Equal(200, clus2added.StatusCode())
+			r.Equal(http.StatusOK, clus2added.StatusCode())
 
 			// Get clus2
 
 			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus2get)
-			r.Equal(200, clus2get.StatusCode())
+			r.Equal(http.StatusOK, clus2get.StatusCode())
 
 			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
@@ -192,14 +193,14 @@ func TestDatagraphHappyPath(t *testing.T) {
 			clus3added, err := cl.ClusterAddItemWithResponse(ctx, clus3.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3added)
-			r.Equal(200, clus3added.StatusCode())
+			r.Equal(http.StatusOK, clus3added.StatusCode())
 
 			// Get clus3
 
 			clus3get, err := cl.ClusterGetWithResponse(ctx, clus3.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus3get)
-			r.Equal(200, clus3get.StatusCode())
+			r.Equal(http.StatusOK, clus3get.StatusCode())
 
 			itemids = dt.Map(clus3get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.NotContains(itemids, item1.JSON200.Id)
@@ -210,7 +211,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			item1get, err := cl.ItemGetWithResponse(ctx, itemslug2)
 			r.NoError(err)
 			r.NotNil(item1get)
-			r.Equal(200, item1get.StatusCode())
+			r.Equal(http.StatusOK, item1get.StatusCode())
 
 			clusterids := dt.Map(item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.Contains(clusterids, clus2.JSON200.Id)
@@ -221,14 +222,14 @@ func TestDatagraphHappyPath(t *testing.T) {
 			item2remove, err := cl.ClusterRemoveItemWithResponse(ctx, clus2.JSON200.Slug, item2.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item2remove)
-			r.Equal(200, item2remove.StatusCode())
+			r.Equal(http.StatusOK, item2remove.StatusCode())
 
 			// Get item2, it's a member of just one cluster now
 
 			item1get, err = cl.ItemGetWithResponse(ctx, itemslug2)
 			r.NoError(err)
 			r.NotNil(item1get)
-			r.Equal(200, item1get.StatusCode())
+			r.Equal(http.StatusOK, item1get.StatusCode())
 
 			clusterids = dt.Map(item1get.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
 			a.NotContains(clusterids, clus2.JSON200.Id)
@@ -239,7 +240,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			clus2get, err = cl.ClusterGetWithResponse(ctx, clus2.JSON200.Slug)
 			r.NoError(err)
 			r.NotNil(clus2get)
-			r.Equal(200, clus2get.StatusCode())
+			r.Equal(http.StatusOK, clus2get.StatusCode())
 
 			itemids = dt.Map(clus2get.JSON200.Items, func(i openapi.Item) string { return i.Id })
 			a.Contains(itemids, item1.JSON200.Id)
@@ -253,7 +254,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			})
 			r.NoError(err)
 			r.NotNil(items1)
-			r.Equal(200, items1.StatusCode())
+			r.Equal(http.StatusOK, items1.StatusCode())
 
 			item1found, found := lo.Find(items1.JSON200.Items, func(item openapi.ItemWithParents) bool {
 				return item.Id == item1.JSON200.Id
