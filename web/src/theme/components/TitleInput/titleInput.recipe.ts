@@ -19,7 +19,6 @@ export const titleInput = defineRecipe({
     overflowWrap: "break-word",
     wordBreak: "break-word",
     fontWeight: "semibold",
-    placeholder: "Title",
     cursor: "text",
     _focus: {
       outline: "none",
