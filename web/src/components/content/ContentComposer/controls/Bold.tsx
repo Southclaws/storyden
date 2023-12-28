@@ -10,6 +10,7 @@ export function Bold() {
       backgroundColor={isActive ? "blackAlpha.100" : undefined}
       onMouseDown={onToggle}
       aria-label="Bold"
+      type="button"
     >
       <svg
         width="24"

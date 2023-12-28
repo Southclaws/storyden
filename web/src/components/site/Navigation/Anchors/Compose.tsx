@@ -1,11 +1,12 @@
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PropsWithChildren } from "react";
 
 import { Link } from "src/theme/components/Link";
 
-export function ComposeAction() {
+export function ComposeAction(props: PropsWithChildren) {
   return (
     <Link href="/new" kind="ghost" size="sm">
-      <PlusCircleIcon /> new post
+      <PlusCircleIcon /> {props.children}
     </Link>
   );
 }

@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { Box, Flex, FlexProps } from "@/styled-system/jsx";
+import { FrostedGlass } from "@/styled-system/patterns";
 
 import { Props, useToolpill } from "./useToolpill";
 
@@ -32,15 +33,13 @@ export function Toolpill({
         <Flex
           id="toolpill-content-container"
           ref={ref}
+          className={FrostedGlass()}
           p="1"
           gap="2"
           flexDirection="column"
           borderRadius="xl"
-          backdropBlur="sm"
-          backdropFilter="auto"
           transitionProperty="background-color"
           transitionDuration="fast"
-          backgroundColor="whiteAlpha.900"
           borderWidth="thin"
           borderStyle="solid"
           borderColor="blackAlpha.50"

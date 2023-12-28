@@ -1851,6 +1851,10 @@ const tokens = {
     "value": "1536px",
     "variable": "var(--breakpoints-2xl)"
   },
+  "blurs.frosted": {
+    "value": "var(--blurs-frosted)",
+    "variable": "var(--blurs-frosted)"
+  },
   "colors.accent.50": {
     "value": "var(--colors-accent-50)",
     "variable": "var(--colors-accent-50)"

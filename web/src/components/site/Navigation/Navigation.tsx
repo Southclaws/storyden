@@ -66,11 +66,9 @@ export function Navigation({ children }: PropsWithChildren) {
           className={styles["navgrid"]}
           pointerEvents="none"
         >
-          <Box className={styles["topbar"]}>
-            <Top />
-          </Box>
+          <Top />
 
-          <Box className={styles["leftbar"]} pb="2">
+          <Box className={styles["leftbar"]}>
             <Left />
           </Box>
 

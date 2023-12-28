@@ -10,6 +10,7 @@ export function Italic() {
       backgroundColor={isActive ? "blackAlpha.100" : undefined}
       onMouseDown={onToggle}
       aria-label="Italic"
+      type="button"
     >
       <svg
         width="24"

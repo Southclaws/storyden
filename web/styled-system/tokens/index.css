@@ -463,6 +463,7 @@
   --breakpoints-lg: 1024px;
   --breakpoints-xl: 1280px;
   --breakpoints-2xl: 1536px;
+  --blurs-frosted: 8px;
   --colors-accent-50: var(--accent-colour-flat-fill-50);
   --colors-accent-100: var(--accent-colour-flat-fill-100);
   --colors-accent-200: var(--accent-colour-flat-fill-200);

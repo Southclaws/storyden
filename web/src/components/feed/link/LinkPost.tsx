@@ -1,10 +1,12 @@
-import { Link, ThreadReference } from "src/api/openapi/schemas";
+import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 import { Heading1 } from "src/theme/components/Heading/Index";
+import { Link } from "src/theme/components/Link";
 
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
+import { Empty } from "../common/PostRef/Empty";
 
 import {
   Box,
@@ -25,7 +27,7 @@ export function LinkPost(props: Props) {
   const session = useSession();
 
   const permalink = `/t/${props.thread.slug}`;
-  const link = props.thread.link as Link;
+  const link = props.thread.link as LinkSchema;
   const asset = link.assets?.[0] ?? props.thread.assets?.[0];
 
   return (
@@ -39,9 +41,9 @@ export function LinkPost(props: Props) {
         backgroundColor="white"
         overflow="hidden"
       >
-        <Box display="flex" w="full" bgColor="accent.100" height="24">
-          {asset && (
-            <Box flexGrow="1" flexShrink="0" width="32">
+        <Box display="flex" w="full" height="24">
+          <Box flexGrow="1" flexShrink="0" width="32">
+            {asset ? (
               <styled.img
                 src={asset.url}
                 height="full"
@@ -49,8 +51,12 @@ export function LinkPost(props: Props) {
                 objectPosition="center"
                 objectFit="cover"
               />
-            </Box>
-          )}
+            ) : (
+              <VStack justify="center" w="full" h="full">
+                <Empty />
+              </VStack>
+            )}
+          </Box>
 
           <VStack
             w="full"
@@ -60,17 +66,19 @@ export function LinkPost(props: Props) {
             p="2"
           >
             <Flex width="full" justifyContent="space-between">
-              <Heading1 size="sm">
+              <Heading1 size="sm" lineClamp={2}>
                 <LinkOverlay href={permalink}>
                   {/* TODO: Next.js Link */}
                   {props.thread.title}
                 </LinkOverlay>
               </Heading1>
+
+              <Link flexShrink="0" kind="ghost" size="xs" href={link.url}>
+                {link.domain}
+              </Link>
             </Flex>
 
             <styled.p lineClamp={2}>
-              <span>{props.thread.short}</span>
-              &nbsp;•&nbsp;
               <styled.span color="gray.500">{link.description}</styled.span>
             </styled.p>
           </VStack>

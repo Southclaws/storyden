@@ -55,6 +55,24 @@ export default defineConfig({
       '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
   },
 
+  patterns: {
+    extend: {
+      FrostedGlass: {
+        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the `,
+        properties: {},
+        transform(props) {
+          return {
+            backgroundColor: "whiteAlpha.800",
+            backdropBlur: "frosted",
+            backdropFilter: "auto",
+            boxShadow: "sm",
+            borderRadius: "lg",
+          };
+        },
+      },
+    },
+  },
+
   // NOTE: The theme references some CSS variables defined in global.css, this
   // is in order to provide some level of customisability for hosts who want to
   // override CSS with custom rules. Panda is primarily just there to wire it
@@ -78,6 +96,9 @@ export default defineConfig({
     },
     extend: {
       semanticTokens: defineSemanticTokens({
+        blurs: {
+          frosted: { value: "8px" },
+        },
         colors: {
           accent: {
             50: { value: "var(--accent-colour-flat-fill-50)" },
