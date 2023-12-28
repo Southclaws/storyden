@@ -23,5 +23,6 @@ export * from './divider';
 export * from './float';
 export * from './bleed';
 export * from './visually-hidden';
+export * from './frosted-glass';
 
 export type { HTMLStyledProps, StyledComponent } from '../types/jsx';

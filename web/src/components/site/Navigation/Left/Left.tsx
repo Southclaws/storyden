@@ -6,17 +6,10 @@ import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/Ca
 import { Link } from "src/theme/components/Link";
 
 import { CategoryList } from "../../../category/CategoryList/CategoryList";
-import { navbarStyles } from "../common";
-import { Authbar } from "../components/Authbar";
 import { useNavigation } from "../useNavigation";
 
-import { Box, Divider, VStack, styled } from "@/styled-system/jsx";
-
-export function Left2() {
-  return (
-    <VStack className={navbarStyles} justify="space-between" px="4"></VStack>
-  );
-}
+import { Box, Divider, styled } from "@/styled-system/jsx";
+import { FrostedGlass } from "@/styled-system/patterns";
 
 export function Left() {
   const { isAdmin } = useNavigation();
@@ -27,7 +20,7 @@ export function Left() {
       height="full"
       justifyContent="end"
       bgColor="accent.200"
-      className={navbarStyles}
+      className={FrostedGlass()}
     >
       <Box id="desktop-nav-box" w="full" height="full" p="4">
         <styled.nav
@@ -35,42 +28,35 @@ export function Left() {
           flexDir="column"
           height="full"
           gap="2"
-          justifyContent="space-between"
           alignItems="start"
+          overflowY="scroll"
         >
-          <VStack width="full" alignItems="start">
-            <Box
-              overflowY="scroll"
-              width="full"
-              css={{
-                touchAction: "none",
-                scrollbarWidth: "none",
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
-              }}
-            >
-              <CategoryList />
-            </Box>
+          <Box
+            width="full"
+            css={{
+              touchAction: "none",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            <CategoryList />
+          </Box>
 
-            {isAdmin && <CategoryCreateTrigger />}
+          {isAdmin && <CategoryCreateTrigger />}
 
-            <Divider />
+          <Divider />
 
-            <Link w="full" size="xs" href="/l">
-              <LinkIcon />
-              Link directory
-            </Link>
+          <Link w="full" size="xs" href="/l">
+            <LinkIcon />
+            Link directory
+          </Link>
 
-            <Link w="full" size="xs" href="/p">
-              <UsersIcon />
-              Member directory
-            </Link>
-          </VStack>
-
-          <VStack alignItems="start">
-            <Authbar />
-          </VStack>
+          <Link w="full" size="xs" href="/p">
+            <UsersIcon />
+            Member directory
+          </Link>
         </styled.nav>
       </Box>
     </styled.header>
