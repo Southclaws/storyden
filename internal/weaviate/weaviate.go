@@ -1,9 +1,10 @@
 package weaviate
 
 import (
-	"fmt"
+	"net/url"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
@@ -12,7 +13,7 @@ import (
 
 type Configuration struct {
 	Enabled   bool   `envconfig:"WEAVIATE_ENABLED"`
-	Host      string `envconfig:"WEAVIATE_HOST"`
+	URL       string `envconfig:"WEAVIATE_URL"`
 	Token     string `envconfig:"WEAVIATE_API_TOKEN"`
 	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
 }
@@ -31,16 +32,21 @@ func newWeaviateClient() (*weaviate.Client, error) {
 		return nil, nil
 	}
 
+	u, err := url.Parse(cfg.URL)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	wc := weaviate.Config{
-		Host:       cfg.Host,
-		Scheme:     "https",
+		Host:       u.Host,
+		Scheme:     u.Scheme,
 		AuthConfig: auth.ApiKey{Value: cfg.Token},
 		Headers:    map[string]string{"X-OpenAI-Api-Key": cfg.OpenAIKey},
 	}
 
 	client, err := weaviate.NewClient(wc)
 	if err != nil {
-		fmt.Println(err)
+		return nil, fault.Wrap(err, fmsg.With("failed to create weaviate client"))
 	}
 
 	return client, nil
