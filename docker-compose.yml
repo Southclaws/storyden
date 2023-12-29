@@ -17,3 +17,26 @@ services:
     environment:
       SWAGGER_JSON_URL: "http://localhost:8000/api/openapi.json"
       WITH_CREDENTIALS: "true"
+
+  weaviate:
+    image: semitechnologies/weaviate:1.23.0
+    restart: on-failure:0
+    command:
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8080'
+    - --scheme
+    - http
+    ports:
+    - 8080:8080
+    - 50051:50051
+    volumes:
+    - ./data/weaviate:/var/lib/weaviate
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
+      CLUSTER_HOSTNAME: 'node1'
