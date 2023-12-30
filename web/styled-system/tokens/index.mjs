@@ -692,79 +692,79 @@ const tokens = {
     "variable": "var(--font-sizes-9xl)"
   },
   "fontSizes.sm": {
-    "value": "1rem",
+    "value": "var(--global-font-size-sm)",
     "variable": "var(--font-sizes-sm)"
   },
   "fontSizes.md": {
-    "value": "1.125rem",
+    "value": "var(--global-font-size-md)",
     "variable": "var(--font-sizes-md)"
   },
   "fontSizes.lg": {
-    "value": "1.2rem",
+    "value": "var(--global-font-size-lg)",
     "variable": "var(--font-sizes-lg)"
   },
   "fontSizes.xl": {
-    "value": "1.44rem",
+    "value": "var(--global-font-size-xl)",
     "variable": "var(--font-sizes-xl)"
   },
   "fontSizes.2xl": {
-    "value": "1.728rem",
+    "value": "var(--global-font-size-2xl)",
     "variable": "var(--font-sizes-2xl)"
   },
   "fontSizes.3xl": {
-    "value": "2.074rem",
+    "value": "var(--global-font-size-3xl)",
     "variable": "var(--font-sizes-3xl)"
   },
   "fontSizes.4xl": {
-    "value": "2.488rem",
+    "value": "var(--global-font-size-4xl)",
     "variable": "var(--font-sizes-4xl)"
   },
   "fontSizes.heading.1": {
-    "value": "var(--font-size-h1)",
+    "value": "var(--global-font-size-h1)",
     "variable": "var(--font-sizes-heading-1)"
   },
   "fontSizes.heading.2": {
-    "value": "var(--font-size-h2)",
+    "value": "var(--global-font-size-h2)",
     "variable": "var(--font-sizes-heading-2)"
   },
   "fontSizes.heading.3": {
-    "value": "var(--font-size-h3)",
+    "value": "var(--global-font-size-h3)",
     "variable": "var(--font-sizes-heading-3)"
   },
   "fontSizes.heading.4": {
-    "value": "var(--font-size-h4)",
+    "value": "var(--global-font-size-h4)",
     "variable": "var(--font-sizes-heading-4)"
   },
   "fontSizes.heading.5": {
-    "value": "var(--font-size-h5)",
+    "value": "var(--global-font-size-h5)",
     "variable": "var(--font-sizes-heading-5)"
   },
   "fontSizes.heading.6": {
-    "value": "var(--font-size-h6)",
+    "value": "var(--global-font-size-h6)",
     "variable": "var(--font-sizes-heading-6)"
   },
   "fontSizes.heading.variable.1": {
-    "value": "var(--font-size-h1-variable)",
+    "value": "var(--global-font-size-h1-variable)",
     "variable": "var(--font-sizes-heading-variable-1)"
   },
   "fontSizes.heading.variable.2": {
-    "value": "var(--font-size-h2-variable)",
+    "value": "var(--global-font-size-h2-variable)",
     "variable": "var(--font-sizes-heading-variable-2)"
   },
   "fontSizes.heading.variable.3": {
-    "value": "var(--font-size-h3-variable)",
+    "value": "var(--global-font-size-h3-variable)",
     "variable": "var(--font-sizes-heading-variable-3)"
   },
   "fontSizes.heading.variable.4": {
-    "value": "var(--font-size-h4-variable)",
+    "value": "var(--global-font-size-h4-variable)",
     "variable": "var(--font-sizes-heading-variable-4)"
   },
   "fontSizes.heading.variable.5": {
-    "value": "var(--font-size-h5-variable)",
+    "value": "var(--global-font-size-h5-variable)",
     "variable": "var(--font-sizes-heading-variable-5)"
   },
   "fontSizes.heading.variable.6": {
-    "value": "var(--font-size-h6-variable)",
+    "value": "var(--global-font-size-h6-variable)",
     "variable": "var(--font-sizes-heading-variable-6)"
   },
   "colors.current": {

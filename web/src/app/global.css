@@ -9,45 +9,66 @@
 }
 
 :root {
-  --font-size-h1: 2.488rem;
-  --font-size-h2: 2.074rem;
-  --font-size-h3: 1.728rem;
-  --font-size-h4: 1.44rem;
-  --font-size-h5: 1.2rem;
-  --font-size-h6: 1.125rem;
+  --global-font-size: 1rem;
+  --global-font-size-sm: 1rem;
+  --global-font-size-md: 1.125rem;
+  --global-font-size-lg: 1.2rem;
+  --global-font-size-xl: 1.44rem;
+  --global-font-size-2xl: 1.728rem;
+  --global-font-size-3xl: 2.074rem;
+  --global-font-size-4xl: 2.488rem;
 
-  --font-size-h1-variable: clamp(
+  --global-font-size-h1: 2.488rem;
+  --global-font-size-h2: 2.074rem;
+  --global-font-size-h3: 1.728rem;
+  --global-font-size-h4: 1.44rem;
+  --global-font-size-h5: 1.2rem;
+  --global-font-size-h6: 1.125rem;
+
+  --global-font-size-h1-variable: clamp(
     100%,
-    calc(var(--font-size-h1) / 4) + 4vw,
-    var(--font-size-h1)
+    calc(var(--global-font-size-h1) / 4) + 4vw,
+    var(--global-font-size-h1)
   );
-  --font-size-h2-variable: clamp(
+  --global-font-size-h2-variable: clamp(
     100%,
-    calc(var(--font-size-h2) / 4) + 4vw,
-    var(--font-size-h2)
+    calc(var(--global-font-size-h2) / 4) + 4vw,
+    var(--global-font-size-h2)
   );
-  --font-size-h3-variable: clamp(
+  --global-font-size-h3-variable: clamp(
     100%,
-    calc(var(--font-size-h3) / 4) + 4vw,
-    var(--font-size-h3)
+    calc(var(--global-font-size-h3) / 4) + 4vw,
+    var(--global-font-size-h3)
   );
-  --font-size-h4-variable: clamp(
+  --global-font-size-h4-variable: clamp(
     100%,
-    calc(var(--font-size-h4) / 4) + 4vw,
-    var(--font-size-h4)
+    calc(var(--global-font-size-h4) / 4) + 4vw,
+    var(--global-font-size-h4)
   );
-  --font-size-h5-variable: clamp(
+  --global-font-size-h5-variable: clamp(
     100%,
-    calc(var(--font-size-h5) / 4) + 4vw,
-    var(--font-size-h5)
+    calc(var(--global-font-size-h5) / 4) + 4vw,
+    var(--global-font-size-h5)
   );
-  --font-size-h6-variable: clamp(
+  --global-font-size-h6-variable: clamp(
     100%,
-    calc(var(--font-size-h6) / 4) + 4vw,
-    var(--font-size-h6)
+    calc(var(--global-font-size-h6) / 4) + 4vw,
+    var(--global-font-size-h6)
   );
 
   color-scheme: only light;
+}
+
+@supports (font-size: 1cqi) {
+  .fluid-font-size {
+    font-size: clamp(
+      0.8rem,
+      var(--font-size-fluid-scale, 5cqi),
+      var(--font-size)
+    );
+    letter-spacing: clamp(-1px, -1cqi, 0px);
+    text-overflow: ellipsis;
+  }
 }
 
 html,
