@@ -5,7 +5,7 @@ import { Heading1 } from "src/theme/components/Heading/Index";
 import { FeedItem } from "../common/FeedItem/FeedItem";
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
 
-import { Flex, styled } from "@/styled-system/jsx";
+import { Flex } from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
