@@ -15,14 +15,13 @@ export function useCollectionMenu({ thread }: Props) {
   const [multiSelect, setMultiSelect] = useState(false);
   const [selected, setSelected] = useState(0);
 
-  // called when we want to reset the menu's state.
-  const onReset = () => {
+  const handleReset = () => {
     setMultiSelect(false);
     setSelected(0);
   };
 
-  const { isOpen, onOpenChange, onToggle } = useDisclosure({
-    onClose: onReset,
+  const { onOpenChange, onToggle } = useDisclosure({
+    onClose: handleReset,
   });
 
   if (!collections) {
@@ -52,10 +51,9 @@ export function useCollectionMenu({ thread }: Props) {
     ready: true as const,
     isAlreadySaved,
     collections: collections.collections,
+    multiSelect,
     onKeyDown,
     onKeyUp,
     onOpenChange,
-    multiSelect,
-    isOpen,
   };
 }

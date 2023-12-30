@@ -15,7 +15,6 @@ export function CollectionMenu(props: Props) {
     multiSelect,
     onKeyDown,
     onKeyUp,
-    isOpen,
     onOpenChange,
     isAlreadySaved,
   } = useCollectionMenu(props);
@@ -26,7 +25,6 @@ export function CollectionMenu(props: Props) {
     <Box onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex={1}>
       <Menu
         size="sm"
-        open={isOpen}
         onOpenChange={onOpenChange}
         closeOnSelect={!multiSelect}
         userSelect="none"
