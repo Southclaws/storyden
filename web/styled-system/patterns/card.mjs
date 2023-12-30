@@ -8,8 +8,9 @@ transform(props) {
   return {
     display: "flex",
     flexDirection: "column",
-    gap: "2",
+    gap: "1",
     width: "full",
+    overflow: "hidden",
     boxShadow: "sm",
     borderRadius: "lg",
     backgroundColor: "bg.default",

@@ -30,8 +30,7 @@ export function ProfilePill({
       href={`/p/${profileReference.handle}`}
       className={css({
         flexShrink: 1,
-        p: "1",
-        pr: showHandle ? "2" : "1",
+        pr: showHandle ? "1" : "0",
         borderRadius: "full",
         minW: "0",
         maxW: "full",

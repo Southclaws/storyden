@@ -23,7 +23,7 @@ export function Byline(props: Props) {
       : undefined;
 
   return (
-    <Flex alignItems="center" justify="space-between" minWidth="0">
+    <Flex alignItems="end" justify="space-between" minWidth="0">
       <Flex
         alignItems="center"
         gap="0"
