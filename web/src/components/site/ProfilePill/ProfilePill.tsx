@@ -4,7 +4,7 @@ import { Anchor } from "src/components/site/Anchor";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 
 import { css } from "@/styled-system/css";
-import { Box, HStack } from "@/styled-system/jsx";
+import { Box } from "@/styled-system/jsx";
 
 import { Handle } from "./Handle";
 

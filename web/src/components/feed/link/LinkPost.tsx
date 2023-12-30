@@ -1,16 +1,12 @@
 import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
-import { Byline } from "src/components/content/Byline";
-import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 import { Anchor } from "src/components/site/Anchor";
 import { Heading1 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
-import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 import { Empty } from "../common/PostRef/Empty";
 
-import { Box, Flex, HStack, VStack, styled } from "@/styled-system/jsx";
+import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { Card } from "@/styled-system/patterns";
 
 type Props = {
