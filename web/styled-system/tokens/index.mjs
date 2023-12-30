@@ -2039,6 +2039,10 @@ const tokens = {
     "value": "var(--colors-bg-default)",
     "variable": "var(--colors-bg-default)"
   },
+  "colors.bg.opaque": {
+    "value": "var(--colors-bg-opaque)",
+    "variable": "var(--colors-bg-opaque)"
+  },
   "colors.bg.subtle": {
     "value": "var(--colors-bg-subtle)",
     "variable": "var(--colors-bg-subtle)"
@@ -2430,6 +2434,10 @@ const tokens = {
   "colors.colorPalette.default": {
     "value": "var(--colors-color-palette-default)",
     "variable": "var(--colors-color-palette-default)"
+  },
+  "colors.colorPalette.opaque": {
+    "value": "var(--colors-color-palette-opaque)",
+    "variable": "var(--colors-color-palette-opaque)"
   },
   "colors.colorPalette.subtle": {
     "value": "var(--colors-color-palette-subtle)",

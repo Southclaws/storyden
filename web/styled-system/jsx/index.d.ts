@@ -24,5 +24,6 @@ export * from './float';
 export * from './bleed';
 export * from './visually-hidden';
 export * from './frosted-glass';
+export * from './card';
 
 export type { HTMLStyledProps, StyledComponent } from '../types/jsx';
