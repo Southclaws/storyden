@@ -62,11 +62,36 @@ export default defineConfig({
         properties: {},
         transform(props) {
           return {
-            backgroundColor: "whiteAlpha.800",
+            backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
             boxShadow: "sm",
             borderRadius: "lg",
+          };
+        },
+      },
+      Card: {
+        description: `A card component that can be used to display content in a container with a border and a shadow.`,
+        properties: {
+          kind: {
+            type: "enum",
+            value: ["edge", "default"],
+          },
+        },
+        transform(props) {
+          const { kind } = props;
+
+          const padding = kind === "edge" ? "0" : "2";
+
+          return {
+            display: "flex",
+            flexDirection: "column",
+            gap: "2",
+            width: "full",
+            boxShadow: "sm",
+            borderRadius: "lg",
+            backgroundColor: "bg.default",
+            padding,
           };
         },
       },
@@ -156,6 +181,12 @@ export default defineConfig({
             canvas: { value: "{colors.gray.100}" },
             default: {
               value: { base: "{colors.white}", _dark: "{colors.gray.200}" },
+            },
+            opaque: {
+              value: {
+                base: "{colors.whiteAlpha.800}",
+                _dark: "{colors.blackAlpha.800}",
+              },
             },
             subtle: {
               value: { base: "{colors.gray.200}", _dark: "{colors.gray.300}" },

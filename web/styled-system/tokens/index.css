@@ -510,6 +510,7 @@
   --colors-accent-dark-text: var(--accent-colour-dark-text-500);
   --colors-bg-canvas: var(--colors-gray-100);
   --colors-bg-default: var(--colors-white);
+  --colors-bg-opaque: var(--colors-white-alpha-800);
   --colors-bg-subtle: var(--colors-gray-200);
   --colors-bg-muted: var(--colors-gray-300);
   --colors-bg-emphasized: var(--colors-gray-400);
@@ -571,6 +572,7 @@ oklch(80% 0.15 360)
 
 .dark {
   --colors-bg-default: var(--colors-gray-200);
+  --colors-bg-opaque: var(--colors-black-alpha-800);
   --colors-bg-subtle: var(--colors-gray-300);
   --colors-bg-muted: var(--colors-gray-400);
   --colors-bg-emphasized: var(--colors-gray-500);

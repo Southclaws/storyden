@@ -17,6 +17,7 @@ import {
   VStack,
   styled,
 } from "@/styled-system/jsx";
+import { Card } from "@/styled-system/patterns";
 
 type Props = {
   thread: ThreadReference;
@@ -32,15 +33,7 @@ export function LinkPost(props: Props) {
 
   return (
     <LinkBox>
-      <styled.article
-        display="flex"
-        flexDir="column"
-        width="full"
-        boxShadow="md"
-        borderRadius="md"
-        backgroundColor="white"
-        overflow="hidden"
-      >
+      <styled.article className={Card({ kind: "edge" })}>
         <Box display="flex" w="full" height="24">
           <Box flexGrow="1" flexShrink="0" width="32">
             {asset ? (
