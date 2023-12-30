@@ -33,22 +33,22 @@ export function ProfilePill({
         p: "1",
         pr: showHandle ? "2" : "1",
         borderRadius: "full",
-        _hover: { backgroundColor: "gray.200", textDecoration: "none" },
         minW: "0",
+        maxW: "full",
+        display: "flex",
+        gap: "1",
       })}
     >
-      <HStack gap="1">
-        <Avatar
-          flexShrink={0}
-          handle={profileReference.handle}
-          width={large ? "8" : "6"}
-        />
-        {showHandle && (
-          <Box minW="0" flexShrink={1}>
-            <Handle profileReference={profileReference} size={size} />
-          </Box>
-        )}
-      </HStack>
+      <Avatar
+        flexShrink={0}
+        handle={profileReference.handle}
+        width={large ? "8" : "6"}
+      />
+      {showHandle && (
+        <Box minW="0" flexShrink={1}>
+          <Handle profileReference={profileReference} size={size} />
+        </Box>
+      )}
     </Anchor>
   );
 }
