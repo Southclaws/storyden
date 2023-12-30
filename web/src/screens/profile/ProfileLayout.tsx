@@ -13,7 +13,13 @@ export function ProfileLayout(props: PropsWithChildren<Props>) {
   if (!profile.ready) return <Unready {...profile.error} />;
 
   return (
-    <VStack py="4" width="full" alignItems="start" gap="2">
+    <VStack
+      className="profile__layout"
+      py="4"
+      width="full"
+      alignItems="start"
+      gap="2"
+    >
       <Header {...profile.data} />
       <Metadata {...profile.data} />
       <p>{profile.data.bio}</p>

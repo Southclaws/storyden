@@ -1,10 +1,14 @@
-import { PropsWithChildren } from "react";
+import { DetailedHTMLProps, HTMLAttributes, PropsWithChildren } from "react";
 
 import { css, cx } from "@/styled-system/css";
 import { HeadingVariantProps, heading } from "@/styled-system/recipes";
 import { StyleProps } from "@/styled-system/types";
 
-type HeadingProps = PropsWithChildren<HeadingVariantProps & StyleProps>;
+type HeadingProps = PropsWithChildren<
+  HeadingVariantProps &
+    StyleProps &
+    DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>
+>;
 
 export function Heading1(props: HeadingProps) {
   const { children, ...rest } = props;
@@ -29,11 +33,19 @@ export function Heading2(props: HeadingProps) {
 }
 
 export function Heading3(props: HeadingProps) {
-  const { children, ...rest } = props;
+  const { children, className, ...rest } = props;
   const [recipeProps, cssProps] = heading.splitVariantProps(rest);
 
+  console.log("recipeProps", recipeProps, "cssProps", cssProps);
+
   return (
-    <h3 className={cx(heading({ size: "lg", ...recipeProps }), css(cssProps))}>
+    <h3
+      className={cx(
+        heading({ size: "lg", ...recipeProps }),
+        css(cssProps),
+        className,
+      )}
+    >
       {children}
     </h3>
   );

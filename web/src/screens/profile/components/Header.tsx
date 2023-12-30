@@ -6,13 +6,28 @@ import { HStack, VStack } from "@/styled-system/jsx";
 
 export function Header(props: PublicProfile) {
   return (
-    <VStack alignItems="start">
-      <HStack justifyContent="start">
+    <VStack className="profile__header" alignItems="start" minW="0" w="full">
+      <HStack justifyContent="start" minW="0" w="full">
         <Avatar handle={props.handle} />
 
-        <VStack alignItems="start" gap="2">
+        <VStack
+          alignItems="start"
+          gap="2"
+          overflow="hidden"
+          minW="0"
+          width="full"
+          containerType="inline-size"
+        >
           <Heading2 size="lg">{props.name}</Heading2>
-          <Heading3 size="md" color="gray.500">
+          <Heading3
+            w="full"
+            size="md"
+            color="gray.500"
+            className="fluid-font-size"
+            textWrap="nowrap"
+            textOverflow="ellipsis"
+            overflow="hidden"
+          >
             @{props.handle}
           </Heading3>
         </VStack>
