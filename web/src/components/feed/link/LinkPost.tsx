@@ -1,5 +1,4 @@
 import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
-import { useSession } from "src/auth";
 import { Anchor } from "src/components/site/Anchor";
 import { Heading1 } from "src/theme/components/Heading/Index";
 
@@ -15,8 +14,6 @@ type Props = {
 };
 
 export function LinkPost(props: Props) {
-  const session = useSession();
-
   const permalink = `/t/${props.thread.slug}`;
   const link = props.thread.link as LinkSchema;
   const asset = link.assets?.[0] ?? props.thread.assets?.[0];
