@@ -25,11 +25,10 @@ export function Navigation({ children }: PropsWithChildren) {
       {/* MOBILE */}
       <Box
         id="mobile-nav-container"
-        // TODO: Remove this and figure out where the overflow is actually coming from
-        overflow="auto"
+        width="full"
         display={{
           base: isNavpillShown(pathname) ? "none" : "unset",
-          lg: "none",
+          md: "none",
         }}
       >
         <Box p="3">
@@ -46,7 +45,7 @@ export function Navigation({ children }: PropsWithChildren) {
         id="desktop-nav-container"
         display={{
           base: "none",
-          lg: "block",
+          md: "block",
         }}
         w="full"
       >
