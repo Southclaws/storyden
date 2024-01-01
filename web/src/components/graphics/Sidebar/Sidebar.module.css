@@ -1,0 +1,11 @@
+.sidebar {
+  transition: transform 0.4s steps(15);
+}
+
+.open {
+  transform: translateX(-480px);
+}
+
+.closed {
+  transform: translateX(0px);
+}
