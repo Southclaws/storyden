@@ -36,11 +36,13 @@ export function useDisclosure(props: UseDisclosureProps = {}) {
     onClose: onCloseProp,
     onOpen: onOpenProp,
     isOpen: isOpenProp,
+    onOpenChange: onOpenChangeProp,
     id: idProp,
   } = props;
 
   const handleOpen = useCallbackRef(onOpenProp);
   const handleClose = useCallbackRef(onCloseProp);
+  const handleOpenChange = useCallbackRef(onOpenChangeProp);
 
   const [isOpenState, setIsOpen] = useState(props.defaultIsOpen || false);
 
@@ -76,12 +78,13 @@ export function useDisclosure(props: UseDisclosureProps = {}) {
   const onOpenChange = useCallback(
     (event: OpenChangeEvent) => {
       if (event.open) {
-        onClose();
-      } else {
         onOpen();
+      } else {
+        onClose();
       }
+      handleOpenChange?.(event);
     },
-    [onOpen, onClose],
+    [onOpen, onClose, handleOpenChange],
   );
 
   function getButtonProps(props: HTMLProps = {}): HTMLProps {
