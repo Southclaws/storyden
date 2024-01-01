@@ -35,7 +35,8 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               maxWidth={{ base: "full", md: "prose" }}
               borderTopRadius="xl"
               borderBottomRadius={{ base: "none", md: "xl" }}
-              bgColor="gray.100"
+              bgColor="bg.default"
+              boxShadow="lg"
               p="4"
             >
               <HStack w="full" justify="space-between">
@@ -55,7 +56,8 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
         .modaldrawer__overlay {
           position: fixed;
           inset: 0;
-          background-color: var(--colors-blackAlpha-600);
+          background-color: var(--colors-black-alpha-600);
+          backdrop-filter: blur(2px);
           z-index: var(--z-index-overlay);
         }
 
