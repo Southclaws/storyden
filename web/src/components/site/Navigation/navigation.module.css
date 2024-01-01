@@ -98,7 +98,7 @@
   animation: fadeIn 0.2s ease-in-out;
 }
 
-.desktop-nav-container[data-leftbar-hidden="true"] .leftbar {
+.desktop-nav-container[data-leftbar-shown="false"] .leftbar {
   animation: fadeOut 0.2s ease-in-out;
   opacity: 0;
   pointer-events: none;
@@ -142,7 +142,7 @@
 }
 
 @media screen and (max-width: 1280px) {
-  .desktop-nav-container[data-leftbar-hidden="true"] .main {
+  .desktop-nav-container[data-leftbar-shown="false"] .main {
     grid-column: leftbar / main;
   }
 }

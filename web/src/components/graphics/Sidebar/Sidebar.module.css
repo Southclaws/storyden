@@ -3,9 +3,9 @@
 }
 
 .open {
-  transform: translateX(-480px);
+  transform: translateX(0px);
 }
 
 .closed {
-  transform: translateX(0px);
+  transform: translateX(-480px);
 }
