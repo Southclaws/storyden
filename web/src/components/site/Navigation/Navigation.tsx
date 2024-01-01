@@ -19,7 +19,7 @@ const isNavpillShown = (path: string | null) =>
 
 export function Navigation({ children }: PropsWithChildren) {
   const pathname = usePathname();
-  const [showLeftBar, setShowLeftBar] = useState(true);
+  const [showLeftBar, setShowLeftBar] = useState(false);
 
   return (
     <>
@@ -50,7 +50,7 @@ export function Navigation({ children }: PropsWithChildren) {
           md: "block",
         }}
         w="full"
-        data-leftbar-hidden={showLeftBar}
+        data-leftbar-shown={showLeftBar}
       >
         <Box id="navigation__scroll" className={styles["navgrid"]}>
           <Box className={styles["main"]}>
