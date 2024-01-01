@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 
 import { Navpill } from "src/components/site/Navigation/Navpill/Navpill";
 
@@ -19,6 +19,7 @@ const isNavpillShown = (path: string | null) =>
 
 export function Navigation({ children }: PropsWithChildren) {
   const pathname = usePathname();
+  const [showLeftBar, setShowLeftBar] = useState(true);
 
   return (
     <>
@@ -43,11 +44,13 @@ export function Navigation({ children }: PropsWithChildren) {
       {/* DESKTOP */}
       <Box
         id="desktop-nav-container"
+        className={styles["desktop-nav-container"]}
         display={{
           base: "none",
           md: "block",
         }}
         w="full"
+        data-leftbar-hidden={showLeftBar}
       >
         <Box id="navigation__scroll" className={styles["navgrid"]}>
           <Box className={styles["main"]}>
@@ -67,7 +70,7 @@ export function Navigation({ children }: PropsWithChildren) {
           className={styles["navgrid"]}
           pointerEvents="none"
         >
-          <Top />
+          <Top sidebarState={showLeftBar} onToggleSidebar={setShowLeftBar} />
 
           <Box className={styles["leftbar"]}>
             <Left />

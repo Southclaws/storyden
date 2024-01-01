@@ -93,6 +93,35 @@
   /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
   margin: -15px;
   padding: 15px;
+
+  /* Animate show/hide */
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.desktop-nav-container[data-leftbar-hidden="true"] .leftbar {
+  animation: fadeOut 0.2s ease-in-out;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
 }
 
 .rightbar {
@@ -109,4 +138,10 @@
 
 .main {
   grid-area: main;
+}
+
+@media screen and (max-width: 1280px) {
+  .desktop-nav-container[data-leftbar-hidden="true"] .main {
+    grid-column: leftbar / main;
+  }
 }
