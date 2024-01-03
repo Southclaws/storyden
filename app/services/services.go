@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/datagraph_searcher"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
@@ -51,5 +52,6 @@ func Build() fx.Option {
 		fx.Provide(avatar_gen.New),
 		fx.Provide(cluster.New, clustertree.New),
 		fx.Provide(item_crud.New, item_tree.New),
+		fx.Provide(datagraph_searcher.New),
 	)
 }

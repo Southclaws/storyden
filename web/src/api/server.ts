@@ -7,13 +7,17 @@ export const server = async <T>({
   params,
   method = "get",
   data,
+  cookie,
 }: Options): Promise<T> => {
   const address = `${API_ADDRESS}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
 
   const response = await fetch(address, {
     method: _method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
     body: buildPayload(data),
   });
 

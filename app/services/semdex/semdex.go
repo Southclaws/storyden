@@ -5,7 +5,6 @@ import (
 	"context"
 
 	"github.com/Southclaws/fault"
-	"github.com/kr/pretty"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate/entities/models"
 	"go.uber.org/fx"
@@ -67,20 +66,26 @@ type service struct {
 }
 
 func (s *service) Index(ctx context.Context, object datagraph.Indexable) error {
-	response, err := s.wc.Data().Creator().
+	content := object.GetText()
+
+	// Don't bother indexing if the content is too short.
+	if len(content) < 30 {
+		return nil
+	}
+
+	_, err := s.wc.Data().Creator().
 		WithClassName("Content").
 		WithProperties(map[string]any{
-			"content": object.Text(),
-			"props":   object.Props(),
+			"datagraph_id":   object.GetID().String(),
+			"datagraph_type": object.GetType(),
+			"name":           object.GetName(),
+			"content":        content,
+			"props":          object.GetProps(),
 		}).
 		Do(ctx)
 	if err != nil {
 		panic(err)
 	}
-
-	_ = response
-
-	pretty.Println(response)
 
 	return nil
 }

@@ -11,8 +11,11 @@ import (
 )
 
 type Indexable interface {
-	Text() string
-	Props() any
+	GetID() xid.ID
+	GetType() string
+	GetName() string
+	GetText() string
+	GetProps() any
 }
 
 type (

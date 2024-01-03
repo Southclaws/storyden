@@ -7,6 +7,7 @@ export type Options = {
   params?: Record<string, string | string[]>;
   data?: unknown;
   responseType?: string;
+  cookie?: string;
 };
 
 export const buildPayload = (data: unknown) => {
