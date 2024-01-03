@@ -39,10 +39,10 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
         <ComposeAction>new</ComposeAction>
       </HStack>
 
-      <HStack className={styles["topbar-middle"]} justify="center">
-        {/* TODO: Semantic search */}
-        {/* <Input placeholder="Search content, knowledgebase and links" /> */}
+      <HStack className={styles["topbar-middle"]} justify="space-between">
         <Title>{title}</Title>
+        {/* TODO */}
+        {/* <Search /> */}
       </HStack>
 
       <HStack className={styles["topbar-right"]}>

@@ -59,6 +59,8 @@ tags:
     description: Arbitrary item pages for indexing structured content.
   - name: links
     description: Social bookmarks.
+  - name: datagraph
+    description: Content graph (posts, clusters, items, links) APIs.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -1111,6 +1113,34 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/LinkGetOK" }
 
+  #
+  #      888          888                                               888
+  #      888          888                                               888
+  #      888          888                                               888
+  #  .d88888  8888b.  888888  8888b.   .d88b.  888d888 8888b.  88888b.  88888b.
+  # d88" 888     "88b 888        "88b d88P"88b 888P"      "88b 888 "88b 888 "88b
+  # 888  888 .d888888 888    .d888888 888  888 888    .d888888 888  888 888  888
+  # Y88b 888 888  888 Y88b.  888  888 Y88b 888 888    888  888 888 d88P 888  888
+  #  "Y88888 "Y888888  "Y888 "Y888888  "Y88888 888    "Y888888 88888P"  888  888
+  #                                        888                 888
+  #                                   Y8b d88P                 888
+  #                                    "Y88P"                  888
+  #
+
+  /v1/datagraph:
+    get:
+      operationId: DatagraphSearch
+      description: Query and search content.
+      tags: [datagraph]
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/DatagraphSearchOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -1785,6 +1815,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/LinkWithRefs"
+
+    DatagraphSearchOK:
+      description: Search results.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -3201,6 +3237,50 @@ components:
         url: { $ref: "#/components/schemas/URL" }
         title: { $ref: "#/components/schemas/LinkTitle" }
         description: { $ref: "#/components/schemas/LinkDescription" }
+
+    #
+    # 8888888b.           888                                               888
+    # 888  "Y88b          888                                               888
+    # 888    888          888                                               888
+    # 888    888  8888b.  888888  8888b.   .d88b.  888d888 8888b.  88888b.  88888b.
+    # 888    888     "88b 888        "88b d88P"88b 888P"      "88b 888 "88b 888 "88b
+    # 888    888 .d888888 888    .d888888 888  888 888    .d888888 888  888 888  888
+    # 888  .d88P 888  888 Y88b.  888  888 Y88b 888 888    888  888 888 d88P 888  888
+    # 8888888P"  "Y888888  "Y888 "Y888888  "Y88888 888    "Y888888 88888P"  888  888
+    #                                          888                 888
+    #                                     Y8b d88P                 888
+    #                                      "Y88P"                  888
+    #
+
+    DatagraphSearchResult:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [items]
+          properties:
+            items: { $ref: "#/components/schemas/DatagraphItemList" }
+
+    DatagraphItemList:
+      type: array
+      items: { $ref: "#/components/schemas/DatagraphItem" }
+
+    DatagraphItem:
+      type: object
+      required: [type, id, name]
+      properties:
+        type: { $ref: "#/components/schemas/DatagraphItemType" }
+        id: { $ref: "#/components/schemas/Identifier" }
+        name:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+
+    DatagraphItemType:
+      type: string
+      enum: [thread, reply, cluster, item, link]
 
   securitySchemes:
     browser:

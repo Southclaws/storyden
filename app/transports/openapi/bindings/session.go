@@ -20,7 +20,7 @@ type CookieJar struct {
 	domain string
 }
 
-func newCookieJar(cfg config.Config, ss *securecookie.Session) *CookieJar {
+func NewCookieJar(cfg config.Config, ss *securecookie.Session) *CookieJar {
 	return &CookieJar{domain: cfg.CookieDomain, ss: ss}
 }
 

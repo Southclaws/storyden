@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -42,9 +43,11 @@ type Thread struct {
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) Text() string { return t.Posts[0].Body }
-
-func (t *Thread) Props() any { return t.Meta }
+func (t *Thread) GetID() xid.ID   { return xid.ID(t.ID) }
+func (t *Thread) GetType() string { return "thread" }
+func (t *Thread) GetName() string { return t.Title }
+func (t *Thread) GetText() string { return t.Posts[0].Body }
+func (t *Thread) GetProps() any   { return t.Meta }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()

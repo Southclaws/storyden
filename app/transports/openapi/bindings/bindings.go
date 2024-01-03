@@ -78,6 +78,7 @@ type Bindings struct {
 	Clusters
 	Items
 	Links
+	Datagraph
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -103,6 +104,7 @@ func bindingsProviders() fx.Option {
 		NewClusters,
 		NewItems,
 		NewLinks,
+		NewDatagraph,
 	)
 }
 
@@ -255,7 +257,7 @@ func Build() fx.Option {
 		fx.Invoke(addMiddleware),
 
 		// Add the cookie session manager.
-		fx.Provide(newCookieJar),
+		fx.Provide(NewCookieJar),
 
 		// Mount the bound OpenAPI routes onto the router.
 		fx.Invoke(mount),
