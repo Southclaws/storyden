@@ -9,7 +9,7 @@ import { CategoryList } from "../../../category/CategoryList/CategoryList";
 import { useNavigation } from "../useNavigation";
 
 import { Box, Divider, styled } from "@/styled-system/jsx";
-import { FrostedGlass } from "@/styled-system/patterns";
+import { Floating } from "@/styled-system/patterns";
 
 export function Left() {
   const { isAdmin } = useNavigation();
@@ -20,7 +20,8 @@ export function Left() {
       height="full"
       justifyContent="end"
       bgColor="accent.200"
-      className={FrostedGlass()}
+      borderRadius="md"
+      className={Floating()}
     >
       <Box id="desktop-nav-box" w="full" height="full" p="4">
         <styled.nav

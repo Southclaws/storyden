@@ -58,15 +58,26 @@ export default defineConfig({
   patterns: {
     extend: {
       FrostedGlass: {
-        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the `,
+        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
         properties: {},
-        transform(props) {
+        transform() {
           return {
             backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            boxShadow: "sm",
+          };
+        },
+      },
+      Floating: {
+        description: `Floating overlay elements.`,
+        properties: {},
+        transform() {
+          return {
+            backgroundColor: "bg.opaque",
+            backdropBlur: "frosted",
+            backdropFilter: "auto",
             borderRadius: "lg",
+            boxShadow: "sm",
           };
         },
       },
@@ -77,14 +88,18 @@ export default defineConfig({
             type: "enum",
             value: ["edge", "default"],
           },
+          display: {
+            type: "property",
+            value: "display",
+          },
         },
         transform(props) {
-          const { kind } = props;
+          const { kind, display } = props;
 
           const padding = kind === "edge" ? "0" : "2";
 
           return {
-            display: "flex",
+            display,
             flexDirection: "column",
             gap: "1",
             width: "full",
@@ -124,6 +139,19 @@ export default defineConfig({
       semanticTokens: defineSemanticTokens({
         blurs: {
           frosted: { value: "8px" },
+        },
+        opacity: {
+          0: { value: "0" },
+          1: { value: "0.1" },
+          2: { value: "0.2" },
+          3: { value: "0.3" },
+          4: { value: "0.4" },
+          5: { value: "0.5" },
+          6: { value: "0.6" },
+          7: { value: "0.7" },
+          8: { value: "0.8" },
+          9: { value: "0.9" },
+          full: { value: "1" },
         },
         colors: {
           accent: {
@@ -225,6 +253,10 @@ export default defineConfig({
           },
           conicGradient: {
             value: conicGradient,
+          },
+          cardBackgroundGradient: {
+            value:
+              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
           },
         },
         spacing: {

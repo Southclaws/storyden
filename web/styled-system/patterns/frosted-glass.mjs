@@ -2,13 +2,11 @@ import { mapObject } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const FrostedGlassConfig = {
-transform(props) {
+transform() {
   return {
     backgroundColor: "bg.opaque",
     backdropBlur: "frosted",
-    backdropFilter: "auto",
-    boxShadow: "sm",
-    borderRadius: "lg"
+    backdropFilter: "auto"
   };
 }}
 
