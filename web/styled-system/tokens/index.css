@@ -464,6 +464,17 @@
   --breakpoints-xl: 1280px;
   --breakpoints-2xl: 1536px;
   --blurs-frosted: 8px;
+  --opacity-0: 0;
+  --opacity-1: 0.1;
+  --opacity-2: 0.2;
+  --opacity-3: 0.3;
+  --opacity-4: 0.4;
+  --opacity-5: 0.5;
+  --opacity-6: 0.6;
+  --opacity-7: 0.7;
+  --opacity-8: 0.8;
+  --opacity-9: 0.9;
+  --opacity-full: 1;
   --colors-accent-50: var(--accent-colour-flat-fill-50);
   --colors-accent-100: var(--accent-colour-flat-fill-100);
   --colors-accent-200: var(--accent-colour-flat-fill-200);
@@ -567,6 +578,7 @@ oklch(80% 0.15 340),
 oklch(80% 0.15 350),
 oklch(80% 0.15 360)
 );
+  --colors-card-background-gradient: linear-gradient(90deg, var(--colors-bg-default), transparent);
   --spacing-safe-bottom: env(safe-area-inset-bottom)
 }
 

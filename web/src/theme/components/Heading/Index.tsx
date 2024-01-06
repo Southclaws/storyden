@@ -36,8 +36,6 @@ export function Heading3(props: HeadingProps) {
   const { children, className, ...rest } = props;
   const [recipeProps, cssProps] = heading.splitVariantProps(rest);
 
-  console.log("recipeProps", recipeProps, "cssProps", cssProps);
-
   return (
     <h3
       className={cx(

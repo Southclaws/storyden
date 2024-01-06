@@ -62,10 +62,13 @@
 @supports (font-size: 1cqi) {
   .fluid-font-size {
     font-size: clamp(
-      0.8rem,
+      1rem,
       var(--font-size-fluid-scale, 5cqi),
       var(--font-size)
     );
+    text-overflow: ellipsis;
+  }
+  .fluid-letter-spacing {
     letter-spacing: clamp(-1px, -1cqi, 0px);
     text-overflow: ellipsis;
   }
