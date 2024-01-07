@@ -20,11 +20,7 @@ export function Client(props: Props) {
     <VStack w="full" alignItems="start">
       <Heading1>Directory</Heading1>
 
-      <p>
-        The place where stuff becomes meaningful. Where order and chaos are
-        balanced. Where knowledge and data are one and the same. Go forth and
-        accumulate, learn and prosper.
-      </p>
+      <p>You can browse the community&apos;s knowledgebase here.</p>
 
       <VStack w="full" alignItems="start">
         <Heading2>New</Heading2>
