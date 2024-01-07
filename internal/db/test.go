@@ -8,22 +8,36 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
+	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 func Truncate(db *sql.DB) error {
 	tables := []string{
-		notification.Table,
-		react.Table,
-		category.Table,
 		tag.Table,
-		post.Table,
 		setting.Table,
+		role.Table,
+		react.Table,
+		post.Table,
+		notification.Table,
+		link.Table,
+		item.Table,
+		collection.Table,
+		cluster.Table,
+		category.Table,
+		authentication.Table,
+		asset.Table,
 		account.Table,
 	}
 
