@@ -132,7 +132,7 @@ func (l Links) Latest() opt.Optional[*Link] {
 
 func (a Links) Len() int           { return len(a) }
 func (a Links) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Links) Less(i, j int) bool { return a[i].ID.String() < a[j].ID.String() }
+func (a Links) Less(i, j int) bool { return a[i].ID.String() > a[j].ID.String() }
 
 func MapA(in []*ent.Link) []*Link {
 	list := dt.Map(in, Map)
