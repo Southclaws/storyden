@@ -63,7 +63,7 @@ export function LinkIndexView(props: Props) {
         pageSize={data.links.page_size}
       />
 
-      <LinkCardList result={data.links} />
+      <LinkCardList links={data.links} />
     </VStack>
   );
 }
