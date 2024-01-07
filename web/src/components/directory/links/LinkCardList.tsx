@@ -4,14 +4,21 @@ import { Empty } from "src/components/feed/common/PostRef/Empty";
 
 import { styled } from "@/styled-system/jsx";
 
-export function LinkCardList(props: { result: LinkListResult }) {
-  if (props.result.links.length === 0) {
+type Props = {
+  links: LinkListResult;
+  show?: number;
+};
+
+export function LinkCardList({ links, show }: Props) {
+  if (links.links.length === 0) {
     return <Empty>no links were found</Empty>;
   }
 
+  const shown = show ? links.links.slice(0, show) : links.links;
+
   return (
     <styled.ol w="full" display="flex" flexDir="column" gap="4">
-      {props.result.links.map((v) => (
+      {shown.map((v) => (
         <styled.li key={v.url}>
           <LinkCard {...v} />
         </styled.li>
