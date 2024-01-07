@@ -7,7 +7,7 @@ import { Empty } from "src/components/feed/common/PostRef/Empty";
 import { Unready } from "src/components/site/Unready";
 import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
 
-import { VStack } from "@/styled-system/jsx";
+import { Center, VStack } from "@/styled-system/jsx";
 
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
 
@@ -19,7 +19,11 @@ export function Client(props: Props) {
   const { items, clusters, links } = data;
 
   if (empty) {
-    return <Empty>This community knowledgebase is empty.</Empty>;
+    return (
+      <Center h="full">
+        <Empty>This community knowledgebase is empty.</Empty>
+      </Center>
+    );
   }
 
   return (
