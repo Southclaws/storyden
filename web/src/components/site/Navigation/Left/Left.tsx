@@ -1,6 +1,6 @@
 "use client";
 
-import { LinkIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { BookOpenIcon, LinkIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
 import { Link } from "src/theme/components/Link";
@@ -48,6 +48,11 @@ export function Left() {
           {isAdmin && <CategoryCreateTrigger />}
 
           <Divider />
+
+          <Link w="full" size="xs" href="/directory">
+            <BookOpenIcon />
+            Knowledgebase
+          </Link>
 
           <Link w="full" size="xs" href="/l">
             <LinkIcon />
