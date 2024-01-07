@@ -25,6 +25,7 @@ export function Link({
     <NextLink className={cn} href={href}>
       <styled.span
         display="flex"
+        alignItems="center"
         gap="1"
         textOverflow="ellipsis"
         overflowX="hidden"
