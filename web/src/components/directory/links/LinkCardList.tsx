@@ -1,6 +1,6 @@
 import { LinkListResult } from "src/api/openapi/schemas";
 import { LinkCard } from "src/components/directory/links/LinkCard";
-import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Empty } from "src/components/site/Empty";
 
 import { styled } from "@/styled-system/jsx";
 

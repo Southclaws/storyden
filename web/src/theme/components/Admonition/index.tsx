@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 
 import { Button } from "../Button";
 
+import { css } from "@/styled-system/css";
 import { VStack, styled } from "@/styled-system/jsx";
 import { AdmonitionVariantProps, admonition } from "@/styled-system/recipes";
 
@@ -22,7 +23,12 @@ export function Admonition(props: PropsWithChildren<AdmonitionProps>) {
   const [admonitionVariantProps] = admonition.splitVariantProps(props);
 
   return (
-    <Presence present={props.value} lazyMount unmountOnExit>
+    <Presence
+      className={css({ w: "full" })}
+      present={props.value}
+      lazyMount
+      unmountOnExit
+    >
       <_Admonition {...admonitionVariantProps}>
         <VStack alignItems="start">
           {props.title && (

@@ -1,5 +1,5 @@
 import { Cluster } from "src/api/openapi/schemas";
-import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Empty } from "src/components/site/Empty";
 import {
   DirectoryPath,
   joinDirectoryPath,

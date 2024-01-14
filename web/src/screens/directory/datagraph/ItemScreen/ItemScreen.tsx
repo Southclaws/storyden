@@ -4,7 +4,7 @@ import { ContentViewer } from "src/components/content/ContentViewer/ContentViewe
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
 import { DatagraphHeader } from "src/components/directory/datagraph/Header";
-import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
 import { Heading2 } from "src/theme/components/Heading/Index";
 

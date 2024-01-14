@@ -6,11 +6,9 @@ import { HStack, styled } from "@/styled-system/jsx";
 
 export function Empty({ children }: PropsWithChildren) {
   return (
-    <HStack alignItems="center">
-      <CubeTransparentIcon className={css({ width: "6", color: "bg.muted" })} />
-      <styled.p fontStyle="italic" color="fg.subtle">
-        {children}
-      </styled.p>
+    <HStack alignItems="center" color="bg.muted">
+      <CubeTransparentIcon className={css({ width: "6" })} />
+      <styled.p fontStyle="italic">{children}</styled.p>
     </HStack>
   );
 }

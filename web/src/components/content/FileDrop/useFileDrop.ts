@@ -15,7 +15,6 @@ export type Props = {
 
 export function useFileDrop(props: Props) {
   const [dragging, setDragging] = useState(false);
-  const editor = useSlate();
 
   function onDragStart() {
     setDragging(true);
@@ -36,18 +35,11 @@ export function useFileDrop(props: Props) {
   }
 
   async function process(f: File) {
-    const { url } = await upload(f);
-
     if (!isSupportedImage(f.type)) {
       throw new Error("Unsupported image format");
     }
 
-    Transforms.insertNodes(editor, {
-      type: "image",
-      caption: url,
-      link: url,
-      children: [{ text: "" }],
-    });
+    await upload(f);
   }
 
   async function handleEvent(e: DragEvent<HTMLDivElement>) {

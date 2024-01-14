@@ -3,7 +3,7 @@
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { LinkCardList } from "src/components/directory/links/LinkCardList";
-import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
 import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
 

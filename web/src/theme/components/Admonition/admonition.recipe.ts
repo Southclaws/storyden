@@ -29,8 +29,8 @@ export const admonition = defineRecipe({
         color: "accent.text.500",
       },
       failure: {
-        backgroundColor: "rose.600",
-        color: "white",
+        backgroundColor: "bg.destructive",
+        color: "fg.default",
       },
     },
   },

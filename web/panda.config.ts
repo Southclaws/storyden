@@ -10,13 +10,13 @@ import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
+import { headingInput } from "src/theme/components/HeadingInput/recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
 import { popover } from "src/theme/components/Popover/popover.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
 import { tabs } from "src/theme/components/Tabs/tabs.recipe";
-import { titleInput } from "src/theme/components/TitleInput/titleInput.recipe";
 
 // TODO: Dark mode = 40%
 const L = "80%";
@@ -125,7 +125,7 @@ export default defineConfig({
     recipes: {
       admonition: admonition,
       input: input,
-      titleInput: titleInput,
+      headingInput: headingInput,
       heading: heading,
       button: button,
       link: link,
