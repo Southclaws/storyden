@@ -1,9 +1,10 @@
 import { PropsWithChildren, useCallback } from "react";
 import { Editable, Slate } from "slate-react";
 
+import { FileDrop } from "../FileDrop/FileDrop";
+
 import { Box } from "@/styled-system/jsx";
 
-import { FileDrop } from "./components/FileDrop/FileDrop";
 import { Element } from "./render/Element";
 import { Leaf } from "./render/Leaf";
 import { Props, useContentComposer } from "./useContentComposer";
@@ -13,7 +14,8 @@ export function ContentComposer({
   children,
   ...props
 }: PropsWithChildren<Props>) {
-  const { editor, initialValue, onChange } = useContentComposer(props);
+  const { editor, initialValue, onChange, handleAssetUpload } =
+    useContentComposer(props);
 
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
@@ -29,7 +31,7 @@ export function ContentComposer({
       <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
         {children}
 
-        <FileDrop onComplete={props.onAssetUpload}>
+        <FileDrop onComplete={handleAssetUpload}>
           <Editable
             renderLeaf={renderLeaf}
             renderElement={renderElement}

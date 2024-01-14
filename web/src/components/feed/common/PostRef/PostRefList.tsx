@@ -1,8 +1,9 @@
 import { PostProps, ThreadReference } from "src/api/openapi/schemas";
 
+import { Empty } from "../../../site/Empty";
+
 import { styled } from "@/styled-system/jsx";
 
-import { Empty } from "./Empty";
 import { PostRef } from "./PostRef";
 
 type Either = PostProps | ThreadReference;

@@ -2,8 +2,8 @@ import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
 import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Empty } from "../../site/Empty";
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
-import { Empty } from "../common/PostRef/Empty";
 
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { Card } from "@/styled-system/patterns";

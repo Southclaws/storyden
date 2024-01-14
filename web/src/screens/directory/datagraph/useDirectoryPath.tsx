@@ -51,3 +51,20 @@ export function joinDirectoryPath(onto: DirectoryPath, end: string): string {
 
   return list.join("/");
 }
+
+/**
+ * replaceDirectoryPath is for when the slug of a datagraph node changes. It's
+ * similar to joinDirectoryPath but it'll replace the old slug with the new one.
+ */
+export function replaceDirectoryPath(
+  onto: DirectoryPath,
+  oldSlug: string,
+  newSlug: string,
+): string {
+  const inPath = indexOf(onto, oldSlug);
+
+  const list =
+    inPath === -1 ? [...onto, newSlug] : [...onto.slice(0, inPath), newSlug];
+
+  return list.join("/");
+}
