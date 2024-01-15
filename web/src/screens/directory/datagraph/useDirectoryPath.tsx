@@ -1,4 +1,4 @@
-import { indexOf } from "lodash";
+import { indexOf, pull } from "lodash";
 import { useParams } from "next/navigation";
 import { z } from "zod";
 
@@ -14,7 +14,11 @@ export function useDirectoryPath() {
 
   const { slug } = ParamsSchema.parse(params);
 
-  return slug as DirectoryPath;
+  const cleaned = pull(slug, "new");
+
+  const dp = cleaned as DirectoryPath;
+
+  return dp;
 }
 
 /**
