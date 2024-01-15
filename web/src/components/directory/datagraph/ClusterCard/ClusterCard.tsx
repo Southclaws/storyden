@@ -26,6 +26,8 @@ export type Props = {
 
 export function ClusterCard({ cluster, directoryPath }: Props) {
   const slug = joinDirectoryPath(directoryPath, cluster.slug);
+  const asset = cluster.assets?.[0];
+
   return (
     <styled.article containerType="inline-size" w="full">
       <LinkBox
@@ -36,11 +38,11 @@ export function ClusterCard({ cluster, directoryPath }: Props) {
         w="full"
         overflow="hidden"
       >
-        {cluster.image_url && (
+        {asset && (
           <Box className={styles["background-blur"]} gridRow="1" height="full">
             <styled.img
               gridRow="1"
-              src={cluster.image_url}
+              src={asset.url}
               width="full"
               height="full"
               objectPosition="center"
@@ -52,10 +54,10 @@ export function ClusterCard({ cluster, directoryPath }: Props) {
           </Box>
         )}
 
-        {cluster.image_url ? (
+        {asset ? (
           <styled.img
             className={styles["image"]}
-            src={cluster.image_url}
+            src={asset.url}
             width="full"
             height="full"
             objectPosition="center"

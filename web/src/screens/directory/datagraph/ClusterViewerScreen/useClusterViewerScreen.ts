@@ -30,7 +30,15 @@ export function useClusterViewerScreen(props: Props) {
   const { slug } = data;
 
   async function handleSave(cluster: ClusterInitialProps) {
-    await clusterUpdate(slug, cluster);
+    await clusterUpdate(slug, {
+      name: cluster.name,
+      slug: cluster.slug,
+      asset_ids: cluster.asset_ids,
+      url: cluster.url,
+      description: cluster.description,
+      content: cluster.content,
+      properties: cluster.properties,
+    });
     await mutate();
 
     // Handle slug changes properly by redirecting to the new path.

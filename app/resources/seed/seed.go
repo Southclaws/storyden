@@ -77,7 +77,7 @@ func New(
 	accounts(account_repo, auth_repo)
 	categories(category_repo)
 	threads(thread_repo, post_repo, react_repo, asset_repo)
-	clusters_items(cluster_repo, item_repo)
+	clusters_items(cluster_repo, item_repo, asset_repo)
 
 	return Ready{}
 }

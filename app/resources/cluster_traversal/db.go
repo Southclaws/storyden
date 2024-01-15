@@ -139,7 +139,6 @@ func fromRow(r subtreeRow) (*datagraph.Cluster, error) {
 		UpdatedAt:   r.ClusterUpdatedAt,
 		Name:        r.ClusterName,
 		Slug:        r.ClusterSlug,
-		ImageURL:    opt.NewPtr(r.ClusterImageUrl),
 		Description: r.ClusterDescription,
 		Owner: profile.Profile{
 			ID:     account_repo.AccountID(r.OwnerId),

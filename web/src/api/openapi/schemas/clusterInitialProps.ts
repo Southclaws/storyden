@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AssetURL } from "./assetURL";
+import type { AssetIDs } from "./assetIDs";
 import type { ClusterDescription } from "./clusterDescription";
 import type { ClusterName } from "./clusterName";
 import type { PostContent } from "./postContent";
@@ -16,7 +16,7 @@ import type { Url } from "./url";
 export interface ClusterInitialProps {
   name: ClusterName;
   slug: Slug;
-  image_url?: AssetURL;
+  asset_ids?: AssetIDs;
   url?: Url;
   description: ClusterDescription;
   content?: PostContent;

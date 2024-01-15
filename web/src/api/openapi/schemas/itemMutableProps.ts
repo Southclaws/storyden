@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AssetURL } from "./assetURL";
+import type { AssetIDs } from "./assetIDs";
 import type { ItemDescription } from "./itemDescription";
 import type { ItemName } from "./itemName";
 import type { PostContent } from "./postContent";
@@ -20,7 +20,7 @@ import type { Url } from "./url";
 export interface ItemMutableProps {
   name?: ItemName;
   slug?: Slug;
-  image_url?: AssetURL;
+  asset_ids?: AssetIDs;
   url?: Url;
   description?: ItemDescription;
   content?: PostContent;

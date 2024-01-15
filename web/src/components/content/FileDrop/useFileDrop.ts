@@ -1,8 +1,6 @@
 "use client";
 
 import { DragEvent, useState } from "react";
-import { Transforms } from "slate";
-import { useSlate } from "slate-react";
 
 import { assetUpload } from "src/api/openapi/assets";
 import { Asset } from "src/api/openapi/schemas";
@@ -13,8 +11,30 @@ export type Props = {
   onComplete?: (asset: Asset) => void;
 };
 
+export function useFileUpload() {
+  async function upload(f: File) {
+    if (!isSupportedImage(f.type)) {
+      throw new Error("Unsupported image format");
+    }
+
+    const asset = await assetUpload(f);
+
+    return asset;
+  }
+
+  return {
+    upload,
+  };
+}
+
 export function useFileDrop(props: Props) {
   const [dragging, setDragging] = useState(false);
+  const { upload } = useFileUpload();
+
+  async function handleUpload(f: File) {
+    const asset = await upload(f);
+    props.onComplete?.(asset);
+  }
 
   function onDragStart() {
     setDragging(true);
@@ -25,23 +45,6 @@ export function useFileDrop(props: Props) {
     setDragging(false);
   }
 
-  async function upload(f: File) {
-    // TODO: Upload progress indicator...
-    const asset = await assetUpload(f);
-
-    props.onComplete?.(asset);
-
-    return asset;
-  }
-
-  async function process(f: File) {
-    if (!isSupportedImage(f.type)) {
-      throw new Error("Unsupported image format");
-    }
-
-    await upload(f);
-  }
-
   async function handleEvent(e: DragEvent<HTMLDivElement>) {
     if (e.dataTransfer.items) {
       await Promise.all(
@@ -50,12 +53,12 @@ export function useFileDrop(props: Props) {
             const file = item.getAsFile();
             if (file == null) return;
 
-            await process(file);
+            await handleUpload(file);
           }
         }),
       );
     } else {
-      await Promise.all([...e.dataTransfer.files].map(process));
+      await Promise.all([...e.dataTransfer.files].map(handleUpload));
     }
   }
 

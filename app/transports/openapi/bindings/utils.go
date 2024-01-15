@@ -146,6 +146,14 @@ func serialiseAssetReference(a *asset.Asset) openapi.Asset {
 	}
 }
 
+func deserialiseAssetID(in string) asset.AssetID {
+	return asset.AssetID(in)
+}
+
+func deserialiseAssetIDs(ids []string) []asset.AssetID {
+	return dt.Map(ids, deserialiseAssetID)
+}
+
 func serialiseTag(t tag.Tag) openapi.Tag {
 	return openapi.Tag{
 		Id:   openapi.Identifier(t.ID),

@@ -25,8 +25,6 @@ const (
 	FieldName = "name"
 	// FieldSlug holds the string denoting the slug field in the database.
 	FieldSlug = "slug"
-	// FieldImageURL holds the string denoting the image_url field in the database.
-	FieldImageURL = "image_url"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldContent holds the string denoting the content field in the database.
@@ -84,7 +82,6 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldName,
 	FieldSlug,
-	FieldImageURL,
 	FieldDescription,
 	FieldContent,
 	FieldAccountID,
@@ -160,11 +157,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // BySlug orders the results by the slug field.
 func BySlug(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSlug, opts...).ToFunc()
-}
-
-// ByImageURL orders the results by the image_url field.
-func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.

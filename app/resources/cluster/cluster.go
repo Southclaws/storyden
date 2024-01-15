@@ -56,15 +56,15 @@ func WithSlug(v string) Option {
 	}
 }
 
-func WithImageURL(v string) Option {
-	return func(c *ent.ClusterMutation) {
-		c.SetImageURL(v)
-	}
-}
-
 func WithAssets(a []asset.AssetID) Option {
 	return func(m *ent.ClusterMutation) {
 		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+	}
+}
+
+func WithAssetsRemoved(a []asset.AssetID) Option {
+	return func(m *ent.ClusterMutation) {
+		m.RemoveAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
 	}
 }
 

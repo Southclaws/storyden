@@ -23,6 +23,7 @@ export function useClusterCreateScreen() {
     properties: {},
     items: [],
     clusters: [],
+    assets: [],
   };
 
   async function handleCreate(cluster: ClusterInitialProps) {
