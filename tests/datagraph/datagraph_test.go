@@ -36,7 +36,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
-			iurl := "https://picsum.photos/500/500"
+			// iurl := "https://picsum.photos/500/500"
 
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
@@ -44,7 +44,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing clusters api",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -63,7 +62,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -86,7 +84,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
@@ -106,7 +103,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname1,
 				Slug:        itemslug1,
 				Description: "testing items api",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -164,7 +160,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname2,
 				Slug:        itemslug2,
 				Description: "testing items api 2",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item2)

@@ -167,6 +167,26 @@ export const clusterUpdate = (
 };
 
 /**
+ * Add an asset to a cluster.
+ */
+export const clusterAddAsset = (clusterSlug: string, id: string) => {
+  return fetcher<ClusterUpdateOKResponse>({
+    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    method: "put",
+  });
+};
+
+/**
+ * Remove an asset from a cluster.
+ */
+export const clusterRemoveAsset = (clusterSlug: string, id: string) => {
+  return fetcher<ClusterUpdateOKResponse>({
+    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    method: "delete",
+  });
+};
+
+/**
  * Set a cluster's parent to the specified cluster
  */
 export const clusterAddCluster = (

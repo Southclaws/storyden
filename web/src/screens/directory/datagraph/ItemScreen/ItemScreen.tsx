@@ -19,7 +19,7 @@ export function ItemScreen(props: Props) {
 
   return (
     <VStack w="full" alignItems="start">
-      <Breadcrumbs directoryPath={directoryPath} />
+      <Breadcrumbs create="hide" directoryPath={directoryPath} />
 
       <DatagraphHeader {...props.item} />
 

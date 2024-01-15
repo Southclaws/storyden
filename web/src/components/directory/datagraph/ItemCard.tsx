@@ -15,6 +15,7 @@ type Props = {
 
 export function ItemCard({ item, directoryPath }: Props) {
   const slug = joinDirectoryPath(directoryPath, item.slug);
+  const asset = item.assets?.[0];
   return (
     <styled.article containerType="inline-size">
       <LinkBox
@@ -24,15 +25,17 @@ export function ItemCard({ item, directoryPath }: Props) {
         aspectRatio="square"
         gridTemplateAreas='"x"'
       >
-        <styled.img
-          src={item.image_url}
-          height="full"
-          width="full"
-          objectPosition="top"
-          objectFit="cover"
-          aspectRatio="square"
-          gridArea="x"
-        />
+        {asset && (
+          <styled.img
+            src={asset.url}
+            height="full"
+            width="full"
+            objectPosition="top"
+            objectFit="cover"
+            aspectRatio="square"
+            gridArea="x"
+          />
+        )}
 
         <VStack gridArea="x" alignItems="center" justifyContent="end">
           <Box

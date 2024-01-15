@@ -81,11 +81,6 @@ func Slug(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldSlug, v))
 }
 
-// ImageURL applies equality check predicate on the "image_url" field. It's identical to ImageURLEQ.
-func ImageURL(v string) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldImageURL, v))
-}
-
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Item {
 	return predicate.Item(sql.FieldEQ(FieldDescription, v))
@@ -359,81 +354,6 @@ func SlugEqualFold(v string) predicate.Item {
 // SlugContainsFold applies the ContainsFold predicate on the "slug" field.
 func SlugContainsFold(v string) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldSlug, v))
-}
-
-// ImageURLEQ applies the EQ predicate on the "image_url" field.
-func ImageURLEQ(v string) predicate.Item {
-	return predicate.Item(sql.FieldEQ(FieldImageURL, v))
-}
-
-// ImageURLNEQ applies the NEQ predicate on the "image_url" field.
-func ImageURLNEQ(v string) predicate.Item {
-	return predicate.Item(sql.FieldNEQ(FieldImageURL, v))
-}
-
-// ImageURLIn applies the In predicate on the "image_url" field.
-func ImageURLIn(vs ...string) predicate.Item {
-	return predicate.Item(sql.FieldIn(FieldImageURL, vs...))
-}
-
-// ImageURLNotIn applies the NotIn predicate on the "image_url" field.
-func ImageURLNotIn(vs ...string) predicate.Item {
-	return predicate.Item(sql.FieldNotIn(FieldImageURL, vs...))
-}
-
-// ImageURLGT applies the GT predicate on the "image_url" field.
-func ImageURLGT(v string) predicate.Item {
-	return predicate.Item(sql.FieldGT(FieldImageURL, v))
-}
-
-// ImageURLGTE applies the GTE predicate on the "image_url" field.
-func ImageURLGTE(v string) predicate.Item {
-	return predicate.Item(sql.FieldGTE(FieldImageURL, v))
-}
-
-// ImageURLLT applies the LT predicate on the "image_url" field.
-func ImageURLLT(v string) predicate.Item {
-	return predicate.Item(sql.FieldLT(FieldImageURL, v))
-}
-
-// ImageURLLTE applies the LTE predicate on the "image_url" field.
-func ImageURLLTE(v string) predicate.Item {
-	return predicate.Item(sql.FieldLTE(FieldImageURL, v))
-}
-
-// ImageURLContains applies the Contains predicate on the "image_url" field.
-func ImageURLContains(v string) predicate.Item {
-	return predicate.Item(sql.FieldContains(FieldImageURL, v))
-}
-
-// ImageURLHasPrefix applies the HasPrefix predicate on the "image_url" field.
-func ImageURLHasPrefix(v string) predicate.Item {
-	return predicate.Item(sql.FieldHasPrefix(FieldImageURL, v))
-}
-
-// ImageURLHasSuffix applies the HasSuffix predicate on the "image_url" field.
-func ImageURLHasSuffix(v string) predicate.Item {
-	return predicate.Item(sql.FieldHasSuffix(FieldImageURL, v))
-}
-
-// ImageURLIsNil applies the IsNil predicate on the "image_url" field.
-func ImageURLIsNil() predicate.Item {
-	return predicate.Item(sql.FieldIsNull(FieldImageURL))
-}
-
-// ImageURLNotNil applies the NotNil predicate on the "image_url" field.
-func ImageURLNotNil() predicate.Item {
-	return predicate.Item(sql.FieldNotNull(FieldImageURL))
-}
-
-// ImageURLEqualFold applies the EqualFold predicate on the "image_url" field.
-func ImageURLEqualFold(v string) predicate.Item {
-	return predicate.Item(sql.FieldEqualFold(FieldImageURL, v))
-}
-
-// ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
-func ImageURLContainsFold(v string) predicate.Item {
-	return predicate.Item(sql.FieldContainsFold(FieldImageURL, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

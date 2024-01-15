@@ -158,3 +158,23 @@ export const itemUpdate = (
     data: itemUpdateBody,
   });
 };
+
+/**
+ * Add an asset to an item.
+ */
+export const itemAddAsset = (itemSlug: string, id: string) => {
+  return fetcher<ItemUpdateOKResponse>({
+    url: `/v1/items/${itemSlug}/assets/${id}`,
+    method: "put",
+  });
+};
+
+/**
+ * Remove an asset from an item.
+ */
+export const itemRemoveAsset = (itemSlug: string, id: string) => {
+  return fetcher<ItemUpdateOKResponse>({
+    url: `/v1/items/${itemSlug}/assets/${id}`,
+    method: "delete",
+  });
+};

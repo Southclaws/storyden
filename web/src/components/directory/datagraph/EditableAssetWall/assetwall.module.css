@@ -1,0 +1,22 @@
+.root {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-auto-flow: dense;
+}
+
+.asset {
+  border-radius: var(--radii-lg);
+  overflow: hidden;
+
+  height: 100%;
+  width: 100%;
+
+  object-position: center;
+  object-fit: cover;
+}
+
+.asset:first-child {
+  grid-column: 1/2;
+  grid-row: 1/3;
+}

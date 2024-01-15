@@ -73,26 +73,6 @@ func (cu *ClusterUpdate) SetSlug(s string) *ClusterUpdate {
 	return cu
 }
 
-// SetImageURL sets the "image_url" field.
-func (cu *ClusterUpdate) SetImageURL(s string) *ClusterUpdate {
-	cu.mutation.SetImageURL(s)
-	return cu
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (cu *ClusterUpdate) SetNillableImageURL(s *string) *ClusterUpdate {
-	if s != nil {
-		cu.SetImageURL(*s)
-	}
-	return cu
-}
-
-// ClearImageURL clears the value of the "image_url" field.
-func (cu *ClusterUpdate) ClearImageURL() *ClusterUpdate {
-	cu.mutation.ClearImageURL()
-	return cu
-}
-
 // SetDescription sets the "description" field.
 func (cu *ClusterUpdate) SetDescription(s string) *ClusterUpdate {
 	cu.mutation.SetDescription(s)
@@ -461,12 +441,6 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Slug(); ok {
 		_spec.SetField(cluster.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.ImageURL(); ok {
-		_spec.SetField(cluster.FieldImageURL, field.TypeString, value)
-	}
-	if cu.mutation.ImageURLCleared() {
-		_spec.ClearField(cluster.FieldImageURL, field.TypeString)
-	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)
 	}
@@ -822,26 +796,6 @@ func (cuo *ClusterUpdateOne) SetName(s string) *ClusterUpdateOne {
 // SetSlug sets the "slug" field.
 func (cuo *ClusterUpdateOne) SetSlug(s string) *ClusterUpdateOne {
 	cuo.mutation.SetSlug(s)
-	return cuo
-}
-
-// SetImageURL sets the "image_url" field.
-func (cuo *ClusterUpdateOne) SetImageURL(s string) *ClusterUpdateOne {
-	cuo.mutation.SetImageURL(s)
-	return cuo
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (cuo *ClusterUpdateOne) SetNillableImageURL(s *string) *ClusterUpdateOne {
-	if s != nil {
-		cuo.SetImageURL(*s)
-	}
-	return cuo
-}
-
-// ClearImageURL clears the value of the "image_url" field.
-func (cuo *ClusterUpdateOne) ClearImageURL() *ClusterUpdateOne {
-	cuo.mutation.ClearImageURL()
 	return cuo
 }
 
@@ -1242,12 +1196,6 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if value, ok := cuo.mutation.Slug(); ok {
 		_spec.SetField(cluster.FieldSlug, field.TypeString, value)
-	}
-	if value, ok := cuo.mutation.ImageURL(); ok {
-		_spec.SetField(cluster.FieldImageURL, field.TypeString, value)
-	}
-	if cuo.mutation.ImageURLCleared() {
-		_spec.ClearField(cluster.FieldImageURL, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(cluster.FieldDescription, field.TypeString, value)

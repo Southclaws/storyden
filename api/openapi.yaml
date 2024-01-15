@@ -944,6 +944,32 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ClusterUpdateOK" }
 
+  /v1/clusters/{cluster_slug}/assets/{id}:
+    put:
+      operationId: ClusterAddAsset
+      description: Add an asset to a cluster.
+      tags: [clusters]
+      parameters:
+        - $ref: "#/components/parameters/ClusterSlugParam"
+        - $ref: "#/components/parameters/AssetPath"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+    delete:
+      operationId: ClusterRemoveAsset
+      description: Remove an asset from a cluster.
+      tags: [clusters]
+      parameters:
+        - $ref: "#/components/parameters/ClusterSlugParam"
+        - $ref: "#/components/parameters/AssetPath"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+
   /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child}:
     put:
       operationId: ClusterAddCluster
@@ -1049,6 +1075,32 @@ paths:
       tags: [items]
       parameters: [$ref: "#/components/parameters/ItemSlugParam"]
       requestBody: { $ref: "#/components/requestBodies/ItemUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ItemUpdateOK" }
+
+  /v1/items/{item_slug}/assets/{id}:
+    put:
+      operationId: ItemAddAsset
+      description: Add an asset to an item.
+      tags: [items]
+      parameters:
+        - $ref: "#/components/parameters/ItemSlugParam"
+        - $ref: "#/components/parameters/AssetPath"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ItemUpdateOK" }
+    delete:
+      operationId: ItemRemoveAsset
+      description: Remove an asset from an item.
+      tags: [items]
+      parameters:
+        - $ref: "#/components/parameters/ItemSlugParam"
+        - $ref: "#/components/parameters/AssetPath"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2857,6 +2909,10 @@ components:
     AssetID:
       $ref: "#/components/schemas/Identifier"
 
+    AssetIDs:
+      type: array
+      items: { $ref: "#/components/schemas/AssetID" }
+
     AssetList:
       type: array
       items: { $ref: "#/components/schemas/Asset" }
@@ -3018,11 +3074,11 @@ components:
     ClusterCommonProps:
       description: The main properties of a cluster.
       type: object
-      required: [name, slug, description, owner, properties]
+      required: [name, slug, assets, description, owner, properties]
       properties:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        assets: { $ref: "#/components/schemas/AssetList" }
         link: { $ref: "#/components/schemas/Link" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
@@ -3039,7 +3095,7 @@ components:
       properties:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
@@ -3052,7 +3108,7 @@ components:
       properties:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
@@ -3111,11 +3167,11 @@ components:
     ItemCommonProps:
       description: The main properties for an item.
       type: object
-      required: [name, slug, description, owner, properties]
+      required: [name, slug, assets, description, owner, properties]
       properties:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        assets: { $ref: "#/components/schemas/AssetList" }
         link: { $ref: "#/components/schemas/Link" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
@@ -3148,7 +3204,7 @@ components:
       properties:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
@@ -3161,7 +3217,7 @@ components:
       properties:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
-        image_url: { $ref: "#/components/schemas/AssetURL" }
+        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }

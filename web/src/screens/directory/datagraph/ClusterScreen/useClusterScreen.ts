@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { ClusterInitialProps, ClusterWithItems } from "src/api/openapi/schemas";
+import {
+  Asset,
+  ClusterInitialProps,
+  ClusterWithItems,
+} from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 
 import { useDirectoryPath } from "../useDirectoryPath";
@@ -13,6 +17,7 @@ export const FormSchema = z.object({
   slug: z.string().min(1, "Please enter a slug."),
   description: z.string().min(1, "Please enter a short description."),
   content: z.string().optional(),
+  asset_ids: z.array(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -38,7 +43,13 @@ export function useClusterScreen({
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
-    defaultValues: cluster,
+    defaultValues: {
+      name: cluster.name,
+      slug: cluster.slug,
+      description: cluster.description,
+      content: cluster.content,
+      asset_ids: cluster.assets.map((a) => a.id),
+    },
   });
 
   function handleEditMode() {
@@ -55,17 +66,24 @@ export function useClusterScreen({
     onSave(payload);
   }
 
-  function handleAssetUpload() {
+  function handleAssetUpload(asset: Asset) {
     if (!editing) return;
+
+    const assetIDs = form.getValues().asset_ids;
+    const newAssetIDs = [...assetIDs, asset.id];
+
+    form.setValue("asset_ids", newAssetIDs);
 
     onSave(form.getValues());
   }
+
+  const handleSubmit = form.handleSubmit(handleSave);
 
   return {
     form,
     handlers: {
       handleEditMode,
-      handleSave,
+      handleSubmit,
       handleAssetUpload,
     },
     directoryPath,

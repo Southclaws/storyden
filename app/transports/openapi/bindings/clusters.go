@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -54,7 +55,6 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 		cluster_svc.Partial{
 			Content:    opt.NewPtr(request.Body.Content),
 			Properties: opt.NewPtr(request.Body.Properties),
-			ImageURL:   opt.NewPtr(request.Body.ImageUrl),
 			URL:        opt.NewPtr(request.Body.Url),
 		},
 	)
@@ -116,7 +116,7 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
 		Name:        opt.NewPtr(request.Body.Name),
 		Slug:        opt.NewPtr(request.Body.Slug),
-		ImageURL:    opt.NewPtr(request.Body.ImageUrl),
+		AssetsAdd:   opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		URL:         opt.NewPtr(request.Body.Url),
 		Description: opt.NewPtr(request.Body.Description),
 		Content:     opt.NewPtr(request.Body.Content),
@@ -127,6 +127,32 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 	}
 
 	return openapi.ClusterUpdate200JSONResponse{
+		ClusterUpdateOKJSONResponse: openapi.ClusterUpdateOKJSONResponse(serialiseCluster(clus)),
+	}, nil
+}
+
+func (c *Clusters) ClusterAddAsset(ctx context.Context, request openapi.ClusterAddAssetRequestObject) (openapi.ClusterAddAssetResponseObject, error) {
+	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
+		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterAddAsset200JSONResponse{
+		ClusterUpdateOKJSONResponse: openapi.ClusterUpdateOKJSONResponse(serialiseCluster(clus)),
+	}, nil
+}
+
+func (c *Clusters) ClusterRemoveAsset(ctx context.Context, request openapi.ClusterRemoveAssetRequestObject) (openapi.ClusterRemoveAssetResponseObject, error) {
+	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
+		AssetsRemove: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterRemoveAsset200JSONResponse{
 		ClusterUpdateOKJSONResponse: openapi.ClusterUpdateOKJSONResponse(serialiseCluster(clus)),
 	}, nil
 }
@@ -182,7 +208,7 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
 		Slug:        in.Slug,
-		ImageUrl:    in.ImageURL.Ptr(),
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
@@ -198,7 +224,7 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
 		Slug:        in.Slug,
-		ImageUrl:    in.ImageURL.Ptr(),
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),

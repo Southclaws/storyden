@@ -29,6 +29,7 @@ export * from "./adminSettingsUpdateOKResponse";
 export * from "./asset";
 export * from "./assetGetOKResponse";
 export * from "./assetID";
+export * from "./assetIDs";
 export * from "./assetList";
 export * from "./assetURL";
 export * from "./assetUploadBody";

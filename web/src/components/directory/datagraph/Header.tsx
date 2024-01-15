@@ -8,6 +8,7 @@ import { Box, HStack, Stack, VStack, styled } from "@/styled-system/jsx";
 type Props = Cluster & Item;
 
 export function DatagraphHeader(props: Props) {
+  const asset = props.assets?.[0];
   return (
     <Stack
       w="full"
@@ -36,9 +37,11 @@ export function DatagraphHeader(props: Props) {
         <styled.p>{props.description}</styled.p>
       </VStack>
 
-      <HStack w="full" h="full" maxH="64" justify="center" minW="0">
-        <styled.img maxHeight="64" borderRadius="lg" src={props.image_url} />
-      </HStack>
+      {asset && (
+        <HStack w="full" h="full" maxH="64" justify="center" minW="0">
+          <styled.img maxHeight="64" borderRadius="lg" src={asset.url} />
+        </HStack>
+      )}
     </Stack>
   );
 }

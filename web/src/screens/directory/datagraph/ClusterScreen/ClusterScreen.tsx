@@ -4,14 +4,13 @@ import { isEmpty } from "lodash";
 import { FormProvider } from "react-hook-form";
 
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
-import { FileDrop } from "src/components/content/FileDrop/FileDrop";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
+import { EditableAssetWall } from "src/components/directory/datagraph/EditableAssetWall/EditableAssetWall";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
-import { EmptyBox } from "src/components/site/EmptyBox";
 import { Admonition } from "src/theme/components/Admonition";
 import { Heading1 } from "src/theme/components/Heading/Index";
 import { Input } from "src/theme/components/Input";
@@ -25,7 +24,7 @@ import { Props, useClusterScreen } from "./useClusterScreen";
 export function ClusterScreen(props: Props) {
   const {
     form,
-    handlers: { handleSave, handleEditMode, handleAssetUpload },
+    handlers: { handleSubmit, handleEditMode, handleAssetUpload },
     directoryPath,
     editing,
     cluster,
@@ -39,7 +38,7 @@ export function ClusterScreen(props: Props) {
       w="full"
       gap="3"
       alignItems="start"
-      onSubmit={form.handleSubmit(handleSave)}
+      onSubmit={handleSubmit}
     >
       <Admonition
         value={!isEmpty(form.formState.errors)}
@@ -70,20 +69,23 @@ export function ClusterScreen(props: Props) {
           )}
         </HStack>
 
-        <VStack w="full" gap="2">
-          <HStack w="full" h="full" maxH="64" justify="center" minW="0">
-            {cluster.image_url ? (
-              <styled.img
-                maxHeight="64"
-                borderRadius="lg"
-                src={cluster.image_url}
-              />
+        <VStack w="full" alignItems="start" gap="2">
+          {/* <HStack w="full" h="full" maxH="64" justify="center" minW="0">
+            {asset ? (
+              <styled.img maxHeight="64" borderRadius="lg" src={asset.url} />
             ) : (
               <FileDrop>
                 <EmptyBox>add images</EmptyBox>
               </FileDrop>
             )}
-          </HStack>
+          </HStack> */}
+
+          <EditableAssetWall
+            maxH="64"
+            editing={editing}
+            onUpload={handleAssetUpload}
+            assets={cluster.assets}
+          />
 
           <VStack alignItems="start" w="full" minW="0">
             <HStack w="full" justify="space-between" alignItems="end">

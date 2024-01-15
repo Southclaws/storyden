@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -33,22 +34,24 @@ type Manager interface {
 }
 
 type Partial struct {
-	Name        opt.Optional[string]
-	Slug        opt.Optional[string]
-	ImageURL    opt.Optional[string]
-	URL         opt.Optional[string]
-	Description opt.Optional[string]
-	Content     opt.Optional[string]
-	Properties  opt.Optional[any]
+	Name         opt.Optional[string]
+	Slug         opt.Optional[string]
+	URL          opt.Optional[string]
+	Description  opt.Optional[string]
+	Content      opt.Optional[string]
+	Properties   opt.Optional[any]
+	AssetsAdd    opt.Optional[[]asset.AssetID]
+	AssetsRemove opt.Optional[[]asset.AssetID]
 }
 
 func (p Partial) Opts() (opts []cluster.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, cluster.WithName(value)) })
 	p.Slug.Call(func(value string) { opts = append(opts, cluster.WithSlug(value)) })
-	p.ImageURL.Call(func(value string) { opts = append(opts, cluster.WithImageURL(value)) })
 	p.Description.Call(func(value string) { opts = append(opts, cluster.WithDescription(value)) })
 	p.Content.Call(func(value string) { opts = append(opts, cluster.WithContent(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, cluster.WithProperties(value)) })
+	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssets(value)) })
+	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssetsRemoved(value)) })
 	return
 }
 
