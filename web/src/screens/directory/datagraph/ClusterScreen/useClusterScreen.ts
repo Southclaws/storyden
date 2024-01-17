@@ -74,7 +74,7 @@ export function useClusterScreen({
 
     form.setValue("asset_ids", newAssetIDs);
 
-    onSave(form.getValues());
+    // onSave(form.getValues());
   }
 
   const handleSubmit = form.handleSubmit(handleSave);

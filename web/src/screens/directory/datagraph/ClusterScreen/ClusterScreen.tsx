@@ -1,8 +1,9 @@
 "use client";
 
 import { isEmpty } from "lodash";
-import { FormProvider } from "react-hook-form";
+import { Controller, FormProvider } from "react-hook-form";
 
+import { Asset } from "src/api/openapi/schemas";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
@@ -30,6 +31,8 @@ export function ClusterScreen(props: Props) {
     cluster,
     isAllowedToEdit,
   } = useClusterScreen(props);
+
+  // console.log("ClusterScreen", { formassets: form.getFieldState("asset_ids") });
 
   return (
     <styled.form
@@ -70,21 +73,25 @@ export function ClusterScreen(props: Props) {
         </HStack>
 
         <VStack w="full" alignItems="start" gap="2">
-          {/* <HStack w="full" h="full" maxH="64" justify="center" minW="0">
-            {asset ? (
-              <styled.img maxHeight="64" borderRadius="lg" src={asset.url} />
-            ) : (
-              <FileDrop>
-                <EmptyBox>add images</EmptyBox>
-              </FileDrop>
-            )}
-          </HStack> */}
+          <Controller
+            name="asset_ids"
+            render={({ field }) => {
+              function handleUpload(a: Asset) {
+                console.log("handle upload", field);
+                field.onChange([...field.value, a.id]);
 
-          <EditableAssetWall
-            maxH="64"
-            editing={editing}
-            onUpload={handleAssetUpload}
-            assets={cluster.assets}
+                // handleAssetUpload(a)
+              }
+
+              return (
+                <EditableAssetWall
+                  height="64"
+                  editing={editing}
+                  onUpload={handleUpload}
+                  assets={field.value}
+                />
+              );
+            }}
           />
 
           <VStack alignItems="start" w="full" minW="0">
