@@ -1,19 +1,21 @@
 import { useRouter } from "next/navigation";
 
-import { clusterCreate, clusterGet } from "src/api/openapi/clusters";
-import { ClusterInitialProps, ClusterWithItems } from "src/api/openapi/schemas";
-import { useSession } from "src/auth";
+import { clusterCreate } from "src/api/openapi/clusters";
+import {
+  Account,
+  ClusterInitialProps,
+  ClusterWithItems,
+} from "src/api/openapi/schemas";
 
 import { joinDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
 
-export function useClusterCreateScreen() {
-  const account = useSession();
+export type Props = {
+  session: Account;
+};
+
+export function useClusterCreateScreen(props: Props) {
   const router = useRouter();
   const directoryPath = useDirectoryPath();
-
-  if (!account) {
-    router.push("/login");
-  }
 
   const initial: ClusterWithItems = {
     id: "",
@@ -22,17 +24,22 @@ export function useClusterCreateScreen() {
     name: "",
     slug: "",
     description: "",
-    owner: account!,
+    owner: props.session,
     properties: {},
     items: [],
     clusters: [],
     assets: [],
   };
 
-  console.log({ directoryPath });
-
   async function handleCreate(cluster: ClusterInitialProps) {
-    const created = await clusterCreate(cluster);
+    const created = await clusterCreate({
+      name: cluster.name,
+      slug: cluster.slug,
+      url: cluster.url,
+      description: cluster.description,
+      content: cluster.content,
+      asset_ids: cluster.asset_ids,
+    });
 
     const newPath = joinDirectoryPath(directoryPath, created.slug);
 

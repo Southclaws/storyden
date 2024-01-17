@@ -5,6 +5,7 @@ import {
   ItemGetOKResponse,
 } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
+import { useServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
 import { ClusterCreateScreen } from "src/screens/directory/datagraph/ClusterCreateScreen/ClusterCreateScreen";
 import { ClusterViewerScreen } from "src/screens/directory/datagraph/ClusterViewerScreen/ClusterViewerScreen";
@@ -20,6 +21,7 @@ type Props = {
 
 export default async function Page(props: Props) {
   const { slug } = ParamsSchema.parse(props.params);
+  const session = await useServerSession();
 
   const [targetSlug, fallback, isNew] = getTargetSlug(slug);
 
@@ -39,7 +41,11 @@ export default async function Page(props: Props) {
 
   if (cluster) {
     if (isNew) {
-      return <ClusterCreateScreen />;
+      if (!session) {
+        redirect(`/login`); // TODO: ?return= back to this path.
+      }
+
+      return <ClusterCreateScreen session={session} />;
     }
 
     return <ClusterViewerScreen slug={targetSlug} cluster={cluster} />;

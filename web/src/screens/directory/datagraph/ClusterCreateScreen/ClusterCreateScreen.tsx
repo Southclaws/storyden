@@ -2,13 +2,13 @@
 
 import { ClusterScreen } from "../ClusterScreen/ClusterScreen";
 
-import { useClusterCreateScreen } from "./useClusterCreateScreen";
+import { Props, useClusterCreateScreen } from "./useClusterCreateScreen";
 
-export function ClusterCreateScreen() {
+export function ClusterCreateScreen(props: Props) {
   const {
     handlers: { handleCreate },
     initial,
-  } = useClusterCreateScreen();
+  } = useClusterCreateScreen(props);
 
   return (
     <ClusterScreen

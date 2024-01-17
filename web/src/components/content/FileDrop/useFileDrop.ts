@@ -8,6 +8,7 @@ import { Asset } from "src/api/openapi/schemas";
 import { isSupportedImage } from "./utils";
 
 export type Props = {
+  disabled?: boolean;
   onComplete?: (asset: Asset) => void;
 };
 
@@ -37,15 +38,21 @@ export function useFileDrop(props: Props) {
   }
 
   function onDragStart() {
+    if (props.disabled) return;
+
     setDragging(true);
   }
 
   function onDragEnd(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
     e.preventDefault();
     setDragging(false);
   }
 
   async function handleEvent(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
     if (e.dataTransfer.items) {
       await Promise.all(
         [...e.dataTransfer.items].map(async (item) => {
@@ -63,6 +70,8 @@ export function useFileDrop(props: Props) {
   }
 
   async function onDrop(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
     e.preventDefault();
 
     try {
