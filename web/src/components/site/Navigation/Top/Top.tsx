@@ -20,6 +20,10 @@ type Props = {
 export function Top({ onToggleSidebar, sidebarState }: Props) {
   const { title } = useNavigation();
 
+  function handleToggle() {
+    onToggleSidebar(!sidebarState);
+  }
+
   return (
     <HStack
       className={cx(FrostedGlass(), styles["topbar"])}
@@ -29,11 +33,7 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
     >
       <HStack className={styles["topbar-left"]}>
         {/* TODO: Action? */}
-        <Button
-          size="sm"
-          kind="ghost"
-          onClick={() => onToggleSidebar(!sidebarState)}
-        >
+        <Button size="sm" kind="ghost" onClick={handleToggle}>
           <Sidebar open={sidebarState} />
         </Button>
         <ComposeAction>new</ComposeAction>
