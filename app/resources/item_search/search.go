@@ -3,6 +3,7 @@ package item_search
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -48,12 +49,17 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Item
 		fn(q)
 	}
 
-	query := s.db.Item.Query().Where(
-		item.NameContainsFold(q.qs),
-		// TODO: more query/filter params
-	).WithOwner().WithClusters(func(cq *ent.ClusterQuery) {
-		cq.WithOwner()
-	})
+	query := s.db.Item.Query().
+		Where(
+			item.NameContainsFold(q.qs),
+			// TODO: more query/filter params
+		).
+		WithOwner().
+		WithClusters(func(cq *ent.ClusterQuery) {
+			cq.WithOwner()
+		}).
+		WithAssets().
+		Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
 
 	r, err := query.All(ctx)
 	if err != nil {
