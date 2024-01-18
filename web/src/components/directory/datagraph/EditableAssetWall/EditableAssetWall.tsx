@@ -6,13 +6,13 @@ import { button } from "@/styled-system/recipes";
 import { Props, useEditableAssetWall } from "./useEditableAssetWall";
 
 export function EditableAssetWall({
-  assets,
+  initialAssets,
   editing,
   onUpload,
   ...props
 }: Props & HstackProps) {
-  const { handlers } = useEditableAssetWall({
-    assets,
+  const { assets, handlers } = useEditableAssetWall({
+    initialAssets,
     editing,
     onUpload,
   });
