@@ -32,8 +32,6 @@ export function ClusterScreen(props: Props) {
     isAllowedToEdit,
   } = useClusterScreen(props);
 
-  // console.log("ClusterScreen", { formassets: form.getFieldState("asset_ids") });
-
   return (
     <styled.form
       display="flex"
@@ -78,9 +76,7 @@ export function ClusterScreen(props: Props) {
             render={({ field }) => {
               function handleUpload(a: Asset) {
                 console.log("handle upload", field);
-                field.onChange([...field.value, a.id]);
-
-                // handleAssetUpload(a)
+                field.onChange([...(field.value ?? []), a.id]);
               }
 
               return (
@@ -88,7 +84,7 @@ export function ClusterScreen(props: Props) {
                   height="64"
                   editing={editing}
                   onUpload={handleUpload}
-                  assets={field.value}
+                  initialAssets={cluster.assets}
                 />
               );
             }}
