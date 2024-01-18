@@ -56,6 +56,7 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 			Content:    opt.NewPtr(request.Body.Content),
 			Properties: opt.NewPtr(request.Body.Properties),
 			URL:        opt.NewPtr(request.Body.Url),
+			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		},
 	)
 	if err != nil {
