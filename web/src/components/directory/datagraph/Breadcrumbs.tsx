@@ -37,6 +37,7 @@ export const _Breadcrumbs = (
         <Fragment key={p}>
           <ChevronRightIcon width="1rem" />
           <Link
+            flexShrink="0"
             key={p}
             href={`/directory/${joinDirectoryPath(paths, p)}`}
             size="xs"
