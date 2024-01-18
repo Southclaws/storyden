@@ -30,7 +30,10 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 }
 
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Cluster, error) {
-	query := d.db.Cluster.Query().Where(cluster.ParentClusterIDIsNil()).WithOwner()
+	query := d.db.Cluster.Query().
+		Where(cluster.ParentClusterIDIsNil()).
+		WithOwner().
+		WithAssets()
 
 	f := filters{}
 	for _, fn := range fs {
