@@ -2159,6 +2159,14 @@ const tokens = {
     "value": "var(--colors-card-background-gradient)",
     "variable": "var(--colors-card-background-gradient)"
   },
+  "colors.backgroundGradientH": {
+    "value": "var(--colors-background-gradient-h)",
+    "variable": "var(--colors-background-gradient-h)"
+  },
+  "colors.backgroundGradientV": {
+    "value": "var(--colors-background-gradient-v)",
+    "variable": "var(--colors-background-gradient-v)"
+  },
   "spacing.safeBottom": {
     "value": "var(--spacing-safe-bottom)",
     "variable": "var(--spacing-safe-bottom)"
