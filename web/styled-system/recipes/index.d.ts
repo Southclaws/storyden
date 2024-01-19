@@ -11,3 +11,4 @@ export * from './checkbox';
 export * from './popover';
 export * from './skeleton';
 export * from './heading-input';
+export * from './card';

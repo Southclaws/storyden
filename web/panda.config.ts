@@ -8,6 +8,7 @@ import { map } from "lodash/fp";
 
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
+import { card } from "src/theme/components/Card/recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
 import { headingInput } from "src/theme/components/HeadingInput/recipe";
@@ -53,6 +54,7 @@ export default defineConfig({
     placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
     collapsed:
       '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
+    containerSmall: "@container (max-width: 200px)",
   },
 
   patterns: {
@@ -134,6 +136,7 @@ export default defineConfig({
       checkbox: checkbox,
       popover: popover,
       skeleton: skeleton,
+      card: card,
     },
     extend: {
       semanticTokens: defineSemanticTokens({
@@ -257,6 +260,14 @@ export default defineConfig({
           cardBackgroundGradient: {
             value:
               "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+          },
+          backgroundGradientH: {
+            value:
+              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+          },
+          backgroundGradientV: {
+            value:
+              "linear-gradient(0deg, var(--colors-bg-default), transparent)",
           },
         },
         spacing: {
