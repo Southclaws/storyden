@@ -1,23 +1,29 @@
 "use client";
 
 import { isEmpty } from "lodash";
-import { Controller, FormProvider } from "react-hook-form";
+import { FormProvider } from "react-hook-form";
 
-import { Asset } from "src/api/openapi/schemas";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
-import { EditableAssetWall } from "src/components/directory/datagraph/EditableAssetWall/EditableAssetWall";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
+import { CancelAction } from "src/components/site/Action/Cancel";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
 import { Admonition } from "src/theme/components/Admonition";
 import { Heading1 } from "src/theme/components/Heading/Index";
 import { Input } from "src/theme/components/Input";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverPositioner,
+} from "src/theme/components/Popover";
 
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
+import { AssetsInput } from "./AssetsInput";
 import { ContentInput } from "./ContentInput";
 import { TitleInput } from "./TitleInput";
 import { Props, useClusterScreen } from "./useClusterScreen";
@@ -25,11 +31,17 @@ import { Props, useClusterScreen } from "./useClusterScreen";
 export function ClusterScreen(props: Props) {
   const {
     form,
-    handlers: { handleSubmit, handleEditMode, handleAssetUpload },
+    handlers: {
+      handleSubmit,
+      handleEditMode,
+      handleAssetUpload,
+      handleAssetRemove,
+    },
     directoryPath,
     editing,
     cluster,
     isAllowedToEdit,
+    isSaving,
   } = useClusterScreen(props);
 
   return (
@@ -60,34 +72,35 @@ export function ClusterScreen(props: Props) {
             {...form.register("slug")}
           />
           {isAllowedToEdit && (
-            <HStack>
-              {editing ? (
-                <SaveAction type="submit">Save</SaveAction>
-              ) : (
-                <EditAction onClick={handleEditMode}>Edit</EditAction>
-              )}
-            </HStack>
+            <Popover open={isSaving} lazyMount>
+              <PopoverAnchor>
+                <HStack>
+                  {editing ? (
+                    <>
+                      <CancelAction onClick={handleEditMode}>
+                        Cancel
+                      </CancelAction>
+                      <SaveAction type="submit">Save</SaveAction>
+                    </>
+                  ) : (
+                    <EditAction onClick={handleEditMode}>Edit</EditAction>
+                  )}
+                </HStack>
+              </PopoverAnchor>
+
+              <PopoverPositioner>
+                <PopoverContent p="2">Saved!</PopoverContent>
+              </PopoverPositioner>
+            </Popover>
           )}
         </HStack>
 
         <VStack w="full" alignItems="start" gap="2">
-          <Controller
-            name="asset_ids"
-            render={({ field }) => {
-              function handleUpload(a: Asset) {
-                console.log("handle upload", field);
-                field.onChange([...(field.value ?? []), a.id]);
-              }
-
-              return (
-                <EditableAssetWall
-                  height="64"
-                  editing={editing}
-                  onUpload={handleUpload}
-                  initialAssets={cluster.assets}
-                />
-              );
-            }}
+          <AssetsInput
+            editing={editing}
+            initialAssets={cluster.assets}
+            handleAssetUpload={handleAssetUpload}
+            handleAssetRemove={handleAssetRemove}
           />
 
           <VStack alignItems="start" w="full" minW="0">

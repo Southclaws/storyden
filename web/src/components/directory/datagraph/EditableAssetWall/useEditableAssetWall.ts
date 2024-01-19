@@ -1,3 +1,4 @@
+import { pull } from "lodash";
 import { useState } from "react";
 
 import { Asset } from "src/api/openapi/schemas";
@@ -7,9 +8,14 @@ export type Props = {
   initialAssets: Asset[];
   editing?: boolean;
   onUpload: (asset: Asset) => void;
+  onRemove: (asset: Asset) => void;
 };
 
-export function useEditableAssetWall({ initialAssets, onUpload }: Props) {
+export function useEditableAssetWall({
+  initialAssets,
+  onUpload,
+  onRemove,
+}: Props) {
   const { upload } = useFileUpload();
   const [assets, setAssets] = useState(initialAssets ?? []);
 
@@ -22,8 +28,13 @@ export function useEditableAssetWall({ initialAssets, onUpload }: Props) {
   }
 
   const handleAssetUpload = async (asset: Asset) => {
-    onUpload(asset);
     setAssets([...assets, asset]);
+    onUpload(asset);
+  };
+
+  const handleAssetRemove = async (asset: Asset) => {
+    setAssets(pull(assets, asset));
+    onRemove(asset);
   };
 
   return {
@@ -31,6 +42,7 @@ export function useEditableAssetWall({ initialAssets, onUpload }: Props) {
     handlers: {
       handleFile,
       handleAssetUpload,
+      handleAssetRemove,
     },
   };
 }

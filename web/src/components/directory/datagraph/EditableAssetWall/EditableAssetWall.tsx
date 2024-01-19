@@ -1,6 +1,10 @@
+import { TrashIcon } from "@heroicons/react/24/outline";
+
+import { Button } from "src/theme/components/Button";
+
 import styles from "./assetwall.module.css";
 
-import { Box, HstackProps, styled } from "@/styled-system/jsx";
+import { Box, HStack, HstackProps, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 import { Props, useEditableAssetWall } from "./useEditableAssetWall";
@@ -9,18 +13,41 @@ export function EditableAssetWall({
   initialAssets,
   editing,
   onUpload,
+  onRemove,
   ...props
 }: Props & HstackProps) {
   const { assets, handlers } = useEditableAssetWall({
     initialAssets,
     editing,
     onUpload,
+    onRemove,
   });
 
   return (
-    <Box className={styles["root"]} {...props} gap="2" w="full">
+    <Box
+      className={styles["root"]}
+      {...props}
+      gap="2"
+      minH={editing ? "64" : "0"}
+      w="full"
+    >
       {assets?.map((a) => (
-        <styled.img key={a.id} className={styles["asset"]} src={a.url} />
+        <Box key={a.id} className={styles["asset"]}>
+          <styled.img className={styles["asset__image"]} src={a.url} />
+
+          {editing && (
+            <HStack className={styles["asset__actions"]} justify="end" p="2">
+              <Button
+                type="button"
+                size="sm"
+                kind="destructive"
+                onClick={() => handlers.handleAssetRemove(a)}
+              >
+                <TrashIcon />
+              </Button>
+            </HStack>
+          )}
+        </Box>
       ))}
 
       {editing && (

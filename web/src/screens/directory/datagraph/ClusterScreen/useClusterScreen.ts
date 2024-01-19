@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
 import {
   Asset,
   ClusterInitialProps,
@@ -37,44 +38,69 @@ export function useClusterScreen({
   const directoryPath = useDirectoryPath();
   const account = useSession();
   const [editing, setEditing] = useState(initialEditingState);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isAllowedToEdit =
     editable && Boolean(account?.id === cluster.owner.id || account?.admin);
 
-  const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
+  const defaults: Form = useMemo(
+    () => ({
       name: cluster.name,
       slug: cluster.slug,
       description: cluster.description,
       content: cluster.content,
       asset_ids: cluster.assets.map((a) => a.id),
-    },
+    }),
+    [cluster],
+  );
+
+  const form = useForm<Form>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: defaults,
   });
 
+  function triggerSavingPopover() {
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 3000);
+  }
+
   function handleEditMode() {
-    if (editing) return;
+    if (editing) {
+      form.reset();
+      setEditing(false);
+
+      return;
+    }
     if (!isAllowedToEdit) return;
 
     setEditing(true);
+    form.reset(cluster);
   }
 
   function handleSave(payload: ClusterInitialProps) {
     if (!editing) return;
 
+    triggerSavingPopover();
     setEditing(false);
     onSave(payload);
   }
 
-  function handleAssetUpload(asset: Asset) {
+  async function handleAssetUpload(asset: Asset) {
     if (!editing) return;
 
-    const assetIDs = form.getValues().asset_ids;
-    const newAssetIDs = [...assetIDs, asset.id];
+    // We only want to run these updates for edits of existing clusters.
+    if (!cluster.id) return;
 
-    form.setValue("asset_ids", newAssetIDs);
+    triggerSavingPopover();
+    await clusterAddAsset(cluster.slug, asset.id);
+  }
 
-    // onSave(form.getValues());
+  async function handleAssetRemove(asset: Asset) {
+    if (!editing) return;
+    if (!cluster.id) return;
+
+    triggerSavingPopover();
+    await clusterRemoveAsset(cluster.slug, asset.id);
   }
 
   const handleSubmit = form.handleSubmit(handleSave);
@@ -85,10 +111,12 @@ export function useClusterScreen({
       handleEditMode,
       handleSubmit,
       handleAssetUpload,
+      handleAssetRemove,
     },
     directoryPath,
     editing,
     cluster,
     isAllowedToEdit,
+    isSaving,
   };
 }

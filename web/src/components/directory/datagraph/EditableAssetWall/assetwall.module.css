@@ -2,12 +2,24 @@
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  grid-auto-flow: dense;
+  grid-auto-flow: column;
 }
 
 .asset {
   border-radius: var(--radii-lg);
   overflow: hidden;
+
+  display: grid;
+}
+
+.asset:first-child {
+  grid-column: 1/2;
+  grid-row: 1/3;
+}
+
+.asset__image {
+  grid-row: 1/2;
+  grid-column: 1/2;
 
   height: 100%;
   width: 100%;
@@ -16,7 +28,8 @@
   object-fit: cover;
 }
 
-.asset:first-child {
+.asset__actions {
+  grid-row: 1/2;
   grid-column: 1/2;
-  grid-row: 1/3;
+  height: min-content;
 }
