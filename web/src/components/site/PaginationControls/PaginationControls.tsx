@@ -23,6 +23,10 @@ export function PaginationControls({
   totalPages,
   onClick,
 }: Props) {
+  if (totalPages <= 1) {
+    return null;
+  }
+
   // NOTE: pages are 1-indexed
   const lastPage = totalPages;
   const lastPageIndex = totalPages + 1;
