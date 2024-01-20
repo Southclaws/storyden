@@ -4,12 +4,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
-import {
-  Asset,
-  ClusterInitialProps,
-  ClusterWithItems,
-} from "src/api/openapi/schemas";
+import { itemAddAsset } from "src/api/openapi/items";
+import { Asset } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
+import {
+  DatagraphNodeInitialProps,
+  DatagraphNodeWithRelations,
+} from "src/components/directory/datagraph/DatagraphNode";
 
 import { useDirectoryPath } from "../useDirectoryPath";
 
@@ -23,14 +24,14 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
-  cluster: ClusterWithItems;
+  node: DatagraphNodeWithRelations;
   initialEditingState?: boolean;
   editable?: boolean;
-  onSave: (c: ClusterInitialProps) => Promise<void>;
+  onSave: (c: DatagraphNodeInitialProps) => Promise<void>;
 };
 
-export function useClusterScreen({
-  cluster,
+export function useDatagraphNodeScreen({
+  node,
   initialEditingState = false,
   editable = true,
   onSave,
@@ -41,17 +42,17 @@ export function useClusterScreen({
   const [isSaving, setIsSaving] = useState(false);
 
   const isAllowedToEdit =
-    editable && Boolean(account?.id === cluster.owner.id || account?.admin);
+    editable && Boolean(account?.id === node.owner.id || account?.admin);
 
   const defaults: Form = useMemo(
     () => ({
-      name: cluster.name,
-      slug: cluster.slug,
-      description: cluster.description,
-      content: cluster.content,
-      asset_ids: cluster.assets.map((a) => a.id),
+      name: node.name,
+      slug: node.slug,
+      description: node.description,
+      content: node.content,
+      asset_ids: node.assets.map((a) => a.id),
     }),
-    [cluster],
+    [node],
   );
 
   const form = useForm<Form>({
@@ -74,33 +75,41 @@ export function useClusterScreen({
     if (!isAllowedToEdit) return;
 
     setEditing(true);
-    form.reset(cluster);
+    form.reset(node);
   }
 
-  function handleSave(payload: ClusterInitialProps) {
+  function handleSave(payload: Form) {
     if (!editing) return;
 
     triggerSavingPopover();
     setEditing(false);
-    onSave(payload);
+    onSave({ type: node.type, ...payload });
   }
 
   async function handleAssetUpload(asset: Asset) {
     if (!editing) return;
 
     // We only want to run these updates for edits of existing clusters.
-    if (!cluster.id) return;
+    if (!node.id) return;
 
     triggerSavingPopover();
-    await clusterAddAsset(cluster.slug, asset.id);
+    if (node.type === "cluster") {
+      await clusterAddAsset(node.slug, asset.id);
+    } else {
+      await itemAddAsset(node.slug, asset.id);
+    }
   }
 
   async function handleAssetRemove(asset: Asset) {
     if (!editing) return;
-    if (!cluster.id) return;
+    if (!node.id) return;
 
     triggerSavingPopover();
-    await clusterRemoveAsset(cluster.slug, asset.id);
+    if (node.type === "cluster") {
+      await clusterRemoveAsset(node.slug, asset.id);
+    } else {
+      await itemAddAsset(node.slug, asset.id);
+    }
   }
 
   const handleSubmit = form.handleSubmit(handleSave);
@@ -115,7 +124,7 @@ export function useClusterScreen({
     },
     directoryPath,
     editing,
-    cluster,
+    node,
     isAllowedToEdit,
     isSaving,
   };

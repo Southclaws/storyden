@@ -100,7 +100,9 @@ func (d *database) Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithClusters(func(cq *ent.ClusterQuery) {
-			cq.WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
+			cq.
+				WithAssets().
+				WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)
 	if err != nil {

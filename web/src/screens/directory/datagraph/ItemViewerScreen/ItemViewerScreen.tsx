@@ -4,16 +4,16 @@ import { Unready } from "src/components/site/Unready";
 
 import { DatagraphNodeScreen } from "../DatagraphNodeScreen/DatagraphNodeScreen";
 
-import { Props, useClusterViewerScreen } from "./useClusterViewerScreen";
+import { Props, useItemViewerScreen } from "./useItemViewerScreen";
 
-export function ClusterViewerScreen(props: Props) {
-  const { ready, data, handlers, error } = useClusterViewerScreen(props);
+export function ItemViewerScreen(props: Props) {
+  const { ready, data, handlers, error } = useItemViewerScreen(props);
 
   if (!ready) return <Unready {...error} />;
 
   return (
     <DatagraphNodeScreen
-      node={{ type: "cluster", ...data }}
+      node={{ type: "item", ...data }}
       onSave={handlers.handleSave}
     />
   );

@@ -12,7 +12,7 @@ import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
 import { Admonition } from "src/theme/components/Admonition";
-import { Heading1 } from "src/theme/components/Heading/Index";
+import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
 import { Input } from "src/theme/components/Input";
 import {
   Popover,
@@ -26,9 +26,9 @@ import { HStack, VStack, styled } from "@/styled-system/jsx";
 import { AssetsInput } from "./AssetsInput";
 import { ContentInput } from "./ContentInput";
 import { TitleInput } from "./TitleInput";
-import { Props, useClusterScreen } from "./useClusterScreen";
+import { Props, useDatagraphNodeScreen } from "./useDatagraphNodeScreen";
 
-export function ClusterScreen(props: Props) {
+export function DatagraphNodeScreen(props: Props) {
   const {
     form,
     handlers: {
@@ -39,10 +39,10 @@ export function ClusterScreen(props: Props) {
     },
     directoryPath,
     editing,
-    cluster,
+    node,
     isAllowedToEdit,
     isSaving,
-  } = useClusterScreen(props);
+  } = useDatagraphNodeScreen(props);
 
   return (
     <styled.form
@@ -68,7 +68,7 @@ export function ClusterScreen(props: Props) {
           <Breadcrumbs
             directoryPath={directoryPath}
             create={editing ? "edit" : "show"}
-            defaultValue={cluster.slug}
+            defaultValue={node.slug}
             {...form.register("slug")}
           />
           {isAllowedToEdit && (
@@ -98,7 +98,7 @@ export function ClusterScreen(props: Props) {
         <VStack w="full" alignItems="start" gap="2">
           <AssetsInput
             editing={editing}
-            initialAssets={cluster.assets}
+            initialAssets={node.assets}
             handleAssetUpload={handleAssetUpload}
             handleAssetRemove={handleAssetRemove}
           />
@@ -108,7 +108,7 @@ export function ClusterScreen(props: Props) {
               {editing ? (
                 <TitleInput />
               ) : (
-                <Heading1>{cluster.name || "(untitled)"}</Heading1>
+                <Heading1>{node.name || "(untitled)"}</Heading1>
               )}
             </HStack>
 
@@ -124,11 +124,11 @@ export function ClusterScreen(props: Props) {
             {editing ? (
               <Input
                 placeholder="Description"
-                defaultValue={cluster.description}
+                defaultValue={node.description}
                 {...form.register("description")}
               />
             ) : (
-              <styled.p>{cluster.description}</styled.p>
+              <styled.p>{node.description}</styled.p>
             )}
           </VStack>
         </VStack>
@@ -136,25 +136,42 @@ export function ClusterScreen(props: Props) {
         {editing ? (
           <ContentInput onAssetUpload={handleAssetUpload} />
         ) : (
-          <ContentViewer value={cluster.content ?? ""} />
+          <ContentViewer value={node.content ?? ""} />
         )}
 
-        <VStack alignItems="start" w="full">
-          {cluster.clusters.length === 0 && cluster.items.length === 0 && (
-            <Empty>Nothing inside</Empty>
-          )}
+        {node.type === "cluster" && (
+          <VStack alignItems="start" w="full">
+            {node.clusters.length === 0 && node.items.length === 0 && (
+              <Empty>Nothing inside</Empty>
+            )}
 
-          {cluster && (cluster.clusters.length ?? 0) > 0 && (
-            <ClusterList
-              directoryPath={directoryPath}
-              clusters={cluster.clusters}
-            />
-          )}
+            {node && (node.clusters.length ?? 0) > 0 && (
+              <ClusterList
+                directoryPath={directoryPath}
+                clusters={node.clusters}
+              />
+            )}
 
-          {cluster && cluster.items.length > 0 && (
-            <ItemGrid directoryPath={directoryPath} items={cluster.items} />
-          )}
-        </VStack>
+            {node && node.items.length > 0 && (
+              <ItemGrid directoryPath={directoryPath} items={node.items} />
+            )}
+          </VStack>
+        )}
+
+        {node.type === "item" && (
+          <VStack alignItems="start" w="full">
+            <Heading2>Member of</Heading2>
+
+            {node.clusters.length ? (
+              <ClusterList
+                directoryPath={directoryPath}
+                clusters={node.clusters}
+              />
+            ) : (
+              <Empty>No Items</Empty>
+            )}
+          </VStack>
+        )}
       </FormProvider>
     </styled.form>
   );

@@ -6,7 +6,7 @@ import { EditableAssetWall } from "src/components/directory/datagraph/EditableAs
 import { FormControl } from "src/theme/components/FormControl";
 import { FormErrorText } from "src/theme/components/FormErrorText";
 
-import { Form } from "./useClusterScreen";
+import { Form } from "./useDatagraphNodeScreen";
 
 type Props = {
   editing: boolean;
