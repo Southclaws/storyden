@@ -4,7 +4,7 @@ import { Button } from "src/theme/components/Button";
 
 import styles from "./assetwall.module.css";
 
-import { Box, HStack, HstackProps, styled } from "@/styled-system/jsx";
+import { Box, BoxProps, HStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 import { Props, useEditableAssetWall } from "./useEditableAssetWall";
@@ -15,7 +15,7 @@ export function EditableAssetWall({
   onUpload,
   onRemove,
   ...props
-}: Props & HstackProps) {
+}: Props & BoxProps) {
   const { assets, handlers } = useEditableAssetWall({
     initialAssets,
     editing,
@@ -24,31 +24,27 @@ export function EditableAssetWall({
   });
 
   return (
-    <Box
-      className={styles["root"]}
-      {...props}
-      gap="2"
-      minH={editing ? "64" : "0"}
-      w="full"
-    >
-      {assets?.map((a) => (
-        <Box key={a.id} className={styles["asset"]}>
-          <styled.img className={styles["asset__image"]} src={a.url} />
+    <Box className={styles["root"]} {...props}>
+      <Box className={styles["grid"]}>
+        {assets?.map((a) => (
+          <Box key={a.id} className={styles["asset"]}>
+            <styled.img className={styles["asset__image"]} src={a.url} />
 
-          {editing && (
-            <HStack className={styles["asset__actions"]} justify="end" p="2">
-              <Button
-                type="button"
-                size="sm"
-                kind="destructive"
-                onClick={() => handlers.handleAssetRemove(a)}
-              >
-                <TrashIcon />
-              </Button>
-            </HStack>
-          )}
-        </Box>
-      ))}
+            {editing && (
+              <HStack className={styles["asset__actions"]} justify="end" p="2">
+                <Button
+                  type="button"
+                  size="sm"
+                  kind="destructive"
+                  onClick={() => handlers.handleAssetRemove(a)}
+                >
+                  <TrashIcon />
+                </Button>
+              </HStack>
+            )}
+          </Box>
+        ))}
+      </Box>
 
       {editing && (
         <Box className={styles["asset"]}>
