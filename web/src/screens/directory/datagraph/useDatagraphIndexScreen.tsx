@@ -6,6 +6,7 @@ import {
   ItemListOKResponse,
   LinkListOKResponse,
 } from "src/api/openapi/schemas";
+import { useSession } from "src/auth";
 
 export type Props = {
   clusters: ClusterListOKResponse;
@@ -14,6 +15,7 @@ export type Props = {
 };
 
 export function useDatagraphIndexScreen(props: Props) {
+  const session = useSession();
   const {
     data: clusters,
     mutate: mutateClusters,
@@ -86,5 +88,6 @@ export function useDatagraphIndexScreen(props: Props) {
       mutateClusters,
       mutateItems,
     },
+    session,
   };
 }

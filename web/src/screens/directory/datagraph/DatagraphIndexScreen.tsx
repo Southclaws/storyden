@@ -13,27 +13,31 @@ import { Center, VStack } from "@/styled-system/jsx";
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
 
 export function Client(props: Props) {
-  const { ready, data, empty, error } = useDatagraphIndexScreen(props);
+  const { ready, data, empty, error, session } = useDatagraphIndexScreen(props);
 
   if (!ready) return <Unready {...error} />;
 
   const { items, clusters, links } = data;
 
-  if (empty) {
-    return (
-      <Center h="full">
-        <Empty>This community knowledgebase is empty.</Empty>
-      </Center>
-    );
-  }
-
   return (
-    <VStack w="full" alignItems="start">
+    <VStack w="full" alignItems="start" gap="4">
       <Breadcrumbs directoryPath={[]} create="show" />
 
-      <Heading1>Directory</Heading1>
-
-      <p>You can browse the community&apos;s knowledgebase here.</p>
+      {empty ? (
+        <Center h="full">
+          <Empty>
+            This community knowledgebase is empty.
+            <br />
+            {session ? (
+              <>Be the first to contribute!</>
+            ) : (
+              <>Please log in to contribute.</>
+            )}
+          </Empty>
+        </Center>
+      ) : (
+        <p>You can browse the community&apos;s knowledgebase here.</p>
+      )}
 
       {items.data.items.length > 0 && (
         <VStack w="full" alignItems="start">
@@ -49,10 +53,12 @@ export function Client(props: Props) {
         </VStack>
       )}
 
-      <VStack w="full" alignItems="start">
-        <Heading2>Clusters</Heading2>
-        <ClusterList directoryPath={[]} {...clusters.data} />
-      </VStack>
+      {clusters.data.clusters.length > 0 && (
+        <VStack w="full" alignItems="start">
+          <Heading2>Clusters</Heading2>
+          <ClusterList directoryPath={[]} {...clusters.data} />
+        </VStack>
+      )}
     </VStack>
   );
 }
