@@ -44,21 +44,21 @@ export function EditableAssetWall({
             )}
           </Box>
         ))}
-      </Box>
 
-      {editing && (
-        <Box className={styles["asset"]}>
-          <styled.label className={button()} htmlFor="assetwall__file-input">
-            Upload
-          </styled.label>
-          <styled.input
-            display="none"
-            id="assetwall__file-input"
-            type="file"
-            onChange={handlers.handleFile}
-          />
-        </Box>
-      )}
+        {editing && (
+          <Box className={styles["asset"]}>
+            <styled.label className={button()} htmlFor="assetwall__file-input">
+              Upload
+            </styled.label>
+            <styled.input
+              display="none"
+              id="assetwall__file-input"
+              type="file"
+              onChange={handlers.handleFile}
+            />
+          </Box>
+        )}
+      </Box>
 
       {/* TODO: Lightbox and ability to view more */}
       {/* {hasMore > 0 && <Button type="button">{hasMore} more</Button>} */}
