@@ -9,7 +9,7 @@ import { useServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
 import { ClusterCreateScreen } from "src/screens/directory/datagraph/ClusterCreateScreen/ClusterCreateScreen";
 import { ClusterViewerScreen } from "src/screens/directory/datagraph/ClusterViewerScreen/ClusterViewerScreen";
-import { ItemScreen } from "src/screens/directory/datagraph/ItemScreen/ItemScreen";
+import { ItemViewerScreen } from "src/screens/directory/datagraph/ItemViewerScreen/ItemViewerScreen";
 import {
   Params,
   ParamsSchema,
@@ -55,7 +55,7 @@ export default async function Page(props: Props) {
     if (isNew) {
       redirect(`/directory/${fallback}`);
     }
-    return <ItemScreen slug={targetSlug} item={item} />;
+    return <ItemViewerScreen slug={targetSlug} item={item} />;
   }
 
   notFound();

@@ -5,7 +5,7 @@ import { Asset } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { FormControl } from "src/theme/components/FormControl";
 
-import { Form } from "./useClusterScreen";
+import { Form } from "./useDatagraphNodeScreen";
 
 type Props = {
   onAssetUpload: (asset: Asset) => void;

@@ -4,7 +4,7 @@ import { FormControl } from "src/theme/components/FormControl";
 import { FormErrorText } from "src/theme/components/FormErrorText";
 import { HeadingInput } from "src/theme/components/HeadingInput";
 
-import { Form } from "./useClusterScreen";
+import { Form } from "./useDatagraphNodeScreen";
 
 export function TitleInput() {
   const { control, formState } = useFormContext<Form>();

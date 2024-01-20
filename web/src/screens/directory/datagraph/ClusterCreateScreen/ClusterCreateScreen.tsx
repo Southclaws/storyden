@@ -1,6 +1,6 @@
 "use client";
 
-import { ClusterScreen } from "../ClusterScreen/ClusterScreen";
+import { DatagraphNodeScreen } from "../DatagraphNodeScreen/DatagraphNodeScreen";
 
 import { Props, useClusterCreateScreen } from "./useClusterCreateScreen";
 
@@ -11,8 +11,8 @@ export function ClusterCreateScreen(props: Props) {
   } = useClusterCreateScreen(props);
 
   return (
-    <ClusterScreen
-      cluster={initial}
+    <DatagraphNodeScreen
+      node={{ type: "cluster", ...initial }}
       initialEditingState={true}
       onSave={handleCreate}
     />
