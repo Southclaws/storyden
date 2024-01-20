@@ -1,5 +1,6 @@
 "use client";
 
+import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { LinkCardList } from "src/components/directory/links/LinkCardList";
@@ -28,6 +29,8 @@ export function Client(props: Props) {
 
   return (
     <VStack w="full" alignItems="start">
+      <Breadcrumbs directoryPath={[]} create="show" />
+
       <Heading1>Directory</Heading1>
 
       <p>You can browse the community&apos;s knowledgebase here.</p>

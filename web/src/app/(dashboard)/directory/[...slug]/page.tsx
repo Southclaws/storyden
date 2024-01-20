@@ -58,5 +58,14 @@ export default async function Page(props: Props) {
     return <ItemViewerScreen slug={targetSlug} item={item} />;
   }
 
+  // Creating a new item or cluster from the root: "/directory/new"
+  if (isNew) {
+    if (!session) {
+      redirect(`/login`); // TODO: ?return= back to this path.
+    }
+
+    return <ClusterCreateScreen session={session} />;
+  }
+
   notFound();
 }
