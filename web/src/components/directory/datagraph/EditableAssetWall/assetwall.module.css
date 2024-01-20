@@ -9,6 +9,7 @@
 .grid {
   flex: 1 0 auto;
   display: grid;
+  gap: 0.5rem;
   grid-template-rows: repeat(auto-fill, var(--square-size));
   grid-template-columns: repeat(auto-fill, var(--square-size));
   grid-auto-flow: dense;
