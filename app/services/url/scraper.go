@@ -12,6 +12,8 @@ import (
 	"golang.org/x/net/html"
 )
 
+var errFailedToScrape = fault.New("failed to scrape")
+
 type Scraper interface {
 	Scrape(ctx context.Context, url string) (*WebContent, error)
 }
@@ -57,6 +59,10 @@ func (s *scraper) Scrape(ctx context.Context, addr string) (*WebContent, error) 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
