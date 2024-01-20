@@ -2,6 +2,7 @@ import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { pull } from "lodash";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
+import { useSession } from "src/auth";
 import {
   DirectoryPath,
   joinDirectoryPath,
@@ -23,7 +24,8 @@ export const _Breadcrumbs = (
   { directoryPath, create, value, defaultValue, onChange, ...rest }: Props,
   ref: ForwardedRef<HTMLInputElement>,
 ) => {
-  const isEditing = create == "edit" && onChange !== undefined;
+  const session = useSession();
+  const isEditing = session && create == "edit" && onChange !== undefined;
   const editingPath = isEditing ? directoryPath.slice(0, -1) : directoryPath;
   const paths = pull(editingPath, "new");
   const jointNew = joinDirectoryPath(directoryPath, "new");
@@ -46,7 +48,7 @@ export const _Breadcrumbs = (
           </Link>
         </Fragment>
       ))}
-      {create == "show" && (
+      {session && create == "show" && (
         <>
           <ChevronRightIcon width="1rem" />
           <Link
