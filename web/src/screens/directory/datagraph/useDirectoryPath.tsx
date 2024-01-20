@@ -12,7 +12,13 @@ export type DirectoryPath = string[];
 export function useDirectoryPath() {
   const params = useParams<Params>();
 
-  const { slug } = ParamsSchema.parse(params);
+  const parsed = ParamsSchema.safeParse(params);
+
+  if (!parsed.success) {
+    return [];
+  }
+
+  const { slug } = parsed.data;
 
   const cleaned = pull(slug, "new");
 
