@@ -6,9 +6,11 @@ import { Unready } from "src/components/site/Unready";
 import { Button } from "src/theme/components/Button";
 import { Input } from "src/theme/components/Input";
 
+import { LinkCard } from "../LinkCard";
+
 import { VStack, styled } from "@/styled-system/jsx";
 
-import { Props, useLinkIndexView } from "./useLinkIndexView";
+import { IndexingState, Props, useLinkIndexView } from "./useLinkIndexView";
 
 export function LinkIndexView(props: Props) {
   const { form, data, handlers } = useLinkIndexView(props);
@@ -28,7 +30,7 @@ export function LinkIndexView(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          placeholder="Search for addresses, keywords or domains"
+          placeholder="Search or paste a new link"
           defaultValue={props.query}
           {...form.register("q")}
         />
@@ -63,7 +65,20 @@ export function LinkIndexView(props: Props) {
         pageSize={data.links.page_size}
       />
 
-      <LinkCardList links={data.links} />
+      {data.indexing.state !== "not-indexing" ? (
+        <IndexingState {...data.indexing} />
+      ) : (
+        <LinkCardList links={data.links} />
+      )}
     </VStack>
   );
+}
+
+function IndexingState(props: IndexingState)  {
+  switch (props.state) {
+    case "not-indexing": return <></> 
+    case "indexing": return <>Indexing {props.url}...</>
+    case "indexed": return <LinkCard {...props.link} />
+    case "error": return <>{props.error}</>
+  }
 }
