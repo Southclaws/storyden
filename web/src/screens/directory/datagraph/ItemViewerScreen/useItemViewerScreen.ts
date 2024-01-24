@@ -1,7 +1,11 @@
 import { useRouter } from "next/navigation";
 
-import { itemUpdate, useItemGet } from "src/api/openapi/items";
-import { ItemInitialProps, ItemWithParents } from "src/api/openapi/schemas";
+import { itemDelete, itemUpdate, useItemGet } from "src/api/openapi/items";
+import {
+  Item,
+  ItemInitialProps,
+  ItemWithParents,
+} from "src/api/openapi/schemas";
 
 import { replaceDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
 
@@ -48,10 +52,15 @@ export function useItemViewerScreen(props: Props) {
     }
   }
 
+  async function handleDelete(item: Item) {
+    await itemDelete(item.slug);
+    // TODO: redirect
+  }
+
   return {
     ready: true as const,
     data,
-    handlers: { handleSave },
+    handlers: { handleSave, handleDelete },
     mutate,
   };
 }

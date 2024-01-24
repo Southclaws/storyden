@@ -1,7 +1,15 @@
 import { useRouter } from "next/navigation";
 
-import { clusterUpdate, useClusterGet } from "src/api/openapi/clusters";
-import { ClusterInitialProps, ClusterWithItems } from "src/api/openapi/schemas";
+import {
+  clusterDelete,
+  clusterUpdate,
+  useClusterGet,
+} from "src/api/openapi/clusters";
+import {
+  Cluster,
+  ClusterInitialProps,
+  ClusterWithItems,
+} from "src/api/openapi/schemas";
 
 import { replaceDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
 
@@ -48,10 +56,26 @@ export function useClusterViewerScreen(props: Props) {
     }
   }
 
+  // TODO: Provide a way to set the new parent cluster for child clusters/items.
+  async function handleDelete(cluster: Cluster) {
+    const { destination } = await clusterDelete(cluster.slug);
+
+    if (destination) {
+      const newPath = replaceDirectoryPath(
+        directoryPath,
+        slug,
+        destination.slug,
+      );
+      router.push(newPath);
+    } else {
+      router.push("/directory");
+    }
+  }
+
   return {
     ready: true as const,
     data,
-    handlers: { handleSave },
+    handlers: { handleSave, handleDelete },
     directoryPath,
     mutate,
   };

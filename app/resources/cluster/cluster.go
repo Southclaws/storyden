@@ -26,7 +26,6 @@ type Repository interface {
 		opts ...Option,
 	) (*datagraph.Cluster, error)
 
-	List(ctx context.Context, filters ...Filter) ([]*datagraph.Cluster, error)
 	Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
 
 	// Update a cluster by ID.
@@ -35,7 +34,8 @@ type Repository interface {
 	// the actual slug a bit more complex due to the naïve implementation.
 	Update(ctx context.Context, id datagraph.ClusterID, opts ...Option) (*datagraph.Cluster, error)
 
-	Archive(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	// Delete removes a cluster permanently, it does not manage children.
+	Delete(ctx context.Context, slug datagraph.ClusterSlug) error
 }
 
 func WithID(id datagraph.ClusterID) Option {

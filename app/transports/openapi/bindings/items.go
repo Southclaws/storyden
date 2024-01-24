@@ -107,6 +107,15 @@ func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateReques
 	}, nil
 }
 
+func (i *Items) ItemDelete(ctx context.Context, request openapi.ItemDeleteRequestObject) (openapi.ItemDeleteResponseObject, error) {
+	_, err := i.im.Delete(ctx, datagraph.ItemSlug(request.ItemSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ItemDelete200Response{}, nil
+}
+
 func (c *Items) ItemAddAsset(ctx context.Context, request openapi.ItemAddAssetRequestObject) (openapi.ItemAddAssetResponseObject, error) {
 	clus, err := c.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
 		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),

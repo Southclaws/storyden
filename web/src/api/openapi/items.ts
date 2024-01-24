@@ -160,6 +160,13 @@ export const itemUpdate = (
 };
 
 /**
+ * Delete an item.
+ */
+export const itemDelete = (itemSlug: string) => {
+  return fetcher<void>({ url: `/v1/items/${itemSlug}`, method: "delete" });
+};
+
+/**
  * Add an asset to an item.
  */
 export const itemAddAsset = (itemSlug: string, id: string) => {
