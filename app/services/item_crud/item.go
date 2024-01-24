@@ -29,7 +29,7 @@ type Manager interface {
 	) (*datagraph.Item, error)
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 	Update(ctx context.Context, slug datagraph.ItemSlug, p Partial) (*datagraph.Item, error)
-	Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
+	Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 }
 
 type Partial struct {
@@ -127,8 +127,8 @@ func (s *service) Update(ctx context.Context, slug datagraph.ItemSlug, p Partial
 	return itm, nil
 }
 
-func (s *service) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
-	itm, err := s.cr.Archive(ctx, slug)
+func (s *service) Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
+	itm, err := s.cr.Delete(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

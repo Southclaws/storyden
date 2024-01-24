@@ -15,6 +15,7 @@ export function ItemViewerScreen(props: Props) {
     <DatagraphNodeScreen
       node={{ type: "item", ...data }}
       onSave={handlers.handleSave}
+      onDelete={handlers.handleDelete}
     />
   );
 }

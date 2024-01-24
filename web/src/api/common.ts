@@ -4,7 +4,7 @@ export type Options = {
   url: string;
   method?: "get" | "post" | "put" | "delete" | "patch";
   headers?: Record<string, string>;
-  params?: Record<string, string | string[]>;
+  params?: Record<string, string | string[] | boolean>;
   data?: unknown;
   responseType?: string;
   cookie?: string;
@@ -25,7 +25,7 @@ export const buildPayload = (data: unknown) => {
 const removeEmpty = omitBy(isNil);
 
 export const cleanQuery = (
-  params?: Record<string, string | string[]>,
+  params?: Record<string, string | string[] | boolean>,
 ): string => {
   if (!params) return "";
 

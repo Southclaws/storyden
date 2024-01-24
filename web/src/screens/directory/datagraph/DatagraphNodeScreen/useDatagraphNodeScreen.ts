@@ -8,6 +8,7 @@ import { itemAddAsset } from "src/api/openapi/items";
 import { Asset } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import {
+  DatagraphNode,
   DatagraphNodeInitialProps,
   DatagraphNodeWithRelations,
 } from "src/components/directory/datagraph/DatagraphNode";
@@ -28,6 +29,7 @@ export type Props = {
   initialEditingState?: boolean;
   editable?: boolean;
   onSave: (c: DatagraphNodeInitialProps) => Promise<void>;
+  onDelete?: (c: DatagraphNode) => Promise<void>;
 };
 
 export function useDatagraphNodeScreen({
@@ -35,6 +37,7 @@ export function useDatagraphNodeScreen({
   initialEditingState = false,
   editable = true,
   onSave,
+  onDelete,
 }: Props) {
   const directoryPath = useDirectoryPath();
   const account = useSession();
@@ -43,6 +46,11 @@ export function useDatagraphNodeScreen({
 
   const isAllowedToEdit =
     editable && Boolean(account?.id === node.owner.id || account?.admin);
+
+  const isAllowedToDelete =
+    editable &&
+    Boolean(account?.id === node.owner.id || account?.admin) &&
+    onDelete;
 
   const defaults: Form = useMemo(
     () => ({
@@ -86,6 +94,12 @@ export function useDatagraphNodeScreen({
     onSave({ type: node.type, ...payload });
   }
 
+  function handleDelete() {
+    if (editing) return;
+
+    onDelete?.(node);
+  }
+
   async function handleAssetUpload(asset: Asset) {
     if (!editing) return;
 
@@ -119,6 +133,7 @@ export function useDatagraphNodeScreen({
     handlers: {
       handleEditMode,
       handleSubmit,
+      handleDelete,
       handleAssetUpload,
       handleAssetRemove,
     },
@@ -127,5 +142,6 @@ export function useDatagraphNodeScreen({
     node,
     isAllowedToEdit,
     isSaving,
+    isAllowedToDelete,
   };
 }

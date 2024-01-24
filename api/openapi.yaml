@@ -943,6 +943,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+    delete:
+      operationId: ClusterDelete
+      description: Delete a cluster and move all children to its parent or root.
+      tags: [clusters]
+      parameters:
+        - $ref: "#/components/parameters/ClusterSlugParam"
+        - $ref: "#/components/parameters/TargetClusterSlugQuery"
+        - $ref: "#/components/parameters/MoveChildClustersQuery"
+        - $ref: "#/components/parameters/MoveChildItemsQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ClusterDeleteOK" }
 
   /v1/clusters/{cluster_slug}/assets/{id}:
     put:
@@ -1080,6 +1094,16 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ItemUpdateOK" }
+    delete:
+      operationId: ItemDelete
+      description: Delete an item.
+      tags: [items]
+      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: Deleted }
 
   /v1/items/{item_slug}/assets/{id}:
     put:
@@ -1321,6 +1345,30 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    TargetClusterSlugQuery:
+      description: Where to move child clusters and items.
+      name: target_cluster
+      in: query
+      required: false
+      schema:
+        type: string
+
+    MoveChildClustersQuery:
+      description: Whether or not to move child clusters.
+      name: move_child_clusters
+      in: query
+      required: false
+      schema:
+        type: boolean
+
+    MoveChildItemsQuery:
+      description: Whether or not to move child items.
+      name: move_child_items
+      in: query
+      required: false
+      schema:
+        type: boolean
 
     ItemSlugParam:
       description: Unique item Slug.
@@ -1788,6 +1836,15 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Cluster"
+
+    ClusterDeleteOK:
+      description: Cluster deleted.
+      content:
+        application/json:
+          schema:
+            properties:
+              destination:
+                $ref: "#/components/schemas/Cluster"
 
     ClusterAddChildOK:
       description: Cluster child added. Returns parent cluster.

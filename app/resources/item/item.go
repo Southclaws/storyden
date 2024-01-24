@@ -26,12 +26,11 @@ type Repository interface {
 		opts ...Option,
 	) (*datagraph.Item, error)
 
-	List(ctx context.Context, filters ...Filter) ([]*datagraph.Item, error)
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 
 	Update(ctx context.Context, slug datagraph.ItemID, opts ...Option) (*datagraph.Item, error)
 
-	Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
+	Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 }
 
 func WithID(id datagraph.ItemID) Option {

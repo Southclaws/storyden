@@ -15,6 +15,8 @@ import type {
   ClusterAddItemOKResponse,
   ClusterCreateBody,
   ClusterCreateOKResponse,
+  ClusterDeleteOKResponse,
+  ClusterDeleteParams,
   ClusterGetOKResponse,
   ClusterListOKResponse,
   ClusterListParams,
@@ -163,6 +165,20 @@ export const clusterUpdate = (
     method: "patch",
     headers: { "Content-Type": "application/json" },
     data: clusterUpdateBody,
+  });
+};
+
+/**
+ * Delete a cluster and move all children to its parent or root.
+ */
+export const clusterDelete = (
+  clusterSlug: string,
+  params?: ClusterDeleteParams,
+) => {
+  return fetcher<ClusterDeleteOKResponse>({
+    url: `/v1/clusters/${clusterSlug}`,
+    method: "delete",
+    params,
   });
 };
 

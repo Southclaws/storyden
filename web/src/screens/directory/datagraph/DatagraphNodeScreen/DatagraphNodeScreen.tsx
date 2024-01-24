@@ -8,6 +8,7 @@ import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { CancelAction } from "src/components/site/Action/Cancel";
+import { DeleteAction } from "src/components/site/Action/Delete";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
@@ -34,6 +35,7 @@ export function DatagraphNodeScreen(props: Props) {
     handlers: {
       handleSubmit,
       handleEditMode,
+      handleDelete,
       handleAssetUpload,
       handleAssetRemove,
     },
@@ -41,6 +43,7 @@ export function DatagraphNodeScreen(props: Props) {
     editing,
     node,
     isAllowedToEdit,
+    isAllowedToDelete,
     isSaving,
   } = useDatagraphNodeScreen(props);
 
@@ -83,7 +86,12 @@ export function DatagraphNodeScreen(props: Props) {
                       <SaveAction type="submit">Save</SaveAction>
                     </>
                   ) : (
-                    <EditAction onClick={handleEditMode}>Edit</EditAction>
+                    <>
+                      <EditAction onClick={handleEditMode}>Edit</EditAction>
+                      {isAllowedToDelete && (
+                        <DeleteAction onClick={handleDelete}></DeleteAction>
+                      )}
+                    </>
                   )}
                 </HStack>
               </PopoverAnchor>

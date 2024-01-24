@@ -132,6 +132,25 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 	}, nil
 }
 
+func (c *Clusters) ClusterDelete(ctx context.Context, request openapi.ClusterDeleteRequestObject) (openapi.ClusterDeleteResponseObject, error) {
+	destinationCluster, err := c.cs.Delete(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.DeleteOptions{
+		MoveTo:   opt.NewPtr((*datagraph.ClusterSlug)(request.Params.TargetCluster)),
+		Clusters: opt.NewPtr(request.Params.MoveChildClusters).OrZero(),
+		Items:    opt.NewPtr(request.Params.MoveChildItems).OrZero(),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterDelete200JSONResponse{
+		ClusterDeleteOKJSONResponse: openapi.ClusterDeleteOKJSONResponse{
+			Destination: opt.Map(opt.NewPtr(destinationCluster), func(in datagraph.Cluster) openapi.Cluster {
+				return serialiseCluster(&in)
+			}).Ptr(),
+		},
+	}, nil
+}
+
 func (c *Clusters) ClusterAddAsset(ctx context.Context, request openapi.ClusterAddAssetRequestObject) (openapi.ClusterAddAssetResponseObject, error) {
 	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
 		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),

@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
+	"github.com/Southclaws/storyden/app/resources/cluster_children"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
@@ -30,7 +31,7 @@ type Manager interface {
 
 	Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
 	Update(ctx context.Context, slug datagraph.ClusterSlug, p Partial) (*datagraph.Cluster, error)
-	Archive(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	Delete(ctx context.Context, slug datagraph.ClusterSlug, d DeleteOptions) (*datagraph.Cluster, error)
 }
 
 type Partial struct {
@@ -42,6 +43,12 @@ type Partial struct {
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
+}
+
+type DeleteOptions struct {
+	MoveTo   opt.Optional[datagraph.ClusterSlug]
+	Clusters bool
+	Items    bool
 }
 
 func (p Partial) Opts() (opts []cluster.Option) {
@@ -58,17 +65,20 @@ func (p Partial) Opts() (opts []cluster.Option) {
 type service struct {
 	l        *zap.Logger
 	cr       cluster.Repository
+	cc       cluster_children.Repository
 	hydrator hydrator.Service
 }
 
 func New(
 	l *zap.Logger,
 	cr cluster.Repository,
+	cc cluster_children.Repository,
 	hydrator hydrator.Service,
 ) Manager {
 	return &service{
 		l:        l.With(zap.String("service", "cluster")),
 		cr:       cr,
+		cc:       cc,
 		hydrator: hydrator,
 	}
 }
@@ -130,13 +140,51 @@ func (s *service) Update(ctx context.Context, slug datagraph.ClusterSlug, p Part
 	return clus, nil
 }
 
-func (s *service) Archive(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error) {
-	clus, err := s.cr.Archive(ctx, slug)
+func (s *service) Delete(ctx context.Context, slug datagraph.ClusterSlug, d DeleteOptions) (*datagraph.Cluster, error) {
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return clus, nil
+	clus, err := s.cr.Get(ctx, slug)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !clus.Owner.Admin {
+		if clus.Owner.ID != accountID {
+			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
+		}
+	}
+
+	destination, err := opt.MapErr(d.MoveTo, func(target datagraph.ClusterSlug) (datagraph.Cluster, error) {
+		opts := []cluster_children.Option{}
+
+		if d.Clusters {
+			opts = append(opts, cluster_children.MoveClusters())
+		}
+
+		if d.Items {
+			opts = append(opts, cluster_children.MoveItems())
+		}
+
+		destination, err := s.cc.Move(ctx, slug, target, opts...)
+		if err != nil {
+			return datagraph.Cluster{}, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return *destination, fault.Wrap(err, fctx.With(ctx))
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = s.cr.Delete(ctx, slug)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return destination.Ptr(), nil
 }
 
 func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []cluster.Option) {
