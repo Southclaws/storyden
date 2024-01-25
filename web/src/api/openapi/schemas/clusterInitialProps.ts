@@ -20,5 +20,6 @@ export interface ClusterInitialProps {
   url?: Url;
   description: ClusterDescription;
   content?: PostContent;
+  parent?: Slug;
   properties?: Properties;
 }

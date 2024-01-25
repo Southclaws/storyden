@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { AssetList } from "./assetList";
+import type { Cluster } from "./cluster";
 import type { ClusterDescription } from "./clusterDescription";
 import type { ClusterName } from "./clusterName";
 import type { Link } from "./link";
@@ -25,5 +26,6 @@ export interface ClusterCommonProps {
   description: ClusterDescription;
   content?: PostContent;
   owner: ProfileReference;
+  parent?: Cluster;
   properties: Properties;
 }
