@@ -1,5 +1,5 @@
 import { Portal } from "@ark-ui/react";
-import format from "date-fns/format";
+import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 import {

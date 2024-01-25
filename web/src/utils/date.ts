@@ -1,3 +1,5 @@
+import { FormatDistanceToNowOptions } from "date-fns";
+
 const formatDistanceLocale = {
   lessThanXSeconds: "{{count}}s",
   xSeconds: "{{count}}s",
@@ -19,13 +21,16 @@ const formatDistanceLocale = {
 
 export const formatDistance = (
   token: keyof typeof formatDistanceLocale,
-  count: string,
+  count: number,
 ) => {
-  const result = formatDistanceLocale[token].replace("{{count}}", count);
+  const result = formatDistanceLocale[token].replace(
+    "{{count}}",
+    count.toString(),
+  );
 
   return result;
 };
 
-export const formatDistanceDefaults = {
+export const formatDistanceDefaults: FormatDistanceToNowOptions = {
   locale: { formatDistance },
 };
