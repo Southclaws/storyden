@@ -24,5 +24,6 @@ export interface ClusterMutableProps {
   url?: Url;
   description?: ClusterDescription;
   content?: PostContent;
+  parent?: Slug;
   properties?: Properties;
 }

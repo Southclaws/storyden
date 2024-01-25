@@ -57,6 +57,7 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 			Properties: opt.NewPtr(request.Body.Properties),
 			URL:        opt.NewPtr(request.Body.Url),
 			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+			Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseClusterSlug),
 		},
 	)
 	if err != nil {
@@ -121,6 +122,7 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 		URL:         opt.NewPtr(request.Body.Url),
 		Description: opt.NewPtr(request.Body.Description),
 		Content:     opt.NewPtr(request.Body.Content),
+		Parent:      opt.NewPtrMap(request.Body.Parent, deserialiseClusterSlug),
 		Properties:  opt.NewPtr(request.Body.Properties),
 	})
 	if err != nil {
@@ -200,24 +202,34 @@ func (c *Clusters) ClusterRemoveCluster(ctx context.Context, request openapi.Clu
 }
 
 func (c *Clusters) ClusterAddItem(ctx context.Context, request openapi.ClusterAddItemRequestObject) (openapi.ClusterAddItemResponseObject, error) {
-	item, err := c.itree.Link(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	_, err := c.itree.Link(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	clus, err := c.cs.Get(ctx, datagraph.ClusterSlug(request.ClusterSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.ClusterAddItem200JSONResponse{
-		ClusterAddItemOKJSONResponse: openapi.ClusterAddItemOKJSONResponse(serialiseItem(item)),
+		ClusterAddItemOKJSONResponse: openapi.ClusterAddItemOKJSONResponse(serialiseClusterWithItems(clus)),
 	}, nil
 }
 
 func (c *Clusters) ClusterRemoveItem(ctx context.Context, request openapi.ClusterRemoveItemRequestObject) (openapi.ClusterRemoveItemResponseObject, error) {
-	item, err := c.itree.Sever(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	_, err := c.itree.Sever(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	clus, err := c.cs.Get(ctx, datagraph.ClusterSlug(request.ClusterSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.ClusterRemoveItem200JSONResponse{
-		ClusterRemoveItemOKJSONResponse: openapi.ClusterRemoveItemOKJSONResponse(serialiseItem(item)),
+		ClusterRemoveItemOKJSONResponse: openapi.ClusterRemoveItemOKJSONResponse(serialiseClusterWithItems(clus)),
 	}, nil
 }
 
@@ -233,6 +245,7 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
+		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
 		Properties:  in.Properties,
 	}
 }
@@ -249,8 +262,13 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
+		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
 		Properties:  in.Properties,
 		Clusters:    dt.Map(in.Clusters, serialiseCluster),
 		Items:       dt.Map(in.Items, serialiseItem),
 	}
+}
+
+func deserialiseClusterSlug(in string) datagraph.ClusterSlug {
+	return datagraph.ClusterSlug(in)
 }

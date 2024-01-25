@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/Southclaws/dt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -119,16 +119,11 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
+				Parent:      &slug1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
 			r.Equal(http.StatusOK, clus2.StatusCode())
-
-			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
-			r.NoError(err)
-			r.NotNil(cadd)
-			r.Equal(http.StatusOK, cadd.StatusCode())
-			r.Equal(clus1.JSON200.Id, cadd.JSON200.Id)
 
 			// List all root level clusters
 
@@ -158,7 +153,9 @@ func TestClustersHappyPath(t *testing.T) {
 			r.NotNil(clus3)
 			r.Equal(http.StatusOK, clus3.StatusCode())
 
-			cadd, err = cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
+			// This time, use the initial create method instead of using `parent`.
+
+			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())

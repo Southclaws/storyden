@@ -9,7 +9,7 @@ import type { ItemWithParents } from "./itemWithParents";
 
 /**
  * A list of items where each item includes all the information about its
-parent cluster too. For use with APIs that want to provide a list of 
+parent cluster too. For use with APIs that want to provide a list of
 items that may be part of different clusters.
 
  */
