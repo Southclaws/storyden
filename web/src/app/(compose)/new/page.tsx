@@ -1,11 +1,18 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { z } from "zod";
 
 import { ComposeScreen } from "src/screens/compose/ComposeScreen";
 
-export default function Page() {
-  const params = useSearchParams();
+const QuerySchema = z.object({
+  id: z.string().optional(),
+});
 
-  return <ComposeScreen editing={params.get("id") ?? undefined} />;
+type Props = {
+  searchParams: z.infer<typeof QuerySchema>;
+};
+
+export default function Page(props: Props) {
+  const params = QuerySchema.parse(props.searchParams);
+  return <ComposeScreen editing={params.id} />;
 }
