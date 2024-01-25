@@ -901,7 +901,8 @@ paths:
         "200": { $ref: "#/components/responses/ClusterCreateOK" }
     get:
       operationId: ClusterList
-      description: List all clusters.
+      description: |
+        List clusters using the given filters. Can be used to get a full tree.
       tags: [clusters]
       security: []
       parameters:

@@ -47,7 +47,8 @@ export const clusterCreate = (clusterCreateBody: ClusterCreateBody) => {
 };
 
 /**
- * List all clusters.
+ * List clusters using the given filters. Can be used to get a full tree.
+
  */
 export const clusterList = (params?: ClusterListParams) => {
   return fetcher<ClusterListOKResponse>({
