@@ -35,3 +35,15 @@ export const cleanQuery = (
 
   return `?${format}`;
 };
+
+export function shouldLog(status: number) {
+  if (status < 400) {
+    return false;
+  }
+
+  if (status === 404) {
+    return false;
+  }
+
+  return true;
+}
