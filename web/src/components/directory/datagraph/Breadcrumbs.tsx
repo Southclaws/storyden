@@ -10,7 +10,7 @@ import {
 import { Input } from "src/theme/components/Input";
 import { Link } from "src/theme/components/Link";
 
-import { HStack } from "@/styled-system/jsx";
+import { Box, HStack } from "@/styled-system/jsx";
 
 type Props = {
   directoryPath: DirectoryPath;
@@ -26,18 +26,19 @@ export const _Breadcrumbs = (
 ) => {
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
-  const editingPath = isEditing ? directoryPath.slice(0, -1) : directoryPath;
-  const paths = pull(editingPath, "new");
+  const paths = pull(directoryPath, "new");
   const jointNew = joinDirectoryPath(directoryPath, "new");
 
   return (
-    <HStack w="full" color="fg.subtle">
+    <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
       <Link minW="min" href="/directory" size="xs">
         Directory
       </Link>
       {paths.map((p) => (
         <Fragment key={p}>
-          <ChevronRightIcon width="1rem" />
+          <Box flexShrink="0">
+            <ChevronRightIcon width="1rem" />
+          </Box>
           <Link
             flexShrink="0"
             key={p}
@@ -50,7 +51,9 @@ export const _Breadcrumbs = (
       ))}
       {session && create == "show" && (
         <>
-          <ChevronRightIcon width="1rem" />
+          <Box flexShrink="0">
+            <ChevronRightIcon width="1rem" />
+          </Box>
           <Link
             flexShrink="0"
             kind="primary"
@@ -63,7 +66,9 @@ export const _Breadcrumbs = (
       )}
       {isEditing && (
         <>
-          <ChevronRightIcon width="1rem" />
+          <Box flexShrink="0">
+            <ChevronRightIcon width="1rem" />
+          </Box>
           <Input
             ref={ref}
             w="full"
