@@ -24,7 +24,11 @@ export function EditableAssetWall({
   });
 
   return (
-    <Box className={styles["root"]} {...props}>
+    <Box
+      className={styles["root"]}
+      data-empty={!editing && initialAssets.length === 0}
+      {...props}
+    >
       <Box className={styles["grid"]}>
         {assets?.map((a) => (
           <Box key={a.id} className={styles["asset"]}>
