@@ -6,6 +6,10 @@
   --square-size: 8rem;
 }
 
+.root:where([data-empty="true"]) {
+  display: none;
+}
+
 .grid {
   flex: 1 0 auto;
   display: grid;
