@@ -67,5 +67,15 @@ export function useContentComposer(props: Props) {
     }
   }
 
-  return { editor, initialValue, onChange };
+  function handleAssetUpload(asset: Asset) {
+    Transforms.insertNodes(editor, {
+      type: "image",
+      caption: asset.url,
+      link: asset.url,
+      children: [{ text: "" }],
+    });
+    props.onAssetUpload?.(asset);
+  }
+
+  return { editor, initialValue, onChange, handleAssetUpload };
 }

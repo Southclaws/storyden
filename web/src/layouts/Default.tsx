@@ -14,7 +14,12 @@ export function Default(props: PropsWithChildren) {
       vaul-drawer-wrapper=""
     >
       <Navigation>
-        <styled.main width="full" minW="0">
+        <styled.main
+          containerType="inline-size"
+          width="full"
+          height="full"
+          minW="0"
+        >
           {props.children}
           <Box height="24"></Box>
         </styled.main>

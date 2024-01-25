@@ -15,6 +15,8 @@ import type {
   ClusterAddItemOKResponse,
   ClusterCreateBody,
   ClusterCreateOKResponse,
+  ClusterDeleteOKResponse,
+  ClusterDeleteParams,
   ClusterGetOKResponse,
   ClusterListOKResponse,
   ClusterListParams,
@@ -45,7 +47,8 @@ export const clusterCreate = (clusterCreateBody: ClusterCreateBody) => {
 };
 
 /**
- * List all clusters.
+ * List clusters using the given filters. Can be used to get a full tree.
+
  */
 export const clusterList = (params?: ClusterListParams) => {
   return fetcher<ClusterListOKResponse>({
@@ -163,6 +166,40 @@ export const clusterUpdate = (
     method: "patch",
     headers: { "Content-Type": "application/json" },
     data: clusterUpdateBody,
+  });
+};
+
+/**
+ * Delete a cluster and move all children to its parent or root.
+ */
+export const clusterDelete = (
+  clusterSlug: string,
+  params?: ClusterDeleteParams,
+) => {
+  return fetcher<ClusterDeleteOKResponse>({
+    url: `/v1/clusters/${clusterSlug}`,
+    method: "delete",
+    params,
+  });
+};
+
+/**
+ * Add an asset to a cluster.
+ */
+export const clusterAddAsset = (clusterSlug: string, id: string) => {
+  return fetcher<ClusterUpdateOKResponse>({
+    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    method: "put",
+  });
+};
+
+/**
+ * Remove an asset from a cluster.
+ */
+export const clusterRemoveAsset = (clusterSlug: string, id: string) => {
+  return fetcher<ClusterUpdateOKResponse>({
+    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    method: "delete",
   });
 };
 

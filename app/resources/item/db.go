@@ -2,7 +2,6 @@ package item
 
 import (
 	"context"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
@@ -100,7 +99,9 @@ func (d *database) Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithClusters(func(cq *ent.ClusterQuery) {
-			cq.WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
+			cq.
+				WithAssets().
+				WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)
 	if err != nil {
@@ -131,11 +132,8 @@ func (d *database) Update(ctx context.Context, id datagraph.ItemID, opts ...Opti
 	return d.Get(ctx, datagraph.ItemSlug(c.Slug))
 }
 
-func (d *database) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
-	update := d.db.Item.Update().Where(item.Slug(string(slug)))
-	update.SetDeletedAt(time.Now())
-
-	_, err := update.Save(ctx)
+func (d *database) Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
+	_, err := d.db.Item.Delete().Where(item.Slug(string(slug))).Exec(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

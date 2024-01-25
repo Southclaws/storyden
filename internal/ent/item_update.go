@@ -73,26 +73,6 @@ func (iu *ItemUpdate) SetSlug(s string) *ItemUpdate {
 	return iu
 }
 
-// SetImageURL sets the "image_url" field.
-func (iu *ItemUpdate) SetImageURL(s string) *ItemUpdate {
-	iu.mutation.SetImageURL(s)
-	return iu
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (iu *ItemUpdate) SetNillableImageURL(s *string) *ItemUpdate {
-	if s != nil {
-		iu.SetImageURL(*s)
-	}
-	return iu
-}
-
-// ClearImageURL clears the value of the "image_url" field.
-func (iu *ItemUpdate) ClearImageURL() *ItemUpdate {
-	iu.mutation.ClearImageURL()
-	return iu
-}
-
 // SetDescription sets the "description" field.
 func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 	iu.mutation.SetDescription(s)
@@ -380,12 +360,6 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := iu.mutation.Slug(); ok {
 		_spec.SetField(item.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := iu.mutation.ImageURL(); ok {
-		_spec.SetField(item.FieldImageURL, field.TypeString, value)
-	}
-	if iu.mutation.ImageURLCleared() {
-		_spec.ClearField(item.FieldImageURL, field.TypeString)
-	}
 	if value, ok := iu.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)
 	}
@@ -667,26 +641,6 @@ func (iuo *ItemUpdateOne) SetName(s string) *ItemUpdateOne {
 // SetSlug sets the "slug" field.
 func (iuo *ItemUpdateOne) SetSlug(s string) *ItemUpdateOne {
 	iuo.mutation.SetSlug(s)
-	return iuo
-}
-
-// SetImageURL sets the "image_url" field.
-func (iuo *ItemUpdateOne) SetImageURL(s string) *ItemUpdateOne {
-	iuo.mutation.SetImageURL(s)
-	return iuo
-}
-
-// SetNillableImageURL sets the "image_url" field if the given value is not nil.
-func (iuo *ItemUpdateOne) SetNillableImageURL(s *string) *ItemUpdateOne {
-	if s != nil {
-		iuo.SetImageURL(*s)
-	}
-	return iuo
-}
-
-// ClearImageURL clears the value of the "image_url" field.
-func (iuo *ItemUpdateOne) ClearImageURL() *ItemUpdateOne {
-	iuo.mutation.ClearImageURL()
 	return iuo
 }
 
@@ -1006,12 +960,6 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if value, ok := iuo.mutation.Slug(); ok {
 		_spec.SetField(item.FieldSlug, field.TypeString, value)
-	}
-	if value, ok := iuo.mutation.ImageURL(); ok {
-		_spec.SetField(item.FieldImageURL, field.TypeString, value)
-	}
-	if iuo.mutation.ImageURLCleared() {
-		_spec.ClearField(item.FieldImageURL, field.TypeString)
 	}
 	if value, ok := iuo.mutation.Description(); ok {
 		_spec.SetField(item.FieldDescription, field.TypeString, value)

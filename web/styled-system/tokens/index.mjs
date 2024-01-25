@@ -1855,6 +1855,50 @@ const tokens = {
     "value": "var(--blurs-frosted)",
     "variable": "var(--blurs-frosted)"
   },
+  "opacity.0": {
+    "value": "var(--opacity-0)",
+    "variable": "var(--opacity-0)"
+  },
+  "opacity.1": {
+    "value": "var(--opacity-1)",
+    "variable": "var(--opacity-1)"
+  },
+  "opacity.2": {
+    "value": "var(--opacity-2)",
+    "variable": "var(--opacity-2)"
+  },
+  "opacity.3": {
+    "value": "var(--opacity-3)",
+    "variable": "var(--opacity-3)"
+  },
+  "opacity.4": {
+    "value": "var(--opacity-4)",
+    "variable": "var(--opacity-4)"
+  },
+  "opacity.5": {
+    "value": "var(--opacity-5)",
+    "variable": "var(--opacity-5)"
+  },
+  "opacity.6": {
+    "value": "var(--opacity-6)",
+    "variable": "var(--opacity-6)"
+  },
+  "opacity.7": {
+    "value": "var(--opacity-7)",
+    "variable": "var(--opacity-7)"
+  },
+  "opacity.8": {
+    "value": "var(--opacity-8)",
+    "variable": "var(--opacity-8)"
+  },
+  "opacity.9": {
+    "value": "var(--opacity-9)",
+    "variable": "var(--opacity-9)"
+  },
+  "opacity.full": {
+    "value": "var(--opacity-full)",
+    "variable": "var(--opacity-full)"
+  },
   "colors.accent.50": {
     "value": "var(--colors-accent-50)",
     "variable": "var(--colors-accent-50)"
@@ -2110,6 +2154,18 @@ const tokens = {
   "colors.conicGradient": {
     "value": "var(--colors-conic-gradient)",
     "variable": "var(--colors-conic-gradient)"
+  },
+  "colors.cardBackgroundGradient": {
+    "value": "var(--colors-card-background-gradient)",
+    "variable": "var(--colors-card-background-gradient)"
+  },
+  "colors.backgroundGradientH": {
+    "value": "var(--colors-background-gradient-h)",
+    "variable": "var(--colors-background-gradient-h)"
+  },
+  "colors.backgroundGradientV": {
+    "value": "var(--colors-background-gradient-v)",
+    "variable": "var(--colors-background-gradient-v)"
   },
   "spacing.safeBottom": {
     "value": "var(--spacing-safe-bottom)",

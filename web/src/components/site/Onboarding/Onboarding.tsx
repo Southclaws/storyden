@@ -13,7 +13,8 @@ export function Onboarding() {
       <Box
         position="absolute"
         // NOTE: not dark mode ready! need a variable
-        background="white"
+        background="bg.default"
+        p="4"
       >
         <Checklist onboardingStatus={onboardingStatus} onFinish={onFinish} />
       </Box>

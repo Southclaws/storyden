@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
@@ -100,8 +99,16 @@ func (d *database) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagr
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithItems(func(iq *ent.ItemQuery) {
-			iq.WithOwner().
+			iq.
+				WithAssets().
+				WithOwner().
 				Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithClusters(func(cq *ent.ClusterQuery) {
+			cq.
+				WithAssets().
+				WithOwner().
+				Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)
 	if err != nil {
@@ -132,14 +139,13 @@ func (d *database) Update(ctx context.Context, id datagraph.ClusterID, opts ...O
 	return d.Get(ctx, datagraph.ClusterSlug(c.Slug))
 }
 
-func (d *database) Archive(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error) {
-	update := d.db.Cluster.Update().Where(cluster.Slug(string(slug)))
-	update.SetDeletedAt(time.Now())
+func (d *database) Delete(ctx context.Context, slug datagraph.ClusterSlug) error {
+	update := d.db.Cluster.Delete().Where(cluster.Slug(string(slug)))
 
-	_, err := update.Save(ctx)
+	_, err := update.Exec(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, slug)
+	return nil
 }

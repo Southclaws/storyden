@@ -1,9 +1,9 @@
 import { Divider, VStack } from "@/styled-system/jsx";
-import { FrostedGlass } from "@/styled-system/patterns";
+import { Floating } from "@/styled-system/patterns";
 
 export function Right() {
   return (
-    <VStack className={FrostedGlass()} justify="space-between" px="4">
+    <VStack className={Floating()} justify="space-between" px="4">
       <p>Threadbase</p>
       <p>Southclaws</p>
 

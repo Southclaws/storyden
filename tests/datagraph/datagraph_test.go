@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -36,7 +37,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
-			iurl := "https://picsum.photos/500/500"
+			// iurl := "https://picsum.photos/500/500"
 
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
@@ -44,7 +45,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing clusters api",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -63,7 +63,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -86,7 +85,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
@@ -106,7 +104,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname1,
 				Slug:        itemslug1,
 				Description: "testing items api",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item1)
@@ -164,7 +161,6 @@ func TestDatagraphHappyPath(t *testing.T) {
 				Name:        itemname2,
 				Slug:        itemslug2,
 				Description: "testing items api 2",
-				ImageUrl:    &iurl,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(item2)
@@ -268,4 +264,120 @@ func TestDatagraphHappyPath(t *testing.T) {
 			a.NotContains(clusterids, clus3.JSON200.Id)
 		}))
 	}))
+}
+
+func TestDatagraphDeletions(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *bindings.CookieJar,
+		ar account.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+
+			// Create three clusters in a tree
+			// clus1
+			// |- clus2
+			//    |- clus3
+
+			clus1, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions1"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus1.StatusCode())
+
+			clus2, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions2"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus2.StatusCode())
+
+			clus3, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions3"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus3.StatusCode())
+
+			cadd, err := cl.ClusterAddCluster(ctx, clus1.JSON200.Slug, clus2.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cadd.StatusCode)
+
+			cadd, err = cl.ClusterAddCluster(ctx, clus2.JSON200.Slug, clus3.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cadd.StatusCode)
+
+			// Add an item to clus3 and delete the cluster with no params
+			// Item becomes orphaned.
+
+			clus3item, err := cl.ItemCreateWithResponse(ctx, uniqueItem("deletions1"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus3item.StatusCode())
+
+			iadd, err := cl.ClusterAddItem(ctx, clus3.JSON200.Slug, clus3item.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, iadd.StatusCode)
+
+			cdel, err := cl.ClusterDeleteWithResponse(ctx, clus3.JSON200.Slug, nil, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cdel.StatusCode())
+			a.Nil(cdel.JSON200.Destination)
+
+			clus3itemget, err := cl.ItemGetWithResponse(ctx, clus3item.JSON200.Slug)
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus3itemget.StatusCode())
+			a.Len(clus3itemget.JSON200.Clusters, 0)
+
+			// Add an item and a cluster to clus2, delete clus2 and move children to clus1
+
+			clus2item, err := cl.ItemCreateWithResponse(ctx, uniqueItem("deletions1"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus2item.StatusCode())
+
+			iadd, err = cl.ClusterAddItem(ctx, clus2.JSON200.Slug, clus2item.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, iadd.StatusCode)
+
+			clus2clus, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions2child"), e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus2clus.StatusCode())
+
+			cadd, err = cl.ClusterAddCluster(ctx, clus2.JSON200.Slug, clus2clus.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cadd.StatusCode)
+
+			cdel, err = cl.ClusterDeleteWithResponse(ctx, clus2.JSON200.Slug, &openapi.ClusterDeleteParams{
+				TargetCluster:     &clus1.JSON200.Slug,
+				MoveChildItems:    opt.New(true).Ptr(),
+				MoveChildClusters: opt.New(true).Ptr(),
+			}, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cdel.StatusCode())
+			a.NotNil(cdel.JSON200.Destination)
+			a.Equal(clus1.JSON200.Id, cdel.JSON200.Destination.Id)
+
+			clus1get, err := cl.ClusterGetWithResponse(ctx, clus1.JSON200.Slug)
+			r.NoError(err)
+			r.Equal(http.StatusOK, clus1get.StatusCode())
+
+			a.Len(clus1get.JSON200.Clusters, 1)
+			a.Len(clus1get.JSON200.Items, 1)
+		}))
+	}))
+}
+
+func uniqueCluster(name string) openapi.ClusterInitialProps {
+	return openapi.ClusterInitialProps{
+		Name:        name,
+		Slug:        name + uuid.NewString(),
+		Description: name,
+	}
+}
+
+func uniqueItem(name string) openapi.ItemInitialProps {
+	return openapi.ItemInitialProps{
+		Name:        name,
+		Slug:        name + uuid.NewString(),
+		Description: name,
+	}
 }

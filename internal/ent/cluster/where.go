@@ -81,11 +81,6 @@ func Slug(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldSlug, v))
 }
 
-// ImageURL applies equality check predicate on the "image_url" field. It's identical to ImageURLEQ.
-func ImageURL(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEQ(FieldImageURL, v))
-}
-
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldEQ(FieldDescription, v))
@@ -364,81 +359,6 @@ func SlugEqualFold(v string) predicate.Cluster {
 // SlugContainsFold applies the ContainsFold predicate on the "slug" field.
 func SlugContainsFold(v string) predicate.Cluster {
 	return predicate.Cluster(sql.FieldContainsFold(FieldSlug, v))
-}
-
-// ImageURLEQ applies the EQ predicate on the "image_url" field.
-func ImageURLEQ(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEQ(FieldImageURL, v))
-}
-
-// ImageURLNEQ applies the NEQ predicate on the "image_url" field.
-func ImageURLNEQ(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldNEQ(FieldImageURL, v))
-}
-
-// ImageURLIn applies the In predicate on the "image_url" field.
-func ImageURLIn(vs ...string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldIn(FieldImageURL, vs...))
-}
-
-// ImageURLNotIn applies the NotIn predicate on the "image_url" field.
-func ImageURLNotIn(vs ...string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldNotIn(FieldImageURL, vs...))
-}
-
-// ImageURLGT applies the GT predicate on the "image_url" field.
-func ImageURLGT(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldGT(FieldImageURL, v))
-}
-
-// ImageURLGTE applies the GTE predicate on the "image_url" field.
-func ImageURLGTE(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldGTE(FieldImageURL, v))
-}
-
-// ImageURLLT applies the LT predicate on the "image_url" field.
-func ImageURLLT(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldLT(FieldImageURL, v))
-}
-
-// ImageURLLTE applies the LTE predicate on the "image_url" field.
-func ImageURLLTE(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldLTE(FieldImageURL, v))
-}
-
-// ImageURLContains applies the Contains predicate on the "image_url" field.
-func ImageURLContains(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldContains(FieldImageURL, v))
-}
-
-// ImageURLHasPrefix applies the HasPrefix predicate on the "image_url" field.
-func ImageURLHasPrefix(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldHasPrefix(FieldImageURL, v))
-}
-
-// ImageURLHasSuffix applies the HasSuffix predicate on the "image_url" field.
-func ImageURLHasSuffix(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldHasSuffix(FieldImageURL, v))
-}
-
-// ImageURLIsNil applies the IsNil predicate on the "image_url" field.
-func ImageURLIsNil() predicate.Cluster {
-	return predicate.Cluster(sql.FieldIsNull(FieldImageURL))
-}
-
-// ImageURLNotNil applies the NotNil predicate on the "image_url" field.
-func ImageURLNotNil() predicate.Cluster {
-	return predicate.Cluster(sql.FieldNotNull(FieldImageURL))
-}
-
-// ImageURLEqualFold applies the EqualFold predicate on the "image_url" field.
-func ImageURLEqualFold(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldEqualFold(FieldImageURL, v))
-}
-
-// ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
-func ImageURLContainsFold(v string) predicate.Cluster {
-	return predicate.Cluster(sql.FieldContainsFold(FieldImageURL, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

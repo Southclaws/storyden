@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -43,9 +44,9 @@ func (i *Items) ItemCreate(ctx context.Context, request openapi.ItemCreateReques
 		request.Body.Description,
 		item_crud.Partial{
 			Content:    opt.NewPtr(request.Body.Content),
-			ImageURL:   opt.NewPtr(request.Body.ImageUrl),
 			Properties: opt.NewPtr(request.Body.Properties),
 			URL:        opt.NewPtr(request.Body.Url),
+			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		},
 	)
 	if err != nil {
@@ -91,7 +92,7 @@ func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateReques
 	item, err := i.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
 		Name:        opt.NewPtr(request.Body.Name),
 		Slug:        opt.NewPtr(request.Body.Slug),
-		ImageURL:    opt.NewPtr(request.Body.ImageUrl),
+		AssetsAdd:   opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		URL:         opt.NewPtr(request.Body.Url),
 		Description: opt.NewPtr(request.Body.Description),
 		Content:     opt.NewPtr(request.Body.Content),
@@ -106,6 +107,41 @@ func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateReques
 	}, nil
 }
 
+func (i *Items) ItemDelete(ctx context.Context, request openapi.ItemDeleteRequestObject) (openapi.ItemDeleteResponseObject, error) {
+	_, err := i.im.Delete(ctx, datagraph.ItemSlug(request.ItemSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ItemDelete200Response{}, nil
+}
+
+func (c *Items) ItemAddAsset(ctx context.Context, request openapi.ItemAddAssetRequestObject) (openapi.ItemAddAssetResponseObject, error) {
+	clus, err := c.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
+		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ItemAddAsset200JSONResponse{
+		ItemUpdateOKJSONResponse: openapi.ItemUpdateOKJSONResponse(serialiseItem(clus)),
+	}, nil
+}
+
+func (c *Items) ItemRemoveAsset(ctx context.Context, request openapi.ItemRemoveAssetRequestObject) (openapi.ItemRemoveAssetResponseObject, error) {
+	clus, err := c.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
+		AssetsRemove: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ItemRemoveAsset200JSONResponse{
+		ItemUpdateOKJSONResponse: openapi.ItemUpdateOKJSONResponse(serialiseItem(clus)),
+	}, nil
+}
+
 func serialiseItem(in *datagraph.Item) openapi.Item {
 	return openapi.Item{
 		Id:          in.ID.String(),
@@ -113,7 +149,7 @@ func serialiseItem(in *datagraph.Item) openapi.Item {
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
 		Slug:        in.Slug,
-		ImageUrl:    in.ImageURL.Ptr(),
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
@@ -130,7 +166,7 @@ func serialiseItemWithParents(in *datagraph.Item) openapi.ItemWithParents {
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
 		Slug:        in.Slug,
-		ImageUrl:    in.ImageURL.Ptr(),
+		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
 		Description: in.Description,
 		Content:     in.Content.Ptr(),

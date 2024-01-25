@@ -8,15 +8,16 @@ import { map } from "lodash/fp";
 
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
+import { card } from "src/theme/components/Card/recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
+import { headingInput } from "src/theme/components/HeadingInput/recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
 import { popover } from "src/theme/components/Popover/popover.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
 import { tabs } from "src/theme/components/Tabs/tabs.recipe";
-import { titleInput } from "src/theme/components/TitleInput/titleInput.recipe";
 
 // TODO: Dark mode = 40%
 const L = "80%";
@@ -53,20 +54,32 @@ export default defineConfig({
     placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
     collapsed:
       '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
+    containerSmall: "@container (max-width: 200px)",
   },
 
   patterns: {
     extend: {
       FrostedGlass: {
-        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the `,
+        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
         properties: {},
-        transform(props) {
+        transform() {
           return {
             backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            boxShadow: "sm",
+          };
+        },
+      },
+      Floating: {
+        description: `Floating overlay elements.`,
+        properties: {},
+        transform() {
+          return {
+            backgroundColor: "bg.opaque",
+            backdropBlur: "frosted",
+            backdropFilter: "auto",
             borderRadius: "lg",
+            boxShadow: "sm",
           };
         },
       },
@@ -77,14 +90,18 @@ export default defineConfig({
             type: "enum",
             value: ["edge", "default"],
           },
+          display: {
+            type: "property",
+            value: "display",
+          },
         },
         transform(props) {
-          const { kind } = props;
+          const { kind, display } = props;
 
           const padding = kind === "edge" ? "0" : "2";
 
           return {
-            display: "flex",
+            display,
             flexDirection: "column",
             gap: "1",
             width: "full",
@@ -110,7 +127,7 @@ export default defineConfig({
     recipes: {
       admonition: admonition,
       input: input,
-      titleInput: titleInput,
+      headingInput: headingInput,
       heading: heading,
       button: button,
       link: link,
@@ -119,11 +136,25 @@ export default defineConfig({
       checkbox: checkbox,
       popover: popover,
       skeleton: skeleton,
+      card: card,
     },
     extend: {
       semanticTokens: defineSemanticTokens({
         blurs: {
           frosted: { value: "8px" },
+        },
+        opacity: {
+          0: { value: "0" },
+          1: { value: "0.1" },
+          2: { value: "0.2" },
+          3: { value: "0.3" },
+          4: { value: "0.4" },
+          5: { value: "0.5" },
+          6: { value: "0.6" },
+          7: { value: "0.7" },
+          8: { value: "0.8" },
+          9: { value: "0.9" },
+          full: { value: "1" },
         },
         colors: {
           accent: {
@@ -225,6 +256,18 @@ export default defineConfig({
           },
           conicGradient: {
             value: conicGradient,
+          },
+          cardBackgroundGradient: {
+            value:
+              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+          },
+          backgroundGradientH: {
+            value:
+              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+          },
+          backgroundGradientV: {
+            value:
+              "linear-gradient(0deg, var(--colors-bg-default), transparent)",
           },
         },
         spacing: {

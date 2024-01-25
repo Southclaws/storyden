@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/Southclaws/dt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -38,14 +38,13 @@ func TestClustersHappyPath(t *testing.T) {
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Clusters\n\nRich text content."
-			iurl1 := "https://picsum.photos/200/200"
+			// iurl1 := "https://picsum.photos/200/200"
 			url1 := "https://southcla.ws"
 			clus1, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing clusters api",
 				Content:     &content1,
-				ImageUrl:    &iurl1,
 				Url:         &url1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
@@ -56,7 +55,6 @@ func TestClustersHappyPath(t *testing.T) {
 			a.Equal(slug1, clus1.JSON200.Slug)
 			a.Equal("testing clusters api", clus1.JSON200.Description)
 			a.Equal(content1, *clus1.JSON200.Content)
-			a.Equal(iurl1, *clus1.JSON200.ImageUrl)
 			a.Equal(url1, clus1.JSON200.Link.Url)
 			a.Equal(acc.ID.String(), string(clus1.JSON200.Owner.Id))
 
@@ -78,7 +76,7 @@ func TestClustersHappyPath(t *testing.T) {
 			slug1 = name1 + uuid.NewString()
 			desc1 := "a new description"
 			cont1 := "# New content"
-			iurl1 = "https://picsum.photos/500/500"
+			// iurl1 = "https://picsum.photos/500/500"
 			url1 = "https://cla.ws"
 			prop1 := any(map[string]any{
 				"key": "value",
@@ -88,7 +86,6 @@ func TestClustersHappyPath(t *testing.T) {
 				Slug:        &slug1,
 				Description: &desc1,
 				Content:     &cont1,
-				ImageUrl:    &iurl1,
 				Url:         &url1,
 				Properties:  &prop1,
 			}, e2e.WithSession(ctx, cj))
@@ -100,7 +97,6 @@ func TestClustersHappyPath(t *testing.T) {
 			a.Equal(slug1, clus1update.JSON200.Slug)
 			a.Equal(desc1, clus1update.JSON200.Description)
 			a.Equal(cont1, *clus1update.JSON200.Content)
-			a.Equal(iurl1, *clus1update.JSON200.ImageUrl)
 			a.Equal(url1, clus1update.JSON200.Link.Url)
 			a.Equal(prop1, clus1update.JSON200.Properties)
 
@@ -123,17 +119,11 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl1,
+				Parent:      &slug1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
 			r.Equal(http.StatusOK, clus2.StatusCode())
-
-			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
-			r.NoError(err)
-			r.NotNil(cadd)
-			r.Equal(http.StatusOK, cadd.StatusCode())
-			r.Equal(clus1.JSON200.Id, cadd.JSON200.Id)
 
 			// List all root level clusters
 
@@ -158,13 +148,14 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
-				ImageUrl:    &iurl1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
 			r.Equal(http.StatusOK, clus3.StatusCode())
 
-			cadd, err = cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
+			// This time, use the initial create method instead of using `parent`.
+
+			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())

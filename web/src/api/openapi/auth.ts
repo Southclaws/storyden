@@ -34,7 +34,7 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 /**
- * Retrieve a list of authentication providers. Storyden supports a few 
+ * Retrieve a list of authentication providers. Storyden supports a few
 ways to authenticate, from simple passwords to OAuth and WebAuthn. This
 endpoint tells a client which auth capabilities are enabled.
 

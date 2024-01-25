@@ -20,7 +20,6 @@ func (Item) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("slug").Unique(),
-		field.String("image_url").Optional().Nillable(),
 		field.String("description"),
 		field.String("content").Optional().Nillable(),
 		field.String("account_id").GoType(xid.ID{}),

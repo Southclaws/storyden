@@ -26,12 +26,11 @@ type Repository interface {
 		opts ...Option,
 	) (*datagraph.Item, error)
 
-	List(ctx context.Context, filters ...Filter) ([]*datagraph.Item, error)
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 
 	Update(ctx context.Context, slug datagraph.ItemID, opts ...Option) (*datagraph.Item, error)
 
-	Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
+	Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 }
 
 func WithID(id datagraph.ItemID) Option {
@@ -52,15 +51,15 @@ func WithSlug(v string) Option {
 	}
 }
 
-func WithImageURL(v string) Option {
-	return func(c *ent.ItemMutation) {
-		c.SetImageURL(v)
-	}
-}
-
 func WithAssets(a []asset.AssetID) Option {
 	return func(m *ent.ItemMutation) {
 		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+	}
+}
+
+func WithAssetsRemoved(a []asset.AssetID) Option {
+	return func(m *ent.ItemMutation) {
+		m.RemoveAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
 	}
 }
 
