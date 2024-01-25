@@ -59,6 +59,7 @@ type Cluster struct {
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
+	Parent      opt.Optional[*Cluster]
 	Properties  any
 
 	Items    []*Item

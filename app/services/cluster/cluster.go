@@ -40,6 +40,7 @@ type Partial struct {
 	URL          opt.Optional[string]
 	Description  opt.Optional[string]
 	Content      opt.Optional[string]
+	Parent       opt.Optional[datagraph.ClusterSlug]
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
@@ -90,9 +91,10 @@ func (s *service) Create(ctx context.Context,
 	desc string,
 	p Partial,
 ) (*datagraph.Cluster, error) {
-	opts := p.Opts()
-
-	opts = append(opts, s.hydrateLink(ctx, p)...)
+	opts, err := s.applyOpts(ctx, p)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	clus, err := s.cr.Create(ctx, owner, name, slug, desc, opts...)
 	if err != nil {
@@ -128,9 +130,10 @@ func (s *service) Update(ctx context.Context, slug datagraph.ClusterSlug, p Part
 		}
 	}
 
-	opts := p.Opts()
-
-	opts = append(opts, s.hydrateLink(ctx, p)...)
+	opts, err := s.applyOpts(ctx, p)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	clus, err = s.cr.Update(ctx, clus.ID, opts...)
 	if err != nil {
@@ -195,4 +198,21 @@ func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []clus
 	}
 
 	return s.hydrator.HydrateCluster(ctx, text, partial.URL)
+}
+
+func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, error) {
+	opts := p.Opts()
+
+	if parentSlug, ok := p.Parent.Get(); ok {
+		parent, err := s.cr.Get(ctx, parentSlug)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		opts = append(opts, cluster.WithParent(parent.ID))
+	}
+
+	opts = append(opts, s.hydrateLink(ctx, p)...)
+
+	return opts, nil
 }

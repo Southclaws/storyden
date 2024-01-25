@@ -86,6 +86,12 @@ func WithContent(v string) Option {
 	}
 }
 
+func WithParent(v datagraph.ClusterID) Option {
+	return func(c *ent.ClusterMutation) {
+		c.SetParentID(xid.ID(v))
+	}
+}
+
 func WithProperties(v any) Option {
 	return func(c *ent.ClusterMutation) {
 		c.SetProperties(v)
