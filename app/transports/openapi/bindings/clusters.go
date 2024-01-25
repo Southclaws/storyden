@@ -57,6 +57,7 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 			Properties: opt.NewPtr(request.Body.Properties),
 			URL:        opt.NewPtr(request.Body.Url),
 			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+			Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseClusterSlug),
 		},
 	)
 	if err != nil {
@@ -121,6 +122,7 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 		URL:         opt.NewPtr(request.Body.Url),
 		Description: opt.NewPtr(request.Body.Description),
 		Content:     opt.NewPtr(request.Body.Content),
+		Parent:      opt.NewPtrMap(request.Body.Parent, deserialiseClusterSlug),
 		Properties:  opt.NewPtr(request.Body.Properties),
 	})
 	if err != nil {
@@ -233,6 +235,7 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
+		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
 		Properties:  in.Properties,
 	}
 }
@@ -249,8 +252,13 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
+		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
 		Properties:  in.Properties,
 		Clusters:    dt.Map(in.Clusters, serialiseCluster),
 		Items:       dt.Map(in.Items, serialiseItem),
 	}
+}
+
+func deserialiseClusterSlug(in string) datagraph.ClusterSlug {
+	return datagraph.ClusterSlug(in)
 }

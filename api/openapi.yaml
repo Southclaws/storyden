@@ -181,7 +181,7 @@ paths:
     post:
       operationId: AdminAccountBanCreate
       description: |
-        Suspend an account - soft delete. This disables the ability for the 
+        Suspend an account - soft delete. This disables the ability for the
         account owner to log in and use the platform. It keeps the account on
         record for linkage to content so UI doesn't break. It does not change
         anything else about the account such as the avatar, name, etc.
@@ -218,7 +218,7 @@ paths:
     get:
       operationId: AuthProviderList
       description: |
-        Retrieve a list of authentication providers. Storyden supports a few 
+        Retrieve a list of authentication providers. Storyden supports a few
         ways to authenticate, from simple passwords to OAuth and WebAuthn. This
         endpoint tells a client which auth capabilities are enabled.
       tags: [auth]
@@ -3092,7 +3092,7 @@ components:
 
     Cluster:
       description: |
-        A cluster is a group of items and other clusters. It serves as an 
+        A cluster is a group of items and other clusters. It serves as an
         abstraction for grouping structured data objects. It can represent
         things such as brands, manufacturers, authors, directors, etc. Clusters
         can be referenced in content posts and they also have their own content.
@@ -3136,6 +3136,7 @@ components:
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
+        parent: { $ref: "#/components/schemas/Cluster" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterList:
@@ -3152,6 +3153,7 @@ components:
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
+        parent: { $ref: "#/components/schemas/ClusterSlug" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterMutableProps:
@@ -3165,6 +3167,7 @@ components:
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
+        parent: { $ref: "#/components/schemas/ClusterSlug" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterItemList:
@@ -3246,7 +3249,7 @@ components:
     ItemList:
       description: |
         A list of items where each item includes all the information about its
-        parent cluster too. For use with APIs that want to provide a list of 
+        parent cluster too. For use with APIs that want to provide a list of
         items that may be part of different clusters.
       type: array
       items: { $ref: "#/components/schemas/ItemWithParents" }

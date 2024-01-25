@@ -8,6 +8,7 @@ import {
 } from "src/api/openapi/schemas";
 
 import { joinDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
+import { last } from "lodash";
 
 export type Props = {
   session: Account;
@@ -32,6 +33,7 @@ export function useClusterCreateScreen(props: Props) {
   };
 
   async function handleCreate(cluster: ClusterInitialProps) {
+    const parentSlug = last(directoryPath as string[]);
     const created = await clusterCreate({
       name: cluster.name,
       slug: cluster.slug,
@@ -39,6 +41,7 @@ export function useClusterCreateScreen(props: Props) {
       description: cluster.description,
       content: cluster.content,
       asset_ids: cluster.asset_ids,
+      parent: parentSlug,
     });
 
     const newPath = joinDirectoryPath(directoryPath, created.slug);
