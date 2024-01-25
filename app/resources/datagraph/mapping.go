@@ -5,6 +5,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -31,13 +32,15 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	assets := dt.Map(c.Edges.Assets, asset.FromModel)
+
 	return &Cluster{
 		ID:          ClusterID(c.ID),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 		Name:        c.Name,
 		Slug:        c.Slug,
-		ImageURL:    opt.NewPtr(c.ImageURL),
+		Assets:      assets,
 		Links:       dt.Map(c.Edges.Links, link.Map),
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
@@ -64,13 +67,15 @@ func ItemFromModel(c *ent.Item) (*Item, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	assets := dt.Map(c.Edges.Assets, asset.FromModel)
+
 	return &Item{
 		ID:          ItemID(c.ID),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 		Name:        c.Name,
 		Slug:        c.Slug,
-		ImageURL:    opt.NewPtr(c.ImageURL),
+		Assets:      assets,
 		Links:       dt.Map(c.Edges.Links, link.Map),
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),

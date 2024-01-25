@@ -1,7 +1,7 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 
 import { Link as LinkSchema } from "src/api/openapi/schemas";
-import { Empty } from "src/components/feed/common/PostRef/Empty";
+import { Empty } from "src/components/site/Empty";
 import { Link } from "src/theme/components/Link";
 
 import {

@@ -30,7 +30,10 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 }
 
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Cluster, error) {
-	query := d.db.Cluster.Query().Where(cluster.ParentClusterIDIsNil()).WithOwner()
+	query := d.db.Cluster.Query().
+		Where(cluster.ParentClusterIDIsNil()).
+		WithOwner().
+		WithAssets()
 
 	f := filters{}
 	for _, fn := range fs {
@@ -78,7 +81,6 @@ select
     c.deleted_at        cluster_deleted_at,
     c.name              cluster_name,
     c.slug              cluster_slug,
-    c.image_url         cluster_image_url,
     c.description       cluster_description,
     c.parent_cluster_id cluster_parent_cluster_id,
     c.account_id        cluster_account_id,
@@ -117,7 +119,6 @@ type subtreeRow struct {
 	ClusterDeletedAt       *time.Time `db:"cluster_deleted_at"`
 	ClusterName            string     `db:"cluster_name"`
 	ClusterSlug            string     `db:"cluster_slug"`
-	ClusterImageUrl        *string    `db:"cluster_image_url"`
 	ClusterDescription     string     `db:"cluster_description"`
 	ClusterParentClusterId xid.ID     `db:"cluster_parent_cluster_id"`
 	ClusterAccountId       xid.ID     `db:"cluster_account_id"`
@@ -139,14 +140,14 @@ func fromRow(r subtreeRow) (*datagraph.Cluster, error) {
 		UpdatedAt:   r.ClusterUpdatedAt,
 		Name:        r.ClusterName,
 		Slug:        r.ClusterSlug,
-		ImageURL:    opt.NewPtr(r.ClusterImageUrl),
 		Description: r.ClusterDescription,
 		Owner: profile.Profile{
-			ID:     account_repo.AccountID(r.OwnerId),
-			Handle: r.OwnerHandle,
-			Name:   r.OwnerName,
-			Bio:    opt.NewPtr(r.OwnerBio).OrZero(),
-			Admin:  r.OwnerAdmin,
+			ID:      account_repo.AccountID(r.OwnerId),
+			Created: r.OwnerCreatedAt,
+			Handle:  r.OwnerHandle,
+			Name:    r.OwnerName,
+			Bio:     opt.NewPtr(r.OwnerBio).OrZero(),
+			Admin:   r.OwnerAdmin,
 		},
 		Properties: r.ClusterProperties,
 	}, nil

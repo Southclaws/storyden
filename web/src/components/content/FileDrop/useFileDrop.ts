@@ -1,8 +1,6 @@
 "use client";
 
 import { DragEvent, useState } from "react";
-import { Transforms } from "slate";
-import { useSlate } from "slate-react";
 
 import { assetUpload } from "src/api/openapi/assets";
 import { Asset } from "src/api/openapi/schemas";
@@ -10,47 +8,51 @@ import { Asset } from "src/api/openapi/schemas";
 import { isSupportedImage } from "./utils";
 
 export type Props = {
+  disabled?: boolean;
   onComplete?: (asset: Asset) => void;
 };
 
-export function useFileDrop(props: Props) {
-  const [dragging, setDragging] = useState(false);
-  const editor = useSlate();
-
-  function onDragStart() {
-    setDragging(true);
-  }
-
-  function onDragEnd(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    setDragging(false);
-  }
-
+export function useFileUpload() {
   async function upload(f: File) {
-    // TODO: Upload progress indicator...
-    const asset = await assetUpload(f);
-
-    props.onComplete?.(asset);
-
-    return asset;
-  }
-
-  async function process(f: File) {
-    const { url } = await upload(f);
-
     if (!isSupportedImage(f.type)) {
       throw new Error("Unsupported image format");
     }
 
-    Transforms.insertNodes(editor, {
-      type: "image",
-      caption: url,
-      link: url,
-      children: [{ text: "" }],
-    });
+    const asset = await assetUpload(f);
+
+    return asset;
+  }
+
+  return {
+    upload,
+  };
+}
+
+export function useFileDrop(props: Props) {
+  const [dragging, setDragging] = useState(false);
+  const { upload } = useFileUpload();
+
+  async function handleUpload(f: File) {
+    const asset = await upload(f);
+    props.onComplete?.(asset);
+  }
+
+  function onDragStart() {
+    if (props.disabled) return;
+
+    setDragging(true);
+  }
+
+  function onDragEnd(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
+    e.preventDefault();
+    setDragging(false);
   }
 
   async function handleEvent(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
     if (e.dataTransfer.items) {
       await Promise.all(
         [...e.dataTransfer.items].map(async (item) => {
@@ -58,16 +60,18 @@ export function useFileDrop(props: Props) {
             const file = item.getAsFile();
             if (file == null) return;
 
-            await process(file);
+            await handleUpload(file);
           }
         }),
       );
     } else {
-      await Promise.all([...e.dataTransfer.files].map(process));
+      await Promise.all([...e.dataTransfer.files].map(handleUpload));
     }
   }
 
   async function onDrop(e: DragEvent<HTMLDivElement>) {
+    if (props.disabled) return;
+
     e.preventDefault();
 
     try {

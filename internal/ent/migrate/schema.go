@@ -109,7 +109,6 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "slug", Type: field.TypeString, Unique: true},
-		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -124,13 +123,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[10]},
+				Columns:    []*schema.Column{ClustersColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[11]},
+				Columns:    []*schema.Column{ClustersColumns[10]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -174,7 +173,6 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "slug", Type: field.TypeString, Unique: true},
-		{Name: "image_url", Type: field.TypeString, Nullable: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
@@ -188,7 +186,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[10]},
+				Columns:    []*schema.Column{ItemsColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

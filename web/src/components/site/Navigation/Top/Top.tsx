@@ -10,7 +10,7 @@ import { useNavigation } from "../useNavigation";
 
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
-import { FrostedGlass } from "@/styled-system/patterns";
+import { Floating } from "@/styled-system/patterns";
 
 type Props = {
   onToggleSidebar: (t: boolean) => void;
@@ -26,7 +26,7 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
 
   return (
     <HStack
-      className={cx(FrostedGlass(), styles["topbar"])}
+      className={cx(Floating(), styles["topbar"])}
       justify="space-between"
       alignItems="center"
       px="4"

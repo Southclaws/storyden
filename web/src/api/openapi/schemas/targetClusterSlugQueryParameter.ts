@@ -7,6 +7,6 @@
  */
 
 /**
- * The URL of an asset uploaded to the platform.
+ * Where to move child clusters and items.
  */
-export type AssetURL = string;
+export type TargetClusterSlugQueryParameter = string;

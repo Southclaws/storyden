@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -28,26 +29,28 @@ type Manager interface {
 	) (*datagraph.Item, error)
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 	Update(ctx context.Context, slug datagraph.ItemSlug, p Partial) (*datagraph.Item, error)
-	Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
+	Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
 }
 
 type Partial struct {
-	Name        opt.Optional[string]
-	Slug        opt.Optional[string]
-	ImageURL    opt.Optional[string]
-	URL         opt.Optional[string]
-	Description opt.Optional[string]
-	Content     opt.Optional[string]
-	Properties  opt.Optional[any]
+	Name         opt.Optional[string]
+	Slug         opt.Optional[string]
+	URL          opt.Optional[string]
+	Description  opt.Optional[string]
+	Content      opt.Optional[string]
+	Properties   opt.Optional[any]
+	AssetsAdd    opt.Optional[[]asset.AssetID]
+	AssetsRemove opt.Optional[[]asset.AssetID]
 }
 
 func (p Partial) Opts() (opts []item.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, item.WithName(value)) })
 	p.Slug.Call(func(value string) { opts = append(opts, item.WithSlug(value)) })
-	p.ImageURL.Call(func(value string) { opts = append(opts, item.WithImageURL(value)) })
 	p.Description.Call(func(value string) { opts = append(opts, item.WithDescription(value)) })
 	p.Content.Call(func(value string) { opts = append(opts, item.WithContent(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, item.WithProperties(value)) })
+	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, item.WithAssets(value)) })
+	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, item.WithAssetsRemoved(value)) })
 	return
 }
 
@@ -124,8 +127,8 @@ func (s *service) Update(ctx context.Context, slug datagraph.ItemSlug, p Partial
 	return itm, nil
 }
 
-func (s *service) Archive(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
-	itm, err := s.cr.Archive(ctx, slug)
+func (s *service) Delete(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error) {
+	itm, err := s.cr.Delete(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

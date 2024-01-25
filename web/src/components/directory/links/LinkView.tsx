@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function LinkView({ link }: Props) {
-  const mainImage = link.assets[0]?.url;
+  const mainImage = link.assets?.[0]?.url;
   const images = mainImage ? link.assets.slice(1).map((v) => v.url) : undefined;
 
   const domainSearch = `/l?q=${link.domain}`;

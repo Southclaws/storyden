@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/cluster"
+	"github.com/Southclaws/storyden/app/resources/cluster_children"
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/item"
@@ -43,6 +44,7 @@ func Build() fx.Option {
 			collection.New,
 			cluster.New,
 			cluster_traversal.New,
+			cluster_children.New,
 			item.New,
 			item_search.New,
 			link.New,

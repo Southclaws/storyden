@@ -25,10 +25,11 @@ export function Card(props: PropsWithChildren<CardProps>) {
   return (
     <styled.li
       p="4"
+      w="full"
       borderRadius="2xl"
       bgColor={complete ? "green.200" : "gray.100"}
     >
-      <HStack gap="1">
+      <HStack w="full" gap="1">
         <Box>
           <Circle
             id="list-icon-circle"
@@ -45,7 +46,7 @@ export function Card(props: PropsWithChildren<CardProps>) {
           </Circle>
         </Box>
 
-        <Box>
+        <Box w="full">
           <HStack justify="space-between">
             <Heading1 size="md">{props.title}</Heading1>
 

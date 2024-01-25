@@ -3,10 +3,10 @@ import { css } from '../css/index.mjs';
 
 const CardConfig = {
 transform(props) {
-  const { kind } = props;
+  const { kind, display } = props;
   const padding = kind === "edge" ? "0" : "2";
   return {
-    display: "flex",
+    display,
     flexDirection: "column",
     gap: "1",
     width: "full",

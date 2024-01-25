@@ -28,7 +28,7 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 /**
- * Suspend an account - soft delete. This disables the ability for the 
+ * Suspend an account - soft delete. This disables the ability for the
 account owner to log in and use the platform. It keeps the account on
 record for linkage to content so UI doesn't break. It does not change
 anything else about the account such as the avatar, name, etc.

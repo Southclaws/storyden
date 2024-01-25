@@ -17,6 +17,7 @@
   --grid-padding-inner: var(--spacing-3);
   --grid-padding-inner-right: 0px;
   --navgrid-right-bar-display: none;
+  min-height: 100dvh;
 }
 
 /* Mobile */
@@ -52,6 +53,7 @@
 
 .main {
   grid-area: main;
+  height: 100%;
 }
 
 .topbar {

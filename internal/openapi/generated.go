@@ -264,11 +264,11 @@ type Asset struct {
 // AssetID A unique identifier for this resource.
 type AssetID = Identifier
 
+// AssetIDs defines model for AssetIDs.
+type AssetIDs = []AssetID
+
 // AssetList defines model for AssetList.
 type AssetList = []Asset
-
-// AssetURL The URL of an asset uploaded to the platform.
-type AssetURL = string
 
 // AttestationConveyancePreference https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
 type AttestationConveyancePreference string
@@ -477,6 +477,8 @@ type CategorySlugList = []CategorySlug
 
 // Cluster defines model for Cluster.
 type Cluster struct {
+	Assets AssetList `json:"assets"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
@@ -493,9 +495,6 @@ type Cluster struct {
 	// Id A unique identifier for this resource.
 	Id Identifier `json:"id"`
 
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
-
 	// Link A web address with content information such as title, description, etc.
 	Link *Link `json:"link,omitempty"`
 
@@ -505,6 +504,12 @@ type Cluster struct {
 
 	// Owner A minimal reference to an account.
 	Owner ProfileReference `json:"owner"`
+
+	// Parent A cluster is a group of items and other clusters. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Clusters
+	// can be referenced in content posts and they also have their own content.
+	Parent *Cluster `json:"parent,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -526,6 +531,8 @@ type Cluster struct {
 
 // ClusterCommonProps The main properties of a cluster.
 type ClusterCommonProps struct {
+	Assets AssetList `json:"assets"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
@@ -533,15 +540,18 @@ type ClusterCommonProps struct {
 	Content     *PostContent       `json:"content,omitempty"`
 	Description ClusterDescription `json:"description"`
 
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
-
 	// Link A web address with content information such as title, description, etc.
 	Link *Link       `json:"link,omitempty"`
 	Name ClusterName `json:"name"`
 
 	// Owner A minimal reference to an account.
 	Owner ProfileReference `json:"owner"`
+
+	// Parent A cluster is a group of items and other clusters. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Clusters
+	// can be referenced in content posts and they also have their own content.
+	Parent *Cluster `json:"parent,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -563,16 +573,18 @@ type ClusterDescription = string
 
 // ClusterInitialProps defines model for ClusterInitialProps.
 type ClusterInitialProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
 	// more complex types such as Slate.js editor documents.
 	Content     *PostContent       `json:"content,omitempty"`
 	Description ClusterDescription `json:"description"`
+	Name        ClusterName        `json:"name"`
 
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL   `json:"image_url,omitempty"`
-	Name     ClusterName `json:"name"`
+	// Parent A URL-safe slug for uniquely identifying resources.
+	Parent *ClusterSlug `json:"parent,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -613,16 +625,18 @@ type ClusterList = []Cluster
 
 // ClusterMutableProps Note: Properties are replace-all and are not merged with existing.
 type ClusterMutableProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
 	// more complex types such as Slate.js editor documents.
 	Content     *PostContent        `json:"content,omitempty"`
 	Description *ClusterDescription `json:"description,omitempty"`
+	Name        *ClusterName        `json:"name,omitempty"`
 
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL    `json:"image_url,omitempty"`
-	Name     *ClusterName `json:"name,omitempty"`
+	// Parent A URL-safe slug for uniquely identifying resources.
+	Parent *ClusterSlug `json:"parent,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -650,6 +664,7 @@ type ClusterSlug = Slug
 
 // ClusterWithItems defines model for ClusterWithItems.
 type ClusterWithItems struct {
+	Assets   AssetList   `json:"assets"`
 	Clusters ClusterList `json:"clusters"`
 
 	// Content The body text of a post within a thread. The type is either a string or
@@ -668,9 +683,6 @@ type ClusterWithItems struct {
 	// Id A unique identifier for this resource.
 	Id Identifier `json:"id"`
 
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
-
 	// Items A list of items within the context of belonging to a cluster. Different
 	// from an ItemList because we do not need to include the parent cluster
 	// information inside each item since it's already available.
@@ -685,6 +697,12 @@ type ClusterWithItems struct {
 
 	// Owner A minimal reference to an account.
 	Owner ProfileReference `json:"owner"`
+
+	// Parent A cluster is a group of items and other clusters. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Clusters
+	// can be referenced in content posts and they also have their own content.
+	Parent *Cluster `json:"parent,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -908,6 +926,8 @@ type Info struct {
 
 // Item defines model for Item.
 type Item struct {
+	Assets AssetList `json:"assets"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
@@ -923,9 +943,6 @@ type Item struct {
 
 	// Id A unique identifier for this resource.
 	Id Identifier `json:"id"`
-
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
 
 	// Link A web address with content information such as title, description, etc.
 	Link *Link `json:"link,omitempty"`
@@ -957,15 +974,14 @@ type Item struct {
 
 // ItemCommonProps The main properties for an item.
 type ItemCommonProps struct {
+	Assets AssetList `json:"assets"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
 	// more complex types such as Slate.js editor documents.
 	Content     *PostContent    `json:"content,omitempty"`
 	Description ItemDescription `json:"description"`
-
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
 
 	// Link A web address with content information such as title, description, etc.
 	Link *Link    `json:"link,omitempty"`
@@ -994,16 +1010,15 @@ type ItemDescription = string
 
 // ItemInitialProps defines model for ItemInitialProps.
 type ItemInitialProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
 	// more complex types such as Slate.js editor documents.
 	Content     *PostContent    `json:"content,omitempty"`
 	Description ItemDescription `json:"description"`
-
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
-	Name     ItemName  `json:"name"`
+	Name        ItemName        `json:"name"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -1030,16 +1045,15 @@ type ItemList = []ItemWithParents
 
 // ItemMutableProps Note: Properties are replace-all and are not merged with existing.
 type ItemMutableProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
 	// Content The body text of a post within a thread. The type is either a string or
 	// an object, depending on what was used during creation. Strings can be
 	// used for basic plain text or markdown content and objects are used for
 	// more complex types such as Slate.js editor documents.
 	Content     *PostContent     `json:"content,omitempty"`
 	Description *ItemDescription `json:"description,omitempty"`
-
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
-	Name     *ItemName `json:"name,omitempty"`
+	Name        *ItemName        `json:"name,omitempty"`
 
 	// Properties Arbitrary JSON object that can express any additional data for a
 	// resource object. This is intended for client implementations to use for
@@ -1067,6 +1081,7 @@ type ItemSlug = Slug
 
 // ItemWithParents defines model for ItemWithParents.
 type ItemWithParents struct {
+	Assets   AssetList   `json:"assets"`
 	Clusters ClusterList `json:"clusters"`
 
 	// Content The body text of a post within a thread. The type is either a string or
@@ -1084,9 +1099,6 @@ type ItemWithParents struct {
 
 	// Id A unique identifier for this resource.
 	Id Identifier `json:"id"`
-
-	// ImageUrl The URL of an asset uploaded to the platform.
-	ImageUrl *AssetURL `json:"image_url,omitempty"`
 
 	// Link A web address with content information such as title, description, etc.
 	Link *Link `json:"link,omitempty"`
@@ -1779,6 +1791,12 @@ type ItemSlugParam = Identifier
 // LinkSlugParam defines model for LinkSlugParam.
 type LinkSlugParam = string
 
+// MoveChildClustersQuery defines model for MoveChildClustersQuery.
+type MoveChildClustersQuery = bool
+
+// MoveChildItemsQuery defines model for MoveChildItemsQuery.
+type MoveChildItemsQuery = bool
+
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
 
@@ -1790,6 +1808,9 @@ type PostIDParam = Identifier
 
 // SearchQuery defines model for SearchQuery.
 type SearchQuery = string
+
+// TargetClusterSlugQuery defines model for TargetClusterSlugQuery.
+type TargetClusterSlugQuery = string
 
 // ThreadMarkParam A thread's ID and optional slug separated by a dash = it's unique mark.
 // This allows endpoints to respond to varying forms of a thread's ID.
@@ -1839,17 +1860,25 @@ type CategoryUpdateOK = Category
 // can be referenced in content posts and they also have their own content.
 type ClusterAddChildOK = Cluster
 
-// ClusterAddItemOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterAddItemOK = Cluster
+// ClusterAddItemOK The full properties of a cluster including all items and maybe child
+// clusters (depending on what the endpoint is configured or queried to do)
+// for rendering a single cluster on a view.
+type ClusterAddItemOK = ClusterWithItems
 
 // ClusterCreateOK A cluster is a group of items and other clusters. It serves as an
 // abstraction for grouping structured data objects. It can represent
 // things such as brands, manufacturers, authors, directors, etc. Clusters
 // can be referenced in content posts and they also have their own content.
 type ClusterCreateOK = Cluster
+
+// ClusterDeleteOK defines model for ClusterDeleteOK.
+type ClusterDeleteOK struct {
+	// Destination A cluster is a group of items and other clusters. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Clusters
+	// can be referenced in content posts and they also have their own content.
+	Destination *Cluster `json:"destination,omitempty"`
+}
 
 // ClusterGetOK The full properties of a cluster including all items and maybe child
 // clusters (depending on what the endpoint is configured or queried to do)
@@ -1867,11 +1896,10 @@ type ClusterListOK struct {
 // can be referenced in content posts and they also have their own content.
 type ClusterRemoveChildOK = Cluster
 
-// ClusterRemoveItemOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterRemoveItemOK = Cluster
+// ClusterRemoveItemOK The full properties of a cluster including all items and maybe child
+// clusters (depending on what the endpoint is configured or queried to do)
+// for rendering a single cluster on a view.
+type ClusterRemoveItemOK = ClusterWithItems
 
 // ClusterUpdateOK A cluster is a group of items and other clusters. It serves as an
 // abstraction for grouping structured data objects. It can represent
@@ -2097,6 +2125,18 @@ type ClusterListParams struct {
 
 	// Author Show only results owned by this account.
 	Author *AccountHandle `form:"author,omitempty" json:"author,omitempty"`
+}
+
+// ClusterDeleteParams defines parameters for ClusterDelete.
+type ClusterDeleteParams struct {
+	// TargetCluster Where to move child clusters and items.
+	TargetCluster *TargetClusterSlugQuery `form:"target_cluster,omitempty" json:"target_cluster,omitempty"`
+
+	// MoveChildClusters Whether or not to move child clusters.
+	MoveChildClusters *MoveChildClustersQuery `form:"move_child_clusters,omitempty" json:"move_child_clusters,omitempty"`
+
+	// MoveChildItems Whether or not to move child items.
+	MoveChildItems *MoveChildItemsQuery `form:"move_child_items,omitempty" json:"move_child_items,omitempty"`
 }
 
 // DatagraphSearchParams defines parameters for DatagraphSearch.
@@ -2439,6 +2479,9 @@ type ClientInterface interface {
 
 	ClusterCreate(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ClusterDelete request
+	ClusterDelete(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ClusterGet request
 	ClusterGet(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2446,6 +2489,12 @@ type ClientInterface interface {
 	ClusterUpdateWithBody(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ClusterUpdate(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ClusterRemoveAsset request
+	ClusterRemoveAsset(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ClusterAddAsset request
+	ClusterAddAsset(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ClusterRemoveCluster request
 	ClusterRemoveCluster(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -2501,6 +2550,9 @@ type ClientInterface interface {
 
 	ItemCreate(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ItemDelete request
+	ItemDelete(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ItemGet request
 	ItemGet(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2508,6 +2560,12 @@ type ClientInterface interface {
 	ItemUpdateWithBody(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ItemUpdate(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ItemRemoveAsset request
+	ItemRemoveAsset(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ItemAddAsset request
+	ItemAddAsset(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkList request
 	LinkList(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3122,6 +3180,18 @@ func (c *Client) ClusterCreate(ctx context.Context, body ClusterCreateJSONReques
 	return c.Client.Do(req)
 }
 
+func (c *Client) ClusterDelete(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewClusterDeleteRequest(c.Server, clusterSlug, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ClusterGet(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewClusterGetRequest(c.Server, clusterSlug)
 	if err != nil {
@@ -3148,6 +3218,30 @@ func (c *Client) ClusterUpdateWithBody(ctx context.Context, clusterSlug ClusterS
 
 func (c *Client) ClusterUpdate(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewClusterUpdateRequest(c.Server, clusterSlug, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ClusterRemoveAsset(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewClusterRemoveAssetRequest(c.Server, clusterSlug, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ClusterAddAsset(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewClusterAddAssetRequest(c.Server, clusterSlug, id)
 	if err != nil {
 		return nil, err
 	}
@@ -3386,6 +3480,18 @@ func (c *Client) ItemCreate(ctx context.Context, body ItemCreateJSONRequestBody,
 	return c.Client.Do(req)
 }
 
+func (c *Client) ItemDelete(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewItemDeleteRequest(c.Server, itemSlug)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ItemGet(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewItemGetRequest(c.Server, itemSlug)
 	if err != nil {
@@ -3412,6 +3518,30 @@ func (c *Client) ItemUpdateWithBody(ctx context.Context, itemSlug ItemSlugParam,
 
 func (c *Client) ItemUpdate(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewItemUpdateRequest(c.Server, itemSlug, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ItemRemoveAsset(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewItemRemoveAssetRequest(c.Server, itemSlug, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ItemAddAsset(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewItemAddAssetRequest(c.Server, itemSlug, id)
 	if err != nil {
 		return nil, err
 	}
@@ -4856,6 +4986,94 @@ func NewClusterCreateRequestWithBody(server string, contentType string, body io.
 	return req, nil
 }
 
+// NewClusterDeleteRequest generates requests for ClusterDelete
+func NewClusterDeleteRequest(server string, clusterSlug ClusterSlugParam, params *ClusterDeleteParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/clusters/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.TargetCluster != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "target_cluster", runtime.ParamLocationQuery, *params.TargetCluster); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.MoveChildClusters != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "move_child_clusters", runtime.ParamLocationQuery, *params.MoveChildClusters); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.MoveChildItems != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "move_child_items", runtime.ParamLocationQuery, *params.MoveChildItems); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewClusterGetRequest generates requests for ClusterGet
 func NewClusterGetRequest(server string, clusterSlug ClusterSlugParam) (*http.Request, error) {
 	var err error
@@ -4933,6 +5151,88 @@ func NewClusterUpdateRequestWithBody(server string, clusterSlug ClusterSlugParam
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewClusterRemoveAssetRequest generates requests for ClusterRemoveAsset
+func NewClusterRemoveAssetRequest(server string, clusterSlug ClusterSlugParam, id AssetPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/clusters/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewClusterAddAssetRequest generates requests for ClusterAddAsset
+func NewClusterAddAssetRequest(server string, clusterSlug ClusterSlugParam, id AssetPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/clusters/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -5588,6 +5888,40 @@ func NewItemCreateRequestWithBody(server string, contentType string, body io.Rea
 	return req, nil
 }
 
+// NewItemDeleteRequest generates requests for ItemDelete
+func NewItemDeleteRequest(server string, itemSlug ItemSlugParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/items/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewItemGetRequest generates requests for ItemGet
 func NewItemGetRequest(server string, itemSlug ItemSlugParam) (*http.Request, error) {
 	var err error
@@ -5665,6 +5999,88 @@ func NewItemUpdateRequestWithBody(server string, itemSlug ItemSlugParam, content
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewItemRemoveAssetRequest generates requests for ItemRemoveAsset
+func NewItemRemoveAssetRequest(server string, itemSlug ItemSlugParam, id AssetPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/items/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewItemAddAssetRequest generates requests for ItemAddAsset
+func NewItemAddAssetRequest(server string, itemSlug ItemSlugParam, id AssetPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/items/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -6592,6 +7008,9 @@ type ClientWithResponsesInterface interface {
 
 	ClusterCreateWithResponse(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterCreateResponse, error)
 
+	// ClusterDeleteWithResponse request
+	ClusterDeleteWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*ClusterDeleteResponse, error)
+
 	// ClusterGetWithResponse request
 	ClusterGetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*ClusterGetResponse, error)
 
@@ -6599,6 +7018,12 @@ type ClientWithResponsesInterface interface {
 	ClusterUpdateWithBodyWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error)
 
 	ClusterUpdateWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error)
+
+	// ClusterRemoveAssetWithResponse request
+	ClusterRemoveAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ClusterRemoveAssetResponse, error)
+
+	// ClusterAddAssetWithResponse request
+	ClusterAddAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ClusterAddAssetResponse, error)
 
 	// ClusterRemoveClusterWithResponse request
 	ClusterRemoveClusterWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*ClusterRemoveClusterResponse, error)
@@ -6654,6 +7079,9 @@ type ClientWithResponsesInterface interface {
 
 	ItemCreateWithResponse(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemCreateResponse, error)
 
+	// ItemDeleteWithResponse request
+	ItemDeleteWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemDeleteResponse, error)
+
 	// ItemGetWithResponse request
 	ItemGetWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemGetResponse, error)
 
@@ -6661,6 +7089,12 @@ type ClientWithResponsesInterface interface {
 	ItemUpdateWithBodyWithResponse(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error)
 
 	ItemUpdateWithResponse(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error)
+
+	// ItemRemoveAssetWithResponse request
+	ItemRemoveAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ItemRemoveAssetResponse, error)
+
+	// ItemAddAssetWithResponse request
+	ItemAddAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ItemAddAssetResponse, error)
 
 	// LinkListWithResponse request
 	LinkListWithResponse(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*LinkListResponse, error)
@@ -7430,6 +7864,29 @@ func (r ClusterCreateResponse) StatusCode() int {
 	return 0
 }
 
+type ClusterDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ClusterDeleteOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ClusterDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ClusterDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ClusterGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7470,6 +7927,52 @@ func (r ClusterUpdateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ClusterUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ClusterRemoveAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ClusterUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ClusterRemoveAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ClusterRemoveAssetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ClusterAddAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ClusterUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ClusterAddAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ClusterAddAssetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -7842,6 +8345,28 @@ func (r ItemCreateResponse) StatusCode() int {
 	return 0
 }
 
+type ItemDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ItemDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ItemDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ItemGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7882,6 +8407,52 @@ func (r ItemUpdateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ItemUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ItemRemoveAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ItemUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ItemRemoveAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ItemRemoveAssetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ItemAddAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ItemUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r ItemAddAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ItemAddAssetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -8651,6 +9222,15 @@ func (c *ClientWithResponses) ClusterCreateWithResponse(ctx context.Context, bod
 	return ParseClusterCreateResponse(rsp)
 }
 
+// ClusterDeleteWithResponse request returning *ClusterDeleteResponse
+func (c *ClientWithResponses) ClusterDeleteWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*ClusterDeleteResponse, error) {
+	rsp, err := c.ClusterDelete(ctx, clusterSlug, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseClusterDeleteResponse(rsp)
+}
+
 // ClusterGetWithResponse request returning *ClusterGetResponse
 func (c *ClientWithResponses) ClusterGetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*ClusterGetResponse, error) {
 	rsp, err := c.ClusterGet(ctx, clusterSlug, reqEditors...)
@@ -8675,6 +9255,24 @@ func (c *ClientWithResponses) ClusterUpdateWithResponse(ctx context.Context, clu
 		return nil, err
 	}
 	return ParseClusterUpdateResponse(rsp)
+}
+
+// ClusterRemoveAssetWithResponse request returning *ClusterRemoveAssetResponse
+func (c *ClientWithResponses) ClusterRemoveAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ClusterRemoveAssetResponse, error) {
+	rsp, err := c.ClusterRemoveAsset(ctx, clusterSlug, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseClusterRemoveAssetResponse(rsp)
+}
+
+// ClusterAddAssetWithResponse request returning *ClusterAddAssetResponse
+func (c *ClientWithResponses) ClusterAddAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ClusterAddAssetResponse, error) {
+	rsp, err := c.ClusterAddAsset(ctx, clusterSlug, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseClusterAddAssetResponse(rsp)
 }
 
 // ClusterRemoveClusterWithResponse request returning *ClusterRemoveClusterResponse
@@ -8845,6 +9443,15 @@ func (c *ClientWithResponses) ItemCreateWithResponse(ctx context.Context, body I
 	return ParseItemCreateResponse(rsp)
 }
 
+// ItemDeleteWithResponse request returning *ItemDeleteResponse
+func (c *ClientWithResponses) ItemDeleteWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemDeleteResponse, error) {
+	rsp, err := c.ItemDelete(ctx, itemSlug, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseItemDeleteResponse(rsp)
+}
+
 // ItemGetWithResponse request returning *ItemGetResponse
 func (c *ClientWithResponses) ItemGetWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemGetResponse, error) {
 	rsp, err := c.ItemGet(ctx, itemSlug, reqEditors...)
@@ -8869,6 +9476,24 @@ func (c *ClientWithResponses) ItemUpdateWithResponse(ctx context.Context, itemSl
 		return nil, err
 	}
 	return ParseItemUpdateResponse(rsp)
+}
+
+// ItemRemoveAssetWithResponse request returning *ItemRemoveAssetResponse
+func (c *ClientWithResponses) ItemRemoveAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ItemRemoveAssetResponse, error) {
+	rsp, err := c.ItemRemoveAsset(ctx, itemSlug, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseItemRemoveAssetResponse(rsp)
+}
+
+// ItemAddAssetWithResponse request returning *ItemAddAssetResponse
+func (c *ClientWithResponses) ItemAddAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, id AssetPath, reqEditors ...RequestEditorFn) (*ItemAddAssetResponse, error) {
+	rsp, err := c.ItemAddAsset(ctx, itemSlug, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseItemAddAssetResponse(rsp)
 }
 
 // LinkListWithResponse request returning *LinkListResponse
@@ -10041,6 +10666,39 @@ func ParseClusterCreateResponse(rsp *http.Response) (*ClusterCreateResponse, err
 	return response, nil
 }
 
+// ParseClusterDeleteResponse parses an HTTP response from a ClusterDeleteWithResponse call
+func ParseClusterDeleteResponse(rsp *http.Response) (*ClusterDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ClusterDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ClusterDeleteOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseClusterGetResponse parses an HTTP response from a ClusterGetWithResponse call
 func ParseClusterGetResponse(rsp *http.Response) (*ClusterGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10083,6 +10741,72 @@ func ParseClusterUpdateResponse(rsp *http.Response) (*ClusterUpdateResponse, err
 	}
 
 	response := &ClusterUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ClusterUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseClusterRemoveAssetResponse parses an HTTP response from a ClusterRemoveAssetWithResponse call
+func ParseClusterRemoveAssetResponse(rsp *http.Response) (*ClusterRemoveAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ClusterRemoveAssetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ClusterUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseClusterAddAssetResponse parses an HTTP response from a ClusterAddAssetWithResponse call
+func ParseClusterAddAssetResponse(rsp *http.Response) (*ClusterAddAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ClusterAddAssetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -10621,6 +11345,32 @@ func ParseItemCreateResponse(rsp *http.Response) (*ItemCreateResponse, error) {
 	return response, nil
 }
 
+// ParseItemDeleteResponse parses an HTTP response from a ItemDeleteWithResponse call
+func ParseItemDeleteResponse(rsp *http.Response) (*ItemDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ItemDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseItemGetResponse parses an HTTP response from a ItemGetWithResponse call
 func ParseItemGetResponse(rsp *http.Response) (*ItemGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10663,6 +11413,72 @@ func ParseItemUpdateResponse(rsp *http.Response) (*ItemUpdateResponse, error) {
 	}
 
 	response := &ItemUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ItemUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseItemRemoveAssetResponse parses an HTTP response from a ItemRemoveAssetWithResponse call
+func ParseItemRemoveAssetResponse(rsp *http.Response) (*ItemRemoveAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ItemRemoveAssetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ItemUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseItemAddAssetResponse parses an HTTP response from a ItemAddAssetWithResponse call
+func ParseItemAddAssetResponse(rsp *http.Response) (*ItemAddAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ItemAddAssetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -11280,11 +12096,20 @@ type ServerInterface interface {
 	// (POST /v1/clusters)
 	ClusterCreate(ctx echo.Context) error
 
+	// (DELETE /v1/clusters/{cluster_slug})
+	ClusterDelete(ctx echo.Context, clusterSlug ClusterSlugParam, params ClusterDeleteParams) error
+
 	// (GET /v1/clusters/{cluster_slug})
 	ClusterGet(ctx echo.Context, clusterSlug ClusterSlugParam) error
 
 	// (PATCH /v1/clusters/{cluster_slug})
 	ClusterUpdate(ctx echo.Context, clusterSlug ClusterSlugParam) error
+
+	// (DELETE /v1/clusters/{cluster_slug}/assets/{id})
+	ClusterRemoveAsset(ctx echo.Context, clusterSlug ClusterSlugParam, id AssetPath) error
+
+	// (PUT /v1/clusters/{cluster_slug}/assets/{id})
+	ClusterAddAsset(ctx echo.Context, clusterSlug ClusterSlugParam, id AssetPath) error
 
 	// (DELETE /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
 	ClusterRemoveCluster(ctx echo.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) error
@@ -11334,11 +12159,20 @@ type ServerInterface interface {
 	// (POST /v1/items)
 	ItemCreate(ctx echo.Context) error
 
+	// (DELETE /v1/items/{item_slug})
+	ItemDelete(ctx echo.Context, itemSlug ItemSlugParam) error
+
 	// (GET /v1/items/{item_slug})
 	ItemGet(ctx echo.Context, itemSlug ItemSlugParam) error
 
 	// (PATCH /v1/items/{item_slug})
 	ItemUpdate(ctx echo.Context, itemSlug ItemSlugParam) error
+
+	// (DELETE /v1/items/{item_slug}/assets/{id})
+	ItemRemoveAsset(ctx echo.Context, itemSlug ItemSlugParam, id AssetPath) error
+
+	// (PUT /v1/items/{item_slug}/assets/{id})
+	ItemAddAsset(ctx echo.Context, itemSlug ItemSlugParam, id AssetPath) error
 
 	// (GET /v1/links)
 	LinkList(ctx echo.Context, params LinkListParams) error
@@ -11833,6 +12667,47 @@ func (w *ServerInterfaceWrapper) ClusterCreate(ctx echo.Context) error {
 	return err
 }
 
+// ClusterDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) ClusterDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "cluster_slug" -------------
+	var clusterSlug ClusterSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, ctx.Param("cluster_slug"), &clusterSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ClusterDeleteParams
+	// ------------- Optional query parameter "target_cluster" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "target_cluster", ctx.QueryParams(), &params.TargetCluster)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter target_cluster: %s", err))
+	}
+
+	// ------------- Optional query parameter "move_child_clusters" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "move_child_clusters", ctx.QueryParams(), &params.MoveChildClusters)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter move_child_clusters: %s", err))
+	}
+
+	// ------------- Optional query parameter "move_child_items" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "move_child_items", ctx.QueryParams(), &params.MoveChildItems)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter move_child_items: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ClusterDelete(ctx, clusterSlug, params)
+	return err
+}
+
 // ClusterGet converts echo context to params.
 func (w *ServerInterfaceWrapper) ClusterGet(ctx echo.Context) error {
 	var err error
@@ -11864,6 +12739,58 @@ func (w *ServerInterfaceWrapper) ClusterUpdate(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ClusterUpdate(ctx, clusterSlug)
+	return err
+}
+
+// ClusterRemoveAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) ClusterRemoveAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "cluster_slug" -------------
+	var clusterSlug ClusterSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, ctx.Param("cluster_slug"), &clusterSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id AssetPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ClusterRemoveAsset(ctx, clusterSlug, id)
+	return err
+}
+
+// ClusterAddAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) ClusterAddAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "cluster_slug" -------------
+	var clusterSlug ClusterSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, ctx.Param("cluster_slug"), &clusterSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id AssetPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ClusterAddAsset(ctx, clusterSlug, id)
 	return err
 }
 
@@ -12191,6 +13118,24 @@ func (w *ServerInterfaceWrapper) ItemCreate(ctx echo.Context) error {
 	return err
 }
 
+// ItemDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) ItemDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "item_slug" -------------
+	var itemSlug ItemSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, ctx.Param("item_slug"), &itemSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ItemDelete(ctx, itemSlug)
+	return err
+}
+
 // ItemGet converts echo context to params.
 func (w *ServerInterfaceWrapper) ItemGet(ctx echo.Context) error {
 	var err error
@@ -12222,6 +13167,58 @@ func (w *ServerInterfaceWrapper) ItemUpdate(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ItemUpdate(ctx, itemSlug)
+	return err
+}
+
+// ItemRemoveAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) ItemRemoveAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "item_slug" -------------
+	var itemSlug ItemSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, ctx.Param("item_slug"), &itemSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id AssetPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ItemRemoveAsset(ctx, itemSlug, id)
+	return err
+}
+
+// ItemAddAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) ItemAddAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "item_slug" -------------
+	var itemSlug ItemSlugParam
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, ctx.Param("item_slug"), &itemSlug)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
+	}
+
+	// ------------- Path parameter "id" -------------
+	var id AssetPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ItemAddAsset(ctx, itemSlug, id)
 	return err
 }
 
@@ -12585,8 +13582,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PATCH(baseURL+"/v1/categories/:category_id", wrapper.CategoryUpdate)
 	router.GET(baseURL+"/v1/clusters", wrapper.ClusterList)
 	router.POST(baseURL+"/v1/clusters", wrapper.ClusterCreate)
+	router.DELETE(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterDelete)
 	router.GET(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterGet)
 	router.PATCH(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterUpdate)
+	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/assets/:id", wrapper.ClusterRemoveAsset)
+	router.PUT(baseURL+"/v1/clusters/:cluster_slug/assets/:id", wrapper.ClusterAddAsset)
 	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/clusters/:cluster_slug_child", wrapper.ClusterRemoveCluster)
 	router.PUT(baseURL+"/v1/clusters/:cluster_slug/clusters/:cluster_slug_child", wrapper.ClusterAddCluster)
 	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/items/:item_slug", wrapper.ClusterRemoveItem)
@@ -12603,8 +13603,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/info/icon/:icon_size", wrapper.IconGet)
 	router.GET(baseURL+"/v1/items", wrapper.ItemList)
 	router.POST(baseURL+"/v1/items", wrapper.ItemCreate)
+	router.DELETE(baseURL+"/v1/items/:item_slug", wrapper.ItemDelete)
 	router.GET(baseURL+"/v1/items/:item_slug", wrapper.ItemGet)
 	router.PATCH(baseURL+"/v1/items/:item_slug", wrapper.ItemUpdate)
+	router.DELETE(baseURL+"/v1/items/:item_slug/assets/:id", wrapper.ItemRemoveAsset)
+	router.PUT(baseURL+"/v1/items/:item_slug/assets/:id", wrapper.ItemAddAsset)
 	router.GET(baseURL+"/v1/links", wrapper.LinkList)
 	router.POST(baseURL+"/v1/links", wrapper.LinkCreate)
 	router.GET(baseURL+"/v1/links/:link_slug", wrapper.LinkGet)
@@ -12671,9 +13674,17 @@ type CategoryUpdateOKJSONResponse Category
 
 type ClusterAddChildOKJSONResponse Cluster
 
-type ClusterAddItemOKJSONResponse Cluster
+type ClusterAddItemOKJSONResponse ClusterWithItems
 
 type ClusterCreateOKJSONResponse Cluster
+
+type ClusterDeleteOKJSONResponse struct {
+	// Destination A cluster is a group of items and other clusters. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Clusters
+	// can be referenced in content posts and they also have their own content.
+	Destination *Cluster `json:"destination,omitempty"`
+}
 
 type ClusterGetOKJSONResponse ClusterWithItems
 
@@ -12683,7 +13694,7 @@ type ClusterListOKJSONResponse struct {
 
 type ClusterRemoveChildOKJSONResponse Cluster
 
-type ClusterRemoveItemOKJSONResponse Cluster
+type ClusterRemoveItemOKJSONResponse ClusterWithItems
 
 type ClusterUpdateOKJSONResponse Cluster
 
@@ -14008,6 +15019,50 @@ func (response ClusterCreatedefaultJSONResponse) VisitClusterCreateResponse(w ht
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type ClusterDeleteRequestObject struct {
+	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
+	Params      ClusterDeleteParams
+}
+
+type ClusterDeleteResponseObject interface {
+	VisitClusterDeleteResponse(w http.ResponseWriter) error
+}
+
+type ClusterDelete200JSONResponse struct{ ClusterDeleteOKJSONResponse }
+
+func (response ClusterDelete200JSONResponse) VisitClusterDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterDelete401Response = UnauthorisedResponse
+
+func (response ClusterDelete401Response) VisitClusterDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ClusterDelete404Response = NotFoundResponse
+
+func (response ClusterDelete404Response) VisitClusterDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ClusterDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ClusterDeletedefaultJSONResponse) VisitClusterDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type ClusterGetRequestObject struct {
 	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
 }
@@ -14089,6 +15144,94 @@ type ClusterUpdatedefaultJSONResponse struct {
 }
 
 func (response ClusterUpdatedefaultJSONResponse) VisitClusterUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type ClusterRemoveAssetRequestObject struct {
+	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
+	Id          AssetPath        `json:"id"`
+}
+
+type ClusterRemoveAssetResponseObject interface {
+	VisitClusterRemoveAssetResponse(w http.ResponseWriter) error
+}
+
+type ClusterRemoveAsset200JSONResponse struct{ ClusterUpdateOKJSONResponse }
+
+func (response ClusterRemoveAsset200JSONResponse) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterRemoveAsset401Response = UnauthorisedResponse
+
+func (response ClusterRemoveAsset401Response) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ClusterRemoveAsset404Response = NotFoundResponse
+
+func (response ClusterRemoveAsset404Response) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ClusterRemoveAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ClusterRemoveAssetdefaultJSONResponse) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type ClusterAddAssetRequestObject struct {
+	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
+	Id          AssetPath        `json:"id"`
+}
+
+type ClusterAddAssetResponseObject interface {
+	VisitClusterAddAssetResponse(w http.ResponseWriter) error
+}
+
+type ClusterAddAsset200JSONResponse struct{ ClusterUpdateOKJSONResponse }
+
+func (response ClusterAddAsset200JSONResponse) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterAddAsset401Response = UnauthorisedResponse
+
+func (response ClusterAddAsset401Response) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ClusterAddAsset404Response = NotFoundResponse
+
+func (response ClusterAddAsset404Response) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ClusterAddAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ClusterAddAssetdefaultJSONResponse) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -14740,6 +15883,48 @@ func (response ItemCreatedefaultJSONResponse) VisitItemCreateResponse(w http.Res
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type ItemDeleteRequestObject struct {
+	ItemSlug ItemSlugParam `json:"item_slug"`
+}
+
+type ItemDeleteResponseObject interface {
+	VisitItemDeleteResponse(w http.ResponseWriter) error
+}
+
+type ItemDelete200Response struct {
+}
+
+func (response ItemDelete200Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type ItemDelete401Response = UnauthorisedResponse
+
+func (response ItemDelete401Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ItemDelete404Response = NotFoundResponse
+
+func (response ItemDelete404Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ItemDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ItemDeletedefaultJSONResponse) VisitItemDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type ItemGetRequestObject struct {
 	ItemSlug ItemSlugParam `json:"item_slug"`
 }
@@ -14821,6 +16006,94 @@ type ItemUpdatedefaultJSONResponse struct {
 }
 
 func (response ItemUpdatedefaultJSONResponse) VisitItemUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type ItemRemoveAssetRequestObject struct {
+	ItemSlug ItemSlugParam `json:"item_slug"`
+	Id       AssetPath     `json:"id"`
+}
+
+type ItemRemoveAssetResponseObject interface {
+	VisitItemRemoveAssetResponse(w http.ResponseWriter) error
+}
+
+type ItemRemoveAsset200JSONResponse struct{ ItemUpdateOKJSONResponse }
+
+func (response ItemRemoveAsset200JSONResponse) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ItemRemoveAsset401Response = UnauthorisedResponse
+
+func (response ItemRemoveAsset401Response) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ItemRemoveAsset404Response = NotFoundResponse
+
+func (response ItemRemoveAsset404Response) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ItemRemoveAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ItemRemoveAssetdefaultJSONResponse) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type ItemAddAssetRequestObject struct {
+	ItemSlug ItemSlugParam `json:"item_slug"`
+	Id       AssetPath     `json:"id"`
+}
+
+type ItemAddAssetResponseObject interface {
+	VisitItemAddAssetResponse(w http.ResponseWriter) error
+}
+
+type ItemAddAsset200JSONResponse struct{ ItemUpdateOKJSONResponse }
+
+func (response ItemAddAsset200JSONResponse) VisitItemAddAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ItemAddAsset401Response = UnauthorisedResponse
+
+func (response ItemAddAsset401Response) VisitItemAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type ItemAddAsset404Response = NotFoundResponse
+
+func (response ItemAddAsset404Response) VisitItemAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type ItemAddAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response ItemAddAssetdefaultJSONResponse) VisitItemAddAssetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -15566,11 +16839,20 @@ type StrictServerInterface interface {
 	// (POST /v1/clusters)
 	ClusterCreate(ctx context.Context, request ClusterCreateRequestObject) (ClusterCreateResponseObject, error)
 
+	// (DELETE /v1/clusters/{cluster_slug})
+	ClusterDelete(ctx context.Context, request ClusterDeleteRequestObject) (ClusterDeleteResponseObject, error)
+
 	// (GET /v1/clusters/{cluster_slug})
 	ClusterGet(ctx context.Context, request ClusterGetRequestObject) (ClusterGetResponseObject, error)
 
 	// (PATCH /v1/clusters/{cluster_slug})
 	ClusterUpdate(ctx context.Context, request ClusterUpdateRequestObject) (ClusterUpdateResponseObject, error)
+
+	// (DELETE /v1/clusters/{cluster_slug}/assets/{id})
+	ClusterRemoveAsset(ctx context.Context, request ClusterRemoveAssetRequestObject) (ClusterRemoveAssetResponseObject, error)
+
+	// (PUT /v1/clusters/{cluster_slug}/assets/{id})
+	ClusterAddAsset(ctx context.Context, request ClusterAddAssetRequestObject) (ClusterAddAssetResponseObject, error)
 
 	// (DELETE /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
 	ClusterRemoveCluster(ctx context.Context, request ClusterRemoveClusterRequestObject) (ClusterRemoveClusterResponseObject, error)
@@ -15620,11 +16902,20 @@ type StrictServerInterface interface {
 	// (POST /v1/items)
 	ItemCreate(ctx context.Context, request ItemCreateRequestObject) (ItemCreateResponseObject, error)
 
+	// (DELETE /v1/items/{item_slug})
+	ItemDelete(ctx context.Context, request ItemDeleteRequestObject) (ItemDeleteResponseObject, error)
+
 	// (GET /v1/items/{item_slug})
 	ItemGet(ctx context.Context, request ItemGetRequestObject) (ItemGetResponseObject, error)
 
 	// (PATCH /v1/items/{item_slug})
 	ItemUpdate(ctx context.Context, request ItemUpdateRequestObject) (ItemUpdateResponseObject, error)
+
+	// (DELETE /v1/items/{item_slug}/assets/{id})
+	ItemRemoveAsset(ctx context.Context, request ItemRemoveAssetRequestObject) (ItemRemoveAssetResponseObject, error)
+
+	// (PUT /v1/items/{item_slug}/assets/{id})
+	ItemAddAsset(ctx context.Context, request ItemAddAssetRequestObject) (ItemAddAssetResponseObject, error)
 
 	// (GET /v1/links)
 	LinkList(ctx context.Context, request LinkListRequestObject) (LinkListResponseObject, error)
@@ -16520,6 +17811,32 @@ func (sh *strictHandler) ClusterCreate(ctx echo.Context) error {
 	return nil
 }
 
+// ClusterDelete operation middleware
+func (sh *strictHandler) ClusterDelete(ctx echo.Context, clusterSlug ClusterSlugParam, params ClusterDeleteParams) error {
+	var request ClusterDeleteRequestObject
+
+	request.ClusterSlug = clusterSlug
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ClusterDelete(ctx.Request().Context(), request.(ClusterDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ClusterDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ClusterDeleteResponseObject); ok {
+		return validResponse.VisitClusterDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // ClusterGet operation middleware
 func (sh *strictHandler) ClusterGet(ctx echo.Context, clusterSlug ClusterSlugParam) error {
 	var request ClusterGetRequestObject
@@ -16570,6 +17887,58 @@ func (sh *strictHandler) ClusterUpdate(ctx echo.Context, clusterSlug ClusterSlug
 		return err
 	} else if validResponse, ok := response.(ClusterUpdateResponseObject); ok {
 		return validResponse.VisitClusterUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// ClusterRemoveAsset operation middleware
+func (sh *strictHandler) ClusterRemoveAsset(ctx echo.Context, clusterSlug ClusterSlugParam, id AssetPath) error {
+	var request ClusterRemoveAssetRequestObject
+
+	request.ClusterSlug = clusterSlug
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ClusterRemoveAsset(ctx.Request().Context(), request.(ClusterRemoveAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ClusterRemoveAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ClusterRemoveAssetResponseObject); ok {
+		return validResponse.VisitClusterRemoveAssetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// ClusterAddAsset operation middleware
+func (sh *strictHandler) ClusterAddAsset(ctx echo.Context, clusterSlug ClusterSlugParam, id AssetPath) error {
+	var request ClusterAddAssetRequestObject
+
+	request.ClusterSlug = clusterSlug
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ClusterAddAsset(ctx.Request().Context(), request.(ClusterAddAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ClusterAddAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ClusterAddAssetResponseObject); ok {
+		return validResponse.VisitClusterAddAssetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -16994,6 +18363,31 @@ func (sh *strictHandler) ItemCreate(ctx echo.Context) error {
 	return nil
 }
 
+// ItemDelete operation middleware
+func (sh *strictHandler) ItemDelete(ctx echo.Context, itemSlug ItemSlugParam) error {
+	var request ItemDeleteRequestObject
+
+	request.ItemSlug = itemSlug
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ItemDelete(ctx.Request().Context(), request.(ItemDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ItemDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ItemDeleteResponseObject); ok {
+		return validResponse.VisitItemDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // ItemGet operation middleware
 func (sh *strictHandler) ItemGet(ctx echo.Context, itemSlug ItemSlugParam) error {
 	var request ItemGetRequestObject
@@ -17044,6 +18438,58 @@ func (sh *strictHandler) ItemUpdate(ctx echo.Context, itemSlug ItemSlugParam) er
 		return err
 	} else if validResponse, ok := response.(ItemUpdateResponseObject); ok {
 		return validResponse.VisitItemUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// ItemRemoveAsset operation middleware
+func (sh *strictHandler) ItemRemoveAsset(ctx echo.Context, itemSlug ItemSlugParam, id AssetPath) error {
+	var request ItemRemoveAssetRequestObject
+
+	request.ItemSlug = itemSlug
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ItemRemoveAsset(ctx.Request().Context(), request.(ItemRemoveAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ItemRemoveAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ItemRemoveAssetResponseObject); ok {
+		return validResponse.VisitItemRemoveAssetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// ItemAddAsset operation middleware
+func (sh *strictHandler) ItemAddAsset(ctx echo.Context, itemSlug ItemSlugParam, id AssetPath) error {
+	var request ItemAddAssetRequestObject
+
+	request.ItemSlug = itemSlug
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ItemAddAsset(ctx.Request().Context(), request.(ItemAddAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ItemAddAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(ItemAddAssetResponseObject); ok {
+		return validResponse.VisitItemAddAssetResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -17483,207 +18929,213 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

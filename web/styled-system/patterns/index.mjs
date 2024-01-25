@@ -19,4 +19,5 @@ export * from './float.mjs';
 export * from './bleed.mjs';
 export * from './visually-hidden.mjs';
 export * from './frosted-glass.mjs';
+export * from './floating.mjs';
 export * from './card.mjs';

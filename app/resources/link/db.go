@@ -88,9 +88,10 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nextPage := opt.NewSafe(page+1, len(r) >= size)
+	isNextPage := len(r) >= size
+	nextPage := opt.NewSafe(page+1, isNextPage)
 
-	if len(r) > 1 {
+	if isNextPage {
 		r = r[:len(r)-1]
 	}
 

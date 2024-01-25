@@ -30,8 +30,6 @@ type Item struct {
 	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
-	// ImageURL holds the value of the "image_url" field.
-	ImageURL *string `json:"image_url,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
@@ -119,7 +117,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldProperties:
 			values[i] = new([]byte)
-		case item.FieldName, item.FieldSlug, item.FieldImageURL, item.FieldDescription, item.FieldContent:
+		case item.FieldName, item.FieldSlug, item.FieldDescription, item.FieldContent:
 			values[i] = new(sql.NullString)
 		case item.FieldCreatedAt, item.FieldUpdatedAt, item.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -176,13 +174,6 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field slug", values[j])
 			} else if value.Valid {
 				i.Slug = value.String
-			}
-		case item.FieldImageURL:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field image_url", values[j])
-			} else if value.Valid {
-				i.ImageURL = new(string)
-				*i.ImageURL = value.String
 			}
 		case item.FieldDescription:
 			if value, ok := values[j].(*sql.NullString); !ok {
@@ -288,11 +279,6 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
 	builder.WriteString(i.Slug)
-	builder.WriteString(", ")
-	if v := i.ImageURL; v != nil {
-		builder.WriteString("image_url=")
-		builder.WriteString(*v)
-	}
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(i.Description)

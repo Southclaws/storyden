@@ -1,4 +1,4 @@
-import { Options, buildPayload, cleanQuery } from "./common";
+import { Options, buildPayload, cleanQuery, shouldLog } from "./common";
 
 export const fetcher = async <T>({
   url,
@@ -25,7 +25,15 @@ export const fetcher = async <T>({
     const data = await response
       .json()
       .catch(() => ({ error: "Failed to parse API response" }));
-    console.warn(data);
+
+    if (shouldLog(response.status)) {
+      console.warn({
+        ...data,
+        status: response.status,
+        statusText: response.statusText,
+      });
+    }
+
     throw new Error(
       data.message ??
         `An unexpected error occurred:  ${response.status} ${response.statusText}`,

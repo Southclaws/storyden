@@ -17,5 +17,5 @@ interface FrostedGlassPatternFn {
   raw: (styles?: FrostedGlassStyles) => SystemStyleObject
 }
 
-/** A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the  */
+/** A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus. */
 export declare const FrostedGlass: FrostedGlassPatternFn;

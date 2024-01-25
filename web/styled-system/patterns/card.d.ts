@@ -7,6 +7,7 @@ import type { Tokens } from '../tokens/index';
 
 export interface CardProperties {
    kind?: ConditionalValue<"edge" | "default">
+	display?: PropertyValue<'display'>
 }
 
 
