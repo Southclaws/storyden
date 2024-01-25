@@ -72,6 +72,7 @@ export const _Breadcrumbs = (
           <Input
             ref={ref}
             w="full"
+            minW="32"
             size="xs"
             placeholder="URL slug"
             defaultValue={defaultValue}
