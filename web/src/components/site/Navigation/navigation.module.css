@@ -199,3 +199,12 @@
     grid-column: leftbar / main;
   }
 }
+
+.navigation__container *::-webkit-scrollbar {
+  width: 0.45rem;
+}
+.navigation__container *::-webkit-scrollbar-thumb {
+  background-color: var(--colors-gray-300);
+  border-radius: var(--radii-lg);
+  border: 0.1rem solid var(--colors-gray-100);
+}
