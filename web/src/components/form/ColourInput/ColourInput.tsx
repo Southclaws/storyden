@@ -25,7 +25,7 @@ export function ColourInput(props: Props) {
     <styled.div
       width="min"
       style={styles}
-      borderWidth={1}
+      borderWidth="thin"
       borderStyle="solid"
       borderColor="blackAlpha.100"
       borderRadius="lg"

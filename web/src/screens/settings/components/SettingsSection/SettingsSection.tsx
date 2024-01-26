@@ -10,7 +10,7 @@ export function SettingsSection({
     <VStack
       w="full"
       gap="2"
-      borderWidth={1}
+      borderWidth="thin"
       borderStyle="solid"
       borderColor="blackAlpha.100"
       borderRadius="lg"

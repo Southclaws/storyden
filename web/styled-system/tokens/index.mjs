@@ -1923,6 +1923,26 @@ const tokens = {
     "value": "var(--opacity-full)",
     "variable": "var(--opacity-full)"
   },
+  "borderWidths.none": {
+    "value": "var(--border-widths-none)",
+    "variable": "var(--border-widths-none)"
+  },
+  "borderWidths.hairline": {
+    "value": "var(--border-widths-hairline)",
+    "variable": "var(--border-widths-hairline)"
+  },
+  "borderWidths.thin": {
+    "value": "var(--border-widths-thin)",
+    "variable": "var(--border-widths-thin)"
+  },
+  "borderWidths.medium": {
+    "value": "var(--border-widths-medium)",
+    "variable": "var(--border-widths-medium)"
+  },
+  "borderWidths.thick": {
+    "value": "var(--border-widths-thick)",
+    "variable": "var(--border-widths-thick)"
+  },
   "colors.accent.50": {
     "value": "var(--colors-accent-50)",
     "variable": "var(--colors-accent-50)"
