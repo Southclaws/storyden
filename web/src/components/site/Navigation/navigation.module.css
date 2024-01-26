@@ -202,6 +202,7 @@
 
 .navigation__container *::-webkit-scrollbar {
   width: 0.45rem;
+  height: 0.45rem;
 }
 .navigation__container *::-webkit-scrollbar-thumb {
   background-color: var(--colors-gray-300);
