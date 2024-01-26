@@ -1,8 +1,6 @@
 /* eslint-disable */
 export * from './factory';
-
 export * from './is-valid-prop';
-
 export * from './box';
 export * from './flex';
 export * from './stack';
@@ -26,5 +24,4 @@ export * from './visually-hidden';
 export * from './frosted-glass';
 export * from './floating';
 export * from './card';
-
 export type { HTMLStyledProps, StyledComponent } from '../types/jsx';

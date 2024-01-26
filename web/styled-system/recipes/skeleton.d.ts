@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface SkeletonVariant {
   
@@ -12,7 +11,7 @@ type SkeletonVariantMap = {
 }
 
 export type SkeletonVariantProps = {
-  [key in keyof SkeletonVariant]?: ConditionalValue<SkeletonVariant[key]>
+  [key in keyof SkeletonVariant]?: ConditionalValue<SkeletonVariant[key]> | undefined
 }
 
 export interface SkeletonRecipe {

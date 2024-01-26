@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ButtonVariant {
   kind: "neutral" | "primary" | "secondary" | "destructive" | "ghost" | "blank"
@@ -13,7 +12,7 @@ type ButtonVariantMap = {
 }
 
 export type ButtonVariantProps = {
-  [key in keyof ButtonVariant]?: ButtonVariant[key]
+  [key in keyof ButtonVariant]?: ButtonVariant[key] | undefined
 }
 
 export interface ButtonRecipe {

@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface CardVariant {
   shape: "box" | "row"
@@ -12,7 +11,7 @@ type CardVariantMap = {
 }
 
 export type CardVariantProps = {
-  [key in keyof CardVariant]?: ConditionalValue<CardVariant[key]>
+  [key in keyof CardVariant]?: ConditionalValue<CardVariant[key]> | undefined
 }
 
 export interface CardRecipe {

@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface MenuVariant {
   size: "sm" | "md" | "lg"
@@ -12,7 +11,7 @@ type MenuVariantMap = {
 }
 
 export type MenuVariantProps = {
-  [key in keyof MenuVariant]?: ConditionalValue<MenuVariant[key]>
+  [key in keyof MenuVariant]?: ConditionalValue<MenuVariant[key]> | undefined
 }
 
 export interface MenuRecipe {

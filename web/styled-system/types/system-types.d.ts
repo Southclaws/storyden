@@ -6,6 +6,18 @@ import type {  SystemProperties, CssVarProperties  } from './style-props';
 type String = string & {}
 type Number = number & {}
 
+export type Pretty<T> = { [K in keyof T]: T[K] } & {}
+
+export type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never
+
+export type DistributiveUnion<T, U> = {
+  [K in keyof T]: K extends keyof U ? U[K] | T[K] : T[K]
+} & DistributiveOmit<U, keyof T>
+
+export type Assign<T, U> = {
+  [K in keyof T]: K extends keyof U ? U[K] : T[K]
+} & U
+
 /* -----------------------------------------------------------------------------
  * Native css properties
  * -----------------------------------------------------------------------------*/
@@ -48,9 +60,11 @@ export interface ExtendableGlobalStyleObject {
   extend?: GlobalStyleObject | undefined
 }
 
-export type CompositionStyleObject<Property extends string> = Nested<{
-  [K in Property]?: K extends keyof SystemStyleObject ? SystemStyleObject[K] : unknown
-}>
+type FilterStyleObject<P extends string> = {
+  [K in P]?: K extends keyof SystemStyleObject ? SystemStyleObject[K] : unknown
+}
+
+export type CompositionStyleObject<Property extends string> = Nested<FilterStyleObject<Property> & CssVarProperties>
 
 /* -----------------------------------------------------------------------------
  * Jsx style props
@@ -61,12 +75,6 @@ interface WithCss {
 type StyleProps = SystemProperties & MinimalNested<SystemStyleObject>
 
 export type JsxStyleProps = StyleProps & WithCss
-
-export type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never
-
-export type Assign<T, U> = {
-  [K in keyof T]: K extends keyof U ? U[K] : T[K]
-} & U
 
 export interface PatchedHTMLProps {
   htmlWidth?: string | number

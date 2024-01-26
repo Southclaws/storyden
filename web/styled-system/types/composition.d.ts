@@ -1,13 +1,13 @@
 /* eslint-disable */
 import type {  CompositionStyleObject  } from './system-types';
 
-interface Recursive<T> {
-  [key: string]: Recursive<T> | T
+interface Token<T> {
+  value: T
+  description?: string
 }
 
-export interface Token<Value = any> {
-  value: Value
-  description?: string
+interface Recursive<T> {
+  [key: string]: Recursive<T> | T
 }
 
 /* -----------------------------------------------------------------------------

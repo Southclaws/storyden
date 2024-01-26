@@ -4,7 +4,7 @@ import type { CssProperties } from './system-types';
 import type { Tokens } from '../tokens/index';
 
 interface PropertyValueTypes {
-	aspectRatio: "auto" | "square" | "landscape" | "portrait" | "wide" | "ultrawide" | "golden";
+	aspectRatio: Tokens["aspectRatios"];
 	zIndex: Tokens["zIndex"];
 	top: Tokens["spacing"];
 	left: Tokens["spacing"];
@@ -58,6 +58,7 @@ interface PropertyValueTypes {
 	marginInline: "auto" | Tokens["spacing"];
 	marginInlineEnd: "auto" | Tokens["spacing"];
 	marginInlineStart: "auto" | Tokens["spacing"];
+	outlineWidth: Tokens["borderWidths"];
 	outlineColor: Tokens["colors"];
 	outline: Tokens["borders"];
 	outlineOffset: Tokens["spacing"];
@@ -114,6 +115,11 @@ interface PropertyValueTypes {
 	borderEndEndRadius: Tokens["radii"];
 	borderEndRadius: Tokens["radii"];
 	border: Tokens["borders"];
+	borderWidth: Tokens["borderWidths"];
+	borderTopWidth: Tokens["borderWidths"];
+	borderLeftWidth: Tokens["borderWidths"];
+	borderRightWidth: Tokens["borderWidths"];
+	borderBottomWidth: Tokens["borderWidths"];
 	borderColor: Tokens["colors"];
 	borderInline: Tokens["borders"];
 	borderInlineWidth: Tokens["borderWidths"];
@@ -199,9 +205,10 @@ interface PropertyValueTypes {
 	scrollSnapMarginRight: Tokens["spacing"];
 	fill: Tokens["colors"];
 	stroke: Tokens["colors"];
+	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "whiteAlpha" | "blackAlpha" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "bg" | "fg" | "border";
+	colorPalette: "current" | "black" | "white" | "transparent" | "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "whiteAlpha" | "blackAlpha" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl";
 }
 
@@ -301,8 +308,101 @@ interface PropertyValueTypes {
 	y: Shorthand<"translateY">;
 }
 
+type StrictableProps =
+  | 'alignContent'
+  | 'alignItems'
+  | 'alignSelf'
+  | 'all'
+  | 'animationComposition'
+  | 'animationDirection'
+  | 'animationFillMode'
+  | 'appearance'
+  | 'backfaceVisibility'
+  | 'backgroundAttachment'
+  | 'backgroundClip'
+  | 'borderCollapse'
+  | 'border'
+  | 'borderBlock'
+  | 'borderBlockEnd'
+  | 'borderBlockStart'
+  | 'borderBottom'
+  | 'borderInline'
+  | 'borderInlineEnd'
+  | 'borderInlineStart'
+  | 'borderLeft'
+  | 'borderRight'
+  | 'borderTop'
+  | 'borderBlockEndStyle'
+  | 'borderBlockStartStyle'
+  | 'borderBlockStyle'
+  | 'borderBottomStyle'
+  | 'borderInlineEndStyle'
+  | 'borderInlineStartStyle'
+  | 'borderInlineStyle'
+  | 'borderLeftStyle'
+  | 'borderRightStyle'
+  | 'borderTopStyle'
+  | 'boxDecorationBreak'
+  | 'boxSizing'
+  | 'breakAfter'
+  | 'breakBefore'
+  | 'breakInside'
+  | 'captionSide'
+  | 'clear'
+  | 'columnFill'
+  | 'columnRuleStyle'
+  | 'contentVisibility'
+  | 'direction'
+  | 'display'
+  | 'emptyCells'
+  | 'flexDirection'
+  | 'flexWrap'
+  | 'float'
+  | 'fontKerning'
+  | 'forcedColorAdjust'
+  | 'isolation'
+  | 'lineBreak'
+  | 'mixBlendMode'
+  | 'objectFit'
+  | 'outlineStyle'
+  | 'overflow'
+  | 'overflowX'
+  | 'overflowY'
+  | 'overflowBlock'
+  | 'overflowInline'
+  | 'overflowWrap'
+  | 'pointerEvents'
+  | 'position'
+  | 'resize'
+  | 'scrollBehavior'
+  | 'touchAction'
+  | 'transformBox'
+  | 'transformStyle'
+  | 'userSelect'
+  | 'visibility'
+  | 'wordBreak'
+  | 'writingMode'
+
+type WithEscapeHatch<T> = T | `[${string}]`
+
+type FilterVagueString<Key, Value> = Value extends boolean
+  ? Value
+  : Key extends StrictableProps
+    ? Value extends `${infer _}` ? Value : never
+    : Value
+
+type PropOrCondition<Key, Value> = ConditionalValue<WithEscapeHatch<Value>>
+
+type PropertyTypeValue<T extends string> = T extends keyof PropertyTypes
+  ? PropOrCondition<T, PropertyTypes[T]>
+  : never;
+
+type CssPropertyValue<T extends string> = T extends keyof CssProperties
+  ? PropOrCondition<T, CssProperties[T]>
+  : never;
+
 export type PropertyValue<T extends string> = T extends keyof PropertyTypes
-  ? ConditionalValue<PropertyTypes[T]>
+  ? PropertyTypeValue<T>
   : T extends keyof CssProperties
-  ? ConditionalValue<CssProperties[T]>
-  : ConditionalValue<string | number>
+    ? CssPropertyValue<T>
+    : PropOrCondition<T, string | number>
