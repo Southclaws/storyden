@@ -44,14 +44,13 @@ export function RichLink(props: PropsWithChildren<Props & RenderElementProps>) {
       borderRadius="md"
       overflow="hidden"
       outlineStyle="solid"
-      outlineWidth="medium"
       outlineColor="gray.100"
       mb="2"
       css={{
         "&[data-selected=true]": {
           outlineStyle: "dashed",
           outlineOffset: "-0.5",
-          outlineWidth: "medium",
+
           outlineColor: "accent.200",
         },
       }}
