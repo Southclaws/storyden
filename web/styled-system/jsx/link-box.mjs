@@ -1,8 +1,14 @@
 import { createElement, forwardRef } from 'react'
-import { styled } from './factory.mjs';
+import { mergeCss } from '../css/css.mjs';
+import { splitProps } from '../helpers.mjs';
 import { getLinkBoxStyle } from '../patterns/link-box.mjs';
+import { styled } from './factory.mjs';
 
 export const LinkBox = /* @__PURE__ */ forwardRef(function LinkBox(props, ref) {
-  const styleProps = getLinkBoxStyle()
-return createElement(styled.div, { ref, ...styleProps, ...props })
-})
+  const [patternProps, restProps] = splitProps(props, [])
+
+const styleProps = getLinkBoxStyle(patternProps)
+const mergedProps = { ref, ...styleProps, ...restProps }
+
+return createElement(styled.div, mergedProps)
+  })

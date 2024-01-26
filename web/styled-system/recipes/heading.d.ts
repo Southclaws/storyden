@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface HeadingVariant {
   size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
@@ -12,7 +11,7 @@ type HeadingVariantMap = {
 }
 
 export type HeadingVariantProps = {
-  [key in keyof HeadingVariant]?: ConditionalValue<HeadingVariant[key]>
+  [key in keyof HeadingVariant]?: ConditionalValue<HeadingVariant[key]> | undefined
 }
 
 export interface HeadingRecipe {

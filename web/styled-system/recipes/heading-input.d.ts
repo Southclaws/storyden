@@ -1,7 +1,6 @@
 /* eslint-disable */
 import type { ConditionalValue } from '../types/index';
-import type { Pretty } from '../types/helpers';
-import type { DistributiveOmit } from '../types/system-types';
+import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface HeadingInputVariant {
   
@@ -12,7 +11,7 @@ type HeadingInputVariantMap = {
 }
 
 export type HeadingInputVariantProps = {
-  [key in keyof HeadingInputVariant]?: ConditionalValue<HeadingInputVariant[key]>
+  [key in keyof HeadingInputVariant]?: ConditionalValue<HeadingInputVariant[key]> | undefined
 }
 
 export interface HeadingInputRecipe {
