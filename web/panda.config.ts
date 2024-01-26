@@ -156,6 +156,13 @@ export default defineConfig({
           9: { value: "0.9" },
           full: { value: "1" },
         },
+        borderWidths: {
+          none: { value: "0" },
+          hairline: { value: "0.5px" },
+          thin: { value: "1px" },
+          medium: { value: "3px" },
+          thick: { value: "3px" },
+        },
         colors: {
           accent: {
             50: { value: "var(--accent-colour-flat-fill-50)" },
