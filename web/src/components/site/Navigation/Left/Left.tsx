@@ -19,7 +19,6 @@ export function Left() {
       display="flex"
       height="full"
       justifyContent="end"
-      bgColor="accent.200"
       borderRadius="md"
       className={Floating()}
     >
