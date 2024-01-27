@@ -15,6 +15,7 @@ const _disabled = {
 export const button = defineRecipe({
   className: "button",
   base: {
+    color: "fg.default",
     alignItems: "center",
     appearance: "none",
     borderRadius: "lg",
@@ -56,6 +57,9 @@ export const button = defineRecipe({
         _hover: {
           background: "gray.100",
           boxShadow: "md",
+          _osDark: {
+            background: "bg.subtle",
+          },
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -73,6 +77,9 @@ export const button = defineRecipe({
         _hover: {
           backgroundColor: "accent.400",
           boxShadow: "md",
+          _osDark: {
+            background: "bg.subtle",
+          },
         },
         _focusVisible: {
           outlineOffset: "2px",
@@ -90,6 +97,9 @@ export const button = defineRecipe({
         _hover: {
           backgroundColor: "gray.300",
           boxShadow: "md",
+          _osDark: {
+            background: "bg.subtle",
+          },
         },
         _active: {
           backgroundColor: "gray.400",
@@ -102,6 +112,9 @@ export const button = defineRecipe({
         _hover: {
           backgroundColor: "rose.500",
           boxShadow: "md",
+          _osDark: {
+            background: "bg.subtle",
+          },
         },
         _active: {
           backgroundColor: "rose.700",
@@ -112,6 +125,9 @@ export const button = defineRecipe({
         _hover: {
           backgroundColor: "gray.200",
           boxShadow: "md",
+          _osDark: {
+            background: "bg.subtle",
+          },
         },
         _active: {
           backgroundColor: "gray.300",

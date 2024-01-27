@@ -10,7 +10,7 @@ export function SendIcon(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <g
-        stroke="#303030"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.5}
