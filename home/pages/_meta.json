@@ -9,10 +9,9 @@
     },
     "blog": {
         "title": "Articles",
-        "display": "hidden",
         "type": "page",
         "theme": {
-            "layout": "full",
+            "layout": "blog",
             "typesetting": "article"
         }
     }
