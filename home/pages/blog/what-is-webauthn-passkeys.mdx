@@ -1,8 +1,8 @@
 # Why WebAuthn and Passkeys?
 
-It's a little confusing because "WebAuthn" is the technical name, "Authn" is a shortening of "Authentication" because nobody wants to type long words any more (even though spicy autocomplete can do it for us now...?) and "Passkey" is the more "branded" and general term when displaying to users and customers. The terms technically aren't integerchangable but for the sake of the user's experience and simplicity, they can be considered the same thing.
+It's a little confusing because "WebAuthn" is the technical name, "Authn" is a shortening of "Authentication" because nobody wants to type long words any more (even though spicy autocomplete can do it for us now...?) and "Passkey" is the more "branded" and general term when displaying to users and customers. The terms technically aren't interchangeable, but for the sake of the user's experience and simplicity, they can be considered the same thing.
 
-I don't need to go into the details of what it actually is, you can learn about that on [this fantastic blog post by Neal Fennimore](https://css-tricks.com/passkeys-what-the-heck-and-why). There are also some more technical articles that go into the details such as [the W3 spec](https://www.w3.org/TR/webauthn-2/) and a [web.dev article](https://web.dev/articles/webauthn-discoverable-credentials).
+I won't go into the details of what it actually is. You can learn about that in [this fantastic blog post by Neal Fennimore](https://css-tricks.com/passkeys-what-the-heck-and-why). There are also some more technical articles that go into the details such as [the W3 spec](https://www.w3.org/TR/webauthn-2/) and a [web.dev article](https://web.dev/articles/webauthn-discoverable-credentials).
 
 ## How and why Storyden uses Passkeys
 
@@ -10,15 +10,15 @@ Storyden supports Passkeys as a fundamental authentication method. This means th
 
 ### Email + Password is not the default any more
 
-Storyden's authentication model does not simply have an "email" and "password" column in its data model. Storyden is a platform for the next era of the web, so it would be foolish to fall into old ways, especially for authentication. Passwords can be enabled but they're not assumed to be the default. You can operate a Storyden instance and completely disable passwords if you want.
+Storyden's authentication model does not simply have an "email" and "password" column in its data model. Storyden is a platform for the next era of the web, so it would be foolish to fall into old ways, especially for authentication. Passwords can be enabled, but they are not assumed to be the default. You can operate a Storyden instance and completely disable passwords if you want.
 
-Similarly, email is not considered a default either. The world is changing and people are much more conscious of privacy, security and technical monopolies on data. You may not want to sprinkle your email address all over the net, and while there have been efforts by Apple, Mozilla and others to create "fake" email addresses that forward to your real one, if you don't need someone's email, then why even require it? This is why Storyden operates on a username-first model, email is optional for transactional or newsletter purposes, but it's not a default.
+Similarly, email is not considered a default either. The world is changing and people are much more conscious of privacy, security and technical monopolies on data. You may not want to sprinkle your email address all over the net. While there have been efforts by Apple, Mozilla, and others to create 'fake' email addresses that forward to your real one, if you don't need someone's email, then why even require it? This is why Storyden operates on a username-first model, email is optional for transactional or newsletter purposes, but it's not a default.
 
 As an operator of a Storyden community, you have the choice to use email + password as the login method for your members, but you also have the choice to allow full anonymity with a username + passkey combination.
 
 ## The benefits of Passkeys
 
-Passkeys are great, in certain circumstances. They're not a silver bullet, but with growing support on devices, browsers and operating systems, they're becoming more and more viable as a default authentication method.
+Passkeys are great in certain circumstances. They're not a silver bullet, but with growing support on devices, browsers and operating systems, they're becoming more and more viable as a default authentication method.
 
 ### Privacy
 
@@ -38,7 +38,7 @@ Passkeys are great, but they're not perfect. There are some downsides to using t
 
 ### Dealing with multiple devices
 
-All services I've enabled a Passkey on recently have treated them as a form of 2FA rather than your first login method. This isn't just because of support, but also difficulties with being locked out of your account. The spec does not define a way to recover accounts or synchronise keys. This is left up to vendors such as Apple, Microsoft and Google.
+All services on which I've recently enabled a Passkey have treated them as a form of 2FA rather than your primary login method. This isn't just because of support, but also difficulties with being locked out of your account. The spec does not define a way to recover accounts or synchronise keys. This is left up to vendors such as Apple, Microsoft and Google.
 
 So, if you're ~~locked in to~~ enjoying the Apple ecosystem on all your devices, you're pretty much covered as iCloud's keychain will synchronise an end to end encrypted backup of your keys between your devices. This means I can sign up to a Storyden instance on my Macbook, then log in to that same account on my iPhone without having to do anything. It's pretty great.
 
