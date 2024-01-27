@@ -10,7 +10,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={525}
           height={114}
           rx={12}
-          fill="#fff"
+          fill="var(--colors-bg-default)"
           fillOpacity={0.75}
         />
         <rect
@@ -19,7 +19,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={163.676}
@@ -27,7 +27,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={214.676}
@@ -35,7 +35,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={233.676}
@@ -43,11 +43,11 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <path
           d="M616.676 28.064a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM622.176 28.064a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM629.176 26.564a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"
-          fill="#C5C5C5"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={132.676}
@@ -55,7 +55,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={14}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={152.676}
@@ -63,7 +63,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={203.676}
@@ -71,7 +71,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={34}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={243.676}
@@ -79,7 +79,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={260.676}
@@ -87,7 +87,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={331.676}
@@ -95,7 +95,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={28}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={369.676}
@@ -103,7 +103,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={53}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={428.676}
@@ -111,7 +111,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={18}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={452.676}
@@ -119,7 +119,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={471.676}
@@ -127,7 +127,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={47}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={524.676}
@@ -135,7 +135,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={21}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={551.676}
@@ -143,7 +143,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={15}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={572.676}
@@ -151,7 +151,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={33}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={132.676}
@@ -159,7 +159,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={42}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={180.676}
@@ -167,7 +167,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={16}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={202.676}
@@ -175,7 +175,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={31}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={239.676}
@@ -183,7 +183,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={282.676}
@@ -191,7 +191,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={313.676}
@@ -199,7 +199,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={69}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={392.676}
@@ -207,7 +207,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={423.676}
@@ -215,7 +215,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={474.676}
@@ -223,7 +223,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={493.676}
@@ -231,7 +231,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={564.676}
@@ -239,7 +239,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={581.676}
@@ -247,16 +247,21 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
-        <circle cx={144.676} cy={96.064} r={12} fill="#C5C5C5" />
+        <circle
+          cx={144.676}
+          cy={96.064}
+          r={12}
+          fill="var(--colors-bg-subtle)"
+        />
         <rect
           x={166.676}
           y={90.064}
           width={54}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={121.176}
@@ -264,7 +269,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={524}
           height={113}
           rx={11.5}
-          stroke="#F4F4F4"
+          stroke="var(--colors-bg-subtle)"
           strokeOpacity={0.69}
         />
       </g>
@@ -275,7 +280,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={525}
           height={114}
           rx={12}
-          fill="#fff"
+          fill="var(--colors-bg-default)"
           fillOpacity={0.75}
         />
         <rect
@@ -284,7 +289,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={53}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={131.676}
@@ -292,7 +297,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={18}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={155.676}
@@ -300,7 +305,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={47}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={208.676}
@@ -308,7 +313,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={21}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={235.676}
@@ -316,7 +321,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={15}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={256.676}
@@ -324,11 +329,11 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={33}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <path
           d="M556.676 58.065a1.5 1.5 0 113-.001 1.5 1.5 0 01-3 0zM562.176 58.065a1.5 1.5 0 113-.001 1.5 1.5 0 01-3 0zM569.176 56.565a1.5 1.5 0 100 2.999 1.5 1.5 0 000-3z"
-          fill="#C5C5C5"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={72.676}
@@ -336,7 +341,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={103.676}
@@ -344,7 +349,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={154.676}
@@ -352,7 +357,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={173.676}
@@ -360,7 +365,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={244.676}
@@ -368,7 +373,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={261.676}
@@ -376,7 +381,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={308.676}
@@ -384,7 +389,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={53}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={367.676}
@@ -392,7 +397,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={18}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={391.676}
@@ -400,7 +405,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={410.676}
@@ -408,7 +413,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={47}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={463.676}
@@ -416,7 +421,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={21}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={490.676}
@@ -424,7 +429,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={15}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={511.676}
@@ -432,7 +437,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={33}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={72.676}
@@ -440,7 +445,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={42}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={120.676}
@@ -448,7 +453,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={16}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={142.676}
@@ -456,7 +461,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={31}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={179.676}
@@ -464,7 +469,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={222.676}
@@ -472,7 +477,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={253.676}
@@ -480,7 +485,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={69}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={332.676}
@@ -488,7 +493,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={14}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={352.676}
@@ -496,7 +501,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={403.676}
@@ -504,7 +509,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={34}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={443.676}
@@ -512,7 +517,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={460.676}
@@ -520,7 +525,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={531.676}
@@ -528,16 +533,21 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={28}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
-        <circle cx={84.676} cy={126.064} r={12} fill="#C5C5C5" />
+        <circle
+          cx={84.676}
+          cy={126.064}
+          r={12}
+          fill="var(--colors-bg-subtle)"
+        />
         <rect
           x={106.676}
           y={120.064}
           width={54}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={61.176}
@@ -545,7 +555,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={524}
           height={113}
           rx={11.5}
-          stroke="#F4F4F4"
+          stroke="var(--colors-bg-subtle)"
           strokeOpacity={0.69}
         />
       </g>
@@ -556,7 +566,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={525}
           height={114}
           rx={12}
-          fill="#fff"
+          fill="var(--colors-bg-default)"
           fillOpacity={0.75}
         />
         <rect
@@ -565,7 +575,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={14}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={32.676}
@@ -573,7 +583,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={83.676}
@@ -581,7 +591,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={34}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={123.676}
@@ -589,7 +599,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={140.676}
@@ -597,11 +607,11 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <path
           d="M496.676 88.064a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM502.176 88.064a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM509.176 86.564a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"
-          fill="#C5C5C5"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={12.676}
@@ -609,7 +619,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={42}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={60.676}
@@ -617,7 +627,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={16}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={82.676}
@@ -625,7 +635,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={31}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={119.676}
@@ -633,7 +643,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={162.676}
@@ -641,7 +651,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={193.676}
@@ -649,7 +659,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={69}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={272.676}
@@ -657,7 +667,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={53}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={331.676}
@@ -665,7 +675,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={18}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={355.676}
@@ -673,7 +683,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={374.676}
@@ -681,7 +691,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={47}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={427.676}
@@ -689,7 +699,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={21}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={454.676}
@@ -697,7 +707,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={15}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={475.676}
@@ -705,7 +715,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={33}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={12.676}
@@ -713,7 +723,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={14}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={32.676}
@@ -721,7 +731,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={83.676}
@@ -729,7 +739,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={34}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={123.676}
@@ -737,7 +747,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={140.676}
@@ -745,7 +755,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={211.676}
@@ -753,7 +763,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={28}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={249.676}
@@ -761,7 +771,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={25}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={280.676}
@@ -769,7 +779,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={45}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={331.676}
@@ -777,7 +787,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={13}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={350.676}
@@ -785,7 +795,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={65}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={421.676}
@@ -793,7 +803,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={11}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
         <rect
           x={438.676}
@@ -801,16 +811,21 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={37}
           height={12}
           rx={4}
-          fill="#E1E1E1"
+          fill="var(--colors-fg-subtle)"
         />
-        <circle cx={24.676} cy={156.064} r={12} fill="#C5C5C5" />
+        <circle
+          cx={24.676}
+          cy={156.064}
+          r={12}
+          fill="var(--colors-bg-subtle)"
+        />
         <rect
           x={46.676}
           y={150.064}
           width={54}
           height={12}
           rx={4}
-          fill="#C5C5C5"
+          fill="var(--colors-bg-subtle)"
         />
         <rect
           x={1.176}
@@ -818,7 +833,7 @@ export function ThreadStaircase(props: SVGProps<SVGSVGElement>) {
           width={524}
           height={113}
           rx={11.5}
-          stroke="#F4F4F4"
+          stroke="var(--colors-bg-subtle)"
           strokeOpacity={0.69}
         />
       </g>

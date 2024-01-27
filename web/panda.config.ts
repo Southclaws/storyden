@@ -164,92 +164,83 @@ export default defineConfig({
           thick: { value: "3px" },
         },
         colors: {
-          accent: {
-            50: { value: "var(--accent-colour-flat-fill-50)" },
-            100: { value: "var(--accent-colour-flat-fill-100)" },
-            200: { value: "var(--accent-colour-flat-fill-200)" },
-            300: { value: "var(--accent-colour-flat-fill-300)" },
-            400: { value: "var(--accent-colour-flat-fill-400)" },
-            DEFAULT: { value: "var(--accent-colour-flat-fill-500)" },
-            500: { value: "var(--accent-colour-flat-fill-500)" },
-            600: { value: "var(--accent-colour-flat-fill-600)" },
-            700: { value: "var(--accent-colour-flat-fill-700)" },
-            800: { value: "var(--accent-colour-flat-fill-800)" },
-            900: { value: "var(--accent-colour-flat-fill-900)" },
-            text: {
-              50: { value: "var(--accent-colour-flat-text-50)" },
-              100: { value: "var(--accent-colour-flat-text-100)" },
-              200: { value: "var(--accent-colour-flat-text-200)" },
-              300: { value: "var(--accent-colour-flat-text-300)" },
-              400: { value: "var(--accent-colour-flat-text-400)" },
-              DEFAULT: { value: "var(--accent-colour-flat-text-500)" },
-              500: { value: "var(--accent-colour-flat-text-500)" },
-              600: { value: "var(--accent-colour-flat-text-600)" },
-              700: { value: "var(--accent-colour-flat-text-700)" },
-              800: { value: "var(--accent-colour-flat-text-800)" },
-              900: { value: "var(--accent-colour-flat-text-900)" },
-            },
-            dark: {
-              50: { value: "var(--accent-colour-dark-fill-50)" },
-              100: { value: "var(--accent-colour-dark-fill-100)" },
-              200: { value: "var(--accent-colour-dark-fill-200)" },
-              300: { value: "var(--accent-colour-dark-fill-300)" },
-              400: { value: "var(--accent-colour-dark-fill-400)" },
-              DEFAULT: { value: "var(--accent-colour-dark-fill-500)" },
-              500: { value: "var(--accent-colour-dark-fill-500)" },
-              600: { value: "var(--accent-colour-dark-fill-600)" },
-              700: { value: "var(--accent-colour-dark-fill-700)" },
-              800: { value: "var(--accent-colour-dark-fill-800)" },
-              900: { value: "var(--accent-colour-dark-fill-900)" },
-              text: {
-                50: { value: "var(--accent-colour-dark-text-50)" },
-                100: { value: "var(--accent-colour-dark-text-100)" },
-                200: { value: "var(--accent-colour-dark-text-200)" },
-                300: { value: "var(--accent-colour-dark-text-300)" },
-                400: { value: "var(--accent-colour-dark-text-400)" },
-                DEFAULT: { value: "var(--accent-colour-dark-text-500)" },
-                500: { value: "var(--accent-colour-dark-text-500)" },
-                600: { value: "var(--accent-colour-dark-text-600)" },
-                700: { value: "var(--accent-colour-dark-text-700)" },
-                800: { value: "var(--accent-colour-dark-text-800)" },
-                900: { value: "var(--accent-colour-dark-text-900)" },
+          bg: {
+            accent: {
+              value: {
+                base: "{colors.accent.50}",
+                _osDark: "{colors.gray.800}",
               },
             },
-          },
-          bg: {
-            canvas: { value: "{colors.gray.100}" },
             default: {
-              value: { base: "{colors.white}", _dark: "{colors.gray.200}" },
+              value: {
+                base: "{colors.white}",
+                _osDark: "{colors.blackAlpha.500}",
+              },
             },
             opaque: {
               value: {
                 base: "{colors.whiteAlpha.800}",
-                _dark: "{colors.blackAlpha.800}",
+                _osDark: "{colors.bg.default}",
               },
             },
             subtle: {
-              value: { base: "{colors.gray.200}", _dark: "{colors.gray.300}" },
+              value: {
+                base: "{colors.gray.200}",
+                _osDark: "{colors.gray.800}",
+              },
             },
             muted: {
-              value: { base: "{colors.gray.300}", _dark: "{colors.gray.400}" },
+              value: {
+                base: "{colors.gray.300}",
+                _osDark: "{colors.gray.900}",
+              },
             },
             emphasized: {
-              value: { base: "{colors.gray.400}", _dark: "{colors.gray.500}" },
+              value: {
+                base: "{colors.gray.400}",
+                _osDark: "{colors.gray.500}",
+              },
             },
             disabled: {
-              value: { base: "{colors.gray.300}", _dark: "{colors.gray.400}" },
+              value: {
+                base: "{colors.gray.300}",
+                _osDark: "{colors.gray.400}",
+              },
             },
             destructive: {
-              value: { base: "{colors.red.300}", _dark: "{colors.red.400}" },
+              value: { base: "{colors.red.300}", _osDark: "{colors.red.400}" },
             },
           },
           fg: {
-            default: { value: "{colors.gray.900}" },
-            muted: { value: "{colors.gray.600}" },
-            subtle: { value: "{colors.gray.500}" },
-            disabled: { value: "{colors.gray.400}" },
+            default: {
+              value: {
+                base: "{colors.gray.900}",
+                _osDark: "{colors.gray.50}",
+              },
+            },
+            muted: {
+              value: {
+                base: "{colors.gray.600}",
+                _osDark: "{colors.gray.200}",
+              },
+            },
+            subtle: {
+              value: {
+                base: "{colors.gray.500}",
+                _osDark: "{colors.gray.500}",
+              },
+            },
+            disabled: {
+              value: {
+                base: "{colors.gray.400}",
+                _osDark: "{colors.gray.600}",
+              },
+            },
             destructive: {
-              value: { base: "{colors.red.500}", _dark: "{colors.red.400}" },
+              value: {
+                base: "{colors.red.500}",
+                _osDark: "{colors.red.400}",
+              },
             },
           },
           border: {
@@ -336,6 +327,58 @@ export default defineConfig({
           },
         },
         colors: defineTokens.colors({
+          accent: {
+            50: { value: "var(--accent-colour-flat-fill-50)" },
+            100: { value: "var(--accent-colour-flat-fill-100)" },
+            200: { value: "var(--accent-colour-flat-fill-200)" },
+            300: { value: "var(--accent-colour-flat-fill-300)" },
+            400: { value: "var(--accent-colour-flat-fill-400)" },
+            DEFAULT: { value: "var(--accent-colour-flat-fill-500)" },
+            500: { value: "var(--accent-colour-flat-fill-500)" },
+            600: { value: "var(--accent-colour-flat-fill-600)" },
+            700: { value: "var(--accent-colour-flat-fill-700)" },
+            800: { value: "var(--accent-colour-flat-fill-800)" },
+            900: { value: "var(--accent-colour-flat-fill-900)" },
+            text: {
+              50: { value: "var(--accent-colour-flat-text-50)" },
+              100: { value: "var(--accent-colour-flat-text-100)" },
+              200: { value: "var(--accent-colour-flat-text-200)" },
+              300: { value: "var(--accent-colour-flat-text-300)" },
+              400: { value: "var(--accent-colour-flat-text-400)" },
+              DEFAULT: { value: "var(--accent-colour-flat-text-500)" },
+              500: { value: "var(--accent-colour-flat-text-500)" },
+              600: { value: "var(--accent-colour-flat-text-600)" },
+              700: { value: "var(--accent-colour-flat-text-700)" },
+              800: { value: "var(--accent-colour-flat-text-800)" },
+              900: { value: "var(--accent-colour-flat-text-900)" },
+            },
+            dark: {
+              50: { value: "var(--accent-colour-dark-fill-50)" },
+              100: { value: "var(--accent-colour-dark-fill-100)" },
+              200: { value: "var(--accent-colour-dark-fill-200)" },
+              300: { value: "var(--accent-colour-dark-fill-300)" },
+              400: { value: "var(--accent-colour-dark-fill-400)" },
+              DEFAULT: { value: "var(--accent-colour-dark-fill-500)" },
+              500: { value: "var(--accent-colour-dark-fill-500)" },
+              600: { value: "var(--accent-colour-dark-fill-600)" },
+              700: { value: "var(--accent-colour-dark-fill-700)" },
+              800: { value: "var(--accent-colour-dark-fill-800)" },
+              900: { value: "var(--accent-colour-dark-fill-900)" },
+              text: {
+                50: { value: "var(--accent-colour-dark-text-50)" },
+                100: { value: "var(--accent-colour-dark-text-100)" },
+                200: { value: "var(--accent-colour-dark-text-200)" },
+                300: { value: "var(--accent-colour-dark-text-300)" },
+                400: { value: "var(--accent-colour-dark-text-400)" },
+                DEFAULT: { value: "var(--accent-colour-dark-text-500)" },
+                500: { value: "var(--accent-colour-dark-text-500)" },
+                600: { value: "var(--accent-colour-dark-text-600)" },
+                700: { value: "var(--accent-colour-dark-text-700)" },
+                800: { value: "var(--accent-colour-dark-text-800)" },
+                900: { value: "var(--accent-colour-dark-text-900)" },
+              },
+            },
+          },
           whiteAlpha: {
             50: { value: "rgba(255, 255, 255, 0.04)" },
             100: { value: "rgba(255, 255, 255, 0.06)" },

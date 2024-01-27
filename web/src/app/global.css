@@ -4,7 +4,7 @@
   *,
   *::before,
   &::after {
-    border-color: var(--colors-black-alpha-200);
+    border-color: var(--colors-border-default);
   }
 }
 
@@ -56,7 +56,7 @@
     var(--global-font-size-h6)
   );
 
-  color-scheme: only light;
+  /* color-scheme: only light; */
 }
 
 @supports (font-size: 1cqi) {
@@ -76,8 +76,8 @@
 
 html,
 body {
-  background-color: var(--accent-colour-flat-fill-50);
-  color: var(--accent-colour-flat-text-50);
+  background-color: var(--colors-bg-default);
+  color: var(--colors-fg-default);
 }
 
 .content-viewer {
@@ -186,7 +186,7 @@ body {
   }
 
   hr {
-    border-color: var(--colors-gray-100);
+    border-color: var(--colors-border-default);
     padding-bottom: var(--spacing-2);
     padding-top: var(--spacing-2);
   }

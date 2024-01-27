@@ -51,15 +51,11 @@ export function LinkPost(props: Props) {
             </Heading1>
           </Flex>
 
-          <styled.p
-            w="full"
-            color="fg.muted"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            textWrap="nowrap"
-          >
-            <Anchor href={link.url}>{link.url}</Anchor>
-          </styled.p>
+          <Box>
+            <styled.p lineClamp={1} wordBreak="break-all">
+              <Anchor href={link.url}>{link.url}</Anchor>
+            </styled.p>
+          </Box>
         </VStack>
       </Box>
 
