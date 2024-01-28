@@ -1,14 +1,13 @@
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import "./globals.css";
+import "../fonts.css";
 
 import localFont from "next/font/local";
-
 import Head from "next/head";
-import "../fonts.css";
-import "../styles.css";
 
 const monasans = localFont({
   src: "./mona-sans.woff2",
   display: "swap",
+  variable: "--font-mona-sans",
 });
 
 export default function MyApp({ Component, pageProps }) {
@@ -42,16 +41,15 @@ export default function MyApp({ Component, pageProps }) {
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#303030" />
       </Head>
 
-      <ChakraProvider
-        theme={extendTheme({
-          fonts: {
-            heading: "p22-mackinac-pro",
-            body: monasans.style.fontFamily,
-          },
-        })}
-      >
-        <Component {...pageProps} />
-      </ChakraProvider>
+      <style jsx global>
+        {`
+          :root {
+            --font-mona-sans: ${monasans.style.fontFamily};
+          }
+        `}
+      </style>
+
+      <Component {...pageProps} />
     </>
   );
 }

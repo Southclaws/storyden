@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "baseUrl": ".",
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -18,7 +19,11 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/styled-system/*": ["styled-system/*"],
+      "@/components/*": ["components/*"]
+    }
   },
   "include": [
     "next-env.d.ts",

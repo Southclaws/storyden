@@ -1,10 +1,10 @@
-import { Box } from "@chakra-ui/react";
+import { Box } from "@/styled-system/jsx";
 import { useTheme } from "nextra-theme-docs";
 import { seo } from "./seo";
 
 export default {
   logo: (
-    <Box>
+    <Box id="logo" p="2">
       <Logo />
     </Box>
   ),
