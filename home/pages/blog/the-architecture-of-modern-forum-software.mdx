@@ -97,7 +97,42 @@ I chose Go because I like Go, and the things I like about Go fit quite nicely in
 
 I won't go into more detail about the codebase itself, it's a pretty standard idiomatic Go codebase with a few opinionated bits like initialisation-time dependency injection, that's a topic for another post.
 
-### Database: SQL and Ent
+### The data model
+
+This section won't go into every single table but a brief overview of the most important parts.
+
+#### Posts
+
+The most interesting and important part of the model is the `posts` table. It's organised as a directed acyclic graph where each post has two parent relationships:
+
+- root post:
+  - if the post is a reply within a thread then this is the first post in that thread
+  - if the post is the start of a thread, this is empty
+    - you can find all threads by simply querying for posts with no root
+- reply-to:
+  - you can also reply to specific posts within a thread, independent of the root post
+  - the reply-tree is similar in principle to that of Reddit, Hacker News or Lobste.rs
+
+There are a few benefits to this approach, a lot of older forums would model "Threads" and "Replies" as two separate tables, but this often leads to some duplication of common fields as well as making certain operations a bit more awkward such as merging two threads, moving posts between threads or promoting posts to top-level threads.
+
+There are some downsides though, Threads and Posts are not identical so there are a few fields that are only used for one but not the other (such as `slug` and `title`.)
+
+#### Authentication
+
+If you look at the "Account" schema, you may notice the lack of two fields that are usually a standard in any database schema with a "user" model:
+
+- email
+- password
+
+This omission is intentional. While [ideating](/blog/building-running-administrating-modern-forum-software) Storyden, one of the values I chose was that Storyden is a platform the the next era of internet culture (or something like that...) and the two things I'm not entirely certain will be guaranteed in 20 years time are emails and passwords.
+
+Okay, the emails one is a stretch, but passwords [I strongly believe should be optional](/blog/what-is-webauthn-passkeys#email--password-is-not-the-default-any-more).
+
+And so, this fact is true right down to the data model. Instead of encoding these concepts as fundamentals on the account table, they exist as "Authentication methods" which use a separate table on a one-to-many basis against accounts.
+
+This makes it trivial to facilitate a [choice](/blog/what-is-webauthn-passkeys#how-storyden-treats-passkeys) of authentication methods for each account and allows individual communities to customise exactly how they want to allow users to register and log in.
+
+### Database tools: SQL and Ent
 
 I have a [complicated](https://southcla.ws/sql) relationship (ha!) with relational databases, but it's a very necessary evil for such a project. While I tend to avoid pasting raw SQL into string-literals in favour of code-generated type-safe interfaces, there's a healthy balance of both.
 
@@ -210,3 +245,69 @@ export const accountUpdate = (accountUpdateBody: AccountUpdateBody) => {
 Which can be easily called in event handlers such as button clicks or form submissions, etc. The `fetcher` is a client written by hand which handles a few extra details such as CORS, cookies and errors.
 
 #### Server Side Rendering
+
+SSR and RSC are a hot topic right now, but I won't go into why. I'm bullish on it and I find the mental model productive (though the reality is a little rough around the edges.)
+
+For a full rundown, I highly recommend [this post by Josh Comeau](https://www.joshwcomeau.com/react/server-components/)!
+
+Storyden's view of this is that _any_ content consumption screen **must** be server side rendered. That is any feed of posts and the posts themselves, as well as other stuff like the knowledgebase and people's profiles.
+
+How this works in the code is all pages start life as `async` function components:
+
+```tsx
+export async function FeedScreen(props: Props) {
+  const data = await server<ThreadListOKResponse>({
+    url: `/v1/threads`,
+    params: {
+      categories: [props.category],
+    } as ThreadListParams,
+  });
+
+  return <Client category={props.category} threads={data.threads} />;
+}
+```
+
+This performs the initial API call with any query parameters passed in from the Next.js page load. It then passes the result to a component called `Client` which is in another file.
+
+<Callout>
+  One thing that's important about Next.js is that there are **two** trees it
+  cares about: the component tree and the module tree. How these trees are
+  structured has ramifications on how server side components work.
+</Callout>
+
+`Client` which is defined in a sibling module looks like something like this:
+
+```tsx
+"use client";
+
+export function Client(props: { category: string; threads: ThreadList }) {
+  const { data, error } = useThreadList(
+    {
+      categories: [props.category],
+    },
+    {
+      swr: {
+        fallbackData: props.threads && { threads: props.threads },
+      },
+    }
+  );
+
+  if (!data) return <Unready {...error} />;
+
+  return <MixedPostList posts={data?.threads} />;
+}
+```
+
+As outlined earlier, these generated hooks such as `useThreadList` are thin wrappers around `useSwr` so there are a few important things happening here:
+
+- the first argument contains the query parameters for the actual API endpoint, these are often the same as the parameters in the browser's address bar.
+- the `swr` option in the second argument means the hook will immediately return the provided data while revalidating in the background. This is called [Pre-fill data](https://swr.vercel.app/docs/prefetching.en-US#pre-fill-data) and it allows this client component to be rendered server-side using the data fetched in the server-only component above but continue to provide the benefits of SWR when it renders on the client.
+- because we're using `fallbackData`, the `data` part of the return value is _always_ present but TypeScript forces us to check due to the discriminated union return type.
+- `MixedPostList` renders immediately with the data we have on the server
+  - once the browser renders this, it'll render again after `useSwr` has re-fetched
+
+Most screens in Storyden follow this pattern, with some extra bits that make certain things easier such as mutations and pagination. But it's pretty much the same idea throughout.
+
+## Conclusion
+
+Ultimately, my goal is to make Storyden secure, modern and easy to contribute to. There's not much more to say on this, but feedback is always welcome so if you have opinions or thoughts on the direction any of this should move in, [open an issue](https://github.com/Southclaws/storyden/issues)!
