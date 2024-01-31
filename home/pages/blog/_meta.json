@@ -1,0 +1,9 @@
+{
+    "*": {
+        "theme": {
+            "typesetting": "article"
+        }
+    },
+    "index": "Index",
+    "what-is-webauthn-passkeys": "Why WebAuthn and Passkeys?"
+}
