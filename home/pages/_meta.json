@@ -11,7 +11,7 @@
         "title": "Articles",
         "type": "page",
         "theme": {
-            "layout": "blog",
+            "layout": "default",
             "typesetting": "article"
         }
     }
