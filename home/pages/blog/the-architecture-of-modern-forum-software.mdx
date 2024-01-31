@@ -1,0 +1,212 @@
+---
+date: 2023-10-05
+description: >-
+  How Storyden is architected for the modern web while making no compromises on
+  compatibility, accessibility and speed for the next era of internet culture.
+---
+
+import { Callout } from "nextra/components";
+
+# The architecture of modern forum software
+
+Storyden, that's the modern forum software I'm referring to. Even though it's [more](./what-are-social-bookmarks-link-aggregators) than just a forum! But anyway, let's get into the innards!
+
+<Callout>
+  Most of what's discussed here is subject to change based on the decisions of
+  contributors, user needs or other circumstances. Generally, what I value is
+  the rationale behind the tools of choice rather than the tools themselves.
+  Software is also known to expire and sometimes deprecated components need to
+  be swapped out for security or usability concerns. This post should be updated
+  if that does happen, but it's always worth checking the repository for the
+  gory details.
+</Callout>
+
+## Starting in the middle
+
+At the core, Storyden's behaviour is defined as an [OpenAPI](https://www.openapis.org/) specification. This specification is hand-written, optimised for readability because it's [intended to be read](https://github.com/Southclaws/storyden/blob/main/api/openapi.yaml).
+
+<details>
+  <summary>
+    I'm very proud of the silly ASCII headers optimised for editor minimaps!
+  </summary>
+  ![silly fun ascii banners!](./2024-01-31-20-10-28.png) [vscode extension for generating
+  these here](https://marketplace.visualstudio.com/items?itemName=BitBelt.converttoasciiart)
+  I use the font "Collosal" and I'm very certain these derive from a [very old website](https://patorjk.com/software/taag)
+  I found as a kid by [Patrick Gillespie](https://patorjk.com/blog/about/)
+</details>
+
+I opted to write the specification and generate the code because I really value static, declarative documents from which the boring bits can be mass-produced. I don't really enjoy writing `func(w http.ResponseWriter, r *http.Request)` functions by hand, dealing with decoding the JSON and encoding the responses and errors. OpenAPI allows me to work with functions that look like this:
+
+```go
+AccountUpdate(ctx context.Context, request openapi.AccountUpdateRequestObject) (openapi.AccountUpdateResponseObject, error) {
+  // access `request.Name`
+  // respond with an `Account` struct
+  // handle errors by returning (nil, err)
+}
+```
+
+It also allows me to generate client code for both Golang (for end-to-end tests, my favourite flavour!) and TypeScript. The frontend for calling the above example looks like this:
+
+```ts
+const updatedAccount = await accountUpdate({ name: "Southclaws" });
+// updatedAccount: { name: "Southclaws", ... }
+```
+
+Which eliminates a metric ton of work for me and other contributors!
+
+But it's more than just a time saver, it's documentation and, most importantly, a _contract!_ A contractual interface that's agreed upon by developers before diving into implementation details behind the interface.
+
+Now I don't take the spec part _that_ seriously, it's a useful layer to write some details about things that may not be obvious just from the operation name and parameters. But there's no formal MAY, SHOULD, MUST lingo in there, it's just a useful source of truth from which everything else is built on.
+
+### Speaking of APIs...
+
+Also, this makes Storyden API-driven. You can bin the stock frontend and build your own if you want! You can also build other services in whatever language you want that call these APIs to automate certain tasks where WebAssembly plugins and integrations aren't quite enough.
+
+### Content-type driven handlers
+
+Another neat thing you can do with OpenAPI is define HTML form friendly handlers. Most JSON APIs accept `application/json` from a `fetch` request. But if we want to support JS-less frontends that want to use HTML forms in all of their natural beauty, it's as simple as:
+
+```yaml
+AccountUpdate:
+  content:
+    application/json:
+      schema: { $ref: "#/components/schemas/AccountMutableProps" }
+    application/x-www-form-urlencoded:
+      schema: { $ref: "#/components/schemas/AccountMutableProps" }
+```
+
+This [`requestBody`](https://spec.openapis.org/oas/latest.html#request-body-object) schema permits two content types that use the exact same underlying schema. This re-use means certain endpoints [✳︎](#subset-of-endpoints-support-forms) can trivially be set up to support non-JS clients as long as their HTML form field IDs match the fields documented in the schema.
+
+HTML forms are important because some folks disable JavaScript for good reasons: privacy concerns, bandwidth constraints and device processing power.
+
+<Callout id="subset-of-endpoints-support-forms" emoji="*️⃣">
+  Not every endpoint is currently worth supporting HTML forums because only a
+  subset of basic functioanlity is implemented in the default Storyden frontend.
+  In theory, it would be possible to support all functionality in some way but,
+  currently (at the time of writing, 2023) I am but a sole developer and I must
+  prioritise! Most of the time, interactive menus/modals/drawers/etc can be
+  substituted for full standalone pages that implement a basic `<form>` with
+  the same fields.
+</Callout>
+
+## The Backend
+
+I've already teased some Go code so if you've not checked out [the repository](https://github.com/Southclaws/storyden), by now you can probably guess the language of choice.
+
+I chose Go because I like Go, and the things I like about Go fit quite nicely into [Storyden's goals](/blog/building-running-administrating-modern-forum-software#innovating-on-a-timeless-idea) particularly how you can compile it almost anywhere for almost anywhere else to a single binary. No deep trees of dynamic source files to package up, no version managers to get confused about, plus it's got a decent type system!
+
+I won't go into more detail about the codebase itself, it's a pretty standard idiomatic Go codebase with a few opinionated bits like initialisation-time dependency injection, that's a topic for another post.
+
+### Database: SQL and Ent
+
+I have a [complicated](https://southcla.ws/sql) relationship (ha!) with relational databases, but it's a very necessary evil for such a project. While I tend to avoid pasting raw SQL into string-literals in favour of code-generated type-safe interfaces, there's a healthy balance of both.
+
+[Ent](https://entgo.io) does most of the CRUD legwork, raw SQL does anything that requires a recursive CTE or an optimised join. That's really all there is to it. The schema has no migration strategy at the time of writing, but this will likely become a necessity as the product matures. I'll likely choose [Atlas](https://atlasgo.io) for that task but suggestions are always welcome!
+
+The main reason I chose Ent was the code generation part, the vast majority of boring queries are CRUD and don't really require too much complication or custom code. Ent also generates the structs too and provides a fairly neat way to traverse the graph of relations.
+
+### API: OpenAPI generated code
+
+The OpenAPI specification mentioned above is turned into Go code using a library called [oapi-codegen](https://github.com/deepmap/oapi-codegen) which does a decent job of generating all the schemas and interface. All developers need to do is satisfy the interface.
+
+## The Frontend
+
+My frontend tool of choice hasn't really changed since I started doing frontend work professionally. Storyden uses Next.js because I like React but also like server-side rendering and shipping HTML.
+
+Next.js has had an admittedly rocky 2023 since the "App directory" chaos and there are lots of new frameworks on the block trying to dethrone it, but I've never really been one to hop between frameworks (terrible frontend dev, aren't I?)
+
+### User interface
+
+My weapon of choice for styling is [Panda](https://panda-css.com), which by no surprise is a code-generation tool. Panda allows you to specify a design system as a (fairly) declarative document and generate all the code and CSS statically. This means the frontend doesn't need to run JavaScript to style things.
+
+Which may sound odd but... look, the frontend world has had a rough decade okay!
+
+So we're shipping static HTML and static CSS like [the Good Old Days](https://thebestmotherfucking.website). Great! But how do you _make it pop_ when everything is static?
+
+Well, I lied, it's not all static, it's [✨ Progressively Enhanced 💫](https://www.gov.uk/service-manual/technology/using-progressive-enhancement) _(very few things make me proud to be British, but the government design system is just amazing)_ which means static HTML and CSS gets sent to the browser to render everything fast, then bits of JavaScript join the party a little later to jazz it up a bit.
+
+What this means in reality is we can have all the bells and whistles of what you'd expect from a modern web **application** while still retaining the qualities of what makes a great web **site**.
+
+#### Ark UI
+
+For the actual components, I've chosen [Ark UI](https://ark-ui.com) which is a neat little headless component library providing all the standard widgets you might expect on a user interface. It pairs quite nicely with Panda CSS and together these two tools power the entire layout and interface elements of Storyden.
+
+<Callout>
+  Chakra, Panda and Ark are all from [the same amazing
+  team](https://github.com/chakra-ui)!
+</Callout>
+
+#### The road from Chakra to Panda
+
+A short side note, Storyden (and most of my products) started life with [Chakra UI](https://chakra-ui.com), which is an amazing library by the very talented Segun Adebayo. For various reasons I chose to move away from Chakra UI after Segun published [this post](https://www.adebayosegun.com/blog/the-future-of-chakra-ui#zero-runtime-css-in-js-panda) and I discovered that Panda is a better fit for the project.
+
+To learn more about why Storyden moved from, [I wrote a short thread about that](https://twitter.com/Southclaws/status/1742274927133151614). And if you're interested in the technical details of _how_ to migrate from Chakra UI to Panda CSS, [I also wrote a guide](https://southcla.ws/how-to-migrate-from-chakra-ui-to-panda-css)!
+
+### SWR
+
+The underlying request state for the React code is managed by [SWR](https://swr.vercel.app), a neat little library from the Vercel team which I fondly remember the release of. It does a few handy things that facilitate instantaneous reactivity to interactions that result in mutations and data access.
+
+I won't go into the details but it's a fantastic tool for building web applications that feel like local apps.
+
+### How OpenAPI is used
+
+For the client code generation, I chose a tool called [Orval](https://orval.dev) which generates code which utilises [SWR](#SWR) as well as all the TypeScript types that match the OpenAPI schemas and the Go structs on the other end.
+
+#### Data retrieval
+
+Getting data (via GET requests) is done via hooks that look like this:
+
+```ts
+export const useAccountGet = <
+  TError = UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof accountGet>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAccountGetKey() : null));
+  const swrFn = () => accountGet();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+```
+
+Which roughly just wrap a `useSwr` hook call and sprinkle in some type annotations.
+
+Note that there's no actual schema validation happening here with a tool such as [Zod](https://zod.dev) because the assumption is that the backend is conforming to the OpenAPI specification too. Given that Storyden is in control of both sides of this in the monorepo, it's a compromise I'm willing to make.
+
+#### Data mutation
+
+Mutations to data such as create, update and delete (POST, PUT, PATCH and DELETE) are done via functions that look like this:
+
+```ts
+/**
+ * Update the information for the currently authenticated account.
+ */
+export const accountUpdate = (accountUpdateBody: AccountUpdateBody) => {
+  return fetcher<AccountUpdateOKResponse>({
+    url: `/v1/accounts`,
+    method: "patch",
+    headers: { "Content-Type": "application/json" },
+    data: accountUpdateBody,
+  });
+};
+```
+
+Which can be easily called in event handlers such as button clicks or form submissions, etc. The `fetcher` is a client written by hand which handles a few extra details such as CORS, cookies and errors.
+
+#### Server Side Rendering
