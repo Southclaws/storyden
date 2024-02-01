@@ -1,5 +1,6 @@
 import { Box } from "@/styled-system/jsx";
 import { useTheme } from "nextra-theme-docs";
+import { seo } from "./seo";
 
 export default {
   logo: (
@@ -7,6 +8,10 @@ export default {
       <Logo />
     </Box>
   ),
+  useNextSeoProps() {
+    return seo;
+  },
+  head: null,
   project: {
     link: "https://github.com/Southclaws/storyden",
   },
