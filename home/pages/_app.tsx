@@ -1,8 +1,12 @@
+import { DefaultSeo } from "next-seo";
+
 import "./globals.css";
 import "../fonts.css";
 
 import localFont from "next/font/local";
 import Head from "next/head";
+
+import { seo } from "../seo";
 
 const monasans = localFont({
   src: "./mona-sans.woff2",
@@ -48,6 +52,8 @@ export default function MyApp({ Component, pageProps }) {
           }
         `}
       </style>
+
+      <DefaultSeo {...seo} />
 
       <Component {...pageProps} />
     </>
