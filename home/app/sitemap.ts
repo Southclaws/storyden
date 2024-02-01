@@ -36,6 +36,8 @@ const lastModified = new Date();
 
 const onlyMDX = filter<string>((v) => v.endsWith(".mdx"));
 
+const stripIndex = filter<string>((v) => !v.endsWith("index"));
+
 const onlyFiles = filter<Dirent>((v) => v.isFile());
 
 const toFilePath = map<Dirent, string>((v) => path.join(v.path, v.name));
@@ -53,7 +55,7 @@ const toSitemapItem = ({ sub, changeFrequency, priority }: ItemSettings) =>
   }));
 
 const processPaths = (s: ItemSettings) =>
-  flow(onlyMDX, removeExtension, toSitemapItem(s));
+  flow(onlyMDX, removeExtension, stripIndex, toSitemapItem(s));
 
 const processBlogPaths = processPaths({
   sub: "blog",
