@@ -8,15 +8,13 @@ import {
   VStack,
   styled,
 } from "@/styled-system/jsx";
-import { NextSeo } from "next-seo";
 import Image from "next/image";
 import Link from "next/link";
 
-import { seo } from "../seo";
 import { FullLogo } from "@/components/FullLogo";
+import { Logo } from "@/components/Logo";
 import { css, cx } from "@/styled-system/css";
 import { Floating, linkButton } from "@/styled-system/patterns";
-import { Logo } from "@/components/Logo";
 
 function Nav() {
   const item = css({
@@ -966,7 +964,6 @@ function Footer() {
 export default function Home() {
   return (
     <Box>
-      <NextSeo title="Storyden: A forum for the modern age." {...seo} />
       <Nav />
       <Hero />
       <Story />
