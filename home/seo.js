@@ -1,5 +1,6 @@
 export const seo = {
   titleTemplate: "%s – Storyden",
+  defaultTitle: "Storyden: A forum for the modern age.",
   description:
     "Storyden is a platform for building communities. A modern take on oldschool bulletin board forums. Designed to be the community platform for the next era of internet culture.",
   themeColor: "#303030",
