@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -21,9 +25,14 @@
       }
     ],
     "paths": {
-      "@/styled-system/*": ["styled-system/*"],
-      "@/components/*": ["components/*"]
-    }
+      "@/styled-system/*": [
+        "styled-system/*"
+      ],
+      "@/components/*": [
+        "components/*"
+      ]
+    },
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
@@ -32,5 +41,7 @@
     ".next/types/**/*.ts",
     "pages/_app.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

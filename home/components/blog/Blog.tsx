@@ -21,9 +21,15 @@ export function Blog() {
       {posts.map((post) => {
         const {
           route,
-          meta: { title },
+          meta,
           frontMatter: { description, date },
         } = post;
+
+        const title = meta?.["title"] ?? "(No title)";
+
+        const timestamp = formatDistanceToNow(date ?? "2021-08-14", {
+          addSuffix: true,
+        });
 
         return (
           <li key={route}>
@@ -32,8 +38,7 @@ export function Blog() {
                 <h1>{title}</h1>
               </Link>
               <p className={styles["timestamp"]}>
-                Posted{" "}
-                <time>{formatDistanceToNow(date, { addSuffix: true })}</time>
+                Posted <time>{timestamp}</time>
               </p>
               <p>{description}</p>
             </article>
