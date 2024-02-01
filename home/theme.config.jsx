@@ -14,8 +14,7 @@ export default {
   project: {
     link: "https://github.com/Southclaws/storyden",
   },
-  docsRepositoryBase:
-    "https://github.com/Southclaws/storyden/blob/main/home/pages",
+  docsRepositoryBase: "https://github.com/Southclaws/storyden/blob/main/home",
 };
 
 function Logo() {
