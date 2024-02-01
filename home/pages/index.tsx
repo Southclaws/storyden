@@ -834,8 +834,9 @@ function CTA() {
         </styled.a>
       </styled.p>
       <styled.p>
-        If you're feeling <b>social</b>, fancy chatting with likeminded folks
-        and want to steer Storyden's development as an early bird, please click{" "}
+        If you&apos;re feeling <b>social</b>, fancy chatting with likeminded
+        folks and want to steer Storyden&apos;s development as an early bird,
+        please click{" "}
         <styled.a
           href="https://discord.gg/XF6ZBGF9XF"
           color="hsla(265, 56%, 42%, 1)"
