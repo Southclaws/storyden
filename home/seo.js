@@ -16,13 +16,6 @@ export const seo = {
         alt: "Storyden: A forum for the modern age.",
         type: "image/png",
       },
-      {
-        url: "https://www.storyden.org/social.png",
-        width: 1728,
-        height: 864,
-        alt: "Storyden: A forum for the modern age.",
-        type: "image/png",
-      },
     ],
   },
   twitter: {
