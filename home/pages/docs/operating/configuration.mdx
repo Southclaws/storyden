@@ -3,6 +3,8 @@ title: Configuration via Environment Variables
 description: Reference for configuring Storyden with environment variables.
 ---
 
+import { Callout } from "nextra/components";
+
 # Configuration
 
 "Configuration" throughout the documentation and codebase refers to these variables which are statically set when the process launches. Changing them requires a restart, however they don't need to be changed much once set.
@@ -20,10 +22,10 @@ These settings are necessary to customise for pretty much all production install
 Used for logging and switching some behaviour to use mocks instead of real services.
 
 When true:
+
 - logs will be output in JSON.
-- emails will be logged instead of sent.
-- SMS messages will be logged instead of sent.
-- other behaviour that, generally, only developers of Storyden will care about.
+- emails will be sent instead of logged.
+- SMS messages will be sent instead of logged.
 
 ### `DATABASE_URL`
 
@@ -43,7 +45,6 @@ The interface bind address. Usually you won't ever need to change this.
 
 This is important as it affects the ability for users to authenticate. It's used for both cookies and WebAuthn.
 
-
 Warning: Changing this will break WebAuthn/Passkey sessions. There's a planned workaround coming but currently it's not recommended you switch domains if you allow users to authenticate with WebAuthn/Passkey.
 
 ### `SESSION_KEY`
@@ -51,6 +52,12 @@ Warning: Changing this will break WebAuthn/Passkey sessions. There's a planned w
 > default: `0000000000000000`
 
 An encryption key for secure cookies. Do not leave this as the default value for production installations. Changing this value will invalidate all active sessions.
+
+<Callout type="info">
+  Changing the session key will invalidate all existing sessions and force all
+  users to log in again. It's best to set this once and only change it if you
+  believe the key has been compromised.
+</Callout>
 
 ### `PUBLIC_WEB_ADDRESS`
 
