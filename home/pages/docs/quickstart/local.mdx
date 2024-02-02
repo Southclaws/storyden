@@ -3,6 +3,18 @@ title: Running locally
 description: Setting up a Storyden instance on your local machine in 30 seconds.
 ---
 
-# Prerequisites
+# Running Storyden locally
 
-- Docker
+## Docker
+
+```sh
+docker run ghcr.io/southclaws/storyden
+```
+
+This will start the full stack (API and web interface) accessible at `http://localhost:3000`.
+
+## Containerless
+
+We don't currently ship release binaries for all systems so in order to run without using a container image, you must compile from source.
+
+For the backend, that's as simple as `go build ./cmd/backend` in the project root and the frontend is a standard Next.js app so you can use `yarn build` in the `web/` directory.
