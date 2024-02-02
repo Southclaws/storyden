@@ -3,6 +3,8 @@ title: Fly.io
 description: Setting up a Storyden instance on Fly.io in under 5 minutes!
 ---
 
+import { Callout } from "nextra/components";
+
 # Fly.io
 
 Fly.io is a platform for running Docker containers on a global network of edge servers. It's a great fit for Storyden because it's container-native and super simple to get started!
@@ -81,13 +83,13 @@ We need to add a volume mount to the `[mounts]` section:
     #
     # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
     #
-    
+
     app = "storyden-unique-name-1234"
     primary_region = "lhr"
-    
+
     [build]
       image = "ghcr.io/southclaws/storyden"
-    
+
     [http_service]
       internal_port = 3000
       force_https = true
@@ -95,7 +97,7 @@ We need to add a volume mount to the `[mounts]` section:
       auto_start_machines = true
       min_machines_running = 0
       processes = ["app"]
-    
+
     [[vm]]
       cpu_kind = "shared"
       cpus = 1
@@ -106,13 +108,29 @@ We need to add a volume mount to the `[mounts]` section:
 +     destination="/data"
 ```
 
-### Domain
+### Environment Variables
 
 Relevant documentation: https://fly.io/docs/reference/configuration#the-env-variables-section
 
-Storyden uses secure cookies for session authentication. As a result, it needs to know what domain it's running on so it can set the `Domain` flag on the cookie.
+Storyden uses secure cookies for session authentication. As a result, it needs to know two things:
 
-There are three relevant environment variables that need the domain name. In the above section, when you ran `fly launch`, it gives you the URL of your app. This URL will look something like:
+- what domain it's running on so it can set the `Domain` flag on the cookie
+- a unique encryption key to keep session tokens secure
+
+Here's an example of the environment variables section in the `fly.toml` file:
+
+```toml
+[env]
+  COOKIE_DOMAIN      = "storyden-unique-name-1234.fly.dev"
+  PUBLIC_WEB_ADDRESS = "https://storyden-unique-name-1234.fly.dev"
+  SESSION_KEY        = "<your key>"
+```
+
+#### `COOKIE_DOMAIN` and `PUBLIC_WEB_ADDRESS`
+
+The [cookie domain](/docs/operating/configuration#cookie_domain) and [public web address](/docs/operating/configuration#public_web_address) variables are necessary for Storyden to manage sessions using cookies and a few other things such as knowing where links should point to.
+
+In the above section, when you ran `fly launch`, it gives you the URL of your app. This URL will look something like:
 
 ```
 https://storyden-unique-name-1234.fly.dev
@@ -120,15 +138,17 @@ https://storyden-unique-name-1234.fly.dev
 
 It's a subdomain of `fly.dev` and is uniquely generated based on your app name. You can refer to the Fly.io domains documentation for information on setting up a custom domain.
 
-```toml
-[env]
-  COOKIE_DOMAIN      = "storyden-unique-name-1234.fly.dev"
-  PUBLIC_WEB_ADDRESS = "https://storyden-unique-name-1234.fly.dev"
-```
+#### `SESSION_KEY`
+
+The [session key](/docs/operating/configuration#session_key) is an important security feature. It's used to encrypt session tokens so that they can't be tampered with. It's important to set this to a unique value that is kept secret. You can use any trusted source of randomness on your local machine to generate it.
+
+<Callout type="warning" emoji="⚠️">
+  A session key must be a hexadecimal string with 16 or more characters.
+</Callout>
 
 ### Re-deploy
 
-And then re-deploy the app:
+Once you've set the three required environment variables, plus anything else from the [configuration](/docs/operating/configuration), you can now re-deploy the app:
 
 ```sh
 fly deploy
