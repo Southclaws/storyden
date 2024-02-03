@@ -2,7 +2,7 @@ import { Options, buildPayload, cleanQuery, shouldLog } from "./common";
 
 export const fetcher = async <T>({
   url,
-  method = "get",
+  method = "GET",
   headers,
   params,
   data,
