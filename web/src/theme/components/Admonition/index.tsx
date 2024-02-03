@@ -36,7 +36,7 @@ export function Admonition(props: PropsWithChildren<AdmonitionProps>) {
           )}
           {props.children}
         </VStack>
-        <Button size="xs" kind="secondary" onClick={handleClose}>
+        <Button size="xs" kind="neutral" onClick={handleClose}>
           Close
         </Button>
       </_Admonition>

@@ -24,7 +24,7 @@ export async function AuthSelection() {
         <styled.li w="full" key={v.provider}>
           <Link
             size="sm"
-            kind="secondary"
+            kind="neutral"
             w="full"
             href={v.link ?? `/auth/${v.provider}`}
           >

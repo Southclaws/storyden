@@ -1,4 +1,4 @@
-import { mapObject } from '../helpers.mjs';
+import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const CardConfig = {
@@ -18,7 +18,10 @@ transform(props) {
   };
 }}
 
-export const getCardStyle = (styles = {}) => CardConfig.transform(styles, { map: mapObject })
+export const getCardStyle = (styles = {}) => {
+  const _styles = getPatternStyles(CardConfig, styles)
+  return CardConfig.transform(_styles, patternFns)
+}
 
 export const Card = (styles) => css(getCardStyle(styles))
 Card.raw = getCardStyle

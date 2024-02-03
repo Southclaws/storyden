@@ -56,7 +56,7 @@ export function LoginForm(props: Props) {
 
             <Button
               w="full"
-              kind="secondary"
+              kind="neutral"
               size="sm"
               type="button"
               onClick={handleWebauthn}

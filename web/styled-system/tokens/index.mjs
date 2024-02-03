@@ -2119,13 +2119,17 @@ const tokens = {
     "value": "var(--border-widths-thick)",
     "variable": "var(--border-widths-thick)"
   },
-  "colors.bg.accent": {
-    "value": "var(--colors-bg-accent)",
-    "variable": "var(--colors-bg-accent)"
-  },
   "colors.bg.default": {
     "value": "var(--colors-bg-default)",
     "variable": "var(--colors-bg-default)"
+  },
+  "colors.bg.site": {
+    "value": "var(--colors-bg-site)",
+    "variable": "var(--colors-bg-site)"
+  },
+  "colors.bg.accent": {
+    "value": "var(--colors-bg-accent)",
+    "variable": "var(--colors-bg-accent)"
   },
   "colors.bg.opaque": {
     "value": "var(--colors-bg-opaque)",
@@ -2531,13 +2535,17 @@ const tokens = {
     "value": "var(--colors-color-palette-dark-text)",
     "variable": "var(--colors-color-palette-dark-text)"
   },
-  "colors.colorPalette.accent": {
-    "value": "var(--colors-color-palette-accent)",
-    "variable": "var(--colors-color-palette-accent)"
-  },
   "colors.colorPalette.default": {
     "value": "var(--colors-color-palette-default)",
     "variable": "var(--colors-color-palette-default)"
+  },
+  "colors.colorPalette.site": {
+    "value": "var(--colors-color-palette-site)",
+    "variable": "var(--colors-color-palette-site)"
+  },
+  "colors.colorPalette.accent": {
+    "value": "var(--colors-color-palette-accent)",
+    "variable": "var(--colors-color-palette-accent)"
   },
   "colors.colorPalette.opaque": {
     "value": "var(--colors-color-palette-opaque)",

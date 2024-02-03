@@ -24,15 +24,19 @@ export const checkbox = defineSlotRecipe({
       transitionDuration: "normal",
       transitionProperty: "border-color, background",
       transitionTimingFunction: "default",
+      background: "bg.subtle",
       _hover: {
         background: "bg.subtle",
       },
       _checked: {
-        background: "accent.100",
+        background: "bg.accent",
         borderColor: "border.accent",
         _hover: {
-          background: "accent.50",
+          background: "accent.500",
         },
+      },
+      _active: {
+        background: "bg.accent/50",
       },
     },
   },

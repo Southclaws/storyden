@@ -18,7 +18,6 @@ const buttonVariantMap = {
   "kind": [
     "neutral",
     "primary",
-    "secondary",
     "destructive",
     "ghost",
     "blank"
