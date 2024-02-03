@@ -5,7 +5,7 @@ import { Options, buildPayload, cleanQuery, shouldLog } from "./common";
 export const server = async <T>({
   url,
   params,
-  method = "get",
+  method = "GET",
   data,
   cookie,
 }: Options): Promise<T> => {

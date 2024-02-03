@@ -2,7 +2,7 @@ import { isNil, omitBy } from "lodash/fp";
 
 export type Options = {
   url: string;
-  method?: "get" | "post" | "put" | "delete" | "patch";
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   params?: Record<string, string | string[] | boolean>;
   data?: unknown;
