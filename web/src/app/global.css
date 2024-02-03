@@ -76,7 +76,7 @@
 
 html,
 body {
-  background-color: var(--colors-bg-default);
+  background-color: var(--colors-bg-site);
   color: var(--colors-fg-default);
 }
 

@@ -88,7 +88,6 @@ export function Palette({ accent_colour, theme }: any) {
         <VStack>
           <Button kind="neutral">Neutral</Button>
           <Button kind="primary">Primary</Button>
-          <Button kind="secondary">Secondary</Button>
           <Button kind="destructive">Destructive</Button>
         </VStack>
 
@@ -98,9 +97,6 @@ export function Palette({ accent_colour, theme }: any) {
           </Button>
           <Button kind="primary" disabled>
             Primary
-          </Button>
-          <Button kind="secondary" disabled>
-            Secondary
           </Button>
           <Button kind="destructive" disabled>
             Destructive
@@ -113,9 +109,6 @@ export function Palette({ accent_colour, theme }: any) {
           </Link>
           <Link href="#" kind="primary">
             Primary
-          </Link>
-          <Link href="#" kind="secondary">
-            Secondary
           </Link>
         </VStack>
       </HStack>

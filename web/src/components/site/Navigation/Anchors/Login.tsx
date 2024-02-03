@@ -4,7 +4,7 @@ import { StyleProps } from "@/styled-system/types";
 
 export function LoginAction(props: StyleProps) {
   return (
-    <Link href="/login" kind="secondary" size="sm" {...props}>
+    <Link href="/login" kind="neutral" size="sm" {...props}>
       Login
     </Link>
   );

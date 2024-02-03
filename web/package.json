@@ -38,11 +38,11 @@
     "slate-react": "^0.101.6",
     "swr": "^2.2.2",
     "unified": "^11.0.4",
-    "vaul": "^0.8.9",
+    "vaul": "^0.9.0",
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.28.0",
+    "@pandacss/dev": "^0.29.1",
     "@simplewebauthn/typescript-types": "^8.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/node": "^20.8.7",
