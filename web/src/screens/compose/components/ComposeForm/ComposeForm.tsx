@@ -47,7 +47,7 @@ export function ComposeForm(props: Props) {
             gap="2"
             alignItems="end"
           >
-            <Button kind="secondary" disabled={!isValid} onClick={onSave}>
+            <Button kind="neutral" disabled={!isValid} onClick={onSave}>
               Save
             </Button>
 

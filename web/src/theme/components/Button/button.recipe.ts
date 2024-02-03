@@ -34,6 +34,9 @@ export const button = defineRecipe({
     userSelect: "none",
     verticalAlign: "middle",
     whiteSpace: "nowrap",
+    _hover: {
+      boxShadow: "md",
+    },
   },
   defaultVariants: {
     kind: "neutral",
@@ -53,81 +56,38 @@ export const button = defineRecipe({
   variants: {
     kind: {
       neutral: {
-        backgroundColor: "blackAlpha.100",
+        backgroundColor: "bg.default",
         _hover: {
-          background: "gray.100",
-          boxShadow: "md",
-          _osDark: {
-            background: "bg.subtle",
-          },
-        },
-        _focusVisible: {
-          outlineOffset: "2px",
-          outline: "2px solid",
-          outlineColor: "border.outline",
+          background: "fg.subtle/20",
         },
         _active: {
-          backgroundColor: "gray.200",
+          background: "fg.subtle/40",
         },
         _disabled,
       },
       primary: {
-        backgroundColor: "accent.500",
-        color: "accent.text.500",
+        backgroundColor: "bg.accent",
         _hover: {
-          backgroundColor: "accent.400",
-          boxShadow: "md",
-          _osDark: {
-            background: "bg.subtle",
-          },
-        },
-        _focusVisible: {
-          outlineOffset: "2px",
-          outline: "2px solid",
-          outlineColor: "border.outline",
+          backgroundColor: "bg.accent/80",
         },
         _active: {
-          backgroundColor: "accent.600",
-        },
-        _disabled,
-      },
-      secondary: {
-        backgroundColor: "gray.200",
-        color: "accent.text.200",
-        _hover: {
-          backgroundColor: "gray.300",
-          boxShadow: "md",
-          _osDark: {
-            background: "bg.subtle",
-          },
-        },
-        _active: {
-          backgroundColor: "gray.400",
+          backgroundColor: "bg.accent/90",
         },
         _disabled,
       },
       destructive: {
-        backgroundColor: "rose.600",
-        color: "white",
+        backgroundColor: "bg.destructive",
         _hover: {
-          backgroundColor: "rose.500",
-          boxShadow: "md",
-          _osDark: {
-            background: "bg.subtle",
-          },
+          backgroundColor: "bg.destructive/80",
         },
         _active: {
-          backgroundColor: "rose.700",
+          backgroundColor: "bg.destructive/90",
         },
         _disabled,
       },
       ghost: {
         _hover: {
-          backgroundColor: "gray.200",
-          boxShadow: "md",
-          _osDark: {
-            background: "bg.subtle",
-          },
+          backgroundColor: "bg.subtle",
         },
         _active: {
           backgroundColor: "gray.300",

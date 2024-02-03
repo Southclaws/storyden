@@ -208,6 +208,7 @@ interface PropertyValueTypes {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
+	containerName: Tokens["containerNames"];
 	colorPalette: "current" | "black" | "white" | "transparent" | "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl";
 }
@@ -391,10 +392,10 @@ type FilterVagueString<Key, Value> = Value extends boolean
     ? Value extends `${infer _}` ? Value : never
     : Value
 
-type PropOrCondition<Key, Value> = ConditionalValue<WithEscapeHatch<Value>>
+type PropOrCondition<Key, Value> = ConditionalValue<WithEscapeHatch<FilterVagueString<Key, Value>>>
 
 type PropertyTypeValue<T extends string> = T extends keyof PropertyTypes
-  ? PropOrCondition<T, PropertyTypes[T]>
+  ? PropOrCondition<T, T extends StrictableProps ? PropertyTypes[T] : PropertyTypes[T]>
   : never;
 
 type CssPropertyValue<T extends string> = T extends keyof CssProperties

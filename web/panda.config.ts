@@ -34,9 +34,110 @@ conic-gradient(
 );
 `;
 
+//prettier-rule
+
+const semanticTokens = defineSemanticTokens({
+  blurs: {
+    frosted: { value: "8px" },
+  },
+  opacity: {
+    0: { value: "0" },
+    1: { value: "0.1" },
+    2: { value: "0.2" },
+    3: { value: "0.3" },
+    4: { value: "0.4" },
+    5: { value: "0.5" },
+    6: { value: "0.6" },
+    7: { value: "0.7" },
+    8: { value: "0.8" },
+    9: { value: "0.9" },
+    full: { value: "1" },
+  },
+  borderWidths: {
+    none: { value: "0" },
+    hairline: { value: "0.5px" },
+    thin: { value: "1px" },
+    medium: { value: "3px" },
+    thick: { value: "3px" },
+  },
+  colors: {
+    bg: {
+      default: {
+        value: { base: "{colors.white}", _osDark: "{colors.gray.800}" },
+      },
+      site: {
+        value: { base: "{colors.accent.50}", _osDark: "{colors.gray.900}" },
+      },
+      accent: {
+        value: { base: "{colors.accent.500}", _osDark: "{colors.accent.900}" },
+      },
+      opaque: {
+        value: { base: "{colors.white}", _osDark: "{colors.gray.800}" },
+      },
+      subtle: {
+        value: { base: "{colors.gray.200}", _osDark: "{colors.gray.800}" },
+      },
+      muted: {
+        value: { base: "{colors.gray.300}", _osDark: "{colors.gray.900}" },
+      },
+      emphasized: {
+        value: { base: "{colors.gray.400}", _osDark: "{colors.gray.500}" },
+      },
+      disabled: {
+        value: { base: "{colors.gray.300}", _osDark: "{colors.gray.400}" },
+      },
+      destructive: {
+        value: { base: "{colors.red.300}", _osDark: "{colors.red.400}" },
+      },
+    },
+    fg: {
+      default: {
+        value: { base: "{colors.gray.900}", _osDark: "{colors.gray.50}" },
+      },
+      muted: {
+        value: { base: "{colors.gray.600}", _osDark: "{colors.gray.200}" },
+      },
+      subtle: {
+        value: { base: "{colors.gray.500}", _osDark: "{colors.gray.500}" },
+      },
+      disabled: {
+        value: { base: "{colors.gray.400}", _osDark: "{colors.gray.600}" },
+      },
+      destructive: {
+        value: { base: "{colors.red.500}", _osDark: "{colors.red.400}" },
+      },
+    },
+    border: {
+      default: { value: "{colors.blackAlpha.200}" },
+      muted: { value: "{colors.gray.500}" },
+      subtle: { value: "{colors.gray.300}" },
+      disabled: { value: "{colors.gray.400}" },
+
+      outline: { value: "{colors.blackAlpha.50}" },
+      accent: { value: "{colors.bg.accent}" },
+    },
+    conicGradient: {
+      value: conicGradient,
+    },
+    cardBackgroundGradient: {
+      value: "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+    },
+    backgroundGradientH: {
+      value: "linear-gradient(90deg, var(--colors-bg-default), transparent)",
+    },
+    backgroundGradientV: {
+      value: "linear-gradient(0deg, var(--colors-bg-default), transparent)",
+    },
+  },
+  spacing: {
+    safeBottom: { value: "env(safe-area-inset-bottom)" },
+  },
+});
+
 export default defineConfig({
   preflight: true,
   strictTokens: true,
+  strictPropertyValues: true,
   include: ["./src/**/*.tsx"],
   jsxFramework: "react",
   exclude: [],
@@ -64,7 +165,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque",
+            backgroundColor: "bg.opaque/80",
             backdropBlur: "frosted",
             backdropFilter: "auto",
           };
@@ -75,7 +176,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque",
+            backgroundColor: "bg.opaque/80",
             backdropBlur: "frosted",
             backdropFilter: "auto",
             borderRadius: "lg",
@@ -139,139 +240,7 @@ export default defineConfig({
       card: card,
     },
     extend: {
-      semanticTokens: defineSemanticTokens({
-        blurs: {
-          frosted: { value: "8px" },
-        },
-        opacity: {
-          0: { value: "0" },
-          1: { value: "0.1" },
-          2: { value: "0.2" },
-          3: { value: "0.3" },
-          4: { value: "0.4" },
-          5: { value: "0.5" },
-          6: { value: "0.6" },
-          7: { value: "0.7" },
-          8: { value: "0.8" },
-          9: { value: "0.9" },
-          full: { value: "1" },
-        },
-        borderWidths: {
-          none: { value: "0" },
-          hairline: { value: "0.5px" },
-          thin: { value: "1px" },
-          medium: { value: "3px" },
-          thick: { value: "3px" },
-        },
-        colors: {
-          bg: {
-            accent: {
-              value: {
-                base: "{colors.accent.50}",
-                _osDark: "{colors.gray.800}",
-              },
-            },
-            default: {
-              value: {
-                base: "{colors.white}",
-                _osDark: "{colors.blackAlpha.500}",
-              },
-            },
-            opaque: {
-              value: {
-                base: "{colors.whiteAlpha.800}",
-                _osDark: "{colors.bg.default}",
-              },
-            },
-            subtle: {
-              value: {
-                base: "{colors.gray.200}",
-                _osDark: "{colors.gray.800}",
-              },
-            },
-            muted: {
-              value: {
-                base: "{colors.gray.300}",
-                _osDark: "{colors.gray.900}",
-              },
-            },
-            emphasized: {
-              value: {
-                base: "{colors.gray.400}",
-                _osDark: "{colors.gray.500}",
-              },
-            },
-            disabled: {
-              value: {
-                base: "{colors.gray.300}",
-                _osDark: "{colors.gray.400}",
-              },
-            },
-            destructive: {
-              value: { base: "{colors.red.300}", _osDark: "{colors.red.400}" },
-            },
-          },
-          fg: {
-            default: {
-              value: {
-                base: "{colors.gray.900}",
-                _osDark: "{colors.gray.50}",
-              },
-            },
-            muted: {
-              value: {
-                base: "{colors.gray.600}",
-                _osDark: "{colors.gray.200}",
-              },
-            },
-            subtle: {
-              value: {
-                base: "{colors.gray.500}",
-                _osDark: "{colors.gray.500}",
-              },
-            },
-            disabled: {
-              value: {
-                base: "{colors.gray.400}",
-                _osDark: "{colors.gray.600}",
-              },
-            },
-            destructive: {
-              value: {
-                base: "{colors.red.500}",
-                _osDark: "{colors.red.400}",
-              },
-            },
-          },
-          border: {
-            default: { value: "{colors.blackAlpha.200}" },
-            muted: { value: "{colors.gray.500}" },
-            subtle: { value: "{colors.gray.300}" },
-            disabled: { value: "{colors.gray.400}" },
-
-            outline: { value: "{colors.blackAlpha.50}" },
-            accent: { value: "{colors.accent.default}" },
-          },
-          conicGradient: {
-            value: conicGradient,
-          },
-          cardBackgroundGradient: {
-            value:
-              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
-          },
-          backgroundGradientH: {
-            value:
-              "linear-gradient(90deg, var(--colors-bg-default), transparent)",
-          },
-          backgroundGradientV: {
-            value:
-              "linear-gradient(0deg, var(--colors-bg-default), transparent)",
-          },
-        },
-        spacing: {
-          safeBottom: { value: "env(safe-area-inset-bottom)" },
-        },
-      }),
+      semanticTokens,
       tokens: defineTokens({
         zIndex: {
           hide: { value: -1 },

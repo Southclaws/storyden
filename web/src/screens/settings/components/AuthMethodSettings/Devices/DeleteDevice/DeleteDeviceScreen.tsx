@@ -25,7 +25,7 @@ export function RoleCreateScreen(props: WithDisclosure<Props>) {
         pb="3"
         gap="4"
       >
-        <Button w="full" size="sm" kind="secondary" onClick={props.onClose}>
+        <Button w="full" size="sm" kind="neutral" onClick={props.onClose}>
           Cancel
         </Button>
         <Button w="full" size="sm" kind="destructive" onClick={handleConfirm}>

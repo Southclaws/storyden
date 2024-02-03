@@ -10,8 +10,9 @@ const linkVariantMap = {
   "kind": [
     "neutral",
     "primary",
-    "secondary",
-    "ghost"
+    "destructive",
+    "ghost",
+    "blank"
   ],
   "size": [
     "xs",

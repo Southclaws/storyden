@@ -56,7 +56,7 @@ export function RegisterForm(props: Props) {
 
             <Button
               w="full"
-              kind="secondary"
+              kind="neutral"
               size="sm"
               type="button"
               onClick={handleWebauthn}
