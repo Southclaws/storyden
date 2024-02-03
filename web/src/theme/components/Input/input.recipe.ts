@@ -4,7 +4,7 @@ export const input = defineRecipe({
   className: "input",
   base: {
     appearance: "none",
-    backgroundColor: "whiteAlpha.600",
+    backgroundColor: "bg.subtle",
     borderColor: "blackAlpha.50",
     borderRadius: "lg",
     boxShadow: "xs",
@@ -18,8 +18,9 @@ export const input = defineRecipe({
       color: "fg.subtle",
     },
     _disabled: {
-      opacity: 0.4,
       cursor: "not-allowed",
+      background: "bg.subtle",
+      color: "fg.disabled",
     },
     _focus: {
       borderColor: "border.accent",
