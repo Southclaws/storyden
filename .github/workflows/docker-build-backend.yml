@@ -2,6 +2,7 @@ name: Build backend image
 
 on:
   push:
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
