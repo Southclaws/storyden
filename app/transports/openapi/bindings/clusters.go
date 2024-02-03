@@ -154,8 +154,10 @@ func (c *Clusters) ClusterDelete(ctx context.Context, request openapi.ClusterDel
 }
 
 func (c *Clusters) ClusterAddAsset(ctx context.Context, request openapi.ClusterAddAssetRequestObject) (openapi.ClusterAddAssetResponseObject, error) {
+	id := openapi.ParseID(request.AssetId)
+
 	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
-		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+		AssetsAdd: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -167,8 +169,10 @@ func (c *Clusters) ClusterAddAsset(ctx context.Context, request openapi.ClusterA
 }
 
 func (c *Clusters) ClusterRemoveAsset(ctx context.Context, request openapi.ClusterRemoveAssetRequestObject) (openapi.ClusterRemoveAssetResponseObject, error) {
+	id := openapi.ParseID(request.AssetId)
+
 	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
-		AssetsRemove: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+		AssetsRemove: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

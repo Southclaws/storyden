@@ -204,8 +204,8 @@ func (aq *AssetQuery) FirstX(ctx context.Context) *Asset {
 
 // FirstID returns the first Asset ID from the query.
 // Returns a *NotFoundError when no Asset ID was found.
-func (aq *AssetQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (aq *AssetQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -217,7 +217,7 @@ func (aq *AssetQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AssetQuery) FirstIDX(ctx context.Context) string {
+func (aq *AssetQuery) FirstIDX(ctx context.Context) xid.ID {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -255,8 +255,8 @@ func (aq *AssetQuery) OnlyX(ctx context.Context) *Asset {
 // OnlyID is like Only, but returns the only Asset ID in the query.
 // Returns a *NotSingularError when more than one Asset ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AssetQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (aq *AssetQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+	var ids []xid.ID
 	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -272,7 +272,7 @@ func (aq *AssetQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AssetQuery) OnlyIDX(ctx context.Context) string {
+func (aq *AssetQuery) OnlyIDX(ctx context.Context) xid.ID {
 	id, err := aq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -300,7 +300,7 @@ func (aq *AssetQuery) AllX(ctx context.Context) []*Asset {
 }
 
 // IDs executes the query and returns a list of Asset IDs.
-func (aq *AssetQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (aq *AssetQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
@@ -312,7 +312,7 @@ func (aq *AssetQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AssetQuery) IDsX(ctx context.Context) []string {
+func (aq *AssetQuery) IDsX(ctx context.Context) []xid.ID {
 	ids, err := aq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -584,7 +584,7 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 
 func (aq *AssetQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Post)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Asset)
+	byID := make(map[xid.ID]*Asset)
 	nids := make(map[xid.ID]map[*Asset]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -614,10 +614,10 @@ func (aq *AssetQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(xid.ID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
+				outValue := *values[0].(*xid.ID)
 				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Asset]struct{}{byID[outValue]: {}}
@@ -645,7 +645,7 @@ func (aq *AssetQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*
 }
 func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Cluster)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Asset)
+	byID := make(map[xid.ID]*Asset)
 	nids := make(map[xid.ID]map[*Asset]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -675,10 +675,10 @@ func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nod
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(xid.ID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
+				outValue := *values[0].(*xid.ID)
 				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Asset]struct{}{byID[outValue]: {}}
@@ -706,7 +706,7 @@ func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nod
 }
 func (aq *AssetQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Item)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Asset)
+	byID := make(map[xid.ID]*Asset)
 	nids := make(map[xid.ID]map[*Asset]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -736,10 +736,10 @@ func (aq *AssetQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(xid.ID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
+				outValue := *values[0].(*xid.ID)
 				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Asset]struct{}{byID[outValue]: {}}
@@ -767,7 +767,7 @@ func (aq *AssetQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*
 }
 func (aq *AssetQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Link)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Asset)
+	byID := make(map[xid.ID]*Asset)
 	nids := make(map[xid.ID]map[*Asset]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -797,10 +797,10 @@ func (aq *AssetQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(xid.ID)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
+				outValue := *values[0].(*xid.ID)
 				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Asset]struct{}{byID[outValue]: {}}

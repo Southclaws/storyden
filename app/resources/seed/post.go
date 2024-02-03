@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/utils"
 )
 
 var (
@@ -212,44 +213,52 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 		Category: Category_02_Photos,
 		Assets: []*asset.Asset{
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
-				MIMEType: "image/jpeg", Size: 2537802, Width: 3024, Height: 4032,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
+				Size: 2537802, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
-				MIMEType: "image/jpeg", Size: 1433625, Width: 3024, Height: 4032,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
+				Size: 1433625, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
-				MIMEType: "image/jpeg", Size: 1828065, Width: 3024, Height: 4032,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
+				Size: 1828065, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
-				MIMEType: "image/jpeg", Size: 1769497, Width: 3024, Height: 4032,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
+				Size: 1769497, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
-				MIMEType: "image/jpeg", Size: 1930321, Width: 4032, Height: 3024,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
+				Size: 1930321, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
-				MIMEType: "image/jpeg", Size: 1724055, Width: 4032, Height: 3024,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
+				Size: 1724055, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
-				MIMEType: "video/quicktime", Size: 2552083, Width: 1080, Height: 1920,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
+				Size: 2552083, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
 			},
 			{
-				ID:       "00000000000000000040-asset-01",
-				URL:      "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
-				MIMEType: "video/quicktime", Size: 3155277, Width: 1080, Height: 1920,
+				ID:   utils.Must(xid.FromString("00000000000000000040")),
+				Name: asset.NewFilename("00000000000000000040-asset-01"),
+				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
+				Size: 3155277, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
 			},
 		},
 		Posts: []*reply.Reply{
@@ -276,7 +285,8 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 		assetIDs := []asset.AssetID{}
 		for i, a := range t.Assets {
 			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
-			a, err := ar.Add(ctx, t.Author.ID, id, a.URL, a.MIMEType, a.Width, a.Height)
+
+			a, err := ar.Add(ctx, t.Author.ID, asset.NewFilename(id), a.URL)
 			if err != nil {
 				panic(err)
 			}

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -18,19 +19,17 @@ import (
 type Asset struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"id,omitempty"`
+	ID xid.ID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Filename holds the value of the "filename" field.
+	Filename string `json:"filename,omitempty"`
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
-	// Mimetype holds the value of the "mimetype" field.
-	Mimetype string `json:"mimetype,omitempty"`
-	// Width holds the value of the "width" field.
-	Width int `json:"width,omitempty"`
-	// Height holds the value of the "height" field.
-	Height int `json:"height,omitempty"`
+	// Metadata holds the value of the "metadata" field.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -110,13 +109,13 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case asset.FieldWidth, asset.FieldHeight:
-			values[i] = new(sql.NullInt64)
-		case asset.FieldID, asset.FieldURL, asset.FieldMimetype:
+		case asset.FieldMetadata:
+			values[i] = new([]byte)
+		case asset.FieldFilename, asset.FieldURL:
 			values[i] = new(sql.NullString)
 		case asset.FieldCreatedAt, asset.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case asset.FieldAccountID:
+		case asset.FieldID, asset.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -134,10 +133,10 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case asset.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				a.ID = value.String
+			} else if value != nil {
+				a.ID = *value
 			}
 		case asset.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -151,29 +150,25 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.UpdatedAt = value.Time
 			}
+		case asset.FieldFilename:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field filename", values[i])
+			} else if value.Valid {
+				a.Filename = value.String
+			}
 		case asset.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
 				a.URL = value.String
 			}
-		case asset.FieldMimetype:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field mimetype", values[i])
-			} else if value.Valid {
-				a.Mimetype = value.String
-			}
-		case asset.FieldWidth:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field width", values[i])
-			} else if value.Valid {
-				a.Width = int(value.Int64)
-			}
-		case asset.FieldHeight:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field height", values[i])
-			} else if value.Valid {
-				a.Height = int(value.Int64)
+		case asset.FieldMetadata:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field metadata", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
+				}
 			}
 		case asset.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -248,17 +243,14 @@ func (a *Asset) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
+	builder.WriteString("filename=")
+	builder.WriteString(a.Filename)
+	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(a.URL)
 	builder.WriteString(", ")
-	builder.WriteString("mimetype=")
-	builder.WriteString(a.Mimetype)
-	builder.WriteString(", ")
-	builder.WriteString("width=")
-	builder.WriteString(fmt.Sprintf("%v", a.Width))
-	builder.WriteString(", ")
-	builder.WriteString("height=")
-	builder.WriteString(fmt.Sprintf("%v", a.Height))
+	builder.WriteString("metadata=")
+	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.AccountID))

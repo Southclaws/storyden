@@ -12,58 +12,48 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Asset {
+func ID(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Asset {
+func IDEQ(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Asset {
+func IDNEQ(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Asset {
+func IDIn(ids ...xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Asset {
+func IDNotIn(ids ...xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Asset {
+func IDGT(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Asset {
+func IDGTE(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Asset {
+func IDLT(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Asset {
+func IDLTE(id xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldLTE(FieldID, id))
-}
-
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.Asset {
-	return predicate.Asset(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.Asset {
-	return predicate.Asset(sql.FieldContainsFold(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -76,24 +66,14 @@ func UpdatedAt(v time.Time) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// Filename applies equality check predicate on the "filename" field. It's identical to FilenameEQ.
+func Filename(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldFilename, v))
+}
+
 // URL applies equality check predicate on the "url" field. It's identical to URLEQ.
 func URL(v string) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldURL, v))
-}
-
-// Mimetype applies equality check predicate on the "mimetype" field. It's identical to MimetypeEQ.
-func Mimetype(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldMimetype, v))
-}
-
-// Width applies equality check predicate on the "width" field. It's identical to WidthEQ.
-func Width(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldWidth, v))
-}
-
-// Height applies equality check predicate on the "height" field. It's identical to HeightEQ.
-func Height(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldHeight, v))
 }
 
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
@@ -181,6 +161,71 @@ func UpdatedAtLTE(v time.Time) predicate.Asset {
 	return predicate.Asset(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
+// FilenameEQ applies the EQ predicate on the "filename" field.
+func FilenameEQ(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldFilename, v))
+}
+
+// FilenameNEQ applies the NEQ predicate on the "filename" field.
+func FilenameNEQ(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldNEQ(FieldFilename, v))
+}
+
+// FilenameIn applies the In predicate on the "filename" field.
+func FilenameIn(vs ...string) predicate.Asset {
+	return predicate.Asset(sql.FieldIn(FieldFilename, vs...))
+}
+
+// FilenameNotIn applies the NotIn predicate on the "filename" field.
+func FilenameNotIn(vs ...string) predicate.Asset {
+	return predicate.Asset(sql.FieldNotIn(FieldFilename, vs...))
+}
+
+// FilenameGT applies the GT predicate on the "filename" field.
+func FilenameGT(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldGT(FieldFilename, v))
+}
+
+// FilenameGTE applies the GTE predicate on the "filename" field.
+func FilenameGTE(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldGTE(FieldFilename, v))
+}
+
+// FilenameLT applies the LT predicate on the "filename" field.
+func FilenameLT(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldLT(FieldFilename, v))
+}
+
+// FilenameLTE applies the LTE predicate on the "filename" field.
+func FilenameLTE(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldLTE(FieldFilename, v))
+}
+
+// FilenameContains applies the Contains predicate on the "filename" field.
+func FilenameContains(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldContains(FieldFilename, v))
+}
+
+// FilenameHasPrefix applies the HasPrefix predicate on the "filename" field.
+func FilenameHasPrefix(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldHasPrefix(FieldFilename, v))
+}
+
+// FilenameHasSuffix applies the HasSuffix predicate on the "filename" field.
+func FilenameHasSuffix(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldHasSuffix(FieldFilename, v))
+}
+
+// FilenameEqualFold applies the EqualFold predicate on the "filename" field.
+func FilenameEqualFold(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEqualFold(FieldFilename, v))
+}
+
+// FilenameContainsFold applies the ContainsFold predicate on the "filename" field.
+func FilenameContainsFold(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldContainsFold(FieldFilename, v))
+}
+
 // URLEQ applies the EQ predicate on the "url" field.
 func URLEQ(v string) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldURL, v))
@@ -246,149 +291,14 @@ func URLContainsFold(v string) predicate.Asset {
 	return predicate.Asset(sql.FieldContainsFold(FieldURL, v))
 }
 
-// MimetypeEQ applies the EQ predicate on the "mimetype" field.
-func MimetypeEQ(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldMimetype, v))
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Asset {
+	return predicate.Asset(sql.FieldIsNull(FieldMetadata))
 }
 
-// MimetypeNEQ applies the NEQ predicate on the "mimetype" field.
-func MimetypeNEQ(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldNEQ(FieldMimetype, v))
-}
-
-// MimetypeIn applies the In predicate on the "mimetype" field.
-func MimetypeIn(vs ...string) predicate.Asset {
-	return predicate.Asset(sql.FieldIn(FieldMimetype, vs...))
-}
-
-// MimetypeNotIn applies the NotIn predicate on the "mimetype" field.
-func MimetypeNotIn(vs ...string) predicate.Asset {
-	return predicate.Asset(sql.FieldNotIn(FieldMimetype, vs...))
-}
-
-// MimetypeGT applies the GT predicate on the "mimetype" field.
-func MimetypeGT(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldGT(FieldMimetype, v))
-}
-
-// MimetypeGTE applies the GTE predicate on the "mimetype" field.
-func MimetypeGTE(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldGTE(FieldMimetype, v))
-}
-
-// MimetypeLT applies the LT predicate on the "mimetype" field.
-func MimetypeLT(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldLT(FieldMimetype, v))
-}
-
-// MimetypeLTE applies the LTE predicate on the "mimetype" field.
-func MimetypeLTE(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldLTE(FieldMimetype, v))
-}
-
-// MimetypeContains applies the Contains predicate on the "mimetype" field.
-func MimetypeContains(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldContains(FieldMimetype, v))
-}
-
-// MimetypeHasPrefix applies the HasPrefix predicate on the "mimetype" field.
-func MimetypeHasPrefix(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldHasPrefix(FieldMimetype, v))
-}
-
-// MimetypeHasSuffix applies the HasSuffix predicate on the "mimetype" field.
-func MimetypeHasSuffix(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldHasSuffix(FieldMimetype, v))
-}
-
-// MimetypeEqualFold applies the EqualFold predicate on the "mimetype" field.
-func MimetypeEqualFold(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEqualFold(FieldMimetype, v))
-}
-
-// MimetypeContainsFold applies the ContainsFold predicate on the "mimetype" field.
-func MimetypeContainsFold(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldContainsFold(FieldMimetype, v))
-}
-
-// WidthEQ applies the EQ predicate on the "width" field.
-func WidthEQ(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldWidth, v))
-}
-
-// WidthNEQ applies the NEQ predicate on the "width" field.
-func WidthNEQ(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldNEQ(FieldWidth, v))
-}
-
-// WidthIn applies the In predicate on the "width" field.
-func WidthIn(vs ...int) predicate.Asset {
-	return predicate.Asset(sql.FieldIn(FieldWidth, vs...))
-}
-
-// WidthNotIn applies the NotIn predicate on the "width" field.
-func WidthNotIn(vs ...int) predicate.Asset {
-	return predicate.Asset(sql.FieldNotIn(FieldWidth, vs...))
-}
-
-// WidthGT applies the GT predicate on the "width" field.
-func WidthGT(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldGT(FieldWidth, v))
-}
-
-// WidthGTE applies the GTE predicate on the "width" field.
-func WidthGTE(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldGTE(FieldWidth, v))
-}
-
-// WidthLT applies the LT predicate on the "width" field.
-func WidthLT(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldLT(FieldWidth, v))
-}
-
-// WidthLTE applies the LTE predicate on the "width" field.
-func WidthLTE(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldLTE(FieldWidth, v))
-}
-
-// HeightEQ applies the EQ predicate on the "height" field.
-func HeightEQ(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldHeight, v))
-}
-
-// HeightNEQ applies the NEQ predicate on the "height" field.
-func HeightNEQ(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldNEQ(FieldHeight, v))
-}
-
-// HeightIn applies the In predicate on the "height" field.
-func HeightIn(vs ...int) predicate.Asset {
-	return predicate.Asset(sql.FieldIn(FieldHeight, vs...))
-}
-
-// HeightNotIn applies the NotIn predicate on the "height" field.
-func HeightNotIn(vs ...int) predicate.Asset {
-	return predicate.Asset(sql.FieldNotIn(FieldHeight, vs...))
-}
-
-// HeightGT applies the GT predicate on the "height" field.
-func HeightGT(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldGT(FieldHeight, v))
-}
-
-// HeightGTE applies the GTE predicate on the "height" field.
-func HeightGTE(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldGTE(FieldHeight, v))
-}
-
-// HeightLT applies the LT predicate on the "height" field.
-func HeightLT(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldLT(FieldHeight, v))
-}
-
-// HeightLTE applies the LTE predicate on the "height" field.
-func HeightLTE(v int) predicate.Asset {
-	return predicate.Asset(sql.FieldLTE(FieldHeight, v))
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Asset {
+	return predicate.Asset(sql.FieldNotNull(FieldMetadata))
 }
 
 // AccountIDEQ applies the EQ predicate on the "account_id" field.

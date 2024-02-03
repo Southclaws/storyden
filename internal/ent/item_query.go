@@ -675,7 +675,7 @@ func (iq *ItemQuery) loadClusters(ctx context.Context, query *ClusterQuery, node
 func (iq *ItemQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Item, init func(*Item), assign func(*Item, *Asset)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Item)
-	nids := make(map[string]map[*Item]struct{})
+	nids := make(map[xid.ID]map[*Item]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -708,7 +708,7 @@ func (iq *ItemQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*xid.ID)
-				inValue := values[1].(*sql.NullString).String
+				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Item]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

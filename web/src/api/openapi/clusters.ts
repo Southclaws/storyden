@@ -322,28 +322,28 @@ export const useClusterDelete = <
 /**
  * Add an asset to a cluster.
  */
-export const clusterAddAsset = (clusterSlug: string, id: string) => {
+export const clusterAddAsset = (clusterSlug: string, assetId: string) => {
   return fetcher<ClusterUpdateOKResponse>({
-    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    url: `/v1/clusters/${clusterSlug}/assets/${assetId}`,
     method: "PUT",
   });
 };
 
 export const getClusterAddAssetMutationFetcher = (
   clusterSlug: string,
-  id: string,
+  assetId: string,
 ) => {
   return (
     _: string,
     { arg }: { arg: Arguments },
   ): Promise<ClusterUpdateOKResponse> => {
-    return clusterAddAsset(clusterSlug, id);
+    return clusterAddAsset(clusterSlug, assetId);
   };
 };
 export const getClusterAddAssetMutationKey = (
   clusterSlug: string,
-  id: string,
-) => `/v1/clusters/${clusterSlug}/assets/${id}` as const;
+  assetId: string,
+) => `/v1/clusters/${clusterSlug}/assets/${assetId}` as const;
 
 export type ClusterAddAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof clusterAddAsset>>
@@ -360,7 +360,7 @@ export const useClusterAddAsset = <
     | InternalServerErrorResponse,
 >(
   clusterSlug: string,
-  id: string,
+  assetId: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof clusterAddAsset>>,
@@ -374,8 +374,8 @@ export const useClusterAddAsset = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getClusterAddAssetMutationKey(clusterSlug, id);
-  const swrFn = getClusterAddAssetMutationFetcher(clusterSlug, id);
+    swrOptions?.swrKey ?? getClusterAddAssetMutationKey(clusterSlug, assetId);
+  const swrFn = getClusterAddAssetMutationFetcher(clusterSlug, assetId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -387,28 +387,28 @@ export const useClusterAddAsset = <
 /**
  * Remove an asset from a cluster.
  */
-export const clusterRemoveAsset = (clusterSlug: string, id: string) => {
+export const clusterRemoveAsset = (clusterSlug: string, assetId: string) => {
   return fetcher<ClusterUpdateOKResponse>({
-    url: `/v1/clusters/${clusterSlug}/assets/${id}`,
+    url: `/v1/clusters/${clusterSlug}/assets/${assetId}`,
     method: "DELETE",
   });
 };
 
 export const getClusterRemoveAssetMutationFetcher = (
   clusterSlug: string,
-  id: string,
+  assetId: string,
 ) => {
   return (
     _: string,
     { arg }: { arg: Arguments },
   ): Promise<ClusterUpdateOKResponse> => {
-    return clusterRemoveAsset(clusterSlug, id);
+    return clusterRemoveAsset(clusterSlug, assetId);
   };
 };
 export const getClusterRemoveAssetMutationKey = (
   clusterSlug: string,
-  id: string,
-) => `/v1/clusters/${clusterSlug}/assets/${id}` as const;
+  assetId: string,
+) => `/v1/clusters/${clusterSlug}/assets/${assetId}` as const;
 
 export type ClusterRemoveAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof clusterRemoveAsset>>
@@ -425,7 +425,7 @@ export const useClusterRemoveAsset = <
     | InternalServerErrorResponse,
 >(
   clusterSlug: string,
-  id: string,
+  assetId: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof clusterRemoveAsset>>,
@@ -439,8 +439,9 @@ export const useClusterRemoveAsset = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getClusterRemoveAssetMutationKey(clusterSlug, id);
-  const swrFn = getClusterRemoveAssetMutationFetcher(clusterSlug, id);
+    swrOptions?.swrKey ??
+    getClusterRemoveAssetMutationKey(clusterSlug, assetId);
+  const swrFn = getClusterRemoveAssetMutationFetcher(clusterSlug, assetId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

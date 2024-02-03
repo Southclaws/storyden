@@ -198,14 +198,14 @@ func (cu *ClusterUpdate) AddItems(i ...*Item) *ClusterUpdate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (cu *ClusterUpdate) AddAssetIDs(ids ...string) *ClusterUpdate {
+func (cu *ClusterUpdate) AddAssetIDs(ids ...xid.ID) *ClusterUpdate {
 	cu.mutation.AddAssetIDs(ids...)
 	return cu
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (cu *ClusterUpdate) AddAssets(a ...*Asset) *ClusterUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -308,14 +308,14 @@ func (cu *ClusterUpdate) ClearAssets() *ClusterUpdate {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (cu *ClusterUpdate) RemoveAssetIDs(ids ...string) *ClusterUpdate {
+func (cu *ClusterUpdate) RemoveAssetIDs(ids ...xid.ID) *ClusterUpdate {
 	cu.mutation.RemoveAssetIDs(ids...)
 	return cu
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (cu *ClusterUpdate) RemoveAssets(a ...*Asset) *ClusterUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -924,14 +924,14 @@ func (cuo *ClusterUpdateOne) AddItems(i ...*Item) *ClusterUpdateOne {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (cuo *ClusterUpdateOne) AddAssetIDs(ids ...string) *ClusterUpdateOne {
+func (cuo *ClusterUpdateOne) AddAssetIDs(ids ...xid.ID) *ClusterUpdateOne {
 	cuo.mutation.AddAssetIDs(ids...)
 	return cuo
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (cuo *ClusterUpdateOne) AddAssets(a ...*Asset) *ClusterUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1034,14 +1034,14 @@ func (cuo *ClusterUpdateOne) ClearAssets() *ClusterUpdateOne {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (cuo *ClusterUpdateOne) RemoveAssetIDs(ids ...string) *ClusterUpdateOne {
+func (cuo *ClusterUpdateOne) RemoveAssetIDs(ids ...xid.ID) *ClusterUpdateOne {
 	cuo.mutation.RemoveAssetIDs(ids...)
 	return cuo
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (cuo *ClusterUpdateOne) RemoveAssets(a ...*Asset) *ClusterUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

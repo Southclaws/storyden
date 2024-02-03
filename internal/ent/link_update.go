@@ -97,14 +97,14 @@ func (lu *LinkUpdate) AddItems(i ...*Item) *LinkUpdate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (lu *LinkUpdate) AddAssetIDs(ids ...string) *LinkUpdate {
+func (lu *LinkUpdate) AddAssetIDs(ids ...xid.ID) *LinkUpdate {
 	lu.mutation.AddAssetIDs(ids...)
 	return lu
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (lu *LinkUpdate) AddAssets(a ...*Asset) *LinkUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -186,14 +186,14 @@ func (lu *LinkUpdate) ClearAssets() *LinkUpdate {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (lu *LinkUpdate) RemoveAssetIDs(ids ...string) *LinkUpdate {
+func (lu *LinkUpdate) RemoveAssetIDs(ids ...xid.ID) *LinkUpdate {
 	lu.mutation.RemoveAssetIDs(ids...)
 	return lu
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (lu *LinkUpdate) RemoveAssets(a ...*Asset) *LinkUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -517,14 +517,14 @@ func (luo *LinkUpdateOne) AddItems(i ...*Item) *LinkUpdateOne {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (luo *LinkUpdateOne) AddAssetIDs(ids ...string) *LinkUpdateOne {
+func (luo *LinkUpdateOne) AddAssetIDs(ids ...xid.ID) *LinkUpdateOne {
 	luo.mutation.AddAssetIDs(ids...)
 	return luo
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (luo *LinkUpdateOne) AddAssets(a ...*Asset) *LinkUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -606,14 +606,14 @@ func (luo *LinkUpdateOne) ClearAssets() *LinkUpdateOne {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (luo *LinkUpdateOne) RemoveAssetIDs(ids ...string) *LinkUpdateOne {
+func (luo *LinkUpdateOne) RemoveAssetIDs(ids ...xid.ID) *LinkUpdateOne {
 	luo.mutation.RemoveAssetIDs(ids...)
 	return luo
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (luo *LinkUpdateOne) RemoveAssets(a ...*Asset) *LinkUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

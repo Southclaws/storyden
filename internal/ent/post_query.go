@@ -1122,7 +1122,7 @@ func (pq *PostQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []
 func (pq *PostQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Post, init func(*Post), assign func(*Post, *Asset)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Post)
-	nids := make(map[string]map[*Post]struct{})
+	nids := make(map[xid.ID]map[*Post]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -1155,7 +1155,7 @@ func (pq *PostQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := *values[0].(*xid.ID)
-				inValue := values[1].(*sql.NullString).String
+				inValue := *values[1].(*xid.ID)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Post]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

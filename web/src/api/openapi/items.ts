@@ -298,26 +298,26 @@ export const useItemDelete = <
 /**
  * Add an asset to an item.
  */
-export const itemAddAsset = (itemSlug: string, id: string) => {
+export const itemAddAsset = (itemSlug: string, assetId: string) => {
   return fetcher<ItemUpdateOKResponse>({
-    url: `/v1/items/${itemSlug}/assets/${id}`,
+    url: `/v1/items/${itemSlug}/assets/${assetId}`,
     method: "PUT",
   });
 };
 
 export const getItemAddAssetMutationFetcher = (
   itemSlug: string,
-  id: string,
+  assetId: string,
 ) => {
   return (
     _: string,
     { arg }: { arg: Arguments },
   ): Promise<ItemUpdateOKResponse> => {
-    return itemAddAsset(itemSlug, id);
+    return itemAddAsset(itemSlug, assetId);
   };
 };
-export const getItemAddAssetMutationKey = (itemSlug: string, id: string) =>
-  `/v1/items/${itemSlug}/assets/${id}` as const;
+export const getItemAddAssetMutationKey = (itemSlug: string, assetId: string) =>
+  `/v1/items/${itemSlug}/assets/${assetId}` as const;
 
 export type ItemAddAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof itemAddAsset>>
@@ -334,7 +334,7 @@ export const useItemAddAsset = <
     | InternalServerErrorResponse,
 >(
   itemSlug: string,
-  id: string,
+  assetId: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof itemAddAsset>>,
@@ -347,8 +347,9 @@ export const useItemAddAsset = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const swrKey = swrOptions?.swrKey ?? getItemAddAssetMutationKey(itemSlug, id);
-  const swrFn = getItemAddAssetMutationFetcher(itemSlug, id);
+  const swrKey =
+    swrOptions?.swrKey ?? getItemAddAssetMutationKey(itemSlug, assetId);
+  const swrFn = getItemAddAssetMutationFetcher(itemSlug, assetId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -360,26 +361,28 @@ export const useItemAddAsset = <
 /**
  * Remove an asset from an item.
  */
-export const itemRemoveAsset = (itemSlug: string, id: string) => {
+export const itemRemoveAsset = (itemSlug: string, assetId: string) => {
   return fetcher<ItemUpdateOKResponse>({
-    url: `/v1/items/${itemSlug}/assets/${id}`,
+    url: `/v1/items/${itemSlug}/assets/${assetId}`,
     method: "DELETE",
   });
 };
 
 export const getItemRemoveAssetMutationFetcher = (
   itemSlug: string,
-  id: string,
+  assetId: string,
 ) => {
   return (
     _: string,
     { arg }: { arg: Arguments },
   ): Promise<ItemUpdateOKResponse> => {
-    return itemRemoveAsset(itemSlug, id);
+    return itemRemoveAsset(itemSlug, assetId);
   };
 };
-export const getItemRemoveAssetMutationKey = (itemSlug: string, id: string) =>
-  `/v1/items/${itemSlug}/assets/${id}` as const;
+export const getItemRemoveAssetMutationKey = (
+  itemSlug: string,
+  assetId: string,
+) => `/v1/items/${itemSlug}/assets/${assetId}` as const;
 
 export type ItemRemoveAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof itemRemoveAsset>>
@@ -396,7 +399,7 @@ export const useItemRemoveAsset = <
     | InternalServerErrorResponse,
 >(
   itemSlug: string,
-  id: string,
+  assetId: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof itemRemoveAsset>>,
@@ -410,8 +413,8 @@ export const useItemRemoveAsset = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getItemRemoveAssetMutationKey(itemSlug, id);
-  const swrFn = getItemRemoveAssetMutationFetcher(itemSlug, id);
+    swrOptions?.swrKey ?? getItemRemoveAssetMutationKey(itemSlug, assetId);
+  const swrFn = getItemRemoveAssetMutationFetcher(itemSlug, assetId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

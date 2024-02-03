@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 )
 
 type database struct {
@@ -22,34 +23,27 @@ func New(db *ent.Client) Repository {
 
 func (d *database) Add(ctx context.Context,
 	accountID account.AccountID,
-	id, url, mt string,
-	width, height int,
+	filename Filename,
+	url string,
 ) (*Asset, error) {
-	asset, err := d.db.Asset.Get(ctx, id)
-	if err != nil && !ent.IsNotFound(err) {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if asset == nil {
-		asset, err = d.db.Asset.
-			Create().
-			SetID(id).
-			SetURL(url).
-			SetWidth(width).
-			SetHeight(height).
-			SetMimetype(mt).
-			SetAccountID(xid.ID(accountID)).
-			Save(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-		}
+	asset, err := d.db.Asset.
+		Create().
+		SetID(filename.id).
+		SetFilename(filename.name).
+		SetURL(url).
+		SetAccountID(xid.ID(accountID)).
+		Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return FromModel(asset), nil
 }
 
-func (d *database) Get(ctx context.Context, id string) (*Asset, error) {
-	asset, err := d.db.Asset.Get(ctx, id)
+func (d *database) Get(ctx context.Context, id Filename) (*Asset, error) {
+	asset, err := d.db.Asset.Query().Where(
+		asset.Filename(id.name),
+	).First(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
@@ -60,11 +54,13 @@ func (d *database) Get(ctx context.Context, id string) (*Asset, error) {
 	return FromModel(asset), nil
 }
 
-func (d *database) Remove(ctx context.Context, accountID account.AccountID, id AssetID) error {
+func (d *database) Remove(ctx context.Context, accountID account.AccountID, id Filename) error {
 	q := d.db.Asset.
-		DeleteOneID(string(id))
+		Delete().Where(
+		asset.Filename(id.name),
+	)
 
-	if err := q.Exec(ctx); err != nil {
+	if _, err := q.Exec(ctx); err != nil {
 		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 

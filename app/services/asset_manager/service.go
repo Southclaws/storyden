@@ -1,18 +1,12 @@
-package asset
+package asset_manager
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha1"
-	"encoding/hex"
-	"fmt"
 	"io"
 	"path"
-	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/gabriel-vasile/mimetype"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -28,8 +22,8 @@ import (
 const assetsSubdirectory = "assets"
 
 type Service interface {
-	Upload(ctx context.Context, r io.Reader, size int64) (*asset.Asset, error)
-	Get(ctx context.Context, path string) (*asset.Asset, io.Reader, error)
+	Upload(ctx context.Context, r io.Reader, size int64, name asset.Filename, url string) (*asset.Asset, error)
+	Get(ctx context.Context, id asset.Filename) (*asset.Asset, io.Reader, error)
 }
 
 func Build() fx.Option {
@@ -71,60 +65,34 @@ func New(
 	}
 }
 
-func (s *service) Upload(ctx context.Context, r io.Reader, size int64) (*asset.Asset, error) {
+func (s *service) Upload(ctx context.Context, r io.Reader, size int64, name asset.Filename, url string) (*asset.Asset, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// NOTE: We load the whole file into memory in order to compute a hash first
-	// which isn't the most optimal route as it means 5 people uploading a 100MB
-	// file to a 512MB server would result in a crash but this can be optimised.
-	// There are a few alternatives, one is to upload the whole file now by just
-	// streaming it to its destination then computing hashes and resizes another
-	// time, another way is by using a rolling hash on the stream during upload.
-
-	buf, err := io.ReadAll(r)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	r = bytes.NewReader(buf)
-
-	mt := mimetype.Detect(buf)
-
-	hash := sha1.Sum(buf)
-	assetID := hex.EncodeToString(hash[:])
-	storagepath := path.Join(assetsSubdirectory, assetID)
-
-	if err := s.os.Write(ctx, storagepath, r, size); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	apiPath := path.Join("api/v1/assets", assetID)
-	url := fmt.Sprintf("%s/%s", s.address, apiPath)
-	mime := mt.String()
-
-	if strings.HasPrefix(mime, "image") {
-		// TODO: figure out width and height
-		fmt.Println("IS AN IMAGE")
-	}
-
-	ast, err := s.asset_repo.Add(ctx, accountID, assetID, url, mime, 0, 0)
+	a, err := s.asset_repo.Add(ctx, accountID, name, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return ast, nil
+	path := buildPath(a.Name)
+
+	if err := s.os.Write(ctx, path, r, size); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return a, nil
 }
 
-func (s *service) Get(ctx context.Context, assetID string) (*asset.Asset, io.Reader, error) {
-	a, err := s.asset_repo.Get(ctx, assetID)
+func (s *service) Get(ctx context.Context, id asset.Filename) (*asset.Asset, io.Reader, error) {
+	a, err := s.asset_repo.Get(ctx, id)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	path := path.Join(assetsSubdirectory, assetID)
-	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", assetID)
+	path := buildPath(a.Name)
+	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", id.String())
 
 	r, size, err := s.os.Read(ctx, path)
 	if err != nil {
@@ -134,4 +102,8 @@ func (s *service) Get(ctx context.Context, assetID string) (*asset.Asset, io.Rea
 	a.Size = int(size)
 
 	return a, r, nil
+}
+
+func buildPath(name asset.Filename) string {
+	return path.Join(assetsSubdirectory, name.String())
 }

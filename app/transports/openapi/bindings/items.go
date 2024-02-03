@@ -117,8 +117,10 @@ func (i *Items) ItemDelete(ctx context.Context, request openapi.ItemDeleteReques
 }
 
 func (c *Items) ItemAddAsset(ctx context.Context, request openapi.ItemAddAssetRequestObject) (openapi.ItemAddAssetResponseObject, error) {
+	id := openapi.ParseID(request.AssetId)
+
 	clus, err := c.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
-		AssetsAdd: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+		AssetsAdd: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -130,8 +132,10 @@ func (c *Items) ItemAddAsset(ctx context.Context, request openapi.ItemAddAssetRe
 }
 
 func (c *Items) ItemRemoveAsset(ctx context.Context, request openapi.ItemRemoveAssetRequestObject) (openapi.ItemRemoveAssetResponseObject, error) {
+	id := openapi.ParseID(request.AssetId)
+
 	clus, err := c.im.Update(ctx, datagraph.ItemSlug(request.ItemSlug), item_crud.Partial{
-		AssetsRemove: opt.New([]asset.AssetID{asset.AssetID(request.Id)}),
+		AssetsRemove: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
