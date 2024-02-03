@@ -232,14 +232,14 @@ func (au *AccountUpdate) AddItems(i ...*Item) *AccountUpdate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (au *AccountUpdate) AddAssetIDs(ids ...string) *AccountUpdate {
+func (au *AccountUpdate) AddAssetIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddAssetIDs(ids...)
 	return au
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (au *AccountUpdate) AddAssets(a ...*Asset) *AccountUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -426,14 +426,14 @@ func (au *AccountUpdate) ClearAssets() *AccountUpdate {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (au *AccountUpdate) RemoveAssetIDs(ids ...string) *AccountUpdate {
+func (au *AccountUpdate) RemoveAssetIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.RemoveAssetIDs(ids...)
 	return au
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (au *AccountUpdate) RemoveAssets(a ...*Asset) *AccountUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1153,14 +1153,14 @@ func (auo *AccountUpdateOne) AddItems(i ...*Item) *AccountUpdateOne {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (auo *AccountUpdateOne) AddAssetIDs(ids ...string) *AccountUpdateOne {
+func (auo *AccountUpdateOne) AddAssetIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddAssetIDs(ids...)
 	return auo
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (auo *AccountUpdateOne) AddAssets(a ...*Asset) *AccountUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1347,14 +1347,14 @@ func (auo *AccountUpdateOne) ClearAssets() *AccountUpdateOne {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (auo *AccountUpdateOne) RemoveAssetIDs(ids ...string) *AccountUpdateOne {
+func (auo *AccountUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.RemoveAssetIDs(ids...)
 	return auo
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (auo *AccountUpdateOne) RemoveAssets(a ...*Asset) *AccountUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

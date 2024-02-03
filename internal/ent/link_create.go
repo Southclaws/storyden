@@ -132,14 +132,14 @@ func (lc *LinkCreate) AddItems(i ...*Item) *LinkCreate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (lc *LinkCreate) AddAssetIDs(ids ...string) *LinkCreate {
+func (lc *LinkCreate) AddAssetIDs(ids ...xid.ID) *LinkCreate {
 	lc.mutation.AddAssetIDs(ids...)
 	return lc
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (lc *LinkCreate) AddAssets(a ...*Asset) *LinkCreate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/item"
 	"github.com/Southclaws/storyden/app/resources/link"
-	asset_svc "github.com/Southclaws/storyden/app/services/asset"
+	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/url"
 )
 
@@ -31,14 +31,14 @@ func Build() fx.Option {
 
 type service struct {
 	l  *zap.Logger
-	as asset_svc.Service
+	as asset_manager.Service
 	lr link.Repository
 	sc url.Scraper
 }
 
 func New(
 	l *zap.Logger,
-	as asset_svc.Service,
+	as asset_manager.Service,
 	cr cluster.Repository,
 	ir item.Repository,
 	lr link.Repository,
@@ -84,7 +84,7 @@ func (s *service) scrapeAndStore(ctx context.Context, url string) (*link.Link, e
 		if err != nil {
 			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", url))
 		} else {
-			opts = append(opts, link.WithAssets(string(a.ID)))
+			opts = append(opts, link.WithAssets(a.ID))
 		}
 	}
 
@@ -111,7 +111,7 @@ func (s *service) copy(ctx context.Context, url string) (*asset.Asset, error) {
 		return nil, fault.Wrap(fault.New("failed to get"), fctx.With(ctx))
 	}
 
-	a, err := s.as.Upload(ctx, resp.Body, resp.ContentLength)
+	a, err := s.as.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(url), url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

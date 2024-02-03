@@ -324,14 +324,14 @@ func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (pc *PostCreate) AddAssetIDs(ids ...string) *PostCreate {
+func (pc *PostCreate) AddAssetIDs(ids ...xid.ID) *PostCreate {
 	pc.mutation.AddAssetIDs(ids...)
 	return pc
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (pc *PostCreate) AddAssets(a ...*Asset) *PostCreate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

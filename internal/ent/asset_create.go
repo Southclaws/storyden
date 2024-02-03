@@ -57,27 +57,21 @@ func (ac *AssetCreate) SetNillableUpdatedAt(t *time.Time) *AssetCreate {
 	return ac
 }
 
+// SetFilename sets the "filename" field.
+func (ac *AssetCreate) SetFilename(s string) *AssetCreate {
+	ac.mutation.SetFilename(s)
+	return ac
+}
+
 // SetURL sets the "url" field.
 func (ac *AssetCreate) SetURL(s string) *AssetCreate {
 	ac.mutation.SetURL(s)
 	return ac
 }
 
-// SetMimetype sets the "mimetype" field.
-func (ac *AssetCreate) SetMimetype(s string) *AssetCreate {
-	ac.mutation.SetMimetype(s)
-	return ac
-}
-
-// SetWidth sets the "width" field.
-func (ac *AssetCreate) SetWidth(i int) *AssetCreate {
-	ac.mutation.SetWidth(i)
-	return ac
-}
-
-// SetHeight sets the "height" field.
-func (ac *AssetCreate) SetHeight(i int) *AssetCreate {
-	ac.mutation.SetHeight(i)
+// SetMetadata sets the "metadata" field.
+func (ac *AssetCreate) SetMetadata(m map[string]interface{}) *AssetCreate {
+	ac.mutation.SetMetadata(m)
 	return ac
 }
 
@@ -88,8 +82,16 @@ func (ac *AssetCreate) SetAccountID(x xid.ID) *AssetCreate {
 }
 
 // SetID sets the "id" field.
-func (ac *AssetCreate) SetID(s string) *AssetCreate {
-	ac.mutation.SetID(s)
+func (ac *AssetCreate) SetID(x xid.ID) *AssetCreate {
+	ac.mutation.SetID(x)
+	return ac
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (ac *AssetCreate) SetNillableID(x *xid.ID) *AssetCreate {
+	if x != nil {
+		ac.SetID(*x)
+	}
 	return ac
 }
 
@@ -207,6 +209,10 @@ func (ac *AssetCreate) defaults() {
 		v := asset.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ac.mutation.ID(); !ok {
+		v := asset.DefaultID()
+		ac.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -217,23 +223,17 @@ func (ac *AssetCreate) check() error {
 	if _, ok := ac.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Asset.updated_at"`)}
 	}
+	if _, ok := ac.mutation.Filename(); !ok {
+		return &ValidationError{Name: "filename", err: errors.New(`ent: missing required field "Asset.filename"`)}
+	}
 	if _, ok := ac.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Asset.url"`)}
-	}
-	if _, ok := ac.mutation.Mimetype(); !ok {
-		return &ValidationError{Name: "mimetype", err: errors.New(`ent: missing required field "Asset.mimetype"`)}
-	}
-	if _, ok := ac.mutation.Width(); !ok {
-		return &ValidationError{Name: "width", err: errors.New(`ent: missing required field "Asset.width"`)}
-	}
-	if _, ok := ac.mutation.Height(); !ok {
-		return &ValidationError{Name: "height", err: errors.New(`ent: missing required field "Asset.height"`)}
 	}
 	if _, ok := ac.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Asset.account_id"`)}
 	}
 	if v, ok := ac.mutation.ID(); ok {
-		if err := asset.IDValidator(v); err != nil {
+		if err := asset.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Asset.id": %w`, err)}
 		}
 	}
@@ -255,10 +255,10 @@ func (ac *AssetCreate) sqlSave(ctx context.Context) (*Asset, error) {
 		return nil, err
 	}
 	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Asset.ID type: %T", _spec.ID.Value)
+		if id, ok := _spec.ID.Value.(*xid.ID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
 		}
 	}
 	ac.mutation.id = &_node.ID
@@ -274,7 +274,7 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = ac.conflict
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := ac.mutation.CreatedAt(); ok {
 		_spec.SetField(asset.FieldCreatedAt, field.TypeTime, value)
@@ -284,21 +284,17 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		_spec.SetField(asset.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := ac.mutation.Filename(); ok {
+		_spec.SetField(asset.FieldFilename, field.TypeString, value)
+		_node.Filename = value
+	}
 	if value, ok := ac.mutation.URL(); ok {
 		_spec.SetField(asset.FieldURL, field.TypeString, value)
 		_node.URL = value
 	}
-	if value, ok := ac.mutation.Mimetype(); ok {
-		_spec.SetField(asset.FieldMimetype, field.TypeString, value)
-		_node.Mimetype = value
-	}
-	if value, ok := ac.mutation.Width(); ok {
-		_spec.SetField(asset.FieldWidth, field.TypeInt, value)
-		_node.Width = value
-	}
-	if value, ok := ac.mutation.Height(); ok {
-		_spec.SetField(asset.FieldHeight, field.TypeInt, value)
-		_node.Height = value
+	if value, ok := ac.mutation.Metadata(); ok {
+		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
 	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -445,6 +441,18 @@ func (u *AssetUpsert) UpdateUpdatedAt() *AssetUpsert {
 	return u
 }
 
+// SetFilename sets the "filename" field.
+func (u *AssetUpsert) SetFilename(v string) *AssetUpsert {
+	u.Set(asset.FieldFilename, v)
+	return u
+}
+
+// UpdateFilename sets the "filename" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateFilename() *AssetUpsert {
+	u.SetExcluded(asset.FieldFilename)
+	return u
+}
+
 // SetURL sets the "url" field.
 func (u *AssetUpsert) SetURL(v string) *AssetUpsert {
 	u.Set(asset.FieldURL, v)
@@ -457,51 +465,21 @@ func (u *AssetUpsert) UpdateURL() *AssetUpsert {
 	return u
 }
 
-// SetMimetype sets the "mimetype" field.
-func (u *AssetUpsert) SetMimetype(v string) *AssetUpsert {
-	u.Set(asset.FieldMimetype, v)
+// SetMetadata sets the "metadata" field.
+func (u *AssetUpsert) SetMetadata(v map[string]interface{}) *AssetUpsert {
+	u.Set(asset.FieldMetadata, v)
 	return u
 }
 
-// UpdateMimetype sets the "mimetype" field to the value that was provided on create.
-func (u *AssetUpsert) UpdateMimetype() *AssetUpsert {
-	u.SetExcluded(asset.FieldMimetype)
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateMetadata() *AssetUpsert {
+	u.SetExcluded(asset.FieldMetadata)
 	return u
 }
 
-// SetWidth sets the "width" field.
-func (u *AssetUpsert) SetWidth(v int) *AssetUpsert {
-	u.Set(asset.FieldWidth, v)
-	return u
-}
-
-// UpdateWidth sets the "width" field to the value that was provided on create.
-func (u *AssetUpsert) UpdateWidth() *AssetUpsert {
-	u.SetExcluded(asset.FieldWidth)
-	return u
-}
-
-// AddWidth adds v to the "width" field.
-func (u *AssetUpsert) AddWidth(v int) *AssetUpsert {
-	u.Add(asset.FieldWidth, v)
-	return u
-}
-
-// SetHeight sets the "height" field.
-func (u *AssetUpsert) SetHeight(v int) *AssetUpsert {
-	u.Set(asset.FieldHeight, v)
-	return u
-}
-
-// UpdateHeight sets the "height" field to the value that was provided on create.
-func (u *AssetUpsert) UpdateHeight() *AssetUpsert {
-	u.SetExcluded(asset.FieldHeight)
-	return u
-}
-
-// AddHeight adds v to the "height" field.
-func (u *AssetUpsert) AddHeight(v int) *AssetUpsert {
-	u.Add(asset.FieldHeight, v)
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AssetUpsert) ClearMetadata() *AssetUpsert {
+	u.SetNull(asset.FieldMetadata)
 	return u
 }
 
@@ -582,6 +560,20 @@ func (u *AssetUpsertOne) UpdateUpdatedAt() *AssetUpsertOne {
 	})
 }
 
+// SetFilename sets the "filename" field.
+func (u *AssetUpsertOne) SetFilename(v string) *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetFilename(v)
+	})
+}
+
+// UpdateFilename sets the "filename" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateFilename() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateFilename()
+	})
+}
+
 // SetURL sets the "url" field.
 func (u *AssetUpsertOne) SetURL(v string) *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
@@ -596,59 +588,24 @@ func (u *AssetUpsertOne) UpdateURL() *AssetUpsertOne {
 	})
 }
 
-// SetMimetype sets the "mimetype" field.
-func (u *AssetUpsertOne) SetMimetype(v string) *AssetUpsertOne {
+// SetMetadata sets the "metadata" field.
+func (u *AssetUpsertOne) SetMetadata(v map[string]interface{}) *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetMimetype(v)
+		s.SetMetadata(v)
 	})
 }
 
-// UpdateMimetype sets the "mimetype" field to the value that was provided on create.
-func (u *AssetUpsertOne) UpdateMimetype() *AssetUpsertOne {
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateMetadata() *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
-		s.UpdateMimetype()
+		s.UpdateMetadata()
 	})
 }
 
-// SetWidth sets the "width" field.
-func (u *AssetUpsertOne) SetWidth(v int) *AssetUpsertOne {
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AssetUpsertOne) ClearMetadata() *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetWidth(v)
-	})
-}
-
-// AddWidth adds v to the "width" field.
-func (u *AssetUpsertOne) AddWidth(v int) *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.AddWidth(v)
-	})
-}
-
-// UpdateWidth sets the "width" field to the value that was provided on create.
-func (u *AssetUpsertOne) UpdateWidth() *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdateWidth()
-	})
-}
-
-// SetHeight sets the "height" field.
-func (u *AssetUpsertOne) SetHeight(v int) *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.SetHeight(v)
-	})
-}
-
-// AddHeight adds v to the "height" field.
-func (u *AssetUpsertOne) AddHeight(v int) *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.AddHeight(v)
-	})
-}
-
-// UpdateHeight sets the "height" field to the value that was provided on create.
-func (u *AssetUpsertOne) UpdateHeight() *AssetUpsertOne {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdateHeight()
+		s.ClearMetadata()
 	})
 }
 
@@ -682,7 +639,7 @@ func (u *AssetUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AssetUpsertOne) ID(ctx context.Context) (id string, err error) {
+func (u *AssetUpsertOne) ID(ctx context.Context) (id xid.ID, err error) {
 	if u.create.driver.Dialect() == dialect.MySQL {
 		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
 		// fields from the database since MySQL does not support the RETURNING clause.
@@ -696,7 +653,7 @@ func (u *AssetUpsertOne) ID(ctx context.Context) (id string, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AssetUpsertOne) IDX(ctx context.Context) string {
+func (u *AssetUpsertOne) IDX(ctx context.Context) xid.ID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -898,6 +855,20 @@ func (u *AssetUpsertBulk) UpdateUpdatedAt() *AssetUpsertBulk {
 	})
 }
 
+// SetFilename sets the "filename" field.
+func (u *AssetUpsertBulk) SetFilename(v string) *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetFilename(v)
+	})
+}
+
+// UpdateFilename sets the "filename" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateFilename() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateFilename()
+	})
+}
+
 // SetURL sets the "url" field.
 func (u *AssetUpsertBulk) SetURL(v string) *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
@@ -912,59 +883,24 @@ func (u *AssetUpsertBulk) UpdateURL() *AssetUpsertBulk {
 	})
 }
 
-// SetMimetype sets the "mimetype" field.
-func (u *AssetUpsertBulk) SetMimetype(v string) *AssetUpsertBulk {
+// SetMetadata sets the "metadata" field.
+func (u *AssetUpsertBulk) SetMetadata(v map[string]interface{}) *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetMimetype(v)
+		s.SetMetadata(v)
 	})
 }
 
-// UpdateMimetype sets the "mimetype" field to the value that was provided on create.
-func (u *AssetUpsertBulk) UpdateMimetype() *AssetUpsertBulk {
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateMetadata() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
-		s.UpdateMimetype()
+		s.UpdateMetadata()
 	})
 }
 
-// SetWidth sets the "width" field.
-func (u *AssetUpsertBulk) SetWidth(v int) *AssetUpsertBulk {
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AssetUpsertBulk) ClearMetadata() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetWidth(v)
-	})
-}
-
-// AddWidth adds v to the "width" field.
-func (u *AssetUpsertBulk) AddWidth(v int) *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.AddWidth(v)
-	})
-}
-
-// UpdateWidth sets the "width" field to the value that was provided on create.
-func (u *AssetUpsertBulk) UpdateWidth() *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdateWidth()
-	})
-}
-
-// SetHeight sets the "height" field.
-func (u *AssetUpsertBulk) SetHeight(v int) *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.SetHeight(v)
-	})
-}
-
-// AddHeight adds v to the "height" field.
-func (u *AssetUpsertBulk) AddHeight(v int) *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.AddHeight(v)
-	})
-}
-
-// UpdateHeight sets the "height" field to the value that was provided on create.
-func (u *AssetUpsertBulk) UpdateHeight() *AssetUpsertBulk {
-	return u.Update(func(s *AssetUpsert) {
-		s.UpdateHeight()
+		s.ClearMetadata()
 	})
 }
 

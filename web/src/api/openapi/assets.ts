@@ -76,14 +76,15 @@ export const useAssetUpload = <
 /**
  * Download an asset by its ID.
  */
-export const assetGet = (id: string) => {
+export const assetGet = (assetFilename: string) => {
   return fetcher<AssetGetOKResponse>({
-    url: `/v1/assets/${id}`,
+    url: `/v1/assets/${assetFilename}`,
     method: "GET",
   });
 };
 
-export const getAssetGetKey = (id: string) => [`/v1/assets/${id}`] as const;
+export const getAssetGetKey = (assetFilename: string) =>
+  [`/v1/assets/${assetFilename}`] as const;
 
 export type AssetGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof assetGet>>
@@ -99,7 +100,7 @@ export const useAssetGet = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  id: string,
+  assetFilename: string,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof assetGet>>, TError> & {
       swrKey?: Key;
@@ -109,10 +110,11 @@ export const useAssetGet = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false && !!id;
+  const isEnabled = swrOptions?.enabled !== false && !!assetFilename;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getAssetGetKey(id) : null));
-  const swrFn = () => assetGet(id);
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAssetGetKey(assetFilename) : null));
+  const swrFn = () => assetGet(assetFilename);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

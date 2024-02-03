@@ -647,7 +647,7 @@ func (c *AssetClient) UpdateOne(a *Asset) *AssetUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AssetClient) UpdateOneID(id string) *AssetUpdateOne {
+func (c *AssetClient) UpdateOneID(id xid.ID) *AssetUpdateOne {
 	mutation := newAssetMutation(c.config, OpUpdateOne, withAssetID(id))
 	return &AssetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -664,7 +664,7 @@ func (c *AssetClient) DeleteOne(a *Asset) *AssetDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AssetClient) DeleteOneID(id string) *AssetDeleteOne {
+func (c *AssetClient) DeleteOneID(id xid.ID) *AssetDeleteOne {
 	builder := c.Delete().Where(asset.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -681,12 +681,12 @@ func (c *AssetClient) Query() *AssetQuery {
 }
 
 // Get returns a Asset entity by its id.
-func (c *AssetClient) Get(ctx context.Context, id string) (*Asset, error) {
+func (c *AssetClient) Get(ctx context.Context, id xid.ID) (*Asset, error) {
 	return c.Query().Where(asset.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AssetClient) GetX(ctx context.Context, id string) *Asset {
+func (c *AssetClient) GetX(ctx context.Context, id xid.ID) *Asset {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

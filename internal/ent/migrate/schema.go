@@ -27,13 +27,12 @@ var (
 	}
 	// AssetsColumns holds the columns for the "assets" table.
 	AssetsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "filename", Type: field.TypeString},
 		{Name: "url", Type: field.TypeString},
-		{Name: "mimetype", Type: field.TypeString},
-		{Name: "width", Type: field.TypeInt},
-		{Name: "height", Type: field.TypeInt},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
 	// AssetsTable holds the schema information for the "assets" table.
@@ -44,9 +43,16 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "assets_accounts_assets",
-				Columns:    []*schema.Column{AssetsColumns[7]},
+				Columns:    []*schema.Column{AssetsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "asset_filename",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[3]},
 			},
 		},
 	}
@@ -399,7 +405,7 @@ var (
 	// ClusterAssetsColumns holds the columns for the "cluster_assets" table.
 	ClusterAssetsColumns = []*schema.Column{
 		{Name: "cluster_id", Type: field.TypeString, Size: 20},
-		{Name: "asset_id", Type: field.TypeString},
+		{Name: "asset_id", Type: field.TypeString, Size: 20},
 	}
 	// ClusterAssetsTable holds the schema information for the "cluster_assets" table.
 	ClusterAssetsTable = &schema.Table{
@@ -449,7 +455,7 @@ var (
 	// ItemAssetsColumns holds the columns for the "item_assets" table.
 	ItemAssetsColumns = []*schema.Column{
 		{Name: "item_id", Type: field.TypeString, Size: 20},
-		{Name: "asset_id", Type: field.TypeString},
+		{Name: "asset_id", Type: field.TypeString, Size: 20},
 	}
 	// ItemAssetsTable holds the schema information for the "item_assets" table.
 	ItemAssetsTable = &schema.Table{
@@ -549,7 +555,7 @@ var (
 	// LinkAssetsColumns holds the columns for the "link_assets" table.
 	LinkAssetsColumns = []*schema.Column{
 		{Name: "link_id", Type: field.TypeString, Size: 20},
-		{Name: "asset_id", Type: field.TypeString},
+		{Name: "asset_id", Type: field.TypeString, Size: 20},
 	}
 	// LinkAssetsTable holds the schema information for the "link_assets" table.
 	LinkAssetsTable = &schema.Table{
@@ -574,7 +580,7 @@ var (
 	// PostAssetsColumns holds the columns for the "post_assets" table.
 	PostAssetsColumns = []*schema.Column{
 		{Name: "post_id", Type: field.TypeString, Size: 20},
-		{Name: "asset_id", Type: field.TypeString},
+		{Name: "asset_id", Type: field.TypeString, Size: 20},
 	}
 	// PostAssetsTable holds the schema information for the "post_assets" table.
 	PostAssetsTable = &schema.Table{

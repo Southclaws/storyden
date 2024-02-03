@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -58,13 +57,13 @@ func WithSlug(v string) Option {
 
 func WithAssets(a []asset.AssetID) Option {
 	return func(m *ent.ClusterMutation) {
-		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+		m.AddAssetIDs(a...)
 	}
 }
 
 func WithAssetsRemoved(a []asset.AssetID) Option {
 	return func(m *ent.ClusterMutation) {
-		m.RemoveAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+		m.RemoveAssetIDs(a...)
 	}
 }
 

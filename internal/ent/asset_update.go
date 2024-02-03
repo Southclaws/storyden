@@ -41,41 +41,27 @@ func (au *AssetUpdate) SetUpdatedAt(t time.Time) *AssetUpdate {
 	return au
 }
 
+// SetFilename sets the "filename" field.
+func (au *AssetUpdate) SetFilename(s string) *AssetUpdate {
+	au.mutation.SetFilename(s)
+	return au
+}
+
 // SetURL sets the "url" field.
 func (au *AssetUpdate) SetURL(s string) *AssetUpdate {
 	au.mutation.SetURL(s)
 	return au
 }
 
-// SetMimetype sets the "mimetype" field.
-func (au *AssetUpdate) SetMimetype(s string) *AssetUpdate {
-	au.mutation.SetMimetype(s)
+// SetMetadata sets the "metadata" field.
+func (au *AssetUpdate) SetMetadata(m map[string]interface{}) *AssetUpdate {
+	au.mutation.SetMetadata(m)
 	return au
 }
 
-// SetWidth sets the "width" field.
-func (au *AssetUpdate) SetWidth(i int) *AssetUpdate {
-	au.mutation.ResetWidth()
-	au.mutation.SetWidth(i)
-	return au
-}
-
-// AddWidth adds i to the "width" field.
-func (au *AssetUpdate) AddWidth(i int) *AssetUpdate {
-	au.mutation.AddWidth(i)
-	return au
-}
-
-// SetHeight sets the "height" field.
-func (au *AssetUpdate) SetHeight(i int) *AssetUpdate {
-	au.mutation.ResetHeight()
-	au.mutation.SetHeight(i)
-	return au
-}
-
-// AddHeight adds i to the "height" field.
-func (au *AssetUpdate) AddHeight(i int) *AssetUpdate {
-	au.mutation.AddHeight(i)
+// ClearMetadata clears the value of the "metadata" field.
+func (au *AssetUpdate) ClearMetadata() *AssetUpdate {
+	au.mutation.ClearMetadata()
 	return au
 }
 
@@ -316,23 +302,17 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.UpdatedAt(); ok {
 		_spec.SetField(asset.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := au.mutation.Filename(); ok {
+		_spec.SetField(asset.FieldFilename, field.TypeString, value)
+	}
 	if value, ok := au.mutation.URL(); ok {
 		_spec.SetField(asset.FieldURL, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Mimetype(); ok {
-		_spec.SetField(asset.FieldMimetype, field.TypeString, value)
+	if value, ok := au.mutation.Metadata(); ok {
+		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
 	}
-	if value, ok := au.mutation.Width(); ok {
-		_spec.SetField(asset.FieldWidth, field.TypeInt, value)
-	}
-	if value, ok := au.mutation.AddedWidth(); ok {
-		_spec.AddField(asset.FieldWidth, field.TypeInt, value)
-	}
-	if value, ok := au.mutation.Height(); ok {
-		_spec.SetField(asset.FieldHeight, field.TypeInt, value)
-	}
-	if value, ok := au.mutation.AddedHeight(); ok {
-		_spec.AddField(asset.FieldHeight, field.TypeInt, value)
+	if au.mutation.MetadataCleared() {
+		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)
 	}
 	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -571,41 +551,27 @@ func (auo *AssetUpdateOne) SetUpdatedAt(t time.Time) *AssetUpdateOne {
 	return auo
 }
 
+// SetFilename sets the "filename" field.
+func (auo *AssetUpdateOne) SetFilename(s string) *AssetUpdateOne {
+	auo.mutation.SetFilename(s)
+	return auo
+}
+
 // SetURL sets the "url" field.
 func (auo *AssetUpdateOne) SetURL(s string) *AssetUpdateOne {
 	auo.mutation.SetURL(s)
 	return auo
 }
 
-// SetMimetype sets the "mimetype" field.
-func (auo *AssetUpdateOne) SetMimetype(s string) *AssetUpdateOne {
-	auo.mutation.SetMimetype(s)
+// SetMetadata sets the "metadata" field.
+func (auo *AssetUpdateOne) SetMetadata(m map[string]interface{}) *AssetUpdateOne {
+	auo.mutation.SetMetadata(m)
 	return auo
 }
 
-// SetWidth sets the "width" field.
-func (auo *AssetUpdateOne) SetWidth(i int) *AssetUpdateOne {
-	auo.mutation.ResetWidth()
-	auo.mutation.SetWidth(i)
-	return auo
-}
-
-// AddWidth adds i to the "width" field.
-func (auo *AssetUpdateOne) AddWidth(i int) *AssetUpdateOne {
-	auo.mutation.AddWidth(i)
-	return auo
-}
-
-// SetHeight sets the "height" field.
-func (auo *AssetUpdateOne) SetHeight(i int) *AssetUpdateOne {
-	auo.mutation.ResetHeight()
-	auo.mutation.SetHeight(i)
-	return auo
-}
-
-// AddHeight adds i to the "height" field.
-func (auo *AssetUpdateOne) AddHeight(i int) *AssetUpdateOne {
-	auo.mutation.AddHeight(i)
+// ClearMetadata clears the value of the "metadata" field.
+func (auo *AssetUpdateOne) ClearMetadata() *AssetUpdateOne {
+	auo.mutation.ClearMetadata()
 	return auo
 }
 
@@ -876,23 +842,17 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 	if value, ok := auo.mutation.UpdatedAt(); ok {
 		_spec.SetField(asset.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := auo.mutation.Filename(); ok {
+		_spec.SetField(asset.FieldFilename, field.TypeString, value)
+	}
 	if value, ok := auo.mutation.URL(); ok {
 		_spec.SetField(asset.FieldURL, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Mimetype(); ok {
-		_spec.SetField(asset.FieldMimetype, field.TypeString, value)
+	if value, ok := auo.mutation.Metadata(); ok {
+		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
 	}
-	if value, ok := auo.mutation.Width(); ok {
-		_spec.SetField(asset.FieldWidth, field.TypeInt, value)
-	}
-	if value, ok := auo.mutation.AddedWidth(); ok {
-		_spec.AddField(asset.FieldWidth, field.TypeInt, value)
-	}
-	if value, ok := auo.mutation.Height(); ok {
-		_spec.SetField(asset.FieldHeight, field.TypeInt, value)
-	}
-	if value, ok := auo.mutation.AddedHeight(); ok {
-		_spec.AddField(asset.FieldHeight, field.TypeInt, value)
+	if auo.mutation.MetadataCleared() {
+		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)
 	}
 	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

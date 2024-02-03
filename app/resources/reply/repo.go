@@ -3,7 +3,6 @@ package reply
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -61,7 +60,7 @@ func WithMeta(meta map[string]any) Option {
 
 func WithAssets(ids ...asset.AssetID) Option {
 	return func(m *ent.PostMutation) {
-		m.AddAssetIDs(dt.Map(ids, func(id asset.AssetID) string { return string(id) })...)
+		m.AddAssetIDs(ids...)
 	}
 }
 

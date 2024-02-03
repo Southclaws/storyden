@@ -144,14 +144,14 @@ func (iu *ItemUpdate) AddClusters(c ...*Cluster) *ItemUpdate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (iu *ItemUpdate) AddAssetIDs(ids ...string) *ItemUpdate {
+func (iu *ItemUpdate) AddAssetIDs(ids ...xid.ID) *ItemUpdate {
 	iu.mutation.AddAssetIDs(ids...)
 	return iu
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (iu *ItemUpdate) AddAssets(a ...*Asset) *ItemUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -227,14 +227,14 @@ func (iu *ItemUpdate) ClearAssets() *ItemUpdate {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (iu *ItemUpdate) RemoveAssetIDs(ids ...string) *ItemUpdate {
+func (iu *ItemUpdate) RemoveAssetIDs(ids ...xid.ID) *ItemUpdate {
 	iu.mutation.RemoveAssetIDs(ids...)
 	return iu
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (iu *ItemUpdate) RemoveAssets(a ...*Asset) *ItemUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -715,14 +715,14 @@ func (iuo *ItemUpdateOne) AddClusters(c ...*Cluster) *ItemUpdateOne {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (iuo *ItemUpdateOne) AddAssetIDs(ids ...string) *ItemUpdateOne {
+func (iuo *ItemUpdateOne) AddAssetIDs(ids ...xid.ID) *ItemUpdateOne {
 	iuo.mutation.AddAssetIDs(ids...)
 	return iuo
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (iuo *ItemUpdateOne) AddAssets(a ...*Asset) *ItemUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -798,14 +798,14 @@ func (iuo *ItemUpdateOne) ClearAssets() *ItemUpdateOne {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (iuo *ItemUpdateOne) RemoveAssetIDs(ids ...string) *ItemUpdateOne {
+func (iuo *ItemUpdateOne) RemoveAssetIDs(ids ...xid.ID) *ItemUpdateOne {
 	iuo.mutation.RemoveAssetIDs(ids...)
 	return iuo
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (iuo *ItemUpdateOne) RemoveAssets(a ...*Asset) *ItemUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

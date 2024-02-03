@@ -776,13 +776,13 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AssetUploadOK" }
-  /v1/assets/{id}:
+  /v1/assets/{asset_filename}:
     get:
       operationId: AssetGet
       description: Download an asset by its ID.
       tags: [assets]
       security: []
-      parameters: [$ref: "#/components/parameters/AssetPath"]
+      parameters: [$ref: "#/components/parameters/AssetPathParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -959,14 +959,14 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ClusterDeleteOK" }
 
-  /v1/clusters/{cluster_slug}/assets/{id}:
+  /v1/clusters/{cluster_slug}/assets/{asset_id}:
     put:
       operationId: ClusterAddAsset
       description: Add an asset to a cluster.
       tags: [clusters]
       parameters:
         - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/AssetPath"
+        - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -978,7 +978,7 @@ paths:
       tags: [clusters]
       parameters:
         - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/AssetPath"
+        - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1106,14 +1106,14 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: Deleted }
 
-  /v1/items/{item_slug}/assets/{id}:
+  /v1/items/{item_slug}/assets/{asset_id}:
     put:
       operationId: ItemAddAsset
       description: Add an asset to an item.
       tags: [items]
       parameters:
         - $ref: "#/components/parameters/ItemSlugParam"
-        - $ref: "#/components/parameters/AssetPath"
+        - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1125,7 +1125,7 @@ paths:
       tags: [items]
       parameters:
         - $ref: "#/components/parameters/ItemSlugParam"
-        - $ref: "#/components/parameters/AssetPath"
+        - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1307,9 +1307,17 @@ components:
       schema:
         type: string
 
-    AssetPath:
+    AssetPathParam:
       description: Asset ID.
-      name: id
+      name: asset_filename
+      in: path
+      required: true
+      schema:
+        type: string
+
+    AssetIDParam:
+      description: Asset ID.
+      name: asset_id
       in: path
       required: true
       schema:
