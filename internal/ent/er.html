@@ -17,13 +17,12 @@ erDiagram
         bool admin
     }
     Asset {
-        string id
+        xidDOTID id
         timeDOTTime created_at
         timeDOTTime updated_at
+        string filename
         string url
-        string mimetype
-        int width
-        int height
+        mapLBRACKstringRBRACKinterface {} metadata
         xidDOTID account_id
     }
     Authentication {

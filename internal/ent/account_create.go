@@ -250,14 +250,14 @@ func (ac *AccountCreate) AddItems(i ...*Item) *AccountCreate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (ac *AccountCreate) AddAssetIDs(ids ...string) *AccountCreate {
+func (ac *AccountCreate) AddAssetIDs(ids ...xid.ID) *AccountCreate {
 	ac.mutation.AddAssetIDs(ids...)
 	return ac
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (ac *AccountCreate) AddAssets(a ...*Asset) *AccountCreate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

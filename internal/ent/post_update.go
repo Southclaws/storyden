@@ -336,14 +336,14 @@ func (pu *PostUpdate) AddReacts(r ...*React) *PostUpdate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (pu *PostUpdate) AddAssetIDs(ids ...string) *PostUpdate {
+func (pu *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
 	pu.mutation.AddAssetIDs(ids...)
 	return pu
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (pu *PostUpdate) AddAssets(a ...*Asset) *PostUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -500,14 +500,14 @@ func (pu *PostUpdate) ClearAssets() *PostUpdate {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (pu *PostUpdate) RemoveAssetIDs(ids ...string) *PostUpdate {
+func (pu *PostUpdate) RemoveAssetIDs(ids ...xid.ID) *PostUpdate {
 	pu.mutation.RemoveAssetIDs(ids...)
 	return pu
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (pu *PostUpdate) RemoveAssets(a ...*Asset) *PostUpdate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1417,14 +1417,14 @@ func (puo *PostUpdateOne) AddReacts(r ...*React) *PostUpdateOne {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (puo *PostUpdateOne) AddAssetIDs(ids ...string) *PostUpdateOne {
+func (puo *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
 	puo.mutation.AddAssetIDs(ids...)
 	return puo
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (puo *PostUpdateOne) AddAssets(a ...*Asset) *PostUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -1581,14 +1581,14 @@ func (puo *PostUpdateOne) ClearAssets() *PostUpdateOne {
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (puo *PostUpdateOne) RemoveAssetIDs(ids ...string) *PostUpdateOne {
+func (puo *PostUpdateOne) RemoveAssetIDs(ids ...xid.ID) *PostUpdateOne {
 	puo.mutation.RemoveAssetIDs(ids...)
 	return puo
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
 func (puo *PostUpdateOne) RemoveAssets(a ...*Asset) *PostUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

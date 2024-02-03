@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -12,23 +13,23 @@ type Asset struct {
 }
 
 func (Asset) Mixin() []ent.Mixin {
-	return []ent.Mixin{CreatedAt{}, UpdatedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}}
 }
 
 func (Asset) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").
-			NotEmpty().
-			Immutable().
-			Unique(),
-
+		field.String("filename"),
 		field.String("url"),
-		field.String("mimetype"),
-		field.Int("width"),
-		field.Int("height"),
+		field.JSON("metadata", map[string]any{}).Optional(),
 
 		// Edges
 		field.String("account_id").GoType(xid.ID{}),
+	}
+}
+
+func (Asset) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("filename"),
 	}
 }
 

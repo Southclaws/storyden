@@ -205,10 +205,9 @@ func clusters_items(cluster_repo cluster.Repository, item_repo item.Repository, 
 
 func assets(ar asset.Repository, owner account.AccountID, id string, assets []*asset.Asset) (ids []asset.AssetID) {
 	ids, err := dt.MapErr(assets, func(a *asset.Asset) (asset.AssetID, error) {
-		id = fmt.Sprintf("%s-asset-%s", id, uuid.NewString())
-		a, err := ar.Add(context.Background(), owner, id, a.URL, a.MIMEType, a.Width, a.Height)
+		a, err := ar.Add(context.Background(), owner, asset.NewExistingFilename(xid.New(), uuid.NewString()), a.URL)
 		if err != nil {
-			return "", err
+			return xid.NilID(), err
 		}
 
 		return a.ID, nil

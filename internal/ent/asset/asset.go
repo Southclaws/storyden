@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/rs/xid"
 )
 
 const (
@@ -18,14 +19,12 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldFilename holds the string denoting the filename field in the database.
+	FieldFilename = "filename"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
-	// FieldMimetype holds the string denoting the mimetype field in the database.
-	FieldMimetype = "mimetype"
-	// FieldWidth holds the string denoting the width field in the database.
-	FieldWidth = "width"
-	// FieldHeight holds the string denoting the height field in the database.
-	FieldHeight = "height"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
@@ -74,10 +73,9 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldFilename,
 	FieldURL,
-	FieldMimetype,
-	FieldWidth,
-	FieldHeight,
+	FieldMetadata,
 	FieldAccountID,
 }
 
@@ -113,6 +111,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -135,24 +135,14 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
+// ByFilename orders the results by the filename field.
+func ByFilename(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFilename, opts...).ToFunc()
+}
+
 // ByURL orders the results by the url field.
 func ByURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldURL, opts...).ToFunc()
-}
-
-// ByMimetype orders the results by the mimetype field.
-func ByMimetype(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMimetype, opts...).ToFunc()
-}
-
-// ByWidth orders the results by the width field.
-func ByWidth(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWidth, opts...).ToFunc()
-}
-
-// ByHeight orders the results by the height field.
-func ByHeight(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldHeight, opts...).ToFunc()
 }
 
 // ByAccountID orders the results by the account_id field.

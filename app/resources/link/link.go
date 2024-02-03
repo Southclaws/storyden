@@ -66,7 +66,7 @@ func WithItems(ids ...xid.ID) Option {
 	}
 }
 
-func WithAssets(ids ...string) Option {
+func WithAssets(ids ...asset.AssetID) Option {
 	return func(lm *ent.LinkMutation) {
 		lm.AddAssetIDs(ids...)
 	}

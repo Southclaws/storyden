@@ -138,16 +138,16 @@ func serialiseReact(r *react.React) openapi.React {
 
 func serialiseAssetReference(a *asset.Asset) openapi.Asset {
 	return openapi.Asset{
-		Id:       string(a.ID),
+		Id:       a.ID.String(),
 		Url:      a.URL,
-		MimeType: a.MIMEType,
-		Width:    float32(a.Width),
-		Height:   float32(a.Height),
+		MimeType: a.Metadata.GetMIMEType(),
+		Width:    float32(a.Metadata.GetWidth()),
+		Height:   float32(a.Metadata.GetHeight()),
 	}
 }
 
 func deserialiseAssetID(in string) asset.AssetID {
-	return asset.AssetID(in)
+	return asset.AssetID(openapi.ParseID(in))
 }
 
 func deserialiseAssetIDs(ids []string) []asset.AssetID {

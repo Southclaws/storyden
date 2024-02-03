@@ -10,10 +10,11 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
+
+	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
 type Result struct {

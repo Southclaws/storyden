@@ -156,14 +156,14 @@ func (ic *ItemCreate) AddClusters(c ...*Cluster) *ItemCreate {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (ic *ItemCreate) AddAssetIDs(ids ...string) *ItemCreate {
+func (ic *ItemCreate) AddAssetIDs(ids ...xid.ID) *ItemCreate {
 	ic.mutation.AddAssetIDs(ids...)
 	return ic
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
 func (ic *ItemCreate) AddAssets(a ...*Asset) *ItemCreate {
-	ids := make([]string, len(a))
+	ids := make([]xid.ID, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}

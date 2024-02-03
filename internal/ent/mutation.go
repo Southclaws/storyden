@@ -92,8 +92,8 @@ type AccountMutation struct {
 	items                 map[xid.ID]struct{}
 	removeditems          map[xid.ID]struct{}
 	cleareditems          bool
-	assets                map[string]struct{}
-	removedassets         map[string]struct{}
+	assets                map[xid.ID]struct{}
+	removedassets         map[xid.ID]struct{}
 	clearedassets         bool
 	done                  bool
 	oldValue              func(context.Context) (*Account, error)
@@ -915,9 +915,9 @@ func (m *AccountMutation) ResetItems() {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *AccountMutation) AddAssetIDs(ids ...string) {
+func (m *AccountMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
-		m.assets = make(map[string]struct{})
+		m.assets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m.assets[ids[i]] = struct{}{}
@@ -935,9 +935,9 @@ func (m *AccountMutation) AssetsCleared() bool {
 }
 
 // RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *AccountMutation) RemoveAssetIDs(ids ...string) {
+func (m *AccountMutation) RemoveAssetIDs(ids ...xid.ID) {
 	if m.removedassets == nil {
-		m.removedassets = make(map[string]struct{})
+		m.removedassets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m.assets, ids[i])
@@ -946,7 +946,7 @@ func (m *AccountMutation) RemoveAssetIDs(ids ...string) {
 }
 
 // RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *AccountMutation) RemovedAssetsIDs() (ids []string) {
+func (m *AccountMutation) RemovedAssetsIDs() (ids []xid.ID) {
 	for id := range m.removedassets {
 		ids = append(ids, id)
 	}
@@ -954,7 +954,7 @@ func (m *AccountMutation) RemovedAssetsIDs() (ids []string) {
 }
 
 // AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *AccountMutation) AssetsIDs() (ids []string) {
+func (m *AccountMutation) AssetsIDs() (ids []xid.ID) {
 	for id := range m.assets {
 		ids = append(ids, id)
 	}
@@ -1513,15 +1513,12 @@ type AssetMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *string
+	id              *xid.ID
 	created_at      *time.Time
 	updated_at      *time.Time
+	filename        *string
 	url             *string
-	mimetype        *string
-	width           *int
-	addwidth        *int
-	height          *int
-	addheight       *int
+	metadata        *map[string]interface{}
 	clearedFields   map[string]struct{}
 	posts           map[xid.ID]struct{}
 	removedposts    map[xid.ID]struct{}
@@ -1562,7 +1559,7 @@ func newAssetMutation(c config, op Op, opts ...assetOption) *AssetMutation {
 }
 
 // withAssetID sets the ID field of the mutation.
-func withAssetID(id string) assetOption {
+func withAssetID(id xid.ID) assetOption {
 	return func(m *AssetMutation) {
 		var (
 			err   error
@@ -1614,13 +1611,13 @@ func (m AssetMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Asset entities.
-func (m *AssetMutation) SetID(id string) {
+func (m *AssetMutation) SetID(id xid.ID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *AssetMutation) ID() (id string, exists bool) {
+func (m *AssetMutation) ID() (id xid.ID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1631,12 +1628,12 @@ func (m *AssetMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *AssetMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *AssetMutation) IDs(ctx context.Context) ([]xid.ID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []xid.ID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1718,6 +1715,42 @@ func (m *AssetMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetFilename sets the "filename" field.
+func (m *AssetMutation) SetFilename(s string) {
+	m.filename = &s
+}
+
+// Filename returns the value of the "filename" field in the mutation.
+func (m *AssetMutation) Filename() (r string, exists bool) {
+	v := m.filename
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFilename returns the old "filename" field's value of the Asset entity.
+// If the Asset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AssetMutation) OldFilename(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFilename is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFilename requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFilename: %w", err)
+	}
+	return oldValue.Filename, nil
+}
+
+// ResetFilename resets all changes to the "filename" field.
+func (m *AssetMutation) ResetFilename() {
+	m.filename = nil
+}
+
 // SetURL sets the "url" field.
 func (m *AssetMutation) SetURL(s string) {
 	m.url = &s
@@ -1754,152 +1787,53 @@ func (m *AssetMutation) ResetURL() {
 	m.url = nil
 }
 
-// SetMimetype sets the "mimetype" field.
-func (m *AssetMutation) SetMimetype(s string) {
-	m.mimetype = &s
+// SetMetadata sets the "metadata" field.
+func (m *AssetMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
 }
 
-// Mimetype returns the value of the "mimetype" field in the mutation.
-func (m *AssetMutation) Mimetype() (r string, exists bool) {
-	v := m.mimetype
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *AssetMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMimetype returns the old "mimetype" field's value of the Asset entity.
+// OldMetadata returns the old "metadata" field's value of the Asset entity.
 // If the Asset object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldMimetype(ctx context.Context) (v string, err error) {
+func (m *AssetMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMimetype is only allowed on UpdateOne operations")
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMimetype requires an ID field in the mutation")
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMimetype: %w", err)
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
 	}
-	return oldValue.Mimetype, nil
+	return oldValue.Metadata, nil
 }
 
-// ResetMimetype resets all changes to the "mimetype" field.
-func (m *AssetMutation) ResetMimetype() {
-	m.mimetype = nil
+// ClearMetadata clears the value of the "metadata" field.
+func (m *AssetMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[asset.FieldMetadata] = struct{}{}
 }
 
-// SetWidth sets the "width" field.
-func (m *AssetMutation) SetWidth(i int) {
-	m.width = &i
-	m.addwidth = nil
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *AssetMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[asset.FieldMetadata]
+	return ok
 }
 
-// Width returns the value of the "width" field in the mutation.
-func (m *AssetMutation) Width() (r int, exists bool) {
-	v := m.width
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWidth returns the old "width" field's value of the Asset entity.
-// If the Asset object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldWidth(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWidth is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWidth requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWidth: %w", err)
-	}
-	return oldValue.Width, nil
-}
-
-// AddWidth adds i to the "width" field.
-func (m *AssetMutation) AddWidth(i int) {
-	if m.addwidth != nil {
-		*m.addwidth += i
-	} else {
-		m.addwidth = &i
-	}
-}
-
-// AddedWidth returns the value that was added to the "width" field in this mutation.
-func (m *AssetMutation) AddedWidth() (r int, exists bool) {
-	v := m.addwidth
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetWidth resets all changes to the "width" field.
-func (m *AssetMutation) ResetWidth() {
-	m.width = nil
-	m.addwidth = nil
-}
-
-// SetHeight sets the "height" field.
-func (m *AssetMutation) SetHeight(i int) {
-	m.height = &i
-	m.addheight = nil
-}
-
-// Height returns the value of the "height" field in the mutation.
-func (m *AssetMutation) Height() (r int, exists bool) {
-	v := m.height
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHeight returns the old "height" field's value of the Asset entity.
-// If the Asset object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldHeight(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldHeight is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldHeight requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHeight: %w", err)
-	}
-	return oldValue.Height, nil
-}
-
-// AddHeight adds i to the "height" field.
-func (m *AssetMutation) AddHeight(i int) {
-	if m.addheight != nil {
-		*m.addheight += i
-	} else {
-		m.addheight = &i
-	}
-}
-
-// AddedHeight returns the value that was added to the "height" field in this mutation.
-func (m *AssetMutation) AddedHeight() (r int, exists bool) {
-	v := m.addheight
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetHeight resets all changes to the "height" field.
-func (m *AssetMutation) ResetHeight() {
-	m.height = nil
-	m.addheight = nil
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *AssetMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, asset.FieldMetadata)
 }
 
 // SetAccountID sets the "account_id" field.
@@ -2228,24 +2162,21 @@ func (m *AssetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AssetMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, asset.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, asset.FieldUpdatedAt)
 	}
+	if m.filename != nil {
+		fields = append(fields, asset.FieldFilename)
+	}
 	if m.url != nil {
 		fields = append(fields, asset.FieldURL)
 	}
-	if m.mimetype != nil {
-		fields = append(fields, asset.FieldMimetype)
-	}
-	if m.width != nil {
-		fields = append(fields, asset.FieldWidth)
-	}
-	if m.height != nil {
-		fields = append(fields, asset.FieldHeight)
+	if m.metadata != nil {
+		fields = append(fields, asset.FieldMetadata)
 	}
 	if m.owner != nil {
 		fields = append(fields, asset.FieldAccountID)
@@ -2262,14 +2193,12 @@ func (m *AssetMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case asset.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case asset.FieldFilename:
+		return m.Filename()
 	case asset.FieldURL:
 		return m.URL()
-	case asset.FieldMimetype:
-		return m.Mimetype()
-	case asset.FieldWidth:
-		return m.Width()
-	case asset.FieldHeight:
-		return m.Height()
+	case asset.FieldMetadata:
+		return m.Metadata()
 	case asset.FieldAccountID:
 		return m.AccountID()
 	}
@@ -2285,14 +2214,12 @@ func (m *AssetMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCreatedAt(ctx)
 	case asset.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case asset.FieldFilename:
+		return m.OldFilename(ctx)
 	case asset.FieldURL:
 		return m.OldURL(ctx)
-	case asset.FieldMimetype:
-		return m.OldMimetype(ctx)
-	case asset.FieldWidth:
-		return m.OldWidth(ctx)
-	case asset.FieldHeight:
-		return m.OldHeight(ctx)
+	case asset.FieldMetadata:
+		return m.OldMetadata(ctx)
 	case asset.FieldAccountID:
 		return m.OldAccountID(ctx)
 	}
@@ -2318,6 +2245,13 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case asset.FieldFilename:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFilename(v)
+		return nil
 	case asset.FieldURL:
 		v, ok := value.(string)
 		if !ok {
@@ -2325,26 +2259,12 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetURL(v)
 		return nil
-	case asset.FieldMimetype:
-		v, ok := value.(string)
+	case asset.FieldMetadata:
+		v, ok := value.(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMimetype(v)
-		return nil
-	case asset.FieldWidth:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetWidth(v)
-		return nil
-	case asset.FieldHeight:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHeight(v)
+		m.SetMetadata(v)
 		return nil
 	case asset.FieldAccountID:
 		v, ok := value.(xid.ID)
@@ -2360,26 +2280,13 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *AssetMutation) AddedFields() []string {
-	var fields []string
-	if m.addwidth != nil {
-		fields = append(fields, asset.FieldWidth)
-	}
-	if m.addheight != nil {
-		fields = append(fields, asset.FieldHeight)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *AssetMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case asset.FieldWidth:
-		return m.AddedWidth()
-	case asset.FieldHeight:
-		return m.AddedHeight()
-	}
 	return nil, false
 }
 
@@ -2388,20 +2295,6 @@ func (m *AssetMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AssetMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case asset.FieldWidth:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddWidth(v)
-		return nil
-	case asset.FieldHeight:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddHeight(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Asset numeric field %s", name)
 }
@@ -2409,7 +2302,11 @@ func (m *AssetMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AssetMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(asset.FieldMetadata) {
+		fields = append(fields, asset.FieldMetadata)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2422,6 +2319,11 @@ func (m *AssetMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AssetMutation) ClearField(name string) error {
+	switch name {
+	case asset.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
 	return fmt.Errorf("unknown Asset nullable field %s", name)
 }
 
@@ -2435,17 +2337,14 @@ func (m *AssetMutation) ResetField(name string) error {
 	case asset.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case asset.FieldFilename:
+		m.ResetFilename()
+		return nil
 	case asset.FieldURL:
 		m.ResetURL()
 		return nil
-	case asset.FieldMimetype:
-		m.ResetMimetype()
-		return nil
-	case asset.FieldWidth:
-		m.ResetWidth()
-		return nil
-	case asset.FieldHeight:
-		m.ResetHeight()
+	case asset.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	case asset.FieldAccountID:
 		m.ResetAccountID()
@@ -4284,8 +4183,8 @@ type ClusterMutation struct {
 	items           map[xid.ID]struct{}
 	removeditems    map[xid.ID]struct{}
 	cleareditems    bool
-	assets          map[string]struct{}
-	removedassets   map[string]struct{}
+	assets          map[xid.ID]struct{}
+	removedassets   map[xid.ID]struct{}
 	clearedassets   bool
 	tags            map[xid.ID]struct{}
 	removedtags     map[xid.ID]struct{}
@@ -5003,9 +4902,9 @@ func (m *ClusterMutation) ResetItems() {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *ClusterMutation) AddAssetIDs(ids ...string) {
+func (m *ClusterMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
-		m.assets = make(map[string]struct{})
+		m.assets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m.assets[ids[i]] = struct{}{}
@@ -5023,9 +4922,9 @@ func (m *ClusterMutation) AssetsCleared() bool {
 }
 
 // RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *ClusterMutation) RemoveAssetIDs(ids ...string) {
+func (m *ClusterMutation) RemoveAssetIDs(ids ...xid.ID) {
 	if m.removedassets == nil {
-		m.removedassets = make(map[string]struct{})
+		m.removedassets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m.assets, ids[i])
@@ -5034,7 +4933,7 @@ func (m *ClusterMutation) RemoveAssetIDs(ids ...string) {
 }
 
 // RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *ClusterMutation) RemovedAssetsIDs() (ids []string) {
+func (m *ClusterMutation) RemovedAssetsIDs() (ids []xid.ID) {
 	for id := range m.removedassets {
 		ids = append(ids, id)
 	}
@@ -5042,7 +4941,7 @@ func (m *ClusterMutation) RemovedAssetsIDs() (ids []string) {
 }
 
 // AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *ClusterMutation) AssetsIDs() (ids []string) {
+func (m *ClusterMutation) AssetsIDs() (ids []xid.ID) {
 	for id := range m.assets {
 		ids = append(ids, id)
 	}
@@ -6365,8 +6264,8 @@ type ItemMutation struct {
 	clusters        map[xid.ID]struct{}
 	removedclusters map[xid.ID]struct{}
 	clearedclusters bool
-	assets          map[string]struct{}
-	removedassets   map[string]struct{}
+	assets          map[xid.ID]struct{}
+	removedassets   map[xid.ID]struct{}
 	clearedassets   bool
 	tags            map[xid.ID]struct{}
 	removedtags     map[xid.ID]struct{}
@@ -6941,9 +6840,9 @@ func (m *ItemMutation) ResetClusters() {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *ItemMutation) AddAssetIDs(ids ...string) {
+func (m *ItemMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
-		m.assets = make(map[string]struct{})
+		m.assets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m.assets[ids[i]] = struct{}{}
@@ -6961,9 +6860,9 @@ func (m *ItemMutation) AssetsCleared() bool {
 }
 
 // RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *ItemMutation) RemoveAssetIDs(ids ...string) {
+func (m *ItemMutation) RemoveAssetIDs(ids ...xid.ID) {
 	if m.removedassets == nil {
-		m.removedassets = make(map[string]struct{})
+		m.removedassets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m.assets, ids[i])
@@ -6972,7 +6871,7 @@ func (m *ItemMutation) RemoveAssetIDs(ids ...string) {
 }
 
 // RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *ItemMutation) RemovedAssetsIDs() (ids []string) {
+func (m *ItemMutation) RemovedAssetsIDs() (ids []xid.ID) {
 	for id := range m.removedassets {
 		ids = append(ids, id)
 	}
@@ -6980,7 +6879,7 @@ func (m *ItemMutation) RemovedAssetsIDs() (ids []string) {
 }
 
 // AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *ItemMutation) AssetsIDs() (ids []string) {
+func (m *ItemMutation) AssetsIDs() (ids []xid.ID) {
 	for id := range m.assets {
 		ids = append(ids, id)
 	}
@@ -7592,8 +7491,8 @@ type LinkMutation struct {
 	items           map[xid.ID]struct{}
 	removeditems    map[xid.ID]struct{}
 	cleareditems    bool
-	assets          map[string]struct{}
-	removedassets   map[string]struct{}
+	assets          map[xid.ID]struct{}
+	removedassets   map[xid.ID]struct{}
 	clearedassets   bool
 	done            bool
 	oldValue        func(context.Context) (*Link, error)
@@ -8083,9 +7982,9 @@ func (m *LinkMutation) ResetItems() {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *LinkMutation) AddAssetIDs(ids ...string) {
+func (m *LinkMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
-		m.assets = make(map[string]struct{})
+		m.assets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m.assets[ids[i]] = struct{}{}
@@ -8103,9 +8002,9 @@ func (m *LinkMutation) AssetsCleared() bool {
 }
 
 // RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *LinkMutation) RemoveAssetIDs(ids ...string) {
+func (m *LinkMutation) RemoveAssetIDs(ids ...xid.ID) {
 	if m.removedassets == nil {
-		m.removedassets = make(map[string]struct{})
+		m.removedassets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m.assets, ids[i])
@@ -8114,7 +8013,7 @@ func (m *LinkMutation) RemoveAssetIDs(ids ...string) {
 }
 
 // RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *LinkMutation) RemovedAssetsIDs() (ids []string) {
+func (m *LinkMutation) RemovedAssetsIDs() (ids []xid.ID) {
 	for id := range m.removedassets {
 		ids = append(ids, id)
 	}
@@ -8122,7 +8021,7 @@ func (m *LinkMutation) RemovedAssetsIDs() (ids []string) {
 }
 
 // AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *LinkMutation) AssetsIDs() (ids []string) {
+func (m *LinkMutation) AssetsIDs() (ids []xid.ID) {
 	for id := range m.assets {
 		ids = append(ids, id)
 	}
@@ -9100,8 +8999,8 @@ type PostMutation struct {
 	reacts             map[xid.ID]struct{}
 	removedreacts      map[xid.ID]struct{}
 	clearedreacts      bool
-	assets             map[string]struct{}
-	removedassets      map[string]struct{}
+	assets             map[xid.ID]struct{}
+	removedassets      map[xid.ID]struct{}
 	clearedassets      bool
 	collections        map[xid.ID]struct{}
 	removedcollections map[xid.ID]struct{}
@@ -10176,9 +10075,9 @@ func (m *PostMutation) ResetReacts() {
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *PostMutation) AddAssetIDs(ids ...string) {
+func (m *PostMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
-		m.assets = make(map[string]struct{})
+		m.assets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		m.assets[ids[i]] = struct{}{}
@@ -10196,9 +10095,9 @@ func (m *PostMutation) AssetsCleared() bool {
 }
 
 // RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *PostMutation) RemoveAssetIDs(ids ...string) {
+func (m *PostMutation) RemoveAssetIDs(ids ...xid.ID) {
 	if m.removedassets == nil {
-		m.removedassets = make(map[string]struct{})
+		m.removedassets = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
 		delete(m.assets, ids[i])
@@ -10207,7 +10106,7 @@ func (m *PostMutation) RemoveAssetIDs(ids ...string) {
 }
 
 // RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *PostMutation) RemovedAssetsIDs() (ids []string) {
+func (m *PostMutation) RemovedAssetsIDs() (ids []xid.ID) {
 	for id := range m.removedassets {
 		ids = append(ids, id)
 	}
@@ -10215,7 +10114,7 @@ func (m *PostMutation) RemovedAssetsIDs() (ids []string) {
 }
 
 // AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *PostMutation) AssetsIDs() (ids []string) {
+func (m *PostMutation) AssetsIDs() (ids []xid.ID) {
 	for id := range m.assets {
 		ids = append(ids, id)
 	}

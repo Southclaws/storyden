@@ -3,7 +3,6 @@ package item
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -53,13 +52,13 @@ func WithSlug(v string) Option {
 
 func WithAssets(a []asset.AssetID) Option {
 	return func(m *ent.ItemMutation) {
-		m.AddAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+		m.AddAssetIDs(a...)
 	}
 }
 
 func WithAssetsRemoved(a []asset.AssetID) Option {
 	return func(m *ent.ItemMutation) {
-		m.RemoveAssetIDs(dt.Map(a, func(id asset.AssetID) string { return string(id) })...)
+		m.RemoveAssetIDs(a...)
 	}
 }
 
@@ -99,13 +98,13 @@ func WithParentClusterRemove(id xid.ID) Option {
 	}
 }
 
-func WithAssetAdd(id string) Option {
+func WithAssetAdd(id asset.AssetID) Option {
 	return func(c *ent.ItemMutation) {
 		c.AddAssetIDs(id)
 	}
 }
 
-func WithAssetRemove(id string) Option {
+func WithAssetRemove(id asset.AssetID) Option {
 	return func(c *ent.ItemMutation) {
 		c.RemoveAssetIDs(id)
 	}

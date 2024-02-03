@@ -25,16 +25,15 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/object"
 )
 
 const (
-	iconRoute          = "api/v1/info/icon"
-	iconStoragePath    = "app"
-	iconFileTemplate   = "icon-%s.png"
-	assetsSubdirectory = "assets"
+	iconRoute        = "api/v1/info/icon"
+	iconFileTemplate = "icon-%s.png"
 )
 
 type Size string
@@ -64,7 +63,7 @@ var (
 
 type Service interface {
 	Upload(ctx context.Context, r io.Reader) error
-	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, int64, error)
+	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error)
 }
 
 func Build() fx.Option {
@@ -76,7 +75,7 @@ type service struct {
 	rbac rbac.AccessManager
 
 	account_repo account.Repository
-	asset_repo   asset.Repository
+	am           asset_manager.Service
 	thread_repo  thread.Repository
 
 	os object.Storer
@@ -89,7 +88,7 @@ func New(
 	rbac rbac.AccessManager,
 
 	account_repo account.Repository,
-	asset_repo asset.Repository,
+	am asset_manager.Service,
 	thread_repo thread.Repository,
 
 	os object.Storer,
@@ -99,7 +98,7 @@ func New(
 		l:            l.With(zap.String("service", "icon")),
 		rbac:         rbac,
 		account_repo: account_repo,
-		asset_repo:   asset_repo,
+		am:           am,
 		thread_repo:  thread_repo,
 		os:           os,
 		address:      cfg.PublicWebAddress,
@@ -125,11 +124,6 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 }
 
 func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) error {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
 	// NOTE: We load the whole file into memory in order to compute a hash first
 	// which isn't the most optimal route as it means 5 people uploading a 100MB
 	// file to a 512MB server would result in a crash but this can be optimised.
@@ -166,7 +160,6 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 	for _, size := range sizes {
 		px := sizeMap[size]
 		filename := fmt.Sprintf(iconFileTemplate, size)
-		filepath := path.Join(iconStoragePath, filename)
 
 		resized := imaging.Resize(source, px, px, imaging.Lanczos)
 
@@ -176,16 +169,10 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		resizeBuffer.Len()
-
-		if err := s.os.Write(ctx, filepath, resizeBuffer, int64(resizeBuffer.Len())); err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-
 		apiPath := path.Join(iconRoute)
 		url := fmt.Sprintf("%s/%s", s.address, apiPath)
 
-		_, err = s.asset_repo.Add(ctx, accountID, filename, url, "image/png", 0, 0)
+		_, err = s.am.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), asset.NewFilename(filename), url)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
@@ -195,21 +182,15 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 	return nil
 }
 
-func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, int64, error) {
-	filename := fmt.Sprintf(iconFileTemplate, size)
+func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error) {
+	filename := asset.NewFilepathFilename(fmt.Sprintf(iconFileTemplate, size))
 
-	a, err := s.asset_repo.Get(ctx, filename)
+	a, r, err := s.am.Get(ctx, filename)
 	if err != nil {
-		return nil, nil, 0, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	filepath := path.Join(iconStoragePath, filename)
-	ctx = fctx.WithMeta(ctx, "path", filepath, "asset_id", string(a.ID))
+	ctx = fctx.WithMeta(ctx, "path", a.Name.String(), "asset_id", a.ID.String())
 
-	r, b, err := s.os.Read(ctx, filepath)
-	if err != nil {
-		return nil, nil, 0, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return a, r, b, nil
+	return a, r, nil
 }
