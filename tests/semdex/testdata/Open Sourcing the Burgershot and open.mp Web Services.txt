@@ -1,0 +1,21 @@
+Hey all???
+
+
+
+As many of you know, I love to open source everything. Even configuration files. I feel this benefits everyone because people can learn techniques and the underlying stack that supports their favourite websites and web services. But also, it provides a level of openness that facilitates the ability to directly contribute expertise and ideas to how services are deployed and configured.
+
+
+
+You can find all the deployment manifests and configuration for the websites and databases available in this repository:
+
+
+
+https://github.com/openmultiplayer/deployment
+
+
+
+If there's something about the site or configuration that you think can be done better or there's an issue that you know how to fix, simply open a pull request! The pull request will be reviewed by the team and if it's merged, the live site will be updated automatically.
+
+
+
+If any of you are interested in learning how all of this works, feel free to reply to this thread with your questions and I will update this post with a F.A.Q. style section of explanations.

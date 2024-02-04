@@ -1,0 +1,29 @@
+Hey all!
+
+
+
+I've been out of writing code for a while and out of SA-MP related code for a long while so I started a little side project for fun recently.
+
+
+
+A basic pitch-based altitude and roll-based heading autopilot for SA-MP.
+
+
+
+Based on real autopilot behaviour with some adjustments made for the simple physics of San Andreas.
+
+
+
+It's slowly turning into a library of functions for you to be able to build your own auto-pilot and aircraft control systems but for now it's mostly just a test.pwn with a bunch of spaghetti code inside!
+
+
+
+Check out the GitHub link for an overview of how it works:
+
+
+
+https://github.com/Southclaws/samp-aviation
+
+
+
+And, I've been developing this live on the Discord so if you want to follow along with new additions (such as VOR course following, ILS approach and landing, procedure turns and other real-life aviation stuff implemented into a 15 year old game) be sure to join the discord and watch out for my live streams!

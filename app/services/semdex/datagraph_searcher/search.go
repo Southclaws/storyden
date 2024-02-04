@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type Result struct {
@@ -57,9 +58,7 @@ type WeaviateObject struct {
 	Content       string `json:"content"`
 }
 
-type WeaviateContent struct {
-	Content []WeaviateObject
-}
+type WeaviateContent map[string][]WeaviateObject
 
 type WeaviateResponse struct {
 	Get WeaviateContent
@@ -76,11 +75,11 @@ func (s *service) Search(ctx context.Context, q string) ([]*Result, error) {
 	arg := s.wc.GraphQL().
 		HybridArgumentBuilder().
 		WithAlpha(0.25).
-		WithFusionType(graphql.Ranked).
+		WithFusionType(graphql.RelativeScore).
 		WithQuery(q)
 
 	result, err := s.wc.GraphQL().Get().
-		WithClassName("Content").
+		WithClassName(semdex.TestClassName).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
@@ -100,7 +99,12 @@ func (s *service) Search(ctx context.Context, q string) ([]*Result, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	results, err := dt.MapErr(parsed.Get.Content, func(v WeaviateObject) (*Result, error) {
+	classData, ok := parsed.Get[semdex.TestClassName]
+	if !ok {
+		return nil, fault.New("weaviate response did not contain expected class data")
+	}
+
+	results, err := dt.MapErr(classData, func(v WeaviateObject) (*Result, error) {
 		id, err := xid.FromString(v.DatagraphID)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
