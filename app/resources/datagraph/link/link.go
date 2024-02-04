@@ -11,10 +11,72 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 )
+
+type Result struct {
+	PageSize    int
+	Results     int
+	TotalPages  int
+	CurrentPage int
+	NextPage    opt.Optional[int]
+	Links       []*datagraph.Link
+}
+
+type Repository interface {
+	Store(ctx context.Context, url, title, description string, opts ...Option) (*datagraph.Link, error)
+	Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error)
+}
+
+type (
+	Option func(*ent.LinkMutation)
+	Filter func(*ent.LinkQuery)
+)
+
+func WithPosts(ids ...xid.ID) Option {
+	return func(lm *ent.LinkMutation) {
+		lm.AddPostIDs(ids...)
+	}
+}
+
+func WithClusters(ids ...xid.ID) Option {
+	return func(lm *ent.LinkMutation) {
+		lm.AddClusterIDs(ids...)
+	}
+}
+
+func WithItems(ids ...xid.ID) Option {
+	return func(lm *ent.LinkMutation) {
+		lm.AddItemIDs(ids...)
+	}
+}
+
+func WithAssets(ids ...asset.AssetID) Option {
+	return func(lm *ent.LinkMutation) {
+		lm.AddAssetIDs(ids...)
+	}
+}
+
+func WithURL(s string) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Where(link.URLContainsFold(s))
+	}
+}
+
+func WithKeyword(s string) Filter {
+	return func(lq *ent.LinkQuery) {
+		lq.Where(link.Or(
+			link.TitleContainsFold(s),
+			link.DescriptionContainsFold(s),
+			link.URLContainsFold(s),
+		))
+	}
+}
 
 type database struct {
 	db *ent.Client
@@ -24,7 +86,7 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Store(ctx context.Context, address, title, description string, opts ...Option) (*Link, error) {
+func (d *database) Store(ctx context.Context, address, title, description string, opts ...Option) (*datagraph.Link, error) {
 	u, err := url.Parse(address)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -61,7 +123,7 @@ func (d *database) Store(ctx context.Context, address, title, description string
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	link := Map(r)
+	link := datagraph.LinkFromModel(r)
 
 	return link, nil
 }
@@ -95,7 +157,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		r = r[:len(r)-1]
 	}
 
-	links := MapA(r)
+	links := datagraph.LinksFromModel(r)
 
 	return &Result{
 		PageSize:    size,

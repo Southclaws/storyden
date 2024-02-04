@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 

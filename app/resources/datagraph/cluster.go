@@ -7,46 +7,16 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 )
 
-type Indexable interface {
-	GetID() xid.ID
-	GetType() string
-	GetName() string
-	GetText() string
-	GetProps() any
-}
-
 type (
 	ClusterID   xid.ID
 	ClusterSlug string
-	ItemID      xid.ID
-	ItemSlug    string
 )
 
 func (i ClusterID) String() string { return xid.ID(i).String() }
-func (i ItemID) String() string    { return xid.ID(i).String() }
-
-type Item struct {
-	ID        ItemID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-
-	Name        string
-	Slug        string
-	Assets      []*asset.Asset
-	Links       link.Links
-	Description string
-	Content     opt.Optional[string]
-	Owner       profile.Profile
-	In          []*Cluster
-	Properties  any
-}
-
-func (*Item) GetResourceName() string { return "Item" }
 
 type Cluster struct {
 	ID        ClusterID
@@ -56,7 +26,7 @@ type Cluster struct {
 	Name        string
 	Slug        string
 	Assets      []*asset.Asset
-	Links       link.Links
+	Links       Links
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
@@ -69,3 +39,9 @@ type Cluster struct {
 }
 
 func (*Cluster) GetResourceName() string { return "cluster" }
+
+func (c *Cluster) GetID() xid.ID   { return xid.ID(c.ID) }
+func (c *Cluster) GetKind() Kind   { return KindCluster }
+func (c *Cluster) GetName() string { return c.Name }
+func (c *Cluster) GetText() string { return c.Description }
+func (c *Cluster) GetProps() any   { return nil }

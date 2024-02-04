@@ -1,7 +1,6 @@
-package link
+package datagraph
 
 import (
-	"context"
 	"sort"
 
 	"github.com/Southclaws/dt"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
 type ID = xid.ID
@@ -25,67 +23,14 @@ type Link struct {
 	Assets      []*asset.Asset
 }
 
-type Result struct {
-	PageSize    int
-	Results     int
-	TotalPages  int
-	CurrentPage int
-	NextPage    opt.Optional[int]
-	Links       []*Link
-}
+func (l *Link) GetID() xid.ID   { return xid.ID(l.ID) }
+func (l *Link) GetKind() Kind   { return KindLink }
+func (l *Link) GetName() string { return l.Title.String() }
+func (l *Link) GetText() string { return l.Description.String() }
+func (l *Link) GetProps() any   { return nil }
 
 func (l *Link) AssetIDs() []asset.AssetID {
 	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })
-}
-
-type Repository interface {
-	Store(ctx context.Context, url, title, description string, opts ...Option) (*Link, error)
-	Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error)
-}
-
-type (
-	Option func(*ent.LinkMutation)
-	Filter func(*ent.LinkQuery)
-)
-
-func WithPosts(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddPostIDs(ids...)
-	}
-}
-
-func WithClusters(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddClusterIDs(ids...)
-	}
-}
-
-func WithItems(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddItemIDs(ids...)
-	}
-}
-
-func WithAssets(ids ...asset.AssetID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddAssetIDs(ids...)
-	}
-}
-
-func WithURL(s string) Filter {
-	return func(lq *ent.LinkQuery) {
-		lq.Where(link.URLContainsFold(s))
-	}
-}
-
-func WithKeyword(s string) Filter {
-	return func(lq *ent.LinkQuery) {
-		lq.Where(link.Or(
-			link.TitleContainsFold(s),
-			link.DescriptionContainsFold(s),
-			link.URLContainsFold(s),
-		))
-	}
 }
 
 func NewLink(url, title, description string) Link {
@@ -108,7 +53,7 @@ func NewLinkOpt(purl, ptitle, pdescription *string) opt.Optional[Link] {
 	})
 }
 
-func Map(in *ent.Link) *Link {
+func LinkFromModel(in *ent.Link) *Link {
 	return &Link{
 		ID:          in.ID,
 		URL:         in.URL,
@@ -134,8 +79,8 @@ func (a Links) Len() int           { return len(a) }
 func (a Links) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Links) Less(i, j int) bool { return a[i].ID.String() > a[j].ID.String() }
 
-func MapA(in []*ent.Link) []*Link {
-	list := dt.Map(in, Map)
+func LinksFromModel(in []*ent.Link) []*Link {
+	list := dt.Map(in, LinkFromModel)
 	sort.Sort(Links(list))
 	return list
 }

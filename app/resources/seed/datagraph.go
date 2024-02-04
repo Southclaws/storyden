@@ -12,9 +12,9 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
+	"github.com/Southclaws/storyden/app/resources/datagraph/item"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 )

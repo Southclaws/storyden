@@ -9,8 +9,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
 	"github.com/Southclaws/storyden/internal/ent"
 	cluster_model "github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/item"

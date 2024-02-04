@@ -9,8 +9,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/link"
-	"github.com/Southclaws/storyden/app/resources/link_graph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph/link_graph"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/internal/openapi"
 )

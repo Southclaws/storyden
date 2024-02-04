@@ -13,9 +13,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/cluster"
-	"github.com/Southclaws/storyden/app/resources/item"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
+	"github.com/Southclaws/storyden/app/resources/datagraph/item"
+	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/url"
 )
@@ -23,7 +24,7 @@ import (
 var errEmptyLink = fault.New("empty link")
 
 type Service interface {
-	Fetch(ctx context.Context, url string) (*link.Link, error)
+	Fetch(ctx context.Context, url string) (*datagraph.Link, error)
 }
 
 func Build() fx.Option {
@@ -53,7 +54,7 @@ func New(
 	}
 }
 
-func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
+func (s *service) Fetch(ctx context.Context, url string) (*datagraph.Link, error) {
 	if url == "" {
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -71,7 +72,7 @@ func (s *service) Fetch(ctx context.Context, url string) (*link.Link, error) {
 	return s.scrapeAndStore(ctx, url)
 }
 
-func (s *service) scrapeAndStore(ctx context.Context, url string) (*link.Link, error) {
+func (s *service) scrapeAndStore(ctx context.Context, url string) (*datagraph.Link, error) {
 	wc, err := s.sc.Scrape(ctx, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

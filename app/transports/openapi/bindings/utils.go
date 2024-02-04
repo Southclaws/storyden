@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -172,7 +172,7 @@ func tagsIDs(i openapi.TagListIDs) []xid.ID {
 	return dt.Map(i, deserialiseID)
 }
 
-func serialiseLink(in *link.Link) openapi.Link {
+func serialiseLink(in *datagraph.Link) openapi.Link {
 	return openapi.Link{
 		Url:         in.URL,
 		Title:       in.Title.Ptr(),
