@@ -10,7 +10,7 @@ import { type CheckboxVariantProps, checkbox } from "@/styled-system/recipes";
 const { withProvider, withContext } = createStyleContext(checkbox);
 
 export * from "@ark-ui/react/checkbox";
-export type CheckboxProps = Ark.CheckboxProps & CheckboxVariantProps;
+export type CheckboxProps = Ark.CheckboxRootProps & CheckboxVariantProps;
 
 const CheckboxRoot = withProvider(styled(Ark.Checkbox.Root), "root");
 export const CheckboxControl = withContext(

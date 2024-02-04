@@ -15,11 +15,18 @@ export function useFeed(
   params?: ThreadListParams,
   initialThreads?: ThreadList,
 ) {
-  const { data, error, mutate } = useThreadList(params, {
-    swr: {
-      fallbackData: initialThreads && { threads: initialThreads },
+  const { data, error, mutate } = useThreadList(
+    {
+      categories: params?.categories,
+      author: params?.author,
+      tags: params?.tags,
     },
-  });
+    {
+      swr: {
+        fallbackData: initialThreads && { threads: initialThreads },
+      },
+    },
+  );
 
   if (!data) {
     return {
