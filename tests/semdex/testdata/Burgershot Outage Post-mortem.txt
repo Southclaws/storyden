@@ -1,0 +1,44 @@
+Hey everyone!
+
+
+
+This is a post-mortem of the forum outage. This was reported?2019-04-17 at 21:28 GMT and resolved 2019-04-18 at 00:56 GMT.
+
+
+
+The outage was caused by a disk filling up with logs from another service running on the same machine.
+
+
+
+Cause of why the logs of this service reached 335237897538 bytes are currently unknown. It seems that Docker does not rotate logs for services that run indefinitely. The service in question has been online since October 2018 and log output has built up substantially.
+
+
+
+
+
+Code:
+-rw-r-----? 1 root root 335237897538 Apr 17 23:45 384a7fd0aff65a82d3dfb406767edcbf5a16d321404a5b1848cfdc3ead95f624-json.log
+
+
+
+The node is configured with the default logging driver: https://docs.docker.com/config/container...json-file/
+
+
+
+Steps to Prevent
+
+
+
+So, to prevent this happening again I am going to do something I have been meaning to do for a long time and move logging aggregation to an external service. This is yet to be decided but I should have some time before this happens again.
+
+
+
+In the meantime, I will be configuring AlertManager (Prometheus) to properly alert me (and potentially other staff members) of these issues ahead of time so we can mitigate these events before they happen.
+
+
+
+-
+
+
+
+Thank you for your understanding, we live and learn!

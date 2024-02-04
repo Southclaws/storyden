@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/storyden/app/services/datagraph_searcher"
+	"github.com/Southclaws/storyden/app/services/semdex/datagraph_searcher"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
