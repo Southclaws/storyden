@@ -12,10 +12,10 @@ const itemStyle = {
   transitionProperty: "background, color",
   transitionTimingFunction: "default",
   _hover: {
-    background: "bg.subtle",
+    background: "bg.muted",
     "& :where(svg)": { color: "fg.default" },
   },
-  _highlighted: { background: "bg.subtle" },
+  _highlighted: { background: "bg.muted" },
   "& :where(svg)": { color: "fg.muted" },
 };
 

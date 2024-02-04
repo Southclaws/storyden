@@ -11,7 +11,7 @@
     "openapi": "orval"
   },
   "dependencies": {
-    "@ark-ui/react": "^1.2.1",
+    "@ark-ui/react": "^2.0.1",
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^8.0.0",
     "@emoji-mart/data": "^1.1.2",
@@ -45,15 +45,15 @@
     "@pandacss/dev": "^0.29.1",
     "@simplewebauthn/typescript-types": "^8.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
-    "@types/node": "^20.8.7",
-    "@types/react": "^18.2.31",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.52",
     "@types/react-avatar-editor": "^13.0.1",
-    "@typescript-eslint/eslint-plugin": "^6.6.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.48.0",
     "eslint-config-next": "^14.0.0",
     "orval": "^6.24.0",
-    "prettier": "^3.0.3",
+    "prettier": "^3.2.5",
     "typescript": "^5.2.2"
   },
   "resolutions": {
