@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -38,16 +38,16 @@ type Thread struct {
 	Meta        map[string]any
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
-	Links       link.Links
+	Links       datagraph.Links
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) GetID() xid.ID   { return xid.ID(t.ID) }
-func (t *Thread) GetType() string { return "thread" }
-func (t *Thread) GetName() string { return t.Title }
-func (t *Thread) GetText() string { return t.Posts[0].Body }
-func (t *Thread) GetProps() any   { return t.Meta }
+func (t *Thread) GetID() xid.ID           { return xid.ID(t.ID) }
+func (t *Thread) GetKind() datagraph.Kind { return datagraph.KindThread }
+func (t *Thread) GetName() string         { return t.Title }
+func (t *Thread) GetText() string         { return t.Posts[0].Body }
+func (t *Thread) GetProps() any           { return t.Meta }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()
@@ -126,6 +126,6 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Meta:        m.Metadata,
 		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
 		Collections: collections.OrZero(),
-		Links:       dt.Map(m.Edges.Links, link.Map),
+		Links:       dt.Map(m.Edges.Links, datagraph.LinkFromModel),
 	}, nil
 }

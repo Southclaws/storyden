@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/item_search"
 	"github.com/Southclaws/storyden/app/resources/item_search"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"

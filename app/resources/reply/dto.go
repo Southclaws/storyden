@@ -7,9 +7,10 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -28,7 +29,7 @@ type Reply struct {
 	Reacts         []*react.React
 	Meta           map[string]any
 	Assets         []*asset.Asset
-	Links          []*link.Link
+	Links          []*datagraph.Link
 	URL            opt.Optional[string]
 
 	CreatedAt time.Time
@@ -37,6 +38,12 @@ type Reply struct {
 }
 
 func (*Reply) GetResourceName() string { return "post" }
+
+func (r *Reply) GetID() xid.ID           { return xid.ID(r.ID) }
+func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindReply }
+func (r *Reply) GetName() string         { return r.Short }
+func (r *Reply) GetText() string         { return r.Body }
+func (r *Reply) GetProps() any           { return r.Meta }
 
 func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Short)
@@ -73,7 +80,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:    m.Metadata,
 		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
-		Links:   dt.Map(m.Edges.Links, link.Map),
+		Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
