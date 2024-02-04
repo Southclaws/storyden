@@ -21,11 +21,7 @@ export function useFeedItemMenu(props: Props) {
   const deleteEnabled =
     account?.admin || account?.id === props.thread.author.id;
 
-  async function onCopyLink() {
-    copyToClipboard(permalink);
-  }
-
-  async function onShare() {
+  async function share() {
     await navigator.share({
       title: `A post by ${props.thread.author.name}`,
       url: `#${props.thread.id}`,
@@ -33,12 +29,29 @@ export function useFeedItemMenu(props: Props) {
     });
   }
 
+  function handleSelect({ value }: { value: string }) {
+    switch (value) {
+      case "copy-link":
+        copyToClipboard(permalink);
+        return;
+
+      case "share":
+        share();
+        return;
+
+      case "delete":
+        props.onDelete();
+        return;
+
+      default:
+        throw new Error("unknown handler");
+    }
+  }
+
   return {
-    onCopyLink,
+    handleSelect,
     shareEnabled,
-    onShare,
     deleteEnabled,
-    onDelete: props.onDelete,
   };
 }
 
