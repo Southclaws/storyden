@@ -5,7 +5,6 @@ import { Button } from "src/theme/components/Button";
 
 import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
-import { ReactList } from "../ReactList/ReactList";
 
 import { Flex, HStack } from "@/styled-system/jsx";
 
@@ -51,7 +50,6 @@ export function PostView(props: Props) {
           <ContentViewer value={props.body} />
         </>
       )}
-      <ReactList {...props} />
     </Flex>
   );
 }

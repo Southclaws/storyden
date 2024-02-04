@@ -40,8 +40,8 @@ export function ReactList(props: Props) {
             </Button>
           </PopoverAnchor>
 
-          <PopoverPositioner ref={ref}>
-            <PopoverContent>
+          <PopoverPositioner>
+            <PopoverContent ref={ref}>
               <Picker
                 data={data}
                 onEmojiSelect={handlers.handleSelect}
