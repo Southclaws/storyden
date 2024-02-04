@@ -29,7 +29,8 @@ export const menu = defineSlotRecipe({
       color: "fg.subtle",
     },
     content: {
-      background: "bg.default",
+      background: "bg.opaque/80",
+      backdropFilter: "blur(8px)",
       borderRadius: "md",
       boxShadow: "lg",
       display: "flex",
