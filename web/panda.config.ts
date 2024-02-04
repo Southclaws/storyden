@@ -34,8 +34,6 @@ conic-gradient(
 );
 `;
 
-//prettier-rule
-
 const semanticTokens = defineSemanticTokens({
   blurs: {
     frosted: { value: "8px" },
