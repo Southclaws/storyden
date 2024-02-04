@@ -18,11 +18,10 @@ import { styled } from "@/styled-system/jsx";
 import { Props, useFeedItemMenu } from "./useFeedItemMenu";
 
 export function FeedItemMenu(props: Props) {
-  const { onCopyLink, shareEnabled, onShare, deleteEnabled, onDelete } =
-    useFeedItemMenu(props);
+  const { shareEnabled, deleteEnabled, handleSelect } = useFeedItemMenu(props);
 
   return (
-    <Menu size="sm" lazyMount>
+    <Menu size="sm" lazyMount onSelect={handleSelect}>
       <MenuTrigger asChild>
         <MoreAction />
       </MenuTrigger>
@@ -45,21 +44,9 @@ export function FeedItemMenu(props: Props) {
 
               <MenuSeparator />
 
-              <MenuItem id="copy-link" onClick={onCopyLink}>
-                Copy link
-              </MenuItem>
-
-              {shareEnabled && (
-                <MenuItem id="share" onClick={onShare}>
-                  Share
-                </MenuItem>
-              )}
-
-              {deleteEnabled && (
-                <MenuItem id="delete" onClick={onDelete}>
-                  Delete
-                </MenuItem>
-              )}
+              <MenuItem id="copy-link">Copy link</MenuItem>
+              {shareEnabled && <MenuItem id="share">Share</MenuItem>}
+              {deleteEnabled && <MenuItem id="delete">Delete</MenuItem>}
             </MenuItemGroup>
           </MenuContent>
         </MenuPositioner>
