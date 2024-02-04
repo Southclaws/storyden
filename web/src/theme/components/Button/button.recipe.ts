@@ -87,10 +87,10 @@ export const button = defineRecipe({
       },
       ghost: {
         _hover: {
-          backgroundColor: "bg.subtle",
+          backgroundColor: "bg.muted",
         },
         _active: {
-          backgroundColor: "gray.300",
+          backgroundColor: "bg.muted/80",
         },
       },
       blank: {
