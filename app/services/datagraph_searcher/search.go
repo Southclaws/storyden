@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
-	"go.uber.org/fx"
-	"go.uber.org/zap"
-
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/rbac"
 )

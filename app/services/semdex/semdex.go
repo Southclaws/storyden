@@ -77,7 +77,7 @@ func (s *service) Index(ctx context.Context, object datagraph.Indexable) error {
 		WithClassName("Content").
 		WithProperties(map[string]any{
 			"datagraph_id":   object.GetID().String(),
-			"datagraph_type": object.GetType(),
+			"datagraph_type": object.GetKind(),
 			"name":           object.GetName(),
 			"content":        content,
 			"props":          object.GetProps(),
