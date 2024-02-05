@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/semdex/result_hydrator"
+	"github.com/Southclaws/storyden/app/services/semdex/simplesearch"
 )
 
 // NOT PROD READY: Just using local transformers for now.
@@ -60,12 +61,11 @@ func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
 func Build() fx.Option {
 	return fx.Provide(
 		result_hydrator.New,
+		simplesearch.NewParallelSearcher,
 		fx.Annotate(
-			func(lc fx.Lifecycle, l *zap.Logger, wc *weaviate.Client, rh *result_hydrator.Hydrator) semdex.Semdexer {
+			func(lc fx.Lifecycle, l *zap.Logger, wc *weaviate.Client, rh *result_hydrator.Hydrator, ss *simplesearch.ParallelSearcher) semdex.Semdexer {
 				if wc == nil {
-					if wc == nil {
-						return &semdex.Empty{}
-					}
+					return &semdex.OnlySearcher{ss}
 				}
 
 				return &withHydration{l, newWeaviateSemdexer(lc, wc), rh}

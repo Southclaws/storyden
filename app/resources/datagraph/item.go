@@ -35,4 +35,10 @@ type Item struct {
 
 func (*Item) GetResourceName() string { return "Item" }
 
-func (*Item) GetKind() Kind { return KindItem }
+func (c *Item) GetID() xid.ID   { return xid.ID(c.ID) }
+func (c *Item) GetKind() Kind   { return KindItem }
+func (c *Item) GetName() string { return c.Name }
+func (c *Item) GetSlug() string { return c.Slug }
+func (c *Item) GetDesc() string { return c.Description }
+func (c *Item) GetText() string { return c.Content.String() }
+func (c *Item) GetProps() any   { return nil }

@@ -43,5 +43,7 @@ func (*Cluster) GetResourceName() string { return "cluster" }
 func (c *Cluster) GetID() xid.ID   { return xid.ID(c.ID) }
 func (c *Cluster) GetKind() Kind   { return KindCluster }
 func (c *Cluster) GetName() string { return c.Name }
-func (c *Cluster) GetText() string { return c.Description }
+func (c *Cluster) GetSlug() string { return c.Slug }
+func (c *Cluster) GetDesc() string { return c.Description }
+func (c *Cluster) GetText() string { return c.Content.String() }
 func (c *Cluster) GetProps() any   { return nil }
