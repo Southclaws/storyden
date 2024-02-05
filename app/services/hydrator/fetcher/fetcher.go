@@ -38,7 +38,7 @@ type service struct {
 	as     asset_manager.Service
 	lr     link.Repository
 	sc     url.Scraper
-	semdex semdex.Service
+	semdex semdex.Indexer
 }
 
 func New(
@@ -48,7 +48,7 @@ func New(
 	ir item.Repository,
 	lr link.Repository,
 	sc url.Scraper,
-	semdex semdex.Service,
+	semdex semdex.Indexer,
 ) Service {
 	return &service{
 		l:      l.With(zap.String("service", "hydrator")),

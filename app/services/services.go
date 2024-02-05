@@ -23,13 +23,10 @@ import (
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
-	"github.com/Southclaws/storyden/app/services/semdex"
-	"github.com/Southclaws/storyden/app/services/semdex/datagraph_searcher"
-	"github.com/Southclaws/storyden/app/services/semdex/indexer"
+	"github.com/Southclaws/storyden/app/services/semdex/weaviate"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/services/url"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
 func Build() fx.Option {
@@ -51,22 +48,9 @@ func Build() fx.Option {
 		url.Build(),
 		hydrator.Build(),
 		fetcher.Build(),
-		buildSemdex(),
+		weaviate.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(cluster.New, clustertree.New, cluster_visibility.New),
 		fx.Provide(item_crud.New, item_tree.New),
-		fx.Provide(datagraph_searcher.New),
 	)
-}
-
-func buildSemdex() fx.Option {
-	return fx.Provide(func(lc fx.Lifecycle, wc *weaviate.Client) (semdex.Service, error) {
-		if wc == nil {
-			if wc == nil {
-				return semdex.Empty{}, nil
-			}
-		}
-
-		return indexer.New(lc, wc)
-	})
 }

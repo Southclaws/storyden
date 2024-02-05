@@ -4,13 +4,28 @@ package semdex
 import (
 	"context"
 
-	"github.com/weaviate/weaviate/entities/models"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-type Service interface {
+type Indexer interface {
 	Index(ctx context.Context, object datagraph.Indexable) error
+}
+
+type Searcher interface {
+	Search(ctx context.Context, query string) ([]*Result, error)
+}
+
+type Semdexer interface {
+	Indexer
+	Searcher
+}
+
+type Result struct {
+	Id   xid.ID
+	Name string
+	Type string
 }
 
 type Empty struct{}
@@ -19,16 +34,6 @@ func (n Empty) Index(ctx context.Context, object datagraph.Indexable) error {
 	return nil
 }
 
-// NOT PROD READY: Just using local transformers for now.
-
-const TestClassName = "ContentText2vecTransformers"
-
-var TestClassObject = &models.Class{
-	Class:      TestClassName,
-	Vectorizer: "text2vec-transformers",
-	ModuleConfig: map[string]interface{}{
-		// "text2vec-openai":   map[string]interface{}{},
-		// "generative-openai": map[string]interface{}{},
-		"text2vec-transformers": map[string]interface{}{},
-	},
+func (n Empty) Search(ctx context.Context, query string) ([]*Result, error) {
+	return nil, nil
 }

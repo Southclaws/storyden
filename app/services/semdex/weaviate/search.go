@@ -1,4 +1,4 @@
-package datagraph_searcher
+package weaviate
 
 import (
 	"context"
@@ -8,48 +8,10 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
-
-type Result struct {
-	Id   xid.ID
-	Name string
-	Type string
-}
-
-type Searcher interface {
-	Search(ctx context.Context, query string) ([]*Result, error)
-}
-
-func Build() fx.Option {
-	return fx.Provide(New)
-}
-
-type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
-
-	wc *weaviate.Client
-}
-
-func New(
-	l *zap.Logger,
-	rbac rbac.AccessManager,
-
-	wc *weaviate.Client,
-) Searcher {
-	return &service{
-		l:    l.With(zap.String("service", "search")),
-		rbac: rbac,
-		wc:   wc,
-	}
-}
 
 type WeaviateObject struct {
 	DatagraphID   string `json:"datagraph_id"`
@@ -64,7 +26,7 @@ type WeaviateResponse struct {
 	Get WeaviateContent
 }
 
-func (s *service) Search(ctx context.Context, q string) ([]*Result, error) {
+func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Result, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
@@ -79,7 +41,7 @@ func (s *service) Search(ctx context.Context, q string) ([]*Result, error) {
 		WithQuery(q)
 
 	result, err := s.wc.GraphQL().Get().
-		WithClassName(semdex.TestClassName).
+		WithClassName(TestClassName).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
@@ -99,17 +61,17 @@ func (s *service) Search(ctx context.Context, q string) ([]*Result, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData, ok := parsed.Get[semdex.TestClassName]
+	classData, ok := parsed.Get[TestClassName]
 	if !ok {
 		return nil, fault.New("weaviate response did not contain expected class data")
 	}
 
-	results, err := dt.MapErr(classData, func(v WeaviateObject) (*Result, error) {
+	results, err := dt.MapErr(classData, func(v WeaviateObject) (*semdex.Result, error) {
 		id, err := xid.FromString(v.DatagraphID)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-		return &Result{
+		return &semdex.Result{
 			Id:   id,
 			Type: v.DatagraphType,
 			Name: v.Name,
