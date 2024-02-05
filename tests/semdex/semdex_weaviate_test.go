@@ -87,7 +87,7 @@ func TestSemdexWeaviate(t *testing.T) {
 			r.NoError(err)
 			r.Equal(http.StatusOK, search1.StatusCode())
 
-			a.Len(search1.JSON200.Items, 5)
+			a.Len(search1.JSON200.Items, 6)
 		}))
 	}))
 }
