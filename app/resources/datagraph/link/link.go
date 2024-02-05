@@ -31,6 +31,7 @@ type Result struct {
 type Repository interface {
 	Store(ctx context.Context, url, title, description string, opts ...Option) (*datagraph.Link, error)
 	Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error)
+	GetByID(ctx context.Context, id datagraph.LinkID) (*datagraph.Link, error)
 }
 
 type (
@@ -115,17 +116,7 @@ func (d *database) Store(ctx context.Context, address, title, description string
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err = d.db.Link.Query().
-		WithAssets().
-		Where(link.ID(r.ID)).
-		First(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	link := datagraph.LinkFromModel(r)
-
-	return link, nil
+	return d.GetByID(ctx, datagraph.LinkID(r.ID))
 }
 
 func (d *database) Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error) {
@@ -167,6 +158,20 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		NextPage:    nextPage,
 		Links:       links,
 	}, nil
+}
+
+func (d *database) GetByID(ctx context.Context, id datagraph.LinkID) (*datagraph.Link, error) {
+	r, err := d.db.Debug().Link.Query().
+		WithAssets().
+		Where(link.ID(xid.ID(id))).
+		First(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	link := datagraph.LinkFromModel(r)
+
+	return link, nil
 }
 
 func getLinkAttrs(u url.URL) (string, string) {

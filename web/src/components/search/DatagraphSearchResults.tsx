@@ -27,7 +27,7 @@ export function DatagraphSearchResults({ result }: Props) {
 }
 
 export function DatagraphResultItem(props: DatagraphItem) {
-  const permalink = `/TODO`;
+  const permalink = buildPermalink(props);
 
   return (
     <LinkBox>
@@ -48,4 +48,19 @@ export function DatagraphResultItem(props: DatagraphItem) {
       </FeedItem>
     </LinkBox>
   );
+}
+
+function buildPermalink(d: DatagraphItem): string {
+  switch (d.type) {
+    case "thread":
+      return `/t/${d.slug}`;
+    case "reply":
+      return `/t/${d.slug}`;
+    case "cluster":
+      return `/directory/${d.slug}`;
+    case "item":
+      return `/directory/${d.slug}`;
+    case "link":
+      return `/l/${d.slug}`;
+  }
 }

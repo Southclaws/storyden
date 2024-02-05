@@ -12,6 +12,6 @@ export interface DatagraphItem {
   description?: string;
   id: Identifier;
   name: string;
+  slug: string;
   type: DatagraphItemType;
-  url?: string;
 }

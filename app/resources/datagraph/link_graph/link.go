@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -16,10 +15,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type ID = xid.ID
-
 type WithRefs struct {
-	ID          ID
+	ID          datagraph.LinkID
 	URL         string
 	Slug        string
 	Domain      string
@@ -94,7 +91,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 	}
 
 	return &WithRefs{
-		ID:          in.ID,
+		ID:          datagraph.LinkID(in.ID),
 		URL:         in.URL,
 		Slug:        in.Slug,
 		Domain:      in.Domain,

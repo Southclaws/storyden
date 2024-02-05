@@ -11,10 +11,10 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type ID = xid.ID
+type LinkID xid.ID
 
 type Link struct {
-	ID          ID
+	ID          LinkID
 	URL         string
 	Slug        string
 	Domain      string
@@ -55,7 +55,7 @@ func NewLinkOpt(purl, ptitle, pdescription *string) opt.Optional[Link] {
 
 func LinkFromModel(in *ent.Link) *Link {
 	return &Link{
-		ID:          in.ID,
+		ID:          LinkID(in.ID),
 		URL:         in.URL,
 		Slug:        in.Slug,
 		Domain:      in.Domain,
@@ -77,7 +77,7 @@ func (l Links) Latest() opt.Optional[*Link] {
 
 func (a Links) Len() int           { return len(a) }
 func (a Links) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Links) Less(i, j int) bool { return a[i].ID.String() > a[j].ID.String() }
+func (a Links) Less(i, j int) bool { return xid.ID(a[i].ID).String() > xid.ID(a[j].ID).String() }
 
 func LinksFromModel(in []*ent.Link) []*Link {
 	list := dt.Map(in, LinkFromModel)

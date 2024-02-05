@@ -123,6 +123,40 @@ func (d *database) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagr
 	return r, nil
 }
 
+func (d *database) GetByID(ctx context.Context, id datagraph.ClusterID) (*datagraph.Cluster, error) {
+	col, err := d.db.Cluster.
+		Query().
+		Where(cluster.ID(xid.ID(id))).
+		WithOwner().
+		WithAssets().
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithItems(func(iq *ent.ItemQuery) {
+			iq.
+				WithAssets().
+				WithOwner().
+				Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithClusters(func(cq *ent.ClusterQuery) {
+			cq.
+				WithAssets().
+				WithOwner().
+				Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
+		}).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err := datagraph.ClusterFromModel(col)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return r, nil
+}
+
 func (d *database) Update(ctx context.Context, id datagraph.ClusterID, opts ...Option) (*datagraph.Cluster, error) {
 	create := d.db.Cluster.UpdateOneID(xid.ID(id))
 	mutate := create.Mutation()
