@@ -28,6 +28,7 @@ type Repository interface {
 	) (*datagraph.Item, error)
 
 	Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph.Item, error)
+	GetByID(ctx context.Context, id datagraph.ItemID) (*datagraph.Item, error)
 
 	Update(ctx context.Context, slug datagraph.ItemID, opts ...Option) (*datagraph.Item, error)
 

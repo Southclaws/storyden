@@ -108,7 +108,7 @@ func (s *service) hydrate(ctx context.Context, body string, urls opt.Optional[st
 			continue
 		}
 
-		links = append(links, ln.ID)
+		links = append(links, xid.ID(ln.ID))
 		assets = append(assets, ln.AssetIDs()...)
 	}
 

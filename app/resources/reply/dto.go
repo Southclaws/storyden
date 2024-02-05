@@ -20,17 +20,18 @@ import (
 type Reply struct {
 	ID post.ID
 
-	Body           string
-	Short          string
-	Author         profile.Profile
-	RootPostID     post.ID
-	RootThreadMark string
-	ReplyTo        opt.Optional[post.ID]
-	Reacts         []*react.React
-	Meta           map[string]any
-	Assets         []*asset.Asset
-	Links          []*datagraph.Link
-	URL            opt.Optional[string]
+	Body            string
+	Short           string
+	Author          profile.Profile
+	RootPostID      post.ID
+	RootThreadMark  string
+	RootThreadTitle string
+	ReplyTo         opt.Optional[post.ID]
+	Reacts          []*react.React
+	Meta            map[string]any
+	Assets          []*asset.Asset
+	Links           []*datagraph.Link
+	URL             opt.Optional[string]
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -81,6 +82,10 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		Meta:    m.Metadata,
 		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
 		Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
+
+		RootPostID:      post.ID(m.RootPostID),
+		RootThreadMark:  opt.NewPtr(m.Edges.Root).OrZero().Slug,
+		RootThreadTitle: opt.NewPtr(m.Edges.Root).OrZero().Title,
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

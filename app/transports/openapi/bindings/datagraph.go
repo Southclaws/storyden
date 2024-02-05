@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -44,8 +45,10 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 
 func serialiseDatagraphItem(v *semdex.Result) openapi.DatagraphItem {
 	return openapi.DatagraphItem{
-		Id:   v.Id.String(),
-		Type: openapi.DatagraphItemType(v.Type),
-		Name: v.Name,
+		Type:        openapi.DatagraphItemType(v.Type.String()),
+		Id:          v.Id.String(),
+		Name:        v.Name,
+		Slug:        v.Slug,
+		Description: &v.Description,
 	}
 }
