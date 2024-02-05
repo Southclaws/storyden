@@ -23,9 +23,12 @@ type Semdexer interface {
 }
 
 type Result struct {
-	Id   xid.ID
-	Name string
-	Type string
+	Id          xid.ID
+	Type        datagraph.Kind
+	Name        string
+	Description string
+	Slug        string
+	ImageURL    string
 }
 
 type Empty struct{}

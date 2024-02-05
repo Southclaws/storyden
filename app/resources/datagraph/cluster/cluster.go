@@ -28,6 +28,7 @@ type Repository interface {
 	) (*datagraph.Cluster, error)
 
 	Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	GetByID(ctx context.Context, id datagraph.ClusterID) (*datagraph.Cluster, error)
 
 	// Update a cluster by ID.
 	// NOTE: slug based update is not supported at the repo level because you'll

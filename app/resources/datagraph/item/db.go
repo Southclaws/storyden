@@ -116,6 +116,33 @@ func (d *database) Get(ctx context.Context, slug datagraph.ItemSlug) (*datagraph
 	return r, nil
 }
 
+func (d *database) GetByID(ctx context.Context, id datagraph.ItemID) (*datagraph.Item, error) {
+	item, err := d.db.Item.
+		Query().
+		Where(item.ID(xid.ID(id))).
+		WithOwner().
+		WithAssets().
+		WithLinks(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithClusters(func(cq *ent.ClusterQuery) {
+			cq.
+				WithAssets().
+				WithOwner().Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
+		}).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err := datagraph.ItemFromModel(item)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return r, nil
+}
+
 func (d *database) Update(ctx context.Context, id datagraph.ItemID, opts ...Option) (*datagraph.Item, error) {
 	create := d.db.Item.UpdateOneID(xid.ID(id))
 	mutate := create.Mutation()

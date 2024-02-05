@@ -3449,15 +3449,15 @@ components:
 
     DatagraphItem:
       type: object
-      required: [type, id, name]
+      required: [type, id, name, slug]
       properties:
         type: { $ref: "#/components/schemas/DatagraphItemType" }
         id: { $ref: "#/components/schemas/Identifier" }
         name:
           type: string
-        description:
+        slug:
           type: string
-        url:
+        description:
           type: string
 
     DatagraphItemType:

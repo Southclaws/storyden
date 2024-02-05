@@ -7,8 +7,10 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate/entities/models"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/services/semdex/result_hydrator"
 )
 
 // NOT PROD READY: Just using local transformers for now.
@@ -57,15 +59,16 @@ func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
 
 func Build() fx.Option {
 	return fx.Provide(
+		result_hydrator.New,
 		fx.Annotate(
-			func(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
+			func(lc fx.Lifecycle, l *zap.Logger, wc *weaviate.Client, rh *result_hydrator.Hydrator) semdex.Semdexer {
 				if wc == nil {
 					if wc == nil {
 						return &semdex.Empty{}
 					}
 				}
 
-				return newWeaviateSemdexer(lc, wc)
+				return &withHydration{l, newWeaviateSemdexer(lc, wc), rh}
 			},
 			fx.As(new(semdex.Indexer)),
 			fx.As(new(semdex.Searcher)),

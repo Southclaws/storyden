@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
@@ -71,9 +72,15 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
+		dk, err := datagraph.NewKind(v.DatagraphType)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
 		return &semdex.Result{
 			Id:   id,
-			Type: v.DatagraphType,
+			Type: dk,
 			Name: v.Name,
 		}, nil
 	})
