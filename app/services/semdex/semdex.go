@@ -22,6 +22,18 @@ type Semdexer interface {
 	Searcher
 }
 
+type OnlySearcher struct {
+	Searcher
+}
+
+func (o *OnlySearcher) Search(ctx context.Context, query string) ([]*Result, error) {
+	return o.Searcher.Search(ctx, query)
+}
+
+func (o *OnlySearcher) Index(ctx context.Context, object datagraph.Indexable) error {
+	return nil
+}
+
 type Result struct {
 	Id          xid.ID
 	Type        datagraph.Kind

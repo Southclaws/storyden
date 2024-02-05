@@ -46,6 +46,8 @@ func (*Thread) GetResourceName() string { return "thread" }
 func (t *Thread) GetID() xid.ID           { return xid.ID(t.ID) }
 func (t *Thread) GetKind() datagraph.Kind { return datagraph.KindThread }
 func (t *Thread) GetName() string         { return t.Title }
+func (t *Thread) GetSlug() string         { return t.Slug }
+func (t *Thread) GetDesc() string         { return t.Short }
 func (t *Thread) GetText() string         { return t.Posts[0].Body }
 func (t *Thread) GetProps() any           { return t.Meta }
 
