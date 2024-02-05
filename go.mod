@@ -35,10 +35,12 @@ require github.com/Southclaws/fault v0.8.1
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/Southclaws/opt v0.6.0
+	github.com/cixtor/readability v1.0.0
 	github.com/dboslee/lru v0.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/glebarez/go-sqlite v1.21.2
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mazznoer/colorgrad v0.9.1
@@ -46,7 +48,10 @@ require (
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
 	github.com/oapi-codegen/runtime v1.1.0
 	github.com/twilio/twilio-go v1.14.1
+	github.com/weaviate/weaviate v1.23.0
 	github.com/weaviate/weaviate-go-client/v4 v4.12.1
+	golang.org/x/sync v0.6.0
+	google.golang.org/api v0.163.0
 )
 
 require (
@@ -59,7 +64,6 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20220729165902-8cddb4f5de06 // indirect
-	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -68,7 +72,6 @@ require (
 	github.com/bytedance/sonic v1.10.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
-	github.com/cixtor/readability v1.0.0 // indirect
 	github.com/dave/jennifer v1.7.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -89,7 +92,6 @@ require (
 	github.com/go-playground/validator/v10 v10.15.5 // indirect
 	github.com/go-webauthn/x v0.1.4 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -125,7 +127,6 @@ require (
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.0 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	github.com/weaviate/weaviate v1.23.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
 	go.mongodb.org/mongo-driver v1.11.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
@@ -136,7 +137,6 @@ require (
 	go.uber.org/goleak v1.2.1 // indirect
 	golang.org/x/arch v0.5.0 // indirect
 	golang.org/x/image v0.13.0 // indirect
-	google.golang.org/api v0.163.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
 	google.golang.org/grpc v1.61.0 // indirect
 	modernc.org/libc v1.22.5 // indirect

@@ -1,0 +1,57 @@
+package simplesearch
+
+import (
+	"context"
+
+	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/post"
+)
+
+type postSearcher struct {
+	ec *ent.Client
+}
+
+func (s *postSearcher) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+	pq := s.ec.Post.Query().Where(
+		post.Or(
+			post.TitleContainsFold(query),
+			post.BodyContainsFold(query),
+		),
+	).WithRoot()
+
+	rs, err := pq.All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results, err := dt.MapErr(rs, func(p *ent.Post) (*semdex.Result, error) {
+		if p.Edges.Root == nil {
+			return &semdex.Result{
+				Id:          p.ID,
+				Type:        datagraph.KindThread,
+				Name:        p.Title,
+				Description: p.Short,
+				Slug:        p.Slug,
+			}, nil
+		} else {
+			return &semdex.Result{
+				Id:          p.ID,
+				Type:        datagraph.KindReply,
+				Name:        p.Edges.Root.Title,
+				Description: p.Short,
+				Slug:        p.Edges.Root.Slug,
+			}, nil
+		}
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return results, nil
+}
