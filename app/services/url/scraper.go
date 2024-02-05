@@ -4,12 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/PuerkitoBio/goquery"
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
-	"golang.org/x/net/html"
 )
 
 var errFailedToScrape = fault.New("failed to scrape")
@@ -21,6 +18,7 @@ type Scraper interface {
 type WebContent struct {
 	Title       string
 	Description string
+	Text        string
 	Image       string
 }
 
@@ -28,13 +26,13 @@ func Build() fx.Option {
 	return fx.Provide(New)
 }
 
-type scraper struct{}
+type webScraper struct{}
 
 func New() Scraper {
-	return &scraper{}
+	return &webScraper{}
 }
 
-func (s *scraper) Scrape(ctx context.Context, addr string) (*WebContent, error) {
+func (s *webScraper) Scrape(ctx context.Context, addr string) (*WebContent, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -65,75 +63,5 @@ func (s *scraper) Scrape(ctx context.Context, addr string) (*WebContent, error) 
 		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))
 	}
 
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	t := metatable(doc)
-
-	wc := &WebContent{
-		Title:       title(t),
-		Description: description(t),
-		Image:       t["og:image"],
-	}
-
-	return wc, nil
-}
-
-func metatable(doc *goquery.Document) map[string]string {
-	return dt.Reduce(doc.Find("head > meta").Nodes, func(wc map[string]string, n *html.Node) map[string]string {
-		k, v := ogtable(n.Attr)
-		if k != "" && v != "" {
-			wc[k] = v
-		}
-
-		return wc
-	}, map[string]string{})
-}
-
-func ogtable(attrs []html.Attribute) (k string, v string) {
-	for _, a := range attrs {
-		switch a.Key {
-		case "property":
-			k = a.Val
-		case "name":
-			k = a.Val
-		case "content":
-			v = a.Val
-		}
-	}
-
-	return
-}
-
-func title(t map[string]string) string {
-	if t["og:title"] != "" {
-		return t["og:title"]
-	}
-	if t["title"] != "" {
-		return t["title"]
-	}
-	if t["og:site_name"] != "" {
-		return t["og:site_name"]
-	}
-	if t["og:url"] != "" {
-		return t["og:url"]
-	}
-	if t["title"] != "" {
-		return t["title"]
-	}
-
-	return ""
-}
-
-func description(t map[string]string) string {
-	if t["og:description"] != "" {
-		return t["og:description"]
-	}
-	if t["description"] != "" {
-		return t["description"]
-	}
-
-	return ""
+	return s.postprocess(ctx, addr, resp.Body)
 }
