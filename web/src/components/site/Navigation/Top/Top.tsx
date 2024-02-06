@@ -42,8 +42,6 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
 
       <HStack className={styles["topbar-middle"]} justify="space-between">
         <Title>{title}</Title>
-        {/* TODO */}
-        <Search />
       </HStack>
 
       <HStack className={styles["topbar-right"]}>
