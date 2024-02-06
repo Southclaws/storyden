@@ -35,7 +35,7 @@ const SelectPositioner = withContext(
   "positioner",
 );
 const SelectTrigger = withContext(styled(ArkSelect.Trigger), "trigger");
-const SelectValueText = withContext(styled(ArkSelect.Value), "valueText");
+const SelectValueText = withContext(styled(ArkSelect.ValueText), "valueText");
 
 const Root = Select;
 const ClearTrigger = SelectClearTrigger;
