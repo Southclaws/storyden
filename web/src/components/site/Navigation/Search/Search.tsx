@@ -12,7 +12,8 @@ export function Search(props: Props) {
   return (
     <styled.form
       display="flex"
-      w="xs"
+      w="full"
+      minW="xs"
       onSubmit={handlers.handleSearch}
       action="/search"
     >
@@ -22,7 +23,8 @@ export function Search(props: Props) {
         borderRightRadius="none"
         type="search"
         defaultValue={props.query}
-        placeholder="Search everything"
+        background="bg.default"
+        placeholder={`Search the ${data.title} knowledgebase`}
         {...form.register("q")}
       />
 

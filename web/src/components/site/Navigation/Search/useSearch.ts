@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { useGetInfo } from "src/api/openapi/misc";
+
 export const FormSchema = z.object({
   q: z.string().min(1, { message: "Please enter a search term" }),
 });
@@ -13,6 +15,7 @@ export type Props = {
 };
 
 export function useSearch(props: Props) {
+  const { data: infoResult } = useGetInfo();
   const router = useRouter();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -21,6 +24,7 @@ export function useSearch(props: Props) {
     },
   });
 
+  const title = infoResult?.title ?? "Storyden";
   const { q } = form.watch();
 
   const handleSearch = form.handleSubmit((data) => {
@@ -36,6 +40,7 @@ export function useSearch(props: Props) {
     form,
     data: {
       q,
+      title,
     },
     handlers: {
       handleSearch,
