@@ -16,6 +16,7 @@ import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
 import { menu } from "src/theme/components/Menu/menu.recipe";
 import { popover } from "src/theme/components/Popover/popover.recipe";
+import { select } from "src/theme/components/Select/select.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
 import { tabs } from "src/theme/components/Tabs/tabs.recipe";
 
@@ -232,6 +233,7 @@ export default defineConfig({
       link: link,
       menu: menu,
       tabs: tabs,
+      select: select,
       checkbox: checkbox,
       popover: popover,
       skeleton: skeleton,
