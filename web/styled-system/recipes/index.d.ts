@@ -7,6 +7,7 @@ export * from './button';
 export * from './link';
 export * from './menu';
 export * from './tabs';
+export * from './select';
 export * from './checkbox';
 export * from './popover';
 export * from './skeleton';
