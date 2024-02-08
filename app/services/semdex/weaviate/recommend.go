@@ -9,50 +9,52 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
+	"github.com/weaviate/weaviate/entities/models"
+	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
-type WeaviateObject struct {
-	DatagraphID   string `json:"datagraph_id"`
-	DatagraphType string `json:"datagraph_type"`
-	Name          string `json:"name"`
-	Content       string `json:"content"`
-}
+func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Indexable) ([]*semdex.Result, error) {
+	wid := GetWeaviateID(object.GetID())
 
-type WeaviateContent map[string][]WeaviateObject
-
-type WeaviateResponse struct {
-	Get     WeaviateContent
-	Explore WeaviateContent
-}
-
-func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Result, error) {
-	fields := []graphql.Field{
-		{Name: "datagraph_id"},
-		{Name: "datagraph_type"},
-		{Name: "name"},
-		{Name: "content"},
-	}
-
-	arg := s.wc.GraphQL().
-		HybridArgumentBuilder().
-		WithAlpha(0.25).
-		WithFusionType(graphql.RelativeScore).
-		WithQuery(q)
-
-	result, err := s.wc.GraphQL().Get().
+	result, err := w.wc.Data().ObjectsGetter().
 		WithClassName(TestClassName).
-		WithFields(fields...).
-		WithHybrid(arg).
-		WithLimit(30).
-		Do(context.Background())
+		WithVector().
+		WithID(wid).
+		Do(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	j, err := json.Marshal(result.Data)
+	wobj := result[0]
+
+	// TODO: Compute vector between account owner and object.
+
+	withNearVector := w.wc.GraphQL().NearVectorArgBuilder().
+		WithVector(wobj.Vector).
+		WithDistance(0.5)
+
+	fields := []graphql.Field{
+		{Name: "datagraph_id"},
+		{Name: "datagraph_type"},
+	}
+
+	recommendations, err := w.wc.GraphQL().Get().
+		WithClassName(TestClassName).
+		WithFields(fields...).
+		WithNearVector(withNearVector).
+		WithLimit(10).
+		Do(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if len(recommendations.Errors) > 0 {
+		return nil, fault.Wrap(gqlerror(recommendations.Errors), fctx.With(ctx))
+	}
+
+	j, err := json.Marshal(recommendations.Data)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -63,10 +65,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData, ok := parsed.Get[TestClassName]
-	if !ok {
-		return nil, fault.New("weaviate response did not contain expected class data")
-	}
+	classData := parsed.Get[TestClassName]
 
 	results, err := dt.MapErr(classData, func(v WeaviateObject) (*semdex.Result, error) {
 		id, err := xid.FromString(v.DatagraphID)
@@ -90,4 +89,10 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 	}
 
 	return results, nil
+}
+
+func gqlerror(gqe []*models.GraphQLError) error {
+	return fault.Wrap(multierr.Combine(dt.Map(gqe, func(e *models.GraphQLError) error {
+		return fault.New(e.Message)
+	})...))
 }
