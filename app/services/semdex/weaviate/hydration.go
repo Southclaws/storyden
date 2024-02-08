@@ -46,3 +46,35 @@ func (h *withHydration) Search(ctx context.Context, query string) ([]*semdex.Res
 
 	return results, nil
 }
+
+func (h *withHydration) Recommend(ctx context.Context, object datagraph.Indexable) ([]*semdex.Result, error) {
+	rs, err := h.wc.Recommend(ctx, object)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results, err := h.Hydrate(ctx, rs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return results, nil
+}
+
+func (h *withHydration) Hydrate(ctx context.Context, results []*semdex.Result) ([]*semdex.Result, error) {
+	// NOTE: Should probably be parallelised at some point...
+	for i, v := range results {
+		r, err := h.rh.Hydrate(ctx, v)
+		if err != nil {
+			h.l.Warn("failed to hydrate search result",
+				zap.String("datagraph_kind", v.Type.String()),
+				zap.String("result_id", v.Id.String()),
+				zap.Error(err))
+			continue
+		}
+
+		results[i] = r
+	}
+
+	return results, nil
+}

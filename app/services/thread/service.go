@@ -83,7 +83,7 @@ type service struct {
 	account_repo account.Repository
 	thread_repo  thread.Repository
 	hydrator     hydrator.Service
-	semdex       semdex.Indexer
+	semdex       semdex.Semdexer
 }
 
 func New(
@@ -93,7 +93,7 @@ func New(
 	account_repo account.Repository,
 	thread_repo thread.Repository,
 	hydrator hydrator.Service,
-	semdex semdex.Indexer,
+	semdex semdex.Semdexer,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "thread")),

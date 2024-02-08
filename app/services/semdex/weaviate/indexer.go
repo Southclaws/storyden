@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/google/uuid"
+	"github.com/rs/xid"
 	weaviate_errors "github.com/weaviate/weaviate-go-client/v4/weaviate/fault"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -14,7 +15,9 @@ import (
 
 func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable) error {
 	content := object.GetText()
-	id := uuid.NewSHA1(uuid.NameSpaceOID, []byte(content)).String()
+	sid := object.GetID()
+
+	wid := GetWeaviateID(object.GetID())
 
 	// Don't bother indexing if the content is too short.
 	if len(content) < 30 {
@@ -23,9 +26,9 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable
 
 	_, err := s.wc.Data().Creator().
 		WithClassName(TestClassName).
-		WithID(id).
+		WithID(wid).
 		WithProperties(map[string]any{
-			"datagraph_id":   object.GetID().String(),
+			"datagraph_id":   sid.String(),
 			"datagraph_type": object.GetKind(),
 			"name":           object.GetName(),
 			"content":        content,
@@ -44,4 +47,8 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable
 	}
 
 	return nil
+}
+
+func GetWeaviateID(id xid.ID) string {
+	return uuid.NewSHA1(uuid.NameSpaceOID, id.Bytes()).String()
 }
