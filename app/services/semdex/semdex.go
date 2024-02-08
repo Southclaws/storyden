@@ -17,9 +17,14 @@ type Searcher interface {
 	Search(ctx context.Context, query string) ([]*Result, error)
 }
 
+type Recommender interface {
+	Recommend(ctx context.Context, object datagraph.Indexable) ([]*Result, error)
+}
+
 type Semdexer interface {
 	Indexer
 	Searcher
+	Recommender
 }
 
 type OnlySearcher struct {
@@ -32,6 +37,10 @@ func (o *OnlySearcher) Search(ctx context.Context, query string) ([]*Result, err
 
 func (o *OnlySearcher) Index(ctx context.Context, object datagraph.Indexable) error {
 	return nil
+}
+
+func (o *OnlySearcher) Recommend(ctx context.Context, object datagraph.Indexable) ([]*Result, error) {
+	return nil, nil
 }
 
 type Result struct {

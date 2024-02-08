@@ -70,8 +70,10 @@ func Build() fx.Option {
 
 				return &withHydration{l, newWeaviateSemdexer(lc, wc), rh}
 			},
+			fx.As(new(semdex.Semdexer)),
 			fx.As(new(semdex.Indexer)),
 			fx.As(new(semdex.Searcher)),
+			fx.As(new(semdex.Recommender)),
 		),
 	)
 }
