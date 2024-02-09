@@ -56,8 +56,8 @@ func (p *Provider) Enabled() bool { return true }
 func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
-func (p *Provider) Link() string {
-	return ""
+func (b *Provider) Link(_ string) (string, error) {
+	return "", nil
 }
 
 func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.Account, error) {

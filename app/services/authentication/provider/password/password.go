@@ -76,9 +76,9 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 	return account, nil
 }
 
-func (b *Provider) Link() string {
+func (b *Provider) Link(_ string) (string, error) {
 	// Password provider does not use external links.
-	return ""
+	return "", nil
 }
 
 func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {

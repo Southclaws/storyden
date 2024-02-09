@@ -42,7 +42,7 @@ func (p *GitHubProvider) Enabled() bool { return p.config.Enabled }
 func (p *GitHubProvider) ID() string    { return id }
 func (p *GitHubProvider) Name() string  { return name }
 
-func (p *GitHubProvider) Link() string {
+func (p *GitHubProvider) Link(_ string) (string, error) {
 	c := oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
@@ -51,7 +51,7 @@ func (p *GitHubProvider) Link() string {
 		Scopes:       []string{},
 	}
 
-	return c.AuthCodeURL("", oauth2.AccessTypeOffline)
+	return c.AuthCodeURL("", oauth2.AccessTypeOffline), nil
 }
 
 func (p *GitHubProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {

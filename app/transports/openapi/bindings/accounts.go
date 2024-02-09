@@ -77,10 +77,20 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	available, err := dt.MapErr(i.am.Providers(), serialiseAuthProvider)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	active, err := dt.MapErr(authmethods, serialiseAuthMethod)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.AccountAuthProviderList200JSONResponse{
 		AccountAuthProviderListOKJSONResponse: openapi.AccountAuthProviderListOKJSONResponse{
-			Available: dt.Map(i.am.Providers(), serialiseAuthProvider),
-			Active:    dt.Map(authmethods, serialiseAuthMethod),
+			Available: available,
+			Active:    active,
 		},
 	}, nil
 }
@@ -106,10 +116,20 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	available, err := dt.MapErr(i.am.Providers(), serialiseAuthProvider)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	active, err := dt.MapErr(authmethods, serialiseAuthMethod)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.AccountAuthMethodDelete200JSONResponse{
 		AccountAuthProviderListOKJSONResponse: openapi.AccountAuthProviderListOKJSONResponse{
-			Available: dt.Map(i.am.Providers(), serialiseAuthProvider),
-			Active:    dt.Map(authmethods, serialiseAuthMethod),
+			Available: available,
+			Active:    active,
 		},
 	}, nil
 }
@@ -146,12 +166,17 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 	return openapi.AccountSetAvatar200Response{}, nil
 }
 
-func serialiseAuthMethod(in *account.AuthMethod) openapi.AccountAuthMethod {
+func serialiseAuthMethod(in *account.AuthMethod) (openapi.AccountAuthMethod, error) {
+	p, err := serialiseAuthProvider(in.Provider)
+	if err != nil {
+		return openapi.AccountAuthMethod{}, fault.Wrap(err)
+	}
+
 	return openapi.AccountAuthMethod{
 		Id:         in.Instance.ID.String(),
 		CreatedAt:  in.Instance.Created,
 		Name:       in.Instance.Name.Or("Unknown"),
 		Identifier: in.Instance.Identifier,
-		Provider:   serialiseAuthProvider(in.Provider),
-	}
+		Provider:   p,
+	}, nil
 }
