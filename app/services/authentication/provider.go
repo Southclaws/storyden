@@ -25,7 +25,7 @@ type Provider interface {
 
 	// Link will, for providers that support it, provide a URL to a third-party
 	// authenticator. OAuth providers use this to start the authentication flow.
-	Link() string
+	Link(redirect string) (string, error)
 
 	// Login is a function that will validate and authenticate a user given that
 	// the provider is happy with the input. The input format differs depending

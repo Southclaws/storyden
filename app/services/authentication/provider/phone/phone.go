@@ -149,9 +149,9 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 	return acc, nil
 }
 
-func (p *Provider) Link() string {
+func (b *Provider) Link(_ string) (string, error) {
 	// Phone provider does not use external links.
-	return ""
+	return "", nil
 }
 
 func (p *Provider) Login(ctx context.Context, handle string, onetimecode string) (*account.Account, error) {

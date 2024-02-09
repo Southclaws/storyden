@@ -7,8 +7,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/endec/securecookie"
 	"github.com/Southclaws/storyden/internal/integration"
-	"github.com/Southclaws/storyden/internal/securecookie"
 )
 
 func TestSession(t *testing.T) {
