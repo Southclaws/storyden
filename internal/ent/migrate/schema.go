@@ -117,6 +117,7 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "review", "public"}, Default: "draft"},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "parent_cluster_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -129,13 +130,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "clusters_accounts_clusters",
-				Columns:    []*schema.Column{ClustersColumns[9]},
+				Columns:    []*schema.Column{ClustersColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "clusters_clusters_clusters",
-				Columns:    []*schema.Column{ClustersColumns[10]},
+				Columns:    []*schema.Column{ClustersColumns[11]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -155,6 +156,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "review", "public"}, Default: "draft"},
 		{Name: "account_collections", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// CollectionsTable holds the schema information for the "collections" table.
@@ -165,7 +167,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "collections_accounts_collections",
-				Columns:    []*schema.Column{CollectionsColumns[5]},
+				Columns:    []*schema.Column{CollectionsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -181,6 +183,7 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "content", Type: field.TypeString, Nullable: true},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "review", "public"}, Default: "draft"},
 		{Name: "properties", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}
@@ -192,7 +195,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[9]},
+				Columns:    []*schema.Column{ItemsColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

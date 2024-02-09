@@ -66,6 +66,20 @@ func (cc *CollectionCreate) SetDescription(s string) *CollectionCreate {
 	return cc
 }
 
+// SetVisibility sets the "visibility" field.
+func (cc *CollectionCreate) SetVisibility(c collection.Visibility) *CollectionCreate {
+	cc.mutation.SetVisibility(c)
+	return cc
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableVisibility(c *collection.Visibility) *CollectionCreate {
+	if c != nil {
+		cc.SetVisibility(*c)
+	}
+	return cc
+}
+
 // SetID sets the "id" field.
 func (cc *CollectionCreate) SetID(x xid.ID) *CollectionCreate {
 	cc.mutation.SetID(x)
@@ -157,6 +171,10 @@ func (cc *CollectionCreate) defaults() {
 		v := collection.DefaultUpdatedAt()
 		cc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := cc.mutation.Visibility(); !ok {
+		v := collection.DefaultVisibility
+		cc.mutation.SetVisibility(v)
+	}
 	if _, ok := cc.mutation.ID(); !ok {
 		v := collection.DefaultID()
 		cc.mutation.SetID(v)
@@ -176,6 +194,14 @@ func (cc *CollectionCreate) check() error {
 	}
 	if _, ok := cc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Collection.description"`)}
+	}
+	if _, ok := cc.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Collection.visibility"`)}
+	}
+	if v, ok := cc.mutation.Visibility(); ok {
+		if err := collection.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Collection.visibility": %w`, err)}
+		}
 	}
 	if v, ok := cc.mutation.ID(); ok {
 		if err := collection.IDValidator(v.String()); err != nil {
@@ -233,6 +259,10 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := cc.mutation.Visibility(); ok {
+		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
+		_node.Visibility = value
 	}
 	if nodes := cc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -355,6 +385,18 @@ func (u *CollectionUpsert) UpdateDescription() *CollectionUpsert {
 	return u
 }
 
+// SetVisibility sets the "visibility" field.
+func (u *CollectionUpsert) SetVisibility(v collection.Visibility) *CollectionUpsert {
+	u.Set(collection.FieldVisibility, v)
+	return u
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CollectionUpsert) UpdateVisibility() *CollectionUpsert {
+	u.SetExcluded(collection.FieldVisibility)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -445,6 +487,20 @@ func (u *CollectionUpsertOne) SetDescription(v string) *CollectionUpsertOne {
 func (u *CollectionUpsertOne) UpdateDescription() *CollectionUpsertOne {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *CollectionUpsertOne) SetVisibility(v collection.Visibility) *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CollectionUpsertOne) UpdateVisibility() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateVisibility()
 	})
 }
 
@@ -705,6 +761,20 @@ func (u *CollectionUpsertBulk) SetDescription(v string) *CollectionUpsertBulk {
 func (u *CollectionUpsertBulk) UpdateDescription() *CollectionUpsertBulk {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *CollectionUpsertBulk) SetVisibility(v collection.Visibility) *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CollectionUpsertBulk) UpdateVisibility() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateVisibility()
 	})
 }
 

@@ -109,6 +109,20 @@ func (ic *ItemCreate) SetAccountID(x xid.ID) *ItemCreate {
 	return ic
 }
 
+// SetVisibility sets the "visibility" field.
+func (ic *ItemCreate) SetVisibility(i item.Visibility) *ItemCreate {
+	ic.mutation.SetVisibility(i)
+	return ic
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (ic *ItemCreate) SetNillableVisibility(i *item.Visibility) *ItemCreate {
+	if i != nil {
+		ic.SetVisibility(*i)
+	}
+	return ic
+}
+
 // SetProperties sets the "properties" field.
 func (ic *ItemCreate) SetProperties(a any) *ItemCreate {
 	ic.mutation.SetProperties(a)
@@ -243,6 +257,10 @@ func (ic *ItemCreate) defaults() {
 		v := item.DefaultUpdatedAt()
 		ic.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ic.mutation.Visibility(); !ok {
+		v := item.DefaultVisibility
+		ic.mutation.SetVisibility(v)
+	}
 	if _, ok := ic.mutation.ID(); !ok {
 		v := item.DefaultID()
 		ic.mutation.SetID(v)
@@ -268,6 +286,14 @@ func (ic *ItemCreate) check() error {
 	}
 	if _, ok := ic.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Item.account_id"`)}
+	}
+	if _, ok := ic.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Item.visibility"`)}
+	}
+	if v, ok := ic.mutation.Visibility(); ok {
+		if err := item.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Item.visibility": %w`, err)}
+		}
 	}
 	if v, ok := ic.mutation.ID(); ok {
 		if err := item.IDValidator(v.String()); err != nil {
@@ -340,6 +366,10 @@ func (ic *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.Content(); ok {
 		_spec.SetField(item.FieldContent, field.TypeString, value)
 		_node.Content = &value
+	}
+	if value, ok := ic.mutation.Visibility(); ok {
+		_spec.SetField(item.FieldVisibility, field.TypeEnum, value)
+		_node.Visibility = value
 	}
 	if value, ok := ic.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
@@ -574,6 +604,18 @@ func (u *ItemUpsert) UpdateAccountID() *ItemUpsert {
 	return u
 }
 
+// SetVisibility sets the "visibility" field.
+func (u *ItemUpsert) SetVisibility(v item.Visibility) *ItemUpsert {
+	u.Set(item.FieldVisibility, v)
+	return u
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ItemUpsert) UpdateVisibility() *ItemUpsert {
+	u.SetExcluded(item.FieldVisibility)
+	return u
+}
+
 // SetProperties sets the "properties" field.
 func (u *ItemUpsert) SetProperties(v any) *ItemUpsert {
 	u.Set(item.FieldProperties, v)
@@ -752,6 +794,20 @@ func (u *ItemUpsertOne) SetAccountID(v xid.ID) *ItemUpsertOne {
 func (u *ItemUpsertOne) UpdateAccountID() *ItemUpsertOne {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *ItemUpsertOne) SetVisibility(v item.Visibility) *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ItemUpsertOne) UpdateVisibility() *ItemUpsertOne {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateVisibility()
 	})
 }
 
@@ -1103,6 +1159,20 @@ func (u *ItemUpsertBulk) SetAccountID(v xid.ID) *ItemUpsertBulk {
 func (u *ItemUpsertBulk) UpdateAccountID() *ItemUpsertBulk {
 	return u.Update(func(s *ItemUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *ItemUpsertBulk) SetVisibility(v item.Visibility) *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ItemUpsertBulk) UpdateVisibility() *ItemUpsertBulk {
+	return u.Update(func(s *ItemUpsert) {
+		s.UpdateVisibility()
 	})
 }
 

@@ -38,6 +38,8 @@ type Cluster struct {
 	ParentClusterID xid.ID `json:"parent_cluster_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// Visibility holds the value of the "visibility" field.
+	Visibility cluster.Visibility `json:"visibility,omitempty"`
 	// Properties holds the value of the "properties" field.
 	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -145,7 +147,7 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cluster.FieldProperties:
 			values[i] = new([]byte)
-		case cluster.FieldName, cluster.FieldSlug, cluster.FieldDescription, cluster.FieldContent:
+		case cluster.FieldName, cluster.FieldSlug, cluster.FieldDescription, cluster.FieldContent, cluster.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -227,6 +229,12 @@ func (c *Cluster) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
 				c.AccountID = *value
+			}
+		case cluster.FieldVisibility:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field visibility", values[i])
+			} else if value.Valid {
+				c.Visibility = cluster.Visibility(value.String)
 			}
 		case cluster.FieldProperties:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -337,6 +345,9 @@ func (c *Cluster) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.AccountID))
+	builder.WriteString(", ")
+	builder.WriteString("visibility=")
+	builder.WriteString(fmt.Sprintf("%v", c.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("properties=")
 	builder.WriteString(fmt.Sprintf("%v", c.Properties))

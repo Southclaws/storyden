@@ -651,6 +651,26 @@ func AccountIDContainsFold(v xid.ID) predicate.Cluster {
 	return predicate.Cluster(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.Cluster {
+	return predicate.Cluster(sql.FieldEQ(FieldVisibility, v))
+}
+
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNEQ(FieldVisibility, v))
+}
+
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.Cluster {
+	return predicate.Cluster(sql.FieldIn(FieldVisibility, vs...))
+}
+
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.Cluster {
+	return predicate.Cluster(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
 // PropertiesIsNil applies the IsNil predicate on the "properties" field.
 func PropertiesIsNil() predicate.Cluster {
 	return predicate.Cluster(sql.FieldIsNull(FieldProperties))

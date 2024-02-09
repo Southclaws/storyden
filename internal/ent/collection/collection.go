@@ -3,6 +3,7 @@
 package collection
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -23,6 +24,8 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldVisibility holds the string denoting the visibility field in the database.
+	FieldVisibility = "visibility"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
@@ -50,6 +53,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldName,
 	FieldDescription,
+	FieldVisibility,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "collections"
@@ -92,6 +96,33 @@ var (
 	IDValidator func(string) error
 )
 
+// Visibility defines the type for the "visibility" enum field.
+type Visibility string
+
+// VisibilityDraft is the default value of the Visibility enum.
+const DefaultVisibility = VisibilityDraft
+
+// Visibility values.
+const (
+	VisibilityDraft  Visibility = "draft"
+	VisibilityReview Visibility = "review"
+	VisibilityPublic Visibility = "public"
+)
+
+func (v Visibility) String() string {
+	return string(v)
+}
+
+// VisibilityValidator is a validator for the "visibility" field enum values. It is called by the builders before save.
+func VisibilityValidator(v Visibility) error {
+	switch v {
+	case VisibilityDraft, VisibilityReview, VisibilityPublic:
+		return nil
+	default:
+		return fmt.Errorf("collection: invalid enum value for visibility field: %q", v)
+	}
+}
+
 // OrderOption defines the ordering options for the Collection queries.
 type OrderOption func(*sql.Selector)
 
@@ -118,6 +149,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByVisibility orders the results by the visibility field.
+func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
 }
 
 // ByOwnerField orders the results by owner field.

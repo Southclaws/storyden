@@ -286,6 +286,26 @@ func DescriptionContainsFold(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldVisibility, v))
+}
+
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldVisibility, v))
+}
+
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldVisibility, vs...))
+}
+
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
 // HasOwner applies the HasEdge predicate on the "owner" edge.
 func HasOwner() predicate.Collection {
 	return predicate.Collection(func(s *sql.Selector) {

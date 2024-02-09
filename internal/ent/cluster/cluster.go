@@ -3,6 +3,7 @@
 package cluster
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,6 +34,8 @@ const (
 	FieldParentClusterID = "parent_cluster_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldVisibility holds the string denoting the visibility field in the database.
+	FieldVisibility = "visibility"
 	// FieldProperties holds the string denoting the properties field in the database.
 	FieldProperties = "properties"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
@@ -100,6 +103,7 @@ var Columns = []string{
 	FieldContent,
 	FieldParentClusterID,
 	FieldAccountID,
+	FieldVisibility,
 	FieldProperties,
 }
 
@@ -140,6 +144,33 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// Visibility defines the type for the "visibility" enum field.
+type Visibility string
+
+// VisibilityDraft is the default value of the Visibility enum.
+const DefaultVisibility = VisibilityDraft
+
+// Visibility values.
+const (
+	VisibilityDraft  Visibility = "draft"
+	VisibilityReview Visibility = "review"
+	VisibilityPublic Visibility = "public"
+)
+
+func (v Visibility) String() string {
+	return string(v)
+}
+
+// VisibilityValidator is a validator for the "visibility" field enum values. It is called by the builders before save.
+func VisibilityValidator(v Visibility) error {
+	switch v {
+	case VisibilityDraft, VisibilityReview, VisibilityPublic:
+		return nil
+	default:
+		return fmt.Errorf("cluster: invalid enum value for visibility field: %q", v)
+	}
+}
 
 // OrderOption defines the ordering options for the Cluster queries.
 type OrderOption func(*sql.Selector)
@@ -192,6 +223,11 @@ func ByParentClusterID(opts ...sql.OrderTermOption) OrderOption {
 // ByAccountID orders the results by the account_id field.
 func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
+}
+
+// ByVisibility orders the results by the visibility field.
+func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
 }
 
 // ByOwnerField orders the results by owner field.
