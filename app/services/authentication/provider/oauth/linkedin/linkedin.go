@@ -59,7 +59,7 @@ func (p *LinkedInProvider) Enabled() bool { return p.config.Enabled }
 func (p *LinkedInProvider) ID() string    { return id }
 func (p *LinkedInProvider) Name() string  { return name }
 
-func (p *LinkedInProvider) Link() string {
+func (p *LinkedInProvider) Link(_ string) (string, error) {
 	c := oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
@@ -71,7 +71,7 @@ func (p *LinkedInProvider) Link() string {
 		},
 	}
 
-	return c.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	return c.AuthCodeURL("state", oauth2.AccessTypeOffline), nil
 }
 
 func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {

@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
@@ -34,6 +35,7 @@ func Build() fx.Option {
 			// All auth providers are initialised, those that fail are disabled.
 			password.New,
 			webauthn.New,
+			google.New,
 			github.New,
 			linkedin.New,
 			phone.New,
@@ -48,6 +50,7 @@ func New(
 
 	pw *password.Provider,
 	wa *webauthn.Provider,
+	gg *google.Provider,
 	gh *github.GitHubProvider,
 	li *linkedin.LinkedInProvider,
 	pp *phone.Provider,
@@ -58,6 +61,7 @@ func New(
 		// whether they are enabled or not. Disabled providers are filtered out.
 		pw,
 		wa,
+		gg,
 		gh,
 		li,
 		pp,

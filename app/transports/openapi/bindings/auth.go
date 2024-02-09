@@ -39,7 +39,10 @@ func NewAuthentication(
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
-	list := dt.Map(o.am.Providers(), serialiseAuthProvider)
+	list, err := dt.MapErr(o.am.Providers(), serialiseAuthProvider)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return openapi.AuthProviderList200JSONResponse{
 		AuthProviderListOKJSONResponse: openapi.AuthProviderListOKJSONResponse{
@@ -93,10 +96,15 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 	return nil
 }
 
-func serialiseAuthProvider(p authentication.Provider) openapi.AuthProvider {
+func serialiseAuthProvider(p authentication.Provider) (openapi.AuthProvider, error) {
+	link, err := p.Link("/")
+	if err != nil {
+		return openapi.AuthProvider{}, fault.Wrap(err)
+	}
+
 	return openapi.AuthProvider{
 		Provider: p.ID(),
 		Name:     p.Name(),
-		Link:     p.Link(),
-	}
+		Link:     link,
+	}, nil
 }
