@@ -125,6 +125,20 @@ func (cu *ClusterUpdate) SetAccountID(x xid.ID) *ClusterUpdate {
 	return cu
 }
 
+// SetVisibility sets the "visibility" field.
+func (cu *ClusterUpdate) SetVisibility(c cluster.Visibility) *ClusterUpdate {
+	cu.mutation.SetVisibility(c)
+	return cu
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableVisibility(c *cluster.Visibility) *ClusterUpdate {
+	if c != nil {
+		cu.SetVisibility(*c)
+	}
+	return cu
+}
+
 // SetProperties sets the "properties" field.
 func (cu *ClusterUpdate) SetProperties(a any) *ClusterUpdate {
 	cu.mutation.SetProperties(a)
@@ -402,6 +416,11 @@ func (cu *ClusterUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ClusterUpdate) check() error {
+	if v, ok := cu.mutation.Visibility(); ok {
+		if err := cluster.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Cluster.visibility": %w`, err)}
+		}
+	}
 	if _, ok := cu.mutation.OwnerID(); cu.mutation.OwnerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Cluster.owner"`)
 	}
@@ -449,6 +468,9 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ContentCleared() {
 		_spec.ClearField(cluster.FieldContent, field.TypeString)
+	}
+	if value, ok := cu.mutation.Visibility(); ok {
+		_spec.SetField(cluster.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := cu.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
@@ -851,6 +873,20 @@ func (cuo *ClusterUpdateOne) SetAccountID(x xid.ID) *ClusterUpdateOne {
 	return cuo
 }
 
+// SetVisibility sets the "visibility" field.
+func (cuo *ClusterUpdateOne) SetVisibility(c cluster.Visibility) *ClusterUpdateOne {
+	cuo.mutation.SetVisibility(c)
+	return cuo
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableVisibility(c *cluster.Visibility) *ClusterUpdateOne {
+	if c != nil {
+		cuo.SetVisibility(*c)
+	}
+	return cuo
+}
+
 // SetProperties sets the "properties" field.
 func (cuo *ClusterUpdateOne) SetProperties(a any) *ClusterUpdateOne {
 	cuo.mutation.SetProperties(a)
@@ -1141,6 +1177,11 @@ func (cuo *ClusterUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ClusterUpdateOne) check() error {
+	if v, ok := cuo.mutation.Visibility(); ok {
+		if err := cluster.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Cluster.visibility": %w`, err)}
+		}
+	}
 	if _, ok := cuo.mutation.OwnerID(); cuo.mutation.OwnerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Cluster.owner"`)
 	}
@@ -1205,6 +1246,9 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 	}
 	if cuo.mutation.ContentCleared() {
 		_spec.ClearField(cluster.FieldContent, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Visibility(); ok {
+		_spec.SetField(cluster.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := cuo.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)

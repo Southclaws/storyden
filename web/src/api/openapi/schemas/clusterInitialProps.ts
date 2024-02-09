@@ -12,6 +12,7 @@ import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
 import type { Url } from "./url";
+import type { Visibility } from "./visibility";
 
 export interface ClusterInitialProps {
   asset_ids?: AssetIDs;
@@ -22,4 +23,5 @@ export interface ClusterInitialProps {
   properties?: Properties;
   slug: Slug;
   url?: Url;
+  visibility?: Visibility;
 }

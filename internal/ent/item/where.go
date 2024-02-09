@@ -566,6 +566,26 @@ func AccountIDContainsFold(v xid.ID) predicate.Item {
 	return predicate.Item(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.Item {
+	return predicate.Item(sql.FieldEQ(FieldVisibility, v))
+}
+
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.Item {
+	return predicate.Item(sql.FieldNEQ(FieldVisibility, v))
+}
+
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.Item {
+	return predicate.Item(sql.FieldIn(FieldVisibility, vs...))
+}
+
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.Item {
+	return predicate.Item(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
 // PropertiesIsNil applies the IsNil predicate on the "properties" field.
 func PropertiesIsNil() predicate.Item {
 	return predicate.Item(sql.FieldIsNull(FieldProperties))

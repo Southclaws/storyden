@@ -24,6 +24,7 @@ func (Cluster) Fields() []ent.Field {
 		field.String("content").Optional().Nillable(),
 		field.String("parent_cluster_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 		field.Any("properties").Optional(),
 	}
 }

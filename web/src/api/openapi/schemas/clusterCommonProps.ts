@@ -14,6 +14,7 @@ import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
+import type { Visibility } from "./visibility";
 
 /**
  * The main properties of a cluster.
@@ -28,4 +29,5 @@ export interface ClusterCommonProps {
   parent?: Cluster;
   properties: Properties;
   slug: Slug;
+  visibility: Visibility;
 }

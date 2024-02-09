@@ -50,6 +50,20 @@ func (cu *CollectionUpdate) SetDescription(s string) *CollectionUpdate {
 	return cu
 }
 
+// SetVisibility sets the "visibility" field.
+func (cu *CollectionUpdate) SetVisibility(c collection.Visibility) *CollectionUpdate {
+	cu.mutation.SetVisibility(c)
+	return cu
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableVisibility(c *collection.Visibility) *CollectionUpdate {
+	if c != nil {
+		cu.SetVisibility(*c)
+	}
+	return cu
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
 func (cu *CollectionUpdate) SetOwnerID(id xid.ID) *CollectionUpdate {
 	cu.mutation.SetOwnerID(id)
@@ -152,6 +166,16 @@ func (cu *CollectionUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *CollectionUpdate) check() error {
+	if v, ok := cu.mutation.Visibility(); ok {
+		if err := collection.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Collection.visibility": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cu *CollectionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdate {
 	cu.modifiers = append(cu.modifiers, modifiers...)
@@ -159,6 +183,9 @@ func (cu *CollectionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Col
 }
 
 func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -175,6 +202,9 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Visibility(); ok {
+		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
 	}
 	if cu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -287,6 +317,20 @@ func (cuo *CollectionUpdateOne) SetName(s string) *CollectionUpdateOne {
 // SetDescription sets the "description" field.
 func (cuo *CollectionUpdateOne) SetDescription(s string) *CollectionUpdateOne {
 	cuo.mutation.SetDescription(s)
+	return cuo
+}
+
+// SetVisibility sets the "visibility" field.
+func (cuo *CollectionUpdateOne) SetVisibility(c collection.Visibility) *CollectionUpdateOne {
+	cuo.mutation.SetVisibility(c)
+	return cuo
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableVisibility(c *collection.Visibility) *CollectionUpdateOne {
+	if c != nil {
+		cuo.SetVisibility(*c)
+	}
 	return cuo
 }
 
@@ -405,6 +449,16 @@ func (cuo *CollectionUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *CollectionUpdateOne) check() error {
+	if v, ok := cuo.mutation.Visibility(); ok {
+		if err := collection.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Collection.visibility": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cuo *CollectionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdateOne {
 	cuo.modifiers = append(cuo.modifiers, modifiers...)
@@ -412,6 +466,9 @@ func (cuo *CollectionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) 
 }
 
 func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection, err error) {
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString))
 	id, ok := cuo.mutation.ID()
 	if !ok {
@@ -445,6 +502,9 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Visibility(); ok {
+		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
 	}
 	if cuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
