@@ -105,6 +105,20 @@ func (iu *ItemUpdate) SetAccountID(x xid.ID) *ItemUpdate {
 	return iu
 }
 
+// SetVisibility sets the "visibility" field.
+func (iu *ItemUpdate) SetVisibility(i item.Visibility) *ItemUpdate {
+	iu.mutation.SetVisibility(i)
+	return iu
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableVisibility(i *item.Visibility) *ItemUpdate {
+	if i != nil {
+		iu.SetVisibility(*i)
+	}
+	return iu
+}
+
 // SetProperties sets the "properties" field.
 func (iu *ItemUpdate) SetProperties(a any) *ItemUpdate {
 	iu.mutation.SetProperties(a)
@@ -321,6 +335,11 @@ func (iu *ItemUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iu *ItemUpdate) check() error {
+	if v, ok := iu.mutation.Visibility(); ok {
+		if err := item.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Item.visibility": %w`, err)}
+		}
+	}
 	if _, ok := iu.mutation.OwnerID(); iu.mutation.OwnerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Item.owner"`)
 	}
@@ -368,6 +387,9 @@ func (iu *ItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if iu.mutation.ContentCleared() {
 		_spec.ClearField(item.FieldContent, field.TypeString)
+	}
+	if value, ok := iu.mutation.Visibility(); ok {
+		_spec.SetField(item.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := iu.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)
@@ -676,6 +698,20 @@ func (iuo *ItemUpdateOne) SetAccountID(x xid.ID) *ItemUpdateOne {
 	return iuo
 }
 
+// SetVisibility sets the "visibility" field.
+func (iuo *ItemUpdateOne) SetVisibility(i item.Visibility) *ItemUpdateOne {
+	iuo.mutation.SetVisibility(i)
+	return iuo
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableVisibility(i *item.Visibility) *ItemUpdateOne {
+	if i != nil {
+		iuo.SetVisibility(*i)
+	}
+	return iuo
+}
+
 // SetProperties sets the "properties" field.
 func (iuo *ItemUpdateOne) SetProperties(a any) *ItemUpdateOne {
 	iuo.mutation.SetProperties(a)
@@ -905,6 +941,11 @@ func (iuo *ItemUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iuo *ItemUpdateOne) check() error {
+	if v, ok := iuo.mutation.Visibility(); ok {
+		if err := item.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Item.visibility": %w`, err)}
+		}
+	}
 	if _, ok := iuo.mutation.OwnerID(); iuo.mutation.OwnerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Item.owner"`)
 	}
@@ -969,6 +1010,9 @@ func (iuo *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) 
 	}
 	if iuo.mutation.ContentCleared() {
 		_spec.ClearField(item.FieldContent, field.TypeString)
+	}
+	if value, ok := iuo.mutation.Visibility(); ok {
+		_spec.SetField(item.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := iuo.mutation.Properties(); ok {
 		_spec.SetField(item.FieldProperties, field.TypeJSON, value)

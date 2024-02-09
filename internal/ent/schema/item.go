@@ -23,6 +23,7 @@ func (Item) Fields() []ent.Field {
 		field.String("description"),
 		field.String("content").Optional().Nillable(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 		field.Any("properties").Optional(),
 	}
 }

@@ -959,6 +959,19 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ClusterDeleteOK" }
 
+  /v1/clusters/{cluster_slug}/visibility:
+    patch:
+      operationId: ClusterUpdateVisibility
+      description: Update the visibility cluster.
+      tags: [clusters]
+      parameters: [$ref: "#/components/parameters/ClusterSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+
   /v1/clusters/{cluster_slug}/assets/{asset_id}:
     put:
       operationId: ClusterAddAsset
@@ -1105,6 +1118,19 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: Deleted }
+
+  /v1/items/{item_slug}/visibility:
+    patch:
+      operationId: ItemUpdateVisibility
+      description: Update the visibility of an item.
+      tags: [items]
+      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ItemUpdateOK" }
 
   /v1/items/{item_slug}/assets/{asset_id}:
     put:
@@ -1550,6 +1576,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/LinkInitialProps" }
+
+    VisibilityUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/VisibilityMutationProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -2009,6 +2040,19 @@ components:
     ContentKinds:
       type: array
       items: { $ref: "#/components/schemas/ContentKind" }
+
+    Visibility:
+      type: string
+      enum:
+        - draft
+        - review
+        - public
+
+    VisibilityMutationProps:
+      type: object
+      required: [visibility]
+      properties:
+        visibility: { $ref: "#/components/schemas/Visibility" }
 
     Slug:
       description: A URL-safe slug for uniquely identifying resources.
@@ -3136,7 +3180,7 @@ components:
     ClusterCommonProps:
       description: The main properties of a cluster.
       type: object
-      required: [name, slug, assets, description, owner, properties]
+      required: [name, slug, assets, description, owner, visibility, properties]
       properties:
         name: { $ref: "#/components/schemas/ClusterName" }
         slug: { $ref: "#/components/schemas/ClusterSlug" }
@@ -3146,6 +3190,7 @@ components:
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Cluster" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterList:
@@ -3163,6 +3208,7 @@ components:
         description: { $ref: "#/components/schemas/ClusterDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/ClusterSlug" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ClusterMutableProps:
@@ -3232,7 +3278,7 @@ components:
     ItemCommonProps:
       description: The main properties for an item.
       type: object
-      required: [name, slug, assets, description, owner, properties]
+      required: [name, slug, assets, description, owner, visibility, properties]
       properties:
         name: { $ref: "#/components/schemas/ItemName" }
         slug: { $ref: "#/components/schemas/ItemSlug" }
@@ -3241,6 +3287,7 @@ components:
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ItemWithParents:
@@ -3273,6 +3320,7 @@ components:
         url: { $ref: "#/components/schemas/URL" }
         description: { $ref: "#/components/schemas/ItemDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     ItemMutableProps:

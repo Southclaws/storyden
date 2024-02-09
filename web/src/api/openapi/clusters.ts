@@ -29,6 +29,7 @@ import type {
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
+  VisibilityUpdateBody,
 } from "./schemas";
 
 /**
@@ -311,6 +312,72 @@ export const useClusterDelete = <
 
   const swrKey = swrOptions?.swrKey ?? getClusterDeleteMutationKey(clusterSlug);
   const swrFn = getClusterDeleteMutationFetcher(clusterSlug, params);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the visibility cluster.
+ */
+export const clusterUpdateVisibility = (
+  clusterSlug: string,
+  visibilityUpdateBody: VisibilityUpdateBody,
+) => {
+  return fetcher<ClusterUpdateOKResponse>({
+    url: `/v1/clusters/${clusterSlug}/visibility`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: visibilityUpdateBody,
+  });
+};
+
+export const getClusterUpdateVisibilityMutationFetcher = (
+  clusterSlug: string,
+) => {
+  return (
+    _: string,
+    { arg }: { arg: Arguments },
+  ): Promise<ClusterUpdateOKResponse> => {
+    return clusterUpdateVisibility(clusterSlug, arg as VisibilityUpdateBody);
+  };
+};
+export const getClusterUpdateVisibilityMutationKey = (clusterSlug: string) =>
+  `/v1/clusters/${clusterSlug}/visibility` as const;
+
+export type ClusterUpdateVisibilityMutationResult = NonNullable<
+  Awaited<ReturnType<typeof clusterUpdateVisibility>>
+>;
+export type ClusterUpdateVisibilityMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useClusterUpdateVisibility = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  clusterSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof clusterUpdateVisibility>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof clusterUpdateVisibility>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getClusterUpdateVisibilityMutationKey(clusterSlug);
+  const swrFn = getClusterUpdateVisibilityMutationFetcher(clusterSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

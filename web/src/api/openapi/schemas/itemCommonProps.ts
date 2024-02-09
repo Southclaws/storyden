@@ -13,6 +13,7 @@ import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
+import type { Visibility } from "./visibility";
 
 /**
  * The main properties for an item.
@@ -26,4 +27,5 @@ export interface ItemCommonProps {
   owner: ProfileReference;
   properties: Properties;
   slug: Slug;
+  visibility: Visibility;
 }

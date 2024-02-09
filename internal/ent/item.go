@@ -36,6 +36,8 @@ type Item struct {
 	Content *string `json:"content,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// Visibility holds the value of the "visibility" field.
+	Visibility item.Visibility `json:"visibility,omitempty"`
 	// Properties holds the value of the "properties" field.
 	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -117,7 +119,7 @@ func (*Item) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case item.FieldProperties:
 			values[i] = new([]byte)
-		case item.FieldName, item.FieldSlug, item.FieldDescription, item.FieldContent:
+		case item.FieldName, item.FieldSlug, item.FieldDescription, item.FieldContent, item.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case item.FieldCreatedAt, item.FieldUpdatedAt, item.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -193,6 +195,12 @@ func (i *Item) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field account_id", values[j])
 			} else if value != nil {
 				i.AccountID = *value
+			}
+		case item.FieldVisibility:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field visibility", values[j])
+			} else if value.Valid {
+				i.Visibility = item.Visibility(value.String)
 			}
 		case item.FieldProperties:
 			if value, ok := values[j].(*[]byte); !ok {
@@ -290,6 +298,9 @@ func (i *Item) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", i.AccountID))
+	builder.WriteString(", ")
+	builder.WriteString("visibility=")
+	builder.WriteString(fmt.Sprintf("%v", i.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("properties=")
 	builder.WriteString(fmt.Sprintf("%v", i.Properties))

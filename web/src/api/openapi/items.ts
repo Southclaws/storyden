@@ -23,6 +23,7 @@ import type {
   ItemUpdateOKResponse,
   NotFoundResponse,
   UnauthorisedResponse,
+  VisibilityUpdateBody,
 } from "./schemas";
 
 /**
@@ -287,6 +288,70 @@ export const useItemDelete = <
 
   const swrKey = swrOptions?.swrKey ?? getItemDeleteMutationKey(itemSlug);
   const swrFn = getItemDeleteMutationFetcher(itemSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the visibility of an item.
+ */
+export const itemUpdateVisibility = (
+  itemSlug: string,
+  visibilityUpdateBody: VisibilityUpdateBody,
+) => {
+  return fetcher<ItemUpdateOKResponse>({
+    url: `/v1/items/${itemSlug}/visibility`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: visibilityUpdateBody,
+  });
+};
+
+export const getItemUpdateVisibilityMutationFetcher = (itemSlug: string) => {
+  return (
+    _: string,
+    { arg }: { arg: Arguments },
+  ): Promise<ItemUpdateOKResponse> => {
+    return itemUpdateVisibility(itemSlug, arg as VisibilityUpdateBody);
+  };
+};
+export const getItemUpdateVisibilityMutationKey = (itemSlug: string) =>
+  `/v1/items/${itemSlug}/visibility` as const;
+
+export type ItemUpdateVisibilityMutationResult = NonNullable<
+  Awaited<ReturnType<typeof itemUpdateVisibility>>
+>;
+export type ItemUpdateVisibilityMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useItemUpdateVisibility = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  itemSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof itemUpdateVisibility>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof itemUpdateVisibility>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getItemUpdateVisibilityMutationKey(itemSlug);
+  const swrFn = getItemUpdateVisibilityMutationFetcher(itemSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

@@ -123,6 +123,20 @@ func (cc *ClusterCreate) SetAccountID(x xid.ID) *ClusterCreate {
 	return cc
 }
 
+// SetVisibility sets the "visibility" field.
+func (cc *ClusterCreate) SetVisibility(c cluster.Visibility) *ClusterCreate {
+	cc.mutation.SetVisibility(c)
+	return cc
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (cc *ClusterCreate) SetNillableVisibility(c *cluster.Visibility) *ClusterCreate {
+	if c != nil {
+		cc.SetVisibility(*c)
+	}
+	return cc
+}
+
 // SetProperties sets the "properties" field.
 func (cc *ClusterCreate) SetProperties(a any) *ClusterCreate {
 	cc.mutation.SetProperties(a)
@@ -291,6 +305,10 @@ func (cc *ClusterCreate) defaults() {
 		v := cluster.DefaultUpdatedAt()
 		cc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := cc.mutation.Visibility(); !ok {
+		v := cluster.DefaultVisibility
+		cc.mutation.SetVisibility(v)
+	}
 	if _, ok := cc.mutation.ID(); !ok {
 		v := cluster.DefaultID()
 		cc.mutation.SetID(v)
@@ -316,6 +334,14 @@ func (cc *ClusterCreate) check() error {
 	}
 	if _, ok := cc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Cluster.account_id"`)}
+	}
+	if _, ok := cc.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Cluster.visibility"`)}
+	}
+	if v, ok := cc.mutation.Visibility(); ok {
+		if err := cluster.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Cluster.visibility": %w`, err)}
+		}
 	}
 	if v, ok := cc.mutation.ID(); ok {
 		if err := cluster.IDValidator(v.String()); err != nil {
@@ -388,6 +414,10 @@ func (cc *ClusterCreate) createSpec() (*Cluster, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Content(); ok {
 		_spec.SetField(cluster.FieldContent, field.TypeString, value)
 		_node.Content = &value
+	}
+	if value, ok := cc.mutation.Visibility(); ok {
+		_spec.SetField(cluster.FieldVisibility, field.TypeEnum, value)
+		_node.Visibility = value
 	}
 	if value, ok := cc.mutation.Properties(); ok {
 		_spec.SetField(cluster.FieldProperties, field.TypeJSON, value)
@@ -673,6 +703,18 @@ func (u *ClusterUpsert) UpdateAccountID() *ClusterUpsert {
 	return u
 }
 
+// SetVisibility sets the "visibility" field.
+func (u *ClusterUpsert) SetVisibility(v cluster.Visibility) *ClusterUpsert {
+	u.Set(cluster.FieldVisibility, v)
+	return u
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ClusterUpsert) UpdateVisibility() *ClusterUpsert {
+	u.SetExcluded(cluster.FieldVisibility)
+	return u
+}
+
 // SetProperties sets the "properties" field.
 func (u *ClusterUpsert) SetProperties(v any) *ClusterUpsert {
 	u.Set(cluster.FieldProperties, v)
@@ -872,6 +914,20 @@ func (u *ClusterUpsertOne) SetAccountID(v xid.ID) *ClusterUpsertOne {
 func (u *ClusterUpsertOne) UpdateAccountID() *ClusterUpsertOne {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *ClusterUpsertOne) SetVisibility(v cluster.Visibility) *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ClusterUpsertOne) UpdateVisibility() *ClusterUpsertOne {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateVisibility()
 	})
 }
 
@@ -1244,6 +1300,20 @@ func (u *ClusterUpsertBulk) SetAccountID(v xid.ID) *ClusterUpsertBulk {
 func (u *ClusterUpsertBulk) UpdateAccountID() *ClusterUpsertBulk {
 	return u.Update(func(s *ClusterUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *ClusterUpsertBulk) SetVisibility(v cluster.Visibility) *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *ClusterUpsertBulk) UpdateVisibility() *ClusterUpsertBulk {
+	return u.Update(func(s *ClusterUpsert) {
+		s.UpdateVisibility()
 	})
 }
 

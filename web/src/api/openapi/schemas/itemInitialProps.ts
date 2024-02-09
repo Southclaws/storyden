@@ -12,6 +12,7 @@ import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
 import type { Slug } from "./slug";
 import type { Url } from "./url";
+import type { Visibility } from "./visibility";
 
 export interface ItemInitialProps {
   asset_ids?: AssetIDs;
@@ -21,4 +22,5 @@ export interface ItemInitialProps {
   properties?: Properties;
   slug: Slug;
   url?: Url;
+  visibility?: Visibility;
 }

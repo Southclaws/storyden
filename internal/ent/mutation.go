@@ -4171,6 +4171,7 @@ type ClusterMutation struct {
 	slug            *string
 	description     *string
 	content         *string
+	visibility      *cluster.Visibility
 	properties      *any
 	clearedFields   map[string]struct{}
 	owner           *xid.ID
@@ -4664,6 +4665,42 @@ func (m *ClusterMutation) ResetAccountID() {
 	m.owner = nil
 }
 
+// SetVisibility sets the "visibility" field.
+func (m *ClusterMutation) SetVisibility(c cluster.Visibility) {
+	m.visibility = &c
+}
+
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *ClusterMutation) Visibility() (r cluster.Visibility, exists bool) {
+	v := m.visibility
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisibility returns the old "visibility" field's value of the Cluster entity.
+// If the Cluster object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClusterMutation) OldVisibility(ctx context.Context) (v cluster.Visibility, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
+	}
+	return oldValue.Visibility, nil
+}
+
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *ClusterMutation) ResetVisibility() {
+	m.visibility = nil
+}
+
 // SetProperties sets the "properties" field.
 func (m *ClusterMutation) SetProperties(a any) {
 	m.properties = &a
@@ -5097,7 +5134,7 @@ func (m *ClusterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ClusterMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, cluster.FieldCreatedAt)
 	}
@@ -5124,6 +5161,9 @@ func (m *ClusterMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, cluster.FieldAccountID)
+	}
+	if m.visibility != nil {
+		fields = append(fields, cluster.FieldVisibility)
 	}
 	if m.properties != nil {
 		fields = append(fields, cluster.FieldProperties)
@@ -5154,6 +5194,8 @@ func (m *ClusterMutation) Field(name string) (ent.Value, bool) {
 		return m.ParentClusterID()
 	case cluster.FieldAccountID:
 		return m.AccountID()
+	case cluster.FieldVisibility:
+		return m.Visibility()
 	case cluster.FieldProperties:
 		return m.Properties()
 	}
@@ -5183,6 +5225,8 @@ func (m *ClusterMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldParentClusterID(ctx)
 	case cluster.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case cluster.FieldVisibility:
+		return m.OldVisibility(ctx)
 	case cluster.FieldProperties:
 		return m.OldProperties(ctx)
 	}
@@ -5256,6 +5300,13 @@ func (m *ClusterMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAccountID(v)
+		return nil
+	case cluster.FieldVisibility:
+		v, ok := value.(cluster.Visibility)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisibility(v)
 		return nil
 	case cluster.FieldProperties:
 		v, ok := value.(any)
@@ -5366,6 +5417,9 @@ func (m *ClusterMutation) ResetField(name string) error {
 		return nil
 	case cluster.FieldAccountID:
 		m.ResetAccountID()
+		return nil
+	case cluster.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	case cluster.FieldProperties:
 		m.ResetProperties()
@@ -5608,6 +5662,7 @@ type CollectionMutation struct {
 	updated_at    *time.Time
 	name          *string
 	description   *string
+	visibility    *collection.Visibility
 	clearedFields map[string]struct{}
 	owner         *xid.ID
 	clearedowner  bool
@@ -5867,6 +5922,42 @@ func (m *CollectionMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetVisibility sets the "visibility" field.
+func (m *CollectionMutation) SetVisibility(c collection.Visibility) {
+	m.visibility = &c
+}
+
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *CollectionMutation) Visibility() (r collection.Visibility, exists bool) {
+	v := m.visibility
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisibility returns the old "visibility" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldVisibility(ctx context.Context) (v collection.Visibility, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
+	}
+	return oldValue.Visibility, nil
+}
+
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *CollectionMutation) ResetVisibility() {
+	m.visibility = nil
+}
+
 // SetOwnerID sets the "owner" edge to the Account entity by id.
 func (m *CollectionMutation) SetOwnerID(id xid.ID) {
 	m.owner = &id
@@ -5994,7 +6085,7 @@ func (m *CollectionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CollectionMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, collection.FieldCreatedAt)
 	}
@@ -6006,6 +6097,9 @@ func (m *CollectionMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, collection.FieldDescription)
+	}
+	if m.visibility != nil {
+		fields = append(fields, collection.FieldVisibility)
 	}
 	return fields
 }
@@ -6023,6 +6117,8 @@ func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case collection.FieldDescription:
 		return m.Description()
+	case collection.FieldVisibility:
+		return m.Visibility()
 	}
 	return nil, false
 }
@@ -6040,6 +6136,8 @@ func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldName(ctx)
 	case collection.FieldDescription:
 		return m.OldDescription(ctx)
+	case collection.FieldVisibility:
+		return m.OldVisibility(ctx)
 	}
 	return nil, fmt.Errorf("unknown Collection field %s", name)
 }
@@ -6076,6 +6174,13 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case collection.FieldVisibility:
+		v, ok := value.(collection.Visibility)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisibility(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)
@@ -6137,6 +6242,9 @@ func (m *CollectionMutation) ResetField(name string) error {
 		return nil
 	case collection.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case collection.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)
@@ -6257,6 +6365,7 @@ type ItemMutation struct {
 	slug            *string
 	description     *string
 	content         *string
+	visibility      *item.Visibility
 	properties      *any
 	clearedFields   map[string]struct{}
 	owner           *xid.ID
@@ -6696,6 +6805,42 @@ func (m *ItemMutation) ResetAccountID() {
 	m.owner = nil
 }
 
+// SetVisibility sets the "visibility" field.
+func (m *ItemMutation) SetVisibility(i item.Visibility) {
+	m.visibility = &i
+}
+
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *ItemMutation) Visibility() (r item.Visibility, exists bool) {
+	v := m.visibility
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisibility returns the old "visibility" field's value of the Item entity.
+// If the Item object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ItemMutation) OldVisibility(ctx context.Context) (v item.Visibility, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
+	}
+	return oldValue.Visibility, nil
+}
+
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *ItemMutation) ResetVisibility() {
+	m.visibility = nil
+}
+
 // SetProperties sets the "properties" field.
 func (m *ItemMutation) SetProperties(a any) {
 	m.properties = &a
@@ -7035,7 +7180,7 @@ func (m *ItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, item.FieldCreatedAt)
 	}
@@ -7059,6 +7204,9 @@ func (m *ItemMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, item.FieldAccountID)
+	}
+	if m.visibility != nil {
+		fields = append(fields, item.FieldVisibility)
 	}
 	if m.properties != nil {
 		fields = append(fields, item.FieldProperties)
@@ -7087,6 +7235,8 @@ func (m *ItemMutation) Field(name string) (ent.Value, bool) {
 		return m.Content()
 	case item.FieldAccountID:
 		return m.AccountID()
+	case item.FieldVisibility:
+		return m.Visibility()
 	case item.FieldProperties:
 		return m.Properties()
 	}
@@ -7114,6 +7264,8 @@ func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldContent(ctx)
 	case item.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case item.FieldVisibility:
+		return m.OldVisibility(ctx)
 	case item.FieldProperties:
 		return m.OldProperties(ctx)
 	}
@@ -7180,6 +7332,13 @@ func (m *ItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAccountID(v)
+		return nil
+	case item.FieldVisibility:
+		v, ok := value.(item.Visibility)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisibility(v)
 		return nil
 	case item.FieldProperties:
 		v, ok := value.(any)
@@ -7281,6 +7440,9 @@ func (m *ItemMutation) ResetField(name string) error {
 		return nil
 	case item.FieldAccountID:
 		m.ResetAccountID()
+		return nil
+	case item.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	case item.FieldProperties:
 		m.ResetProperties()
