@@ -8,7 +8,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/item"
 )
 
 type (
@@ -77,6 +79,12 @@ func WithDescription(v string) Option {
 func WithContent(v string) Option {
 	return func(c *ent.ItemMutation) {
 		c.SetContent(v)
+	}
+}
+
+func WithVisibility(v post.Visibility) Option {
+	return func(c *ent.ItemMutation) {
+		c.SetVisibility(item.Visibility(v.ToEnt()))
 	}
 }
 

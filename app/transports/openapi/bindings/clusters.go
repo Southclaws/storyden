@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	cluster_svc "github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/clustertree"
@@ -135,7 +136,21 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 }
 
 func (c *Clusters) ClusterUpdateVisibility(ctx context.Context, request openapi.ClusterUpdateVisibilityRequestObject) (openapi.ClusterUpdateVisibilityResponseObject, error) {
-	return nil, nil
+	v, err := post.NewVisibility(string(request.Body.Visibility))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
+		Visibility: opt.New(v),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ClusterUpdateVisibility200JSONResponse{
+		ClusterUpdateOKJSONResponse: openapi.ClusterUpdateOKJSONResponse(serialiseCluster(clus)),
+	}, nil
 }
 
 func (c *Clusters) ClusterDelete(ctx context.Context, request openapi.ClusterDeleteRequestObject) (openapi.ClusterDeleteResponseObject, error) {

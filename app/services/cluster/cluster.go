@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/cluster_children"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 )
@@ -41,6 +42,7 @@ type Partial struct {
 	Description  opt.Optional[string]
 	Content      opt.Optional[string]
 	Parent       opt.Optional[datagraph.ClusterSlug]
+	Visibility   opt.Optional[post.Visibility]
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
@@ -57,6 +59,7 @@ func (p Partial) Opts() (opts []cluster.Option) {
 	p.Slug.Call(func(value string) { opts = append(opts, cluster.WithSlug(value)) })
 	p.Description.Call(func(value string) { opts = append(opts, cluster.WithDescription(value)) })
 	p.Content.Call(func(value string) { opts = append(opts, cluster.WithContent(value)) })
+	p.Visibility.Call(func(value post.Visibility) { opts = append(opts, cluster.WithVisibility(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, cluster.WithProperties(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssetsRemoved(value)) })
