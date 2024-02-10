@@ -302,7 +302,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			thread.WithID(t.ID),
 			thread.WithBody(first.Body),
 			thread.WithSummary(first.Body),
-			thread.WithStatus(post.StatusPublished),
+			thread.WithVisibility(post.VisibilityPublished),
 			thread.WithAssets(assetIDs),
 		)
 		if err != nil {

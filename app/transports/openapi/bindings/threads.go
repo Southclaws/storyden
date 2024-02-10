@@ -41,7 +41,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	status, err := deserialiseThreadStatus(request.Body.Status)
+	status, err := deserialiseThreadStatus(request.Body.Visibility)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -80,17 +80,17 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	status, err := opt.MapErr(opt.NewPtr(request.Body.Status), deserialiseThreadStatus)
+	Visibility, err := opt.MapErr(opt.NewPtr(request.Body.Visibility), deserialiseThreadStatus)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
-		Title:    opt.NewPtr(request.Body.Title),
-		Body:     opt.NewPtr(request.Body.Body),
-		Tags:     opt.NewPtrMap(request.Body.Tags, tagsIDs),
-		Category: opt.NewPtrMap(request.Body.Category, deserialiseID),
-		Status:   status,
+		Title:      opt.NewPtr(request.Body.Title),
+		Body:       opt.NewPtr(request.Body.Body),
+		Tags:       opt.NewPtrMap(request.Body.Tags, tagsIDs),
+		Category:   opt.NewPtrMap(request.Body.Category, deserialiseID),
+		Visibility: Visibility,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -167,10 +167,10 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}, nil
 }
 
-func deserialiseThreadStatus(in openapi.ThreadStatus) (post.Status, error) {
-	s, err := post.NewStatus(string(in))
+func deserialiseThreadStatus(in openapi.Visibility) (post.Visibility, error) {
+	s, err := post.NewVisibility(string(in))
 	if err != nil {
-		return post.Status{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		return post.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 
 	return s, nil

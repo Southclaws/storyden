@@ -90,11 +90,11 @@ func main() {
 				}
 
 				thread, err := client.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
-					Category: "00000000000000000010",
-					Title:    title,
-					Body:     body,
-					Url:      url,
-					Status:   openapi.Published,
+					Category:   "00000000000000000010",
+					Title:      title,
+					Body:       body,
+					Url:        url,
+					Visibility: openapi.Published,
 				}, s)
 				if err != nil {
 					return fault.Wrap(err, fctx.With(ctx))

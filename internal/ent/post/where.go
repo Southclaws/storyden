@@ -716,24 +716,24 @@ func MetadataNotNil() predicate.Post {
 	return predicate.Post(sql.FieldNotNull(FieldMetadata))
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldStatus, v))
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldVisibility, v))
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldStatus, v))
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldVisibility, v))
 }
 
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldStatus, vs...))
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldVisibility, vs...))
 }
 
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldStatus, vs...))
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldVisibility, vs...))
 }
 
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.

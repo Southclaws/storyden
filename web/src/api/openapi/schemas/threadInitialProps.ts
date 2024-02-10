@@ -9,16 +9,16 @@ import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
 import type { TagListIDs } from "./tagListIDs";
-import type { ThreadStatus } from "./threadStatus";
 import type { ThreadTitle } from "./threadTitle";
 import type { Url } from "./url";
+import type { Visibility } from "./visibility";
 
 export interface ThreadInitialProps {
   body: PostContent;
   category: Identifier;
   meta?: Metadata;
-  status: ThreadStatus;
   tags?: TagListIDs;
   title: ThreadTitle;
   url?: Url;
+  visibility: Visibility;
 }

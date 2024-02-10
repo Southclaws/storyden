@@ -134,6 +134,10 @@ func (c *Clusters) ClusterUpdate(ctx context.Context, request openapi.ClusterUpd
 	}, nil
 }
 
+func (c *Clusters) ClusterUpdateVisibility(ctx context.Context, request openapi.ClusterUpdateVisibilityRequestObject) (openapi.ClusterUpdateVisibilityResponseObject, error) {
+	return nil, nil
+}
+
 func (c *Clusters) ClusterDelete(ctx context.Context, request openapi.ClusterDeleteRequestObject) (openapi.ClusterDeleteResponseObject, error) {
 	destinationCluster, err := c.cs.Delete(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.DeleteOptions{
 		MoveTo:   opt.NewPtr((*datagraph.ClusterSlug)(request.Params.TargetCluster)),
