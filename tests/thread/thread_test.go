@@ -54,10 +54,10 @@ func TestThreads(t *testing.T) {
 			a.Equal(slug.Make(cat1name), cat1create.JSON200.Slug)
 
 			thread1create, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
-				Body:     "this is a thread",
-				Category: cat1create.JSON200.Id,
-				Status:   openapi.Published,
-				Title:    "Thread testing",
+				Body:       "this is a thread",
+				Category:   cat1create.JSON200.Id,
+				Visibility: openapi.Published,
+				Title:      "Thread testing",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(thread1create)

@@ -9139,7 +9139,7 @@ type PostMutation struct {
 	body               *string
 	short              *string
 	metadata           *map[string]interface{}
-	status             *post.Status
+	visibility         *post.Visibility
 	clearedFields      map[string]struct{}
 	author             *xid.ID
 	clearedauthor      bool
@@ -9789,40 +9789,40 @@ func (m *PostMutation) ResetMetadata() {
 	delete(m.clearedFields, post.FieldMetadata)
 }
 
-// SetStatus sets the "status" field.
-func (m *PostMutation) SetStatus(po post.Status) {
-	m.status = &po
+// SetVisibility sets the "visibility" field.
+func (m *PostMutation) SetVisibility(po post.Visibility) {
+	m.visibility = &po
 }
 
-// Status returns the value of the "status" field in the mutation.
-func (m *PostMutation) Status() (r post.Status, exists bool) {
-	v := m.status
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *PostMutation) Visibility() (r post.Visibility, exists bool) {
+	v := m.visibility
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldStatus returns the old "status" field's value of the Post entity.
+// OldVisibility returns the old "visibility" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldStatus(ctx context.Context) (v post.Status, err error) {
+func (m *PostMutation) OldVisibility(ctx context.Context) (v post.Visibility, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
 	}
-	return oldValue.Status, nil
+	return oldValue.Visibility, nil
 }
 
-// ResetStatus resets all changes to the "status" field.
-func (m *PostMutation) ResetStatus() {
-	m.status = nil
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *PostMutation) ResetVisibility() {
+	m.visibility = nil
 }
 
 // SetCategoryID sets the "category_id" field.
@@ -10469,8 +10469,8 @@ func (m *PostMutation) Fields() []string {
 	if m.metadata != nil {
 		fields = append(fields, post.FieldMetadata)
 	}
-	if m.status != nil {
-		fields = append(fields, post.FieldStatus)
+	if m.visibility != nil {
+		fields = append(fields, post.FieldVisibility)
 	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
@@ -10507,8 +10507,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Short()
 	case post.FieldMetadata:
 		return m.Metadata()
-	case post.FieldStatus:
-		return m.Status()
+	case post.FieldVisibility:
+		return m.Visibility()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	}
@@ -10544,8 +10544,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldShort(ctx)
 	case post.FieldMetadata:
 		return m.OldMetadata(ctx)
-	case post.FieldStatus:
-		return m.OldStatus(ctx)
+	case post.FieldVisibility:
+		return m.OldVisibility(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	}
@@ -10641,12 +10641,12 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMetadata(v)
 		return nil
-	case post.FieldStatus:
-		v, ok := value.(post.Status)
+	case post.FieldVisibility:
+		v, ok := value.(post.Visibility)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetStatus(v)
+		m.SetVisibility(v)
 		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
@@ -10785,8 +10785,8 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldMetadata:
 		m.ResetMetadata()
 		return nil
-	case post.FieldStatus:
-		m.ResetStatus()
+	case post.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()

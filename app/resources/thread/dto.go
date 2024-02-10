@@ -32,7 +32,7 @@ type Thread struct {
 	Author      profile.Profile
 	Tags        []string
 	Category    category.Category
-	Status      post.Status
+	Visibility  post.Visibility
 	Posts       []*reply.Reply
 	Reacts      []*react.React
 	Meta        map[string]any
@@ -120,7 +120,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Author:      *pro,
 		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category:    *category,
-		Status:      post.NewStatusFromEnt(m.Status),
+		Visibility:  post.NewVisibilityFromEnt(m.Visibility),
 		Posts:       posts,
 		Reacts:      dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:        m.Metadata,

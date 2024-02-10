@@ -19,7 +19,7 @@ func (s *service) Create(ctx context.Context,
 	title string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
-	status post.Status,
+	status post.Visibility,
 	tags []string,
 	meta map[string]any,
 	partial Partial,
@@ -39,7 +39,7 @@ func (s *service) Create(ctx context.Context,
 
 	opts := partial.Opts()
 	opts = append(opts,
-		thread.WithStatus(status),
+		thread.WithVisibility(status),
 		thread.WithMeta(meta),
 	)
 

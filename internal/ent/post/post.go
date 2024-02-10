@@ -40,8 +40,8 @@ const (
 	FieldShort = "short"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldVisibility holds the string denoting the visibility field in the database.
+	FieldVisibility = "visibility"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
@@ -142,7 +142,7 @@ var Columns = []string{
 	FieldBody,
 	FieldShort,
 	FieldMetadata,
-	FieldStatus,
+	FieldVisibility,
 	FieldCategoryID,
 }
 
@@ -197,29 +197,30 @@ var (
 	IDValidator func(string) error
 )
 
-// Status defines the type for the "status" enum field.
-type Status string
+// Visibility defines the type for the "visibility" enum field.
+type Visibility string
 
-// StatusDraft is the default value of the Status enum.
-const DefaultStatus = StatusDraft
+// VisibilityDraft is the default value of the Visibility enum.
+const DefaultVisibility = VisibilityDraft
 
-// Status values.
+// Visibility values.
 const (
-	StatusDraft     Status = "draft"
-	StatusPublished Status = "published"
+	VisibilityDraft     Visibility = "draft"
+	VisibilityReview    Visibility = "review"
+	VisibilityPublished Visibility = "published"
 )
 
-func (s Status) String() string {
-	return string(s)
+func (v Visibility) String() string {
+	return string(v)
 }
 
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusDraft, StatusPublished:
+// VisibilityValidator is a validator for the "visibility" field enum values. It is called by the builders before save.
+func VisibilityValidator(v Visibility) error {
+	switch v {
+	case VisibilityDraft, VisibilityReview, VisibilityPublished:
 		return nil
 	default:
-		return fmt.Errorf("post: invalid enum value for status field: %q", s)
+		return fmt.Errorf("post: invalid enum value for visibility field: %q", v)
 	}
 }
 
@@ -286,9 +287,9 @@ func ByShort(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldShort, opts...).ToFunc()
 }
 
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+// ByVisibility orders the results by the visibility field.
+func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
 }
 
 // ByCategoryID orders the results by the category_id field.
