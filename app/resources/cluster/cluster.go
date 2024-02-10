@@ -8,7 +8,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
 )
 
 type (
@@ -88,6 +90,12 @@ func WithContent(v string) Option {
 func WithParent(v datagraph.ClusterID) Option {
 	return func(c *ent.ClusterMutation) {
 		c.SetParentID(xid.ID(v))
+	}
+}
+
+func WithVisibility(v post.Visibility) Option {
+	return func(c *ent.ClusterMutation) {
+		c.SetVisibility(cluster.Visibility(v.ToEnt()))
 	}
 }
 

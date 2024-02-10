@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 )
@@ -38,6 +39,7 @@ type Partial struct {
 	URL          opt.Optional[string]
 	Description  opt.Optional[string]
 	Content      opt.Optional[string]
+	Visibility   opt.Optional[post.Visibility]
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
@@ -48,6 +50,7 @@ func (p Partial) Opts() (opts []item.Option) {
 	p.Slug.Call(func(value string) { opts = append(opts, item.WithSlug(value)) })
 	p.Description.Call(func(value string) { opts = append(opts, item.WithDescription(value)) })
 	p.Content.Call(func(value string) { opts = append(opts, item.WithContent(value)) })
+	p.Visibility.Call(func(value post.Visibility) { opts = append(opts, item.WithVisibility(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, item.WithProperties(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, item.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, item.WithAssetsRemoved(value)) })
