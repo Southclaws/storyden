@@ -7,16 +7,17 @@ import (
 	"fmt"
 )
 
-type Status struct {
-	v statusEnum
+type Visibility struct {
+	v visibilityEnum
 }
 
 var (
-	StatusDraft     = Status{statusDraft}
-	StatusPublished = Status{statusPublished}
+	VisibilityDraft     = Visibility{visibilityDraft}
+	VisibilityReview    = Visibility{visibilityReview}
+	VisibilityPublished = Visibility{visibilityPublished}
 )
 
-func (r Status) Format(f fmt.State, verb rune) {
+func (r Visibility) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 's':
 		fmt.Fprint(f, r.v)
@@ -26,38 +27,40 @@ func (r Status) Format(f fmt.State, verb rune) {
 		fmt.Fprint(f, r.v)
 	}
 }
-func (r Status) String() string {
+func (r Visibility) String() string {
 	return string(r.v)
 }
-func (r Status) MarshalText() ([]byte, error) {
+func (r Visibility) MarshalText() ([]byte, error) {
 	return []byte(r.v), nil
 }
-func (r *Status) UnmarshalText(in []byte) error {
-	s, err := NewStatus(string(in))
+func (r *Visibility) UnmarshalText(in []byte) error {
+	s, err := NewVisibility(string(in))
 	if err != nil {
 		return err
 	}
 	*r = s
 	return nil
 }
-func (r Status) Value() (driver.Value, error) {
+func (r Visibility) Value() (driver.Value, error) {
 	return r.v, nil
 }
-func (r *Status) Scan(in any) error {
-	s, err := NewStatus(fmt.Sprint(in))
+func (r *Visibility) Scan(in any) error {
+	s, err := NewVisibility(fmt.Sprint(in))
 	if err != nil {
 		return err
 	}
 	*r = s
 	return nil
 }
-func NewStatus(in string) (Status, error) {
+func NewVisibility(in string) (Visibility, error) {
 	switch in {
-	case string(statusDraft):
-		return StatusDraft, nil
-	case string(statusPublished):
-		return StatusPublished, nil
+	case string(visibilityDraft):
+		return VisibilityDraft, nil
+	case string(visibilityReview):
+		return VisibilityReview, nil
+	case string(visibilityPublished):
+		return VisibilityPublished, nil
 	default:
-		return Status{}, fmt.Errorf("invalid value for type 'Status': '%s'", in)
+		return Visibility{}, fmt.Errorf("invalid value for type 'Visibility': '%s'", in)
 	}
 }

@@ -27,7 +27,7 @@ type Service interface {
 		title string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
-		status post.Status,
+		status post.Visibility,
 		tags []string,
 		meta map[string]any,
 		partial Partial,
@@ -53,13 +53,13 @@ type Service interface {
 }
 
 type Partial struct {
-	Title    opt.Optional[string]
-	Body     opt.Optional[string]
-	Tags     opt.Optional[[]xid.ID]
-	Category opt.Optional[xid.ID]
-	Status   opt.Optional[post.Status]
-	URL      opt.Optional[string]
-	Meta     opt.Optional[map[string]any]
+	Title      opt.Optional[string]
+	Body       opt.Optional[string]
+	Tags       opt.Optional[[]xid.ID]
+	Category   opt.Optional[xid.ID]
+	Visibility opt.Optional[post.Visibility]
+	URL        opt.Optional[string]
+	Meta       opt.Optional[map[string]any]
 }
 
 func (p Partial) Opts() (opts []thread.Option) {
@@ -67,7 +67,7 @@ func (p Partial) Opts() (opts []thread.Option) {
 	p.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
 	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
-	p.Status.Call(func(v post.Status) { opts = append(opts, thread.WithStatus(v)) })
+	p.Visibility.Call(func(v post.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
 	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
 	return
 }

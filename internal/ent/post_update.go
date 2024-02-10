@@ -187,16 +187,16 @@ func (pu *PostUpdate) ClearMetadata() *PostUpdate {
 	return pu
 }
 
-// SetStatus sets the "status" field.
-func (pu *PostUpdate) SetStatus(po post.Status) *PostUpdate {
-	pu.mutation.SetStatus(po)
+// SetVisibility sets the "visibility" field.
+func (pu *PostUpdate) SetVisibility(po post.Visibility) *PostUpdate {
+	pu.mutation.SetVisibility(po)
 	return pu
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableStatus(po *post.Status) *PostUpdate {
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableVisibility(po *post.Visibility) *PostUpdate {
 	if po != nil {
-		pu.SetStatus(*po)
+		pu.SetVisibility(*po)
 	}
 	return pu
 }
@@ -594,9 +594,9 @@ func (pu *PostUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *PostUpdate) check() error {
-	if v, ok := pu.mutation.Status(); ok {
-		if err := post.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+	if v, ok := pu.mutation.Visibility(); ok {
+		if err := post.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
 	if _, ok := pu.mutation.AuthorID(); pu.mutation.AuthorCleared() && !ok {
@@ -662,8 +662,8 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := pu.mutation.Status(); ok {
-		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
+	if value, ok := pu.mutation.Visibility(); ok {
+		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
 	if pu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1268,16 +1268,16 @@ func (puo *PostUpdateOne) ClearMetadata() *PostUpdateOne {
 	return puo
 }
 
-// SetStatus sets the "status" field.
-func (puo *PostUpdateOne) SetStatus(po post.Status) *PostUpdateOne {
-	puo.mutation.SetStatus(po)
+// SetVisibility sets the "visibility" field.
+func (puo *PostUpdateOne) SetVisibility(po post.Visibility) *PostUpdateOne {
+	puo.mutation.SetVisibility(po)
 	return puo
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableStatus(po *post.Status) *PostUpdateOne {
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableVisibility(po *post.Visibility) *PostUpdateOne {
 	if po != nil {
-		puo.SetStatus(*po)
+		puo.SetVisibility(*po)
 	}
 	return puo
 }
@@ -1688,9 +1688,9 @@ func (puo *PostUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *PostUpdateOne) check() error {
-	if v, ok := puo.mutation.Status(); ok {
-		if err := post.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+	if v, ok := puo.mutation.Visibility(); ok {
+		if err := post.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
 	if _, ok := puo.mutation.AuthorID(); puo.mutation.AuthorCleared() && !ok {
@@ -1773,8 +1773,8 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	if puo.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := puo.mutation.Status(); ok {
-		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
+	if value, ok := puo.mutation.Visibility(); ok {
+		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
 	if puo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{

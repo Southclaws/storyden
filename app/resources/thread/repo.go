@@ -89,9 +89,9 @@ func WithCategory(v xid.ID) Option {
 	}
 }
 
-func WithStatus(v post.Status) Option {
+func WithVisibility(v post.Visibility) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetStatus(v.ToEnt())
+		pm.SetVisibility(v.ToEnt())
 	}
 }
 
@@ -133,8 +133,8 @@ func HasCategories(ids []string) Query {
 	}
 }
 
-func HasStatus(status post.Status) Query {
+func HasStatus(status post.Visibility) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.StatusEQ(status.ToEnt()))
+		q.Where(ent_post.VisibilityEQ(status.ToEnt()))
 	}
 }

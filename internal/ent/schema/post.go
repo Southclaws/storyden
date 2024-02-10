@@ -35,10 +35,7 @@ func (Post) Fields() []ent.Field {
 		field.JSON("metadata", map[string]any{}).
 			Optional().
 			Comment("Arbitrary metadata used by clients to store domain specific information."),
-		field.Enum("status").Values(
-			"draft",
-			"published",
-		).Default("draft"),
+		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),

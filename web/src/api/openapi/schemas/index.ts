@@ -233,7 +233,6 @@ export * from "./threadMark";
 export * from "./threadMutableProps";
 export * from "./threadReference";
 export * from "./threadReferenceAllOf";
-export * from "./threadStatus";
 export * from "./threadTitle";
 export * from "./threadUpdateBody";
 export * from "./threadUpdateOKResponse";

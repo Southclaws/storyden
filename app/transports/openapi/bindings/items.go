@@ -107,6 +107,10 @@ func (i *Items) ItemUpdate(ctx context.Context, request openapi.ItemUpdateReques
 	}, nil
 }
 
+func (i *Items) ItemUpdateVisibility(ctx context.Context, request openapi.ItemUpdateVisibilityRequestObject) (openapi.ItemUpdateVisibilityResponseObject, error) {
+	return nil, nil
+}
+
 func (i *Items) ItemDelete(ctx context.Context, request openapi.ItemDeleteRequestObject) (openapi.ItemDeleteResponseObject, error) {
 	_, err := i.im.Delete(ctx, datagraph.ItemSlug(request.ItemSlug))
 	if err != nil {

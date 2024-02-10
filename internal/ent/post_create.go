@@ -167,16 +167,16 @@ func (pc *PostCreate) SetMetadata(m map[string]interface{}) *PostCreate {
 	return pc
 }
 
-// SetStatus sets the "status" field.
-func (pc *PostCreate) SetStatus(po post.Status) *PostCreate {
-	pc.mutation.SetStatus(po)
+// SetVisibility sets the "visibility" field.
+func (pc *PostCreate) SetVisibility(po post.Visibility) *PostCreate {
+	pc.mutation.SetVisibility(po)
 	return pc
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (pc *PostCreate) SetNillableStatus(po *post.Status) *PostCreate {
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (pc *PostCreate) SetNillableVisibility(po *post.Visibility) *PostCreate {
 	if po != nil {
-		pc.SetStatus(*po)
+		pc.SetVisibility(*po)
 	}
 	return pc
 }
@@ -415,9 +415,9 @@ func (pc *PostCreate) defaults() {
 		v := post.DefaultPinned
 		pc.mutation.SetPinned(v)
 	}
-	if _, ok := pc.mutation.Status(); !ok {
-		v := post.DefaultStatus
-		pc.mutation.SetStatus(v)
+	if _, ok := pc.mutation.Visibility(); !ok {
+		v := post.DefaultVisibility
+		pc.mutation.SetVisibility(v)
 	}
 	if _, ok := pc.mutation.ID(); !ok {
 		v := post.DefaultID()
@@ -445,12 +445,12 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.Short(); !ok {
 		return &ValidationError{Name: "short", err: errors.New(`ent: missing required field "Post.short"`)}
 	}
-	if _, ok := pc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Post.status"`)}
+	if _, ok := pc.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Post.visibility"`)}
 	}
-	if v, ok := pc.mutation.Status(); ok {
-		if err := post.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Post.status": %w`, err)}
+	if v, ok := pc.mutation.Visibility(); ok {
+		if err := post.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
 	if v, ok := pc.mutation.ID(); ok {
@@ -537,9 +537,9 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if value, ok := pc.mutation.Status(); ok {
-		_spec.SetField(post.FieldStatus, field.TypeEnum, value)
-		_node.Status = value
+	if value, ok := pc.mutation.Visibility(); ok {
+		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
+		_node.Visibility = value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -941,15 +941,15 @@ func (u *PostUpsert) ClearMetadata() *PostUpsert {
 	return u
 }
 
-// SetStatus sets the "status" field.
-func (u *PostUpsert) SetStatus(v post.Status) *PostUpsert {
-	u.Set(post.FieldStatus, v)
+// SetVisibility sets the "visibility" field.
+func (u *PostUpsert) SetVisibility(v post.Visibility) *PostUpsert {
+	u.Set(post.FieldVisibility, v)
 	return u
 }
 
-// UpdateStatus sets the "status" field to the value that was provided on create.
-func (u *PostUpsert) UpdateStatus() *PostUpsert {
-	u.SetExcluded(post.FieldStatus)
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *PostUpsert) UpdateVisibility() *PostUpsert {
+	u.SetExcluded(post.FieldVisibility)
 	return u
 }
 
@@ -1218,17 +1218,17 @@ func (u *PostUpsertOne) ClearMetadata() *PostUpsertOne {
 	})
 }
 
-// SetStatus sets the "status" field.
-func (u *PostUpsertOne) SetStatus(v post.Status) *PostUpsertOne {
+// SetVisibility sets the "visibility" field.
+func (u *PostUpsertOne) SetVisibility(v post.Visibility) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
-		s.SetStatus(v)
+		s.SetVisibility(v)
 	})
 }
 
-// UpdateStatus sets the "status" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateStatus() *PostUpsertOne {
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateVisibility() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
-		s.UpdateStatus()
+		s.UpdateVisibility()
 	})
 }
 
@@ -1667,17 +1667,17 @@ func (u *PostUpsertBulk) ClearMetadata() *PostUpsertBulk {
 	})
 }
 
-// SetStatus sets the "status" field.
-func (u *PostUpsertBulk) SetStatus(v post.Status) *PostUpsertBulk {
+// SetVisibility sets the "visibility" field.
+func (u *PostUpsertBulk) SetVisibility(v post.Visibility) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
-		s.SetStatus(v)
+		s.SetVisibility(v)
 	})
 }
 
-// UpdateStatus sets the "status" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateStatus() *PostUpsertBulk {
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateVisibility() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
-		s.UpdateStatus()
+		s.UpdateVisibility()
 	})
 }
 

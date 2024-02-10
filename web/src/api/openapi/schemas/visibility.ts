@@ -12,5 +12,5 @@ export type Visibility = (typeof Visibility)[keyof typeof Visibility];
 export const Visibility = {
   draft: "draft",
   review: "review",
-  public: "public",
+  published: "published",
 } as const;
