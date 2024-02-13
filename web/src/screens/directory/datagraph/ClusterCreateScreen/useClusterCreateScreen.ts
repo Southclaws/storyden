@@ -1,3 +1,4 @@
+import { last } from "lodash";
 import { useRouter } from "next/navigation";
 
 import { clusterCreate } from "src/api/openapi/clusters";
@@ -8,7 +9,6 @@ import {
 } from "src/api/openapi/schemas";
 
 import { joinDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
-import { last } from "lodash";
 
 export type Props = {
   session: Account;
@@ -30,6 +30,7 @@ export function useClusterCreateScreen(props: Props) {
     items: [],
     clusters: [],
     assets: [],
+    visibility: "draft",
   };
 
   async function handleCreate(cluster: ClusterInitialProps) {
