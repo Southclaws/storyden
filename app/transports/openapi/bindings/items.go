@@ -67,6 +67,15 @@ func (i *Items) ItemList(ctx context.Context, request openapi.ItemListRequestObj
 		opts = append(opts, item_search.WithNameContains(*v))
 	}
 
+	visibility, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if v, ok := visibility.Get(); ok {
+		opts = append(opts, item_search.WithVisibility(v))
+	}
+
 	items, err := i.is.Search(ctx, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

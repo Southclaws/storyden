@@ -1,4 +1,4 @@
-import { isNil, omitBy } from "lodash/fp";
+import { filter, flow, reduce, toPairs } from "lodash/fp";
 
 export type Options = {
   url: string;
@@ -22,16 +22,40 @@ export const buildPayload = (data: unknown) => {
   return JSON.stringify(data);
 };
 
-const removeEmpty = omitBy(isNil);
+type ParameterValue = string | string[] | boolean;
 
-export const cleanQuery = (
-  params?: Record<string, string | string[] | boolean>,
-): string => {
+type QueryParameters = Record<string, ParameterValue>;
+
+const removeEmpty = filter<[string, ParameterValue]>(
+  ([, v]) => v !== null && v !== undefined && v !== "",
+);
+
+// NOTE: This is for correctly formatting arrays as multiple instances of the
+// same key-value pair (the correct way to send arrays in query parameters).
+const objectToParams = (init: URLSearchParams) =>
+  reduce((acc: URLSearchParams, [k, v]: [string, ParameterValue]) => {
+    if (Array.isArray(v)) {
+      v.forEach((vv) => acc.append(k, vv));
+    } else if (typeof v === "boolean") {
+      acc.append(k, v ? "true" : "false");
+    } else {
+      acc.append(k, v);
+    }
+
+    return acc;
+  }, init);
+
+const processQueryParams = (init: URLSearchParams) =>
+  flow(toPairs, removeEmpty, objectToParams(init));
+
+export const cleanQuery = (params?: QueryParameters): string => {
   if (!params) return "";
 
-  const clean = removeEmpty(params);
+  const usp = processQueryParams(new URLSearchParams())(params);
 
-  const format = new URLSearchParams(clean).toString();
+  const format = usp.toString();
+
+  if (!format) return "";
 
   return `?${format}`;
 };

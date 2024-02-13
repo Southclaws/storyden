@@ -5,20 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AccountHandle } from "./accountHandle";
-import type { Identifier } from "./identifier";
-import type { VisibilityParamParameter } from "./visibilityParamParameter";
+import type { Visibility } from "./visibility";
 
-export type ClusterListParams = {
-  /**
-   * List this cluster and all child clusters.
-   */
-  cluster_id?: Identifier;
-  /**
-   * Show only results owned by this account.
-   */
-  author?: AccountHandle;
-  /**
+/**
  * Filter clusters with specific visibility values. Note that by
 default, only published clusters are returned. When 'draft' is
 specified, only drafts owned by the requesting account are included.
@@ -26,5 +15,4 @@ When 'review' is specified, the request will fail if the requesting
 account is not an administrator.
 
  */
-  visibility?: VisibilityParamParameter;
-};
+export type VisibilityParamParameter = Visibility[];

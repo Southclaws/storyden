@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/item"
 )
@@ -19,7 +20,8 @@ type Search interface {
 }
 
 type query struct {
-	qs string
+	qs         string
+	visibility []post.Visibility
 }
 
 type Option func(*query)
@@ -27,6 +29,12 @@ type Option func(*query)
 func WithNameContains(s string) Option {
 	return func(q *query) {
 		q.qs = s
+	}
+}
+
+func WithVisibility(v []post.Visibility) Option {
+	return func(q *query) {
+		q.visibility = v
 	}
 }
 

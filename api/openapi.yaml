@@ -916,6 +916,7 @@ paths:
           required: false
           in: query
           schema: { $ref: "#/components/schemas/AccountHandle" }
+        - $ref: "#/components/parameters/VisibilityParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -962,7 +963,10 @@ paths:
   /v1/clusters/{cluster_slug}/visibility:
     patch:
       operationId: ClusterUpdateVisibility
-      description: Update the visibility cluster.
+      description: |
+        Update the visibility of a cluster. When changed, this may trigger other
+        operations such as notifications/newsletters. Changing the visibility of
+        anything to "published" is often accompanied by some other side effects.
       tags: [clusters]
       parameters: [$ref: "#/components/parameters/ClusterSlugParam"]
       requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
@@ -1079,7 +1083,9 @@ paths:
       description: List all items using the filtering options.
       tags: [items]
       security: []
-      parameters: [$ref: "#/components/parameters/SearchQuery"]
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/VisibilityParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1420,6 +1426,20 @@ components:
       required: true
       schema:
         type: string
+
+    VisibilityParam:
+      name: visibility
+      description: |
+        Filter clusters with specific visibility values. Note that by
+        default, only published clusters are returned. When 'draft' is
+        specified, only drafts owned by the requesting account are included.
+        When 'review' is specified, the request will fail if the requesting
+        account is not an administrator.
+      required: false
+      in: query
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/Visibility" }
 
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
