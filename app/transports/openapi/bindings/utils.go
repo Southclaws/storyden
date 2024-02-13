@@ -2,6 +2,8 @@ package bindings
 
 import (
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
@@ -178,4 +181,30 @@ func serialiseLink(in *link.Link) openapi.Link {
 		Domain:      in.Domain,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 	}
+}
+
+func deserialiseVisibility(in openapi.Visibility) (post.Visibility, error) {
+	v, err := post.NewVisibility(string(in))
+	if err != nil {
+		return post.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return v, nil
+}
+
+func serialiseVisibility(in post.Visibility) openapi.Visibility {
+	return openapi.Visibility(in.String())
+}
+
+func deserialiseVisibilityList(in []openapi.Visibility) ([]post.Visibility, error) {
+	v, err := dt.MapErr(in, deserialiseVisibility)
+	if err != nil {
+		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return v, nil
+}
+
+func serialiseVisibilityList(in []post.Visibility) []openapi.Visibility {
+	return dt.Map(in, serialiseVisibility)
 }

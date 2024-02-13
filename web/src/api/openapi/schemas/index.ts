@@ -241,6 +241,7 @@ export * from "./url";
 export * from "./userVerificationRequirement";
 export * from "./visibility";
 export * from "./visibilityMutationProps";
+export * from "./visibilityParamParameter";
 export * from "./visibilityUpdateBody";
 export * from "./webAuthnGetAssertionOKResponse";
 export * from "./webAuthnMakeAssertionBody";

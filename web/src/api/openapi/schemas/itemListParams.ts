@@ -6,10 +6,20 @@
  * OpenAPI spec version: 1
  */
 import type { SearchQueryParameter } from "./searchQueryParameter";
+import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
 export type ItemListParams = {
   /**
    * Search query string.
    */
   q?: SearchQueryParameter;
+  /**
+ * Filter clusters with specific visibility values. Note that by
+default, only published clusters are returned. When 'draft' is
+specified, only drafts owned by the requesting account are included.
+When 'review' is specified, the request will fail if the requesting
+account is not an administrator.
+
+ */
+  visibility?: VisibilityParamParameter;
 };

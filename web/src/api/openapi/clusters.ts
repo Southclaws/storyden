@@ -321,7 +321,10 @@ export const useClusterDelete = <
   };
 };
 /**
- * Update the visibility cluster.
+ * Update the visibility of a cluster. When changed, this may trigger other
+operations such as notifications/newsletters. Changing the visibility of
+anything to "published" is often accompanied by some other side effects.
+
  */
 export const clusterUpdateVisibility = (
   clusterSlug: string,

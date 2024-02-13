@@ -14,6 +14,7 @@ import (
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
@@ -42,6 +43,14 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Cluster
 
 	if f.accountSlug != nil {
 		query.Where(cluster.HasOwnerWith(account.Handle(*f.accountSlug)))
+	}
+
+	if len(f.visibility) > 0 {
+		query.Where(cluster.VisibilityIn(dt.Map(f.visibility, func(v post.Visibility) cluster.Visibility {
+			return cluster.Visibility(v.String())
+		})...))
+	} else {
+		query.Where(cluster.VisibilityIn(cluster.VisibilityPublished))
 	}
 
 	cs, err := query.All(ctx)

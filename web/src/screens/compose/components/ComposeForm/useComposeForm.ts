@@ -7,7 +7,7 @@ import { useCategoryList } from "src/api/openapi/categories";
 import {
   Thread,
   ThreadInitialProps,
-  ThreadStatus,
+  Visibility,
 } from "src/api/openapi/schemas";
 import { threadCreate, threadUpdate } from "src/api/openapi/threads";
 import { handleError } from "src/components/site/ErrorBanner";
@@ -54,7 +54,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       url: data.url ?? "",
       // assets: data.assets ?? [],
 
-      status: ThreadStatus.draft,
+      visibility: Visibility.draft,
     };
 
     if (editing) {
@@ -72,7 +72,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         title,
         body,
         category,
-        status: ThreadStatus.published,
+        visibility: Visibility.published,
         tags: [],
         url,
       });
@@ -82,7 +82,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         title,
         body,
         category,
-        status: ThreadStatus.published,
+        visibility: Visibility.published,
         tags: [],
         url,
       });
