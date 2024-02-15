@@ -46,9 +46,11 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Cluster
 	}
 
 	if len(f.visibility) > 0 {
-		query.Where(cluster.VisibilityIn(dt.Map(f.visibility, func(v post.Visibility) cluster.Visibility {
+		visibilityTypes := dt.Map(f.visibility, func(v post.Visibility) cluster.Visibility {
 			return cluster.Visibility(v.String())
-		})...))
+		})
+
+		query.Where(cluster.VisibilityIn(visibilityTypes...))
 	} else {
 		query.Where(cluster.VisibilityIn(cluster.VisibilityPublished))
 	}
