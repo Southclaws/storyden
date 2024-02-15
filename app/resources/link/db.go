@@ -32,7 +32,7 @@ func (d *database) Store(ctx context.Context, address, title, description string
 
 	slug, domain := getLinkAttrs(*u)
 
-	create := d.db.Debug().Link.Create()
+	create := d.db.Link.Create()
 	mutate := create.Mutation()
 
 	mutate.SetURL(address)
