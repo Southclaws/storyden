@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 )
 
@@ -60,6 +61,7 @@ type Cluster struct {
 	Content     opt.Optional[string]
 	Owner       profile.Profile
 	Parent      opt.Optional[*Cluster]
+	Visibility  post.Visibility
 	Properties  any
 
 	Items    []*Item
