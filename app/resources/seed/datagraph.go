@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/item"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 )
 
@@ -177,6 +178,7 @@ func clusters_items(cluster_repo cluster.Repository, item_repo item.Repository, 
 			cluster.WithID(c.ID),
 			cluster.WithAssets(assets(ar, c.Owner.ID, c.ID.String(), c.Assets)),
 			cluster.WithContent(c.Content.String()),
+			cluster.WithVisibility(post.VisibilityPublished),
 		)
 		if err != nil {
 			panic(err)
@@ -193,6 +195,7 @@ func clusters_items(cluster_repo cluster.Repository, item_repo item.Repository, 
 				item.WithContent(i.Content.String()),
 				item.WithAssets(assets(ar, i.Owner.ID, i.ID.String(), i.Assets)),
 				item.WithParentClusterAdd(xid.ID(c.ID)),
+				item.WithVisibility(post.VisibilityPublished),
 			)
 			if err != nil {
 				panic(err)
