@@ -36,6 +36,8 @@ func TestClustersHappyPath(t *testing.T) {
 
 			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
+			visibility := openapi.Published
+
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Clusters\n\nRich text content."
@@ -47,6 +49,7 @@ func TestClustersHappyPath(t *testing.T) {
 				Description: "testing clusters api",
 				Content:     &content1,
 				Url:         &url1,
+				Visibility:  &visibility, // Admin account can post directly to published
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -121,6 +124,7 @@ func TestClustersHappyPath(t *testing.T) {
 				Slug:        slug2,
 				Description: "testing clusters children",
 				Parent:      &slug1,
+				Visibility:  &visibility,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -149,6 +153,7 @@ func TestClustersHappyPath(t *testing.T) {
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
+				Visibility:  &visibility,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
@@ -227,6 +232,8 @@ func TestClustersFiltering(t *testing.T) {
 			ctx1, acc1 := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 			ctx2, acc2 := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
 
+			visibility := openapi.Published
+
 			name1 := "test-cluster-owned-by-1"
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Clusters\n\nOwned by Odin."
@@ -235,6 +242,7 @@ func TestClustersFiltering(t *testing.T) {
 				Slug:        slug1,
 				Description: "testing clusters api",
 				Content:     &content1,
+				Visibility:  &visibility,
 			}, e2e.WithSession(ctx1, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -248,6 +256,7 @@ func TestClustersFiltering(t *testing.T) {
 				Slug:        slug2,
 				Description: "testing clusters api",
 				Content:     &content2,
+				Visibility:  &visibility,
 			}, e2e.WithSession(ctx2, cj))
 			r.NoError(err)
 			r.NotNil(clus1)

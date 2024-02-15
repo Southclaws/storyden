@@ -7,13 +7,13 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster"
 	"github.com/Southclaws/storyden/app/resources/cluster_children"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 )
@@ -41,6 +41,7 @@ type Partial struct {
 	Description  opt.Optional[string]
 	Content      opt.Optional[string]
 	Parent       opt.Optional[datagraph.ClusterSlug]
+	Visibility   opt.Optional[post.Visibility]
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
@@ -64,20 +65,20 @@ func (p Partial) Opts() (opts []cluster.Option) {
 }
 
 type service struct {
-	l        *zap.Logger
+	ar       account.Repository
 	cr       cluster.Repository
 	cc       cluster_children.Repository
 	hydrator hydrator.Service
 }
 
 func New(
-	l *zap.Logger,
+	ar account.Repository,
 	cr cluster.Repository,
 	cc cluster_children.Repository,
 	hydrator hydrator.Service,
 ) Manager {
 	return &service{
-		l:        l.With(zap.String("service", "cluster")),
+		ar:       ar,
 		cr:       cr,
 		cc:       cc,
 		hydrator: hydrator,
@@ -201,6 +202,13 @@ func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []clus
 }
 
 func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, error) {
+	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
+		return s.ar.GetByID(ctx, aid)
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	opts := p.Opts()
 
 	if parentSlug, ok := p.Parent.Get(); ok {
@@ -210,6 +218,17 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, e
 		}
 
 		opts = append(opts, cluster.WithParent(parent.ID))
+	}
+
+	if acc, ok := acc.Get(); ok {
+		p.Visibility.Call(func(value post.Visibility) {
+			// Only admins can immediately post to the public feed.
+			if value == post.VisibilityPublished && !acc.Admin {
+				return
+			}
+
+			opts = append(opts, cluster.WithVisibility(value))
+		})
 	}
 
 	opts = append(opts, s.hydrateLink(ctx, p)...)
