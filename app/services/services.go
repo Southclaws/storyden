@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/cluster"
+	"github.com/Southclaws/storyden/app/services/cluster/cluster_visibility"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/datagraph_searcher"
@@ -50,7 +51,7 @@ func Build() fx.Option {
 		fetcher.Build(),
 		fx.Provide(semdex.New),
 		fx.Provide(avatar_gen.New),
-		fx.Provide(cluster.New, clustertree.New),
+		fx.Provide(cluster.New, clustertree.New, cluster_visibility.New),
 		fx.Provide(item_crud.New, item_tree.New),
 		fx.Provide(datagraph_searcher.New),
 	)

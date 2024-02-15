@@ -9,33 +9,42 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/cluster_traversal"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	cluster_svc "github.com/Southclaws/storyden/app/services/cluster"
+	"github.com/Southclaws/storyden/app/services/cluster/cluster_visibility"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Clusters struct {
+	ar    account.Repository
 	cs    cluster_svc.Manager
+	cv    *cluster_visibility.Controller
 	ctree clustertree.Graph
 	ctr   cluster_traversal.Repository
 	itree item_tree.Graph
 }
 
 func NewClusters(
+	ar account.Repository,
 	cs cluster_svc.Manager,
+	cv *cluster_visibility.Controller,
 	ctree clustertree.Graph,
 	ctr cluster_traversal.Repository,
 	itree item_tree.Graph,
 ) Clusters {
 	return Clusters{
+		ar:    ar,
 		cs:    cs,
+		cv:    cv,
 		ctree: ctree,
 		ctr:   ctr,
 		itree: itree,
@@ -71,8 +80,14 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 }
 
 func (c *Clusters) ClusterList(ctx context.Context, request openapi.ClusterListRequestObject) (openapi.ClusterListResponseObject, error) {
+	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
+		return c.ar.GetByID(ctx, aid)
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var cs []*datagraph.Cluster
-	var err error
 
 	opts := []cluster_traversal.Filter{}
 
@@ -80,13 +95,36 @@ func (c *Clusters) ClusterList(ctx context.Context, request openapi.ClusterListR
 		opts = append(opts, cluster_traversal.WithOwner(*v))
 	}
 
-	visibility, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
+	visibilities, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if v, ok := visibility.Get(); ok {
-		opts = append(opts, cluster_traversal.WithVisibility(v))
+	if a, ok := acc.Get(); ok {
+		// NOTE: We do not want to allow anyone to request ANY cluster that is
+		// not published, but we also want to allow admins to request clusters
+		// that are in review. So we need to check if the requesting account is
+		// an admin and if they are not, automatically add a WithOwner filter.
+
+		if v, ok := visibilities.Get(); ok {
+			opts = append(opts, cluster_traversal.WithVisibility(v...))
+
+			if lo.Contains(v, post.VisibilityDraft) {
+				// If the result is to contain drafts, only show the account's.
+				opts = append(opts, cluster_traversal.WithOwner(a.Handle))
+			} else if lo.Contains(v, post.VisibilityReview) {
+				// If the result is to contain clusters that are in-review, then
+				// we need to check if the requesting account is an admin first.
+				if !a.Admin {
+					opts = append(opts, cluster_traversal.WithOwner(a.Handle))
+				}
+			}
+		}
+	} else {
+		// When the request is not made by an authenticated account, we do not
+		// permit any visibility other than "published".
+
+		opts = append(opts, cluster_traversal.WithVisibility(post.VisibilityPublished))
 	}
 
 	if id := request.Params.ClusterId; id != nil {
@@ -150,9 +188,7 @@ func (c *Clusters) ClusterUpdateVisibility(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	clus, err := c.cs.Update(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.Partial{
-		Visibility: opt.New(v),
-	})
+	clus, err := c.cv.ChangeVisibility(ctx, datagraph.ClusterSlug(request.ClusterSlug), v)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -278,6 +314,7 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
+		Visibility:  serialiseVisibility(in.Visibility),
 		Properties:  in.Properties,
 	}
 }
@@ -295,6 +332,7 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
+		Visibility:  serialiseVisibility(in.Visibility),
 		Properties:  in.Properties,
 		Clusters:    dt.Map(in.Clusters, serialiseCluster),
 		Items:       dt.Map(in.Items, serialiseItem),
