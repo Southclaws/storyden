@@ -57,6 +57,11 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	vis, err := opt.MapErr(opt.NewPtr(request.Body.Visibility), deserialiseVisibility)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	clus, err := c.cs.Create(ctx,
 		session,
 		request.Body.Name,
@@ -68,6 +73,7 @@ func (c *Clusters) ClusterCreate(ctx context.Context, request openapi.ClusterCre
 			URL:        opt.NewPtr(request.Body.Url),
 			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseClusterSlug),
+			Visibility: vis,
 		},
 	)
 	if err != nil {
