@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/tests/testutils"
 )
 
 func TestClustersHappyPath(t *testing.T) {
@@ -275,6 +276,163 @@ func TestClustersFiltering(t *testing.T) {
 
 			a.NotContains(ids2, clus1.JSON200.Id)
 			a.Contains(ids2, clus2.JSON200.Id)
+		}))
+	}))
+}
+
+func TestClustersVisibility(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *bindings.CookieJar,
+		ar account.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+
+			// Tests:
+			// - Admin can change visibility of anyone's cluster
+			// - Admin can list non-published clusters
+			// - Non-admin can not list non-published clusters
+			// - Non-admin cannot update visibility of any clusters
+			// - Author can list their own hidden clusters
+			// - Author can update visibility of their own clusters
+
+			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+			ctxAuthor, accAuthor := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
+			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
+
+			// Author creates 3 clusters
+
+			name1 := "TestClustersFiltering1"
+			slug1 := name1 + uuid.NewString()
+			clus1 := testutils.AssertRequest(cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{Name: name1, Slug: slug1, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+
+			name2 := "TestClustersFiltering2"
+			slug2 := name2 + uuid.NewString()
+			clus2 := testutils.AssertRequest(cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{Name: name2, Slug: slug2, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+
+			name3 := "TestClustersFiltering3"
+			slug3 := name3 + uuid.NewString()
+			clus3 := testutils.AssertRequest(cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{Name: name3, Slug: slug3, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+
+			name4 := "TestClustersFiltering4"
+			slug4 := name4 + uuid.NewString()
+			clus4 := testutils.AssertRequest(cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{Name: name4, Slug: slug4, Description: ""}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+
+			// Public listing without filters does not contain any of them
+			// because they were created without being published.
+
+			clist := testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{}))(t, http.StatusOK)
+
+			ids := dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			// List does not contain any because they have not been published
+			// and the request was made without auth from the owner.
+			a.NotContains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id)
+			a.NotContains(ids, clus4.JSON200.Id)
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Author: &accAuthor.Handle,
+			}))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.NotContains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id)
+			a.NotContains(ids, clus4.JSON200.Id)
+
+			// Admin can change visibility
+
+			update1 := testutils.AssertRequest(
+				cl.ClusterUpdateVisibilityWithResponse(ctx, clus1.JSON200.Slug, openapi.VisibilityMutationProps{
+					Visibility: openapi.Published,
+				}, e2e.WithSession(ctxAdmin, cj)),
+			)(t, http.StatusOK)
+			a.Equal(openapi.Published, update1.JSON200.Visibility)
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Author: &accAuthor.Handle,
+			}))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.Contains(ids, clus1.JSON200.Id, "admin made this cluster visible")
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id)
+			a.NotContains(ids, clus4.JSON200.Id)
+
+			// Author can change visibility
+
+			update2 := testutils.AssertRequest(
+				cl.ClusterUpdateVisibilityWithResponse(ctx, clus2.JSON200.Slug, openapi.VisibilityMutationProps{
+					Visibility: openapi.Published,
+				}, e2e.WithSession(ctxAuthor, cj)),
+			)(t, http.StatusOK)
+			a.Equal(openapi.Published, update2.JSON200.Visibility)
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Author: &accAuthor.Handle,
+			}))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.Contains(ids, clus1.JSON200.Id, "admin made this cluster visible")
+			a.Contains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id)
+			a.NotContains(ids, clus4.JSON200.Id)
+
+			// Author can list their own hidden clusters, but not others.
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Visibility: &[]openapi.Visibility{openapi.Draft},
+			}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.NotContains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.Contains(ids, clus3.JSON200.Id, "this is the only cluster not published above")
+			a.NotContains(ids, clus4.JSON200.Id, "owned by someone else, should not be visible")
+
+			// Admin can only list in-review clusters, but not drafts.
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Visibility: &[]openapi.Visibility{openapi.Review},
+			}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.NotContains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.NotContains(ids, clus3.JSON200.Id)
+			a.NotContains(ids, clus4.JSON200.Id)
+
+			// Author moves clus3 to in-review
+
+			update3 := testutils.AssertRequest(
+				cl.ClusterUpdateVisibilityWithResponse(ctx, clus3.JSON200.Slug, openapi.VisibilityMutationProps{
+					Visibility: openapi.Review,
+				}, e2e.WithSession(ctxAuthor, cj)),
+			)(t, http.StatusOK)
+			a.Equal(openapi.Review, update3.JSON200.Visibility)
+
+			clist = testutils.AssertRequest(cl.ClusterListWithResponse(ctx, &openapi.ClusterListParams{
+				Visibility: &[]openapi.Visibility{openapi.Review},
+			}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+
+			ids = dt.Map(clist.JSON200.Clusters, func(c openapi.Cluster) string { return c.Id })
+
+			a.NotContains(ids, clus1.JSON200.Id)
+			a.NotContains(ids, clus2.JSON200.Id)
+			a.Contains(ids, clus3.JSON200.Id, "in review so is now visible to admins")
+			a.NotContains(ids, clus4.JSON200.Id, "")
 		}))
 	}))
 }
