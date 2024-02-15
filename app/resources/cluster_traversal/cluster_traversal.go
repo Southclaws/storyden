@@ -26,7 +26,7 @@ func WithOwner(v string) Filter {
 	}
 }
 
-func WithVisibility(v []post.Visibility) Filter {
+func WithVisibility(v ...post.Visibility) Filter {
 	return func(f *filters) {
 		f.visibility = v
 	}
