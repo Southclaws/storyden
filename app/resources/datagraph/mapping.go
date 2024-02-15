@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -32,6 +33,11 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	visibility, err := post.NewVisibility(c.Visibility.String())
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	assets := dt.Map(c.Edges.Assets, asset.FromModel)
 
 	return &Cluster{
@@ -47,6 +53,7 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		Owner:       *pro,
 		Items:       items,
 		Clusters:    clusters,
+		Visibility:  visibility,
 		Properties:  c.Properties,
 	}, nil
 }
