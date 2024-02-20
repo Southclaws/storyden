@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { KeyedMutator } from "swr";
 import { z } from "zod";
 
 import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
