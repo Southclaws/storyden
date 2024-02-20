@@ -21,7 +21,7 @@ export function Client(props: Props) {
 
   return (
     <VStack w="full" alignItems="start" gap="4">
-      <Breadcrumbs directoryPath={[]} create="show" />
+      <Breadcrumbs directoryPath={[]} visibility="draft" create="show" />
 
       {empty ? (
         <Center h="full">

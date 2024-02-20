@@ -3,12 +3,14 @@ import { useRouter } from "next/navigation";
 import {
   clusterDelete,
   clusterUpdate,
+  clusterUpdateVisibility,
   useClusterGet,
 } from "src/api/openapi/clusters";
 import {
   Cluster,
   ClusterInitialProps,
   ClusterWithItems,
+  Visibility,
 } from "src/api/openapi/schemas";
 
 import { replaceDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
@@ -36,6 +38,11 @@ export function useClusterViewerScreen(props: Props) {
   }
 
   const { slug } = data;
+
+  async function handleVisibilityChange(visibility: Visibility) {
+    await clusterUpdateVisibility(slug, { visibility });
+    await mutate();
+  }
 
   async function handleSave(cluster: ClusterInitialProps) {
     await clusterUpdate(slug, {
@@ -75,7 +82,7 @@ export function useClusterViewerScreen(props: Props) {
   return {
     ready: true as const,
     data,
-    handlers: { handleSave, handleDelete },
+    handlers: { handleSave, handleVisibilityChange, handleDelete },
     directoryPath,
     mutate,
   };
