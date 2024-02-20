@@ -6,9 +6,9 @@ import { FormProvider } from "react-hook-form";
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterList } from "src/components/directory/datagraph/ClusterList";
+import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { CancelAction } from "src/components/site/Action/Cancel";
-import { DeleteAction } from "src/components/site/Action/Delete";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
@@ -35,6 +35,7 @@ export function DatagraphNodeScreen(props: Props) {
     handlers: {
       handleSubmit,
       handleEditMode,
+      handleVisibilityChange,
       handleDelete,
       handleAssetUpload,
       handleAssetRemove,
@@ -43,9 +44,10 @@ export function DatagraphNodeScreen(props: Props) {
     editing,
     node,
     isAllowedToEdit,
-    isAllowedToDelete,
     isSaving,
   } = useDatagraphNodeScreen(props);
+
+  console.log({ isSaving });
 
   return (
     <styled.form
@@ -70,6 +72,7 @@ export function DatagraphNodeScreen(props: Props) {
         <HStack w="full" justify="space-between">
           <Breadcrumbs
             directoryPath={directoryPath}
+            visibility={node.visibility}
             create={editing ? "edit" : "show"}
             defaultValue={node.slug}
             {...form.register("slug")}
@@ -88,11 +91,13 @@ export function DatagraphNodeScreen(props: Props) {
                   ) : (
                     <>
                       <EditAction onClick={handleEditMode}>Edit</EditAction>
-                      {isAllowedToDelete && (
-                        <DeleteAction onClick={handleDelete}></DeleteAction>
-                      )}
                     </>
                   )}
+                  <DatagraphNodeMenu
+                    node={node}
+                    onVisibilityChange={handleVisibilityChange}
+                    onDelete={handleDelete}
+                  />
                 </HStack>
               </PopoverAnchor>
 

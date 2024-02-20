@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { KeyedMutator } from "swr";
 import { z } from "zod";
 
 import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
 import { itemAddAsset } from "src/api/openapi/items";
-import { Asset } from "src/api/openapi/schemas";
+import { Asset, Visibility } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import {
   DatagraphNode,
@@ -28,6 +29,7 @@ export type Props = {
   node: DatagraphNodeWithRelations;
   initialEditingState?: boolean;
   editable?: boolean;
+  onVisibilityChange?: (v: Visibility) => Promise<void>;
   onSave: (c: DatagraphNodeInitialProps) => Promise<void>;
   onDelete?: (c: DatagraphNode) => Promise<void>;
 };
@@ -36,6 +38,7 @@ export function useDatagraphNodeScreen({
   node,
   initialEditingState = false,
   editable = true,
+  onVisibilityChange,
   onSave,
   onDelete,
 }: Props) {
@@ -94,6 +97,11 @@ export function useDatagraphNodeScreen({
     onSave({ type: node.type, ...payload });
   }
 
+  async function handleVisibilityChange(v: Visibility) {
+    triggerSavingPopover();
+    onVisibilityChange?.(v);
+  }
+
   function handleDelete() {
     if (editing) return;
 
@@ -133,6 +141,7 @@ export function useDatagraphNodeScreen({
     handlers: {
       handleEditMode,
       handleSubmit,
+      handleVisibilityChange,
       handleDelete,
       handleAssetUpload,
       handleAssetRemove,
