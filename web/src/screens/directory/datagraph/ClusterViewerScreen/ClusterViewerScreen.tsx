@@ -15,6 +15,7 @@ export function ClusterViewerScreen(props: Props) {
     <DatagraphNodeScreen
       node={{ type: "cluster", ...data }}
       onSave={handlers.handleSave}
+      onVisibilityChange={handlers.handleVisibilityChange}
       onDelete={handlers.handleDelete}
     />
   );

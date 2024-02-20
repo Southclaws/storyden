@@ -1,7 +1,8 @@
 import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import { pull } from "lodash";
+import { last, pull } from "lodash";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
+import { Visibility } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import {
   DirectoryPath,
@@ -14,6 +15,7 @@ import { Box, HStack } from "@/styled-system/jsx";
 
 type Props = {
   directoryPath: DirectoryPath;
+  visibility: Visibility;
   create: "hide" | "show" | "edit";
   value?: string;
   defaultValue?: string;
@@ -21,34 +23,60 @@ type Props = {
 };
 
 export const _Breadcrumbs = (
-  { directoryPath, create, value, defaultValue, onChange, ...rest }: Props,
+  {
+    directoryPath,
+    visibility,
+    create,
+    value,
+    defaultValue,
+    onChange,
+    ...rest
+  }: Props,
   ref: ForwardedRef<HTMLInputElement>,
 ) => {
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
   const paths = pull(directoryPath, "new");
   const jointNew = joinDirectoryPath(directoryPath, "new");
+  const current = last(paths);
 
   return (
     <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
       <Link minW="min" href="/directory" size="xs">
         Directory
       </Link>
-      {paths.map((p) => (
-        <Fragment key={p}>
-          <Box flexShrink="0">
-            <ChevronRightIcon width="1rem" />
-          </Box>
-          <Link
-            flexShrink="0"
-            key={p}
-            href={`/directory/${joinDirectoryPath(paths, p)}`}
-            size="xs"
-          >
-            {p}
-          </Link>
-        </Fragment>
-      ))}
+      {paths.map((p) => {
+        const isCurrent = p === current;
+
+        return (
+          <Fragment key={p}>
+            <Box flexShrink="0">
+              <ChevronRightIcon width="1rem" />
+            </Box>
+            <Link
+              flexShrink="0"
+              borderColor={
+                isCurrent && visibility === "published"
+                  ? "white"
+                  : visibility === "draft"
+                    ? "accent"
+                    : "blue.500"
+              }
+              borderStyle={
+                isCurrent && visibility !== "published" ? "dashed" : "none"
+              }
+              borderWidth={
+                isCurrent && visibility !== "published" ? "thin" : "none"
+              }
+              key={p}
+              href={`/directory/${joinDirectoryPath(paths, p)}`}
+              size="xs"
+            >
+              {p} {isCurrent && <span>({visibility})</span>}
+            </Link>
+          </Fragment>
+        );
+      })}
       {session && create == "show" && (
         <>
           <Box flexShrink="0">
