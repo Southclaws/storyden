@@ -68,10 +68,10 @@ func TestSemdexWeaviate(t *testing.T) {
 				r.NoError(err)
 
 				response, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
-					Title:    title,
-					Category: cat1create.JSON200.Id,
-					Body:     string(b),
-					Status:   openapi.Published,
+					Title:      title,
+					Category:   cat1create.JSON200.Id,
+					Body:       string(b),
+					Visibility: openapi.Published,
 				}, e2e.WithSession(ctx, cj))
 				r.NoError(err)
 				r.Equal(http.StatusOK, response.StatusCode())
