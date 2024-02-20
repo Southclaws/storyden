@@ -30,7 +30,7 @@ export function Navigation({ children }: PropsWithChildren) {
       <Box
         id="navigation__fixed"
         position="fixed"
-        zIndex="overlay"
+        zIndex="docked"
         top="0"
         left="0"
         height="dvh"

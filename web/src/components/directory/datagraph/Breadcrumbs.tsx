@@ -46,7 +46,7 @@ export const _Breadcrumbs = (
         Directory
       </Link>
       {paths.map((p) => {
-        const isCurrent = p === current;
+        const isCurrent = p === current && create === "show";
 
         return (
           <Fragment key={p}>
@@ -73,7 +73,7 @@ export const _Breadcrumbs = (
               size="xs"
             >
               {p}{" "}
-              {isCurrent && visibility !== "published" && (
+              {isCurrent && visibility && visibility !== "published" && (
                 <span>({visibility})</span>
               )}
             </Link>

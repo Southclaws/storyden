@@ -47,8 +47,6 @@ export function DatagraphNodeScreen(props: Props) {
     isSaving,
   } = useDatagraphNodeScreen(props);
 
-  console.log({ isSaving });
-
   return (
     <styled.form
       display="flex"
