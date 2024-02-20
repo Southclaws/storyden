@@ -72,7 +72,10 @@ export const _Breadcrumbs = (
               href={`/directory/${joinDirectoryPath(paths, p)}`}
               size="xs"
             >
-              {p} {isCurrent && <span>({visibility})</span>}
+              {p}{" "}
+              {isCurrent && visibility !== "published" && (
+                <span>({visibility})</span>
+              )}
             </Link>
           </Fragment>
         );
