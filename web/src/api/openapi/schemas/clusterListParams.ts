@@ -7,9 +7,19 @@
  */
 import type { AccountHandle } from "./accountHandle";
 import type { Identifier } from "./identifier";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
+import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
 export type ClusterListParams = {
+  /**
+   * Search query string.
+   */
+  q?: SearchQueryParameter;
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
   /**
    * List this cluster and all child clusters.
    */
