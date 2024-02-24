@@ -1,6 +1,9 @@
 "use client";
 
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren } from "react";
+import { useLocalStorage } from "usehooks-ts";
+
+import { NAVIGATION_SIDEBAR_STATE_KEY } from "src/local/state-keys";
 
 import styles from "./navigation.module.css";
 
@@ -11,7 +14,13 @@ import { Navpill } from "./Navpill/Navpill";
 import { Top } from "./Top/Top";
 
 export function Navigation({ children }: PropsWithChildren) {
-  const [showLeftBar, setShowLeftBar] = useState(true);
+  const [showLeftBar, setShowLeftBar] = useLocalStorage(
+    NAVIGATION_SIDEBAR_STATE_KEY,
+    false,
+    {
+      initializeWithValue: false,
+    },
+  );
 
   return (
     <Box

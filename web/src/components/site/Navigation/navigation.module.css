@@ -126,23 +126,29 @@
   }
 
   .leftbar {
+    opacity: 0;
     display: block;
     grid-area: leftbar;
-    pointer-events: all;
     overflow: hidden;
 
     /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
     margin: -15px;
     padding: 15px;
-
-    /* Animate show/hide */
-    animation: fadeIn 0.2s ease-in-out;
   }
 
   .navigation__container[data-leftbar-shown="false"] .leftbar {
-    animation: fadeOut 0.2s ease-in-out;
     opacity: 0;
     pointer-events: none;
+    /* NOTE: Doesn't work properly on initial page load, causes the sidebar to
+    flicker visible and play the animation, need a way to not do this soon. */
+    /* animation: fadeOut 0.2s ease-in-out; */
+  }
+
+  .navigation__container[data-leftbar-shown="true"] .leftbar {
+    opacity: 1;
+    pointer-events: all;
+
+    animation: fadeIn 0.2s ease-in-out;
   }
 
   @keyframes fadeIn {
@@ -169,7 +175,9 @@
   .rightbar {
     display: var(--navgrid-right-bar-display);
     grid-area: rightbar;
-    pointer-events: all;
+
+    /* TODO: Remove this when the right is actually used */
+    pointer-events: none;
 
     overflow: hidden;
 
