@@ -5,9 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ItemListResult } from "./itemListResult";
+import type { ThreadList } from "./threadList";
 
-/**
- * Item list.
- */
-export type ItemListOKResponse = ItemListResult;
+export type ThreadListResultAllOf = {
+  threads: ThreadList;
+};

@@ -605,6 +605,8 @@ paths:
       tags: [threads]
       security: []
       parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
         - name: author
           description: Show only results creeated by this user.
           required: false
@@ -906,6 +908,8 @@ paths:
       tags: [clusters]
       security: []
       parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
         - name: cluster_id
           description: List this cluster and all child clusters.
           required: false
@@ -1766,11 +1770,7 @@ components:
       description: List of all threads.
       content:
         application/json:
-          schema:
-            type: object
-            required: [threads]
-            properties:
-              threads: { $ref: "#/components/schemas/ThreadList" }
+          schema: { $ref: "#/components/schemas/ThreadListResult" }
 
     ThreadGet:
       description: The information about a thread and its posts.
@@ -1877,11 +1877,7 @@ components:
       description: Cluster list.
       content:
         application/json:
-          schema:
-            type: object
-            required: [clusters]
-            properties:
-              clusters: { $ref: "#/components/schemas/ClusterList" }
+          schema: { $ref: "#/components/schemas/ClusterListResult" }
 
     ClusterGetOK:
       description: Cluster information and content.
@@ -1945,11 +1941,7 @@ components:
       description: Item list.
       content:
         application/json:
-          schema:
-            type: object
-            required: [items]
-            properties:
-              items: { $ref: "#/components/schemas/ItemList" }
+          schema: { $ref: "#/components/schemas/ItemListResult" }
 
     ItemGetOK:
       description: Item information and content.
@@ -2919,6 +2911,14 @@ components:
       items:
         $ref: "#/components/schemas/ThreadReference"
 
+    ThreadListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [threads]
+          properties:
+            threads: { $ref: "#/components/schemas/ThreadList" }
+
     Thread:
       allOf:
         - $ref: "#/components/schemas/ThreadReference"
@@ -3212,6 +3212,14 @@ components:
       type: array
       items: { $ref: "#/components/schemas/Cluster" }
 
+    ClusterListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [clusters]
+          properties:
+            clusters: { $ref: "#/components/schemas/ClusterList" }
+
     ClusterInitialProps:
       type: object
       required: [name, slug, description]
@@ -3325,6 +3333,14 @@ components:
         items that may be part of different clusters.
       type: array
       items: { $ref: "#/components/schemas/ItemWithParents" }
+
+    ItemListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [items]
+          properties:
+            items: { $ref: "#/components/schemas/ItemList" }
 
     ItemInitialProps:
       type: object

@@ -7,9 +7,19 @@
  */
 import type { AccountHandle } from "./accountHandle";
 import type { CategorySlugList } from "./categorySlugList";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
+import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
 
 export type ThreadListParams = {
+  /**
+   * Search query string.
+   */
+  q?: SearchQueryParameter;
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
   /**
    * Show only results creeated by this user.
    */
