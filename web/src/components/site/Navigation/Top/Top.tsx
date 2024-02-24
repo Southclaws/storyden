@@ -4,7 +4,6 @@ import { Button } from "src/theme/components/Button";
 import styles from "../navigation.module.css";
 
 import { ComposeAction } from "../Anchors/Compose";
-import { Search } from "../Search/Search";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
 import { useNavigation } from "../useNavigation";
