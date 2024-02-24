@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 )
@@ -17,7 +16,7 @@ type clusterSearcher struct {
 	ec *ent.Client
 }
 
-func (s *clusterSearcher) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+func (s *clusterSearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
 	cq := s.ec.Cluster.Query().Where(
 		cluster.Or(
 			cluster.NameContainsFold(query),

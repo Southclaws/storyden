@@ -13,14 +13,13 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
-func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Indexable) ([]*semdex.Result, error) {
+func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Indexable) (datagraph.NodeReferenceList, error) {
 	wid := GetWeaviateID(object.GetID())
 
 	result, err := w.wc.Data().ObjectsGetter().
-		WithClassName(TestClassName).
+		WithClassName(w.mc.Class).
 		WithVector().
 		WithID(wid).
 		Do(ctx)
@@ -42,7 +41,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 	}
 
 	recommendations, err := w.wc.GraphQL().Get().
-		WithClassName(TestClassName).
+		WithClassName(w.mc.Class).
 		WithFields(fields...).
 		WithNearVector(withNearVector).
 		WithLimit(10).
@@ -65,9 +64,13 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData := parsed.Get[TestClassName]
+	classData := parsed.Get[w.mc.Class]
 
-	results, err := dt.MapErr(classData, func(v WeaviateObject) (*semdex.Result, error) {
+	classData = dt.Filter(classData, func(o WeaviateObject) bool {
+		return o.DatagraphID != object.GetID().String()
+	})
+
+	results, err := dt.MapErr(classData, func(v WeaviateObject) (*datagraph.NodeReference, error) {
 		id, err := xid.FromString(v.DatagraphID)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
@@ -78,9 +81,9 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		return &semdex.Result{
-			Id:   id,
-			Type: dk,
+		return &datagraph.NodeReference{
+			ID:   id,
+			Kind: dk,
 			Name: v.Name,
 		}, nil
 	})

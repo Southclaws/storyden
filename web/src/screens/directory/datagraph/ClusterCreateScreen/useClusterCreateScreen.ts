@@ -31,6 +31,7 @@ export function useClusterCreateScreen(props: Props) {
     clusters: [],
     assets: [],
     visibility: "draft",
+    recomentations: [],
   };
 
   async function handleCreate(cluster: ClusterInitialProps) {

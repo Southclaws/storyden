@@ -7,6 +7,7 @@
  */
 import type { Cluster } from "./cluster";
 import type { ClusterWithItemsAllOf } from "./clusterWithItemsAllOf";
+import type { DatagraphRecommendations } from "./datagraphRecommendations";
 
 /**
  * The full properties of a cluster including all items and maybe child
@@ -14,4 +15,6 @@ clusters (depending on what the endpoint is configured or queried to do)
 for rendering a single cluster on a view.
 
  */
-export type ClusterWithItems = Cluster & ClusterWithItemsAllOf;
+export type ClusterWithItems = Cluster &
+  DatagraphRecommendations &
+  ClusterWithItemsAllOf;

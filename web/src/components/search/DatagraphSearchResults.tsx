@@ -15,8 +15,6 @@ export function DatagraphSearchResults({ result }: Props) {
     return <EmptyState />;
   }
 
-  console.log(result);
-
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="4">
       {result.items.map((v) => (

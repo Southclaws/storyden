@@ -28,9 +28,9 @@ func NewParallelSearcher(ec *ent.Client) *ParallelSearcher {
 	}
 }
 
-func (s *ParallelSearcher) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
 	mx := sync.Mutex{}
-	results := []*semdex.Result{}
+	results := []*datagraph.NodeReference{}
 
 	eg, ctx := errgroup.WithContext(ctx)
 
@@ -57,10 +57,10 @@ func (s *ParallelSearcher) Search(ctx context.Context, query string) ([]*semdex.
 	return results, nil
 }
 
-func indexableToResult[T datagraph.Indexable](v T) *semdex.Result {
-	return &semdex.Result{
-		Id:          v.GetID(),
-		Type:        v.GetKind(),
+func indexableToResult[T datagraph.Indexable](v T) *datagraph.NodeReference {
+	return &datagraph.NodeReference{
+		ID:          v.GetID(),
+		Kind:        v.GetKind(),
 		Name:        v.GetName(),
 		Description: v.GetDesc(),
 		Slug:        v.GetSlug(),

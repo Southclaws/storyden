@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
@@ -33,7 +34,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	items := dt.Map(r, serialiseDatagraphItem)
+	items := dt.Map(r, serialiseDatagraphNodeReference)
 
 	return openapi.DatagraphSearch200JSONResponse{
 		DatagraphSearchOKJSONResponse: openapi.DatagraphSearchOKJSONResponse{
@@ -43,10 +44,10 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 	}, nil
 }
 
-func serialiseDatagraphItem(v *semdex.Result) openapi.DatagraphItem {
+func serialiseDatagraphNodeReference(v *datagraph.NodeReference) openapi.DatagraphItem {
 	return openapi.DatagraphItem{
-		Type:        openapi.DatagraphItemType(v.Type.String()),
-		Id:          v.Id.String(),
+		Kind:        openapi.DatagraphItemKind(v.Kind.String()),
+		Id:          v.ID.String(),
 		Name:        v.Name,
 		Slug:        v.Slug,
 		Description: &v.Description,

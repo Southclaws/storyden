@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { CommonProperties } from "./commonProperties";
+import type { DatagraphRecommendations } from "./datagraphRecommendations";
 import type { ItemCommonProps } from "./itemCommonProps";
 import type { ItemWithParentsAllOf } from "./itemWithParentsAllOf";
 
@@ -16,4 +17,5 @@ schemas that only want a single item along with its cluster information.
  */
 export type ItemWithParents = CommonProperties &
   ItemCommonProps &
+  DatagraphRecommendations &
   ItemWithParentsAllOf;

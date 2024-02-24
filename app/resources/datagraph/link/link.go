@@ -161,7 +161,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 }
 
 func (d *database) GetByID(ctx context.Context, id datagraph.LinkID) (*datagraph.Link, error) {
-	r, err := d.db.Debug().Link.Query().
+	r, err := d.db.Link.Query().
 		WithAssets().
 		Where(link.ID(xid.ID(id))).
 		First(ctx)

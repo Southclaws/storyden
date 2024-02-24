@@ -12,19 +12,20 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link_graph"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
+	"github.com/Southclaws/storyden/app/services/link_getter"
 	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Links struct {
 	fr fetcher.Service
 	lr link.Repository
-	lg link_graph.Repository
+	lg *link_getter.Getter
 }
 
 func NewLinks(
 	fr fetcher.Service,
 	lr link.Repository,
-	lg link_graph.Repository,
+	lg *link_getter.Getter,
 ) Links {
 	return Links{
 		fr: fr,
@@ -100,15 +101,16 @@ func (i *Links) LinkGet(ctx context.Context, request openapi.LinkGetRequestObjec
 
 func serialiseLinkWithRefs(in *link_graph.WithRefs) openapi.LinkWithRefs {
 	return openapi.LinkWithRefs{
-		Url:         in.URL,
-		Title:       in.Title.Ptr(),
-		Description: in.Description.Ptr(),
-		Slug:        in.Slug,
-		Domain:      in.Domain,
-		Assets:      dt.Map(in.Assets, serialiseAssetReference),
-		Threads:     dt.Map(in.Threads, serialiseThreadReference),
-		Posts:       dt.Map(in.Replies, serialisePost),
-		Clusters:    dt.Map(in.Clusters, serialiseCluster),
-		Items:       dt.Map(in.Items, serialiseItemWithParents),
+		Url:            in.URL,
+		Title:          in.Title.Ptr(),
+		Description:    in.Description.Ptr(),
+		Slug:           in.Slug,
+		Domain:         in.Domain,
+		Assets:         dt.Map(in.Assets, serialiseAssetReference),
+		Threads:        dt.Map(in.Threads, serialiseThreadReference),
+		Posts:          dt.Map(in.Replies, serialisePost),
+		Clusters:       dt.Map(in.Clusters, serialiseCluster),
+		Items:          dt.Map(in.Items, serialiseItemWithParents),
+		Recomentations: dt.Map(in.Related, serialiseDatagraphNodeReference),
 	}
 }

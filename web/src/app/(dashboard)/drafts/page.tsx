@@ -19,7 +19,5 @@ export default async function Page() {
     }),
   ]);
 
-  console.log(clusters);
-
   return <DraftListScreen threads={threads} clusters={clusters} />;
 }
