@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	_ "github.com/joho/godotenv/autoload"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,8 +33,9 @@ const dir = "testdata"
 func TestSemdexWeaviate(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("WEAVIATE_ENABLED", "true")
-	os.Setenv("WEAVIATE_URL", "http://localhost:8080")
+	if os.Getenv("WEAVIATE_ENABLED") != "true" {
+		return
+	}
 
 	integration.Test(t, &config.Config{}, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
