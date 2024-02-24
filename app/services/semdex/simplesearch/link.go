@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 )
@@ -17,7 +16,7 @@ type linkSearcher struct {
 	ec *ent.Client
 }
 
-func (s *linkSearcher) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+func (s *linkSearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
 	lq := s.ec.Link.Query().Where(
 		link.Or(
 			link.TitleContainsFold(query),

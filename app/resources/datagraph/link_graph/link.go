@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -27,7 +28,16 @@ type WithRefs struct {
 	Replies     []*reply.Reply
 	Clusters    []*datagraph.Cluster
 	Items       []*datagraph.Item
+	Related     datagraph.NodeReferenceList
 }
+
+func (l *WithRefs) GetID() xid.ID           { return xid.ID(l.ID) }
+func (l *WithRefs) GetKind() datagraph.Kind { return datagraph.KindLink }
+func (l *WithRefs) GetName() string         { return l.Title.String() }
+func (l *WithRefs) GetSlug() string         { return l.Slug }
+func (l *WithRefs) GetDesc() string         { return l.Description.String() }
+func (l *WithRefs) GetText() string         { return l.Description.String() }
+func (l *WithRefs) GetProps() any           { return nil }
 
 func (l *WithRefs) AssetIDs() []asset.AssetID {
 	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })

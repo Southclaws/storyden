@@ -22,21 +22,21 @@ func (h *withHydration) Index(ctx context.Context, object datagraph.Indexable) e
 	return h.wc.Index(ctx, object)
 }
 
-func (h *withHydration) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+func (h *withHydration) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
 	rs, err := h.wc.Search(ctx, query)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	results := []*semdex.Result{}
+	results := datagraph.NodeReferenceList{}
 
 	// NOTE: Should probably be parallelised at some point...
 	for _, v := range rs {
 		r, err := h.rh.Hydrate(ctx, v)
 		if err != nil {
 			h.l.Warn("failed to hydrate search result",
-				zap.String("datagraph_kind", v.Type.String()),
-				zap.String("result_id", v.Id.String()),
+				zap.String("datagraph_kind", v.Kind.String()),
+				zap.String("result_id", v.ID.String()),
 				zap.Error(err))
 			continue
 		}
@@ -47,7 +47,7 @@ func (h *withHydration) Search(ctx context.Context, query string) ([]*semdex.Res
 	return results, nil
 }
 
-func (h *withHydration) Recommend(ctx context.Context, object datagraph.Indexable) ([]*semdex.Result, error) {
+func (h *withHydration) Recommend(ctx context.Context, object datagraph.Indexable) (datagraph.NodeReferenceList, error) {
 	rs, err := h.wc.Recommend(ctx, object)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -61,20 +61,21 @@ func (h *withHydration) Recommend(ctx context.Context, object datagraph.Indexabl
 	return results, nil
 }
 
-func (h *withHydration) Hydrate(ctx context.Context, results []*semdex.Result) ([]*semdex.Result, error) {
+func (h *withHydration) Hydrate(ctx context.Context, results datagraph.NodeReferenceList) (datagraph.NodeReferenceList, error) {
+	hydrated := datagraph.NodeReferenceList{}
 	// NOTE: Should probably be parallelised at some point...
-	for i, v := range results {
+	for _, v := range results {
 		r, err := h.rh.Hydrate(ctx, v)
 		if err != nil {
 			h.l.Warn("failed to hydrate search result",
-				zap.String("datagraph_kind", v.Type.String()),
-				zap.String("result_id", v.Id.String()),
+				zap.String("datagraph_kind", v.Kind.String()),
+				zap.String("result_id", v.ID.String()),
 				zap.Error(err))
 			continue
 		}
 
-		results[i] = r
+		hydrated = append(hydrated, r)
 	}
 
-	return results, nil
+	return hydrated, nil
 }

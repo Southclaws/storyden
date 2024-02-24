@@ -5,13 +5,13 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { DatagraphItemType } from "./datagraphItemType";
+import type { DatagraphItemKind } from "./datagraphItemKind";
 import type { Identifier } from "./identifier";
 
 export interface DatagraphItem {
   description?: string;
   id: Identifier;
+  kind: DatagraphItemKind;
   name: string;
   slug: string;
-  type: DatagraphItemType;
 }

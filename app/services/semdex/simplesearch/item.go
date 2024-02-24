@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/item"
 )
@@ -17,7 +16,7 @@ type itemSearcher struct {
 	ec *ent.Client
 }
 
-func (s *itemSearcher) Search(ctx context.Context, query string) ([]*semdex.Result, error) {
+func (s *itemSearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
 	iq := s.ec.Item.Query().Where(
 		item.Or(
 			item.NameContainsFold(query),

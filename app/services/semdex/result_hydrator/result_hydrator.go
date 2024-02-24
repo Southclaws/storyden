@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type Hydrator struct {
@@ -34,10 +33,10 @@ func New(
 	return &Hydrator{tr, rr, ir, cr, lr}
 }
 
-func (h *Hydrator) Hydrate(ctx context.Context, sr *semdex.Result) (*semdex.Result, error) {
-	switch sr.Type {
+func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*datagraph.NodeReference, error) {
+	switch sr.Kind {
 	case datagraph.KindThread:
-		t, err := h.tr.Get(ctx, post.ID(sr.Id))
+		t, err := h.tr.Get(ctx, post.ID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -50,7 +49,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *semdex.Result) (*semdex.Resu
 
 	case datagraph.KindReply:
 
-		r, err := h.rr.Get(ctx, post.ID(sr.Id))
+		r, err := h.rr.Get(ctx, post.ID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -62,7 +61,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *semdex.Result) (*semdex.Resu
 		return sr, nil
 
 	case datagraph.KindCluster:
-		c, err := h.cr.GetByID(ctx, datagraph.ClusterID(sr.Id))
+		c, err := h.cr.GetByID(ctx, datagraph.ClusterID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -73,7 +72,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *semdex.Result) (*semdex.Resu
 		return sr, nil
 
 	case datagraph.KindItem:
-		i, err := h.ir.GetByID(ctx, datagraph.ItemID(sr.Id))
+		i, err := h.ir.GetByID(ctx, datagraph.ItemID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -84,7 +83,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *semdex.Result) (*semdex.Resu
 		return sr, nil
 
 	case datagraph.KindLink:
-		ln, err := h.lr.GetByID(ctx, datagraph.LinkID(sr.Id))
+		ln, err := h.lr.GetByID(ctx, datagraph.LinkID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
