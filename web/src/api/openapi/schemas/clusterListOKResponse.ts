@@ -5,8 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ClusterList } from "./clusterList";
+import type { ClusterListResult } from "./clusterListResult";
 
-export type ClusterListOKResponse = {
-  clusters: ClusterList;
-};
+/**
+ * Cluster list.
+ */
+export type ClusterListOKResponse = ClusterListResult;
