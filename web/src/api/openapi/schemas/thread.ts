@@ -5,7 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { DatagraphRecommendations } from "./datagraphRecommendations";
 import type { ThreadAllOf } from "./threadAllOf";
 import type { ThreadReference } from "./threadReference";
 
-export type Thread = ThreadReference & ThreadAllOf;
+export type Thread = ThreadReference & DatagraphRecommendations & ThreadAllOf;

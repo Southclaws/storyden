@@ -2922,6 +2922,7 @@ components:
     Thread:
       allOf:
         - $ref: "#/components/schemas/ThreadReference"
+        - $ref: "#/components/schemas/DatagraphRecommendations"
         - type: object
           required: [posts]
           properties:
@@ -3176,6 +3177,7 @@ components:
       required: [items]
       allOf:
         - $ref: "#/components/schemas/Cluster"
+        - $ref: "#/components/schemas/DatagraphRecommendations"
         - required: [items, clusters]
           properties:
             items: { $ref: "#/components/schemas/ClusterItemList" }
@@ -3311,6 +3313,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/ItemCommonProps"
+        - $ref: "#/components/schemas/DatagraphRecommendations"
         - required: [clusters]
           properties:
             clusters: { $ref: "#/components/schemas/ClusterList" }
@@ -3392,6 +3395,7 @@ components:
     LinkWithRefs:
       allOf:
         - $ref: "#/components/schemas/Link"
+        - $ref: "#/components/schemas/DatagraphRecommendations"
         - required: [threads, posts, clusters, items, collections]
           properties:
             threads: { $ref: "#/components/schemas/ThreadList" }
@@ -3449,9 +3453,9 @@ components:
 
     DatagraphItem:
       type: object
-      required: [type, id, name, slug]
+      required: [kind, id, name, slug]
       properties:
-        type: { $ref: "#/components/schemas/DatagraphItemType" }
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
         id: { $ref: "#/components/schemas/Identifier" }
         name:
           type: string
@@ -3460,9 +3464,14 @@ components:
         description:
           type: string
 
-    DatagraphItemType:
+    DatagraphItemKind:
       type: string
       enum: [thread, reply, cluster, item, link]
+
+    DatagraphRecommendations:
+      required: [recomentations]
+      properties:
+        recomentations: { $ref: "#/components/schemas/DatagraphItemList" }
 
   securitySchemes:
     browser:

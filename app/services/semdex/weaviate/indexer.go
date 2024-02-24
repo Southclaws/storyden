@@ -25,7 +25,7 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable
 	}
 
 	_, err := s.wc.Data().Creator().
-		WithClassName(TestClassName).
+		WithClassName(s.mc.Class).
 		WithID(wid).
 		WithProperties(map[string]any{
 			"datagraph_id":   sid.String(),

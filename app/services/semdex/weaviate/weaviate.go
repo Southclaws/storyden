@@ -16,27 +16,26 @@ import (
 
 // NOT PROD READY: Just using local transformers for now.
 
-const TestClassName = "ContentText2vecTransformers"
-
-var TestClassObject = &models.Class{
-	Class:      TestClassName,
-	Vectorizer: "text2vec-transformers",
-	ModuleConfig: map[string]interface{}{
-		// "text2vec-openai":   map[string]interface{}{},
-		// "generative-openai": map[string]interface{}{},
-		"text2vec-transformers": map[string]interface{}{},
-	},
-}
-
 type weaviateSemdexer struct {
 	wc *weaviate.Client
+	mc models.Class
 }
 
 func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
+	class := models.Class{
+		Class:      "ContentText2vecTransformers",
+		Vectorizer: "text2vec-transformers",
+		ModuleConfig: map[string]interface{}{
+			// "text2vec-openai":   map[string]interface{}{},
+			// "generative-openai": map[string]interface{}{},
+			"text2vec-transformers": map[string]interface{}{},
+		},
+	}
+
 	lc.Append(fx.StartHook(func(ctx context.Context) error {
 		r, err := wc.Schema().
 			ClassExistenceChecker().
-			WithClassName(TestClassName).
+			WithClassName(class.Class).
 			Do(ctx)
 		if err != nil {
 			return fault.Wrap(err)
@@ -45,7 +44,7 @@ func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
 		if !r {
 			err := wc.Schema().
 				ClassCreator().
-				WithClass(TestClassObject).
+				WithClass(&class).
 				Do(ctx)
 			if err != nil {
 				return fault.Wrap(err)
@@ -55,7 +54,7 @@ func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client) semdex.Semdexer {
 		return nil
 	}))
 
-	return &weaviateSemdexer{wc}
+	return &weaviateSemdexer{wc, class}
 }
 
 func Build() fx.Option {

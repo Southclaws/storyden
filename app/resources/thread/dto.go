@@ -39,6 +39,12 @@ type Thread struct {
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
 	Links       datagraph.Links
+	Related     []*datagraph.NodeReference
+}
+
+type ThreadWithRecommendations struct {
+	Thread
+	Related []*datagraph.Indexable
 }
 
 func (*Thread) GetResourceName() string { return "thread" }

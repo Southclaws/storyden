@@ -11,7 +11,6 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type WeaviateObject struct {
@@ -28,7 +27,7 @@ type WeaviateResponse struct {
 	Explore WeaviateContent
 }
 
-func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Result, error) {
+func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.NodeReferenceList, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
@@ -43,7 +42,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 		WithQuery(q)
 
 	result, err := s.wc.GraphQL().Get().
-		WithClassName(TestClassName).
+		WithClassName(s.mc.Class).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
@@ -63,12 +62,12 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData, ok := parsed.Get[TestClassName]
+	classData, ok := parsed.Get[s.mc.Class]
 	if !ok {
 		return nil, fault.New("weaviate response did not contain expected class data")
 	}
 
-	results, err := dt.MapErr(classData, func(v WeaviateObject) (*semdex.Result, error) {
+	results, err := dt.MapErr(classData, func(v WeaviateObject) (*datagraph.NodeReference, error) {
 		id, err := xid.FromString(v.DatagraphID)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
@@ -79,9 +78,9 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) ([]*semdex.Resu
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		return &semdex.Result{
-			Id:   id,
-			Type: dk,
+		return &datagraph.NodeReference{
+			ID:   id,
+			Kind: dk,
 			Name: v.Name,
 		}, nil
 	})

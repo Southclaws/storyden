@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1
  */
 
-export type DatagraphItemType =
-  (typeof DatagraphItemType)[keyof typeof DatagraphItemType];
+export type DatagraphItemKind =
+  (typeof DatagraphItemKind)[keyof typeof DatagraphItemKind];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const DatagraphItemType = {
+export const DatagraphItemKind = {
   thread: "thread",
   reply: "reply",
   cluster: "cluster",
