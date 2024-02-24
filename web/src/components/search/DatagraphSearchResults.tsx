@@ -42,14 +42,14 @@ export function DatagraphResultItem(props: DatagraphItem) {
         </Flex>
 
         <styled.p lineClamp={3}>{props.description}</styled.p>
-        <styled.p lineClamp={3}>{props.type}</styled.p>
+        <styled.p lineClamp={3}>{props.kind}</styled.p>
       </FeedItem>
     </LinkBox>
   );
 }
 
 function buildPermalink(d: DatagraphItem): string {
-  switch (d.type) {
+  switch (d.kind) {
     case "thread":
       return `/t/${d.slug}`;
     case "reply":
