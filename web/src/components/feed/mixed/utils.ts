@@ -15,7 +15,7 @@ export type MixedContentChunk = MixedContentLists & { id: string };
 
 const chunkThreads = chunk(5);
 const chunkClusters = chunk(2);
-const chunkItems = chunk(2);
+const chunkItems = chunk(4);
 const chunkLinks = chunk(5);
 
 const filterInterestingLinks = filter((v: Link) =>

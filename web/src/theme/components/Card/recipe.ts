@@ -3,17 +3,30 @@ import { defineSlotRecipe } from "@pandacss/dev";
 export const card = defineSlotRecipe({
   className: "card",
   slots: [
+    // Global bits (span the entire card)
     "root",
+    "mediaBackdrop",
+
+    // Top level bits
+    "contentContainer",
+    "mediaContainer",
+
+    // Content container bits
     "textArea",
+    "footer",
     "title",
     "text",
+
+    // Media container bits
     "media",
-    "mediaContainer",
-    "mediaBackdrop",
+
+    // Overlay bits
+    "childrenOverlay",
   ],
   base: {
     root: {
-      "--text-lines": "2",
+      "--card-text-lines": "2",
+      "--card-image-max-height": "50px",
 
       containerType: "inline-size",
       display: "grid",
@@ -35,19 +48,32 @@ export const card = defineSlotRecipe({
       opacity: "0.1",
       contain: "size",
     },
+
+    contentContainer: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      gap: "2",
+      height: "full",
+      zIndex: "2",
+      padding: "2",
+      minWidth: "0",
+      overflow: "hidden",
+    },
     mediaContainer: {
       zIndex: "2",
     },
+
     media: {
       width: "full",
       height: "full",
       objectFit: "cover",
     },
-    textArea: {
-      zIndex: "2",
-      padding: "2",
-      minWidth: "0",
-      overflow: "hidden",
+    textArea: {},
+    footer: {
+      display: "flex",
+      justify: "start",
+      width: "full",
     },
     title: {
       display: "block",
@@ -60,8 +86,11 @@ export const card = defineSlotRecipe({
     },
     text: {
       display: "block",
-      lineClamp: "var(--text-lines)",
+      lineClamp: "var(--card-text-lines)",
       textOverflow: "ellipsis",
+    },
+    childrenOverlay: {
+      zIndex: "3",
     },
   },
   variants: {
@@ -97,7 +126,7 @@ export const card = defineSlotRecipe({
         media: {
           objectPosition: "top",
         },
-        textArea: {
+        contentContainer: {
           gridRow: "2 / 3",
           gridColumn: "1 / 2",
         },
@@ -106,10 +135,14 @@ export const card = defineSlotRecipe({
             display: "none",
           },
         },
+        childrenOverlay: {
+          gridRow: "1 / 3",
+          gridColumn: "1 / 2",
+        },
       },
       row: {
         root: {
-          gridTemplateRows: "1fr",
+          gridTemplateRows: "auto",
           gridTemplateColumns: "2fr 1fr 1fr",
           gridTemplateAreas: "var(--card-row-areas)",
         },
@@ -120,7 +153,7 @@ export const card = defineSlotRecipe({
         mediaContainer: {
           gridArea: "media",
         },
-        textArea: {
+        contentContainer: {
           gridArea: "text",
           background: "backgroundGradientH",
         },
@@ -128,6 +161,14 @@ export const card = defineSlotRecipe({
           _containerSmall: {
             display: "none",
           },
+        },
+        childrenOverlay: {
+          gridRow: "1 / 1",
+          gridColumn: "1 / 4",
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "end",
+          padding: "2",
         },
       },
     },

@@ -17,7 +17,7 @@ export function FeedItemByline(props: Props) {
   const permalink = `/t/${props.thread.slug}`;
 
   return (
-    <Flex justifyContent="space-between" gap="2">
+    <Flex w="full" justifyContent="space-between" gap="2">
       <Byline
         href={permalink}
         author={props.thread.author}

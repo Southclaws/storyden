@@ -9,7 +9,7 @@ import { isShareEnabled } from "src/utils/client";
 
 export type Props = {
   thread: ThreadReference;
-  onDelete: () => void;
+  onDelete?: () => void;
 };
 
 export function useFeedItemMenu(props: Props) {
@@ -19,7 +19,8 @@ export function useFeedItemMenu(props: Props) {
 
   const shareEnabled = isShareEnabled();
   const deleteEnabled =
-    account?.admin || account?.id === props.thread.author.id;
+    (account?.admin || account?.id === props.thread.author.id) &&
+    props.onDelete;
 
   async function share() {
     await navigator.share({
@@ -40,7 +41,7 @@ export function useFeedItemMenu(props: Props) {
         return;
 
       case "delete":
-        props.onDelete();
+        props.onDelete?.();
         return;
 
       default:

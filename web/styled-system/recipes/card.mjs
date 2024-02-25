@@ -13,8 +13,24 @@ const cardSlotNames = [
     "card__root"
   ],
   [
+    "mediaBackdrop",
+    "card__mediaBackdrop"
+  ],
+  [
+    "contentContainer",
+    "card__contentContainer"
+  ],
+  [
+    "mediaContainer",
+    "card__mediaContainer"
+  ],
+  [
     "textArea",
     "card__textArea"
+  ],
+  [
+    "footer",
+    "card__footer"
   ],
   [
     "title",
@@ -29,12 +45,8 @@ const cardSlotNames = [
     "card__media"
   ],
   [
-    "mediaContainer",
-    "card__mediaContainer"
-  ],
-  [
-    "mediaBackdrop",
-    "card__mediaBackdrop"
+    "childrenOverlay",
+    "card__childrenOverlay"
   ]
 ]
 const cardSlotFns = /* @__PURE__ */ cardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, cardDefaultVariants, getSlotCompoundVariant(cardCompoundVariants, slotName))])
