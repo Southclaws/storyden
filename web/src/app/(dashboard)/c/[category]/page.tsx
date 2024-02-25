@@ -1,9 +1,9 @@
-type Props = {
-  params: {
-    category: string;
-  };
-};
+// type Props = {
+//   params: {
+//     category: string;
+//   };
+// };
 
-export default function Page(props: Props) {
+export default function Page() {
   return <>CATEGORY FEED</>;
 }

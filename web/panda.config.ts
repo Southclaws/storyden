@@ -137,6 +137,7 @@ export default defineConfig({
   preflight: true,
   strictTokens: true,
   strictPropertyValues: true,
+  validation: "error",
   include: ["./src/**/*.tsx"],
   jsxFramework: "react",
   exclude: [],
@@ -154,11 +155,23 @@ export default defineConfig({
     placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
     collapsed:
       '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
-    containerSmall: "@container (max-width: 200px)",
+    containerSmall: "@container (max-width: 300px)",
   },
 
   patterns: {
     extend: {
+      LStack: {
+        description: "A VStack with full width aligned left.",
+        transform() {
+          return {
+            display: "flex",
+            gap: "3",
+            flexDirection: "column",
+            width: "full",
+            alignItems: "start",
+          };
+        },
+      },
       FrostedGlass: {
         description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
         properties: {},
@@ -183,7 +196,7 @@ export default defineConfig({
           };
         },
       },
-      Card: {
+      CardBox: {
         description: `A card component that can be used to display content in a container with a border and a shadow.`,
         properties: {
           kind: {

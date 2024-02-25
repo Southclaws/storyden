@@ -10,32 +10,33 @@ export const card = defineSlotRecipe({
     "media",
     "mediaContainer",
     "mediaBackdrop",
-    "mediaBackdropContainer",
   ],
   base: {
     root: {
+      "--text-lines": "2",
+
       containerType: "inline-size",
       display: "grid",
-      w: "full",
-      h: "full",
+      width: "full",
       gap: "0",
       overflow: "hidden",
       borderRadius: "lg",
       boxShadow: "sm",
+      minHeight: "0",
     },
     mediaBackdrop: {
+      width: "full",
+      height: "full",
       objectPosition: "center",
       objectFit: "cover",
       blur: "xl",
       filter: "auto",
-    },
-    mediaBackdropContainer: {
-      width: "full",
-      height: "full",
-      zIndex: "0",
+      zIndex: "1",
+      opacity: "0.1",
+      contain: "size",
     },
     mediaContainer: {
-      zIndex: "1",
+      zIndex: "2",
     },
     media: {
       width: "full",
@@ -45,18 +46,39 @@ export const card = defineSlotRecipe({
     textArea: {
       zIndex: "2",
       padding: "2",
-      backgroundColor: "bg.opaque",
-      backdropBlur: "frosted",
-      backdropFilter: "auto",
-    },
-    text: {
-      lineClamp: "2",
+      minWidth: "0",
+      overflow: "hidden",
     },
     title: {
-      lineClamp: "1",
+      display: "block",
+      overflow: "hidden",
+      textWrap: "nowrap",
+      textOverflow: "ellipsis",
+      _hover: {
+        textDecoration: "underline",
+      },
+    },
+    text: {
+      display: "block",
+      lineClamp: "var(--text-lines)",
+      textOverflow: "ellipsis",
     },
   },
   variants: {
+    mediaDisplay: {
+      with: {
+        root: {
+          "--card-image-display": "block",
+          "--card-row-areas": `"text text media"`,
+        },
+      },
+      without: {
+        root: {
+          "--card-media-display": "none",
+          "--card-row-areas": `"text text text"`,
+        },
+      },
+    },
     shape: {
       box: {
         root: {
@@ -86,26 +108,33 @@ export const card = defineSlotRecipe({
         },
       },
       row: {
-        // root: {
-        //   gridTemplateRows: "5lh",
-        //   gridTemplateColumns: "1fr 5lh",
-        // },
-        // mediaBackdrop: {
-        //   gridRow: "1",
-        //   gridColumn: "1 / 3",
-        // },
-        // media: {
-        //   gridRow: "1",
-        //   gridColumn: "2 / 3",
-        // },
-        // textArea: {
-        //   gridRow: "1",
-        //   gridColumn: "2 / 3",
-        // },
+        root: {
+          gridTemplateRows: "1fr",
+          gridTemplateColumns: "2fr 1fr 1fr",
+          gridTemplateAreas: "var(--card-row-areas)",
+        },
+        mediaBackdrop: {
+          gridRow: "1 / 1",
+          gridColumn: "2 / 4",
+        },
+        mediaContainer: {
+          gridArea: "media",
+        },
+        textArea: {
+          gridArea: "text",
+          background: "backgroundGradientH",
+        },
+        text: {
+          _containerSmall: {
+            display: "none",
+          },
+        },
       },
     },
   },
   defaultVariants: {
+    mediaDisplay: "with",
     shape: "box",
   },
+  jsx: ["Card"],
 });

@@ -6,7 +6,7 @@ import {
 import { Heading3 } from "src/theme/components/Heading/Index";
 
 import { Box, LinkBox, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
-import { Card, FrostedGlass } from "@/styled-system/patterns";
+import { CardBox, FrostedGlass } from "@/styled-system/patterns";
 
 type Props = {
   item: Item;
@@ -19,7 +19,7 @@ export function ItemCard({ item, directoryPath }: Props) {
   return (
     <styled.article containerType="inline-size">
       <LinkBox
-        className={Card({ kind: "edge", display: "grid" })}
+        className={CardBox({ kind: "edge", display: "grid" })}
         w="full"
         h="full"
         aspectRatio="square"

@@ -6,7 +6,7 @@ import { Empty } from "../../site/Empty";
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
 
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
-import { Card } from "@/styled-system/patterns";
+import { CardBox } from "@/styled-system/patterns";
 
 type Props = {
   thread: ThreadReference;
@@ -19,7 +19,7 @@ export function LinkPost(props: Props) {
   const asset = link.assets?.[0] ?? props.thread.assets?.[0];
 
   return (
-    <styled.article className={Card({ kind: "edge" })}>
+    <styled.article className={CardBox({ kind: "edge" })}>
       <Box display="flex" w="full" height="16">
         <Box flexGrow="1" flexShrink="0" width="32">
           {asset ? (

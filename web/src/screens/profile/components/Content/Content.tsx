@@ -1,5 +1,5 @@
 import { PublicProfile } from "src/api/openapi/schemas";
-import { MixedPostList } from "src/components/feed/mixed/MixedPostList";
+import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
 import {
   Tabs,
@@ -32,9 +32,9 @@ export function Content(props: PublicProfile) {
         </TabsList>
 
         <TabsContent value="posts">
-          <MixedPostList
-            posts={content.data.threads}
-            onDelete={content.handlers.handleDelete}
+          <TextPostList
+            posts={content.data.threads.threads}
+            onDelete={content.handlers.handleDeleteThread}
           />
         </TabsContent>
 
