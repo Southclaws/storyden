@@ -142,7 +142,7 @@ export const card = defineSlotRecipe({
       },
       row: {
         root: {
-          gridTemplateRows: "auto",
+          gridTemplateRows: "minmax(3lh, 1fr)",
           gridTemplateColumns: "2fr 1fr 1fr",
           gridTemplateAreas: "var(--card-row-areas)",
         },
@@ -152,6 +152,7 @@ export const card = defineSlotRecipe({
         },
         mediaContainer: {
           gridArea: "media",
+          maxHeight: "32",
         },
         contentContainer: {
           gridArea: "text",
