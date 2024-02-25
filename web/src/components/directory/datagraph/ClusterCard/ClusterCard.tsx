@@ -17,7 +17,7 @@ import {
   VStack,
   styled,
 } from "@/styled-system/jsx";
-import { Card } from "@/styled-system/patterns";
+import { CardBox } from "@/styled-system/patterns";
 
 export type Props = {
   cluster: Cluster;
@@ -32,7 +32,7 @@ export function ClusterCard({ cluster, directoryPath }: Props) {
     <styled.article containerType="inline-size" w="full">
       <LinkBox
         className={cx(
-          Card({ kind: "edge", display: "grid" }),
+          CardBox({ kind: "edge", display: "grid" }),
           styles["container"],
         )}
         w="full"

@@ -1,8 +1,8 @@
 import { PropsWithChildren } from "react";
 
 import { styled } from "@/styled-system/jsx";
-import { Card } from "@/styled-system/patterns";
+import { CardBox } from "@/styled-system/patterns";
 
 export function FeedItem({ children }: PropsWithChildren) {
-  return <styled.article className={Card()}>{children}</styled.article>;
+  return <styled.article className={CardBox()}>{children}</styled.article>;
 }

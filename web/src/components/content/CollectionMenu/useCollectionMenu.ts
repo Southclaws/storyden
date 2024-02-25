@@ -93,7 +93,7 @@ export function useCollectionMenu({ thread }: Props) {
           await collectionAddPost(id, thread.id);
         }
 
-        await mutate?.();
+        await mutate?.mutateThreads();
     }
   };
 
