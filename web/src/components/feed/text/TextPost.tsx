@@ -1,32 +1,44 @@
 import { ThreadReference } from "src/api/openapi/schemas";
-import { Anchor } from "src/components/site/Anchor";
-import { Heading1 } from "src/theme/components/Heading/Index";
+import { useSession } from "src/auth";
+import { Byline } from "src/components/content/Byline";
+import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
+import { Card } from "src/theme/components/Card";
 
-import { FeedItem } from "../common/FeedItem/FeedItem";
-import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
+import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
-import { Flex } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
 
 type Props = {
   thread: ThreadReference;
   onDelete?: () => void;
 };
 
-export function TextPost(props: Props) {
-  const permalink = `/t/${props.thread.slug}`;
+export function TextPost({ thread, onDelete }: Props) {
+  const session = useSession();
+  const permalink = `/t/${thread.slug}`;
 
   return (
-    <FeedItem>
-      <Flex justifyContent="space-between">
-        <Heading1 size="sm">
-          <Anchor href={permalink}>{props.thread.title}</Anchor>
-        </Heading1>
-      </Flex>
-
-      {/* Suggestion from Jonas: do we actually need a short text preview? */}
-      {/* <styled.p lineClamp={1}>{props.thread.short}</styled.p> */}
-
-      <FeedItemByline thread={props.thread} onDelete={props.onDelete} />
-    </FeedItem>
+    <Card
+      shape="row"
+      title={thread.title}
+      text={thread.short}
+      url={permalink}
+      image={thread.assets[0]?.url}
+      controls={
+        session && (
+          <HStack>
+            <CollectionMenu thread={thread} />
+            <FeedItemMenu thread={thread} onDelete={onDelete} />
+          </HStack>
+        )
+      }
+    >
+      <Byline
+        href={permalink}
+        author={thread.author}
+        time={new Date(thread.createdAt)}
+        updated={new Date(thread.updatedAt)}
+      />
+    </Card>
   );
 }

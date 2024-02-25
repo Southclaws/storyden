@@ -4,18 +4,19 @@ import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { BookmarkAction } from "src/components/site/Action/Bookmark";
 import { Checkbox } from "src/theme/components/Checkbox";
 import {
+  Menu,
   MenuContent,
   MenuItem,
   MenuItemGroup,
   MenuItemGroupLabel,
+  MenuPositioner,
   MenuSeparator,
+  MenuTrigger,
 } from "src/theme/components/Menu";
-import { Menu, MenuPositioner, MenuTrigger } from "src/theme/components/Menu";
 
 import { CollectionCreateTrigger } from "../CollectionCreate/CollectionCreateTrigger";
 
-import { Center, HStack } from "@/styled-system/jsx";
-import { Box } from "@/styled-system/jsx";
+import { Box, Center, HStack } from "@/styled-system/jsx";
 
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 
