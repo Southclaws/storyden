@@ -1,6 +1,9 @@
-import { LinkListResult } from "src/api/openapi/schemas";
+import { map } from "lodash/fp";
+
+import { Link, LinkListResult } from "src/api/openapi/schemas";
 import { LinkCard } from "src/components/directory/links/LinkCard";
 import { Empty } from "src/components/site/Empty";
+import { CardGrid, CardItem, CardRows } from "src/theme/components/Card";
 
 import { styled } from "@/styled-system/jsx";
 
@@ -25,4 +28,22 @@ export function LinkCardList({ links, show }: Props) {
       ))}
     </styled.ol>
   );
+}
+
+const toCardItems = map<Link, CardItem>((l) => ({
+  id: l.slug,
+  title: l.title || l.url,
+  text: l.description,
+  image: l.assets[0]?.url,
+  url: l.url,
+}));
+
+export function LinkCardRows({ links }: { links: Link[] }) {
+  const items = toCardItems(links);
+  return <CardRows items={items} />;
+}
+
+export function LinkCardGrid({ links }: { links: Link[] }) {
+  const items = toCardItems(links);
+  return <CardGrid items={items} />;
 }

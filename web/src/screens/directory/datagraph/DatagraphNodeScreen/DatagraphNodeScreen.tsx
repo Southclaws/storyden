@@ -5,7 +5,7 @@ import { FormProvider } from "react-hook-form";
 
 import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
-import { ClusterList } from "src/components/directory/datagraph/ClusterList";
+import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { CancelAction } from "src/components/site/Action/Cancel";
@@ -157,7 +157,7 @@ export function DatagraphNodeScreen(props: Props) {
             )}
 
             {node && (node.clusters.length ?? 0) > 0 && (
-              <ClusterList
+              <ClusterCardRows
                 directoryPath={directoryPath}
                 clusters={node.clusters}
               />
@@ -174,7 +174,7 @@ export function DatagraphNodeScreen(props: Props) {
             <Heading2>Member of</Heading2>
 
             {node.clusters.length ? (
-              <ClusterList
+              <ClusterCardRows
                 directoryPath={directoryPath}
                 clusters={node.clusters}
               />

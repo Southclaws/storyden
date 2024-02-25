@@ -45,7 +45,7 @@ export const card = defineSlotRecipe({
       blur: "xl",
       filter: "auto",
       zIndex: "1",
-      opacity: "0.1",
+      opacity: "0.2",
       contain: "size",
     },
 
@@ -91,6 +91,7 @@ export const card = defineSlotRecipe({
     },
     childrenOverlay: {
       zIndex: "3",
+      pointerEvents: "none",
     },
   },
   variants: {
@@ -152,7 +153,8 @@ export const card = defineSlotRecipe({
         },
         mediaContainer: {
           gridArea: "media",
-          maxHeight: "32",
+          maxHeight: "full",
+          contain: "size",
         },
         contentContainer: {
           gridArea: "text",
