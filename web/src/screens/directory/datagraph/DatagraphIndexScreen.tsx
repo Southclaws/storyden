@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
-import { ClusterList } from "src/components/directory/datagraph/ClusterList";
+import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
 import { LinkCardList } from "src/components/directory/links/LinkCardList";
 import { Empty } from "src/components/site/Empty";
@@ -56,7 +56,7 @@ export function Client(props: Props) {
       {clusters.data.clusters.length > 0 && (
         <VStack w="full" alignItems="start">
           <Heading2>Clusters</Heading2>
-          <ClusterList directoryPath={[]} {...clusters.data} />
+          <ClusterCardRows directoryPath={[]} {...clusters.data} />
         </VStack>
       )}
     </VStack>

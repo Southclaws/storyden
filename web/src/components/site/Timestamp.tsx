@@ -1,22 +1,48 @@
+import { timestamp } from "src/utils/date";
+
 import { styled } from "@/styled-system/jsx";
 
 import { Anchor } from "./Anchor";
 
 type Props = {
-  created: string;
-  updated?: string | undefined;
+  created: string | Date;
+  updated?: string | Date | undefined;
   href?: string;
 };
 
-export function Timestamp({ created, updated, ...props }: Props) {
+export function Timestamp(props: Props) {
+  const { created, updated } = props;
+
+  const createdDate = normaliseDate(created);
+  const updatedDate = normaliseDate(updated);
+
+  const showUpdated = isUpdatedLongerThanADay(createdDate, updatedDate);
+
+  const createdAt = timestamp(createdDate);
+  const updatedAt = updated ? timestamp(updated) : null;
+
   return (
     <styled.span>
       {props.href ? (
-        <Anchor href={props.href}>{created}</Anchor>
+        <Anchor href={props.href}>{createdAt}</Anchor>
       ) : (
-        <styled.span>{created}</styled.span>
+        <styled.span>{createdAt}</styled.span>
       )}
-      {updated && <> (updated {updated})</>}
+      {showUpdated && <> (updated {updatedAt})</>}
     </styled.span>
   );
+}
+
+function normaliseDate(date: string | Date | undefined) {
+  if (date === undefined) {
+    return new Date();
+  }
+
+  return date instanceof Date ? date : new Date(date);
+}
+
+function isUpdatedLongerThanADay(created: Date, updated?: Date) {
+  if (!updated) return false;
+
+  return updated.getTime() - created.getTime() > 1000 * 60 * 60 * 24;
 }

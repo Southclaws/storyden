@@ -1,4 +1,4 @@
-import { FormatDistanceToNowOptions } from "date-fns";
+import { FormatDistanceToNowOptions, formatDistanceToNow } from "date-fns";
 
 const formatDistanceLocale = {
   lessThanXSeconds: "{{count}}s",
@@ -34,3 +34,11 @@ export const formatDistance = (
 export const formatDistanceDefaults: FormatDistanceToNowOptions = {
   locale: { formatDistance },
 };
+
+export function timestamp(date: string | number | Date) {
+  try {
+    return formatDistanceToNow(date, formatDistanceDefaults);
+  } catch (e: unknown) {
+    throw new Error(`Failed to format date: ${date}: error: ${e}`);
+  }
+}

@@ -10,11 +10,7 @@ export function Metadata(props: PublicProfile) {
     <>
       <styled.p color="fg.muted">
         Registered&nbsp;
-        <Timestamp
-          created={formatDistanceToNow(new Date(props.createdAt), {
-            addSuffix: true,
-          })}
-        />
+        <Timestamp created={props.createdAt} />
       </styled.p>
 
       {props.deletedAt && (
