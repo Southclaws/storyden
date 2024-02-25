@@ -1,6 +1,6 @@
-import { ClusterList } from "src/components/directory/datagraph/ClusterList";
+import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
-import { LinkListRows } from "src/components/directory/links/LinkListRows";
+import { LinkCardRows } from "src/components/directory/links/LinkCardList";
 
 import { TextPostList } from "../text/TextPostList";
 import { MixedContent } from "../useFeed";
@@ -28,13 +28,13 @@ export function MixedContentFeed({ data }: Props) {
 function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
   return (
     <LStack>
-      <ClusterList directoryPath={[]} clusters={data.clusters} />
+      <ClusterCardRows directoryPath={[]} clusters={data.clusters} />
 
       <TextPostList posts={data.threads} />
 
       <ItemGrid directoryPath={[]} items={data.items} />
 
-      <LinkListRows links={data.links} />
+      <LinkCardRows links={data.links} />
     </LStack>
   );
 }

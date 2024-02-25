@@ -20,6 +20,7 @@ export function TextPost({ thread, onDelete }: Props) {
   return (
     <Card
       shape="row"
+      id={thread.id}
       title={thread.title}
       text={thread.short}
       url={permalink}

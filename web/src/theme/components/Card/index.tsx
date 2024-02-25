@@ -1,14 +1,13 @@
 import { PropsWithChildren } from "react";
 
-import { Empty } from "src/components/site/Empty";
-
 import { Heading3 } from "../Heading/Index";
 
 import { cx } from "@/styled-system/css";
-import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
+import { Grid, LStack, styled } from "@/styled-system/jsx";
 import { CardVariantProps, card } from "@/styled-system/recipes";
 
 export type CardItem = {
+  id: string;
   title: string;
   url: string;
   text?: string;
@@ -40,15 +39,9 @@ export function Card({
 
       {image && <styled.img className={styles.mediaBackdrop} src={image} />}
 
-      {image ? (
+      {image && (
         <div className={styles.mediaContainer}>
           <styled.img className={styles.media} src={image} />
-        </div>
-      ) : (
-        <div className={styles.mediaContainer}>
-          <Center h="full" display={{ base: "none", sm: "flex" }}>
-            <Empty></Empty>
-          </Center>
         </div>
       )}
 
@@ -73,7 +66,7 @@ export function CardRows({ items }: { items: CardItem[] }) {
   return (
     <LStack maxH="min">
       {items.map((i) => (
-        <Card key={i.title} shape="row" {...i} />
+        <Card key={i.id} shape="row" {...i} />
       ))}
     </LStack>
   );
