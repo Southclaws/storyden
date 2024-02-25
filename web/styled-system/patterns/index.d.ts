@@ -20,6 +20,7 @@ export * from './float';
 export * from './bleed';
 export * from './visually-hidden';
 export * from './cq';
+export * from './lstack';
 export * from './frosted-glass';
 export * from './floating';
-export * from './card';
+export * from './card-box';

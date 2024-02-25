@@ -1,7 +1,7 @@
 import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
-const CardConfig = {
+const CardBoxConfig = {
 transform(props) {
   const { kind, display } = props;
   const padding = kind === "edge" ? "0" : "2";
@@ -18,10 +18,10 @@ transform(props) {
   };
 }}
 
-export const getCardStyle = (styles = {}) => {
-  const _styles = getPatternStyles(CardConfig, styles)
-  return CardConfig.transform(_styles, patternFns)
+export const getCardBoxStyle = (styles = {}) => {
+  const _styles = getPatternStyles(CardBoxConfig, styles)
+  return CardBoxConfig.transform(_styles, patternFns)
 }
 
-export const Card = (styles) => css(getCardStyle(styles))
-Card.raw = getCardStyle
+export const CardBox = (styles) => css(getCardBoxStyle(styles))
+CardBox.raw = getCardBoxStyle
