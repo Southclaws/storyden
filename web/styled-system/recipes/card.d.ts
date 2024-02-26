@@ -17,7 +17,7 @@ export type CardVariantProps = {
 
 export interface CardRecipe {
   __type: CardVariantProps
-  (props?: CardVariantProps): Pretty<Record<"root" | "mediaBackdrop" | "contentContainer" | "mediaContainer" | "textArea" | "footer" | "title" | "text" | "media" | "childrenOverlay", string>>
+  (props?: CardVariantProps): Pretty<Record<"root" | "mediaBackdrop" | "contentContainer" | "mediaContainer" | "textArea" | "footer" | "title" | "text" | "media" | "controlsOverlayContainer" | "controls", string>>
   raw: (props?: CardVariantProps) => CardVariantProps
   variantMap: CardVariantMap
   variantKeys: Array<keyof CardVariant>
