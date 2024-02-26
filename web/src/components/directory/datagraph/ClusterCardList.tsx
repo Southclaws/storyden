@@ -1,6 +1,5 @@
 import { Cluster } from "src/api/openapi/schemas";
-
-import { Grid, LStack } from "@/styled-system/jsx";
+import { CardGrid, CardRows } from "src/theme/components/Card";
 
 import { ClusterCard } from "./ClusterCard";
 
@@ -11,7 +10,7 @@ type Props = {
 
 export function ClusterCardRows({ directoryPath, clusters }: Props) {
   return (
-    <LStack>
+    <CardRows>
       {clusters.map((c) => (
         <ClusterCard
           key={c.id}
@@ -20,20 +19,13 @@ export function ClusterCardRows({ directoryPath, clusters }: Props) {
           cluster={c}
         />
       ))}
-    </LStack>
+    </CardRows>
   );
 }
 
 export function ClusterCardGrid({ directoryPath, clusters }: Props) {
   return (
-    <Grid
-      w="full"
-      gridTemplateColumns={{
-        base: "2",
-        sm: "4",
-        lg: "6",
-      }}
-    >
+    <CardGrid>
       {clusters.map((c) => (
         <ClusterCard
           key={c.id}
@@ -42,6 +34,6 @@ export function ClusterCardGrid({ directoryPath, clusters }: Props) {
           cluster={c}
         />
       ))}
-    </Grid>
+    </CardGrid>
   );
 }

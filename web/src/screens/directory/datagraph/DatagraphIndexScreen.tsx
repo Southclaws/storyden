@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
-import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
+import { ItemCardGrid } from "src/components/directory/datagraph/ItemCardList";
 import { LinkCardList } from "src/components/directory/links/LinkCardList";
 import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
@@ -42,7 +42,7 @@ export function Client(props: Props) {
       {items.data.items.length > 0 && (
         <VStack w="full" alignItems="start">
           <Heading2>New items</Heading2>
-          <ItemGrid directoryPath={[]} {...items.data} />
+          <ItemCardGrid directoryPath={[]} {...items.data} />
         </VStack>
       )}
 
