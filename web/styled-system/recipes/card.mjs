@@ -45,8 +45,12 @@ const cardSlotNames = [
     "card__media"
   ],
   [
-    "childrenOverlay",
-    "card__childrenOverlay"
+    "controlsOverlayContainer",
+    "card__controlsOverlayContainer"
+  ],
+  [
+    "controls",
+    "card__controls"
   ]
 ]
 const cardSlotFns = /* @__PURE__ */ cardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, cardDefaultVariants, getSlotCompoundVariant(cardCompoundVariants, slotName))])
