@@ -19,6 +19,7 @@ export const card = defineSlotRecipe({
 
     // Media container bits
     "media",
+    "mediaMissing",
 
     // Overlay bits
     "controlsOverlayContainer",
@@ -134,6 +135,12 @@ export const card = defineSlotRecipe({
         media: {
           objectPosition: "top",
         },
+        mediaMissing: {
+          gridRow: "1 / 2",
+          gridColumn: "1 / 2",
+          height: "full",
+          paddingBottom: "3lh",
+        },
         contentContainer: {
           gridRow: "2 / 3",
           gridColumn: "1 / 2",
@@ -170,6 +177,9 @@ export const card = defineSlotRecipe({
           gridArea: "media",
           maxHeight: "full",
           contain: "size",
+        },
+        mediaMissing: {
+          display: "none",
         },
         contentContainer: {
           gridArea: "text",
