@@ -2,8 +2,7 @@ import { slice } from "lodash/fp";
 
 import { Item } from "src/api/openapi/schemas";
 import { DirectoryPath } from "src/screens/directory/datagraph/useDirectoryPath";
-
-import { Grid } from "@/styled-system/jsx";
+import { CardGrid } from "src/theme/components/Card";
 
 import { ItemCard } from "./ItemCard";
 
@@ -12,20 +11,11 @@ type Props = {
   directoryPath: DirectoryPath;
 };
 
-export function ItemGrid(props: Props) {
+export function ItemCardGrid(props: Props) {
   const items = slice(0, 4, props.items);
 
   return (
-    <Grid
-      w="full"
-      gridTemplateColumns={{
-        base: "2",
-        sm: "3",
-        md: "3",
-        lg: "4",
-      }}
-      gridTemplateRows="1"
-    >
+    <CardGrid>
       {items.map((item) => (
         <ItemCard
           key={item.id}
@@ -33,6 +23,6 @@ export function ItemGrid(props: Props) {
           item={item}
         />
       ))}
-    </Grid>
+    </CardGrid>
   );
 }

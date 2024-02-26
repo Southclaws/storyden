@@ -9,3 +9,20 @@ export function DirectoryBadge() {
     </styled.span>
   );
 }
+
+// TODO: Make this a recipe component.
+export function NewBadge() {
+  return (
+    <styled.span
+      fontSize="xs"
+      fontWeight="bold"
+      backgroundColor="accent.100"
+      color="accent.800"
+      px="1"
+      py="0.5"
+      borderRadius="sm"
+    >
+      New
+    </styled.span>
+  );
+}

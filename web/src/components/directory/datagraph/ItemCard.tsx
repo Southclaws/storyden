@@ -1,57 +1,44 @@
 import { Item } from "src/api/openapi/schemas";
+import { Timestamp } from "src/components/site/Timestamp";
 import {
   DirectoryPath,
   joinDirectoryPath,
 } from "src/screens/directory/datagraph/useDirectoryPath";
-import { Heading3 } from "src/theme/components/Heading/Index";
+import { Card } from "src/theme/components/Card";
 
-import { Box, LinkBox, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
-import { CardBox, FrostedGlass } from "@/styled-system/patterns";
+import { DirectoryBadge } from "../DirectoryBadge";
 
-type Props = {
+import { HStack } from "@/styled-system/jsx";
+import { CardVariantProps } from "@/styled-system/recipes";
+
+export type Props = {
   item: Item;
   directoryPath: DirectoryPath;
-};
+} & CardVariantProps;
 
-export function ItemCard({ item, directoryPath }: Props) {
+export function ItemCard({ item, directoryPath, ...rest }: Props) {
   const slug = joinDirectoryPath(directoryPath, item.slug);
   const asset = item.assets?.[0];
-  return (
-    <styled.article containerType="inline-size">
-      <LinkBox
-        className={CardBox({ kind: "edge", display: "grid" })}
-        w="full"
-        h="full"
-        aspectRatio="square"
-        gridTemplateAreas='"x"'
-      >
-        {asset && (
-          <styled.img
-            src={asset.url}
-            height="full"
-            width="full"
-            objectPosition="top"
-            objectFit="cover"
-            aspectRatio="square"
-            gridArea="x"
-          />
-        )}
+  const url = `/directory/${slug}`;
 
-        <VStack gridArea="x" alignItems="center" justifyContent="end">
-          <Box
-            className={FrostedGlass()}
-            height="min"
-            p="2"
-            wordBreak="break-all"
-          >
-            <Heading3 className="fluid-font-size" lineClamp={1}>
-              {/* TODO: Next link */}
-              <LinkOverlay href={`/directory/${slug}`}>{item.name}</LinkOverlay>
-            </Heading3>
-            <styled.p lineClamp={1}>{item.description}</styled.p>
-          </Box>
-        </VStack>
-      </LinkBox>
-    </styled.article>
+  return (
+    <Card
+      id={item.id}
+      title={item.name}
+      text={item.description}
+      url={url}
+      image={asset?.url}
+      {...rest}
+    >
+      <HStack color="fg.muted">
+        <DirectoryBadge />
+
+        <Timestamp
+          created={item.createdAt}
+          updated={item.updatedAt}
+          href={url}
+        />
+      </HStack>
+    </Card>
   );
 }

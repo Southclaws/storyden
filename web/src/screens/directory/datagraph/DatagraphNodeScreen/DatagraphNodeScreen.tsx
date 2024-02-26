@@ -7,7 +7,7 @@ import { ContentViewer } from "src/components/content/ContentViewer/ContentViewe
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
-import { ItemGrid } from "src/components/directory/datagraph/ItemGrid";
+import { ItemCardGrid } from "src/components/directory/datagraph/ItemCardList";
 import { CancelAction } from "src/components/site/Action/Cancel";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
@@ -164,7 +164,7 @@ export function DatagraphNodeScreen(props: Props) {
             )}
 
             {node && node.items.length > 0 && (
-              <ItemGrid directoryPath={directoryPath} items={node.items} />
+              <ItemCardGrid directoryPath={directoryPath} items={node.items} />
             )}
           </VStack>
         )}
