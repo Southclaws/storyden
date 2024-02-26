@@ -1,9 +1,11 @@
 import { PropsWithChildren, ReactNode } from "react";
 
+import { Empty } from "src/components/site/Empty";
+
 import { Heading3 } from "../Heading/Index";
 
 import { cx } from "@/styled-system/css";
-import { Grid, LStack, styled } from "@/styled-system/jsx";
+import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
 import { CardVariantProps, card } from "@/styled-system/recipes";
 
 export type CardItem = {
@@ -41,11 +43,17 @@ export function Card({
 
       {image && <styled.img className={styles.mediaBackdrop} src={image} />}
 
-      {image && (
-        <div className={styles.mediaContainer}>
+      <div className={styles.mediaContainer}>
+        {image ? (
           <styled.img className={styles.media} src={image} />
-        </div>
-      )}
+        ) : (
+          <div className={styles.mediaMissing}>
+            <Center h="full">
+              <Empty>no image</Empty>
+            </Center>
+          </div>
+        )}
+      </div>
 
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
