@@ -21,7 +21,8 @@ export const card = defineSlotRecipe({
     "media",
 
     // Overlay bits
-    "childrenOverlay",
+    "controlsOverlayContainer",
+    "controls",
   ],
   base: {
     root: {
@@ -89,9 +90,15 @@ export const card = defineSlotRecipe({
       lineClamp: "var(--card-text-lines)",
       textOverflow: "ellipsis",
     },
-    childrenOverlay: {
+
+    // The overlay is used to position the controls such as buttons etc. The
+    // container itself should not capture interactions, but the controls do.
+    controlsOverlayContainer: {
       zIndex: "3",
       pointerEvents: "none",
+    },
+    controls: {
+      pointerEvents: "auto",
     },
   },
   variants: {
@@ -130,15 +137,23 @@ export const card = defineSlotRecipe({
         contentContainer: {
           gridRow: "2 / 3",
           gridColumn: "1 / 2",
+          backdropBlur: "frosted",
+          backdropGrayscale: "0.5",
+          backdropFilter: "auto",
+          backgroundColor: "bg.opaque/90",
         },
         text: {
           _containerSmall: {
             display: "none",
           },
         },
-        childrenOverlay: {
-          gridRow: "1 / 3",
-          gridColumn: "1 / 2",
+        controlsOverlayContainer: {
+          gridRow: "1 / 1",
+          gridColumn: "1 / 4",
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "start",
+          padding: "2",
         },
       },
       row: {
@@ -165,7 +180,7 @@ export const card = defineSlotRecipe({
             display: "none",
           },
         },
-        childrenOverlay: {
+        controlsOverlayContainer: {
           gridRow: "1 / 1",
           gridColumn: "1 / 4",
           display: "flex",

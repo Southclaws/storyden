@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
 import { Heading3 } from "../Heading/Index";
 
@@ -35,7 +35,9 @@ export function Card({
 
   return (
     <styled.article className={styles.root}>
-      <div className={styles.childrenOverlay}>{controls}</div>
+      <div className={styles.controlsOverlayContainer}>
+        <div className={styles.controls}>{controls}</div>
+      </div>
 
       {image && <styled.img className={styles.mediaBackdrop} src={image} />}
 
@@ -62,29 +64,41 @@ export function Card({
   );
 }
 
-export function CardRows({ items }: { items: CardItem[] }) {
+export type CardGroupProps =
+  | {
+      items: CardItem[];
+      children?: undefined;
+    }
+  | {
+      items?: undefined;
+      children: ReactNode[];
+    };
+
+export function CardRows(props: CardGroupProps) {
   return (
     <LStack maxH="min">
-      {items.map((i) => (
-        <Card key={i.id} shape="row" {...i} />
-      ))}
+      {props.children
+        ? props.children
+        : props.items.map((i) => <Card key={i.id} shape="row" {...i} />)}
     </LStack>
   );
 }
 
-export function CardGrid({ items }: { items: CardItem[] }) {
+export function CardGrid(props: CardGroupProps) {
+  const items = props.items?.length ?? props.children?.length ?? 0;
+
   return (
     <Grid
       w="full"
       gridTemplateColumns={{
         base: "2",
-        sm: "4",
-        lg: "6",
+        // Dynamically change the columns based on number of items.
+        md: items === 3 ? "3" : items === 4 ? "4" : "2",
       }}
     >
-      {items.map((i) => (
-        <Card key={i.title} shape="row" {...i} />
-      ))}
+      {props.children
+        ? props.children
+        : props.items.map((i) => <Card key={i.id} shape="box" {...i} />)}
     </Grid>
   );
 }
