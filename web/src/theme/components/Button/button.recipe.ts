@@ -58,30 +58,30 @@ export const button = defineRecipe({
       neutral: {
         backgroundColor: "bg.default",
         _hover: {
-          background: "fg.subtle/20",
+          background: "bg.subtle",
         },
         _active: {
-          background: "fg.subtle/40",
+          background: "bg.muted",
         },
         _disabled,
       },
       primary: {
         backgroundColor: "bg.accent",
         _hover: {
-          backgroundColor: "bg.accent/80",
+          backgroundColor: "bg.accent.subtle",
         },
         _active: {
-          backgroundColor: "bg.accent/90",
+          backgroundColor: "bg.accent.muted",
         },
         _disabled,
       },
       destructive: {
         backgroundColor: "bg.destructive",
         _hover: {
-          backgroundColor: "bg.destructive/80",
+          backgroundColor: "bg.destructive.subtle", // TODO: Proper tokens for states on all colour tokens
         },
         _active: {
-          backgroundColor: "bg.destructive/90",
+          backgroundColor: "bg.destructive.muted",
         },
         _disabled,
       },
