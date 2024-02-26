@@ -45,6 +45,10 @@ const cardSlotNames = [
     "card__media"
   ],
   [
+    "mediaMissing",
+    "card__mediaMissing"
+  ],
+  [
     "controlsOverlayContainer",
     "card__controlsOverlayContainer"
   ],
