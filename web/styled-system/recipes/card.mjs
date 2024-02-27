@@ -13,6 +13,10 @@ const cardSlotNames = [
     "card__root"
   ],
   [
+    "mediaBackdropContainer",
+    "card__mediaBackdropContainer"
+  ],
+  [
     "mediaBackdrop",
     "card__mediaBackdrop"
   ],

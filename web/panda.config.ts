@@ -105,6 +105,9 @@ const semanticTokens = defineSemanticTokens({
       destructive: {
         value: { base: "{colors.red.500}", _osDark: "{colors.red.400}" },
       },
+      accent: {
+        value: { base: "{colors.accent.100}", _osDark: "{colors.accent.200}" },
+      },
     },
     border: {
       default: { value: "{colors.blackAlpha.200}" },

@@ -5,6 +5,7 @@ export const card = defineSlotRecipe({
   slots: [
     // Global bits (span the entire card)
     "root",
+    "mediaBackdropContainer",
     "mediaBackdrop",
 
     // Top level bits
@@ -39,6 +40,10 @@ export const card = defineSlotRecipe({
       boxShadow: "sm",
       minHeight: "0",
     },
+    mediaBackdropContainer: {
+      contain: "size",
+      zIndex: "1",
+    },
     mediaBackdrop: {
       width: "full",
       height: "full",
@@ -46,9 +51,7 @@ export const card = defineSlotRecipe({
       objectFit: "cover",
       blur: "xl",
       filter: "auto",
-      zIndex: "1",
       opacity: "0.2",
-      contain: "size",
     },
 
     contentContainer: {
@@ -166,17 +169,16 @@ export const card = defineSlotRecipe({
       row: {
         root: {
           gridTemplateRows: "minmax(3lh, 1fr)",
-          gridTemplateColumns: "2fr 1fr 1fr",
+          gridTemplateColumns: "1fr 2fr 1fr",
           gridTemplateAreas: "var(--card-row-areas)",
         },
-        mediaBackdrop: {
+        mediaBackdropContainer: {
           gridRow: "1 / 1",
           gridColumn: "2 / 4",
         },
         mediaContainer: {
           gridArea: "media",
           maxHeight: "full",
-          contain: "size",
         },
         mediaMissing: {
           display: "none",

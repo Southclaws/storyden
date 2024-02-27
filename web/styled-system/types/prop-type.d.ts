@@ -4,7 +4,6 @@ import type { CssProperties } from './system-types';
 import type { Tokens } from '../tokens/index';
 
 interface PropertyValueTypes {
-	ligten: Tokens["colors"];
 	aspectRatio: Tokens["aspectRatios"];
 	zIndex: Tokens["zIndex"];
 	top: Tokens["spacing"];
@@ -222,7 +221,6 @@ interface PropertyValueTypes {
 
   export interface PropertyTypes extends PropertyValueTypes {
   
-	light: Shorthand<"ligten">;
 	pos: Shorthand<"position">;
 	insetEnd: Shorthand<"insetInlineEnd">;
 	end: Shorthand<"insetInlineEnd">;

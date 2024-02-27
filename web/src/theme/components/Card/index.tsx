@@ -41,7 +41,11 @@ export function Card({
         <div className={styles.controls}>{controls}</div>
       </div>
 
-      {image && <styled.img className={styles.mediaBackdrop} src={image} />}
+      {image && (
+        <div className={styles.mediaBackdropContainer}>
+          <styled.img className={styles.mediaBackdrop} src={image} />
+        </div>
+      )}
 
       <div className={styles.mediaContainer}>
         {image ? (
