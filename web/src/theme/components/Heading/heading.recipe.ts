@@ -8,6 +8,7 @@ export const heading = defineRecipe({
   defaultVariants: {
     size: "md",
   },
+
   variants: {
     size: {
       xs: {
