@@ -4,7 +4,12 @@ import { styled } from "@/styled-system/jsx";
 
 export function DirectoryBadge() {
   return (
-    <styled.span backgroundColor="accent.100" px="1" borderRadius="md">
+    <styled.span
+      backgroundColor="bg.accent"
+      color="fg.accent"
+      px="1"
+      borderRadius="md"
+    >
       <Link href="/directory">directory</Link>
     </styled.span>
   );
@@ -16,8 +21,8 @@ export function NewBadge() {
     <styled.span
       fontSize="xs"
       fontWeight="bold"
-      backgroundColor="accent.100"
-      color="accent.800"
+      backgroundColor="bg.accent"
+      color="fg.accent"
       px="1"
       py="0.5"
       borderRadius="sm"
