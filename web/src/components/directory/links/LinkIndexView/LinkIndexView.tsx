@@ -1,6 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { LinkCardList } from "src/components/directory/links/LinkCardList";
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 import { Button } from "src/theme/components/Button";
@@ -10,6 +9,7 @@ import { LinkCard } from "../LinkCard";
 
 import { VStack, styled } from "@/styled-system/jsx";
 
+import { LinkResultList } from "./LinkResultList";
 import { IndexingState, Props, useLinkIndexView } from "./useLinkIndexView";
 
 export function LinkIndexView(props: Props) {
@@ -68,7 +68,7 @@ export function LinkIndexView(props: Props) {
       {data.indexing.state !== "not-indexing" ? (
         <IndexingState {...data.indexing} />
       ) : (
-        <LinkCardList links={data.links} />
+        <LinkResultList links={data.links} />
       )}
     </VStack>
   );
@@ -78,7 +78,7 @@ function IndexingState(props: IndexingState)  {
   switch (props.state) {
     case "not-indexing": return <></> 
     case "indexing": return <>Indexing {props.url}...</>
-    case "indexed": return <LinkCard {...props.link} />
+    case "indexed": return <LinkCard shape="row" link={props.link} />
     case "error": return <>{props.error}</>
   }
 }
