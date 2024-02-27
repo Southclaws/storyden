@@ -56,7 +56,12 @@ export function Client(props: Props) {
       {clusters.data.clusters.length > 0 && (
         <VStack w="full" alignItems="start">
           <Heading2>Clusters</Heading2>
-          <ClusterCardRows directoryPath={[]} {...clusters.data} />
+          <ClusterCardRows
+            directoryPath={[]}
+            context="directory"
+            size="small"
+            {...clusters.data}
+          />
         </VStack>
       )}
     </VStack>

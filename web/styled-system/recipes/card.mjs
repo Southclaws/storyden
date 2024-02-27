@@ -3,9 +3,32 @@ import { createRecipe } from './create-recipe.mjs';
 
 const cardDefaultVariants = {
   "mediaDisplay": "with",
-  "shape": "box"
+  "shape": "box",
+  "size": "default"
 }
-const cardCompoundVariants = []
+const cardCompoundVariants = [
+  {
+    "size": "small",
+    "shape": "row",
+    "css": {
+      "root": {
+        "gridTemplateColumns": "1fr 2fr minmax(0, 3lh)"
+      },
+      "text": {
+        "display": "none"
+      },
+      "title": {
+        "fontSize": "sm"
+      },
+      "controlsOverlayContainer": {
+        "display": "flex",
+        "justifyContent": "end",
+        "alignItems": "start",
+        "padding": "2"
+      }
+    }
+  }
+]
 
 const cardSlotNames = [
   [
@@ -69,7 +92,8 @@ const cardFn = memo((props = {}) => {
 
 const cardVariantKeys = [
   "mediaDisplay",
-  "shape"
+  "shape",
+  "size"
 ]
 
 export const card = /* @__PURE__ */ Object.assign(cardFn, {
@@ -85,6 +109,10 @@ export const card = /* @__PURE__ */ Object.assign(cardFn, {
   "shape": [
     "box",
     "row"
+  ],
+  "size": [
+    "default",
+    "small"
   ]
 },
   splitVariantProps(props) {

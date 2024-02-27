@@ -5,6 +5,7 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 interface CardVariant {
   mediaDisplay: "with" | "without"
 shape: "box" | "row"
+size: "default" | "small"
 }
 
 type CardVariantMap = {
@@ -12,7 +13,7 @@ type CardVariantMap = {
 }
 
 export type CardVariantProps = {
-  [key in keyof CardVariant]?: ConditionalValue<CardVariant[key]> | undefined
+  [key in keyof CardVariant]?: CardVariant[key] | undefined
 }
 
 export interface CardRecipe {

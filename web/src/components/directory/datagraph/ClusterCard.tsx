@@ -11,12 +11,20 @@ import { DirectoryBadge } from "../DirectoryBadge";
 import { HStack } from "@/styled-system/jsx";
 import { CardVariantProps } from "@/styled-system/recipes";
 
+export type ClusterCardContext = "directory" | "generic";
+
 export type Props = {
   cluster: Cluster;
   directoryPath: DirectoryPath;
+  context: ClusterCardContext;
 } & CardVariantProps;
 
-export function ClusterCard({ cluster, directoryPath, ...rest }: Props) {
+export function ClusterCard({
+  cluster,
+  directoryPath,
+  context,
+  ...rest
+}: Props) {
   const slug = joinDirectoryPath(directoryPath, cluster.slug);
   const asset = cluster.assets?.[0];
   const url = `/directory/${slug}`;
@@ -30,15 +38,24 @@ export function ClusterCard({ cluster, directoryPath, ...rest }: Props) {
       image={asset?.url}
       {...rest}
     >
-      <HStack color="fg.muted">
-        <DirectoryBadge />
+      {context === "generic" ? (
+        <HStack color="fg.muted">
+          <DirectoryBadge />
 
+          <Timestamp
+            created={cluster.createdAt}
+            updated={cluster.updatedAt}
+            href={url}
+          />
+        </HStack>
+      ) : (
         <Timestamp
           created={cluster.createdAt}
           updated={cluster.updatedAt}
+          large
           href={url}
         />
-      </HStack>
+      )}
     </Card>
   );
 }

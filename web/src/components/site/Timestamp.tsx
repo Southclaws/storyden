@@ -8,6 +8,7 @@ type Props = {
   created: string | Date;
   updated?: string | Date | undefined;
   href?: string;
+  large?: boolean;
 };
 
 export function Timestamp(props: Props) {
@@ -18,13 +19,18 @@ export function Timestamp(props: Props) {
 
   const showUpdated = isUpdatedLongerThanADay(createdDate, updatedDate);
 
-  const createdAt = timestamp(createdDate);
-  const updatedAt = updated ? timestamp(updated) : null;
+  const createdAt = timestamp(createdDate, !props.large);
+  const updatedAt = updated ? timestamp(updated, !props.large) : null;
 
   return (
     <styled.span>
       {props.href ? (
-        <Anchor href={props.href}>{createdAt}</Anchor>
+        <Anchor href={props.href}>
+          {props.large && (
+            <styled.span className="fluid-font-size">created</styled.span>
+          )}{" "}
+          {createdAt}
+        </Anchor>
       ) : (
         <styled.span>{createdAt}</styled.span>
       )}

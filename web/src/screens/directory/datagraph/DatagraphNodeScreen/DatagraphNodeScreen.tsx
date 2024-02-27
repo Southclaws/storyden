@@ -159,6 +159,7 @@ export function DatagraphNodeScreen(props: Props) {
             {node && (node.clusters.length ?? 0) > 0 && (
               <ClusterCardRows
                 directoryPath={directoryPath}
+                context="directory"
                 clusters={node.clusters}
               />
             )}
@@ -176,6 +177,7 @@ export function DatagraphNodeScreen(props: Props) {
             {node.clusters.length ? (
               <ClusterCardRows
                 directoryPath={directoryPath}
+                context="directory"
                 clusters={node.clusters}
               />
             ) : (

@@ -22,6 +22,7 @@ export function DraftListScreen(props: Props) {
 
       <ClusterCardRows
         directoryPath={directoryPath}
+        context="generic"
         clusters={data.clusters.data.clusters}
       />
     </VStack>
