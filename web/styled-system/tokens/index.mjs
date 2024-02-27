@@ -2175,6 +2175,10 @@ const tokens = {
     "value": "var(--colors-fg-destructive)",
     "variable": "var(--colors-fg-destructive)"
   },
+  "colors.fg.accent": {
+    "value": "var(--colors-fg-accent)",
+    "variable": "var(--colors-fg-accent)"
+  },
   "colors.border.default": {
     "value": "var(--colors-border-default)",
     "variable": "var(--colors-border-default)"
