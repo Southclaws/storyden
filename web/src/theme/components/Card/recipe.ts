@@ -66,6 +66,7 @@ export const card = defineSlotRecipe({
       overflow: "hidden",
     },
     mediaContainer: {
+      contain: "size",
       zIndex: "2",
     },
 
@@ -202,10 +203,36 @@ export const card = defineSlotRecipe({
         },
       },
     },
+    size: {
+      default: {},
+      small: {},
+    },
   },
+  compoundVariants: [
+    {
+      size: "small",
+      shape: "row",
+      css: {
+        root: {
+          gridTemplateColumns: "1fr 2fr minmax(0, 3lh)",
+        },
+        text: { display: "none" },
+        title: {
+          fontSize: "sm",
+        },
+        controlsOverlayContainer: {
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "start",
+          padding: "2",
+        },
+      },
+    },
+  ],
   defaultVariants: {
     mediaDisplay: "with",
     shape: "box",
+    size: "default",
   },
   jsx: ["Card"],
 });

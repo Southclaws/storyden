@@ -27,11 +27,13 @@ export function Card({
   image,
   controls,
   shape,
+  size,
 }: PropsWithChildren<Props>) {
   const hasImage = Boolean(image);
 
   const styles = card({
     shape,
+    size,
     mediaDisplay: hasImage ? "with" : "without",
   });
 
