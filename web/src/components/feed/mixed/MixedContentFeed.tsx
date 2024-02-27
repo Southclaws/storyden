@@ -46,7 +46,11 @@ function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
           <SectionHeader recent={recent} href="/directory">
             Directory
           </SectionHeader>
-          <ClusterCardGrid directoryPath={[]} clusters={data.clusters} />
+          <ClusterCardGrid
+            directoryPath={[]}
+            context="generic"
+            clusters={data.clusters}
+          />
         </>
       )}
 

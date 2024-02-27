@@ -35,9 +35,12 @@ export const formatDistanceDefaults: FormatDistanceToNowOptions = {
   locale: { formatDistance },
 };
 
-export function timestamp(date: string | number | Date) {
+export function timestamp(date: string | number | Date, short = true) {
   try {
-    return formatDistanceToNow(date, formatDistanceDefaults);
+    return formatDistanceToNow(
+      date,
+      short ? formatDistanceDefaults : { addSuffix: true },
+    );
   } catch (e: unknown) {
     throw new Error(`Failed to format date: ${date}: error: ${e}`);
   }
