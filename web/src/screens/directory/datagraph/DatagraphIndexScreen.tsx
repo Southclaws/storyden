@@ -3,7 +3,7 @@
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { ItemCardGrid } from "src/components/directory/datagraph/ItemCardList";
-import { LinkCardList } from "src/components/directory/links/LinkCardList";
+import { LinkResultList } from "src/components/directory/links/LinkIndexView/LinkResultList";
 import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
 import { Heading2 } from "src/theme/components/Heading/Index";
@@ -49,7 +49,7 @@ export function Client(props: Props) {
       {links.data.results > 0 && (
         <VStack w="full" alignItems="start">
           <Heading2>New links</Heading2>
-          <LinkCardList links={links.data} show={3} />
+          <LinkResultList links={links.data} show={3} />
         </VStack>
       )}
 
