@@ -1,22 +1,31 @@
-import { map } from "lodash/fp";
-
 import { Link } from "src/api/openapi/schemas";
-import { CardGrid, CardItem, CardRows } from "src/theme/components/Card";
+import { CardGrid, CardRows } from "src/theme/components/Card";
 
-const toCardItems = map<Link, CardItem>((l) => ({
-  id: l.slug,
-  title: l.title || l.url,
-  text: l.description,
-  image: l.assets[0]?.url,
-  url: l.url,
-}));
+import { CardVariantProps } from "@/styled-system/recipes";
 
-export function LinkCardRows({ links }: { links: Link[] }) {
-  const items = toCardItems(links);
-  return <CardRows items={items} />;
+import { LinkCard } from "./LinkCard";
+
+type Props = {
+  links: Link[];
+  size?: CardVariantProps["size"];
+};
+
+export function LinkCardRows({ links, size }: Props) {
+  return (
+    <CardRows>
+      {links.map((l) => (
+        <LinkCard key={l.slug} shape="row" size={size} link={l} />
+      ))}
+    </CardRows>
+  );
 }
 
-export function LinkCardGrid({ links }: { links: Link[] }) {
-  const items = toCardItems(links);
-  return <CardGrid items={items} />;
+export function LinkCardGrid({ links, size }: Props) {
+  return (
+    <CardGrid>
+      {links.map((l) => (
+        <LinkCard key={l.slug} shape="row" size={size} link={l} />
+      ))}
+    </CardGrid>
+  );
 }
