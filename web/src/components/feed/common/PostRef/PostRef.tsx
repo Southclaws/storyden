@@ -2,17 +2,11 @@ import { PostProps, ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Heading1 } from "src/theme/components/Heading/Index";
+import { Card } from "src/theme/components/Card";
 
-import { FeedItem } from "../FeedItem/FeedItem";
+import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
 
-import {
-  Flex,
-  HStack,
-  LinkBox,
-  LinkOverlay,
-  styled,
-} from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
 
 type Props =
   | {
@@ -30,6 +24,7 @@ export function PostRef({ kind, item }: Props) {
   const data =
     kind === "thread"
       ? {
+          id: item.id,
           title: item.title,
           permalink: `/t/${item.slug}`,
           short: item.short,
@@ -38,6 +33,7 @@ export function PostRef({ kind, item }: Props) {
           updatedAt: item.updatedAt,
         }
       : {
+          id: item.id,
           title: item.root_slug, // TODO: Include parent thread title on API
           permalink: `/t/${item.root_slug}#${item.id}`,
           short: item.body,
@@ -47,32 +43,28 @@ export function PostRef({ kind, item }: Props) {
         };
 
   return (
-    <LinkBox>
-      <FeedItem>
-        <Flex justifyContent="space-between">
-          <Heading1 size="sm">
-            <LinkOverlay href={data.permalink}>
-              {/* TODO: Next.js Link */}
-              {data.title}
-            </LinkOverlay>
-          </Heading1>
-        </Flex>
-
-        <styled.p lineClamp={3}>{data.short}</styled.p>
-
-        <Flex justifyContent="space-between">
-          <Byline
-            href={data.permalink}
-            author={data.author}
-            time={new Date(data.createdAt)}
-            updated={new Date(data.updatedAt)}
-          />
-
+    <Card
+      id={data.id}
+      title={data.title}
+      text={data.short}
+      url={data.permalink}
+      shape="row"
+      controls={
+        session &&
+        kind === "thread" && (
           <HStack>
-            {session && kind === "thread" && <CollectionMenu thread={item} />}
+            <CollectionMenu thread={item} />
+            <FeedItemMenu thread={item} />
           </HStack>
-        </Flex>
-      </FeedItem>
-    </LinkBox>
+        )
+      }
+    >
+      <Byline
+        href={data.permalink}
+        author={data.author}
+        time={new Date(data.createdAt)}
+        updated={new Date(data.updatedAt)}
+      />
+    </Card>
   );
 }
