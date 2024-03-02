@@ -57,6 +57,7 @@ function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
       {data.threads.length > 0 && (
         <>
           <SectionHeader
+            href="/t"
             recent={recent}
             // TODO: Build thread index page then link there.
             // OR even, chunk these based on category and link to the category?
