@@ -4,7 +4,6 @@ package thread
 
 import (
 	"context"
-	"time"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -37,13 +36,11 @@ type Service interface {
 
 	Delete(ctx context.Context, id post.ID) error
 
-	// ListAll returns all threads.
-	ListAll(
-		ctx context.Context,
-		before time.Time,
-		max int,
-		query Params,
-	) ([]*thread.Thread, error)
+	List(ctx context.Context,
+		page int,
+		size int,
+		opts Params,
+	) (*thread.Result, error)
 
 	// Get one thread and the posts within it.
 	Get(
