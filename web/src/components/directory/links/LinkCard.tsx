@@ -2,6 +2,7 @@ import { Link as LinkSchema } from "src/api/openapi/schemas";
 import { Card } from "src/theme/components/Card";
 import { Link } from "src/theme/components/Link";
 
+import { HStack } from "@/styled-system/jsx";
 import { CardVariantProps } from "@/styled-system/recipes";
 
 export type Props = {
@@ -22,9 +23,14 @@ export function LinkCard({ link, ...rest }: Props) {
       shape="row"
       {...rest}
     >
-      <Link size="sm" href={domainSearch}>
-        More from {link.domain}
-      </Link>
+      <HStack>
+        <Link size="xs" href={`/l/${link.slug}`} kind="neutral">
+          View in directory
+        </Link>
+        <Link size="xs" href={domainSearch}>
+          More from this site
+        </Link>
+      </HStack>
     </Card>
   );
 }
