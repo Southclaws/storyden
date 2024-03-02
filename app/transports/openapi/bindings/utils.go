@@ -75,6 +75,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
 		Assets:         dt.Map(t.Assets, serialiseAssetReference),
+		Collections:    dt.Map(t.Collections, serialiseCollection),
 		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
 		Recomentations: dt.Map(t.Related, serialiseDatagraphNodeReference),
 	}
