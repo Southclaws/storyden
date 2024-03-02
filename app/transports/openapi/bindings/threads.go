@@ -2,7 +2,7 @@ package bindings
 
 import (
 	"context"
-	"time"
+	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -120,13 +120,24 @@ func reacts(reacts []*react.React) []openapi.React {
 }
 
 func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequestObject) (openapi.ThreadListResponseObject, error) {
-	// optionally map from OpenAPI account handle type to AccountID type.
+	pageSize := 50
+
+	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
+		v, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return 0
+		}
+
+		return max(1, int(v))
+	}).Or(1)
+
+	query := opt.NewPtr(request.Params.Q)
+
 	author, err := openapi.OptionalID(ctx, i.account_repo, request.Params.Author)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// optionally map from OpenAPI identifier type to xid.ID type.
 	tags := opt.NewPtrMap(request.Params.Tags, func(t []openapi.Identifier) []xid.ID {
 		return dt.Map(t, func(i openapi.Identifier) xid.ID {
 			return openapi.ParseID(i)
@@ -135,7 +146,9 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 
 	cats := opt.NewPtr(request.Params.Categories)
 
-	threads, err := i.thread_svc.ListAll(ctx, time.Now(), 10000, thread_service.Params{
+	page = max(0, page-1)
+	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
+		Query:      query,
 		AccountID:  author,
 		Tags:       tags,
 		Categories: cats,
@@ -144,9 +157,16 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	page = result.CurrentPage + 1
+
 	return openapi.ThreadList200JSONResponse{
 		ThreadListOKJSONResponse: openapi.ThreadListOKJSONResponse{
-			Threads: dt.Map(threads, serialiseThreadReference),
+			CurrentPage: page,
+			NextPage:    result.NextPage.Ptr(),
+			PageSize:    result.PageSize,
+			Results:     result.Results,
+			Threads:     dt.Map(result.Threads, serialiseThreadReference),
+			TotalPages:  result.TotalPages,
 		},
 	}, nil
 }

@@ -3,6 +3,7 @@ package thread
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -11,6 +12,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
@@ -22,7 +24,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
-	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 )
@@ -161,30 +162,25 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 
 func (d *database) List(
 	ctx context.Context,
-	before time.Time,
-	max int,
+	page int,
+	size int,
 	opts ...Query,
-) ([]*Thread, error) {
-	filters := []predicate.Post{
-		ent_post.DeletedAtIsNil(),
-		ent_post.First(true),
+) (*Result, error) {
+	if size < 1 {
+		size = 1
 	}
 
-	if !before.IsZero() {
-		filters = append(filters, ent_post.CreatedAtLT(before))
+	if size > 100 {
+		size = 100
 	}
 
-	if max < 1 {
-		max = 1
+	query := d.db.Debug().Post.Query().Where(ent_post.First(true))
+
+	for _, fn := range opts {
+		fn(query)
 	}
 
-	if max > 100 {
-		max = 100
-	}
-
-	query := d.db.Post.Query().
-		Where(filters...).
-		Limit(max).
+	query.
 		WithCategory().
 		WithAuthor().
 		WithAssets(func(aq *ent.AssetQuery) {
@@ -198,26 +194,41 @@ func (d *database) List(
 		}).
 		Order(ent_post.ByUpdatedAt(sql.OrderDesc()), ent_post.ByCreatedAt(sql.OrderDesc()))
 
-	for _, fn := range opts {
-		fn(query)
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	query.
+		Limit(size + 1).
+		Offset(page * size)
 
 	result, err := query.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	// counts, err := d.GetPostCounts(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	isNextPage := len(result) >= size
+	nextPage := opt.NewSafe(page+1, isNextPage)
+	totalPages := int(math.Ceil(float64(total) / float64(size)))
+
+	if isNextPage {
+		result = result[:len(result)-1]
+	}
 
 	threads, err := dt.MapErr(result, FromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return threads, nil
+	return &Result{
+		PageSize:    size,
+		Results:     len(threads),
+		TotalPages:  totalPages,
+		CurrentPage: page,
+		NextPage:    nextPage,
+		Threads:     threads,
+	}, nil
 }
 
 func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {

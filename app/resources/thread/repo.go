@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
@@ -17,15 +18,16 @@ import (
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
-// Note: The resources thread and post both map to the same underlying database
-// schema ent. The point of the resources being separate is to provide
-// separate intuitive APIs that abstract away the detail that a `post` item in
-// the database and a `thread` item use the same underlying table.
+type Result struct {
+	PageSize    int
+	Results     int
+	TotalPages  int
+	CurrentPage int
+	NextPage    opt.Optional[int]
+	Threads     []*Thread
+}
 
 type Repository interface {
-	// Create a new thread. A thread is just a "post" in the underlying data
-	// ent. But a thread is marked as "first" and has a title, catgegory and
-	// tags, and no parent post.
 	Create(
 		ctx context.Context,
 		title string,
@@ -37,12 +39,13 @@ type Repository interface {
 
 	Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error)
 
-	List(
-		ctx context.Context,
-		before time.Time,
-		max int,
+	// List is used for listing threads or filtering with basic queries. It's
+	// not sufficient for full scale text-based or semantic search however.
+	List(ctx context.Context,
+		page int,
+		size int,
 		opts ...Query,
-	) ([]*Thread, error)
+	) (*Result, error)
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
@@ -115,6 +118,28 @@ func WithLinks(ids ...xid.ID) Option {
 
 type Query func(q *ent.PostQuery)
 
+func HasKeyword(s string) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(ent_post.Or(
+			ent_post.TitleContainsFold(s),
+			ent_post.SlugContainsFold(s),
+			ent_post.BodyContainsFold(s),
+		))
+	}
+}
+
+func HasCreatedDateBefore(t time.Time) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(ent_post.CreatedAtLT(t))
+	}
+}
+
+func HasUpdatedDateBefore(t time.Time) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(ent_post.UpdatedAtLT(t))
+	}
+}
+
 func HasAuthor(id account.AccountID) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(ent_post.HasAuthorWith(ent_account.ID(xid.ID(id))))
@@ -136,5 +161,11 @@ func HasCategories(ids []string) Query {
 func HasStatus(status post.Visibility) Query {
 	return func(q *ent.PostQuery) {
 		q.Where(ent_post.VisibilityEQ(status.ToEnt()))
+	}
+}
+
+func HasNotBeenDeleted() Query {
+	return func(q *ent.PostQuery) {
+		q.Where(ent_post.DeletedAtIsNil())
 	}
 }
