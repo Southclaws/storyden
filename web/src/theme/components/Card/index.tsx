@@ -63,7 +63,7 @@ export function Card({
 
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
-          <Heading3 className={cx("fluid-font-size")} lineClamp={2}>
+          <Heading3 className={cx("fluid-font-size")}>
             <a href={url} className={styles.title}>
               {title || "(untitled)"}
             </a>

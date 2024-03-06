@@ -28,7 +28,6 @@ export const card = defineSlotRecipe({
   ],
   base: {
     root: {
-      "--card-text-lines": "2",
       "--card-image-max-height": "50px",
 
       containerType: "inline-size",
@@ -82,18 +81,13 @@ export const card = defineSlotRecipe({
       width: "full",
     },
     title: {
-      display: "block",
-      overflow: "hidden",
-      textWrap: "nowrap",
-      textOverflow: "ellipsis",
+      lineClamp: "1",
       _hover: {
         textDecoration: "underline",
       },
     },
     text: {
-      display: "block",
-      lineClamp: "var(--card-text-lines)",
-      textOverflow: "ellipsis",
+      lineClamp: "1",
     },
 
     // The overlay is used to position the controls such as buttons etc. The
@@ -169,7 +163,7 @@ export const card = defineSlotRecipe({
       },
       row: {
         root: {
-          gridTemplateRows: "minmax(3lh, 1fr)",
+          gridTemplateRows: "minmax(min-content, 1fr)",
           gridTemplateColumns: "1fr 2fr 1fr",
           gridTemplateAreas: "var(--card-row-areas)",
         },
@@ -214,7 +208,7 @@ export const card = defineSlotRecipe({
       shape: "row",
       css: {
         root: {
-          gridTemplateColumns: "1fr 2fr minmax(0, 3lh)",
+          gridTemplateColumns: "1fr 2fr minmax(0, min-content)",
         },
         text: { display: "none" },
         title: {
