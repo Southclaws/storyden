@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -43,8 +44,10 @@ export function useDatagraphNodeScreen({
 }: Props) {
   const directoryPath = useDirectoryPath();
   const account = useSession();
+  const router = useRouter();
   const [editing, setEditing] = useState(initialEditingState);
   const [isSaving, setIsSaving] = useState(false);
+  const isNew = !node.id;
 
   const isAllowedToEdit =
     editable && Boolean(account?.id === node.owner.id || account?.admin);
@@ -77,8 +80,9 @@ export function useDatagraphNodeScreen({
 
   function handleEditMode() {
     if (editing) {
-      form.reset();
-      setEditing(false);
+      if (isNew) {
+        router.back();
+      }
 
       return;
     }
