@@ -12,7 +12,7 @@ const cardCompoundVariants = [
     "shape": "row",
     "css": {
       "root": {
-        "gridTemplateColumns": "1fr 2fr minmax(0, 3lh)"
+        "gridTemplateColumns": "1fr 2fr minmax(0, min-content)"
       },
       "text": {
         "display": "none"
