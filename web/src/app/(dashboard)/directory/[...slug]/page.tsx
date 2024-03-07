@@ -7,19 +7,24 @@ import {
 import { server } from "src/api/server";
 import { useServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
+import { ClusterCreateManyScreen } from "src/screens/directory/datagraph/ClusterCreateManyScreen/ClusterCreateManyScreen";
 import { ClusterCreateScreen } from "src/screens/directory/datagraph/ClusterCreateScreen/ClusterCreateScreen";
 import { ClusterViewerScreen } from "src/screens/directory/datagraph/ClusterViewerScreen/ClusterViewerScreen";
 import { ItemViewerScreen } from "src/screens/directory/datagraph/ItemViewerScreen/ItemViewerScreen";
 import {
   Params,
   ParamsSchema,
+  Query,
+  QuerySchema,
 } from "src/screens/directory/datagraph/useDirectoryPath";
 
 type Props = {
   params: Params;
+  searchParams: Query;
 };
 
 export default async function Page(props: Props) {
+  const { bulk } = QuerySchema.parse(props.searchParams);
   const { slug } = ParamsSchema.parse(props.params);
   const session = await useServerSession();
 
@@ -45,6 +50,10 @@ export default async function Page(props: Props) {
         redirect(`/login`); // TODO: ?return= back to this path.
       }
 
+      if (bulk) {
+        return <ClusterCreateManyScreen cluster={cluster} />;
+      }
+
       return <ClusterCreateScreen session={session} />;
     }
 
@@ -62,6 +71,10 @@ export default async function Page(props: Props) {
   if (isNew) {
     if (!session) {
       redirect(`/login`); // TODO: ?return= back to this path.
+    }
+
+    if (bulk) {
+      return <ClusterCreateManyScreen />;
     }
 
     return <ClusterCreateScreen session={session} />;

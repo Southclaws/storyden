@@ -6,6 +6,15 @@ export const ParamsSchema = z.object({
   slug: z.string().array().min(1),
 });
 export type Params = z.infer<typeof ParamsSchema>;
+export const QuerySchema = z.object({
+  bulk: z
+    .string()
+    .optional()
+    .transform((v) => {
+      return v !== undefined || v != null;
+    }),
+});
+export type Query = z.infer<typeof QuerySchema>;
 
 export type DirectoryPath = string[];
 
