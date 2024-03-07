@@ -1,4 +1,4 @@
-import { ChevronRightIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { last, pull } from "lodash";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
@@ -13,9 +13,11 @@ import { Link } from "src/theme/components/Link";
 
 import { Box, HStack } from "@/styled-system/jsx";
 
+import { DatagraphCreateMenu } from "./DatagraphCreateMenu/DatagraphCreateMenu";
+
 type Props = {
   directoryPath: DirectoryPath;
-  visibility: Visibility;
+  visibility?: Visibility;
   create: "hide" | "show" | "edit";
   value?: string;
   defaultValue?: string;
@@ -37,7 +39,7 @@ export const _Breadcrumbs = (
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
   const paths = pull(directoryPath, "new");
-  const jointNew = joinDirectoryPath(directoryPath, "new");
+  // const jointNew = joinDirectoryPath(directoryPath, "new");
   const current = last(paths);
 
   return (
@@ -85,14 +87,7 @@ export const _Breadcrumbs = (
           <Box flexShrink="0">
             <ChevronRightIcon width="1rem" />
           </Box>
-          <Link
-            flexShrink="0"
-            kind="primary"
-            href={`/directory/${jointNew}`}
-            size="xs"
-          >
-            <PlusCircleIcon /> Create
-          </Link>
+          <DatagraphCreateMenu />
         </>
       )}
       {isEditing && (
