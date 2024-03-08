@@ -1,0 +1,31 @@
+app          = "tagwatch"
+kill_signal  = "SIGINT"
+kill_timeout = 5
+processes    = []
+
+[build]
+  image = "ghcr.io/southclaws/storyden:latest"
+
+[env]
+  COOKIE_DOMAIN      = "tagwat.ch"
+  PUBLIC_API_ADDRESS = "https://tagwatch.fly.dev"
+  PUBLIC_WEB_ADDRESS = "https://tagwat.ch"
+
+  ASSET_STORAGE_TYPE = "s3"
+
+[http_service]
+  auto_start_machines  = true
+  auto_stop_machines   = true
+  force_https          = true
+  internal_port        = 3000
+  min_machines_running = 1
+  processes            = ['app']
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus     = 1
+  memory   = '1gb'
+
+[mounts]
+  destination = "/data"
+  source      = "tagwatch_data"
