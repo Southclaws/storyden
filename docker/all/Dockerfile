@@ -14,7 +14,7 @@ ADD ./Taskfile.yml .
 
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/backend
 
-FROM node:18 AS base
+FROM node:18-alpine AS base
 
 #
 # DEPENDENCIES LAYER
