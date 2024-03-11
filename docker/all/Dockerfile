@@ -14,7 +14,7 @@ ADD ./Taskfile.yml .
 
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/backend
 
-FROM node:18-alpine AS base
+FROM node:18 AS base
 
 #
 # DEPENDENCIES LAYER
@@ -26,7 +26,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY ./web/package.json ./web/yarn.lock* ./
-RUN yarn --frozen-lockfile --ignore-scripts
+RUN yarn --frozen-lockfile --ignore-scripts --network-timeout 1000000 install
 
 #
 # BUILDER LAYER
