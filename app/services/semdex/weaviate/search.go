@@ -42,7 +42,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		WithQuery(q)
 
 	result, err := s.wc.GraphQL().Get().
-		WithClassName(s.mc.Class).
+		WithClassName(s.cn.String()).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
@@ -62,7 +62,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData, ok := parsed.Get[s.mc.Class]
+	classData, ok := parsed.Get[s.cn.String()]
 	if !ok {
 		return nil, fault.New("weaviate response did not contain expected class data")
 	}

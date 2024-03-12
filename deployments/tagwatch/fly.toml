@@ -13,6 +13,10 @@ processes    = []
 
   ASSET_STORAGE_TYPE = "s3"
 
+  WEAVIATE_CLASS_NAME = "text2vec-openai"
+  WEAVIATE_ENABLED    = "false"
+  WEAVIATE_URL        = "http://tagwatch-weaviate.internal:8080"
+
 [http_service]
   auto_start_machines  = true
   auto_stop_machines   = true
