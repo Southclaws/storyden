@@ -19,7 +19,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 	wid := GetWeaviateID(object.GetID())
 
 	result, err := w.wc.Data().ObjectsGetter().
-		WithClassName(w.mc.Class).
+		WithClassName(w.cn.String()).
 		WithVector().
 		WithID(wid).
 		Do(ctx)
@@ -41,7 +41,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 	}
 
 	recommendations, err := w.wc.GraphQL().Get().
-		WithClassName(w.mc.Class).
+		WithClassName(w.cn.String()).
 		WithFields(fields...).
 		WithNearVector(withNearVector).
 		WithLimit(10).
@@ -64,7 +64,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	classData := parsed.Get[w.mc.Class]
+	classData := parsed.Get[w.cn.String()]
 
 	classData = dt.Filter(classData, func(o WeaviateObject) bool {
 		return o.DatagraphID != object.GetID().String()

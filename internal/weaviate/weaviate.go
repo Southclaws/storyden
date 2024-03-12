@@ -1,6 +1,7 @@
 package weaviate
 
 import (
+	"context"
 	"net/url"
 
 	"github.com/Southclaws/fault"
@@ -8,13 +9,21 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
+	"github.com/weaviate/weaviate/entities/models"
 	"go.uber.org/fx"
 )
+
+type WeaviateClassName string
+
+func (w WeaviateClassName) String() string {
+	return string(w)
+}
 
 type Configuration struct {
 	Enabled   bool   `envconfig:"WEAVIATE_ENABLED"`
 	URL       string `envconfig:"WEAVIATE_URL"`
 	Token     string `envconfig:"WEAVIATE_API_TOKEN"`
+	ClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
 	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
 }
 
@@ -22,19 +31,19 @@ func Build() fx.Option {
 	return fx.Provide(newWeaviateClient)
 }
 
-func newWeaviateClient() (*weaviate.Client, error) {
+func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, error) {
 	cfg := Configuration{}
 	if err := envconfig.Process("", &cfg); err != nil {
-		return nil, fault.Wrap(err)
+		return nil, "", fault.Wrap(err)
 	}
 
 	if !cfg.Enabled {
-		return nil, nil
+		return nil, "", nil
 	}
 
 	u, err := url.Parse(cfg.URL)
 	if err != nil {
-		return nil, fault.Wrap(err)
+		return nil, "", fault.Wrap(err)
 	}
 
 	wc := weaviate.Config{
@@ -46,8 +55,56 @@ func newWeaviateClient() (*weaviate.Client, error) {
 
 	client, err := weaviate.NewClient(wc)
 	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to create weaviate client"))
+		return nil, "", fault.Wrap(err, fmsg.With("failed to create weaviate client"))
 	}
 
-	return client, nil
+	classMap := map[string]models.Class{
+		"text2vec-transformers": {
+			Class:      "ContentText2vecTransformers",
+			Vectorizer: "text2vec-transformers",
+			ModuleConfig: map[string]interface{}{
+				"text2vec-transformers": map[string]interface{}{},
+			},
+		},
+		"text2vec-openai": {
+			Class:      "ContentOpenAI",
+			Vectorizer: "text2vec-openai",
+			ModuleConfig: map[string]interface{}{
+				"text2vec-transformers": map[string]interface{}{},
+			},
+		},
+	}
+
+	if cfg.ClassName == "text2vec-openai" && cfg.OpenAIKey == "" {
+		return nil, "", fault.New("OpenAI API key is required for text2vec-openai class")
+	}
+
+	class, ok := classMap[cfg.ClassName]
+	if !ok {
+		return nil, "", fault.New("invalid class name")
+	}
+
+	lc.Append(fx.StartHook(func(ctx context.Context) error {
+		r, err := client.Schema().
+			ClassExistenceChecker().
+			WithClassName(class.Class).
+			Do(ctx)
+		if err != nil {
+			return fault.Wrap(err)
+		}
+
+		if !r {
+			err := client.Schema().
+				ClassCreator().
+				WithClass(&class).
+				Do(ctx)
+			if err != nil {
+				return fault.Wrap(err)
+			}
+		}
+
+		return nil
+	}))
+
+	return client, WeaviateClassName(class.Class), nil
 }
