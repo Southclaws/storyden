@@ -4,69 +4,58 @@ import { Presence } from "@ark-ui/react";
 
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
-import { Input } from "src/theme/components/Input";
 
 import { CloseAction } from "../../Action/Close";
 import { AdminAction } from "../Anchors/Admin";
 import { ComposeAction } from "../Anchors/Compose";
 import { DashboardAction } from "../Anchors/Dashboard";
+import { DraftsAction } from "../Anchors/Drafts";
 import { HomeAction } from "../Anchors/Home";
-import { LinksAction } from "../Anchors/Links";
+import { KnowledgebaseAction } from "../Anchors/Knowledgebase";
 import { LoginAction } from "../Anchors/Login";
 import { LogoutAction } from "../Anchors/Logout";
-import { NotificationsAction } from "../Anchors/Notifications";
 import { SettingsAction } from "../Anchors/Settings";
+import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
+import { Search } from "../Search/Search";
 
-import { css } from "@/styled-system/css";
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
+import { vstack } from "@/styled-system/patterns";
 
-import { Menu } from "./components/Menu";
-import { SearchResults } from "./components/SearchResults";
 import { useNavpill } from "./useNavpill";
 
 export function Navpill() {
-  const {
-    isExpanded,
-    onExpand,
-    onClose,
-    account,
-    searchQuery,
-    onSearch,
-    searchResults,
-  } = useNavpill();
+  const { isExpanded, onExpand, onClose, account } = useNavpill();
   return (
     <Toolpill onClickOutside={onClose}>
-      <Presence present={isExpanded} className={css({ w: "full" })}>
-        <styled.div w="full">
-          <HStack w="full" justify="space-between">
-            {account ? (
-              <>
-                <HStack>
-                  <HomeAction />
-                  <NotificationsAction />
-                  <LinksAction />
-                  <LogoutAction />
-                </HStack>
-                <HStack>
-                  {account.admin && (
-                    <>
-                      <AdminAction />
-                    </>
-                  )}
-                  <SettingsAction />
-                </HStack>
-              </>
-            ) : (
-              <LoginAction />
-            )}
-          </HStack>
-
-          {searchResults.length ? (
-            <SearchResults results={searchResults} />
+      <Presence
+        present={isExpanded}
+        className={vstack({ w: "full", gap: "2" })}
+      >
+        <HStack w="full" justify="space-between">
+          {account ? (
+            <>
+              <HStack>
+                <HomeAction />
+                <DraftsAction />
+                <LogoutAction />
+              </HStack>
+              <HStack>
+                {account.admin && (
+                  <>
+                    <AdminAction />
+                    {/* TODO: Move public drafts for admin review to /queue */}
+                    {/* <QueueAction /> */}
+                  </>
+                )}
+                <SettingsAction />
+              </HStack>
+            </>
           ) : (
-            <Menu />
+            <LoginAction />
           )}
-        </styled.div>
+        </HStack>
+
+        <ContentNavigationList />
       </Presence>
 
       {account ? (
@@ -75,14 +64,7 @@ export function Navpill() {
             <>
               <ProfilePill profileReference={account} showHandle={false} />
 
-              <Input
-                border="none"
-                size="sm"
-                placeholder="Search disabled..."
-                disabled
-                value={searchQuery}
-                onChange={onSearch}
-              />
+              <Search />
               <CloseAction onClick={onClose} />
             </>
           ) : (
@@ -90,7 +72,7 @@ export function Navpill() {
               <ProfilePill profileReference={account} showHandle={false} />
               <HomeAction />
               <ComposeAction />
-              <NotificationsAction />
+              <KnowledgebaseAction />
               <DashboardAction onClick={onExpand} />
             </>
           )}
@@ -100,13 +82,7 @@ export function Navpill() {
           {isExpanded ? (
             <>
               <HomeAction />
-              <Input
-                border="none"
-                placeholder="Search disabled..."
-                disabled
-                value={searchQuery}
-                onChange={onSearch}
-              />
+              <Search />
               <CloseAction onClick={onClose} />
             </>
           ) : (

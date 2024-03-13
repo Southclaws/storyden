@@ -1,3 +1,4 @@
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
 import { Button } from "src/theme/components/Button";
@@ -13,7 +14,6 @@ export function Search(props: Props) {
     <styled.form
       display="flex"
       w="full"
-      minW="xs"
       onSubmit={handlers.handleSearch}
       action="/search"
     >
@@ -24,7 +24,7 @@ export function Search(props: Props) {
         type="search"
         defaultValue={props.query}
         background="bg.default"
-        placeholder={`Search the ${data.title} knowledgebase`}
+        placeholder={`Search...`}
         {...form.register("q")}
       />
 
@@ -45,7 +45,7 @@ export function Search(props: Props) {
         type="submit"
         width="min"
       >
-        Search
+        <MagnifyingGlassIcon />
       </Button>
     </styled.form>
   );
