@@ -8,7 +8,7 @@ import { Link } from "src/theme/components/Link";
 
 import { VStack, styled } from "@/styled-system/jsx";
 
-import { Card } from "./Card";
+import { ChecklistItem } from "./ChecklistItem";
 import { isComplete, useChecklist } from "./useChecklist";
 
 type Props = {
@@ -34,7 +34,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
         listStyleType="none"
         m="0"
       >
-        <Card
+        <ChecklistItem
           step={1}
           current={onboardingStatus}
           title="Create an account"
@@ -44,9 +44,9 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
             Start by creating an account. The first registration is
             automatically given administrator rights!
           </styled.p>
-        </Card>
+        </ChecklistItem>
 
-        <Card
+        <ChecklistItem
           step={2}
           current={onboardingStatus}
           title="Create a category"
@@ -57,9 +57,9 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
             a name and set it up just how you like!
           </styled.p>
           <CategoryCreateModal onClose={onClose} isOpen={isOpen} />
-        </Card>
+        </ChecklistItem>
 
-        <Card
+        <ChecklistItem
           step={3}
           current={onboardingStatus}
           title="Write your first post"
@@ -69,13 +69,20 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
             An intro, a thesis, a manifesto, a set of rules or just a hi! Get
             started on your first post in your new category!
           </styled.p>
-        </Card>
+        </ChecklistItem>
 
         <VStack textAlign="center" px="2">
           <Heading2 size="md">Invite your people</Heading2>
           <styled.p>
-            And you&apos;re ready to go! Spread the word and let the posts flow.{" "}
-            <Link color="blue.400" href="https://www.storyden.org/docs">
+            And you&apos;re ready to go! Spread the word and let the posts flow.
+          </styled.p>
+
+          <styled.p>
+            <Link
+              size="xs"
+              color="blue.400"
+              href="https://www.storyden.org/docs"
+            >
               Visit the docs
             </Link>{" "}
             for more info if you get stuck.
@@ -88,6 +95,18 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           )}
         </VStack>
       </styled.ol>
+
+      <hr />
+
+      <VStack>
+        <Heading2 size="sm">Not an admin?</Heading2>
+
+        <p>
+          This site is not quite ready to use but you can still browse around!
+        </p>
+
+        <Button onClick={onFinish}>Hide this message</Button>
+      </VStack>
     </VStack>
   );
 }

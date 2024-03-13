@@ -12,9 +12,12 @@ export function Onboarding() {
     <Box position="relative">
       <Box
         position="absolute"
-        // NOTE: not dark mode ready! need a variable
         background="bg.default"
         p="4"
+        zIndex="banner"
+        boxShadow="2xl"
+        borderRadius="2xl"
+        w="full"
       >
         <Checklist onboardingStatus={onboardingStatus} onFinish={onFinish} />
       </Box>
