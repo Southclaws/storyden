@@ -3,7 +3,7 @@ import { Button } from "src/theme/components/Button";
 
 import styles from "../navigation.module.css";
 
-import { ComposeAction } from "../Anchors/Compose";
+import { Search } from "../Search/Search";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
 import { useNavigation } from "../useNavigation";
@@ -36,10 +36,10 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
         <Button size="sm" kind="ghost" onClick={handleToggle}>
           <Sidebar open={sidebarState} />
         </Button>
-        <ComposeAction>new</ComposeAction>
+        <Search />
       </HStack>
 
-      <HStack className={styles["topbar-middle"]} justify="space-between">
+      <HStack className={styles["topbar-middle"]} justify="space-around">
         <Title>{title}</Title>
       </HStack>
 
