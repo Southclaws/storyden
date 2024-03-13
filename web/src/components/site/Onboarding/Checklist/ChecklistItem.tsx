@@ -19,17 +19,19 @@ type CardProps = {
   onClick?: () => void;
 };
 
-export function Card(props: PropsWithChildren<CardProps>) {
+export function ChecklistItem(props: PropsWithChildren<CardProps>) {
   const complete = isComplete(props.step, props.current);
   const isCurrent = statusToStep[props.current] === props.step;
   return (
     <styled.li
       p="4"
       w="full"
+      maxW="prose"
       borderRadius="2xl"
       bgColor={complete ? "green.200" : "gray.100"}
+      color={{ _osDark: "gray.800", _osLight: "gray.800" }}
     >
-      <HStack w="full" gap="1">
+      <HStack w="full" gap="2">
         <Box>
           <Circle
             id="list-icon-circle"
