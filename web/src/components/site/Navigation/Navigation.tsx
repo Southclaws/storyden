@@ -7,6 +7,8 @@ import { NAVIGATION_SIDEBAR_STATE_KEY } from "src/local/state-keys";
 
 import styles from "./navigation.module.css";
 
+import { Onboarding } from "../Onboarding/Onboarding";
+
 import { Box } from "@/styled-system/jsx";
 
 import { Left } from "./Left/Left";
@@ -31,6 +33,7 @@ export function Navigation({ children }: PropsWithChildren) {
       <Box id="navigation__scroll" className={styles["navgrid"]}>
         <Box className={styles["main"]}>
           {/*  */}
+          <Onboarding />
           {children}
           {/*  */}
         </Box>

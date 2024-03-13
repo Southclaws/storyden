@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
+import { Button } from "src/theme/components/Button";
 import { Heading1 } from "src/theme/components/Heading/Index";
 import { Link } from "src/theme/components/Link";
 
@@ -52,16 +53,27 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
           <HStack justify="space-between">
             <Heading1 size="md">{props.title}</Heading1>
 
-            {!complete && isCurrent && (
-              <Link
-                href={props.url ?? ""}
-                bgColor="green.200"
-                size="xs"
-                onClick={props.onClick}
-              >
-                Complete
-              </Link>
-            )}
+            {!complete &&
+              isCurrent &&
+              (props.url ? (
+                <Link
+                  href={props.url}
+                  bgColor={{ _osDark: "green.300", _osLight: "green.200" }}
+                  color={{ _osDark: "gray.800", _osLight: "gray.800" }}
+                  size="xs"
+                >
+                  Complete
+                </Link>
+              ) : (
+                <Button
+                  bgColor={{ _osDark: "green.300", _osLight: "green.200" }}
+                  color={{ _osDark: "gray.800", _osLight: "gray.800" }}
+                  size="xs"
+                  onClick={props.onClick}
+                >
+                  Complete
+                </Button>
+              ))}
           </HStack>
           {props.children}
         </Box>

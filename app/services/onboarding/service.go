@@ -27,8 +27,9 @@ const (
 )
 
 type service struct {
-	cachedStatus Status
-	ec           *ent.Client
+	cachedStatus     Status
+	completedAlready bool
+	ec               *ent.Client
 }
 
 func Build() fx.Option {
@@ -48,6 +49,10 @@ func Build() fx.Option {
 				// NOTE: not thread safe but probably fine.
 				s.cachedStatus = *initial
 
+				if *initial == StatusComplete {
+					s.completedAlready = true
+				}
+
 				return nil
 			},
 		})
@@ -57,7 +62,13 @@ func Build() fx.Option {
 }
 
 func (s *service) GetOnboardingStatus(ctx context.Context) (*Status, error) {
-	if s.cachedStatus == StatusComplete {
+	// If the app booted up with the onboarding status already complete, we can
+	// skip the checks and always return the completed status. Basically, this
+	// function should only ever actually do any work on either the first boot
+	// onboarding or if the app rebooted and the admin still hasn't finished.
+	// 99% of the time this function will never do any work. But we need this
+	// little check to prevent wasting resources on every single page load.
+	if s.completedAlready && s.cachedStatus == StatusComplete {
 		return &StatusComplete, nil
 	}
 
