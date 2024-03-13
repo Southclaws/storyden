@@ -18,6 +18,8 @@ export function Onboarding() {
         boxShadow="2xl"
         borderRadius="2xl"
         w="full"
+        maxH="breakpoint-sm"
+        overflowY="scroll"
       >
         <Checklist onboardingStatus={onboardingStatus} onFinish={onFinish} />
       </Box>

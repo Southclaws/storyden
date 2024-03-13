@@ -1,11 +1,18 @@
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useGetInfo } from "src/api/openapi/misc";
 import { OnboardingStatus } from "src/api/openapi/schemas";
+import { useSession } from "src/auth";
 
 export function useOnboarding() {
   const { data: info } = useGetInfo();
+  const session = useSession();
+  const pathName = usePathname();
   const [localStatus, setlocalStatus] = useState<string | null>(null);
+
+  const isComposingNewThread = pathName === "/new";
+  const isAdmin = session?.admin ?? false;
 
   // NOTE: local onboarding status value takes priority.
   useEffect(() => {
@@ -20,7 +27,20 @@ export function useOnboarding() {
   const onboardingStatus: OnboardingStatus =
     (localStatus as OnboardingStatus) ?? info?.onboarding_status ?? "complete";
 
-  const showOnboarding = isOnboarding(onboardingStatus) && onboardingStatus;
+  // Rules: If there's no session and the onboarding has not started, show
+  // the onboarding to ANY user. But, once the first account is created, only
+  // show the onboarding flow to the newly authenticated admin account. Once the
+  // first stage is done there's no point showing the onboarding flow to guests.
+  const isOnboardingAccount = session
+    ? onboardingStatus !== "requires_first_account"
+    : onboardingStatus === "requires_first_account";
+
+  console.log({ session, isAdmin, onboardingStatus, isOnboardingAccount });
+
+  const showOnboarding =
+    isOnboarding(onboardingStatus) &&
+    !isComposingNewThread &&
+    isOnboardingAccount;
 
   return {
     showOnboarding,
