@@ -156,7 +156,7 @@ require (
 )
 
 require (
-	github.com/Southclaws/enumerator v1.3.1
+	github.com/Southclaws/enumerator v1.3.2
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/cockroachdb/apd v1.1.1-0.20181017181144-bced77f817b4 // indirect

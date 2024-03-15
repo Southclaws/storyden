@@ -37,6 +37,7 @@ github.com/Southclaws/dt v1.0.1 h1:9sof6hS2yLgrXoaxmBzlZNIyDRDKh/qLgDhUAlY/AF4=
 github.com/Southclaws/dt v1.0.1/go.mod h1:8EZr10LTV9E/hR5PdNFUbGHSoLo7//+EhDcxf0t1WNQ=
 github.com/Southclaws/enumerator v1.3.1 h1:nEnJiCXxqIOjA4AdEIehywDLWir14n/0CGu9m8gYHuQ=
 github.com/Southclaws/enumerator v1.3.1/go.mod h1:0fpqxXSmmqWC6pzOlXS79qKmGgvb4mABLx5+XrWVkTQ=
+github.com/Southclaws/enumerator v1.3.2/go.mod h1:WowGpG5avqY8kMUOL3fOnphfv6Xu8ODYNSd5RquvflM=
 github.com/Southclaws/fault v0.8.1 h1:mgqqdC6kUBQ6ExMALZ0nNaDfNJD5h2+wq3se5mAyX+8=
 github.com/Southclaws/fault v0.8.1/go.mod h1:VUVkAWutC59SL16s6FTqf3I6I2z77RmnaW5XRz4bLOE=
 github.com/Southclaws/opt v0.6.0 h1:DnsHXMfeW8vV1y2oa26bpx1dn76PERw4QNw25b6U498=
