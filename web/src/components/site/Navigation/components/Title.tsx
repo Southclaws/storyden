@@ -5,7 +5,13 @@ import { styled } from "@/styled-system/jsx";
 
 export function Title({ children }: PropsWithChildren) {
   return (
-    <styled.h1 fontSize="lg" fontWeight="bold" wordBreak="keep-all">
+    <styled.h1
+      fontSize="lg"
+      fontWeight="bold"
+      textWrap="nowrap"
+      overflow="hidden"
+      textOverflow="ellipsis"
+    >
       <Link href="/">{children}</Link>
     </styled.h1>
   );
