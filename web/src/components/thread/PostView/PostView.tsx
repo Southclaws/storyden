@@ -1,6 +1,5 @@
 import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
-import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Button } from "src/theme/components/Button";
 
 import { Byline } from "../../content/Byline";
@@ -47,7 +46,7 @@ export function PostView(props: Props) {
         </>
       ) : (
         <>
-          <ContentViewer value={props.body} />
+          <ContentComposer initialValue={props.body} disabled />
         </>
       )}
     </Flex>

@@ -18,7 +18,7 @@ export function BodyInput({
   const { control } = useBodyInput();
 
   return (
-    <FormControl>
+    <FormControl h="full">
       <Controller
         render={({ field, formState }) => (
           <ContentComposer

@@ -35,8 +35,6 @@ export function useOnboarding() {
     ? onboardingStatus !== "requires_first_account"
     : onboardingStatus === "requires_first_account";
 
-  console.log({ session, isAdmin, onboardingStatus, isOnboardingAccount });
-
   const showOnboarding =
     isOnboarding(onboardingStatus) &&
     !isComposingNewThread &&
