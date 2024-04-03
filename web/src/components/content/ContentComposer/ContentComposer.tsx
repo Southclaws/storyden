@@ -1,50 +1,61 @@
-import { PropsWithChildren, useCallback } from "react";
-import { Editable, Slate } from "slate-react";
+import { EditorContent } from "@tiptap/react";
+import { BoldIcon, ItalicIcon, StrikethroughIcon } from "lucide-react";
 
-import { FileDrop } from "../FileDrop/FileDrop";
+import { Button } from "src/theme/components/Button";
 
-import { Box } from "@/styled-system/jsx";
+import { css } from "@/styled-system/css";
+import { HStack, LStack } from "@/styled-system/jsx";
 
-import { Element } from "./render/Element";
-import { Leaf } from "./render/Leaf";
 import { Props, useContentComposer } from "./useContentComposer";
 
-export function ContentComposer({
-  disabled,
-  children,
-  ...props
-}: PropsWithChildren<Props>) {
-  const { editor, initialValue, onChange, handleAssetUpload } =
-    useContentComposer(props);
-
-  const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
-  const renderElement = useCallback((props: any) => <Element {...props} />, []);
+export function ContentComposer(props: Props) {
+  const { editor, handlers } = useContentComposer(props);
 
   return (
-    <Box
+    <LStack
       id="rich-text-editor"
       className="typography"
       w="full"
       h="full"
+      gap="1"
       onDragOver={(e) => e.preventDefault()}
     >
-      <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
-        {children}
+      <HStack>
+        <Button
+          type="button"
+          size="xs"
+          kind="ghost"
+          onClick={handlers.handleBold}
+        >
+          <BoldIcon />
+        </Button>
+        <Button
+          type="button"
+          size="xs"
+          kind="ghost"
+          onClick={handlers.handleItalic}
+        >
+          <ItalicIcon />
+        </Button>
+        <Button
+          type="button"
+          size="xs"
+          kind="ghost"
+          onClick={handlers.handleStrike}
+        >
+          <StrikethroughIcon />
+        </Button>
+      </HStack>
 
-        <FileDrop onComplete={handleAssetUpload}>
-          <Editable
-            renderLeaf={renderLeaf}
-            renderElement={renderElement}
-            readOnly={disabled}
-            placeholder="Write your heart out..."
-            style={{
-              minHeight: props.minHeight ?? "8em",
-              outline: "0px solid transparent",
-              opacity: disabled ? 0.5 : 1,
-            }}
-          />
-        </FileDrop>
-      </Slate>
-    </Box>
+      <EditorContent
+        id="editor-content"
+        className={css({
+          // NOTE: We want to make the clickable area expand to the full height.
+          height: "full",
+          width: "full",
+        })}
+        editor={editor}
+      />
+    </LStack>
   );
 }

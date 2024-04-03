@@ -3,7 +3,7 @@
 import { isEmpty } from "lodash";
 import { FormProvider } from "react-hook-form";
 
-import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
@@ -147,7 +147,7 @@ export function DatagraphNodeScreen(props: Props) {
         {editing ? (
           <ContentInput onAssetUpload={handleAssetUpload} />
         ) : (
-          <ContentViewer value={node.content ?? ""} />
+          <ContentComposer disabled initialValue={node.content ?? ""} />
         )}
 
         {node.type === "cluster" && (

@@ -1,81 +1,90 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import {
-  BaseEditor,
-  Descendant,
-  Editor,
-  Transforms,
-  createEditor,
-} from "slate";
-import { ReactEditor, withReact } from "slate-react";
+import Mention from "@tiptap/extension-mention";
+import Placeholder from "@tiptap/extension-placeholder";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-import { Asset } from "src/api/openapi/schemas";
+import { useImageUpload } from "../useImageUpload";
 
-import { deserialise, serialise } from "./serialisation";
-import { withExtensions } from "./utils";
+import { css } from "@/styled-system/css";
+
+import { ImageExtended } from "./plugins/ImagePlugin";
 
 export type Props = {
-  resetKey?: string;
   disabled?: boolean;
-  minHeight?: string;
   initialValue?: string;
-  onChange: (value: string) => void;
-  onAssetUpload?: (asset: Asset) => void;
+  onChange?: (value: string) => void;
 };
 
-const defaultValue: Descendant[] = [
-  {
-    type: "paragraph",
-    children: [{ text: "" }],
-  },
-];
-
 export function useContentComposer(props: Props) {
-  const editorRef = useRef<BaseEditor & ReactEditor>();
-  if (!editorRef.current) {
-    editorRef.current = withExtensions(withReact(createEditor()));
-  }
-  const editor = editorRef.current;
+  const { upload } = useImageUpload();
 
-  const initialValue: Descendant[] = useMemo(() => {
-    if (props.initialValue) {
-      return deserialise(props.initialValue);
-    }
-
-    return defaultValue;
-  }, [props.initialValue]);
-
-  useMemo(() => {
-    if (!props.resetKey) return;
-
-    Transforms.delete(editor, {
-      at: {
-        anchor: Editor.start(editor, []),
-        focus: Editor.end(editor, []),
+  const editor = useEditor({
+    editorProps: {
+      attributes: {
+        class: css({
+          height: "full",
+          width: "full",
+          boxShadow: "md",
+          padding: "2",
+          borderRadius: "sm",
+        }),
       },
-    });
-  }, [props.resetKey, editor]);
+    },
+    extensions: [
+      StarterKit,
+      ImageExtended.configure({
+        allowBase64: false,
+        HTMLAttributes: {
+          class: css({ borderRadius: "md" }),
+        },
+        handleFileUpload: upload,
+      }),
+      Placeholder.configure({
+        placeholder: "Write your heart out...",
+        includeChildren: true,
+        showOnlyCurrent: false,
+        considerAnyAsEmpty: true,
+      }),
+      Mention.configure({
+        HTMLAttributes: {
+          class: "mention",
+        },
+        suggestion: {
+          render: () => ({
+            onStart: (props) => {
+              console.log("start", props.clientRect?.());
+            },
+          }),
+        },
+      }),
+    ],
+    content: props.initialValue ?? "<p></p>",
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      props.onChange?.(html);
+    },
+  });
 
-  function onChange(value: Descendant[]) {
-    const isAstChange = editor.operations.some(
-      (op) => "set_selection" !== op.type,
-    );
-
-    if (isAstChange) {
-      props.onChange(serialise(value));
-    }
+  function handleBold() {
+    editor?.chain().focus().toggleBold().run();
   }
 
-  function handleAssetUpload(asset: Asset) {
-    Transforms.insertNodes(editor, {
-      type: "image",
-      caption: asset.url,
-      link: asset.url,
-      children: [{ text: "" }],
-    });
-    props.onAssetUpload?.(asset);
+  function handleItalic() {
+    editor?.chain().focus().toggleItalic().run();
   }
 
-  return { editor, initialValue, onChange, handleAssetUpload };
+  function handleStrike() {
+    editor?.chain().focus().toggleStrike().run();
+  }
+
+  return {
+    editor,
+    handlers: {
+      handleBold,
+      handleItalic,
+      handleStrike,
+    },
+  };
 }

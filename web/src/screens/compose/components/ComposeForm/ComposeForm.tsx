@@ -1,25 +1,18 @@
 import { isValid } from "date-fns";
 import { FormProvider } from "react-hook-form";
 
-import { Bold } from "src/components/content/ContentComposer/controls/Bold";
-import { Italic } from "src/components/content/ContentComposer/controls/Italic";
-import { BackAction } from "src/components/site/Action/Back";
-import { SaveAction } from "src/components/site/Action/Save";
-import { SendAction } from "src/components/site/Action/Send";
-import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 import { Button } from "src/theme/components/Button";
 
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";
-import { LinkInput } from "../LinkInput/LinkInput";
 import { TitleInput } from "../TitleInput/TitleInput";
 
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { HStack, styled } from "@/styled-system/jsx";
 
 import { Props, useComposeForm } from "./useComposeForm";
 
 export function ComposeForm(props: Props) {
-  const { formContext, onBack, onPublish, onSave, onAssetUpload } =
+  const { formContext, onPublish, onSave, onAssetUpload } =
     useComposeForm(props);
 
   return (
@@ -66,29 +59,7 @@ export function ComposeForm(props: Props) {
           <CategorySelect />
         </HStack>
 
-        <HStack width="full">
-          <LinkInput />
-        </HStack>
-
-        <BodyInput onAssetUpload={onAssetUpload}>
-          <Toolpill w="min" display={{ base: "flex", md: "none" }}>
-            <VStack>
-              <HStack>
-                <Bold />
-                <Italic />
-              </HStack>
-              <HStack>
-                <BackAction href="/" onClick={onBack} />
-                <SendAction onClick={onPublish} />
-                <SaveAction onClick={onSave} />
-              </HStack>
-            </VStack>
-          </Toolpill>
-          <HStack display={{ base: "none", md: "flex" }}>
-            <Bold />
-            <Italic />
-          </HStack>
-        </BodyInput>
+        <BodyInput onAssetUpload={onAssetUpload} />
       </FormProvider>
     </styled.form>
   );
