@@ -13,7 +13,7 @@ require (
 	github.com/el-mike/restrict v1.0.0
 	github.com/forPelevin/gomoji v1.1.8
 	github.com/getkin/kin-openapi v0.120.0
-	github.com/gomarkdown/markdown v0.0.0-20230922112808-5421fefb8386
+	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
 	github.com/gosimple/slug v1.13.1
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/joho/godotenv v1.5.1
