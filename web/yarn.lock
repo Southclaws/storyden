@@ -10148,6 +10148,7 @@ __metadata:
     "@pandacss/dev": "npm:^0.29.1"
     "@simplewebauthn/browser": "npm:^9.0.0"
     "@simplewebauthn/typescript-types": "npm:^8.0.0"
+    "@tiptap/core": "npm:^2.3.0"
     "@tiptap/extension-bullet-list": "npm:^2.2.4"
     "@tiptap/extension-dropcursor": "npm:^2.2.4"
     "@tiptap/extension-focus": "npm:^2.3.0"
