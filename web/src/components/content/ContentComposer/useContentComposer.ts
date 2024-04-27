@@ -1,6 +1,6 @@
 "use client";
 
-import Mention from "@tiptap/extension-mention";
+import { FocusClasses } from "@tiptap/extension-focus";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -26,14 +26,12 @@ export function useContentComposer(props: Props) {
         class: css({
           height: "full",
           width: "full",
-          boxShadow: "md",
-          padding: "2",
-          borderRadius: "sm",
         }),
       },
     },
     extensions: [
       StarterKit,
+      FocusClasses,
       ImageExtended.configure({
         allowBase64: false,
         HTMLAttributes: {
@@ -46,18 +44,6 @@ export function useContentComposer(props: Props) {
         includeChildren: true,
         showOnlyCurrent: false,
         considerAnyAsEmpty: true,
-      }),
-      Mention.configure({
-        HTMLAttributes: {
-          class: "mention",
-        },
-        suggestion: {
-          render: () => ({
-            onStart: (props) => {
-              console.log("start", props.clientRect?.());
-            },
-          }),
-        },
       }),
     ],
     content: props.initialValue ?? "<p></p>",

@@ -3,9 +3,12 @@ import { BoldIcon, ItalicIcon, StrikethroughIcon } from "lucide-react";
 
 import { Button } from "src/theme/components/Button";
 
-import { css } from "@/styled-system/css";
-import { HStack, LStack } from "@/styled-system/jsx";
+import "./styles.css";
 
+import { css } from "@/styled-system/css";
+import { LStack } from "@/styled-system/jsx";
+
+import { FloatingMenu } from "./plugins/MenuPlugin";
 import { Props, useContentComposer } from "./useContentComposer";
 
 export function ContentComposer(props: Props) {
@@ -14,38 +17,44 @@ export function ContentComposer(props: Props) {
   return (
     <LStack
       id="rich-text-editor"
+      containerType="inline-size"
       className="typography"
       w="full"
       h="full"
       gap="1"
       onDragOver={(e) => e.preventDefault()}
     >
-      <HStack>
-        <Button
-          type="button"
-          size="xs"
-          kind="ghost"
-          onClick={handlers.handleBold}
-        >
-          <BoldIcon />
-        </Button>
-        <Button
-          type="button"
-          size="xs"
-          kind="ghost"
-          onClick={handlers.handleItalic}
-        >
-          <ItalicIcon />
-        </Button>
-        <Button
-          type="button"
-          size="xs"
-          kind="ghost"
-          onClick={handlers.handleStrike}
-        >
-          <StrikethroughIcon />
-        </Button>
-      </HStack>
+      {editor && (
+        <FloatingMenu editor={editor}>
+          <Button
+            type="button"
+            size="xs"
+            kind="ghost"
+            title="Toggle bold text"
+            onClick={handlers.handleBold}
+          >
+            <BoldIcon />
+          </Button>
+          <Button
+            type="button"
+            size="xs"
+            kind="ghost"
+            title="Toggle italic text"
+            onClick={handlers.handleItalic}
+          >
+            <ItalicIcon />
+          </Button>
+          <Button
+            type="button"
+            size="xs"
+            kind="ghost"
+            title="Toggle strikeout text"
+            onClick={handlers.handleStrike}
+          >
+            <StrikethroughIcon />
+          </Button>
+        </FloatingMenu>
+      )}
 
       <EditorContent
         id="editor-content"

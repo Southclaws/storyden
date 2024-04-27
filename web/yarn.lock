@@ -2246,6 +2246,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-focus@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@tiptap/extension-focus@npm:2.3.0"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: 10c0/ae6430d521ceaac53c837214fcf6ecdb93ca32f2192f632b3a4989ac44d09b67cfc04ec32a443061727987d9d81d58f5ddc9abf82291727176eee3f839df8ca7
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-gapcursor@npm:^2.3.0":
   version: 2.3.0
   resolution: "@tiptap/extension-gapcursor@npm:2.3.0"
@@ -10140,6 +10150,7 @@ __metadata:
     "@simplewebauthn/typescript-types": "npm:^8.0.0"
     "@tiptap/extension-bullet-list": "npm:^2.2.4"
     "@tiptap/extension-dropcursor": "npm:^2.2.4"
+    "@tiptap/extension-focus": "npm:^2.3.0"
     "@tiptap/extension-image": "npm:^2.2.4"
     "@tiptap/extension-list-item": "npm:^2.2.4"
     "@tiptap/extension-mention": "npm:^2.2.4"
