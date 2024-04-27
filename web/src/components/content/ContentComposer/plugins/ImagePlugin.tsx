@@ -23,10 +23,15 @@ type Options = {
 
 function Component(props: NodeViewProps) {
   return (
-    <NodeViewWrapper className="react-component">
+    <NodeViewWrapper
+      className={css({
+        cursor: "pointer",
+      })}
+    >
       <styled.img borderRadius="md" {...props.node.attrs} />
       <NodeViewContent
         className={css({
+          width: "full",
           textAlign: "center",
           fontStyle: "italic",
           color: "fg.muted",
