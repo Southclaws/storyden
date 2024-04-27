@@ -33,7 +33,7 @@ export function MixedContentFeed({ data }: Props) {
 // TODO: Really, we should be computing the whole list as a data structure first
 // then passing it to a simple mapping component which just performs the render.
 function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
-  const recent = true; // TODO: derive from created/updated dates of the chunks
+  const recent = false; // TODO: derive from created/updated dates of the chunks
 
   const dontShowDirectoryHeaderTwice = Boolean(
     !(data.clusters.length && data.items.length && !data.threads.length),
