@@ -1834,18 +1834,18 @@ __metadata:
   linkType: hard
 
 "@simplewebauthn/browser@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@simplewebauthn/browser@npm:9.0.0"
+  version: 9.0.1
+  resolution: "@simplewebauthn/browser@npm:9.0.1"
   dependencies:
-    "@simplewebauthn/types": "npm:^9.0.0"
-  checksum: 10c0/be2685357f092ed68c984f7f76f8d7ed5f2fb7a094d723b211add3e97fbd3e601f1485660c1314cc775826a90ed882efea7b627cbb5e2ef21d40634232d3f6cb
+    "@simplewebauthn/types": "npm:^9.0.1"
+  checksum: 10c0/141f3f55d99ad2b4dcf697026d2470fa10b65a36286b616ead71b56ddd5636c30eb001599d27c2509a87c93def6636a2c7081ae362910268b78733a676af3ebf
   languageName: node
   linkType: hard
 
-"@simplewebauthn/types@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@simplewebauthn/types@npm:9.0.0"
-  checksum: 10c0/fbee5b7ff3af01958529a1f84911fbf64cf73c8505e058ccea956f140f6028e84894bddfffd479347dd2ea00cc4e31a13b0eb9285fc3bc9048ba95eb97520374
+"@simplewebauthn/types@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@simplewebauthn/types@npm:9.0.1"
+  checksum: 10c0/397f079ac029ada1413d6001850e3b49f99297a9933822758bdca9c47c36d6558e1dc81682725e0b03c501551c94fea040cead76883dcd2bb3a34b32984900f5
   languageName: node
   linkType: hard
 
