@@ -95,10 +95,6 @@ export class FloatingMenuView {
     this.hide();
   };
 
-  tippyBlurHandler = (event: FocusEvent) => {
-    this.blurHandler({ event });
-  };
-
   update(view: EditorView, oldState?: EditorState) {
     const { state } = view;
     const { doc, selection } = state;
