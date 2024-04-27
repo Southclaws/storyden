@@ -180,7 +180,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque/80",
+            backgroundColor: "bg.opaque/60",
             backdropBlur: "frosted",
             backdropFilter: "auto",
           };
