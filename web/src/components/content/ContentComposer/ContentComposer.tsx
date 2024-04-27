@@ -1,12 +1,18 @@
 import { EditorContent } from "@tiptap/react";
-import { BoldIcon, ItalicIcon, StrikethroughIcon } from "lucide-react";
+import {
+  BoldIcon,
+  ImageIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+} from "lucide-react";
 
 import { Button } from "src/theme/components/Button";
 
 import "./styles.css";
 
 import { css } from "@/styled-system/css";
-import { LStack } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
+import { button } from "@/styled-system/recipes";
 
 import { FloatingMenu } from "./plugins/MenuPlugin";
 import { Props, useContentComposer } from "./useContentComposer";
@@ -53,6 +59,24 @@ export function ContentComposer(props: Props) {
           >
             <StrikethroughIcon />
           </Button>
+          &nbsp;
+          <label
+            className={button({
+              size: "xs",
+              kind: "ghost",
+            })}
+            htmlFor="filepicker"
+            title="Insert an image"
+          >
+            <ImageIcon />
+          </label>
+          <styled.input
+            id="filepicker"
+            type="file"
+            multiple
+            display="none"
+            onChange={handlers.handleFileUpload}
+          />
         </FloatingMenu>
       )}
 

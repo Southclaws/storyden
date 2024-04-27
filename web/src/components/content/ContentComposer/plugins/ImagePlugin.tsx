@@ -18,7 +18,7 @@ import { styled } from "@/styled-system/jsx";
 const COMPONENT_NAME = "sd-image";
 
 type Options = {
-  handleFileUpload: (file: File) => Promise<Asset>;
+  handleFiles: (file: File[]) => Promise<Asset[]>;
 };
 
 function Component(props: NodeViewProps) {
@@ -62,7 +62,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
     return [COMPONENT_NAME, mergeAttributes(HTMLAttributes), 0];
   },
   addProseMirrorPlugins() {
-    const handleFileUpload = this.options.handleFileUpload;
+    const handleFiles = this.options.handleFiles;
     return [
       new Plugin({
         props: {
@@ -86,25 +86,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
               }
 
               event.preventDefault();
-
-              const { schema } = view.state;
-              const imageNode = schema.nodes?.["image"];
-              const coordinates = view.posAtCoords({
-                left: event.clientX,
-                top: event.clientY,
-              });
-
-              if (!imageNode || !coordinates) {
-                return;
-              }
-
-              images.forEach((image) => {
-                handleFileUpload(image).then((asset) => {
-                  const node = imageNode.create({ src: asset.url });
-                  const transaction = view.state.tr.replaceSelectionWith(node);
-                  view.dispatch(transaction);
-                });
-              });
+              handleFiles(images);
             },
 
             paste(view, event) {
@@ -126,21 +108,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
               }
 
               event.preventDefault();
-
-              const { schema } = view.state;
-              const imageNode = schema.nodes?.["image"];
-
-              if (!imageNode) {
-                return;
-              }
-
-              images.forEach((image) => {
-                handleFileUpload(image).then((asset) => {
-                  const node = imageNode.create({ src: asset.url });
-                  const transaction = view.state.tr.replaceSelectionWith(node);
-                  view.dispatch(transaction);
-                });
-              });
+              handleFiles(images);
             },
           },
         },
