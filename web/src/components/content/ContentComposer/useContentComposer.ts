@@ -127,18 +127,6 @@ export function useContentComposer(props: Props) {
     }
   }
 
-  function handleBold() {
-    editor?.chain().focus().toggleBold().run();
-  }
-
-  function handleItalic() {
-    editor?.chain().focus().toggleItalic().run();
-  }
-
-  function handleStrike() {
-    editor?.chain().focus().toggleStrike().run();
-  }
-
   function getBlockType(): Block | null {
     if (editor?.isActive("paragraph")) return "p";
     if (editor?.isActive("heading", { level: 1 })) return "h1";
@@ -161,20 +149,49 @@ export function useContentComposer(props: Props) {
         active: getBlockType(),
         set: handleBlockType,
       },
+
+      // Marks
       bold: {
         isActive: editor?.isActive("bold") ?? false,
         isDisabled: editor?.can().toggleBold() === false,
-        toggle: handleBold,
+        toggle: () => editor?.chain().focus().toggleBold().run(),
       },
       italic: {
         isActive: editor?.isActive("italic") ?? false,
         isDisabled: editor?.can().toggleItalic() === false,
-        toggle: handleItalic,
+        toggle: () => editor?.chain().focus().toggleItalic().run(),
       },
       strike: {
         isActive: editor?.isActive("strike") ?? false,
         isDisabled: editor?.can().toggleStrike() === false,
-        toggle: handleStrike,
+        toggle: () => editor?.chain().focus().toggleStrike().run(),
+      },
+      code: {
+        isActive: editor?.isActive("code") ?? false,
+        isDisabled: editor?.can().toggleCode() === false,
+        toggle: () => editor?.chain().focus().toggleCode().run(),
+      },
+
+      // Blocks
+      blockquote: {
+        isActive: editor?.isActive("blockquote") ?? false,
+        isDisabled: editor?.can().toggleBlockquote() === false,
+        toggle: () => editor?.chain().focus().toggleBlockquote().run(),
+      },
+      pre: {
+        isActive: editor?.isActive("codeBlock") ?? false,
+        isDisabled: editor?.can().toggleCodeBlock() === false,
+        toggle: () => editor?.chain().focus().toggleCodeBlock().run(),
+      },
+      bulletList: {
+        isActive: editor?.isActive("bulletList") ?? false,
+        isDisabled: editor?.can().toggleBulletList() === false,
+        toggle: () => editor?.chain().focus().toggleBulletList().run(),
+      },
+      orderedList: {
+        isActive: editor?.isActive("orderedList") ?? false,
+        isDisabled: editor?.can().toggleOrderedList() === false,
+        toggle: () => editor?.chain().focus().toggleOrderedList().run(),
       },
     },
   };

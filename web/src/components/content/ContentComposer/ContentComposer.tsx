@@ -2,6 +2,9 @@ import { Portal } from "@ark-ui/react";
 import { EditorContent } from "@tiptap/react";
 import {
   BoldIcon,
+  Code2Icon,
+  CodeIcon,
+  CodeSquareIcon,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -10,8 +13,12 @@ import {
   Heading6Icon,
   ImageIcon,
   ItalicIcon,
+  ListIcon,
+  ListOrderedIcon,
+  SeparatorVerticalIcon,
   StrikethroughIcon,
   TextIcon,
+  TextQuoteIcon,
 } from "lucide-react";
 import { useRef } from "react";
 import { match } from "ts-pattern";
@@ -143,7 +150,56 @@ export function ContentComposer(props: Props) {
           >
             <StrikethroughIcon />
           </Button>
-          &nbsp;
+          <Button
+            type="button"
+            size="xs"
+            kind={format.code.isActive ? "primary" : "ghost"}
+            title="Toggle inline code snippet"
+            onClick={format.code.toggle}
+          >
+            <CodeIcon />
+          </Button>
+
+          <Button
+            type="button"
+            size="xs"
+            kind={format.blockquote.isActive ? "primary" : "ghost"}
+            title="Toggle quote"
+            onClick={format.blockquote.toggle}
+          >
+            <TextQuoteIcon />
+          </Button>
+
+          <Button
+            type="button"
+            size="xs"
+            kind={format.pre.isActive ? "primary" : "ghost"}
+            title="Toggle code block"
+            onClick={format.pre.toggle}
+          >
+            <CodeSquareIcon />
+          </Button>
+
+          <Button
+            type="button"
+            size="xs"
+            kind={format.bulletList.isActive ? "primary" : "ghost"}
+            title="Toggle bullet points"
+            onClick={format.bulletList.toggle}
+          >
+            <ListIcon />
+          </Button>
+
+          <Button
+            type="button"
+            size="xs"
+            kind={format.orderedList.isActive ? "primary" : "ghost"}
+            title="Toggle numbered list"
+            onClick={format.orderedList.toggle}
+          >
+            <ListOrderedIcon />
+          </Button>
+
           <label
             className={button({
               size: "xs",
