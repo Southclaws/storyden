@@ -9691,6 +9691,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-pattern@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "ts-pattern@npm:5.1.1"
+  checksum: 10c0/20ec96d1d07b074585082c0378abdc1ecd0d9aaa3d4c2bf2d668f645693daad7b65734292704d90a8472a79080dfe8f2b36d8bdb01f6145d1f4351a51516e307
+  languageName: node
+  linkType: hard
+
 "tsconfck@npm:^2.0.1, tsconfck@npm:^2.1.2":
   version: 2.1.2
   resolution: "tsconfck@npm:2.1.2"
@@ -10124,6 +10131,7 @@ __metadata:
     remark-parse: "npm:^11.0.0"
     server-only: "npm:^0.0.1"
     swr: "npm:^2.2.2"
+    ts-pattern: "npm:^5.1.1"
     typescript: "npm:^5.2.2"
     unified: "npm:^11.0.4"
     usehooks-ts: "npm:^2.15.1"

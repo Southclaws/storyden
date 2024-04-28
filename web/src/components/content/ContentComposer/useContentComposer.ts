@@ -12,6 +12,8 @@ import { css } from "@/styled-system/css";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
 
+export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
 export type Props = {
   disabled?: boolean;
   initialValue?: string;
@@ -83,18 +85,6 @@ export function useContentComposer(props: Props) {
     },
   });
 
-  function handleBold() {
-    editor?.chain().focus().toggleBold().run();
-  }
-
-  function handleItalic() {
-    editor?.chain().focus().toggleItalic().run();
-  }
-
-  function handleStrike() {
-    editor?.chain().focus().toggleStrike().run();
-  }
-
   async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
     if (!e.currentTarget.files) {
       return;
@@ -107,13 +97,85 @@ export function useContentComposer(props: Props) {
     await handleFiles(images);
   }
 
+  function handleBlockType(kind: Block) {
+    switch (kind) {
+      case "p":
+        editor?.chain().focus().setParagraph().run();
+        break;
+      case "h1":
+        editor?.chain().focus().setHeading({ level: 1 }).run();
+        break;
+      case "h2":
+        editor?.chain().focus().setHeading({ level: 2 }).run();
+        break;
+
+      case "h3":
+        editor?.chain().focus().setHeading({ level: 3 }).run();
+        break;
+
+      case "h4":
+        editor?.chain().focus().setHeading({ level: 4 }).run();
+        break;
+
+      case "h5":
+        editor?.chain().focus().setHeading({ level: 5 }).run();
+        break;
+
+      case "h6":
+        editor?.chain().focus().setHeading({ level: 6 }).run();
+        break;
+    }
+  }
+
+  function handleBold() {
+    editor?.chain().focus().toggleBold().run();
+  }
+
+  function handleItalic() {
+    editor?.chain().focus().toggleItalic().run();
+  }
+
+  function handleStrike() {
+    editor?.chain().focus().toggleStrike().run();
+  }
+
+  function getBlockType(): Block | null {
+    if (editor?.isActive("paragraph")) return "p";
+    if (editor?.isActive("heading", { level: 1 })) return "h1";
+    if (editor?.isActive("heading", { level: 2 })) return "h2";
+    if (editor?.isActive("heading", { level: 3 })) return "h3";
+    if (editor?.isActive("heading", { level: 4 })) return "h4";
+    if (editor?.isActive("heading", { level: 5 })) return "h5";
+    if (editor?.isActive("heading", { level: 6 })) return "h6";
+
+    return null;
+  }
+
   return {
     editor,
     handlers: {
-      handleBold,
-      handleItalic,
-      handleStrike,
       handleFileUpload,
+    },
+    format: {
+      text: {
+        active: getBlockType(),
+        set: handleBlockType,
+      },
+      bold: {
+        isActive: editor?.isActive("bold") ?? false,
+        isDisabled: editor?.can().toggleBold() === false,
+        toggle: handleBold,
+      },
+      italic: {
+        isActive: editor?.isActive("italic") ?? false,
+        isDisabled: editor?.can().toggleItalic() === false,
+        toggle: handleItalic,
+      },
+      strike: {
+        isActive: editor?.isActive("strike") ?? false,
+        isDisabled: editor?.can().toggleStrike() === false,
+        toggle: handleStrike,
+      },
     },
   };
 }
