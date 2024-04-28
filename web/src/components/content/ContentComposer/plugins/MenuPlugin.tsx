@@ -132,9 +132,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
       return;
     }
 
-    const { pluginKey = PLUGIN_KEY, editor } = props;
-
-    const menuEditor = editor || currentEditor;
+    const menuEditor = props.editor || currentEditor;
 
     if (!menuEditor) {
       console.warn(
@@ -144,13 +142,13 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     }
 
     const plugin = FloatingMenuPlugin({
-      pluginKey,
+      pluginKey: PLUGIN_KEY,
       editor: menuEditor,
       element,
     });
 
     menuEditor.registerPlugin(plugin);
-    return () => menuEditor.unregisterPlugin(pluginKey);
+    return () => menuEditor.unregisterPlugin(PLUGIN_KEY);
   }, [props.editor, currentEditor, element]);
 
   return (
@@ -170,7 +168,8 @@ const menuStyles = css({
   borderRadius: "xl",
   display: "flex",
   flexWrap: "wrap",
-  padding: "2",
+  gap: "1",
+  padding: "1",
   boxShadow: "md",
   borderColor: "border.default",
   borderStyle: "solid",
