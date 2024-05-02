@@ -6,6 +6,8 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent } from "react";
 
+import { Asset } from "src/api/openapi/schemas";
+
 import { useImageUpload } from "../useImageUpload";
 
 import { css } from "@/styled-system/css";
@@ -38,7 +40,7 @@ export function useContentComposer(props: Props) {
       return [];
     }
 
-    const assets = [];
+    const assets: Asset[] = [];
     for (const f of files) {
       const asset = await upload(f);
 
