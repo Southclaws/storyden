@@ -4,7 +4,7 @@ import { PublicProfile } from "src/api/openapi/schemas";
 import { MemberOptionsTrigger } from "src/components/member/MemberOptions/MemberOptionsTrigger";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 
-import { LinkBox, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
+import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
 
 type Props = PublicProfile & {
   onChange?: () => void;
@@ -25,7 +25,7 @@ export function MemberCard(props: Props) {
       }}
     >
       <styled.td overflow="auto" flexShrink="1" flexGrow="0">
-        <LinkBox display="flex" alignItems="center" gap="2">
+        <Box position="relative" display="flex" alignItems="center" gap="2">
           <Avatar flexShrink="0" handle={props.handle} />
           <VStack alignItems="start" gap="0">
             <styled.h1
@@ -45,7 +45,7 @@ export function MemberCard(props: Props) {
               </LinkOverlay>
             </styled.h2>
           </VStack>
-        </LinkBox>
+        </Box>
       </styled.td>
 
       <styled.td overflow="auto" flexShrink="0" flexGrow="1">

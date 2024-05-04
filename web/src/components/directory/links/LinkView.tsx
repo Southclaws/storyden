@@ -4,13 +4,7 @@ import { LinkWithRefs } from "src/api/openapi/schemas";
 import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 import { Link } from "src/theme/components/Link";
 
-import {
-  Flex,
-  HStack,
-  LinkBox,
-  LinkOverlay,
-  styled,
-} from "@/styled-system/jsx";
+import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {
   link: LinkWithRefs;
@@ -24,7 +18,7 @@ export function LinkView({ link }: Props) {
 
   return (
     <Flex flexDir="column" gap="2">
-      <LinkBox>
+      <Box position="relative">
         <HStack justify="space-between">
           <LinkOverlay
             display="flex"
@@ -48,7 +42,7 @@ export function LinkView({ link }: Props) {
             (no title) {link.slug}
           </styled.h1>
         )}
-      </LinkBox>
+      </Box>
 
       <styled.p color="fg.muted">
         {link.description || "No description was found at this link's site."}

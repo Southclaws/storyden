@@ -1,11 +1,11 @@
 import { Collection } from "src/api/openapi/schemas";
 import { Heading1 } from "src/theme/components/Heading/Index";
 
-import { Flex, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
+import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
 export function CollectionListItem(props: Collection) {
   return (
-    <LinkBox key={props.id}>
+    <Box key={props.id} position="relative">
       <styled.li key={props.id} listStyleType="none">
         <Flex id={props.id} flexDir="column" gap="1">
           <LinkOverlay
@@ -16,6 +16,6 @@ export function CollectionListItem(props: Collection) {
           <p>{props.description}</p>
         </Flex>
       </styled.li>
-    </LinkBox>
+    </Box>
   );
 }
