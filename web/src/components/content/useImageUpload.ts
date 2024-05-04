@@ -23,7 +23,8 @@ export function isSupportedImage(mime: string): boolean {
   switch (category) {
     case "image":
       return true;
-  }
 
-  return false;
+    default:
+      return false;
+  }
 }
