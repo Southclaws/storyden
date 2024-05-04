@@ -66,7 +66,7 @@ export function LinkIndexView(props: Props) {
       />
 
       {data.indexing.state !== "not-indexing" ? (
-        <IndexingState {...data.indexing} />
+        <IndexingStateBadge {...data.indexing} />
       ) : (
         <LinkResultList links={data.links} />
       )}
@@ -74,11 +74,15 @@ export function LinkIndexView(props: Props) {
   );
 }
 
-function IndexingState(props: IndexingState)  {
+function IndexingStateBadge(props: IndexingState) {
   switch (props.state) {
-    case "not-indexing": return <></> 
-    case "indexing": return <>Indexing {props.url}...</>
-    case "indexed": return <LinkCard shape="row" link={props.link} />
-    case "error": return <>{props.error}</>
+    case "not-indexing":
+      return <></>;
+    case "indexing":
+      return <>Indexing {props.url}...</>;
+    case "indexed":
+      return <LinkCard shape="row" link={props.link} />;
+    case "error":
+      return <>{props.error}</>;
   }
 }
