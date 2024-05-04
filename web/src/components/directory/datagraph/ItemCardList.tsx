@@ -1,7 +1,7 @@
 import { slice } from "lodash/fp";
 
 import { Item } from "src/api/openapi/schemas";
-import { DirectoryPath } from "src/screens/directory/datagraph/useDirectoryPath";
+import { DirectoryPath } from "src/screens/directory/datagraph/directory-path";
 import { CardGrid } from "src/theme/components/Card";
 
 import { ItemCard } from "./ItemCard";

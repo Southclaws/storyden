@@ -1,0 +1,4 @@
+.has-focus {
+  border-radius: 3px;
+  background-color: var(--colors-black-alpha-50);
+}

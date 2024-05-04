@@ -3,7 +3,7 @@ import { Timestamp } from "src/components/site/Timestamp";
 import {
   DirectoryPath,
   joinDirectoryPath,
-} from "src/screens/directory/datagraph/useDirectoryPath";
+} from "src/screens/directory/datagraph/directory-path";
 import { Card } from "src/theme/components/Card";
 
 import { DirectoryBadge } from "../DirectoryBadge";

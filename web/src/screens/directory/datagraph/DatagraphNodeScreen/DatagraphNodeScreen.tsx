@@ -3,7 +3,6 @@
 import { isEmpty } from "lodash";
 import { FormProvider } from "react-hook-form";
 
-import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
@@ -144,11 +143,13 @@ export function DatagraphNodeScreen(props: Props) {
           </VStack>
         </VStack>
 
-        {editing ? (
-          <ContentInput onAssetUpload={handleAssetUpload} />
-        ) : (
-          <ContentViewer value={node.content ?? ""} />
-        )}
+        <ContentInput
+          disabled={!editing}
+          onAssetUpload={handleAssetUpload}
+          initialValue={
+            node.content ?? form.formState.defaultValues?.["content"]
+          }
+        />
 
         {node.type === "cluster" && (
           <VStack alignItems="start" w="full">
