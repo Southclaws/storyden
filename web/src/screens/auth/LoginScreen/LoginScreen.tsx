@@ -22,13 +22,7 @@ export async function LoginScreen() {
   // {isOnlyOAuth && <styled.p textAlign="center">choose a login provider</styled.p>}
 
   return (
-    <VStack
-      minH="dvh"
-      p="12"
-      background={
-        "linear-gradient(180deg, var(--accent-colour-flat-fill-100) 0%, var(--accent-colour-flat-fill-200) 100%)" as any
-      }
-    >
+    <VStack minH="dvh" p="12">
       <VStack>
         <Image
           className={css({ width: "28" })}
