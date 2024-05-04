@@ -1,33 +1,26 @@
-import { PropsWithChildren } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
-import { Asset } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
+import { ContentComposerProps } from "src/components/content/ContentComposer/useContentComposer";
 import { FormControl } from "src/theme/components/FormControl";
 
 import { Form } from "./useDatagraphNodeScreen";
 
-type Props = {
-  onAssetUpload: (asset: Asset) => void;
-};
+type Props = ContentComposerProps;
 
-export function ContentInput({
-  children,
-  onAssetUpload,
-}: PropsWithChildren<Props>) {
+export function ContentInput({ disabled, initialValue, onAssetUpload }: Props) {
   const { control } = useFormContext<Form>();
 
   return (
     <FormControl>
       <Controller
-        render={({ field, formState }) => (
+        render={({ field }) => (
           <ContentComposer
+            disabled={disabled}
             onChange={field.onChange}
             onAssetUpload={onAssetUpload}
-            initialValue={formState.defaultValues?.["content"]}
-          >
-            {children}
-          </ContentComposer>
+            initialValue={initialValue}
+          />
         )}
         control={control}
         name="content"

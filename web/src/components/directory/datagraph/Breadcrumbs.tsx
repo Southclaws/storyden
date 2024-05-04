@@ -7,7 +7,7 @@ import { useSession } from "src/auth";
 import {
   DirectoryPath,
   joinDirectoryPath,
-} from "src/screens/directory/datagraph/useDirectoryPath";
+} from "src/screens/directory/datagraph/directory-path";
 import { Input } from "src/theme/components/Input";
 import { Link } from "src/theme/components/Link";
 
@@ -24,7 +24,7 @@ type Props = {
   onChange?: FormEventHandler<HTMLInputElement>;
 };
 
-export const _Breadcrumbs = (
+export const Breadcrumbs_ = (
   {
     directoryPath,
     visibility,
@@ -112,4 +112,4 @@ export const _Breadcrumbs = (
   );
 };
 
-export const Breadcrumbs = forwardRef(_Breadcrumbs);
+export const Breadcrumbs = forwardRef(Breadcrumbs_);

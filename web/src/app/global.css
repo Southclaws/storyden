@@ -108,28 +108,34 @@ body {
   h1 {
     margin-top: 0;
 
-    font-size: var(--font-size-h1);
-    font-size: var(--font-size-h1-variable);
+    font-size: var(--global-font-size-h1);
+    font-size: var(--global-font-size-h1-variable);
+    font-weight: 800;
   }
   h2 {
-    font-size: var(--font-size-h2);
-    font-size: var(--font-size-h2-variable);
+    font-size: var(--global-font-size-h2);
+    font-size: var(--global-font-size-h2-variable);
+    font-weight: 800;
   }
   h3 {
-    font-size: var(--font-size-h3);
-    font-size: var(--font-size-h3-variable);
+    font-size: var(--global-font-size-h3);
+    font-size: var(--global-font-size-h3-variable);
+    font-weight: 700;
   }
   h4 {
-    font-size: var(--font-size-h4);
-    font-size: var(--font-size-h4-variable);
+    font-size: var(--global-font-size-h4);
+    font-size: var(--global-font-size-h4-variable);
+    font-weight: 700;
   }
   h5 {
-    font-size: var(--font-size-h5);
-    font-size: var(--font-size-h5-variable);
+    font-size: var(--global-font-size-h5);
+    font-size: var(--global-font-size-h5-variable);
+    font-weight: 700;
   }
   h6 {
-    font-size: var(--font-size-h6);
-    font-size: var(--font-size-h6-variable);
+    font-size: var(--global-font-size-h6);
+    font-size: var(--global-font-size-h6-variable);
+    font-weight: 700;
   }
 
   small {
@@ -164,6 +170,9 @@ body {
     font-family: monospace;
     overflow-x: scroll;
     max-width: 100%;
+    border-radius: var(--radii-lg);
+    padding: var(--spacing-2);
+    background-color: var(--colors-bg-subtle);
   }
 
   /* LEAF ELEMENTS */
@@ -190,4 +199,20 @@ body {
     padding-bottom: var(--spacing-2);
     padding-top: var(--spacing-2);
   }
+}
+
+/* Editor stuff */
+
+.ProseMirror-focused,
+.ProseMirror:focus {
+  height: 100%;
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--colors-fg-subtle);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }

@@ -7,7 +7,8 @@ import {
   ItemWithParents,
 } from "src/api/openapi/schemas";
 
-import { replaceDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
+import { replaceDirectoryPath } from "../directory-path";
+import { useDirectoryPath } from "../useDirectoryPath";
 
 export type Props = {
   slug: string;

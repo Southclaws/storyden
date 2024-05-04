@@ -15,12 +15,11 @@ import { handleError } from "src/components/site/ErrorBanner";
 export type Props = { editing?: string; initialDraft?: Thread };
 
 export const FormShapeSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().default(""),
   body: z.string().min(1),
   category: z.string(),
   tags: z.string().array().optional(),
   url: z.string().optional(),
-  // assets: z.array(z.string()),
 });
 export type FormShape = z.infer<typeof FormShapeSchema>;
 
@@ -52,7 +51,6 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       title: data.title ?? "",
       body: data.body ?? "",
       url: data.url ?? "",
-      // assets: data.assets ?? [],
 
       visibility: Visibility.draft,
     };
@@ -67,6 +65,13 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   };
 
   const doPublish = async ({ title, body, category, url }: FormShape) => {
+    if (title.length < 1) {
+      formContext.setError("title", {
+        message: "Your post must have a title to be published",
+      });
+      return;
+    }
+
     if (editing) {
       const { slug } = await threadUpdate(editing, {
         title,

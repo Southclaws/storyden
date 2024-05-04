@@ -139,6 +139,9 @@ export function DatagraphBulkImport(props: Props) {
                   }
                 />
               );
+
+            default:
+              return null;
           }
         })}
       </CardRows>

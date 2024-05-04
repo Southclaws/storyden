@@ -2,7 +2,7 @@ import { pull } from "lodash";
 import { useState } from "react";
 
 import { Asset } from "src/api/openapi/schemas";
-import { useFileUpload } from "src/components/content/FileDrop/useFileDrop";
+import { useImageUpload } from "src/components/content/useImageUpload";
 
 export type Props = {
   initialAssets: Asset[];
@@ -16,7 +16,7 @@ export function useEditableAssetWall({
   onUpload,
   onRemove,
 }: Props) {
-  const { upload } = useFileUpload();
+  const { upload } = useImageUpload();
   const [assets, setAssets] = useState(initialAssets ?? []);
 
   async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {

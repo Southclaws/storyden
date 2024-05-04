@@ -15,6 +15,7 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "noImplicitAny": false,
     "strict": true,
     "strictBindCallApply": true,
     "noImplicitOverride": true,
