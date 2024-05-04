@@ -2,6 +2,7 @@
 
 import { FocusClasses } from "@tiptap/extension-focus";
 import Placeholder from "@tiptap/extension-placeholder";
+import { generateHTML, generateJSON } from "@tiptap/html";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect } from "react";
@@ -27,6 +28,31 @@ export type Props = {
 export function useContentComposer(props: Props) {
   const { upload } = useImageUpload();
 
+  const extensions = [
+    StarterKit,
+    FocusClasses,
+    ImageExtended.configure({
+      allowBase64: false,
+      HTMLAttributes: {
+        class: css({ borderRadius: "md" }),
+      },
+      handleFiles,
+    }),
+    Placeholder.configure({
+      placeholder: "Write your heart out...",
+      includeChildren: true,
+      showOnlyCurrent: false,
+      considerAnyAsEmpty: true,
+    }),
+  ];
+
+  // This is for the initial server render.
+  const initialValueJSON = generateJSON(
+    props.initialValue ?? "<p></p>",
+    extensions,
+  );
+  const initialValueHTML = generateHTML(initialValueJSON, extensions);
+
   const editor = useEditor({
     editorProps: {
       editable: () => !props.disabled,
@@ -37,23 +63,7 @@ export function useContentComposer(props: Props) {
         }),
       },
     },
-    extensions: [
-      StarterKit,
-      FocusClasses,
-      ImageExtended.configure({
-        allowBase64: false,
-        HTMLAttributes: {
-          class: css({ borderRadius: "md" }),
-        },
-        handleFiles,
-      }),
-      Placeholder.configure({
-        placeholder: "Write your heart out...",
-        includeChildren: true,
-        showOnlyCurrent: false,
-        considerAnyAsEmpty: true,
-      }),
-    ],
+    extensions,
     content: props.initialValue ?? "<p></p>",
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -162,6 +172,7 @@ export function useContentComposer(props: Props) {
 
   return {
     editor,
+    initialValueHTML,
     handlers: {
       handleFileUpload,
     },

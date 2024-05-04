@@ -39,7 +39,8 @@ import { FloatingMenu } from "./plugins/MenuPlugin";
 import { Props, useContentComposer } from "./useContentComposer";
 
 export function ContentComposer(props: Props) {
-  const { editor, handlers, format } = useContentComposer(props);
+  const { editor, initialValueHTML, handlers, format } =
+    useContentComposer(props);
 
   return (
     <LStack
@@ -51,7 +52,7 @@ export function ContentComposer(props: Props) {
       gap="1"
       onDragOver={(e) => e.preventDefault()}
     >
-      {editor && (
+      {editor ? (
         <FloatingMenu editor={editor}>
           <Menu
             size="sm"
@@ -217,6 +218,8 @@ export function ContentComposer(props: Props) {
             onChange={handlers.handleFileUpload}
           />
         </FloatingMenu>
+      ) : (
+        <div dangerouslySetInnerHTML={{ __html: initialValueHTML }} />
       )}
 
       <EditorContent

@@ -2361,6 +2361,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/html@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "@tiptap/html@npm:2.3.1"
+  dependencies:
+    zeed-dom: "npm:^0.10.9"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0
+    "@tiptap/pm": ^2.0.0
+  checksum: 10c0/bc964a327200726eb701631c922d0ce43e37bd22a2f6b7441d80b113c4d74e8482d6c2766270e10bdd242d5ac879e8923dce248b9e01d003a008dd66f5dc192f
+  languageName: node
+  linkType: hard
+
 "@tiptap/pm@npm:^2.2.4":
   version: 2.3.0
   resolution: "@tiptap/pm@npm:2.3.0"
@@ -4449,6 +4461,13 @@ __metadata:
   dependencies:
     "@types/node": "npm:^17.0.36"
   checksum: 10c0/fa8895d9aab8ea249243661147687556b86b42c11e922d5a2a068df073a32b7ed374f8c2423b20fd8f236a9b6aac09dc39beefef7d2617700bde6be9c5509fe5
+  languageName: node
+  linkType: hard
+
+"css-what@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "css-what@npm:6.1.0"
+  checksum: 10c0/a09f5a6b14ba8dcf57ae9a59474722e80f20406c53a61e9aedb0eedc693b135113ffe2983f4efc4b5065ae639442e9ae88df24941ef159c218b231011d733746
   languageName: node
   linkType: hard
 
@@ -10101,6 +10120,7 @@ __metadata:
     "@tiptap/extension-mention": "npm:^2.2.4"
     "@tiptap/extension-ordered-list": "npm:^2.2.4"
     "@tiptap/extension-placeholder": "npm:^2.2.4"
+    "@tiptap/html": "npm:^2.3.1"
     "@tiptap/pm": "npm:^2.2.4"
     "@tiptap/react": "npm:^2.2.4"
     "@tiptap/starter-kit": "npm:^2.2.4"
@@ -10355,6 +10375,15 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zeed-dom@npm:^0.10.9":
+  version: 0.10.11
+  resolution: "zeed-dom@npm:0.10.11"
+  dependencies:
+    css-what: "npm:^6.1.0"
+  checksum: 10c0/68c22a1324af9ce45ec49ba7aaf86492c7b87c2fa307664a0a4d8dcd0a279ff97221787f5f1354f52fe9ac9a27559214d1b4c283374a1993c38c6242c4b0ac8b
   languageName: node
   linkType: hard
 
