@@ -1,6 +1,6 @@
 import { PostProps } from "src/api/openapi/schemas";
 import { Byline } from "src/components/content/Byline";
-import { ContentViewer } from "src/components/content/ContentViewer/ContentViewer";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { PostMenu } from "src/components/thread/PostMenu/PostMenu";
 
 import { Flex } from "@/styled-system/jsx";
@@ -8,7 +8,7 @@ import { Flex } from "@/styled-system/jsx";
 export function PostListItem(props: PostProps) {
   return (
     <Flex id={props.id} flexDir="column" gap="2">
-      <ContentViewer value={props.body} />
+      <ContentComposer disabled initialValue={props.body} />
 
       <Byline
         href={`#${props.id}`}
