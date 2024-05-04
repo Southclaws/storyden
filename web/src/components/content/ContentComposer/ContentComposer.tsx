@@ -71,6 +71,8 @@ export function ContentComposer(props: Props) {
                   .with("h2", () => <Heading2Icon />)
                   .with("h3", () => <Heading3Icon />)
                   .with("h4", () => <Heading4Icon />)
+                  .with("h5", () => <Heading5Icon />)
+                  .with("h6", () => <Heading6Icon />)
                   .otherwise(() => (
                     <TextIcon />
                   ))}
