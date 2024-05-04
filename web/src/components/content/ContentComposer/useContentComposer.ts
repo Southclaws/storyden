@@ -17,7 +17,7 @@ import { ImageExtended } from "./plugins/ImagePlugin";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
-export type Props = {
+export type ContentComposerProps = {
   disabled?: boolean;
   resetKey?: string;
   initialValue?: string;
@@ -25,7 +25,7 @@ export type Props = {
   onAssetUpload?: (asset: Asset) => void;
 };
 
-export function useContentComposer(props: Props) {
+export function useContentComposer(props: ContentComposerProps) {
   const { upload } = useImageUpload();
 
   const extensions = [
@@ -55,7 +55,6 @@ export function useContentComposer(props: Props) {
 
   const editor = useEditor({
     editorProps: {
-      editable: () => !props.disabled,
       attributes: {
         class: css({
           height: "full",
@@ -85,6 +84,14 @@ export function useContentComposer(props: Props) {
 
     editor.commands.setContent(props.initialValue ?? "<p></p>");
   }, [editor, props.initialValue, props.resetKey]);
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    editor.setEditable(!props.disabled);
+  }, [editor, props.disabled]);
 
   async function handleFiles(files: File[]) {
     if (!editor) {

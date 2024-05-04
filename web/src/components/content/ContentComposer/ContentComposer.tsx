@@ -36,9 +36,9 @@ import { LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 import { FloatingMenu } from "./plugins/MenuPlugin";
-import { Props, useContentComposer } from "./useContentComposer";
+import { ContentComposerProps, useContentComposer } from "./useContentComposer";
 
-export function ContentComposer(props: Props) {
+export function ContentComposer(props: ContentComposerProps) {
   const { editor, initialValueHTML, handlers, format } =
     useContentComposer(props);
 

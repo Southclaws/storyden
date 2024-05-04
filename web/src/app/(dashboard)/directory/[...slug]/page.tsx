@@ -5,7 +5,7 @@ import {
   ItemGetOKResponse,
 } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
-import { useServerSession } from "src/auth/server-session";
+import { getServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
 import { ClusterCreateManyScreen } from "src/screens/directory/datagraph/ClusterCreateManyScreen/ClusterCreateManyScreen";
 import { ClusterCreateScreen } from "src/screens/directory/datagraph/ClusterCreateScreen/ClusterCreateScreen";
@@ -16,7 +16,7 @@ import {
   ParamsSchema,
   Query,
   QuerySchema,
-} from "src/screens/directory/datagraph/useDirectoryPath";
+} from "src/screens/directory/datagraph/directory-path";
 
 type Props = {
   params: Params;
@@ -26,7 +26,7 @@ type Props = {
 export default async function Page(props: Props) {
   const { bulk } = QuerySchema.parse(props.searchParams);
   const { slug } = ParamsSchema.parse(props.params);
-  const session = await useServerSession();
+  const session = await getServerSession();
 
   const [targetSlug, fallback, isNew] = getTargetSlug(slug);
 

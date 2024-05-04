@@ -1,9 +1,11 @@
+"use server";
+
 import { cookies } from "next/headers";
 
 import { AccountGetOKResponse } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
 
-export async function useServerSession() {
+export async function getServerSession() {
   const session = cookies().get("storyden-session");
   const cookie = session ? `${session.name}=${session.value}` : "";
 
