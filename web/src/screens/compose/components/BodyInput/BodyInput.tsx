@@ -11,10 +11,7 @@ type Props = {
   onAssetUpload: (asset: Asset) => void;
 };
 
-export function BodyInput({
-  children,
-  onAssetUpload,
-}: PropsWithChildren<Props>) {
+export function BodyInput({ onAssetUpload }: PropsWithChildren<Props>) {
   const { control } = useBodyInput();
 
   return (
@@ -25,9 +22,7 @@ export function BodyInput({
             onChange={field.onChange}
             onAssetUpload={onAssetUpload}
             initialValue={formState.defaultValues?.["body"]}
-          >
-            {children}
-          </ContentComposer>
+          />
         )}
         control={control}
         name="body"
