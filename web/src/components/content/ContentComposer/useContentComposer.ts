@@ -21,6 +21,7 @@ export type Props = {
   resetKey?: string;
   initialValue?: string;
   onChange?: (value: string) => void;
+  onAssetUpload?: (asset: Asset) => void;
 };
 
 export function useContentComposer(props: Props) {
@@ -99,6 +100,7 @@ export function useContentComposer(props: Props) {
       view.dispatch(transaction);
 
       assets.push(asset);
+      props.onAssetUpload?.(asset);
     }
 
     return assets;
