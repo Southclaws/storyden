@@ -157,7 +157,7 @@ export function useContentComposer(props: Props) {
     if (editor?.isActive("heading", { level: 5 })) return "h5";
     if (editor?.isActive("heading", { level: 6 })) return "h6";
 
-    return null;
+    return "p";
   }
 
   return {
