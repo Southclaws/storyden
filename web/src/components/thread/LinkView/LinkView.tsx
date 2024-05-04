@@ -1,6 +1,6 @@
 import { Asset, Link } from "src/api/openapi/schemas";
 
-import { Box, LinkBox, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
+import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   link: Link;
@@ -9,7 +9,8 @@ type Props = {
 
 export function LinkView({ link, asset }: Props) {
   return (
-    <LinkBox
+    <Box
+      position="relative"
       display="flex"
       w="full"
       borderRadius="xl"
@@ -45,6 +46,6 @@ export function LinkView({ link, asset }: Props) {
           <br />
         </Box>
       </VStack>
-    </LinkBox>
+    </Box>
   );
 }

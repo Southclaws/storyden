@@ -4,7 +4,7 @@ import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { FeedItem } from "../feed/common/FeedItem/FeedItem";
 
-import { Flex, LinkBox, LinkOverlay, styled } from "@/styled-system/jsx";
+import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {
   result: DatagraphSearchResult;
@@ -28,7 +28,7 @@ export function DatagraphResultItem(props: DatagraphItem) {
   const permalink = buildPermalink(props);
 
   return (
-    <LinkBox>
+    <Box position="relative">
       <FeedItem>
         <Flex justifyContent="space-between">
           <Heading1 size="sm">
@@ -44,7 +44,7 @@ export function DatagraphResultItem(props: DatagraphItem) {
         <styled.p lineClamp={3}>{props.description}</styled.p>
         <styled.p lineClamp={3}>{props.kind}</styled.p>
       </FeedItem>
-    </LinkBox>
+    </Box>
   );
 }
 
