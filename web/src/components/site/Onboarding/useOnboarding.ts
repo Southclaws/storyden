@@ -12,7 +12,7 @@ export function useOnboarding() {
   const [localStatus, setlocalStatus] = useState<string | null>(null);
 
   const isComposingNewThread = pathName === "/new";
-  const isAdmin = session?.admin ?? false;
+  // const isAdmin = session?.admin ?? false;
 
   // NOTE: local onboarding status value takes priority.
   useEffect(() => {

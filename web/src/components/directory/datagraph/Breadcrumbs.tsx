@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { last, pull } from "lodash";
+import { last } from "lodash";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
 import { Visibility } from "src/api/openapi/schemas";
@@ -38,7 +38,7 @@ export const Breadcrumbs_ = (
 ) => {
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
-  const paths = pull(directoryPath, "new");
+  const paths = directoryPath.filter((p) => p !== "new");
   // const jointNew = joinDirectoryPath(directoryPath, "new");
   const current = last(paths);
 
