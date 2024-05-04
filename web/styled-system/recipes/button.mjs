@@ -34,9 +34,10 @@ const buttonVariantMap = {
 
 const buttonVariantKeys = Object.keys(buttonVariantMap)
 
-export const button = /* @__PURE__ */ Object.assign(memo(buttonFn), {
+export const button = /* @__PURE__ */ Object.assign(memo(buttonFn.recipeFn), {
   __recipe__: true,
   __name__: 'button',
+  __getCompoundVariantCss__: buttonFn.__getCompoundVariantCss__,
   raw: (props) => props,
   variantKeys: buttonVariantKeys,
   variantMap: buttonVariantMap,
@@ -46,4 +47,5 @@ export const button = /* @__PURE__ */ Object.assign(memo(buttonFn), {
   splitVariantProps(props) {
     return splitProps(props, buttonVariantKeys)
   },
+  getVariantProps: buttonFn.getVariantProps,
 })

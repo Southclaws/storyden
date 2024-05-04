@@ -6,5 +6,9 @@ import type { DistributiveOmit } from '../types/system-types';
 
 export interface FloatingProps extends FloatingProperties, DistributiveOmit<HTMLStyledProps<'div'>, keyof FloatingProperties > {}
 
-/** Floating overlay elements. */
+/**
+ * Floating overlay elements.
+
+
+ */
 export declare const Floating: FunctionComponent<FloatingProps>

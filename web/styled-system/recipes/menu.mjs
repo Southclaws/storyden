@@ -1,4 +1,4 @@
-import { getSlotCompoundVariant, memo, splitProps } from '../helpers.mjs';
+import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mjs';
 import { createRecipe } from './create-recipe.mjs';
 
 const menuDefaultVariants = {
@@ -71,12 +71,13 @@ const menuSlotNames = [
 const menuSlotFns = /* @__PURE__ */ menuSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, menuDefaultVariants, getSlotCompoundVariant(menuCompoundVariants, slotName))])
 
 const menuFn = memo((props = {}) => {
-  return Object.fromEntries(menuSlotFns.map(([slotName, slotFn]) => [slotName, slotFn(props)]))
+  return Object.fromEntries(menuSlotFns.map(([slotName, slotFn]) => [slotName, slotFn.recipeFn(props)]))
 })
 
 const menuVariantKeys = [
   "size"
 ]
+const getVariantProps = (variants) => ({ ...menuDefaultVariants, ...compact(variants) })
 
 export const menu = /* @__PURE__ */ Object.assign(menuFn, {
   __recipe__: false,
@@ -93,4 +94,5 @@ export const menu = /* @__PURE__ */ Object.assign(menuFn, {
   splitVariantProps(props) {
     return splitProps(props, menuVariantKeys)
   },
+  getVariantProps
 })

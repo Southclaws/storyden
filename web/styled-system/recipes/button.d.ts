@@ -22,6 +22,7 @@ export interface ButtonRecipe {
   variantMap: ButtonVariantMap
   variantKeys: Array<keyof ButtonVariant>
   splitVariantProps<Props extends ButtonVariantProps>(props: Props): [ButtonVariantProps, Pretty<DistributiveOmit<Props, keyof ButtonVariantProps>>]
+  getVariantProps: (props?: ButtonVariantProps) => ButtonVariantProps
 }
 
 

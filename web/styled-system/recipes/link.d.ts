@@ -22,6 +22,7 @@ export interface LinkRecipe {
   variantMap: LinkVariantMap
   variantKeys: Array<keyof LinkVariant>
   splitVariantProps<Props extends LinkVariantProps>(props: Props): [LinkVariantProps, Pretty<DistributiveOmit<Props, keyof LinkVariantProps>>]
+  getVariantProps: (props?: LinkVariantProps) => LinkVariantProps
 }
 
 

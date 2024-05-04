@@ -1,5 +1,5 @@
 import { createElement, forwardRef } from 'react'
-import { mergeCss } from '../css/css.mjs';
+
 import { splitProps } from '../helpers.mjs';
 import { getLinkOverlayStyle } from '../patterns/link-overlay.mjs';
 import { styled } from './factory.mjs';

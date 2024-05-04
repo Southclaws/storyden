@@ -7,9 +7,10 @@ const headingInputVariantMap = {}
 
 const headingInputVariantKeys = Object.keys(headingInputVariantMap)
 
-export const headingInput = /* @__PURE__ */ Object.assign(memo(headingInputFn), {
+export const headingInput = /* @__PURE__ */ Object.assign(memo(headingInputFn.recipeFn), {
   __recipe__: true,
   __name__: 'headingInput',
+  __getCompoundVariantCss__: headingInputFn.__getCompoundVariantCss__,
   raw: (props) => props,
   variantKeys: headingInputVariantKeys,
   variantMap: headingInputVariantMap,
@@ -19,4 +20,5 @@ export const headingInput = /* @__PURE__ */ Object.assign(memo(headingInputFn), 
   splitVariantProps(props) {
     return splitProps(props, headingInputVariantKeys)
   },
+  getVariantProps: headingInputFn.getVariantProps,
 })

@@ -23,6 +23,7 @@ export interface CardRecipe {
   variantMap: CardVariantMap
   variantKeys: Array<keyof CardVariant>
   splitVariantProps<Props extends CardVariantProps>(props: Props): [CardVariantProps, Pretty<DistributiveOmit<Props, keyof CardVariantProps>>]
+  getVariantProps: (props?: CardVariantProps) => CardVariantProps
 }
 
 

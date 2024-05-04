@@ -21,6 +21,7 @@ export interface InputRecipe {
   variantMap: InputVariantMap
   variantKeys: Array<keyof InputVariant>
   splitVariantProps<Props extends InputVariantProps>(props: Props): [InputVariantProps, Pretty<DistributiveOmit<Props, keyof InputVariantProps>>]
+  getVariantProps: (props?: InputVariantProps) => InputVariantProps
 }
 
 

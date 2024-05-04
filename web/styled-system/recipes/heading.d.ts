@@ -21,6 +21,7 @@ export interface HeadingRecipe {
   variantMap: HeadingVariantMap
   variantKeys: Array<keyof HeadingVariant>
   splitVariantProps<Props extends HeadingVariantProps>(props: Props): [HeadingVariantProps, Pretty<DistributiveOmit<Props, keyof HeadingVariantProps>>]
+  getVariantProps: (props?: HeadingVariantProps) => HeadingVariantProps
 }
 
 

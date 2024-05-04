@@ -43,8 +43,6 @@ export type OpacityToken = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" |
 
 export type BorderWidthToken = "none" | "hairline" | "thin" | "medium" | "thick"
 
-export type AnimationName = "shimmer"
-
 export type Tokens = {
 		aspectRatios: AspectRatioToken
 		borders: BorderToken
@@ -66,7 +64,6 @@ export type Tokens = {
 		breakpoints: BreakpointToken
 		opacity: OpacityToken
 		borderWidths: BorderWidthToken
-		animationName: AnimationName
 } & { [token: string]: never }
 
 export type TokenCategory = "aspectRatios" | "zIndex" | "opacity" | "colors" | "fonts" | "fontSizes" | "fontWeights" | "lineHeights" | "letterSpacings" | "sizes" | "shadows" | "spacing" | "radii" | "borders" | "borderWidths" | "durations" | "easings" | "animations" | "blurs" | "gradients" | "breakpoints" | "assets"

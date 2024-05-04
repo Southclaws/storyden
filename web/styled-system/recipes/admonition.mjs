@@ -13,9 +13,10 @@ const admonitionVariantMap = {
 
 const admonitionVariantKeys = Object.keys(admonitionVariantMap)
 
-export const admonition = /* @__PURE__ */ Object.assign(memo(admonitionFn), {
+export const admonition = /* @__PURE__ */ Object.assign(memo(admonitionFn.recipeFn), {
   __recipe__: true,
   __name__: 'admonition',
+  __getCompoundVariantCss__: admonitionFn.__getCompoundVariantCss__,
   raw: (props) => props,
   variantKeys: admonitionVariantKeys,
   variantMap: admonitionVariantMap,
@@ -25,4 +26,5 @@ export const admonition = /* @__PURE__ */ Object.assign(memo(admonitionFn), {
   splitVariantProps(props) {
     return splitProps(props, admonitionVariantKeys)
   },
+  getVariantProps: admonitionFn.getVariantProps,
 })

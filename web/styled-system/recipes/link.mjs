@@ -26,9 +26,10 @@ const linkVariantMap = {
 
 const linkVariantKeys = Object.keys(linkVariantMap)
 
-export const link = /* @__PURE__ */ Object.assign(memo(linkFn), {
+export const link = /* @__PURE__ */ Object.assign(memo(linkFn.recipeFn), {
   __recipe__: true,
   __name__: 'link',
+  __getCompoundVariantCss__: linkFn.__getCompoundVariantCss__,
   raw: (props) => props,
   variantKeys: linkVariantKeys,
   variantMap: linkVariantMap,
@@ -38,4 +39,5 @@ export const link = /* @__PURE__ */ Object.assign(memo(linkFn), {
   splitVariantProps(props) {
     return splitProps(props, linkVariantKeys)
   },
+  getVariantProps: linkFn.getVariantProps,
 })

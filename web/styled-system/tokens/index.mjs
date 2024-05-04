@@ -2052,71 +2052,71 @@ const tokens = {
     "variable": "var(--breakpoints-2xl)"
   },
   "blurs.frosted": {
-    "value": "var(--blurs-frosted)",
+    "value": "8px",
     "variable": "var(--blurs-frosted)"
   },
   "opacity.0": {
-    "value": "var(--opacity-0)",
+    "value": "0",
     "variable": "var(--opacity-0)"
   },
   "opacity.1": {
-    "value": "var(--opacity-1)",
+    "value": "0.1",
     "variable": "var(--opacity-1)"
   },
   "opacity.2": {
-    "value": "var(--opacity-2)",
+    "value": "0.2",
     "variable": "var(--opacity-2)"
   },
   "opacity.3": {
-    "value": "var(--opacity-3)",
+    "value": "0.3",
     "variable": "var(--opacity-3)"
   },
   "opacity.4": {
-    "value": "var(--opacity-4)",
+    "value": "0.4",
     "variable": "var(--opacity-4)"
   },
   "opacity.5": {
-    "value": "var(--opacity-5)",
+    "value": "0.5",
     "variable": "var(--opacity-5)"
   },
   "opacity.6": {
-    "value": "var(--opacity-6)",
+    "value": "0.6",
     "variable": "var(--opacity-6)"
   },
   "opacity.7": {
-    "value": "var(--opacity-7)",
+    "value": "0.7",
     "variable": "var(--opacity-7)"
   },
   "opacity.8": {
-    "value": "var(--opacity-8)",
+    "value": "0.8",
     "variable": "var(--opacity-8)"
   },
   "opacity.9": {
-    "value": "var(--opacity-9)",
+    "value": "0.9",
     "variable": "var(--opacity-9)"
   },
   "opacity.full": {
-    "value": "var(--opacity-full)",
+    "value": "1",
     "variable": "var(--opacity-full)"
   },
   "borderWidths.none": {
-    "value": "var(--border-widths-none)",
+    "value": "0",
     "variable": "var(--border-widths-none)"
   },
   "borderWidths.hairline": {
-    "value": "var(--border-widths-hairline)",
+    "value": "0.5px",
     "variable": "var(--border-widths-hairline)"
   },
   "borderWidths.thin": {
-    "value": "var(--border-widths-thin)",
+    "value": "1px",
     "variable": "var(--border-widths-thin)"
   },
   "borderWidths.medium": {
-    "value": "var(--border-widths-medium)",
+    "value": "3px",
     "variable": "var(--border-widths-medium)"
   },
   "borderWidths.thick": {
-    "value": "var(--border-widths-thick)",
+    "value": "3px",
     "variable": "var(--border-widths-thick)"
   },
   "colors.bg.default": {
@@ -2180,47 +2180,47 @@ const tokens = {
     "variable": "var(--colors-fg-accent)"
   },
   "colors.border.default": {
-    "value": "var(--colors-border-default)",
+    "value": "var(--colors-black-alpha-200)",
     "variable": "var(--colors-border-default)"
   },
   "colors.border.muted": {
-    "value": "var(--colors-border-muted)",
+    "value": "var(--colors-gray-500)",
     "variable": "var(--colors-border-muted)"
   },
   "colors.border.subtle": {
-    "value": "var(--colors-border-subtle)",
+    "value": "var(--colors-gray-300)",
     "variable": "var(--colors-border-subtle)"
   },
   "colors.border.disabled": {
-    "value": "var(--colors-border-disabled)",
+    "value": "var(--colors-gray-400)",
     "variable": "var(--colors-border-disabled)"
   },
   "colors.border.outline": {
-    "value": "var(--colors-border-outline)",
+    "value": "var(--colors-black-alpha-50)",
     "variable": "var(--colors-border-outline)"
   },
   "colors.border.accent": {
-    "value": "var(--colors-border-accent)",
+    "value": "var(--colors-bg-accent)",
     "variable": "var(--colors-border-accent)"
   },
   "colors.conicGradient": {
-    "value": "var(--colors-conic-gradient)",
+    "value": "\nconic-gradient(\n    oklch(80% 0.15 0),\noklch(80% 0.15 10),\noklch(80% 0.15 20),\noklch(80% 0.15 30),\noklch(80% 0.15 40),\noklch(80% 0.15 50),\noklch(80% 0.15 60),\noklch(80% 0.15 70),\noklch(80% 0.15 80),\noklch(80% 0.15 90),\noklch(80% 0.15 100),\noklch(80% 0.15 110),\noklch(80% 0.15 120),\noklch(80% 0.15 130),\noklch(80% 0.15 140),\noklch(80% 0.15 150),\noklch(80% 0.15 160),\noklch(80% 0.15 170),\noklch(80% 0.15 180),\noklch(80% 0.15 190),\noklch(80% 0.15 200),\noklch(80% 0.15 210),\noklch(80% 0.15 220),\noklch(80% 0.15 230),\noklch(80% 0.15 240),\noklch(80% 0.15 250),\noklch(80% 0.15 260),\noklch(80% 0.15 270),\noklch(80% 0.15 280),\noklch(80% 0.15 290),\noklch(80% 0.15 300),\noklch(80% 0.15 310),\noklch(80% 0.15 320),\noklch(80% 0.15 330),\noklch(80% 0.15 340),\noklch(80% 0.15 350),\noklch(80% 0.15 360)\n);\n",
     "variable": "var(--colors-conic-gradient)"
   },
   "colors.cardBackgroundGradient": {
-    "value": "var(--colors-card-background-gradient)",
+    "value": "linear-gradient(90deg, var(--colors-bg-default), transparent)",
     "variable": "var(--colors-card-background-gradient)"
   },
   "colors.backgroundGradientH": {
-    "value": "var(--colors-background-gradient-h)",
+    "value": "linear-gradient(90deg, var(--colors-bg-default), transparent)",
     "variable": "var(--colors-background-gradient-h)"
   },
   "colors.backgroundGradientV": {
-    "value": "var(--colors-background-gradient-v)",
+    "value": "linear-gradient(0deg, var(--colors-bg-default), transparent)",
     "variable": "var(--colors-background-gradient-v)"
   },
   "spacing.safeBottom": {
-    "value": "var(--spacing-safe-bottom)",
+    "value": "env(safe-area-inset-bottom)",
     "variable": "var(--spacing-safe-bottom)"
   },
   "spacing.-1": {
@@ -2356,7 +2356,7 @@ const tokens = {
     "variable": "var(--spacing-3\\.5)"
   },
   "spacing.-safeBottom": {
-    "value": "var(--spacing-safe-bottom)",
+    "value": "calc(var(--spacing-safe-bottom) * -1)",
     "variable": "var(--spacing-safe-bottom)"
   },
   "colors.colorPalette": {
