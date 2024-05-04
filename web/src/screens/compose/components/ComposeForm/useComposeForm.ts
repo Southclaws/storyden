@@ -69,6 +69,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       formContext.setError("title", {
         message: "Your post must have a title to be published",
       });
+      return;
     }
 
     if (editing) {
