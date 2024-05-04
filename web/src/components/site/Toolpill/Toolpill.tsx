@@ -48,7 +48,7 @@ export function Toolpill({
           justifyContent="space-between"
           alignItems="center"
           pointerEvents="auto"
-          {...props}
+          {...(props as any)}
         >
           {props.children}
         </Flex>

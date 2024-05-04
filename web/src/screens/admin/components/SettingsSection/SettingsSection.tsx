@@ -16,7 +16,7 @@ export function SettingsSection({
       borderRadius="lg"
       p="4"
       alignItems="start"
-      {...props}
+      {...(props as any)}
     >
       {children}
     </VStack>
