@@ -8,7 +8,8 @@ import {
   ClusterWithItems,
 } from "src/api/openapi/schemas";
 
-import { joinDirectoryPath, useDirectoryPath } from "../useDirectoryPath";
+import { joinDirectoryPath } from "../directory-path";
+import { useDirectoryPath } from "../useDirectoryPath";
 
 export type Props = {
   session: Account;
