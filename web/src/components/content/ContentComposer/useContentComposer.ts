@@ -4,7 +4,7 @@ import { FocusClasses } from "@tiptap/extension-focus";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 
 import { Asset } from "src/api/openapi/schemas";
 
@@ -28,6 +28,7 @@ export function useContentComposer(props: Props) {
 
   const editor = useEditor({
     editorProps: {
+      editable: () => !props.disabled,
       attributes: {
         class: css({
           height: "full",
@@ -58,6 +59,21 @@ export function useContentComposer(props: Props) {
       props.onChange?.(html);
     },
   });
+
+  // This is a huge hack but it means the composer doesn't need to be made into
+  // a controlled component. Baiscally, if the resetKey changes, we reset the
+  // content of the editor to the initial value or empty paragraph. Hacky? Yes.
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    if (!props.resetKey) {
+      return;
+    }
+
+    editor.commands.setContent(props.initialValue ?? "<p></p>");
+  }, [editor, props.initialValue, props.resetKey]);
 
   async function handleFiles(files: File[]) {
     if (!editor) {

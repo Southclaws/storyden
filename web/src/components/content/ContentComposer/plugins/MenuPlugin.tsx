@@ -96,6 +96,11 @@ export class FloatingMenuView {
   };
 
   update(view: EditorView, oldState?: EditorState) {
+    if (!view.editable) {
+      this.hide();
+      return;
+    }
+
     const { state } = view;
     const { doc, selection } = state;
     const { from, to } = selection;
