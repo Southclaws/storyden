@@ -5,7 +5,6 @@ import { useCurrentEditor } from "@tiptap/react";
 import { useEffect, useState } from "react";
 
 import { css, cx } from "@/styled-system/css";
-import { Box } from "@/styled-system/jsx";
 import { FrostedGlass } from "@/styled-system/patterns";
 
 const PLUGIN_KEY = "floatingMenu";
