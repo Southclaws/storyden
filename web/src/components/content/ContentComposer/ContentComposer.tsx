@@ -2,7 +2,6 @@ import { Portal } from "@ark-ui/react";
 import { EditorContent } from "@tiptap/react";
 import {
   BoldIcon,
-  Code2Icon,
   CodeIcon,
   CodeSquareIcon,
   Heading1Icon,
@@ -15,12 +14,10 @@ import {
   ItalicIcon,
   ListIcon,
   ListOrderedIcon,
-  SeparatorVerticalIcon,
   StrikethroughIcon,
   TextIcon,
   TextQuoteIcon,
 } from "lucide-react";
-import { useRef } from "react";
 import { match } from "ts-pattern";
 
 import { Button } from "src/theme/components/Button";
