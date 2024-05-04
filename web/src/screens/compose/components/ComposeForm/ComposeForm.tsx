@@ -1,4 +1,3 @@
-import { isValid } from "date-fns";
 import { FormProvider } from "react-hook-form";
 
 import { Button } from "src/theme/components/Button";
@@ -40,14 +39,18 @@ export function ComposeForm(props: Props) {
             gap="2"
             alignItems="end"
           >
-            <Button kind="neutral" disabled={!isValid} onClick={onSave}>
+            <Button
+              kind="neutral"
+              disabled={!formContext.formState.isValid}
+              onClick={onSave}
+            >
               Save
             </Button>
 
             <Button
               kind="primary"
               type="submit"
-              disabled={!isValid}
+              disabled={!formContext.formState.isValid}
               // isLoading={formContext.formState.isSubmitting}
             >
               Post
