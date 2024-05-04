@@ -21,6 +21,7 @@ export interface PopoverRecipe {
   variantMap: PopoverVariantMap
   variantKeys: Array<keyof PopoverVariant>
   splitVariantProps<Props extends PopoverVariantProps>(props: Props): [PopoverVariantProps, Pretty<DistributiveOmit<Props, keyof PopoverVariantProps>>]
+  getVariantProps: (props?: PopoverVariantProps) => PopoverVariantProps
 }
 
 

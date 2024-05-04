@@ -21,6 +21,7 @@ export interface CheckboxRecipe {
   variantMap: CheckboxVariantMap
   variantKeys: Array<keyof CheckboxVariant>
   splitVariantProps<Props extends CheckboxVariantProps>(props: Props): [CheckboxVariantProps, Pretty<DistributiveOmit<Props, keyof CheckboxVariantProps>>]
+  getVariantProps: (props?: CheckboxVariantProps) => CheckboxVariantProps
 }
 
 

@@ -1,5 +1,5 @@
 import { createElement, forwardRef } from 'react'
-import { mergeCss } from '../css/css.mjs';
+
 import { splitProps } from '../helpers.mjs';
 import { getCardBoxStyle } from '../patterns/card-box.mjs';
 import { styled } from './factory.mjs';

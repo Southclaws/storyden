@@ -21,6 +21,7 @@ export interface SelectRecipe {
   variantMap: SelectVariantMap
   variantKeys: Array<keyof SelectVariant>
   splitVariantProps<Props extends SelectVariantProps>(props: Props): [SelectVariantProps, Pretty<DistributiveOmit<Props, keyof SelectVariantProps>>]
+  getVariantProps: (props?: SelectVariantProps) => SelectVariantProps
 }
 
 

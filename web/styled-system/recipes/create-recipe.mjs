@@ -5,7 +5,7 @@ import { cx } from '../css/cx.mjs';
 import { compact, createCss, splitProps, uniq, withoutSpace } from '../helpers.mjs';
 
 export const createRecipe = (name, defaultVariants, compoundVariants) => {
- const getRecipeStyles = (variants) => {
+ const getVariantProps = (variants) => {
    return {
      [name]: '__ignore__',
      ...defaultVariants,
@@ -34,11 +34,12 @@ export const createRecipe = (name, defaultVariants, compoundVariants) => {
      },
      utility: {
        
+       toHash: (path, hashFn) => hashFn(path.join(":")),
        transform,
      }
    })
 
-   const recipeStyles = getRecipeStyles(variants)
+   const recipeStyles = getVariantProps(variants)
 
    if (withCompoundVariants) {
      const compoundVariantStyles = getCompoundVariantCss(compoundVariants, recipeStyles)
@@ -48,11 +49,13 @@ export const createRecipe = (name, defaultVariants, compoundVariants) => {
    return recipeCss(recipeStyles)
   }
 
-   return Object.assign(recipeFn, {
+   return {
+     recipeFn,
+     getVariantProps,
      __getCompoundVariantCss__: (variants) => {
-       return getCompoundVariantCss(compoundVariants, getRecipeStyles(variants));
+       return getCompoundVariantCss(compoundVariants, getVariantProps(variants));
      },
-   })
+   }
 }
 
 export const mergeRecipes = (recipeA, recipeB) => {

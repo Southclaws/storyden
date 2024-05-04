@@ -21,6 +21,7 @@ export interface MenuRecipe {
   variantMap: MenuVariantMap
   variantKeys: Array<keyof MenuVariant>
   splitVariantProps<Props extends MenuVariantProps>(props: Props): [MenuVariantProps, Pretty<DistributiveOmit<Props, keyof MenuVariantProps>>]
+  getVariantProps: (props?: MenuVariantProps) => MenuVariantProps
 }
 
 

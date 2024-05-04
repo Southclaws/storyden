@@ -1,5 +1,5 @@
 /* eslint-disable */
-import type {  ConditionalValue, Conditions, Nested  } from './conditions';
+import type {  ConditionalValue, Nested  } from './conditions';
 import type {  PropertiesFallback  } from './csstype';
 import type {  SystemProperties, CssVarProperties  } from './style-props';
 
@@ -36,10 +36,6 @@ export interface CssKeyframes {
  * Conditional css properties
  * -----------------------------------------------------------------------------*/
 
-type MinimalNested<P> = {
-  [K in keyof Conditions]?: Nested<P>
-}
-
 interface GenericProperties {
   [key: string]: ConditionalValue<String | Number | boolean>
 }
@@ -70,9 +66,9 @@ export type CompositionStyleObject<Property extends string> = Nested<FilterStyle
  * Jsx style props
  * -----------------------------------------------------------------------------*/
 interface WithCss {
-  css?: SystemStyleObject
+  css?: SystemStyleObject | SystemStyleObject[]
 }
-type StyleProps = SystemProperties & MinimalNested<SystemStyleObject>
+type StyleProps = SystemStyleObject & WithCss
 
 export type JsxStyleProps = StyleProps & WithCss
 

@@ -22,6 +22,7 @@ export interface TabsRecipe {
   variantMap: TabsVariantMap
   variantKeys: Array<keyof TabsVariant>
   splitVariantProps<Props extends TabsVariantProps>(props: Props): [TabsVariantProps, Pretty<DistributiveOmit<Props, keyof TabsVariantProps>>]
+  getVariantProps: (props?: TabsVariantProps) => TabsVariantProps
 }
 
 

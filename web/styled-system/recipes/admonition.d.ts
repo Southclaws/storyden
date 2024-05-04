@@ -21,6 +21,7 @@ export interface AdmonitionRecipe {
   variantMap: AdmonitionVariantMap
   variantKeys: Array<keyof AdmonitionVariant>
   splitVariantProps<Props extends AdmonitionVariantProps>(props: Props): [AdmonitionVariantProps, Pretty<DistributiveOmit<Props, keyof AdmonitionVariantProps>>]
+  getVariantProps: (props?: AdmonitionVariantProps) => AdmonitionVariantProps
 }
 
 

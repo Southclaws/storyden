@@ -21,6 +21,7 @@ export interface HeadingInputRecipe {
   variantMap: HeadingInputVariantMap
   variantKeys: Array<keyof HeadingInputVariant>
   splitVariantProps<Props extends HeadingInputVariantProps>(props: Props): [HeadingInputVariantProps, Pretty<DistributiveOmit<Props, keyof HeadingInputVariantProps>>]
+  getVariantProps: (props?: HeadingInputVariantProps) => HeadingInputVariantProps
 }
 
 

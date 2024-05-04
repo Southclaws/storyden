@@ -21,6 +21,7 @@ export interface SkeletonRecipe {
   variantMap: SkeletonVariantMap
   variantKeys: Array<keyof SkeletonVariant>
   splitVariantProps<Props extends SkeletonVariantProps>(props: Props): [SkeletonVariantProps, Pretty<DistributiveOmit<Props, keyof SkeletonVariantProps>>]
+  getVariantProps: (props?: SkeletonVariantProps) => SkeletonVariantProps
 }
 
 
