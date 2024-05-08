@@ -160,6 +160,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 	for _, size := range sizes {
 		px := sizeMap[size]
 		filename := fmt.Sprintf(iconFileTemplate, size)
+		assetFilename := asset.NewFilepathFilename(filename)
 
 		resized := imaging.Resize(source, px, px, imaging.Lanczos)
 
@@ -172,11 +173,10 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 		apiPath := path.Join(iconRoute)
 		url := fmt.Sprintf("%s/%s", s.address, apiPath)
 
-		_, err = s.am.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), asset.NewFilename(filename), url)
+		_, err = s.am.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, url)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
-
 	}
 
 	return nil

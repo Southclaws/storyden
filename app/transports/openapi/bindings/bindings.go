@@ -170,7 +170,7 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *Cook
 				r.URL.Path,
 				zap.String("method", r.Method),
 				zap.Any("query", r.URL.Query()),
-				zap.Any("headers", r.Header),
+				// zap.Any("headers", r.Header),
 				zap.Int64("body", r.ContentLength),
 			)
 

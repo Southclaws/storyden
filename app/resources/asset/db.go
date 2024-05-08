@@ -28,7 +28,7 @@ func (d *database) Add(ctx context.Context,
 ) (*Asset, error) {
 	asset, err := d.db.Asset.
 		Create().
-		SetID(filename.id).
+		SetID(filename.GetID()).
 		SetFilename(filename.name).
 		SetURL(url).
 		SetAccountID(xid.ID(accountID)).
