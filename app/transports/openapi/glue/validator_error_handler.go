@@ -3,6 +3,7 @@ package glue
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -63,7 +64,7 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 				"schema_error", se.Reason,
 				"schema_field", se.SchemaField,
 				"schema_description", se.Schema.Description,
-				"schema_type", se.Schema.Type,
+				"schema_type", fmt.Sprint(se.Schema.Type),
 				"path", strings.Join(se.JSONPointer(), "."),
 			)
 

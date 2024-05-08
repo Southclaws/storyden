@@ -88,12 +88,10 @@ type PostEdges struct {
 // AuthorOrErr returns the Author value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PostEdges) AuthorOrErr() (*Account, error) {
-	if e.loadedTypes[0] {
-		if e.Author == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: account.Label}
-		}
+	if e.Author != nil {
 		return e.Author, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "author"}
 }
@@ -101,12 +99,10 @@ func (e PostEdges) AuthorOrErr() (*Account, error) {
 // CategoryOrErr returns the Category value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PostEdges) CategoryOrErr() (*Category, error) {
-	if e.loadedTypes[1] {
-		if e.Category == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: category.Label}
-		}
+	if e.Category != nil {
 		return e.Category, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: category.Label}
 	}
 	return nil, &NotLoadedError{edge: "category"}
 }
@@ -123,12 +119,10 @@ func (e PostEdges) TagsOrErr() ([]*Tag, error) {
 // RootOrErr returns the Root value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PostEdges) RootOrErr() (*Post, error) {
-	if e.loadedTypes[3] {
-		if e.Root == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: post.Label}
-		}
+	if e.Root != nil {
 		return e.Root, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: post.Label}
 	}
 	return nil, &NotLoadedError{edge: "root"}
 }
@@ -145,12 +139,10 @@ func (e PostEdges) PostsOrErr() ([]*Post, error) {
 // ReplyToOrErr returns the ReplyTo value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PostEdges) ReplyToOrErr() (*Post, error) {
-	if e.loadedTypes[5] {
-		if e.ReplyTo == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: post.Label}
-		}
+	if e.ReplyTo != nil {
 		return e.ReplyTo, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: post.Label}
 	}
 	return nil, &NotLoadedError{edge: "replyTo"}
 }

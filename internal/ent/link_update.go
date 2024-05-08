@@ -39,15 +39,39 @@ func (lu *LinkUpdate) SetDomain(s string) *LinkUpdate {
 	return lu
 }
 
+// SetNillableDomain sets the "domain" field if the given value is not nil.
+func (lu *LinkUpdate) SetNillableDomain(s *string) *LinkUpdate {
+	if s != nil {
+		lu.SetDomain(*s)
+	}
+	return lu
+}
+
 // SetTitle sets the "title" field.
 func (lu *LinkUpdate) SetTitle(s string) *LinkUpdate {
 	lu.mutation.SetTitle(s)
 	return lu
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (lu *LinkUpdate) SetNillableTitle(s *string) *LinkUpdate {
+	if s != nil {
+		lu.SetTitle(*s)
+	}
+	return lu
+}
+
 // SetDescription sets the "description" field.
 func (lu *LinkUpdate) SetDescription(s string) *LinkUpdate {
 	lu.mutation.SetDescription(s)
+	return lu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (lu *LinkUpdate) SetNillableDescription(s *string) *LinkUpdate {
+	if s != nil {
+		lu.SetDescription(*s)
+	}
 	return lu
 }
 
@@ -459,15 +483,39 @@ func (luo *LinkUpdateOne) SetDomain(s string) *LinkUpdateOne {
 	return luo
 }
 
+// SetNillableDomain sets the "domain" field if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillableDomain(s *string) *LinkUpdateOne {
+	if s != nil {
+		luo.SetDomain(*s)
+	}
+	return luo
+}
+
 // SetTitle sets the "title" field.
 func (luo *LinkUpdateOne) SetTitle(s string) *LinkUpdateOne {
 	luo.mutation.SetTitle(s)
 	return luo
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillableTitle(s *string) *LinkUpdateOne {
+	if s != nil {
+		luo.SetTitle(*s)
+	}
+	return luo
+}
+
 // SetDescription sets the "description" field.
 func (luo *LinkUpdateOne) SetDescription(s string) *LinkUpdateOne {
 	luo.mutation.SetDescription(s)
+	return luo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillableDescription(s *string) *LinkUpdateOne {
+	if s != nil {
+		luo.SetDescription(*s)
+	}
 	return luo
 }
 

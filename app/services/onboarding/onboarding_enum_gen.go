@@ -35,8 +35,8 @@ func (r Status) String() string {
 func (r Status) MarshalText() ([]byte, error) {
 	return []byte(r.v), nil
 }
-func (r *Status) UnmarshalText(in []byte) error {
-	s, err := NewStatus(string(in))
+func (r *Status) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewStatus(string(__iNpUt__))
 	if err != nil {
 		return err
 	}
@@ -46,16 +46,16 @@ func (r *Status) UnmarshalText(in []byte) error {
 func (r Status) Value() (driver.Value, error) {
 	return r.v, nil
 }
-func (r *Status) Scan(in any) error {
-	s, err := NewStatus(fmt.Sprint(in))
+func (r *Status) Scan(__iNpUt__ any) error {
+	s, err := NewStatus(fmt.Sprint(__iNpUt__))
 	if err != nil {
 		return err
 	}
 	*r = s
 	return nil
 }
-func NewStatus(in string) (Status, error) {
-	switch in {
+func NewStatus(__iNpUt__ string) (Status, error) {
+	switch __iNpUt__ {
 	case string(statusRequiresFirstAccount):
 		return StatusRequiresFirstAccount, nil
 	case string(statusRequiresCategory):
@@ -67,6 +67,6 @@ func NewStatus(in string) (Status, error) {
 	case string(statusComplete):
 		return StatusComplete, nil
 	default:
-		return Status{}, fmt.Errorf("invalid value for type 'Status': '%s'", in)
+		return Status{}, fmt.Errorf("invalid value for type 'Status': '%s'", __iNpUt__)
 	}
 }

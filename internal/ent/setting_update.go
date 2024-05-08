@@ -35,6 +35,14 @@ func (su *SettingUpdate) SetValue(s string) *SettingUpdate {
 	return su
 }
 
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (su *SettingUpdate) SetNillableValue(s *string) *SettingUpdate {
+	if s != nil {
+		su.SetValue(*s)
+	}
+	return su
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (su *SettingUpdate) SetUpdatedAt(t time.Time) *SettingUpdate {
 	su.mutation.SetUpdatedAt(t)
@@ -128,6 +136,14 @@ type SettingUpdateOne struct {
 // SetValue sets the "value" field.
 func (suo *SettingUpdateOne) SetValue(s string) *SettingUpdateOne {
 	suo.mutation.SetValue(s)
+	return suo
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (suo *SettingUpdateOne) SetNillableValue(s *string) *SettingUpdateOne {
+	if s != nil {
+		suo.SetValue(*s)
+	}
 	return suo
 }
 

@@ -67,15 +67,39 @@ func (cu *ClusterUpdate) SetName(s string) *ClusterUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableName(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetSlug sets the "slug" field.
 func (cu *ClusterUpdate) SetSlug(s string) *ClusterUpdate {
 	cu.mutation.SetSlug(s)
 	return cu
 }
 
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableSlug(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetSlug(*s)
+	}
+	return cu
+}
+
 // SetDescription sets the "description" field.
 func (cu *ClusterUpdate) SetDescription(s string) *ClusterUpdate {
 	cu.mutation.SetDescription(s)
+	return cu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableDescription(s *string) *ClusterUpdate {
+	if s != nil {
+		cu.SetDescription(*s)
+	}
 	return cu
 }
 
@@ -122,6 +146,14 @@ func (cu *ClusterUpdate) ClearParentClusterID() *ClusterUpdate {
 // SetAccountID sets the "account_id" field.
 func (cu *ClusterUpdate) SetAccountID(x xid.ID) *ClusterUpdate {
 	cu.mutation.SetAccountID(x)
+	return cu
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (cu *ClusterUpdate) SetNillableAccountID(x *xid.ID) *ClusterUpdate {
+	if x != nil {
+		cu.SetAccountID(*x)
+	}
 	return cu
 }
 
@@ -815,15 +847,39 @@ func (cuo *ClusterUpdateOne) SetName(s string) *ClusterUpdateOne {
 	return cuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableName(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
 // SetSlug sets the "slug" field.
 func (cuo *ClusterUpdateOne) SetSlug(s string) *ClusterUpdateOne {
 	cuo.mutation.SetSlug(s)
 	return cuo
 }
 
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableSlug(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetSlug(*s)
+	}
+	return cuo
+}
+
 // SetDescription sets the "description" field.
 func (cuo *ClusterUpdateOne) SetDescription(s string) *ClusterUpdateOne {
 	cuo.mutation.SetDescription(s)
+	return cuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableDescription(s *string) *ClusterUpdateOne {
+	if s != nil {
+		cuo.SetDescription(*s)
+	}
 	return cuo
 }
 
@@ -870,6 +926,14 @@ func (cuo *ClusterUpdateOne) ClearParentClusterID() *ClusterUpdateOne {
 // SetAccountID sets the "account_id" field.
 func (cuo *ClusterUpdateOne) SetAccountID(x xid.ID) *ClusterUpdateOne {
 	cuo.mutation.SetAccountID(x)
+	return cuo
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (cuo *ClusterUpdateOne) SetNillableAccountID(x *xid.ID) *ClusterUpdateOne {
+	if x != nil {
+		cuo.SetAccountID(*x)
+	}
 	return cuo
 }
 

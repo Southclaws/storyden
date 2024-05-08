@@ -67,15 +67,39 @@ func (iu *ItemUpdate) SetName(s string) *ItemUpdate {
 	return iu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableName(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetName(*s)
+	}
+	return iu
+}
+
 // SetSlug sets the "slug" field.
 func (iu *ItemUpdate) SetSlug(s string) *ItemUpdate {
 	iu.mutation.SetSlug(s)
 	return iu
 }
 
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableSlug(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetSlug(*s)
+	}
+	return iu
+}
+
 // SetDescription sets the "description" field.
 func (iu *ItemUpdate) SetDescription(s string) *ItemUpdate {
 	iu.mutation.SetDescription(s)
+	return iu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableDescription(s *string) *ItemUpdate {
+	if s != nil {
+		iu.SetDescription(*s)
+	}
 	return iu
 }
 
@@ -102,6 +126,14 @@ func (iu *ItemUpdate) ClearContent() *ItemUpdate {
 // SetAccountID sets the "account_id" field.
 func (iu *ItemUpdate) SetAccountID(x xid.ID) *ItemUpdate {
 	iu.mutation.SetAccountID(x)
+	return iu
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (iu *ItemUpdate) SetNillableAccountID(x *xid.ID) *ItemUpdate {
+	if x != nil {
+		iu.SetAccountID(*x)
+	}
 	return iu
 }
 
@@ -660,15 +692,39 @@ func (iuo *ItemUpdateOne) SetName(s string) *ItemUpdateOne {
 	return iuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableName(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetName(*s)
+	}
+	return iuo
+}
+
 // SetSlug sets the "slug" field.
 func (iuo *ItemUpdateOne) SetSlug(s string) *ItemUpdateOne {
 	iuo.mutation.SetSlug(s)
 	return iuo
 }
 
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableSlug(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetSlug(*s)
+	}
+	return iuo
+}
+
 // SetDescription sets the "description" field.
 func (iuo *ItemUpdateOne) SetDescription(s string) *ItemUpdateOne {
 	iuo.mutation.SetDescription(s)
+	return iuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableDescription(s *string) *ItemUpdateOne {
+	if s != nil {
+		iuo.SetDescription(*s)
+	}
 	return iuo
 }
 
@@ -695,6 +751,14 @@ func (iuo *ItemUpdateOne) ClearContent() *ItemUpdateOne {
 // SetAccountID sets the "account_id" field.
 func (iuo *ItemUpdateOne) SetAccountID(x xid.ID) *ItemUpdateOne {
 	iuo.mutation.SetAccountID(x)
+	return iuo
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (iuo *ItemUpdateOne) SetNillableAccountID(x *xid.ID) *ItemUpdateOne {
+	if x != nil {
+		iuo.SetAccountID(*x)
+	}
 	return iuo
 }
 

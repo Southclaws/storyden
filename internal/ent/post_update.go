@@ -69,6 +69,14 @@ func (pu *PostUpdate) SetFirst(b bool) *PostUpdate {
 	return pu
 }
 
+// SetNillableFirst sets the "first" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableFirst(b *bool) *PostUpdate {
+	if b != nil {
+		pu.SetFirst(*b)
+	}
+	return pu
+}
+
 // SetTitle sets the "title" field.
 func (pu *PostUpdate) SetTitle(s string) *PostUpdate {
 	pu.mutation.SetTitle(s)
@@ -169,9 +177,25 @@ func (pu *PostUpdate) SetBody(s string) *PostUpdate {
 	return pu
 }
 
+// SetNillableBody sets the "body" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableBody(s *string) *PostUpdate {
+	if s != nil {
+		pu.SetBody(*s)
+	}
+	return pu
+}
+
 // SetShort sets the "short" field.
 func (pu *PostUpdate) SetShort(s string) *PostUpdate {
 	pu.mutation.SetShort(s)
+	return pu
+}
+
+// SetNillableShort sets the "short" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableShort(s *string) *PostUpdate {
+	if s != nil {
+		pu.SetShort(*s)
+	}
 	return pu
 }
 
@@ -1150,6 +1174,14 @@ func (puo *PostUpdateOne) SetFirst(b bool) *PostUpdateOne {
 	return puo
 }
 
+// SetNillableFirst sets the "first" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableFirst(b *bool) *PostUpdateOne {
+	if b != nil {
+		puo.SetFirst(*b)
+	}
+	return puo
+}
+
 // SetTitle sets the "title" field.
 func (puo *PostUpdateOne) SetTitle(s string) *PostUpdateOne {
 	puo.mutation.SetTitle(s)
@@ -1250,9 +1282,25 @@ func (puo *PostUpdateOne) SetBody(s string) *PostUpdateOne {
 	return puo
 }
 
+// SetNillableBody sets the "body" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableBody(s *string) *PostUpdateOne {
+	if s != nil {
+		puo.SetBody(*s)
+	}
+	return puo
+}
+
 // SetShort sets the "short" field.
 func (puo *PostUpdateOne) SetShort(s string) *PostUpdateOne {
 	puo.mutation.SetShort(s)
+	return puo
+}
+
+// SetNillableShort sets the "short" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableShort(s *string) *PostUpdateOne {
+	if s != nil {
+		puo.SetShort(*s)
+	}
 	return puo
 }
 

@@ -33,8 +33,8 @@ func (r Visibility) String() string {
 func (r Visibility) MarshalText() ([]byte, error) {
 	return []byte(r.v), nil
 }
-func (r *Visibility) UnmarshalText(in []byte) error {
-	s, err := NewVisibility(string(in))
+func (r *Visibility) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewVisibility(string(__iNpUt__))
 	if err != nil {
 		return err
 	}
@@ -44,16 +44,16 @@ func (r *Visibility) UnmarshalText(in []byte) error {
 func (r Visibility) Value() (driver.Value, error) {
 	return r.v, nil
 }
-func (r *Visibility) Scan(in any) error {
-	s, err := NewVisibility(fmt.Sprint(in))
+func (r *Visibility) Scan(__iNpUt__ any) error {
+	s, err := NewVisibility(fmt.Sprint(__iNpUt__))
 	if err != nil {
 		return err
 	}
 	*r = s
 	return nil
 }
-func NewVisibility(in string) (Visibility, error) {
-	switch in {
+func NewVisibility(__iNpUt__ string) (Visibility, error) {
+	switch __iNpUt__ {
 	case string(visibilityDraft):
 		return VisibilityDraft, nil
 	case string(visibilityReview):
@@ -61,6 +61,6 @@ func NewVisibility(in string) (Visibility, error) {
 	case string(visibilityPublished):
 		return VisibilityPublished, nil
 	default:
-		return Visibility{}, fmt.Errorf("invalid value for type 'Visibility': '%s'", in)
+		return Visibility{}, fmt.Errorf("invalid value for type 'Visibility': '%s'", __iNpUt__)
 	}
 }

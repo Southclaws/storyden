@@ -44,9 +44,25 @@ func (cu *CollectionUpdate) SetName(s string) *CollectionUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableName(s *string) *CollectionUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetDescription sets the "description" field.
 func (cu *CollectionUpdate) SetDescription(s string) *CollectionUpdate {
 	cu.mutation.SetDescription(s)
+	return cu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableDescription(s *string) *CollectionUpdate {
+	if s != nil {
+		cu.SetDescription(*s)
+	}
 	return cu
 }
 
@@ -314,9 +330,25 @@ func (cuo *CollectionUpdateOne) SetName(s string) *CollectionUpdateOne {
 	return cuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableName(s *string) *CollectionUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
 // SetDescription sets the "description" field.
 func (cuo *CollectionUpdateOne) SetDescription(s string) *CollectionUpdateOne {
 	cuo.mutation.SetDescription(s)
+	return cuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableDescription(s *string) *CollectionUpdateOne {
+	if s != nil {
+		cuo.SetDescription(*s)
+	}
 	return cuo
 }
 

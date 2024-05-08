@@ -47,9 +47,25 @@ func (au *AssetUpdate) SetFilename(s string) *AssetUpdate {
 	return au
 }
 
+// SetNillableFilename sets the "filename" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableFilename(s *string) *AssetUpdate {
+	if s != nil {
+		au.SetFilename(*s)
+	}
+	return au
+}
+
 // SetURL sets the "url" field.
 func (au *AssetUpdate) SetURL(s string) *AssetUpdate {
 	au.mutation.SetURL(s)
+	return au
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableURL(s *string) *AssetUpdate {
+	if s != nil {
+		au.SetURL(*s)
+	}
 	return au
 }
 
@@ -68,6 +84,14 @@ func (au *AssetUpdate) ClearMetadata() *AssetUpdate {
 // SetAccountID sets the "account_id" field.
 func (au *AssetUpdate) SetAccountID(x xid.ID) *AssetUpdate {
 	au.mutation.SetAccountID(x)
+	return au
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableAccountID(x *xid.ID) *AssetUpdate {
+	if x != nil {
+		au.SetAccountID(*x)
+	}
 	return au
 }
 
@@ -557,9 +581,25 @@ func (auo *AssetUpdateOne) SetFilename(s string) *AssetUpdateOne {
 	return auo
 }
 
+// SetNillableFilename sets the "filename" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableFilename(s *string) *AssetUpdateOne {
+	if s != nil {
+		auo.SetFilename(*s)
+	}
+	return auo
+}
+
 // SetURL sets the "url" field.
 func (auo *AssetUpdateOne) SetURL(s string) *AssetUpdateOne {
 	auo.mutation.SetURL(s)
+	return auo
+}
+
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableURL(s *string) *AssetUpdateOne {
+	if s != nil {
+		auo.SetURL(*s)
+	}
 	return auo
 }
 
@@ -578,6 +618,14 @@ func (auo *AssetUpdateOne) ClearMetadata() *AssetUpdateOne {
 // SetAccountID sets the "account_id" field.
 func (auo *AssetUpdateOne) SetAccountID(x xid.ID) *AssetUpdateOne {
 	auo.mutation.SetAccountID(x)
+	return auo
+}
+
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableAccountID(x *xid.ID) *AssetUpdateOne {
+	if x != nil {
+		auo.SetAccountID(*x)
+	}
 	return auo
 }
 

@@ -94,12 +94,10 @@ func (e AssetEdges) LinksOrErr() ([]*Link, error) {
 // OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e AssetEdges) OwnerOrErr() (*Account, error) {
-	if e.loadedTypes[4] {
-		if e.Owner == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: account.Label}
-		}
+	if e.Owner != nil {
 		return e.Owner, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "owner"}
 }
