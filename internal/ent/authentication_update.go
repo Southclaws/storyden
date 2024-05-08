@@ -36,15 +36,39 @@ func (au *AuthenticationUpdate) SetService(s string) *AuthenticationUpdate {
 	return au
 }
 
+// SetNillableService sets the "service" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableService(s *string) *AuthenticationUpdate {
+	if s != nil {
+		au.SetService(*s)
+	}
+	return au
+}
+
 // SetIdentifier sets the "identifier" field.
 func (au *AuthenticationUpdate) SetIdentifier(s string) *AuthenticationUpdate {
 	au.mutation.SetIdentifier(s)
 	return au
 }
 
+// SetNillableIdentifier sets the "identifier" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableIdentifier(s *string) *AuthenticationUpdate {
+	if s != nil {
+		au.SetIdentifier(*s)
+	}
+	return au
+}
+
 // SetToken sets the "token" field.
 func (au *AuthenticationUpdate) SetToken(s string) *AuthenticationUpdate {
 	au.mutation.SetToken(s)
+	return au
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableToken(s *string) *AuthenticationUpdate {
+	if s != nil {
+		au.SetToken(*s)
+	}
 	return au
 }
 
@@ -243,15 +267,39 @@ func (auo *AuthenticationUpdateOne) SetService(s string) *AuthenticationUpdateOn
 	return auo
 }
 
+// SetNillableService sets the "service" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableService(s *string) *AuthenticationUpdateOne {
+	if s != nil {
+		auo.SetService(*s)
+	}
+	return auo
+}
+
 // SetIdentifier sets the "identifier" field.
 func (auo *AuthenticationUpdateOne) SetIdentifier(s string) *AuthenticationUpdateOne {
 	auo.mutation.SetIdentifier(s)
 	return auo
 }
 
+// SetNillableIdentifier sets the "identifier" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableIdentifier(s *string) *AuthenticationUpdateOne {
+	if s != nil {
+		auo.SetIdentifier(*s)
+	}
+	return auo
+}
+
 // SetToken sets the "token" field.
 func (auo *AuthenticationUpdateOne) SetToken(s string) *AuthenticationUpdateOne {
 	auo.mutation.SetToken(s)
+	return auo
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableToken(s *string) *AuthenticationUpdateOne {
+	if s != nil {
+		auo.SetToken(*s)
+	}
 	return auo
 }
 

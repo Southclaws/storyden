@@ -37,15 +37,39 @@ func (ru *ReactUpdate) SetAccountID(x xid.ID) *ReactUpdate {
 	return ru
 }
 
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (ru *ReactUpdate) SetNillableAccountID(x *xid.ID) *ReactUpdate {
+	if x != nil {
+		ru.SetAccountID(*x)
+	}
+	return ru
+}
+
 // SetPostID sets the "post_id" field.
 func (ru *ReactUpdate) SetPostID(x xid.ID) *ReactUpdate {
 	ru.mutation.SetPostID(x)
 	return ru
 }
 
+// SetNillablePostID sets the "post_id" field if the given value is not nil.
+func (ru *ReactUpdate) SetNillablePostID(x *xid.ID) *ReactUpdate {
+	if x != nil {
+		ru.SetPostID(*x)
+	}
+	return ru
+}
+
 // SetEmoji sets the "emoji" field.
 func (ru *ReactUpdate) SetEmoji(s string) *ReactUpdate {
 	ru.mutation.SetEmoji(s)
+	return ru
+}
+
+// SetNillableEmoji sets the "emoji" field if the given value is not nil.
+func (ru *ReactUpdate) SetNillableEmoji(s *string) *ReactUpdate {
+	if s != nil {
+		ru.SetEmoji(*s)
+	}
 	return ru
 }
 
@@ -221,15 +245,39 @@ func (ruo *ReactUpdateOne) SetAccountID(x xid.ID) *ReactUpdateOne {
 	return ruo
 }
 
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillableAccountID(x *xid.ID) *ReactUpdateOne {
+	if x != nil {
+		ruo.SetAccountID(*x)
+	}
+	return ruo
+}
+
 // SetPostID sets the "post_id" field.
 func (ruo *ReactUpdateOne) SetPostID(x xid.ID) *ReactUpdateOne {
 	ruo.mutation.SetPostID(x)
 	return ruo
 }
 
+// SetNillablePostID sets the "post_id" field if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillablePostID(x *xid.ID) *ReactUpdateOne {
+	if x != nil {
+		ruo.SetPostID(*x)
+	}
+	return ruo
+}
+
 // SetEmoji sets the "emoji" field.
 func (ruo *ReactUpdateOne) SetEmoji(s string) *ReactUpdateOne {
 	ruo.mutation.SetEmoji(s)
+	return ruo
+}
+
+// SetNillableEmoji sets the "emoji" field if the given value is not nil.
+func (ruo *ReactUpdateOne) SetNillableEmoji(s *string) *ReactUpdateOne {
+	if s != nil {
+		ruo.SetEmoji(*s)
+	}
 	return ruo
 }
 

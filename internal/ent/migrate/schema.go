@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -753,6 +754,7 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
+	AccountTagsTable.Annotation = &entsql.Annotation{}
 	ClusterItemsTable.ForeignKeys[0].RefTable = ClustersTable
 	ClusterItemsTable.ForeignKeys[1].RefTable = ItemsTable
 	ClusterAssetsTable.ForeignKeys[0].RefTable = ClustersTable

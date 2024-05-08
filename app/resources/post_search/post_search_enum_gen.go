@@ -32,8 +32,8 @@ func (r Kind) String() string {
 func (r Kind) MarshalText() ([]byte, error) {
 	return []byte(r.v), nil
 }
-func (r *Kind) UnmarshalText(in []byte) error {
-	s, err := NewKind(string(in))
+func (r *Kind) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewKind(string(__iNpUt__))
 	if err != nil {
 		return err
 	}
@@ -43,21 +43,21 @@ func (r *Kind) UnmarshalText(in []byte) error {
 func (r Kind) Value() (driver.Value, error) {
 	return r.v, nil
 }
-func (r *Kind) Scan(in any) error {
-	s, err := NewKind(fmt.Sprint(in))
+func (r *Kind) Scan(__iNpUt__ any) error {
+	s, err := NewKind(fmt.Sprint(__iNpUt__))
 	if err != nil {
 		return err
 	}
 	*r = s
 	return nil
 }
-func NewKind(in string) (Kind, error) {
-	switch in {
+func NewKind(__iNpUt__ string) (Kind, error) {
+	switch __iNpUt__ {
 	case string(kindThread):
 		return KindThread, nil
 	case string(kindPost):
 		return KindPost, nil
 	default:
-		return Kind{}, fmt.Errorf("invalid value for type 'Kind': '%s'", in)
+		return Kind{}, fmt.Errorf("invalid value for type 'Kind': '%s'", __iNpUt__)
 	}
 }

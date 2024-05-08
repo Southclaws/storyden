@@ -71,9 +71,25 @@ func (au *AccountUpdate) SetHandle(s string) *AccountUpdate {
 	return au
 }
 
+// SetNillableHandle sets the "handle" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableHandle(s *string) *AccountUpdate {
+	if s != nil {
+		au.SetHandle(*s)
+	}
+	return au
+}
+
 // SetName sets the "name" field.
 func (au *AccountUpdate) SetName(s string) *AccountUpdate {
 	au.mutation.SetName(s)
+	return au
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableName(s *string) *AccountUpdate {
+	if s != nil {
+		au.SetName(*s)
+	}
 	return au
 }
 
@@ -992,9 +1008,25 @@ func (auo *AccountUpdateOne) SetHandle(s string) *AccountUpdateOne {
 	return auo
 }
 
+// SetNillableHandle sets the "handle" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableHandle(s *string) *AccountUpdateOne {
+	if s != nil {
+		auo.SetHandle(*s)
+	}
+	return auo
+}
+
 // SetName sets the "name" field.
 func (auo *AccountUpdateOne) SetName(s string) *AccountUpdateOne {
 	auo.mutation.SetName(s)
+	return auo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableName(s *string) *AccountUpdateOne {
+	if s != nil {
+		auo.SetName(*s)
+	}
 	return auo
 }
 

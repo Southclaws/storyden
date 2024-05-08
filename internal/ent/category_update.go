@@ -43,9 +43,25 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableName(s *string) *CategoryUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetSlug sets the "slug" field.
 func (cu *CategoryUpdate) SetSlug(s string) *CategoryUpdate {
 	cu.mutation.SetSlug(s)
+	return cu
+}
+
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableSlug(s *string) *CategoryUpdate {
+	if s != nil {
+		cu.SetSlug(*s)
+	}
 	return cu
 }
 
@@ -325,9 +341,25 @@ func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 	return cuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableName(s *string) *CategoryUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
 // SetSlug sets the "slug" field.
 func (cuo *CategoryUpdateOne) SetSlug(s string) *CategoryUpdateOne {
 	cuo.mutation.SetSlug(s)
+	return cuo
+}
+
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableSlug(s *string) *CategoryUpdateOne {
+	if s != nil {
+		cuo.SetSlug(*s)
+	}
 	return cuo
 }
 

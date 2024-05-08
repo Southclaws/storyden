@@ -48,12 +48,10 @@ type ReactEdges struct {
 // AccountOrErr returns the Account value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ReactEdges) AccountOrErr() (*Account, error) {
-	if e.loadedTypes[0] {
-		if e.Account == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: account.Label}
-		}
+	if e.Account != nil {
 		return e.Account, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "account"}
 }
@@ -61,12 +59,10 @@ func (e ReactEdges) AccountOrErr() (*Account, error) {
 // PostOrErr returns the Post value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ReactEdges) PostOrErr() (*Post, error) {
-	if e.loadedTypes[1] {
-		if e.Post == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: post.Label}
-		}
+	if e.Post != nil {
 		return e.Post, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: post.Label}
 	}
 	return nil, &NotLoadedError{edge: "Post"}
 }

@@ -34,9 +34,25 @@ func (nu *NotificationUpdate) SetTitle(s string) *NotificationUpdate {
 	return nu
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableTitle(s *string) *NotificationUpdate {
+	if s != nil {
+		nu.SetTitle(*s)
+	}
+	return nu
+}
+
 // SetDescription sets the "description" field.
 func (nu *NotificationUpdate) SetDescription(s string) *NotificationUpdate {
 	nu.mutation.SetDescription(s)
+	return nu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableDescription(s *string) *NotificationUpdate {
+	if s != nil {
+		nu.SetDescription(*s)
+	}
 	return nu
 }
 
@@ -46,9 +62,25 @@ func (nu *NotificationUpdate) SetLink(s string) *NotificationUpdate {
 	return nu
 }
 
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableLink(s *string) *NotificationUpdate {
+	if s != nil {
+		nu.SetLink(*s)
+	}
+	return nu
+}
+
 // SetRead sets the "read" field.
 func (nu *NotificationUpdate) SetRead(b bool) *NotificationUpdate {
 	nu.mutation.SetRead(b)
+	return nu
+}
+
+// SetNillableRead sets the "read" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableRead(b *bool) *NotificationUpdate {
+	if b != nil {
+		nu.SetRead(*b)
+	}
 	return nu
 }
 
@@ -139,9 +171,25 @@ func (nuo *NotificationUpdateOne) SetTitle(s string) *NotificationUpdateOne {
 	return nuo
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableTitle(s *string) *NotificationUpdateOne {
+	if s != nil {
+		nuo.SetTitle(*s)
+	}
+	return nuo
+}
+
 // SetDescription sets the "description" field.
 func (nuo *NotificationUpdateOne) SetDescription(s string) *NotificationUpdateOne {
 	nuo.mutation.SetDescription(s)
+	return nuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableDescription(s *string) *NotificationUpdateOne {
+	if s != nil {
+		nuo.SetDescription(*s)
+	}
 	return nuo
 }
 
@@ -151,9 +199,25 @@ func (nuo *NotificationUpdateOne) SetLink(s string) *NotificationUpdateOne {
 	return nuo
 }
 
+// SetNillableLink sets the "link" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableLink(s *string) *NotificationUpdateOne {
+	if s != nil {
+		nuo.SetLink(*s)
+	}
+	return nuo
+}
+
 // SetRead sets the "read" field.
 func (nuo *NotificationUpdateOne) SetRead(b bool) *NotificationUpdateOne {
 	nuo.mutation.SetRead(b)
+	return nuo
+}
+
+// SetNillableRead sets the "read" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableRead(b *bool) *NotificationUpdateOne {
+	if b != nil {
+		nuo.SetRead(*b)
+	}
 	return nuo
 }
 
