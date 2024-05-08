@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 func (o *Authentication) OAuthProviderCallback(ctx context.Context, request openapi.OAuthProviderCallbackRequestObject) (openapi.OAuthProviderCallbackResponseObject, error) {

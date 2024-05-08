@@ -8,16 +8,16 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/deepmap/oapi-codegen/pkg/middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
+	echomiddleware "github.com/oapi-codegen/echo-middleware"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 type Authentication struct {
@@ -73,7 +73,7 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 		return nil
 	}
 
-	c := ctx.Value(middleware.EchoContextKey).(echo.Context)
+	c := ctx.Value(echomiddleware.EchoContextKey).(echo.Context)
 
 	// first check if the middleware injected an account ID, if not, fail.
 	aid, err := session.GetAccountID(c.Request().Context())

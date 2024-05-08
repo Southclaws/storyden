@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/cluster/cluster_visibility"
 	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/item_tree"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Clusters struct {

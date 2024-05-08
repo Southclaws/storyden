@@ -15,7 +15,7 @@ import (
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Posts struct {

@@ -6,14 +6,13 @@ package transport
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/transports/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
 	"github.com/Southclaws/storyden/internal/http"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		http.Build(),
-
-		openapi.Build(),
+		bindings.Build(),
 	)
 }
