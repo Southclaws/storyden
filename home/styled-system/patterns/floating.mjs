@@ -1,4 +1,4 @@
-import { mapObject } from '../helpers.mjs';
+import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const FloatingConfig = {
@@ -12,7 +12,10 @@ transform() {
   };
 }}
 
-export const getFloatingStyle = (styles = {}) => FloatingConfig.transform(styles, { map: mapObject })
+export const getFloatingStyle = (styles = {}) => {
+  const _styles = getPatternStyles(FloatingConfig, styles)
+  return FloatingConfig.transform(_styles, patternFns)
+}
 
 export const Floating = (styles) => css(getFloatingStyle(styles))
 Floating.raw = getFloatingStyle

@@ -1,13 +1,13 @@
 import { createElement, forwardRef } from 'react'
 
 import { splitProps } from '../helpers.mjs';
-import { getBoxStyle } from '../patterns/box.mjs';
+import { getCqStyle } from '../patterns/cq.mjs';
 import { styled } from './factory.mjs';
 
-export const Box = /* @__PURE__ */ forwardRef(function Box(props, ref) {
-  const [patternProps, restProps] = splitProps(props, [])
+export const Cq = /* @__PURE__ */ forwardRef(function Cq(props, ref) {
+  const [patternProps, restProps] = splitProps(props, ["name","type"])
 
-const styleProps = getBoxStyle(patternProps)
+const styleProps = getCqStyle(patternProps)
 const mergedProps = { ref, ...styleProps, ...restProps }
 
 return createElement(styled.div, mergedProps)

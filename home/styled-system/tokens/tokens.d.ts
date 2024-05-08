@@ -37,8 +37,6 @@ export type ColorToken = "current" | "black" | "white" | "transparent" | "rose.5
 
 export type BreakpointToken = "sm" | "md" | "lg" | "xl" | "2xl"
 
-export type AnimationName = "spin" | "ping" | "pulse" | "bounce"
-
 export type Tokens = {
 		aspectRatios: AspectRatioToken
 		borders: BorderToken
@@ -57,7 +55,6 @@ export type Tokens = {
 		fonts: FontToken
 		colors: ColorToken
 		breakpoints: BreakpointToken
-		animationName: AnimationName
 } & { [token: string]: never }
 
 export type TokenCategory = "aspectRatios" | "zIndex" | "opacity" | "colors" | "fonts" | "fontSizes" | "fontWeights" | "lineHeights" | "letterSpacings" | "sizes" | "shadows" | "spacing" | "radii" | "borders" | "borderWidths" | "durations" | "easings" | "animations" | "blurs" | "gradients" | "breakpoints" | "assets"

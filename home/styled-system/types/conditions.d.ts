@@ -150,9 +150,9 @@ export interface Conditions {
 	"_landscape": string
 	/** `@media (orientation: portrait)` */
 	"_portrait": string
-	/** ` &.dark, .dark &` */
+	/** `.dark &` */
 	"_dark": string
-	/** ` &.light, .light &` */
+	/** `.light &` */
 	"_light": string
 	/** `@media (prefers-color-scheme: dark)` */
 	"_osDark": string
@@ -178,70 +178,92 @@ export interface Conditions {
 	"_horizontal": string
 	/** `&[data-orientation=vertical]` */
 	"_vertical": string
-	/** `@media screen and (min-width: 40em)` */
+	/** `@starting-style` */
+	"_starting": string
+	/** `@media screen and (min-width: 40rem)` */
 	"sm": string
-	/** `@media screen and (min-width: 40em) and (max-width: 47.9975em)` */
+	/** `@media screen and (min-width: 40rem) and (max-width: 47.9975rem)` */
 	"smOnly": string
-	/** `@media screen and (max-width: 39.9975em)` */
+	/** `@media screen and (max-width: 39.9975rem)` */
 	"smDown": string
-	/** `@media screen and (min-width: 48em)` */
+	/** `@media screen and (min-width: 48rem)` */
 	"md": string
-	/** `@media screen and (min-width: 48em) and (max-width: 63.9975em)` */
+	/** `@media screen and (min-width: 48rem) and (max-width: 63.9975rem)` */
 	"mdOnly": string
-	/** `@media screen and (max-width: 47.9975em)` */
+	/** `@media screen and (max-width: 47.9975rem)` */
 	"mdDown": string
-	/** `@media screen and (min-width: 64em)` */
+	/** `@media screen and (min-width: 64rem)` */
 	"lg": string
-	/** `@media screen and (min-width: 64em) and (max-width: 79.9975em)` */
+	/** `@media screen and (min-width: 64rem) and (max-width: 79.9975rem)` */
 	"lgOnly": string
-	/** `@media screen and (max-width: 63.9975em)` */
+	/** `@media screen and (max-width: 63.9975rem)` */
 	"lgDown": string
-	/** `@media screen and (min-width: 80em)` */
+	/** `@media screen and (min-width: 80rem)` */
 	"xl": string
-	/** `@media screen and (min-width: 80em) and (max-width: 95.9975em)` */
+	/** `@media screen and (min-width: 80rem) and (max-width: 95.9975rem)` */
 	"xlOnly": string
-	/** `@media screen and (max-width: 79.9975em)` */
+	/** `@media screen and (max-width: 79.9975rem)` */
 	"xlDown": string
-	/** `@media screen and (min-width: 96em)` */
+	/** `@media screen and (min-width: 96rem)` */
 	"2xl": string
-	/** `@media screen and (min-width: 96em)` */
+	/** `@media screen and (min-width: 96rem)` */
 	"2xlOnly": string
-	/** `@media screen and (max-width: 95.9975em)` */
+	/** `@media screen and (max-width: 95.9975rem)` */
 	"2xlDown": string
-	/** `@media screen and (min-width: 40em) and (max-width: 47.9975em)` */
+	/** `@media screen and (min-width: 40rem) and (max-width: 47.9975rem)` */
 	"smToMd": string
-	/** `@media screen and (min-width: 40em) and (max-width: 63.9975em)` */
+	/** `@media screen and (min-width: 40rem) and (max-width: 63.9975rem)` */
 	"smToLg": string
-	/** `@media screen and (min-width: 40em) and (max-width: 79.9975em)` */
+	/** `@media screen and (min-width: 40rem) and (max-width: 79.9975rem)` */
 	"smToXl": string
-	/** `@media screen and (min-width: 40em) and (max-width: 95.9975em)` */
+	/** `@media screen and (min-width: 40rem) and (max-width: 95.9975rem)` */
 	"smTo2xl": string
-	/** `@media screen and (min-width: 48em) and (max-width: 63.9975em)` */
+	/** `@media screen and (min-width: 48rem) and (max-width: 63.9975rem)` */
 	"mdToLg": string
-	/** `@media screen and (min-width: 48em) and (max-width: 79.9975em)` */
+	/** `@media screen and (min-width: 48rem) and (max-width: 79.9975rem)` */
 	"mdToXl": string
-	/** `@media screen and (min-width: 48em) and (max-width: 95.9975em)` */
+	/** `@media screen and (min-width: 48rem) and (max-width: 95.9975rem)` */
 	"mdTo2xl": string
-	/** `@media screen and (min-width: 64em) and (max-width: 79.9975em)` */
+	/** `@media screen and (min-width: 64rem) and (max-width: 79.9975rem)` */
 	"lgToXl": string
-	/** `@media screen and (min-width: 64em) and (max-width: 95.9975em)` */
+	/** `@media screen and (min-width: 64rem) and (max-width: 95.9975rem)` */
 	"lgTo2xl": string
-	/** `@media screen and (min-width: 80em) and (max-width: 95.9975em)` */
+	/** `@media screen and (min-width: 80rem) and (max-width: 95.9975rem)` */
 	"xlTo2xl": string
+	/** `@container  (min-width: 20rem)` */
+	"@/xs": string
+	/** `@container  (min-width: 24rem)` */
+	"@/sm": string
+	/** `@container  (min-width: 28rem)` */
+	"@/md": string
+	/** `@container  (min-width: 32rem)` */
+	"@/lg": string
+	/** `@container  (min-width: 36rem)` */
+	"@/xl": string
+	/** `@container  (min-width: 42rem)` */
+	"@/2xl": string
+	/** `@container  (min-width: 48rem)` */
+	"@/3xl": string
+	/** `@container  (min-width: 56rem)` */
+	"@/4xl": string
+	/** `@container  (min-width: 64rem)` */
+	"@/5xl": string
+	/** `@container  (min-width: 72rem)` */
+	"@/6xl": string
+	/** `@container  (min-width: 80rem)` */
+	"@/7xl": string
+	/** `@container  (min-width: 90rem)` */
+	"@/8xl": string
 	/** The base (=no conditions) styles to apply  */
 	"base": string
 }
 
-export type Condition = keyof Conditions
-
-export type Conditional<V> =
+export type ConditionalValue<V> =
   | V
   | Array<V | null>
   | {
-      [K in keyof Conditions]?: Conditional<V>
+      [K in keyof Conditions]?: ConditionalValue<V>
     }
-
-export type ConditionalValue<T> = Conditional<T>
 
 export type Nested<P> = P & {
   [K in Selectors]?: Nested<P>

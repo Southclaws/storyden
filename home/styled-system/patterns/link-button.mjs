@@ -1,8 +1,8 @@
-import { mapObject, __spreadValues } from '../helpers.mjs';
+import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const linkButtonConfig = {
-transform:(props) => __spreadValues({
+transform:(props) => ({
   backgroundColor: "white",
   alignItems: "center",
   appearance: "none",
@@ -41,10 +41,14 @@ transform:(props) => __spreadValues({
   "& svg": {
     width: "4",
     height: "4"
-  }
-}, props)}
+  },
+  ...props
+})}
 
-export const getLinkButtonStyle = (styles = {}) => linkButtonConfig.transform(styles, { map: mapObject })
+export const getLinkButtonStyle = (styles = {}) => {
+  const _styles = getPatternStyles(linkButtonConfig, styles)
+  return linkButtonConfig.transform(_styles, patternFns)
+}
 
 export const linkButton = (styles) => css(getLinkButtonStyle(styles))
 linkButton.raw = getLinkButtonStyle

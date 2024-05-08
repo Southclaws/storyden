@@ -6,5 +6,9 @@ import type { DistributiveOmit } from '../types/system-types';
 
 export interface LinkButtonProps extends LinkButtonProperties, DistributiveOmit<HTMLStyledProps<'div'>, keyof LinkButtonProperties > {}
 
-/** Link button */
+/**
+ * Link button
+
+
+ */
 export declare const LinkButton: FunctionComponent<LinkButtonProps>
