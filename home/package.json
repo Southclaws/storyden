@@ -21,7 +21,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.28.0",
+    "@pandacss/dev": "^0.39.0",
     "@types/lodash": "^4.17.1",
     "@types/node": "^20.12.10",
     "@types/react": "^18.3.1",
