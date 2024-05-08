@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/category"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Categories struct {

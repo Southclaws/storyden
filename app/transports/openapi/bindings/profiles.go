@@ -15,8 +15,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile_search"
 	"github.com/Southclaws/storyden/app/services/account"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type PhoneAuth struct {

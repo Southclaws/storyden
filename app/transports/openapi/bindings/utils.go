@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 

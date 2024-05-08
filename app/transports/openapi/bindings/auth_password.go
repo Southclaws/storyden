@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {

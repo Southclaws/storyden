@@ -1,5 +1,5 @@
 package: openapi
-output: generated.go
+output: app/transports/openapi/server_gen.go
 generate:
   client: true
   echo-server: true

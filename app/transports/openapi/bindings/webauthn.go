@@ -22,8 +22,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
+	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/openapi"
 )
 
 const cookieName = "storyden-webauthn-session"
