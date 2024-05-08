@@ -6,12 +6,13 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 )
 
 type Filename struct {
-	id    xid.ID
+	id    opt.Optional[xid.ID]
 	name  string
 	hasID bool
 }
@@ -22,13 +23,17 @@ func (a Filename) String() string {
 	return a.name
 }
 
+func (f Filename) GetID() xid.ID {
+	return f.id.Or(xid.New())
+}
+
 func NewFilename(name string) Filename {
 	return NewExistingFilename(xid.New(), name)
 }
 
 func NewExistingFilename(id xid.ID, name string) Filename {
 	return Filename{
-		id:    id,
+		id:    opt.New(id),
 		name:  slug.Make(formatFilename(id, name)),
 		hasID: true,
 	}
@@ -54,7 +59,7 @@ func ParseAssetFilename(s string) (*Filename, error) {
 	}
 
 	return &Filename{
-		id:   id,
+		id:   opt.New(id),
 		name: fmt.Sprintf("%s-%s", parts[0], parts[1]),
 	}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -42,7 +43,7 @@ func FromModel(a *ent.Asset) *Asset {
 	return &Asset{
 		ID: AssetID(a.ID),
 		Name: Filename{
-			id:    a.ID,
+			id:    opt.New(a.ID),
 			name:  a.Filename,
 			hasID: true,
 		},
