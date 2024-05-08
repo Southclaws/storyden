@@ -9621,14 +9621,14 @@ __metadata:
   linkType: hard
 
 "vaul@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "vaul@npm:0.9.0"
+  version: 0.9.1
+  resolution: "vaul@npm:0.9.1"
   dependencies:
     "@radix-ui/react-dialog": "npm:^1.0.4"
   peerDependencies:
     react: ^16.8 || ^17.0 || ^18.0
     react-dom: ^16.8 || ^17.0 || ^18.0
-  checksum: 10c0/3b4290f7bbc984c7ab3784e6b5a16f6cd2f380798d8c0d1a01818f215f473ecefc6a3f5ccf6724107282a9ceb1a7f8fce8f841ae3eb70cc63b23776bd42fd9e7
+  checksum: 10c0/33fc4ab9554acdcb218fb5048f270607aaa3eb58909cf2e4300c1bca8ba8b989845500b9f116e62fde8d3f56a26e42bdd722a1e7fcd5a074a480b86d11612005
   languageName: node
   linkType: hard
 
