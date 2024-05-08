@@ -14,18 +14,6 @@ function filterBaseConditions(c) {
   return c.slice().filter((v) => !isBaseCondition(v));
 }
 
-// src/css-important.ts
-var importantRegex = /\s*!(important)?/i;
-function isImportant(value) {
-  return typeof value === "string" ? importantRegex.test(value) : false;
-}
-function withoutImportant(value) {
-  return typeof value === "string" ? value.replace(importantRegex, "").trim() : value;
-}
-function withoutSpace(str) {
-  return typeof str === "string" ? str.replaceAll(" ", "_") : str;
-}
-
 // src/hash.ts
 function toChar(code) {
   return String.fromCharCode(code + (code > 25 ? 39 : 97));
@@ -47,21 +35,16 @@ function toHash(value) {
   return toName(toPhash(5381, value) >>> 0);
 }
 
-// src/merge-props.ts
-function mergeProps(...sources) {
-  const objects = sources.filter(Boolean);
-  return objects.reduce((prev, obj) => {
-    Object.keys(obj).forEach((key) => {
-      const prevValue = prev[key];
-      const value = obj[key];
-      if (isObject(prevValue) && isObject(value)) {
-        prev[key] = mergeProps(prevValue, value);
-      } else {
-        prev[key] = value;
-      }
-    });
-    return prev;
-  }, {});
+// src/important.ts
+var importantRegex = /\s*!(important)?/i;
+function isImportant(value) {
+  return typeof value === "string" ? importantRegex.test(value) : false;
+}
+function withoutImportant(value) {
+  return typeof value === "string" ? value.replace(importantRegex, "").trim() : value;
+}
+function withoutSpace(str) {
+  return typeof str === "string" ? str.replaceAll(" ", "_") : str;
 }
 
 // src/memo.ts
@@ -79,6 +62,23 @@ var memo = (fn) => {
   return get;
 };
 
+// src/merge-props.ts
+function mergeProps(...sources) {
+  const objects = sources.filter(Boolean);
+  return objects.reduce((prev, obj) => {
+    Object.keys(obj).forEach((key) => {
+      const prevValue = prev[key];
+      const value = obj[key];
+      if (isObject(prevValue) && isObject(value)) {
+        prev[key] = mergeProps(prevValue, value);
+      } else {
+        prev[key] = value;
+      }
+    });
+    return prev;
+  }, {});
+}
+
 // src/walk-object.ts
 var isNotNullish = (element) => element != null;
 function walkObject(target, predicate, options = {}) {
@@ -87,7 +87,7 @@ function walkObject(target, predicate, options = {}) {
     if (isObject(value) || Array.isArray(value)) {
       const result = {};
       for (const [prop, child] of Object.entries(value)) {
-        const key = getKey?.(prop) ?? prop;
+        const key = getKey?.(prop, child) ?? prop;
         const childPath = [...path, key];
         if (stop?.(value, childPath)) {
           return predicate(value, path);
@@ -113,21 +113,16 @@ function mapObject(obj, fn) {
 
 // src/normalize-style-object.ts
 function toResponsiveObject(values, breakpoints) {
-  return values.reduce((acc, current, index) => {
-    const key = breakpoints[index];
-    if (current != null) {
-      acc[key] = current;
-    }
-    return acc;
-  }, {});
-}
-function normalizeShorthand(styles, context) {
-  const { hasShorthand, resolveShorthand } = context.utility;
-  return walkObject(styles, (v) => v, {
-    getKey: (prop) => {
-      return hasShorthand ? resolveShorthand(prop) : prop;
-    }
-  });
+  return values.reduce(
+    (acc, current, index) => {
+      const key = breakpoints[index];
+      if (current != null) {
+        acc[key] = current;
+      }
+      return acc;
+    },
+    {}
+  );
 }
 function normalizeStyleObject(styles, context, shorthand = true) {
   const { utility, conditions } = context;
@@ -158,14 +153,15 @@ function createCss(context) {
     let result;
     if (hash) {
       const baseArray = [...conds.finalize(conditions), className];
-      result = formatClassName(toHash(baseArray.join(":")));
+      result = formatClassName(utility.toHash(baseArray, toHash));
     } else {
       const baseArray = [...conds.finalize(conditions), formatClassName(className)];
       result = baseArray.join(":");
     }
     return result;
   };
-  return memo((styleObject = {}) => {
+  return memo(({ base, ...styles } = {}) => {
+    const styleObject = Object.assign(styles, base);
     const normalizedObject = normalizeStyleObject(styleObject, context);
     const classNames = /* @__PURE__ */ new Set();
     walkObject(normalizedObject, (value, paths) => {
@@ -184,14 +180,14 @@ function createCss(context) {
   });
 }
 function compactStyles(...styles) {
-  return styles.filter((style) => isObject(style) && Object.keys(compact(style)).length > 0);
+  return styles.flat().filter((style) => isObject(style) && Object.keys(compact(style)).length > 0);
 }
 function createMergeCss(context) {
   function resolve(styles) {
     const allStyles = compactStyles(...styles);
     if (allStyles.length === 1)
       return allStyles;
-    return allStyles.map((style) => normalizeShorthand(style, context));
+    return allStyles.map((style) => normalizeStyleObject(style, context));
   }
   function mergeCss(...styles) {
     return mergeProps(...resolve(styles));
@@ -210,6 +206,34 @@ var hypenateProperty = memo((property) => {
     return property;
   return property.replace(wordRegex, "-$1").replace(msRegex, "-ms-").toLowerCase();
 });
+
+// src/is-css-function.ts
+var fns = ["min", "max", "clamp", "calc"];
+var fnRegExp = new RegExp(`^(${fns.join("|")})\\(.*\\)`);
+var isCssFunction = (v) => typeof v === "string" && fnRegExp.test(v);
+
+// src/is-css-unit.ts
+var lengthUnits = "cm,mm,Q,in,pc,pt,px,em,ex,ch,rem,lh,rlh,vw,vh,vmin,vmax,vb,vi,svw,svh,lvw,lvh,dvw,dvh,cqw,cqh,cqi,cqb,cqmin,cqmax,%";
+var lengthUnitsPattern = `(?:${lengthUnits.split(",").join("|")})`;
+var lengthRegExp = new RegExp(`^[+-]?[0-9]*.?[0-9]+(?:[eE][+-]?[0-9]+)?${lengthUnitsPattern}$`);
+var isCssUnit = (v) => typeof v === "string" && lengthRegExp.test(v);
+
+// src/is-css-var.ts
+var isCssVar = (v) => typeof v === "string" && /^var\(--.+\)$/.test(v);
+
+// src/pattern-fns.ts
+var patternFns = {
+  map: mapObject,
+  isCssFunction,
+  isCssVar,
+  isCssUnit
+};
+var getPatternStyles = (pattern, styles) => {
+  if (!pattern?.defaultValues)
+    return styles;
+  const defaults = typeof pattern.defaultValues === "function" ? pattern.defaultValues(styles) : pattern.defaultValues;
+  return Object.assign({}, defaults, compact(styles));
+};
 
 // src/slot.ts
 var getSlotRecipes = (recipe = {}) => {
@@ -260,6 +284,7 @@ export {
   createCss,
   createMergeCss,
   filterBaseConditions,
+  getPatternStyles,
   getSlotCompoundVariant,
   getSlotRecipes,
   hypenateProperty,
@@ -268,6 +293,7 @@ export {
   mapObject,
   memo,
   mergeProps,
+  patternFns,
   splitProps,
   toHash,
   uniq,

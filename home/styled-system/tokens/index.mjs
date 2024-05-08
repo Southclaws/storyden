@@ -1784,7 +1784,7 @@ const tokens = {
     "variable": "var(--colors-fg-default)"
   },
   "colors.bg.canvas": {
-    "value": "var(--colors-bg-canvas)",
+    "value": "var(--colors-gray-100)",
     "variable": "var(--colors-bg-canvas)"
   },
   "colors.bg.default": {
@@ -1796,7 +1796,7 @@ const tokens = {
     "variable": "var(--colors-bg-opaque)"
   },
   "blurs.frosted": {
-    "value": "var(--blurs-frosted)",
+    "value": "8px",
     "variable": "var(--blurs-frosted)"
   },
   "spacing.-1": {
