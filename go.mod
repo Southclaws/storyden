@@ -2,7 +2,7 @@ module github.com/Southclaws/storyden
 
 go 1.22
 
-toolchain go1.22.1
+toolchain go1.22.3
 
 require (
 	ariga.io/atlas v0.22.0 // indirect
