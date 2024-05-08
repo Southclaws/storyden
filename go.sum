@@ -41,6 +41,8 @@ github.com/Southclaws/fault v0.8.1 h1:mgqqdC6kUBQ6ExMALZ0nNaDfNJD5h2+wq3se5mAyX+
 github.com/Southclaws/fault v0.8.1/go.mod h1:VUVkAWutC59SL16s6FTqf3I6I2z77RmnaW5XRz4bLOE=
 github.com/Southclaws/opt v0.6.0 h1:DnsHXMfeW8vV1y2oa26bpx1dn76PERw4QNw25b6U498=
 github.com/Southclaws/opt v0.6.0/go.mod h1:zGjXSHmM4ScFX3TLkCr8TdVvd4KAcZq0mwWtzqoqwwQ=
+github.com/Southclaws/opt v0.6.1 h1:Hi6fQZOuZHrDXO7CbV2dsjkAxJvgFUerw91REo06yQE=
+github.com/Southclaws/opt v0.6.1/go.mod h1:zGjXSHmM4ScFX3TLkCr8TdVvd4KAcZq0mwWtzqoqwwQ=
 github.com/agext/levenshtein v1.2.3 h1:YB2fHEn0UJagG8T1rrWknE3ZQzWM06O8AMAatNn7lmo=
 github.com/agext/levenshtein v1.2.3/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/ajg/form v1.5.1 h1:t9c7v8JUKu/XxOGBU0yjNpaMloxGEJhUkqFRq0ibGeU=
