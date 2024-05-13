@@ -7,6 +7,6 @@
  */
 
 /**
- * Where to move child clusters and items.
+ * Where to move child clusters.
  */
 export type TargetClusterSlugQueryParameter = string;

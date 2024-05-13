@@ -18,7 +18,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -92,7 +91,6 @@ func checkColumn(table, column string) error {
 			category.Table:       category.ValidColumn,
 			cluster.Table:        cluster.ValidColumn,
 			collection.Table:     collection.ValidColumn,
-			item.Table:           item.ValidColumn,
 			link.Table:           link.ValidColumn,
 			notification.Table:   notification.ValidColumn,
 			post.Table:           post.ValidColumn,

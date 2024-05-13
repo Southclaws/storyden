@@ -49,8 +49,6 @@ func (Cluster) Edges() []ent.Edge {
 			Field("parent_cluster_id").
 			Comment("A many-to-many recursive self reference. The parent cluster, if any."),
 
-		edge.To("items", Item.Type),
-
 		edge.To("assets", Asset.Type),
 
 		edge.From("tags", Tag.Type).

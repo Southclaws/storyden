@@ -15,7 +15,6 @@ var (
 	KindThread  = Kind{kindThread}
 	KindReply   = Kind{kindReply}
 	KindCluster = Kind{kindCluster}
-	KindItem    = Kind{kindItem}
 	KindLink    = Kind{kindLink}
 )
 
@@ -29,12 +28,15 @@ func (r Kind) Format(f fmt.State, verb rune) {
 		fmt.Fprint(f, r.v)
 	}
 }
+
 func (r Kind) String() string {
 	return string(r.v)
 }
+
 func (r Kind) MarshalText() ([]byte, error) {
 	return []byte(r.v), nil
 }
+
 func (r *Kind) UnmarshalText(__iNpUt__ []byte) error {
 	s, err := NewKind(string(__iNpUt__))
 	if err != nil {
@@ -43,9 +45,11 @@ func (r *Kind) UnmarshalText(__iNpUt__ []byte) error {
 	*r = s
 	return nil
 }
+
 func (r Kind) Value() (driver.Value, error) {
 	return r.v, nil
 }
+
 func (r *Kind) Scan(__iNpUt__ any) error {
 	s, err := NewKind(fmt.Sprint(__iNpUt__))
 	if err != nil {
@@ -54,6 +58,7 @@ func (r *Kind) Scan(__iNpUt__ any) error {
 	*r = s
 	return nil
 }
+
 func NewKind(__iNpUt__ string) (Kind, error) {
 	switch __iNpUt__ {
 	case string(kindThread):
@@ -62,8 +67,6 @@ func NewKind(__iNpUt__ string) (Kind, error) {
 		return KindReply, nil
 	case string(kindCluster):
 		return KindCluster, nil
-	case string(kindItem):
-		return KindItem, nil
 	case string(kindLink):
 		return KindLink, nil
 	default:

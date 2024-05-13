@@ -17,8 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
-	"github.com/Southclaws/storyden/app/services/item_crud"
-	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/app/services/link_getter"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
@@ -52,7 +50,6 @@ func Build() fx.Option {
 		weaviate.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(cluster.New, clustertree.New, cluster_visibility.New),
-		fx.Provide(item_crud.New, item_tree.New),
 		fx.Provide(link_getter.New),
 	)
 }

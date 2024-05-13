@@ -43,8 +43,6 @@ const (
 	EdgeCollections = "collections"
 	// EdgeClusters holds the string denoting the clusters edge name in mutations.
 	EdgeClusters = "clusters"
-	// EdgeItems holds the string denoting the items edge name in mutations.
-	EdgeItems = "items"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the account in the database.
@@ -94,13 +92,6 @@ const (
 	ClustersInverseTable = "clusters"
 	// ClustersColumn is the table column denoting the clusters relation/edge.
 	ClustersColumn = "account_id"
-	// ItemsTable is the table that holds the items relation/edge.
-	ItemsTable = "items"
-	// ItemsInverseTable is the table name for the Item entity.
-	// It exists in this package in order to avoid circular dependency with the "item" package.
-	ItemsInverseTable = "items"
-	// ItemsColumn is the table column denoting the items relation/edge.
-	ItemsColumn = "account_id"
 	// AssetsTable is the table that holds the assets relation/edge.
 	AssetsTable = "assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -301,20 +292,6 @@ func ByClusters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByItemsCount orders the results by items count.
-func ByItemsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newItemsStep(), opts...)
-	}
-}
-
-// ByItems orders the results by items terms.
-func ByItems(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newItemsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByAssetsCount orders the results by assets count.
 func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -375,13 +352,6 @@ func newClustersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClustersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ClustersTable, ClustersColumn),
-	)
-}
-func newItemsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ItemsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ItemsTable, ItemsColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {

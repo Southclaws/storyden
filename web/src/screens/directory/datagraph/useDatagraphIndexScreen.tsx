@@ -1,16 +1,13 @@
 import { useClusterList } from "src/api/openapi/clusters";
-import { useItemList } from "src/api/openapi/items";
 import { useLinkList } from "src/api/openapi/links";
 import {
   ClusterListOKResponse,
-  ItemListOKResponse,
   LinkListOKResponse,
 } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 
 export type Props = {
   clusters: ClusterListOKResponse;
-  items: ItemListOKResponse;
   links: LinkListOKResponse;
 };
 
@@ -30,19 +27,6 @@ export function useDatagraphIndexScreen(props: Props) {
   );
 
   const {
-    data: items,
-    mutate: mutateItems,
-    error: errorItems,
-  } = useItemList(
-    {},
-    {
-      swr: {
-        fallbackData: props.items,
-      },
-    },
-  );
-
-  const {
     data: links,
     mutate: mutateLinks,
     error: errorLinks,
@@ -55,17 +39,14 @@ export function useDatagraphIndexScreen(props: Props) {
     },
   );
 
-  if (!clusters || !items || !links) {
+  if (!clusters || !links) {
     return {
       ready: false as const,
-      error: errorClusters || errorItems || errorLinks,
+      error: errorClusters || errorLinks,
     };
   }
 
-  const empty =
-    clusters.clusters.length === 0 &&
-    items.items.length === 0 &&
-    links.results === 0;
+  const empty = clusters.clusters.length === 0 && links.results === 0;
 
   return {
     ready: true as const,
@@ -75,10 +56,6 @@ export function useDatagraphIndexScreen(props: Props) {
         data: clusters,
         mutate: mutateClusters,
       },
-      items: {
-        data: items,
-        mutate: mutateItems,
-      },
       links: {
         data: links,
         mutate: mutateLinks,
@@ -86,7 +63,6 @@ export function useDatagraphIndexScreen(props: Props) {
     },
     mutate: {
       mutateClusters,
-      mutateItems,
     },
     session,
   };

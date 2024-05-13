@@ -3,7 +3,6 @@ import { chunk, filter } from "lodash/fp";
 
 import {
   ClusterList,
-  ItemList,
   Link,
   LinkList,
   ThreadList,
@@ -15,7 +14,6 @@ export type MixedContentChunk = MixedContentLists & { id: string };
 
 const chunkThreads = chunk(5);
 const chunkClusters = chunk(2);
-const chunkItems = chunk(4);
 const chunkLinks = chunk(5);
 
 const filterInterestingLinks = filter((v: Link) =>
@@ -27,7 +25,6 @@ const filterInterestingLinks = filter((v: Link) =>
 export function chunkData(data: MixedContent): MixedContentChunk[] {
   const { threads } = data.threads;
   const { clusters } = data.clusters;
-  const { items } = data.items;
   const { links } = data.links;
 
   // Filter out links that are missing titles/etc so the home screen looks nice.
@@ -35,21 +32,14 @@ export function chunkData(data: MixedContent): MixedContentChunk[] {
 
   const threadsChunks = chunkThreads(threads);
   const clustersChunks = chunkClusters(clusters);
-  const itemsChunks = chunkItems(items);
   const linksChunks = chunkLinks(goodLinks);
 
-  const zipped = zip(
-    threadsChunks,
-    clustersChunks,
-    itemsChunks,
-    linksChunks,
-  ).map(
+  const zipped = zip(threadsChunks, clustersChunks, linksChunks).map(
     (v, i) =>
       ({
         id: i.toString(),
         threads: (v[0] as ThreadList) ?? [],
         clusters: (v[1] as ClusterList) ?? [],
-        items: (v[2] as ItemList) ?? [],
         links: (v[3] as LinkList) ?? [],
       }) satisfies MixedContentChunk,
   );

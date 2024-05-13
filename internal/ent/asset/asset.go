@@ -31,8 +31,6 @@ const (
 	EdgePosts = "posts"
 	// EdgeClusters holds the string denoting the clusters edge name in mutations.
 	EdgeClusters = "clusters"
-	// EdgeItems holds the string denoting the items edge name in mutations.
-	EdgeItems = "items"
 	// EdgeLinks holds the string denoting the links edge name in mutations.
 	EdgeLinks = "links"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
@@ -49,11 +47,6 @@ const (
 	// ClustersInverseTable is the table name for the Cluster entity.
 	// It exists in this package in order to avoid circular dependency with the "cluster" package.
 	ClustersInverseTable = "clusters"
-	// ItemsTable is the table that holds the items relation/edge. The primary key declared below.
-	ItemsTable = "item_assets"
-	// ItemsInverseTable is the table name for the Item entity.
-	// It exists in this package in order to avoid circular dependency with the "item" package.
-	ItemsInverseTable = "items"
 	// LinksTable is the table that holds the links relation/edge. The primary key declared below.
 	LinksTable = "link_assets"
 	// LinksInverseTable is the table name for the Link entity.
@@ -86,9 +79,6 @@ var (
 	// ClustersPrimaryKey and ClustersColumn2 are the table columns denoting the
 	// primary key for the clusters relation (M2M).
 	ClustersPrimaryKey = []string{"cluster_id", "asset_id"}
-	// ItemsPrimaryKey and ItemsColumn2 are the table columns denoting the
-	// primary key for the items relation (M2M).
-	ItemsPrimaryKey = []string{"item_id", "asset_id"}
 	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
 	// primary key for the links relation (M2M).
 	LinksPrimaryKey = []string{"link_id", "asset_id"}
@@ -178,20 +168,6 @@ func ByClusters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByItemsCount orders the results by items count.
-func ByItemsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newItemsStep(), opts...)
-	}
-}
-
-// ByItems orders the results by items terms.
-func ByItems(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newItemsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByLinksCount orders the results by links count.
 func ByLinksCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -224,13 +200,6 @@ func newClustersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClustersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClustersTable, ClustersPrimaryKey...),
-	)
-}
-func newItemsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ItemsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ItemsTable, ItemsPrimaryKey...),
 	)
 }
 func newLinksStep() *sqlgraph.Step {

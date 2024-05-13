@@ -41,9 +41,6 @@ func (Asset) Edges() []ent.Edge {
 		edge.From("clusters", Cluster.Type).
 			Ref("assets"),
 
-		edge.From("items", Item.Type).
-			Ref("assets"),
-
 		edge.From("links", Link.Type).
 			Ref("assets"),
 

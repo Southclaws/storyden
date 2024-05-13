@@ -68,19 +68,6 @@ erDiagram
         string description
         collectionDOTVisibility visibility
     }
-    Item {
-        xidDOTID id
-        timeDOTTime created_at
-        timeDOTTime updated_at
-        timeDOTTime deleted_at
-        string name
-        string slug
-        string description
-        string content
-        xidDOTID account_id
-        itemDOTVisibility visibility
-        any properties
-    }
     Link {
         xidDOTID id
         timeDOTTime created_at
@@ -144,17 +131,13 @@ erDiagram
     	Account }o--o{ Tag : "tags/accounts"
     	Account |o--o{ Collection : "collections/owner"
     	Account |o--o{ Cluster : "clusters/owner"
-    	Account |o--o{ Item : "items/owner"
     	Account |o--o{ Asset : "assets/owner"
     	Category |o--o{ Post : "posts/category"
     	Cluster |o--o{ Cluster : "clusters/parent"
-    	Cluster }o--o{ Item : "items/clusters"
     	Cluster }o--o{ Asset : "assets/clusters"
     	Collection }o--o{ Post : "posts/collections"
-    	Item }o--o{ Asset : "assets/items"
     	Link }o--o{ Post : "posts/links"
     	Link }o--o{ Cluster : "clusters/links"
-    	Link }o--o{ Item : "items/links"
     	Link }o--o{ Asset : "assets/links"
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
@@ -163,7 +146,6 @@ erDiagram
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
     	Tag }o--o{ Cluster : "clusters/tags"
-    	Tag }o--o{ Item : "items/tags"
 		</div>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 	<script src="https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js"></script>

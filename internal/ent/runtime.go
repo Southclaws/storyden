@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -276,45 +275,6 @@ func init() {
 	// collection.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	collection.IDValidator = func() func(string) error {
 		validators := collectionDescID.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(id string) error {
-			for _, fn := range fns {
-				if err := fn(id); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	itemMixin := schema.Item{}.Mixin()
-	itemMixinFields0 := itemMixin[0].Fields()
-	_ = itemMixinFields0
-	itemMixinFields1 := itemMixin[1].Fields()
-	_ = itemMixinFields1
-	itemMixinFields2 := itemMixin[2].Fields()
-	_ = itemMixinFields2
-	itemFields := schema.Item{}.Fields()
-	_ = itemFields
-	// itemDescCreatedAt is the schema descriptor for created_at field.
-	itemDescCreatedAt := itemMixinFields1[0].Descriptor()
-	// item.DefaultCreatedAt holds the default value on creation for the created_at field.
-	item.DefaultCreatedAt = itemDescCreatedAt.Default.(func() time.Time)
-	// itemDescUpdatedAt is the schema descriptor for updated_at field.
-	itemDescUpdatedAt := itemMixinFields2[0].Descriptor()
-	// item.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	item.DefaultUpdatedAt = itemDescUpdatedAt.Default.(func() time.Time)
-	// item.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	item.UpdateDefaultUpdatedAt = itemDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// itemDescID is the schema descriptor for id field.
-	itemDescID := itemMixinFields0[0].Descriptor()
-	// item.DefaultID holds the default value on creation for the id field.
-	item.DefaultID = itemDescID.Default.(func() xid.ID)
-	// item.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	item.IDValidator = func() func(string) error {
-		validators := itemDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

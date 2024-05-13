@@ -20,7 +20,6 @@ import (
 	cluster_svc "github.com/Southclaws/storyden/app/services/cluster"
 	"github.com/Southclaws/storyden/app/services/cluster/cluster_visibility"
 	"github.com/Southclaws/storyden/app/services/clustertree"
-	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
@@ -30,7 +29,6 @@ type Clusters struct {
 	cv    *cluster_visibility.Controller
 	ctree clustertree.Graph
 	ctr   cluster_traversal.Repository
-	itree item_tree.Graph
 }
 
 func NewClusters(
@@ -39,7 +37,6 @@ func NewClusters(
 	cv *cluster_visibility.Controller,
 	ctree clustertree.Graph,
 	ctr cluster_traversal.Repository,
-	itree item_tree.Graph,
 ) Clusters {
 	return Clusters{
 		ar:    ar,
@@ -47,7 +44,6 @@ func NewClusters(
 		cv:    cv,
 		ctree: ctree,
 		ctr:   ctr,
-		itree: itree,
 	}
 }
 
@@ -208,7 +204,6 @@ func (c *Clusters) ClusterDelete(ctx context.Context, request openapi.ClusterDel
 	destinationCluster, err := c.cs.Delete(ctx, datagraph.ClusterSlug(request.ClusterSlug), cluster_svc.DeleteOptions{
 		MoveTo:   opt.NewPtr((*datagraph.ClusterSlug)(request.Params.TargetCluster)),
 		Clusters: opt.NewPtr(request.Params.MoveChildClusters).OrZero(),
-		Items:    opt.NewPtr(request.Params.MoveChildItems).OrZero(),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -275,38 +270,6 @@ func (c *Clusters) ClusterRemoveCluster(ctx context.Context, request openapi.Clu
 	}, nil
 }
 
-func (c *Clusters) ClusterAddItem(ctx context.Context, request openapi.ClusterAddItemRequestObject) (openapi.ClusterAddItemResponseObject, error) {
-	_, err := c.itree.Link(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	clus, err := c.cs.Get(ctx, datagraph.ClusterSlug(request.ClusterSlug))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.ClusterAddItem200JSONResponse{
-		ClusterAddItemOKJSONResponse: openapi.ClusterAddItemOKJSONResponse(serialiseClusterWithItems(clus)),
-	}, nil
-}
-
-func (c *Clusters) ClusterRemoveItem(ctx context.Context, request openapi.ClusterRemoveItemRequestObject) (openapi.ClusterRemoveItemResponseObject, error) {
-	_, err := c.itree.Sever(ctx, datagraph.ItemSlug(request.ItemSlug), datagraph.ClusterSlug(request.ClusterSlug))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	clus, err := c.cs.Get(ctx, datagraph.ClusterSlug(request.ClusterSlug))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.ClusterRemoveItem200JSONResponse{
-		ClusterRemoveItemOKJSONResponse: openapi.ClusterRemoveItemOKJSONResponse(serialiseClusterWithItems(clus)),
-	}, nil
-}
-
 func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 	return openapi.Cluster{
 		Id:          in.ID.String(),
@@ -325,8 +288,8 @@ func serialiseCluster(in *datagraph.Cluster) openapi.Cluster {
 	}
 }
 
-func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
-	return openapi.ClusterWithItems{
+func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithChildren {
+	return openapi.ClusterWithChildren{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,
 		UpdatedAt:   in.UpdatedAt,
@@ -340,8 +303,7 @@ func serialiseClusterWithItems(in *datagraph.Cluster) openapi.ClusterWithItems {
 		Parent:      opt.Map(in.Parent, serialiseCluster).Ptr(),
 		Visibility:  serialiseVisibility(in.Visibility),
 		Properties:  in.Properties,
-		Clusters:    dt.Map(in.Clusters, serialiseCluster),
-		Items:       dt.Map(in.Items, serialiseItem),
+		Children:    dt.Map(in.Clusters, serialiseCluster),
 	}
 }
 

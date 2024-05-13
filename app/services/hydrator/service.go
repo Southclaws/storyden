@@ -10,7 +10,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/hydrator/extractor"
@@ -21,7 +20,6 @@ type Service interface {
 	HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option
 	HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option
 	HydrateCluster(ctx context.Context, body string, url opt.Optional[string]) []cluster.Option
-	HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option
 }
 
 func Build() fx.Option {
@@ -32,7 +30,6 @@ type service struct {
 	l  *zap.Logger
 	tr thread.Repository
 	cr cluster.Repository
-	ir item.Repository
 	f  fetcher.Service
 }
 
@@ -40,14 +37,12 @@ func New(
 	l *zap.Logger,
 	tr thread.Repository,
 	cr cluster.Repository,
-	ir item.Repository,
 	f fetcher.Service,
 ) Service {
 	return &service{
 		l:  l.With(zap.String("service", "hydrator")),
 		tr: tr,
 		cr: cr,
-		ir: ir,
 		f:  f,
 	}
 }
@@ -78,15 +73,6 @@ func (s *service) HydrateCluster(ctx context.Context, body string, url opt.Optio
 	return []cluster.Option{
 		cluster.WithAssets(assets),
 		cluster.WithLinks(links...),
-	}
-}
-
-func (s *service) HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option {
-	_, links, assets := s.hydrate(ctx, body, url)
-
-	return []item.Option{
-		item.WithAssets(assets),
-		item.WithLinks(links...),
 	}
 }
 

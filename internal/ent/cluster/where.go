@@ -750,29 +750,6 @@ func HasClustersWith(preds ...predicate.Cluster) predicate.Cluster {
 	})
 }
 
-// HasItems applies the HasEdge predicate on the "items" edge.
-func HasItems() predicate.Cluster {
-	return predicate.Cluster(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ItemsTable, ItemsPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasItemsWith applies the HasEdge predicate on the "items" edge with a given conditions (other predicates).
-func HasItemsWith(preds ...predicate.Item) predicate.Cluster {
-	return predicate.Cluster(func(s *sql.Selector) {
-		step := newItemsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasAssets applies the HasEdge predicate on the "assets" edge.
 func HasAssets() predicate.Cluster {
 	return predicate.Cluster(func(s *sql.Selector) {

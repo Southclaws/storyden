@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -39,7 +38,6 @@ type AccountQuery struct {
 	withTags           *TagQuery
 	withCollections    *CollectionQuery
 	withClusters       *ClusterQuery
-	withItems          *ItemQuery
 	withAssets         *AssetQuery
 	modifiers          []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -225,28 +223,6 @@ func (aq *AccountQuery) QueryClusters() *ClusterQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(cluster.Table, cluster.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ClustersTable, account.ClustersColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryItems chains the current query on the "items" edge.
-func (aq *AccountQuery) QueryItems() *ItemQuery {
-	query := (&ItemClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(account.Table, account.FieldID, selector),
-			sqlgraph.To(item.Table, item.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.ItemsTable, account.ItemsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -475,7 +451,6 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withTags:           aq.withTags.Clone(),
 		withCollections:    aq.withCollections.Clone(),
 		withClusters:       aq.withClusters.Clone(),
-		withItems:          aq.withItems.Clone(),
 		withAssets:         aq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
@@ -557,17 +532,6 @@ func (aq *AccountQuery) WithClusters(opts ...func(*ClusterQuery)) *AccountQuery 
 		opt(query)
 	}
 	aq.withClusters = query
-	return aq
-}
-
-// WithItems tells the query-builder to eager-load the nodes that are connected to
-// the "items" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithItems(opts ...func(*ItemQuery)) *AccountQuery {
-	query := (&ItemClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withItems = query
 	return aq
 }
 
@@ -660,7 +624,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [8]bool{
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withRoles != nil,
@@ -668,7 +632,6 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			aq.withTags != nil,
 			aq.withCollections != nil,
 			aq.withClusters != nil,
-			aq.withItems != nil,
 			aq.withAssets != nil,
 		}
 	)
@@ -739,13 +702,6 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadClusters(ctx, query, nodes,
 			func(n *Account) { n.Edges.Clusters = []*Cluster{} },
 			func(n *Account, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := aq.withItems; query != nil {
-		if err := aq.loadItems(ctx, query, nodes,
-			func(n *Account) { n.Edges.Items = []*Item{} },
-			func(n *Account, e *Item) { n.Edges.Items = append(n.Edges.Items, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1019,36 +975,6 @@ func (aq *AccountQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 	}
 	query.Where(predicate.Cluster(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.ClustersColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.AccountID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (aq *AccountQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*Account, init func(*Account), assign func(*Account, *Item)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[xid.ID]*Account)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(item.FieldAccountID)
-	}
-	query.Where(predicate.Item(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(account.ItemsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

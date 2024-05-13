@@ -117,15 +117,3 @@ func WithChildClusterRemove(id xid.ID) Option {
 		c.RemoveClusterIDs(id)
 	}
 }
-
-func WithItemAdd(id xid.ID) Option {
-	return func(c *ent.ClusterMutation) {
-		c.AddItemIDs(id)
-	}
-}
-
-func WithItemRemove(id xid.ID) Option {
-	return func(c *ent.ClusterMutation) {
-		c.RemoveItemIDs(id)
-	}
-}

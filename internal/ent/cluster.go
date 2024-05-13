@@ -56,8 +56,6 @@ type ClusterEdges struct {
 	Parent *Cluster `json:"parent,omitempty"`
 	// Clusters holds the value of the clusters edge.
 	Clusters []*Cluster `json:"clusters,omitempty"`
-	// Items holds the value of the items edge.
-	Items []*Item `json:"items,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
@@ -66,7 +64,7 @@ type ClusterEdges struct {
 	Links []*Link `json:"links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [6]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -100,19 +98,10 @@ func (e ClusterEdges) ClustersOrErr() ([]*Cluster, error) {
 	return nil, &NotLoadedError{edge: "clusters"}
 }
 
-// ItemsOrErr returns the Items value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClusterEdges) ItemsOrErr() ([]*Item, error) {
-	if e.loadedTypes[3] {
-		return e.Items, nil
-	}
-	return nil, &NotLoadedError{edge: "items"}
-}
-
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClusterEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -121,7 +110,7 @@ func (e ClusterEdges) AssetsOrErr() ([]*Asset, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClusterEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -130,7 +119,7 @@ func (e ClusterEdges) TagsOrErr() ([]*Tag, error) {
 // LinksOrErr returns the Links value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClusterEdges) LinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[5] {
 		return e.Links, nil
 	}
 	return nil, &NotLoadedError{edge: "links"}
@@ -266,11 +255,6 @@ func (c *Cluster) QueryParent() *ClusterQuery {
 // QueryClusters queries the "clusters" edge of the Cluster entity.
 func (c *Cluster) QueryClusters() *ClusterQuery {
 	return NewClusterClient(c.config).QueryClusters(c)
-}
-
-// QueryItems queries the "items" edge of the Cluster entity.
-func (c *Cluster) QueryItems() *ItemQuery {
-	return NewClusterClient(c.config).QueryItems(c)
 }
 
 // QueryAssets queries the "assets" edge of the Cluster entity.
