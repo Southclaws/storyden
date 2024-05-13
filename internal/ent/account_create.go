@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -232,21 +231,6 @@ func (ac *AccountCreate) AddClusters(c ...*Cluster) *AccountCreate {
 		ids[i] = c[i].ID
 	}
 	return ac.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (ac *AccountCreate) AddItemIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddItemIDs(ids...)
-	return ac
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (ac *AccountCreate) AddItems(i ...*Item) *AccountCreate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return ac.AddItemIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -518,22 +502,6 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.ItemsTable,
-			Columns: []string{account.ItemsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

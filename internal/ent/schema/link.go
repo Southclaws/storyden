@@ -32,7 +32,6 @@ func (Link) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("posts", Post.Type),
 		edge.To("clusters", Cluster.Type),
-		edge.To("items", Item.Type),
 		edge.To("assets", Asset.Type),
 	}
 }

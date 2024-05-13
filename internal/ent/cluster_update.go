@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -228,21 +227,6 @@ func (cu *ClusterUpdate) AddClusters(c ...*Cluster) *ClusterUpdate {
 	return cu.AddClusterIDs(ids...)
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (cu *ClusterUpdate) AddItemIDs(ids ...xid.ID) *ClusterUpdate {
-	cu.mutation.AddItemIDs(ids...)
-	return cu
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (cu *ClusterUpdate) AddItems(i ...*Item) *ClusterUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cu.AddItemIDs(ids...)
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (cu *ClusterUpdate) AddAssetIDs(ids ...xid.ID) *ClusterUpdate {
 	cu.mutation.AddAssetIDs(ids...)
@@ -324,27 +308,6 @@ func (cu *ClusterUpdate) RemoveClusters(c ...*Cluster) *ClusterUpdate {
 		ids[i] = c[i].ID
 	}
 	return cu.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (cu *ClusterUpdate) ClearItems() *ClusterUpdate {
-	cu.mutation.ClearItems()
-	return cu
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (cu *ClusterUpdate) RemoveItemIDs(ids ...xid.ID) *ClusterUpdate {
-	cu.mutation.RemoveItemIDs(ids...)
-	return cu
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (cu *ClusterUpdate) RemoveItems(i ...*Item) *ClusterUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cu.RemoveItemIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -606,51 +569,6 @@ func (cu *ClusterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedItemsIDs(); len(nodes) > 0 && !cu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1008,21 +926,6 @@ func (cuo *ClusterUpdateOne) AddClusters(c ...*Cluster) *ClusterUpdateOne {
 	return cuo.AddClusterIDs(ids...)
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (cuo *ClusterUpdateOne) AddItemIDs(ids ...xid.ID) *ClusterUpdateOne {
-	cuo.mutation.AddItemIDs(ids...)
-	return cuo
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (cuo *ClusterUpdateOne) AddItems(i ...*Item) *ClusterUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cuo.AddItemIDs(ids...)
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (cuo *ClusterUpdateOne) AddAssetIDs(ids ...xid.ID) *ClusterUpdateOne {
 	cuo.mutation.AddAssetIDs(ids...)
@@ -1104,27 +1007,6 @@ func (cuo *ClusterUpdateOne) RemoveClusters(c ...*Cluster) *ClusterUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return cuo.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (cuo *ClusterUpdateOne) ClearItems() *ClusterUpdateOne {
-	cuo.mutation.ClearItems()
-	return cuo
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (cuo *ClusterUpdateOne) RemoveItemIDs(ids ...xid.ID) *ClusterUpdateOne {
-	cuo.mutation.RemoveItemIDs(ids...)
-	return cuo
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (cuo *ClusterUpdateOne) RemoveItems(i ...*Item) *ClusterUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return cuo.RemoveItemIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1416,51 +1298,6 @@ func (cuo *ClusterUpdateOne) sqlSave(ctx context.Context) (_node *Cluster, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !cuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   cluster.ItemsTable,
-			Columns: cluster.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

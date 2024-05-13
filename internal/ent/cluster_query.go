@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -31,7 +30,6 @@ type ClusterQuery struct {
 	withOwner    *AccountQuery
 	withParent   *ClusterQuery
 	withClusters *ClusterQuery
-	withItems    *ItemQuery
 	withAssets   *AssetQuery
 	withTags     *TagQuery
 	withLinks    *LinkQuery
@@ -131,28 +129,6 @@ func (cq *ClusterQuery) QueryClusters() *ClusterQuery {
 			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
 			sqlgraph.To(cluster.Table, cluster.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, cluster.ClustersTable, cluster.ClustersColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryItems chains the current query on the "items" edge.
-func (cq *ClusterQuery) QueryItems() *ItemQuery {
-	query := (&ItemClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, selector),
-			sqlgraph.To(item.Table, item.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, cluster.ItemsTable, cluster.ItemsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -421,7 +397,6 @@ func (cq *ClusterQuery) Clone() *ClusterQuery {
 		withOwner:    cq.withOwner.Clone(),
 		withParent:   cq.withParent.Clone(),
 		withClusters: cq.withClusters.Clone(),
-		withItems:    cq.withItems.Clone(),
 		withAssets:   cq.withAssets.Clone(),
 		withTags:     cq.withTags.Clone(),
 		withLinks:    cq.withLinks.Clone(),
@@ -461,17 +436,6 @@ func (cq *ClusterQuery) WithClusters(opts ...func(*ClusterQuery)) *ClusterQuery 
 		opt(query)
 	}
 	cq.withClusters = query
-	return cq
-}
-
-// WithItems tells the query-builder to eager-load the nodes that are connected to
-// the "items" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ClusterQuery) WithItems(opts ...func(*ItemQuery)) *ClusterQuery {
-	query := (&ItemClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withItems = query
 	return cq
 }
 
@@ -586,11 +550,10 @@ func (cq *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 	var (
 		nodes       = []*Cluster{}
 		_spec       = cq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [6]bool{
 			cq.withOwner != nil,
 			cq.withParent != nil,
 			cq.withClusters != nil,
-			cq.withItems != nil,
 			cq.withAssets != nil,
 			cq.withTags != nil,
 			cq.withLinks != nil,
@@ -633,13 +596,6 @@ func (cq *ClusterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Clus
 		if err := cq.loadClusters(ctx, query, nodes,
 			func(n *Cluster) { n.Edges.Clusters = []*Cluster{} },
 			func(n *Cluster, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := cq.withItems; query != nil {
-		if err := cq.loadItems(ctx, query, nodes,
-			func(n *Cluster) { n.Edges.Items = []*Item{} },
-			func(n *Cluster, e *Item) { n.Edges.Items = append(n.Edges.Items, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -752,67 +708,6 @@ func (cq *ClusterQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 			return fmt.Errorf(`unexpected referenced foreign-key "parent_cluster_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
-	}
-	return nil
-}
-func (cq *ClusterQuery) loadItems(ctx context.Context, query *ItemQuery, nodes []*Cluster, init func(*Cluster), assign func(*Cluster, *Item)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[xid.ID]*Cluster)
-	nids := make(map[xid.ID]map[*Cluster]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(cluster.ItemsTable)
-		s.Join(joinT).On(s.C(item.FieldID), joinT.C(cluster.ItemsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(cluster.ItemsPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(cluster.ItemsPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(xid.ID)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := *values[0].(*xid.ID)
-				inValue := *values[1].(*xid.ID)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Cluster]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Item](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "items" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
 	}
 	return nil
 }

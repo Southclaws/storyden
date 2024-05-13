@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -44,7 +43,6 @@ const (
 	TypeCategory       = "Category"
 	TypeCluster        = "Cluster"
 	TypeCollection     = "Collection"
-	TypeItem           = "Item"
 	TypeLink           = "Link"
 	TypeNotification   = "Notification"
 	TypePost           = "Post"
@@ -89,9 +87,6 @@ type AccountMutation struct {
 	clusters              map[xid.ID]struct{}
 	removedclusters       map[xid.ID]struct{}
 	clearedclusters       bool
-	items                 map[xid.ID]struct{}
-	removeditems          map[xid.ID]struct{}
-	cleareditems          bool
 	assets                map[xid.ID]struct{}
 	removedassets         map[xid.ID]struct{}
 	clearedassets         bool
@@ -860,60 +855,6 @@ func (m *AccountMutation) ResetClusters() {
 	m.removedclusters = nil
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by ids.
-func (m *AccountMutation) AddItemIDs(ids ...xid.ID) {
-	if m.items == nil {
-		m.items = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.items[ids[i]] = struct{}{}
-	}
-}
-
-// ClearItems clears the "items" edge to the Item entity.
-func (m *AccountMutation) ClearItems() {
-	m.cleareditems = true
-}
-
-// ItemsCleared reports if the "items" edge to the Item entity was cleared.
-func (m *AccountMutation) ItemsCleared() bool {
-	return m.cleareditems
-}
-
-// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
-func (m *AccountMutation) RemoveItemIDs(ids ...xid.ID) {
-	if m.removeditems == nil {
-		m.removeditems = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.items, ids[i])
-		m.removeditems[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
-func (m *AccountMutation) RemovedItemsIDs() (ids []xid.ID) {
-	for id := range m.removeditems {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ItemsIDs returns the "items" edge IDs in the mutation.
-func (m *AccountMutation) ItemsIDs() (ids []xid.ID) {
-	for id := range m.items {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetItems resets all changes to the "items" edge.
-func (m *AccountMutation) ResetItems() {
-	m.items = nil
-	m.cleareditems = false
-	m.removeditems = nil
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *AccountMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -1218,7 +1159,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 8)
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1239,9 +1180,6 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.clusters != nil {
 		edges = append(edges, account.EdgeClusters)
-	}
-	if m.items != nil {
-		edges = append(edges, account.EdgeItems)
 	}
 	if m.assets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -1295,12 +1233,6 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case account.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.items))
-		for id := range m.items {
-			ids = append(ids, id)
-		}
-		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -1313,7 +1245,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 8)
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1334,9 +1266,6 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedclusters != nil {
 		edges = append(edges, account.EdgeClusters)
-	}
-	if m.removeditems != nil {
-		edges = append(edges, account.EdgeItems)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -1390,12 +1319,6 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case account.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.removeditems))
-		for id := range m.removeditems {
-			ids = append(ids, id)
-		}
-		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.removedassets))
 		for id := range m.removedassets {
@@ -1408,7 +1331,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 8)
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
 	}
@@ -1429,9 +1352,6 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedclusters {
 		edges = append(edges, account.EdgeClusters)
-	}
-	if m.cleareditems {
-		edges = append(edges, account.EdgeItems)
 	}
 	if m.clearedassets {
 		edges = append(edges, account.EdgeAssets)
@@ -1457,8 +1377,6 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedcollections
 	case account.EdgeClusters:
 		return m.clearedclusters
-	case account.EdgeItems:
-		return m.cleareditems
 	case account.EdgeAssets:
 		return m.clearedassets
 	}
@@ -1498,9 +1416,6 @@ func (m *AccountMutation) ResetEdge(name string) error {
 	case account.EdgeClusters:
 		m.ResetClusters()
 		return nil
-	case account.EdgeItems:
-		m.ResetItems()
-		return nil
 	case account.EdgeAssets:
 		m.ResetAssets()
 		return nil
@@ -1526,9 +1441,6 @@ type AssetMutation struct {
 	clusters        map[xid.ID]struct{}
 	removedclusters map[xid.ID]struct{}
 	clearedclusters bool
-	items           map[xid.ID]struct{}
-	removeditems    map[xid.ID]struct{}
-	cleareditems    bool
 	links           map[xid.ID]struct{}
 	removedlinks    map[xid.ID]struct{}
 	clearedlinks    bool
@@ -1980,60 +1892,6 @@ func (m *AssetMutation) ResetClusters() {
 	m.removedclusters = nil
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by ids.
-func (m *AssetMutation) AddItemIDs(ids ...xid.ID) {
-	if m.items == nil {
-		m.items = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.items[ids[i]] = struct{}{}
-	}
-}
-
-// ClearItems clears the "items" edge to the Item entity.
-func (m *AssetMutation) ClearItems() {
-	m.cleareditems = true
-}
-
-// ItemsCleared reports if the "items" edge to the Item entity was cleared.
-func (m *AssetMutation) ItemsCleared() bool {
-	return m.cleareditems
-}
-
-// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
-func (m *AssetMutation) RemoveItemIDs(ids ...xid.ID) {
-	if m.removeditems == nil {
-		m.removeditems = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.items, ids[i])
-		m.removeditems[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
-func (m *AssetMutation) RemovedItemsIDs() (ids []xid.ID) {
-	for id := range m.removeditems {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ItemsIDs returns the "items" edge IDs in the mutation.
-func (m *AssetMutation) ItemsIDs() (ids []xid.ID) {
-	for id := range m.items {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetItems resets all changes to the "items" edge.
-func (m *AssetMutation) ResetItems() {
-	m.items = nil
-	m.cleareditems = false
-	m.removeditems = nil
-}
-
 // AddLinkIDs adds the "links" edge to the Link entity by ids.
 func (m *AssetMutation) AddLinkIDs(ids ...xid.ID) {
 	if m.links == nil {
@@ -2355,15 +2213,12 @@ func (m *AssetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.posts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.clusters != nil {
 		edges = append(edges, asset.EdgeClusters)
-	}
-	if m.items != nil {
-		edges = append(edges, asset.EdgeItems)
 	}
 	if m.links != nil {
 		edges = append(edges, asset.EdgeLinks)
@@ -2390,12 +2245,6 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case asset.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.items))
-		for id := range m.items {
-			ids = append(ids, id)
-		}
-		return ids
 	case asset.EdgeLinks:
 		ids := make([]ent.Value, 0, len(m.links))
 		for id := range m.links {
@@ -2412,15 +2261,12 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.removedposts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.removedclusters != nil {
 		edges = append(edges, asset.EdgeClusters)
-	}
-	if m.removeditems != nil {
-		edges = append(edges, asset.EdgeItems)
 	}
 	if m.removedlinks != nil {
 		edges = append(edges, asset.EdgeLinks)
@@ -2444,12 +2290,6 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case asset.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.removeditems))
-		for id := range m.removeditems {
-			ids = append(ids, id)
-		}
-		return ids
 	case asset.EdgeLinks:
 		ids := make([]ent.Value, 0, len(m.removedlinks))
 		for id := range m.removedlinks {
@@ -2462,15 +2302,12 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.clearedposts {
 		edges = append(edges, asset.EdgePosts)
 	}
 	if m.clearedclusters {
 		edges = append(edges, asset.EdgeClusters)
-	}
-	if m.cleareditems {
-		edges = append(edges, asset.EdgeItems)
 	}
 	if m.clearedlinks {
 		edges = append(edges, asset.EdgeLinks)
@@ -2489,8 +2326,6 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 		return m.clearedposts
 	case asset.EdgeClusters:
 		return m.clearedclusters
-	case asset.EdgeItems:
-		return m.cleareditems
 	case asset.EdgeLinks:
 		return m.clearedlinks
 	case asset.EdgeOwner:
@@ -2519,9 +2354,6 @@ func (m *AssetMutation) ResetEdge(name string) error {
 		return nil
 	case asset.EdgeClusters:
 		m.ResetClusters()
-		return nil
-	case asset.EdgeItems:
-		m.ResetItems()
 		return nil
 	case asset.EdgeLinks:
 		m.ResetLinks()
@@ -4181,9 +4013,6 @@ type ClusterMutation struct {
 	clusters        map[xid.ID]struct{}
 	removedclusters map[xid.ID]struct{}
 	clearedclusters bool
-	items           map[xid.ID]struct{}
-	removeditems    map[xid.ID]struct{}
-	cleareditems    bool
 	assets          map[xid.ID]struct{}
 	removedassets   map[xid.ID]struct{}
 	clearedassets   bool
@@ -4884,60 +4713,6 @@ func (m *ClusterMutation) ResetClusters() {
 	m.removedclusters = nil
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by ids.
-func (m *ClusterMutation) AddItemIDs(ids ...xid.ID) {
-	if m.items == nil {
-		m.items = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.items[ids[i]] = struct{}{}
-	}
-}
-
-// ClearItems clears the "items" edge to the Item entity.
-func (m *ClusterMutation) ClearItems() {
-	m.cleareditems = true
-}
-
-// ItemsCleared reports if the "items" edge to the Item entity was cleared.
-func (m *ClusterMutation) ItemsCleared() bool {
-	return m.cleareditems
-}
-
-// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
-func (m *ClusterMutation) RemoveItemIDs(ids ...xid.ID) {
-	if m.removeditems == nil {
-		m.removeditems = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.items, ids[i])
-		m.removeditems[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
-func (m *ClusterMutation) RemovedItemsIDs() (ids []xid.ID) {
-	for id := range m.removeditems {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ItemsIDs returns the "items" edge IDs in the mutation.
-func (m *ClusterMutation) ItemsIDs() (ids []xid.ID) {
-	for id := range m.items {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetItems resets all changes to the "items" edge.
-func (m *ClusterMutation) ResetItems() {
-	m.items = nil
-	m.cleareditems = false
-	m.removeditems = nil
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *ClusterMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -5430,7 +5205,7 @@ func (m *ClusterMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClusterMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.owner != nil {
 		edges = append(edges, cluster.EdgeOwner)
 	}
@@ -5439,9 +5214,6 @@ func (m *ClusterMutation) AddedEdges() []string {
 	}
 	if m.clusters != nil {
 		edges = append(edges, cluster.EdgeClusters)
-	}
-	if m.items != nil {
-		edges = append(edges, cluster.EdgeItems)
 	}
 	if m.assets != nil {
 		edges = append(edges, cluster.EdgeAssets)
@@ -5473,12 +5245,6 @@ func (m *ClusterMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case cluster.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.items))
-		for id := range m.items {
-			ids = append(ids, id)
-		}
-		return ids
 	case cluster.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -5503,12 +5269,9 @@ func (m *ClusterMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClusterMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.removedclusters != nil {
 		edges = append(edges, cluster.EdgeClusters)
-	}
-	if m.removeditems != nil {
-		edges = append(edges, cluster.EdgeItems)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, cluster.EdgeAssets)
@@ -5529,12 +5292,6 @@ func (m *ClusterMutation) RemovedIDs(name string) []ent.Value {
 	case cluster.EdgeClusters:
 		ids := make([]ent.Value, 0, len(m.removedclusters))
 		for id := range m.removedclusters {
-			ids = append(ids, id)
-		}
-		return ids
-	case cluster.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.removeditems))
-		for id := range m.removeditems {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5562,7 +5319,7 @@ func (m *ClusterMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClusterMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.clearedowner {
 		edges = append(edges, cluster.EdgeOwner)
 	}
@@ -5571,9 +5328,6 @@ func (m *ClusterMutation) ClearedEdges() []string {
 	}
 	if m.clearedclusters {
 		edges = append(edges, cluster.EdgeClusters)
-	}
-	if m.cleareditems {
-		edges = append(edges, cluster.EdgeItems)
 	}
 	if m.clearedassets {
 		edges = append(edges, cluster.EdgeAssets)
@@ -5597,8 +5351,6 @@ func (m *ClusterMutation) EdgeCleared(name string) bool {
 		return m.clearedparent
 	case cluster.EdgeClusters:
 		return m.clearedclusters
-	case cluster.EdgeItems:
-		return m.cleareditems
 	case cluster.EdgeAssets:
 		return m.clearedassets
 	case cluster.EdgeTags:
@@ -5635,9 +5387,6 @@ func (m *ClusterMutation) ResetEdge(name string) error {
 		return nil
 	case cluster.EdgeClusters:
 		m.ResetClusters()
-		return nil
-	case cluster.EdgeItems:
-		m.ResetItems()
 		return nil
 	case cluster.EdgeAssets:
 		m.ResetAssets()
@@ -6352,1285 +6101,6 @@ func (m *CollectionMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Collection edge %s", name)
 }
 
-// ItemMutation represents an operation that mutates the Item nodes in the graph.
-type ItemMutation struct {
-	config
-	op              Op
-	typ             string
-	id              *xid.ID
-	created_at      *time.Time
-	updated_at      *time.Time
-	deleted_at      *time.Time
-	name            *string
-	slug            *string
-	description     *string
-	content         *string
-	visibility      *item.Visibility
-	properties      *any
-	clearedFields   map[string]struct{}
-	owner           *xid.ID
-	clearedowner    bool
-	clusters        map[xid.ID]struct{}
-	removedclusters map[xid.ID]struct{}
-	clearedclusters bool
-	assets          map[xid.ID]struct{}
-	removedassets   map[xid.ID]struct{}
-	clearedassets   bool
-	tags            map[xid.ID]struct{}
-	removedtags     map[xid.ID]struct{}
-	clearedtags     bool
-	links           map[xid.ID]struct{}
-	removedlinks    map[xid.ID]struct{}
-	clearedlinks    bool
-	done            bool
-	oldValue        func(context.Context) (*Item, error)
-	predicates      []predicate.Item
-}
-
-var _ ent.Mutation = (*ItemMutation)(nil)
-
-// itemOption allows management of the mutation configuration using functional options.
-type itemOption func(*ItemMutation)
-
-// newItemMutation creates new mutation for the Item entity.
-func newItemMutation(c config, op Op, opts ...itemOption) *ItemMutation {
-	m := &ItemMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeItem,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withItemID sets the ID field of the mutation.
-func withItemID(id xid.ID) itemOption {
-	return func(m *ItemMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Item
-		)
-		m.oldValue = func(ctx context.Context) (*Item, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Item.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withItem sets the old Item of the mutation.
-func withItem(node *Item) itemOption {
-	return func(m *ItemMutation) {
-		m.oldValue = func(context.Context) (*Item, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ItemMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ItemMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Item entities.
-func (m *ItemMutation) SetID(id xid.ID) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ItemMutation) ID() (id xid.ID, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ItemMutation) IDs(ctx context.Context) ([]xid.ID, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []xid.ID{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Item.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (m *ItemMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
-}
-
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *ItemMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatedAt returns the old "created_at" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
-	}
-	return oldValue.CreatedAt, nil
-}
-
-// ResetCreatedAt resets all changes to the "created_at" field.
-func (m *ItemMutation) ResetCreatedAt() {
-	m.created_at = nil
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (m *ItemMutation) SetUpdatedAt(t time.Time) {
-	m.updated_at = &t
-}
-
-// UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *ItemMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updated_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatedAt returns the old "updated_at" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
-	}
-	return oldValue.UpdatedAt, nil
-}
-
-// ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *ItemMutation) ResetUpdatedAt() {
-	m.updated_at = nil
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (m *ItemMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
-}
-
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *ItemMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeletedAt returns the old "deleted_at" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
-	}
-	return oldValue.DeletedAt, nil
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *ItemMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[item.FieldDeletedAt] = struct{}{}
-}
-
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *ItemMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[item.FieldDeletedAt]
-	return ok
-}
-
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *ItemMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, item.FieldDeletedAt)
-}
-
-// SetName sets the "name" field.
-func (m *ItemMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *ItemMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *ItemMutation) ResetName() {
-	m.name = nil
-}
-
-// SetSlug sets the "slug" field.
-func (m *ItemMutation) SetSlug(s string) {
-	m.slug = &s
-}
-
-// Slug returns the value of the "slug" field in the mutation.
-func (m *ItemMutation) Slug() (r string, exists bool) {
-	v := m.slug
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSlug returns the old "slug" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldSlug(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSlug requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
-	}
-	return oldValue.Slug, nil
-}
-
-// ResetSlug resets all changes to the "slug" field.
-func (m *ItemMutation) ResetSlug() {
-	m.slug = nil
-}
-
-// SetDescription sets the "description" field.
-func (m *ItemMutation) SetDescription(s string) {
-	m.description = &s
-}
-
-// Description returns the value of the "description" field in the mutation.
-func (m *ItemMutation) Description() (r string, exists bool) {
-	v := m.description
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDescription returns the old "description" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldDescription(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDescription requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
-	}
-	return oldValue.Description, nil
-}
-
-// ResetDescription resets all changes to the "description" field.
-func (m *ItemMutation) ResetDescription() {
-	m.description = nil
-}
-
-// SetContent sets the "content" field.
-func (m *ItemMutation) SetContent(s string) {
-	m.content = &s
-}
-
-// Content returns the value of the "content" field in the mutation.
-func (m *ItemMutation) Content() (r string, exists bool) {
-	v := m.content
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldContent returns the old "content" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldContent(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldContent is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldContent requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldContent: %w", err)
-	}
-	return oldValue.Content, nil
-}
-
-// ClearContent clears the value of the "content" field.
-func (m *ItemMutation) ClearContent() {
-	m.content = nil
-	m.clearedFields[item.FieldContent] = struct{}{}
-}
-
-// ContentCleared returns if the "content" field was cleared in this mutation.
-func (m *ItemMutation) ContentCleared() bool {
-	_, ok := m.clearedFields[item.FieldContent]
-	return ok
-}
-
-// ResetContent resets all changes to the "content" field.
-func (m *ItemMutation) ResetContent() {
-	m.content = nil
-	delete(m.clearedFields, item.FieldContent)
-}
-
-// SetAccountID sets the "account_id" field.
-func (m *ItemMutation) SetAccountID(x xid.ID) {
-	m.owner = &x
-}
-
-// AccountID returns the value of the "account_id" field in the mutation.
-func (m *ItemMutation) AccountID() (r xid.ID, exists bool) {
-	v := m.owner
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAccountID returns the old "account_id" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAccountID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
-	}
-	return oldValue.AccountID, nil
-}
-
-// ResetAccountID resets all changes to the "account_id" field.
-func (m *ItemMutation) ResetAccountID() {
-	m.owner = nil
-}
-
-// SetVisibility sets the "visibility" field.
-func (m *ItemMutation) SetVisibility(i item.Visibility) {
-	m.visibility = &i
-}
-
-// Visibility returns the value of the "visibility" field in the mutation.
-func (m *ItemMutation) Visibility() (r item.Visibility, exists bool) {
-	v := m.visibility
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldVisibility returns the old "visibility" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldVisibility(ctx context.Context) (v item.Visibility, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVisibility requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
-	}
-	return oldValue.Visibility, nil
-}
-
-// ResetVisibility resets all changes to the "visibility" field.
-func (m *ItemMutation) ResetVisibility() {
-	m.visibility = nil
-}
-
-// SetProperties sets the "properties" field.
-func (m *ItemMutation) SetProperties(a any) {
-	m.properties = &a
-}
-
-// Properties returns the value of the "properties" field in the mutation.
-func (m *ItemMutation) Properties() (r any, exists bool) {
-	v := m.properties
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldProperties returns the old "properties" field's value of the Item entity.
-// If the Item object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ItemMutation) OldProperties(ctx context.Context) (v any, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProperties is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProperties requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProperties: %w", err)
-	}
-	return oldValue.Properties, nil
-}
-
-// ClearProperties clears the value of the "properties" field.
-func (m *ItemMutation) ClearProperties() {
-	m.properties = nil
-	m.clearedFields[item.FieldProperties] = struct{}{}
-}
-
-// PropertiesCleared returns if the "properties" field was cleared in this mutation.
-func (m *ItemMutation) PropertiesCleared() bool {
-	_, ok := m.clearedFields[item.FieldProperties]
-	return ok
-}
-
-// ResetProperties resets all changes to the "properties" field.
-func (m *ItemMutation) ResetProperties() {
-	m.properties = nil
-	delete(m.clearedFields, item.FieldProperties)
-}
-
-// SetOwnerID sets the "owner" edge to the Account entity by id.
-func (m *ItemMutation) SetOwnerID(id xid.ID) {
-	m.owner = &id
-}
-
-// ClearOwner clears the "owner" edge to the Account entity.
-func (m *ItemMutation) ClearOwner() {
-	m.clearedowner = true
-	m.clearedFields[item.FieldAccountID] = struct{}{}
-}
-
-// OwnerCleared reports if the "owner" edge to the Account entity was cleared.
-func (m *ItemMutation) OwnerCleared() bool {
-	return m.clearedowner
-}
-
-// OwnerID returns the "owner" edge ID in the mutation.
-func (m *ItemMutation) OwnerID() (id xid.ID, exists bool) {
-	if m.owner != nil {
-		return *m.owner, true
-	}
-	return
-}
-
-// OwnerIDs returns the "owner" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// OwnerID instead. It exists only for internal usage by the builders.
-func (m *ItemMutation) OwnerIDs() (ids []xid.ID) {
-	if id := m.owner; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetOwner resets all changes to the "owner" edge.
-func (m *ItemMutation) ResetOwner() {
-	m.owner = nil
-	m.clearedowner = false
-}
-
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by ids.
-func (m *ItemMutation) AddClusterIDs(ids ...xid.ID) {
-	if m.clusters == nil {
-		m.clusters = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.clusters[ids[i]] = struct{}{}
-	}
-}
-
-// ClearClusters clears the "clusters" edge to the Cluster entity.
-func (m *ItemMutation) ClearClusters() {
-	m.clearedclusters = true
-}
-
-// ClustersCleared reports if the "clusters" edge to the Cluster entity was cleared.
-func (m *ItemMutation) ClustersCleared() bool {
-	return m.clearedclusters
-}
-
-// RemoveClusterIDs removes the "clusters" edge to the Cluster entity by IDs.
-func (m *ItemMutation) RemoveClusterIDs(ids ...xid.ID) {
-	if m.removedclusters == nil {
-		m.removedclusters = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.clusters, ids[i])
-		m.removedclusters[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedClusters returns the removed IDs of the "clusters" edge to the Cluster entity.
-func (m *ItemMutation) RemovedClustersIDs() (ids []xid.ID) {
-	for id := range m.removedclusters {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ClustersIDs returns the "clusters" edge IDs in the mutation.
-func (m *ItemMutation) ClustersIDs() (ids []xid.ID) {
-	for id := range m.clusters {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetClusters resets all changes to the "clusters" edge.
-func (m *ItemMutation) ResetClusters() {
-	m.clusters = nil
-	m.clearedclusters = false
-	m.removedclusters = nil
-}
-
-// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
-func (m *ItemMutation) AddAssetIDs(ids ...xid.ID) {
-	if m.assets == nil {
-		m.assets = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.assets[ids[i]] = struct{}{}
-	}
-}
-
-// ClearAssets clears the "assets" edge to the Asset entity.
-func (m *ItemMutation) ClearAssets() {
-	m.clearedassets = true
-}
-
-// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
-func (m *ItemMutation) AssetsCleared() bool {
-	return m.clearedassets
-}
-
-// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
-func (m *ItemMutation) RemoveAssetIDs(ids ...xid.ID) {
-	if m.removedassets == nil {
-		m.removedassets = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.assets, ids[i])
-		m.removedassets[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
-func (m *ItemMutation) RemovedAssetsIDs() (ids []xid.ID) {
-	for id := range m.removedassets {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// AssetsIDs returns the "assets" edge IDs in the mutation.
-func (m *ItemMutation) AssetsIDs() (ids []xid.ID) {
-	for id := range m.assets {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetAssets resets all changes to the "assets" edge.
-func (m *ItemMutation) ResetAssets() {
-	m.assets = nil
-	m.clearedassets = false
-	m.removedassets = nil
-}
-
-// AddTagIDs adds the "tags" edge to the Tag entity by ids.
-func (m *ItemMutation) AddTagIDs(ids ...xid.ID) {
-	if m.tags == nil {
-		m.tags = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.tags[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTags clears the "tags" edge to the Tag entity.
-func (m *ItemMutation) ClearTags() {
-	m.clearedtags = true
-}
-
-// TagsCleared reports if the "tags" edge to the Tag entity was cleared.
-func (m *ItemMutation) TagsCleared() bool {
-	return m.clearedtags
-}
-
-// RemoveTagIDs removes the "tags" edge to the Tag entity by IDs.
-func (m *ItemMutation) RemoveTagIDs(ids ...xid.ID) {
-	if m.removedtags == nil {
-		m.removedtags = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.tags, ids[i])
-		m.removedtags[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTags returns the removed IDs of the "tags" edge to the Tag entity.
-func (m *ItemMutation) RemovedTagsIDs() (ids []xid.ID) {
-	for id := range m.removedtags {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TagsIDs returns the "tags" edge IDs in the mutation.
-func (m *ItemMutation) TagsIDs() (ids []xid.ID) {
-	for id := range m.tags {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTags resets all changes to the "tags" edge.
-func (m *ItemMutation) ResetTags() {
-	m.tags = nil
-	m.clearedtags = false
-	m.removedtags = nil
-}
-
-// AddLinkIDs adds the "links" edge to the Link entity by ids.
-func (m *ItemMutation) AddLinkIDs(ids ...xid.ID) {
-	if m.links == nil {
-		m.links = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.links[ids[i]] = struct{}{}
-	}
-}
-
-// ClearLinks clears the "links" edge to the Link entity.
-func (m *ItemMutation) ClearLinks() {
-	m.clearedlinks = true
-}
-
-// LinksCleared reports if the "links" edge to the Link entity was cleared.
-func (m *ItemMutation) LinksCleared() bool {
-	return m.clearedlinks
-}
-
-// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
-func (m *ItemMutation) RemoveLinkIDs(ids ...xid.ID) {
-	if m.removedlinks == nil {
-		m.removedlinks = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.links, ids[i])
-		m.removedlinks[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
-func (m *ItemMutation) RemovedLinksIDs() (ids []xid.ID) {
-	for id := range m.removedlinks {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// LinksIDs returns the "links" edge IDs in the mutation.
-func (m *ItemMutation) LinksIDs() (ids []xid.ID) {
-	for id := range m.links {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetLinks resets all changes to the "links" edge.
-func (m *ItemMutation) ResetLinks() {
-	m.links = nil
-	m.clearedlinks = false
-	m.removedlinks = nil
-}
-
-// Where appends a list predicates to the ItemMutation builder.
-func (m *ItemMutation) Where(ps ...predicate.Item) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ItemMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ItemMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Item, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ItemMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ItemMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Item).
-func (m *ItemMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ItemMutation) Fields() []string {
-	fields := make([]string, 0, 10)
-	if m.created_at != nil {
-		fields = append(fields, item.FieldCreatedAt)
-	}
-	if m.updated_at != nil {
-		fields = append(fields, item.FieldUpdatedAt)
-	}
-	if m.deleted_at != nil {
-		fields = append(fields, item.FieldDeletedAt)
-	}
-	if m.name != nil {
-		fields = append(fields, item.FieldName)
-	}
-	if m.slug != nil {
-		fields = append(fields, item.FieldSlug)
-	}
-	if m.description != nil {
-		fields = append(fields, item.FieldDescription)
-	}
-	if m.content != nil {
-		fields = append(fields, item.FieldContent)
-	}
-	if m.owner != nil {
-		fields = append(fields, item.FieldAccountID)
-	}
-	if m.visibility != nil {
-		fields = append(fields, item.FieldVisibility)
-	}
-	if m.properties != nil {
-		fields = append(fields, item.FieldProperties)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ItemMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case item.FieldCreatedAt:
-		return m.CreatedAt()
-	case item.FieldUpdatedAt:
-		return m.UpdatedAt()
-	case item.FieldDeletedAt:
-		return m.DeletedAt()
-	case item.FieldName:
-		return m.Name()
-	case item.FieldSlug:
-		return m.Slug()
-	case item.FieldDescription:
-		return m.Description()
-	case item.FieldContent:
-		return m.Content()
-	case item.FieldAccountID:
-		return m.AccountID()
-	case item.FieldVisibility:
-		return m.Visibility()
-	case item.FieldProperties:
-		return m.Properties()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ItemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case item.FieldCreatedAt:
-		return m.OldCreatedAt(ctx)
-	case item.FieldUpdatedAt:
-		return m.OldUpdatedAt(ctx)
-	case item.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
-	case item.FieldName:
-		return m.OldName(ctx)
-	case item.FieldSlug:
-		return m.OldSlug(ctx)
-	case item.FieldDescription:
-		return m.OldDescription(ctx)
-	case item.FieldContent:
-		return m.OldContent(ctx)
-	case item.FieldAccountID:
-		return m.OldAccountID(ctx)
-	case item.FieldVisibility:
-		return m.OldVisibility(ctx)
-	case item.FieldProperties:
-		return m.OldProperties(ctx)
-	}
-	return nil, fmt.Errorf("unknown Item field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ItemMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case item.FieldCreatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatedAt(v)
-		return nil
-	case item.FieldUpdatedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatedAt(v)
-		return nil
-	case item.FieldDeletedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeletedAt(v)
-		return nil
-	case item.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
-	case item.FieldSlug:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSlug(v)
-		return nil
-	case item.FieldDescription:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDescription(v)
-		return nil
-	case item.FieldContent:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetContent(v)
-		return nil
-	case item.FieldAccountID:
-		v, ok := value.(xid.ID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAccountID(v)
-		return nil
-	case item.FieldVisibility:
-		v, ok := value.(item.Visibility)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetVisibility(v)
-		return nil
-	case item.FieldProperties:
-		v, ok := value.(any)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetProperties(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Item field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ItemMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ItemMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ItemMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Item numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ItemMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(item.FieldDeletedAt) {
-		fields = append(fields, item.FieldDeletedAt)
-	}
-	if m.FieldCleared(item.FieldContent) {
-		fields = append(fields, item.FieldContent)
-	}
-	if m.FieldCleared(item.FieldProperties) {
-		fields = append(fields, item.FieldProperties)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ItemMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ItemMutation) ClearField(name string) error {
-	switch name {
-	case item.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
-	case item.FieldContent:
-		m.ClearContent()
-		return nil
-	case item.FieldProperties:
-		m.ClearProperties()
-		return nil
-	}
-	return fmt.Errorf("unknown Item nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ItemMutation) ResetField(name string) error {
-	switch name {
-	case item.FieldCreatedAt:
-		m.ResetCreatedAt()
-		return nil
-	case item.FieldUpdatedAt:
-		m.ResetUpdatedAt()
-		return nil
-	case item.FieldDeletedAt:
-		m.ResetDeletedAt()
-		return nil
-	case item.FieldName:
-		m.ResetName()
-		return nil
-	case item.FieldSlug:
-		m.ResetSlug()
-		return nil
-	case item.FieldDescription:
-		m.ResetDescription()
-		return nil
-	case item.FieldContent:
-		m.ResetContent()
-		return nil
-	case item.FieldAccountID:
-		m.ResetAccountID()
-		return nil
-	case item.FieldVisibility:
-		m.ResetVisibility()
-		return nil
-	case item.FieldProperties:
-		m.ResetProperties()
-		return nil
-	}
-	return fmt.Errorf("unknown Item field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ItemMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.owner != nil {
-		edges = append(edges, item.EdgeOwner)
-	}
-	if m.clusters != nil {
-		edges = append(edges, item.EdgeClusters)
-	}
-	if m.assets != nil {
-		edges = append(edges, item.EdgeAssets)
-	}
-	if m.tags != nil {
-		edges = append(edges, item.EdgeTags)
-	}
-	if m.links != nil {
-		edges = append(edges, item.EdgeLinks)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ItemMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case item.EdgeOwner:
-		if id := m.owner; id != nil {
-			return []ent.Value{*id}
-		}
-	case item.EdgeClusters:
-		ids := make([]ent.Value, 0, len(m.clusters))
-		for id := range m.clusters {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeAssets:
-		ids := make([]ent.Value, 0, len(m.assets))
-		for id := range m.assets {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeTags:
-		ids := make([]ent.Value, 0, len(m.tags))
-		for id := range m.tags {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.links))
-		for id := range m.links {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ItemMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.removedclusters != nil {
-		edges = append(edges, item.EdgeClusters)
-	}
-	if m.removedassets != nil {
-		edges = append(edges, item.EdgeAssets)
-	}
-	if m.removedtags != nil {
-		edges = append(edges, item.EdgeTags)
-	}
-	if m.removedlinks != nil {
-		edges = append(edges, item.EdgeLinks)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ItemMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case item.EdgeClusters:
-		ids := make([]ent.Value, 0, len(m.removedclusters))
-		for id := range m.removedclusters {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeAssets:
-		ids := make([]ent.Value, 0, len(m.removedassets))
-		for id := range m.removedassets {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeTags:
-		ids := make([]ent.Value, 0, len(m.removedtags))
-		for id := range m.removedtags {
-			ids = append(ids, id)
-		}
-		return ids
-	case item.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.removedlinks))
-		for id := range m.removedlinks {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ItemMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
-	if m.clearedowner {
-		edges = append(edges, item.EdgeOwner)
-	}
-	if m.clearedclusters {
-		edges = append(edges, item.EdgeClusters)
-	}
-	if m.clearedassets {
-		edges = append(edges, item.EdgeAssets)
-	}
-	if m.clearedtags {
-		edges = append(edges, item.EdgeTags)
-	}
-	if m.clearedlinks {
-		edges = append(edges, item.EdgeLinks)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ItemMutation) EdgeCleared(name string) bool {
-	switch name {
-	case item.EdgeOwner:
-		return m.clearedowner
-	case item.EdgeClusters:
-		return m.clearedclusters
-	case item.EdgeAssets:
-		return m.clearedassets
-	case item.EdgeTags:
-		return m.clearedtags
-	case item.EdgeLinks:
-		return m.clearedlinks
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ItemMutation) ClearEdge(name string) error {
-	switch name {
-	case item.EdgeOwner:
-		m.ClearOwner()
-		return nil
-	}
-	return fmt.Errorf("unknown Item unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ItemMutation) ResetEdge(name string) error {
-	switch name {
-	case item.EdgeOwner:
-		m.ResetOwner()
-		return nil
-	case item.EdgeClusters:
-		m.ResetClusters()
-		return nil
-	case item.EdgeAssets:
-		m.ResetAssets()
-		return nil
-	case item.EdgeTags:
-		m.ResetTags()
-		return nil
-	case item.EdgeLinks:
-		m.ResetLinks()
-		return nil
-	}
-	return fmt.Errorf("unknown Item edge %s", name)
-}
-
 // LinkMutation represents an operation that mutates the Link nodes in the graph.
 type LinkMutation struct {
 	config
@@ -7650,9 +6120,6 @@ type LinkMutation struct {
 	clusters        map[xid.ID]struct{}
 	removedclusters map[xid.ID]struct{}
 	clearedclusters bool
-	items           map[xid.ID]struct{}
-	removeditems    map[xid.ID]struct{}
-	cleareditems    bool
 	assets          map[xid.ID]struct{}
 	removedassets   map[xid.ID]struct{}
 	clearedassets   bool
@@ -8089,60 +6556,6 @@ func (m *LinkMutation) ResetClusters() {
 	m.removedclusters = nil
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by ids.
-func (m *LinkMutation) AddItemIDs(ids ...xid.ID) {
-	if m.items == nil {
-		m.items = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.items[ids[i]] = struct{}{}
-	}
-}
-
-// ClearItems clears the "items" edge to the Item entity.
-func (m *LinkMutation) ClearItems() {
-	m.cleareditems = true
-}
-
-// ItemsCleared reports if the "items" edge to the Item entity was cleared.
-func (m *LinkMutation) ItemsCleared() bool {
-	return m.cleareditems
-}
-
-// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
-func (m *LinkMutation) RemoveItemIDs(ids ...xid.ID) {
-	if m.removeditems == nil {
-		m.removeditems = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.items, ids[i])
-		m.removeditems[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
-func (m *LinkMutation) RemovedItemsIDs() (ids []xid.ID) {
-	for id := range m.removeditems {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ItemsIDs returns the "items" edge IDs in the mutation.
-func (m *LinkMutation) ItemsIDs() (ids []xid.ID) {
-	for id := range m.items {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetItems resets all changes to the "items" edge.
-func (m *LinkMutation) ResetItems() {
-	m.items = nil
-	m.cleareditems = false
-	m.removeditems = nil
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *LinkMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -8415,15 +6828,12 @@ func (m *LinkMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LinkMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.posts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
 	if m.clusters != nil {
 		edges = append(edges, link.EdgeClusters)
-	}
-	if m.items != nil {
-		edges = append(edges, link.EdgeItems)
 	}
 	if m.assets != nil {
 		edges = append(edges, link.EdgeAssets)
@@ -8447,12 +6857,6 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case link.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.items))
-		for id := range m.items {
-			ids = append(ids, id)
-		}
-		return ids
 	case link.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -8465,15 +6869,12 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LinkMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedposts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
 	if m.removedclusters != nil {
 		edges = append(edges, link.EdgeClusters)
-	}
-	if m.removeditems != nil {
-		edges = append(edges, link.EdgeItems)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, link.EdgeAssets)
@@ -8497,12 +6898,6 @@ func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case link.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.removeditems))
-		for id := range m.removeditems {
-			ids = append(ids, id)
-		}
-		return ids
 	case link.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.removedassets))
 		for id := range m.removedassets {
@@ -8515,15 +6910,12 @@ func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LinkMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.clearedposts {
 		edges = append(edges, link.EdgePosts)
 	}
 	if m.clearedclusters {
 		edges = append(edges, link.EdgeClusters)
-	}
-	if m.cleareditems {
-		edges = append(edges, link.EdgeItems)
 	}
 	if m.clearedassets {
 		edges = append(edges, link.EdgeAssets)
@@ -8539,8 +6931,6 @@ func (m *LinkMutation) EdgeCleared(name string) bool {
 		return m.clearedposts
 	case link.EdgeClusters:
 		return m.clearedclusters
-	case link.EdgeItems:
-		return m.cleareditems
 	case link.EdgeAssets:
 		return m.clearedassets
 	}
@@ -8564,9 +6954,6 @@ func (m *LinkMutation) ResetEdge(name string) error {
 		return nil
 	case link.EdgeClusters:
 		m.ResetClusters()
-		return nil
-	case link.EdgeItems:
-		m.ResetItems()
 		return nil
 	case link.EdgeAssets:
 		m.ResetAssets()
@@ -12635,9 +11022,6 @@ type TagMutation struct {
 	clusters        map[xid.ID]struct{}
 	removedclusters map[xid.ID]struct{}
 	clearedclusters bool
-	items           map[xid.ID]struct{}
-	removeditems    map[xid.ID]struct{}
-	cleareditems    bool
 	accounts        map[xid.ID]struct{}
 	removedaccounts map[xid.ID]struct{}
 	clearedaccounts bool
@@ -12930,60 +11314,6 @@ func (m *TagMutation) ResetClusters() {
 	m.removedclusters = nil
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by ids.
-func (m *TagMutation) AddItemIDs(ids ...xid.ID) {
-	if m.items == nil {
-		m.items = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.items[ids[i]] = struct{}{}
-	}
-}
-
-// ClearItems clears the "items" edge to the Item entity.
-func (m *TagMutation) ClearItems() {
-	m.cleareditems = true
-}
-
-// ItemsCleared reports if the "items" edge to the Item entity was cleared.
-func (m *TagMutation) ItemsCleared() bool {
-	return m.cleareditems
-}
-
-// RemoveItemIDs removes the "items" edge to the Item entity by IDs.
-func (m *TagMutation) RemoveItemIDs(ids ...xid.ID) {
-	if m.removeditems == nil {
-		m.removeditems = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.items, ids[i])
-		m.removeditems[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedItems returns the removed IDs of the "items" edge to the Item entity.
-func (m *TagMutation) RemovedItemsIDs() (ids []xid.ID) {
-	for id := range m.removeditems {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ItemsIDs returns the "items" edge IDs in the mutation.
-func (m *TagMutation) ItemsIDs() (ids []xid.ID) {
-	for id := range m.items {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetItems resets all changes to the "items" edge.
-func (m *TagMutation) ResetItems() {
-	m.items = nil
-	m.cleareditems = false
-	m.removeditems = nil
-}
-
 // AddAccountIDs adds the "accounts" edge to the Account entity by ids.
 func (m *TagMutation) AddAccountIDs(ids ...xid.ID) {
 	if m.accounts == nil {
@@ -13188,15 +11518,12 @@ func (m *TagMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TagMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.posts != nil {
 		edges = append(edges, tag.EdgePosts)
 	}
 	if m.clusters != nil {
 		edges = append(edges, tag.EdgeClusters)
-	}
-	if m.items != nil {
-		edges = append(edges, tag.EdgeItems)
 	}
 	if m.accounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
@@ -13220,12 +11547,6 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tag.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.items))
-		for id := range m.items {
-			ids = append(ids, id)
-		}
-		return ids
 	case tag.EdgeAccounts:
 		ids := make([]ent.Value, 0, len(m.accounts))
 		for id := range m.accounts {
@@ -13238,15 +11559,12 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TagMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedposts != nil {
 		edges = append(edges, tag.EdgePosts)
 	}
 	if m.removedclusters != nil {
 		edges = append(edges, tag.EdgeClusters)
-	}
-	if m.removeditems != nil {
-		edges = append(edges, tag.EdgeItems)
 	}
 	if m.removedaccounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
@@ -13270,12 +11588,6 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tag.EdgeItems:
-		ids := make([]ent.Value, 0, len(m.removeditems))
-		for id := range m.removeditems {
-			ids = append(ids, id)
-		}
-		return ids
 	case tag.EdgeAccounts:
 		ids := make([]ent.Value, 0, len(m.removedaccounts))
 		for id := range m.removedaccounts {
@@ -13288,15 +11600,12 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TagMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.clearedposts {
 		edges = append(edges, tag.EdgePosts)
 	}
 	if m.clearedclusters {
 		edges = append(edges, tag.EdgeClusters)
-	}
-	if m.cleareditems {
-		edges = append(edges, tag.EdgeItems)
 	}
 	if m.clearedaccounts {
 		edges = append(edges, tag.EdgeAccounts)
@@ -13312,8 +11621,6 @@ func (m *TagMutation) EdgeCleared(name string) bool {
 		return m.clearedposts
 	case tag.EdgeClusters:
 		return m.clearedclusters
-	case tag.EdgeItems:
-		return m.cleareditems
 	case tag.EdgeAccounts:
 		return m.clearedaccounts
 	}
@@ -13337,9 +11644,6 @@ func (m *TagMutation) ResetEdge(name string) error {
 		return nil
 	case tag.EdgeClusters:
 		m.ResetClusters()
-		return nil
-	case tag.EdgeItems:
-		m.ResetItems()
 		return nil
 	case tag.EdgeAccounts:
 		m.ResetAccounts()

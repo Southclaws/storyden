@@ -1,15 +1,11 @@
 import { filter } from "lodash/fp";
 
 import { useClusterList } from "src/api/openapi/clusters";
-import { useItemList } from "src/api/openapi/items";
 import { useLinkList } from "src/api/openapi/links";
 import {
   ClusterList,
   ClusterListParams,
   ClusterListResult,
-  ItemList,
-  ItemListParams,
-  ItemListResult,
   LinkList,
   LinkListParams,
   LinkListResult,
@@ -24,14 +20,12 @@ import { threadDelete, useThreadList } from "src/api/openapi/threads";
 export type MixedContent = {
   threads: ThreadListResult;
   clusters: ClusterListResult;
-  items: ItemListResult;
   links: LinkListResult;
 };
 
 export type MixedContentLists = {
   threads: ThreadList;
   clusters: ClusterList;
-  items: ItemList;
   links: LinkList;
 };
 
@@ -43,13 +37,11 @@ export type Props = {
   params?: {
     threads?: ThreadListParams;
     clusters?: ClusterListParams;
-    items?: ItemListParams;
     links?: LinkListParams;
   };
   initialData?: {
     threads: ThreadListResult;
     clusters: ClusterListResult;
-    items: ItemListResult;
     links: LinkListResult;
   };
 };
@@ -75,14 +67,6 @@ export function useFeed({ params, initialData }: Props) {
   });
 
   const {
-    data: items,
-    mutate: mutateItems,
-    error: errorItems,
-  } = useItemList(params?.items, {
-    swr: { fallbackData: initialData?.items },
-  });
-
-  const {
     data: links,
     mutate: mutateLinks,
     error: errorLinks,
@@ -90,8 +74,8 @@ export function useFeed({ params, initialData }: Props) {
     swr: { fallbackData: initialData?.links },
   });
 
-  const isReady = threads && clusters && items && links;
-  const allErrors = errorThreads || errorClusters || errorItems || errorLinks;
+  const isReady = threads && clusters && links;
+  const allErrors = errorThreads || errorClusters || errorLinks;
 
   if (!isReady) {
     return {
@@ -122,13 +106,11 @@ export function useFeed({ params, initialData }: Props) {
     data: {
       threads,
       clusters,
-      items,
       links,
     } satisfies MixedContent,
     mutate: {
       mutateThreads,
       mutateClusters,
-      mutateItems,
       mutateLinks,
     },
     handlers: {

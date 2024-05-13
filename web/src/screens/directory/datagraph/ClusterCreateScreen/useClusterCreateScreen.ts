@@ -5,7 +5,7 @@ import { clusterCreate } from "src/api/openapi/clusters";
 import {
   Account,
   ClusterInitialProps,
-  ClusterWithItems,
+  ClusterWithChildren,
 } from "src/api/openapi/schemas";
 
 import { joinDirectoryPath } from "../directory-path";
@@ -19,7 +19,7 @@ export function useClusterCreateScreen(props: Props) {
   const router = useRouter();
   const directoryPath = useDirectoryPath();
 
-  const initial: ClusterWithItems = {
+  const initial: ClusterWithChildren = {
     id: "",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -28,8 +28,7 @@ export function useClusterCreateScreen(props: Props) {
     description: "",
     owner: props.session,
     properties: {},
-    items: [],
-    clusters: [],
+    children: [],
     assets: [],
     visibility: "draft",
     recomentations: [],

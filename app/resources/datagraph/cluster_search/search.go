@@ -1,4 +1,4 @@
-package item_search
+package cluster_search
 
 import (
 	"context"
@@ -12,11 +12,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/cluster"
 )
 
 type Search interface {
-	Search(ctx context.Context, opts ...Option) ([]*datagraph.Item, error)
+	Search(ctx context.Context, opts ...Option) ([]*datagraph.Cluster, error)
 }
 
 type query struct {
@@ -50,16 +50,16 @@ func New(db *ent.Client, raw *sqlx.DB) Search {
 	}
 }
 
-func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Item, error) {
+func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Cluster, error) {
 	q := &query{}
 
 	for _, fn := range opts {
 		fn(q)
 	}
 
-	query := s.db.Item.Query().
+	query := s.db.Cluster.Query().
 		Where(
-			item.NameContainsFold(q.qs),
+			cluster.NameContainsFold(q.qs),
 			// TODO: more query/filter params
 		).
 		WithOwner().
@@ -67,17 +67,17 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Item
 			cq.WithOwner()
 		}).
 		WithAssets().
-		Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
+		Order(cluster.ByUpdatedAt(sql.OrderDesc()), cluster.ByCreatedAt(sql.OrderDesc()))
 
 	r, err := query.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	items, err := dt.MapErr(r, datagraph.ItemFromModel)
+	clusters, err := dt.MapErr(r, datagraph.ClusterFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return items, nil
+	return clusters, nil
 }

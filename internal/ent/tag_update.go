@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -61,21 +60,6 @@ func (tu *TagUpdate) AddClusters(c ...*Cluster) *TagUpdate {
 		ids[i] = c[i].ID
 	}
 	return tu.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (tu *TagUpdate) AddItemIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddItemIDs(ids...)
-	return tu
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (tu *TagUpdate) AddItems(i ...*Item) *TagUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tu.AddItemIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
@@ -138,27 +122,6 @@ func (tu *TagUpdate) RemoveClusters(c ...*Cluster) *TagUpdate {
 		ids[i] = c[i].ID
 	}
 	return tu.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (tu *TagUpdate) ClearItems() *TagUpdate {
-	tu.mutation.ClearItems()
-	return tu
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (tu *TagUpdate) RemoveItemIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemoveItemIDs(ids...)
-	return tu
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (tu *TagUpdate) RemoveItems(i ...*Item) *TagUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tu.RemoveItemIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
@@ -314,51 +277,6 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedItemsIDs(); len(nodes) > 0 && !tu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if tu.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -456,21 +374,6 @@ func (tuo *TagUpdateOne) AddClusters(c ...*Cluster) *TagUpdateOne {
 	return tuo.AddClusterIDs(ids...)
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (tuo *TagUpdateOne) AddItemIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddItemIDs(ids...)
-	return tuo
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (tuo *TagUpdateOne) AddItems(i ...*Item) *TagUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tuo.AddItemIDs(ids...)
-}
-
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
 func (tuo *TagUpdateOne) AddAccountIDs(ids ...xid.ID) *TagUpdateOne {
 	tuo.mutation.AddAccountIDs(ids...)
@@ -531,27 +434,6 @@ func (tuo *TagUpdateOne) RemoveClusters(c ...*Cluster) *TagUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return tuo.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (tuo *TagUpdateOne) ClearItems() *TagUpdateOne {
-	tuo.mutation.ClearItems()
-	return tuo
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (tuo *TagUpdateOne) RemoveItemIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemoveItemIDs(ids...)
-	return tuo
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (tuo *TagUpdateOne) RemoveItems(i ...*Item) *TagUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tuo.RemoveItemIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
@@ -730,51 +612,6 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !tuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

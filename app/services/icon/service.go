@@ -190,7 +190,5 @@ func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ctx = fctx.WithMeta(ctx, "path", a.Name.String(), "asset_id", a.ID.String())
-
 	return a, r, nil
 }

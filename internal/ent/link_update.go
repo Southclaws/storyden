@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -105,21 +104,6 @@ func (lu *LinkUpdate) AddClusters(c ...*Cluster) *LinkUpdate {
 	return lu.AddClusterIDs(ids...)
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (lu *LinkUpdate) AddItemIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddItemIDs(ids...)
-	return lu
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (lu *LinkUpdate) AddItems(i ...*Item) *LinkUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return lu.AddItemIDs(ids...)
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (lu *LinkUpdate) AddAssetIDs(ids ...xid.ID) *LinkUpdate {
 	lu.mutation.AddAssetIDs(ids...)
@@ -180,27 +164,6 @@ func (lu *LinkUpdate) RemoveClusters(c ...*Cluster) *LinkUpdate {
 		ids[i] = c[i].ID
 	}
 	return lu.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (lu *LinkUpdate) ClearItems() *LinkUpdate {
-	lu.mutation.ClearItems()
-	return lu
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (lu *LinkUpdate) RemoveItemIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemoveItemIDs(ids...)
-	return lu
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (lu *LinkUpdate) RemoveItems(i ...*Item) *LinkUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return lu.RemoveItemIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -365,51 +328,6 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := lu.mutation.RemovedItemsIDs(); len(nodes) > 0 && !lu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := lu.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if lu.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -549,21 +467,6 @@ func (luo *LinkUpdateOne) AddClusters(c ...*Cluster) *LinkUpdateOne {
 	return luo.AddClusterIDs(ids...)
 }
 
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (luo *LinkUpdateOne) AddItemIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddItemIDs(ids...)
-	return luo
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (luo *LinkUpdateOne) AddItems(i ...*Item) *LinkUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return luo.AddItemIDs(ids...)
-}
-
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (luo *LinkUpdateOne) AddAssetIDs(ids ...xid.ID) *LinkUpdateOne {
 	luo.mutation.AddAssetIDs(ids...)
@@ -624,27 +527,6 @@ func (luo *LinkUpdateOne) RemoveClusters(c ...*Cluster) *LinkUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return luo.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (luo *LinkUpdateOne) ClearItems() *LinkUpdateOne {
-	luo.mutation.ClearItems()
-	return luo
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (luo *LinkUpdateOne) RemoveItemIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemoveItemIDs(ids...)
-	return luo
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (luo *LinkUpdateOne) RemoveItems(i ...*Item) *LinkUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return luo.RemoveItemIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -832,51 +714,6 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if luo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := luo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !luo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := luo.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   link.ItemsTable,
-			Columns: link.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

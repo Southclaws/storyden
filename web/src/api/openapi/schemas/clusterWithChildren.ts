@@ -6,15 +6,13 @@
  * OpenAPI spec version: 1
  */
 import type { Cluster } from "./cluster";
-import type { ClusterWithItemsAllOf } from "./clusterWithItemsAllOf";
+import type { ClusterWithChildrenAllOf } from "./clusterWithChildrenAllOf";
 import type { DatagraphRecommendations } from "./datagraphRecommendations";
 
 /**
- * The full properties of a cluster including all items and maybe child
-clusters (depending on what the endpoint is configured or queried to do)
-for rendering a single cluster on a view.
+ * The full properties of a cluster including all child clusters.
 
  */
-export type ClusterWithItems = Cluster &
+export type ClusterWithChildren = Cluster &
   DatagraphRecommendations &
-  ClusterWithItemsAllOf;
+  ClusterWithChildrenAllOf;

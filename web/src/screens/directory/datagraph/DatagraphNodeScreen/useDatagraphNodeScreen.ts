@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
-import { itemAddAsset } from "src/api/openapi/items";
 import { Asset, Visibility } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import {
@@ -97,7 +96,7 @@ export function useDatagraphNodeScreen({
 
     triggerSavingPopover();
     setEditing(false);
-    onSave({ type: node.type, ...payload });
+    onSave(payload);
   }
 
   async function handleVisibilityChange(v: Visibility) {
@@ -118,11 +117,7 @@ export function useDatagraphNodeScreen({
     if (!node.id) return;
 
     triggerSavingPopover();
-    if (node.type === "cluster") {
-      await clusterAddAsset(node.slug, asset.id);
-    } else {
-      await itemAddAsset(node.slug, asset.id);
-    }
+    await clusterAddAsset(node.slug, asset.id);
   }
 
   async function handleAssetRemove(asset: Asset) {
@@ -130,11 +125,7 @@ export function useDatagraphNodeScreen({
     if (!node.id) return;
 
     triggerSavingPopover();
-    if (node.type === "cluster") {
-      await clusterRemoveAsset(node.slug, asset.id);
-    } else {
-      await itemAddAsset(node.slug, asset.id);
-    }
+    await clusterRemoveAsset(node.slug, asset.id);
   }
 
   const handleSubmit = form.handleSubmit(handleSave);

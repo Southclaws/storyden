@@ -9,7 +9,7 @@ import type { ClusterCommonProps } from "./clusterCommonProps";
 import type { CommonProperties } from "./commonProperties";
 
 /**
- * A cluster is a group of items and other clusters. It serves as an
+ * A cluster is a text document with children and assets. It serves as an
 abstraction for grouping structured data objects. It can represent
 things such as brands, manufacturers, authors, directors, etc. Clusters
 can be referenced in content posts and they also have their own content.

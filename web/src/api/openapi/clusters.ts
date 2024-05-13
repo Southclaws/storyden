@@ -14,7 +14,6 @@ import { fetcher } from "../client";
 
 import type {
   ClusterAddChildOKResponse,
-  ClusterAddItemOKResponse,
   ClusterCreateBody,
   ClusterCreateOKResponse,
   ClusterDeleteOKResponse,
@@ -23,7 +22,6 @@ import type {
   ClusterListOKResponse,
   ClusterListParams,
   ClusterRemoveChildOKResponse,
-  ClusterRemoveItemOKResponse,
   ClusterUpdateBody,
   ClusterUpdateOKResponse,
   InternalServerErrorResponse,
@@ -33,7 +31,7 @@ import type {
 } from "./schemas";
 
 /**
- * Create a cluster for grouping items and other clusters together.
+ * Create a cluster for curating structured knowledge together.
 
  */
 export const clusterCreate = (clusterCreateBody: ClusterCreateBody) => {
@@ -657,137 +655,6 @@ export const useClusterRemoveCluster = <
     clusterSlug,
     clusterSlugChild,
   );
-
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-/**
- * Add an item to a cluster.
- */
-export const clusterAddItem = (clusterSlug: string, itemSlug: string) => {
-  return fetcher<ClusterAddItemOKResponse>({
-    url: `/v1/clusters/${clusterSlug}/items/${itemSlug}`,
-    method: "PUT",
-  });
-};
-
-export const getClusterAddItemMutationFetcher = (
-  clusterSlug: string,
-  itemSlug: string,
-) => {
-  return (
-    _: string,
-    __: { arg: Arguments },
-  ): Promise<ClusterAddItemOKResponse> => {
-    return clusterAddItem(clusterSlug, itemSlug);
-  };
-};
-export const getClusterAddItemMutationKey = (
-  clusterSlug: string,
-  itemSlug: string,
-) => `/v1/clusters/${clusterSlug}/items/${itemSlug}` as const;
-
-export type ClusterAddItemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof clusterAddItem>>
->;
-export type ClusterAddItemMutationError =
-  | UnauthorisedResponse
-  | NotFoundResponse
-  | InternalServerErrorResponse;
-
-export const useClusterAddItem = <
-  TError =
-    | UnauthorisedResponse
-    | NotFoundResponse
-    | InternalServerErrorResponse,
->(
-  clusterSlug: string,
-  itemSlug: string,
-  options?: {
-    swr?: SWRMutationConfiguration<
-      Awaited<ReturnType<typeof clusterAddItem>>,
-      TError,
-      string,
-      Arguments,
-      Awaited<ReturnType<typeof clusterAddItem>>
-    > & { swrKey?: string };
-  },
-) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const swrKey =
-    swrOptions?.swrKey ?? getClusterAddItemMutationKey(clusterSlug, itemSlug);
-  const swrFn = getClusterAddItemMutationFetcher(clusterSlug, itemSlug);
-
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-/**
- * Remove an item from a cluster.
- */
-export const clusterRemoveItem = (clusterSlug: string, itemSlug: string) => {
-  return fetcher<ClusterRemoveItemOKResponse>({
-    url: `/v1/clusters/${clusterSlug}/items/${itemSlug}`,
-    method: "DELETE",
-  });
-};
-
-export const getClusterRemoveItemMutationFetcher = (
-  clusterSlug: string,
-  itemSlug: string,
-) => {
-  return (
-    _: string,
-    __: { arg: Arguments },
-  ): Promise<ClusterRemoveItemOKResponse> => {
-    return clusterRemoveItem(clusterSlug, itemSlug);
-  };
-};
-export const getClusterRemoveItemMutationKey = (
-  clusterSlug: string,
-  itemSlug: string,
-) => `/v1/clusters/${clusterSlug}/items/${itemSlug}` as const;
-
-export type ClusterRemoveItemMutationResult = NonNullable<
-  Awaited<ReturnType<typeof clusterRemoveItem>>
->;
-export type ClusterRemoveItemMutationError =
-  | UnauthorisedResponse
-  | NotFoundResponse
-  | InternalServerErrorResponse;
-
-export const useClusterRemoveItem = <
-  TError =
-    | UnauthorisedResponse
-    | NotFoundResponse
-    | InternalServerErrorResponse,
->(
-  clusterSlug: string,
-  itemSlug: string,
-  options?: {
-    swr?: SWRMutationConfiguration<
-      Awaited<ReturnType<typeof clusterRemoveItem>>,
-      TError,
-      string,
-      Arguments,
-      Awaited<ReturnType<typeof clusterRemoveItem>>
-    > & { swrKey?: string };
-  },
-) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const swrKey =
-    swrOptions?.swrKey ??
-    getClusterRemoveItemMutationKey(clusterSlug, itemSlug);
-  const swrFn = getClusterRemoveItemMutationFetcher(clusterSlug, itemSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

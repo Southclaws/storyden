@@ -174,41 +174,6 @@ var (
 			},
 		},
 	}
-	// ItemsColumns holds the columns for the "items" table.
-	ItemsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "slug", Type: field.TypeString, Unique: true},
-		{Name: "description", Type: field.TypeString},
-		{Name: "content", Type: field.TypeString, Nullable: true},
-		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "review", "published"}, Default: "draft"},
-		{Name: "properties", Type: field.TypeJSON, Nullable: true},
-		{Name: "account_id", Type: field.TypeString, Size: 20},
-	}
-	// ItemsTable holds the schema information for the "items" table.
-	ItemsTable = &schema.Table{
-		Name:       "items",
-		Columns:    ItemsColumns,
-		PrimaryKey: []*schema.Column{ItemsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "items_accounts_items",
-				Columns:    []*schema.Column{ItemsColumns[10]},
-				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "item_slug",
-				Unique:  false,
-				Columns: []*schema.Column{ItemsColumns[5]},
-			},
-		},
-	}
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -381,31 +346,6 @@ var (
 			},
 		},
 	}
-	// ClusterItemsColumns holds the columns for the "cluster_items" table.
-	ClusterItemsColumns = []*schema.Column{
-		{Name: "cluster_id", Type: field.TypeString, Size: 20},
-		{Name: "item_id", Type: field.TypeString, Size: 20},
-	}
-	// ClusterItemsTable holds the schema information for the "cluster_items" table.
-	ClusterItemsTable = &schema.Table{
-		Name:       "cluster_items",
-		Columns:    ClusterItemsColumns,
-		PrimaryKey: []*schema.Column{ClusterItemsColumns[0], ClusterItemsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "cluster_items_cluster_id",
-				Columns:    []*schema.Column{ClusterItemsColumns[0]},
-				RefColumns: []*schema.Column{ClustersColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "cluster_items_item_id",
-				Columns:    []*schema.Column{ClusterItemsColumns[1]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// ClusterAssetsColumns holds the columns for the "cluster_assets" table.
 	ClusterAssetsColumns = []*schema.Column{
 		{Name: "cluster_id", Type: field.TypeString, Size: 20},
@@ -456,31 +396,6 @@ var (
 			},
 		},
 	}
-	// ItemAssetsColumns holds the columns for the "item_assets" table.
-	ItemAssetsColumns = []*schema.Column{
-		{Name: "item_id", Type: field.TypeString, Size: 20},
-		{Name: "asset_id", Type: field.TypeString, Size: 20},
-	}
-	// ItemAssetsTable holds the schema information for the "item_assets" table.
-	ItemAssetsTable = &schema.Table{
-		Name:       "item_assets",
-		Columns:    ItemAssetsColumns,
-		PrimaryKey: []*schema.Column{ItemAssetsColumns[0], ItemAssetsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "item_assets_item_id",
-				Columns:    []*schema.Column{ItemAssetsColumns[0]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "item_assets_asset_id",
-				Columns:    []*schema.Column{ItemAssetsColumns[1]},
-				RefColumns: []*schema.Column{AssetsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// LinkPostsColumns holds the columns for the "link_posts" table.
 	LinkPostsColumns = []*schema.Column{
 		{Name: "link_id", Type: field.TypeString, Size: 20},
@@ -527,31 +442,6 @@ var (
 				Symbol:     "link_clusters_cluster_id",
 				Columns:    []*schema.Column{LinkClustersColumns[1]},
 				RefColumns: []*schema.Column{ClustersColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// LinkItemsColumns holds the columns for the "link_items" table.
-	LinkItemsColumns = []*schema.Column{
-		{Name: "link_id", Type: field.TypeString, Size: 20},
-		{Name: "item_id", Type: field.TypeString, Size: 20},
-	}
-	// LinkItemsTable holds the schema information for the "link_items" table.
-	LinkItemsTable = &schema.Table{
-		Name:       "link_items",
-		Columns:    LinkItemsColumns,
-		PrimaryKey: []*schema.Column{LinkItemsColumns[0], LinkItemsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "link_items_link_id",
-				Columns:    []*schema.Column{LinkItemsColumns[0]},
-				RefColumns: []*schema.Column{LinksColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "link_items_item_id",
-				Columns:    []*schema.Column{LinkItemsColumns[1]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -681,31 +571,6 @@ var (
 			},
 		},
 	}
-	// TagItemsColumns holds the columns for the "tag_items" table.
-	TagItemsColumns = []*schema.Column{
-		{Name: "tag_id", Type: field.TypeString, Size: 20},
-		{Name: "item_id", Type: field.TypeString, Size: 20},
-	}
-	// TagItemsTable holds the schema information for the "tag_items" table.
-	TagItemsTable = &schema.Table{
-		Name:       "tag_items",
-		Columns:    TagItemsColumns,
-		PrimaryKey: []*schema.Column{TagItemsColumns[0], TagItemsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "tag_items_tag_id",
-				Columns:    []*schema.Column{TagItemsColumns[0]},
-				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "tag_items_item_id",
-				Columns:    []*schema.Column{TagItemsColumns[1]},
-				RefColumns: []*schema.Column{ItemsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
@@ -714,7 +579,6 @@ var (
 		CategoriesTable,
 		ClustersTable,
 		CollectionsTable,
-		ItemsTable,
 		LinksTable,
 		NotificationsTable,
 		PostsTable,
@@ -723,19 +587,15 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
-		ClusterItemsTable,
 		ClusterAssetsTable,
 		CollectionPostsTable,
-		ItemAssetsTable,
 		LinkPostsTable,
 		LinkClustersTable,
-		LinkItemsTable,
 		LinkAssetsTable,
 		PostAssetsTable,
 		RoleAccountsTable,
 		TagPostsTable,
 		TagClustersTable,
-		TagItemsTable,
 	}
 )
 
@@ -745,7 +605,6 @@ func init() {
 	ClustersTable.ForeignKeys[0].RefTable = AccountsTable
 	ClustersTable.ForeignKeys[1].RefTable = ClustersTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
-	ItemsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = PostsTable
@@ -755,20 +614,14 @@ func init() {
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	AccountTagsTable.Annotation = &entsql.Annotation{}
-	ClusterItemsTable.ForeignKeys[0].RefTable = ClustersTable
-	ClusterItemsTable.ForeignKeys[1].RefTable = ItemsTable
 	ClusterAssetsTable.ForeignKeys[0].RefTable = ClustersTable
 	ClusterAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
-	ItemAssetsTable.ForeignKeys[0].RefTable = ItemsTable
-	ItemAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	LinkPostsTable.ForeignKeys[0].RefTable = LinksTable
 	LinkPostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinkClustersTable.ForeignKeys[0].RefTable = LinksTable
 	LinkClustersTable.ForeignKeys[1].RefTable = ClustersTable
-	LinkItemsTable.ForeignKeys[0].RefTable = LinksTable
-	LinkItemsTable.ForeignKeys[1].RefTable = ItemsTable
 	LinkAssetsTable.ForeignKeys[0].RefTable = LinksTable
 	LinkAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
@@ -779,6 +632,4 @@ func init() {
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 	TagClustersTable.ForeignKeys[0].RefTable = TagsTable
 	TagClustersTable.ForeignKeys[1].RefTable = ClustersTable
-	TagItemsTable.ForeignKeys[0].RefTable = TagsTable
-	TagItemsTable.ForeignKeys[1].RefTable = ItemsTable
 }

@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
@@ -98,12 +97,6 @@ func (d *database) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagr
 		WithLinks(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
-		WithItems(func(iq *ent.ItemQuery) {
-			iq.
-				WithAssets().
-				WithOwner().
-				Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
-		}).
 		WithClusters(func(cq *ent.ClusterQuery) {
 			cq.
 				WithAssets().
@@ -131,12 +124,6 @@ func (d *database) GetByID(ctx context.Context, id datagraph.ClusterID) (*datagr
 		WithAssets().
 		WithLinks(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
-		}).
-		WithItems(func(iq *ent.ItemQuery) {
-			iq.
-				WithAssets().
-				WithOwner().
-				Order(item.ByUpdatedAt(sql.OrderDesc()), item.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithClusters(func(cq *ent.ClusterQuery) {
 			cq.

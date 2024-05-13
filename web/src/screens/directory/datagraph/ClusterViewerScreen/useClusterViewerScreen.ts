@@ -9,7 +9,7 @@ import {
 import {
   Cluster,
   ClusterInitialProps,
-  ClusterWithItems,
+  ClusterWithChildren,
   Visibility,
 } from "src/api/openapi/schemas";
 
@@ -18,7 +18,7 @@ import { useDirectoryPath } from "../useDirectoryPath";
 
 export type Props = {
   slug: string;
-  cluster: ClusterWithItems;
+  cluster: ClusterWithChildren;
 };
 
 export function useClusterViewerScreen(props: Props) {

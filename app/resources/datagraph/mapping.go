@@ -22,11 +22,6 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	items, err := dt.MapErr(c.Edges.Items, ItemFromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
 	clusters, err := dt.MapErr(c.Edges.Clusters, ClusterFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -50,43 +45,8 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
 		Owner:       *pro,
-		Items:       items,
 		Clusters:    clusters,
 		Visibility:  visibility,
-		Properties:  c.Properties,
-	}, nil
-}
-
-func ItemFromModel(c *ent.Item) (*Item, error) {
-	accEdge, err := c.Edges.OwnerOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	pro, err := profile.FromModel(accEdge)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	clusters, err := dt.MapErr(c.Edges.Clusters, ClusterFromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	assets := dt.Map(c.Edges.Assets, asset.FromModel)
-
-	return &Item{
-		ID:          ItemID(c.ID),
-		CreatedAt:   c.CreatedAt,
-		UpdatedAt:   c.UpdatedAt,
-		Name:        c.Name,
-		Slug:        c.Slug,
-		Assets:      assets,
-		Links:       dt.Map(c.Edges.Links, LinkFromModel),
-		Description: c.Description,
-		Content:     opt.NewPtr(c.Content),
-		Owner:       *pro,
-		In:          clusters,
 		Properties:  c.Properties,
 	}, nil
 }

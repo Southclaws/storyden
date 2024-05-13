@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
 	"github.com/Southclaws/storyden/internal/ent"
 	cluster_model "github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 )
 
 type database struct {
@@ -67,24 +66,6 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.ClusterSlug, toS
 				return fault.Wrap(err)
 			}
 		}
-
-		if o.moveItems {
-			items, err := d.db.Item.Query().Where(item.HasClustersWith(cluster_model.ID(xid.ID(fromCluster.ID)))).All(ctx)
-			if err != nil {
-				return fault.Wrap(err)
-			}
-			childItemIDs := dt.Map(items, func(i *ent.Item) xid.ID { return i.ID })
-
-			err = d.db.Item.Update().
-				RemoveClusterIDs(xid.ID(fromCluster.ID)).
-				AddClusterIDs(xid.ID(toCluster.ID)).
-				Where(item.IDIn(childItemIDs...)).
-				Exec(ctx)
-			if err != nil {
-				return fault.Wrap(err)
-			}
-		}
-
 		return
 	}()
 	if err != nil {

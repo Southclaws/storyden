@@ -8,6 +8,5 @@ const (
 	kindThread  kindEnum = "thread"
 	kindReply   kindEnum = "reply"
 	kindCluster kindEnum = "cluster"
-	kindItem    kindEnum = "item"
 	kindLink    kindEnum = "link"
 )

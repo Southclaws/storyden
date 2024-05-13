@@ -26,8 +26,6 @@ type Tx struct {
 	Cluster *ClusterClient
 	// Collection is the client for interacting with the Collection builders.
 	Collection *CollectionClient
-	// Item is the client for interacting with the Item builders.
-	Item *ItemClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Notification is the client for interacting with the Notification builders.
@@ -179,7 +177,6 @@ func (tx *Tx) init() {
 	tx.Category = NewCategoryClient(tx.config)
 	tx.Cluster = NewClusterClient(tx.config)
 	tx.Collection = NewCollectionClient(tx.config)
-	tx.Item = NewItemClient(tx.config)
 	tx.Link = NewLinkClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)

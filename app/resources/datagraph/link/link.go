@@ -51,12 +51,6 @@ func WithClusters(ids ...xid.ID) Option {
 	}
 }
 
-func WithItems(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddItemIDs(ids...)
-	}
-}
-
 func WithAssets(ids ...asset.AssetID) Option {
 	return func(lm *ent.LinkMutation) {
 		lm.AddAssetIDs(ids...)

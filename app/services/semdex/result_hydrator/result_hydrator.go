@@ -8,7 +8,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/reply"
@@ -18,7 +17,6 @@ import (
 type Hydrator struct {
 	tr thread.Repository
 	rr reply.Repository
-	ir item.Repository
 	cr cluster.Repository
 	lr link.Repository
 }
@@ -26,11 +24,10 @@ type Hydrator struct {
 func New(
 	tr thread.Repository,
 	rr reply.Repository,
-	ir item.Repository,
 	cr cluster.Repository,
 	lr link.Repository,
 ) *Hydrator {
-	return &Hydrator{tr, rr, ir, cr, lr}
+	return &Hydrator{tr, rr, cr, lr}
 }
 
 func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*datagraph.NodeReference, error) {
@@ -68,17 +65,6 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 
 		sr.Name = c.Name
 		sr.Description = c.Description
-
-		return sr, nil
-
-	case datagraph.KindItem:
-		i, err := h.ir.GetByID(ctx, datagraph.ItemID(sr.ID))
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		sr.Name = i.Name
-		sr.Description = i.Description
 
 		return sr, nil
 

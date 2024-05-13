@@ -5,9 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Item } from "./item";
+import type { DatagraphNode } from "./datagraphNode";
 
-/**
- * Item created.
- */
-export type ItemCreateOKResponse = Item;
+export type DatagraphNodeList = DatagraphNode[];

@@ -76,7 +76,6 @@ type Bindings struct {
 	Assets
 	Collections
 	Clusters
-	Items
 	Links
 	Datagraph
 }
@@ -102,7 +101,6 @@ func bindingsProviders() fx.Option {
 		NewAssets,
 		NewCollections,
 		NewClusters,
-		NewItems,
 		NewLinks,
 		NewDatagraph,
 	)

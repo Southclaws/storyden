@@ -5,6 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ItemInitialProps } from "./itemInitialProps";
+import type { ClusterList } from "./clusterList";
 
-export type ItemCreateBody = ItemInitialProps;
+export type ClusterWithChildrenAllOf = {
+  children: ClusterList;
+};

@@ -27,7 +27,6 @@ type WithRefs struct {
 	Threads     []*thread.Thread
 	Replies     []*reply.Reply
 	Clusters    []*datagraph.Cluster
-	Items       []*datagraph.Item
 	Related     datagraph.NodeReferenceList
 }
 
@@ -54,11 +53,6 @@ func Map(in *ent.Link) (*WithRefs, error) {
 	}
 
 	clusterEdge, err := in.Edges.ClustersOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	itemEdge, err := in.Edges.ItemsOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -95,11 +89,6 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	items, err := dt.MapErr(itemEdge, datagraph.ItemFromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
 	return &WithRefs{
 		ID:          datagraph.LinkID(in.ID),
 		URL:         in.URL,
@@ -111,6 +100,5 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		Threads:     threads,
 		Replies:     replies,
 		Clusters:    clusters,
-		Items:       items,
 	}, nil
 }

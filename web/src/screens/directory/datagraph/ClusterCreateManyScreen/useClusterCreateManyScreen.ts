@@ -1,13 +1,13 @@
 import { last } from "lodash";
 
 import { clusterCreate, useClusterGet } from "src/api/openapi/clusters";
-import { ClusterWithItems, Link } from "src/api/openapi/schemas";
+import { ClusterWithChildren, Link } from "src/api/openapi/schemas";
 import { DatagraphNodeWithRelations } from "src/components/directory/datagraph/DatagraphNode";
 
 import { useDirectoryPath } from "../useDirectoryPath";
 
 export type Props = {
-  cluster?: ClusterWithItems;
+  cluster?: ClusterWithChildren;
 };
 
 export function useClusterCreateManyScreen(props: Props) {

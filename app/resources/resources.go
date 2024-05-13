@@ -10,9 +10,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_children"
+	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_search"
 	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_traversal"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item_search"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link_graph"
 	"github.com/Southclaws/storyden/app/resources/notification"
@@ -45,8 +44,7 @@ func Build() fx.Option {
 			cluster.New,
 			cluster_traversal.New,
 			cluster_children.New,
-			item.New,
-			item_search.New,
+			cluster_search.New,
 			link.New,
 			link_graph.New,
 			profile_search.New,

@@ -6,20 +6,15 @@
  * OpenAPI spec version: 1
  */
 import type { MoveChildClustersQueryParameter } from "./moveChildClustersQueryParameter";
-import type { MoveChildItemsQueryParameter } from "./moveChildItemsQueryParameter";
 import type { TargetClusterSlugQueryParameter } from "./targetClusterSlugQueryParameter";
 
 export type ClusterDeleteParams = {
   /**
-   * Where to move child clusters and items.
+   * Where to move child clusters.
    */
   target_cluster?: TargetClusterSlugQueryParameter;
   /**
    * Whether or not to move child clusters.
    */
   move_child_clusters?: MoveChildClustersQueryParameter;
-  /**
-   * Whether or not to move child items.
-   */
-  move_child_items?: MoveChildItemsQueryParameter;
 };

@@ -34,7 +34,6 @@ type Cluster struct {
 	Visibility  post.Visibility
 	Properties  any
 
-	Items    []*Item
 	Clusters []*Cluster
 }
 
