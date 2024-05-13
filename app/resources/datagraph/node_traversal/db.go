@@ -191,12 +191,12 @@ func (d *database) Subtree(ctx context.Context, id datagraph.NodeID, fs ...Filte
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		clus, err := fromRow(c)
+		n, err := fromRow(c)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		nodes = append(nodes, clus)
+		nodes = append(nodes, n)
 	}
 
 	return nodes, nil

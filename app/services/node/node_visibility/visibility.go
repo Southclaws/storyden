@@ -46,18 +46,18 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	clus, err := m.cr.Get(ctx, slug)
+	n, err := m.cr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if !acc.Admin {
-		if clus.Owner.ID != accountID {
+		if n.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
 
-	clus, err = m.cr.Update(ctx, clus.ID, node.WithVisibility(visibility))
+	n, err = m.cr.Update(ctx, n.ID, node.WithVisibility(visibility))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -66,5 +66,5 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		// TODO: Emit events, send notifications, etc.
 	}
 
-	return clus, nil
+	return n, nil
 }
