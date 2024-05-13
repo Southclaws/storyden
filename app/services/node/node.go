@@ -96,21 +96,21 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	clus, err := s.cr.Create(ctx, owner, name, slug, desc, opts...)
+	n, err := s.cr.Create(ctx, owner, name, slug, desc, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return clus, nil
+	return n, nil
 }
 
 func (s *service) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error) {
-	clus, err := s.cr.Get(ctx, slug)
+	n, err := s.cr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return clus, nil
+	return n, nil
 }
 
 func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial) (*datagraph.Node, error) {
@@ -119,13 +119,13 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	clus, err := s.cr.Get(ctx, slug)
+	n, err := s.cr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !clus.Owner.Admin {
-		if clus.Owner.ID != accountID {
+	if !n.Owner.Admin {
+		if n.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
@@ -135,12 +135,12 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	clus, err = s.cr.Update(ctx, clus.ID, opts...)
+	n, err = s.cr.Update(ctx, n.ID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return clus, nil
+	return n, nil
 }
 
 func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteOptions) (*datagraph.Node, error) {
@@ -149,13 +149,13 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	clus, err := s.cr.Get(ctx, slug)
+	n, err := s.cr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !clus.Owner.Admin {
-		if clus.Owner.ID != accountID {
+	if !n.Owner.Admin {
+		if n.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
