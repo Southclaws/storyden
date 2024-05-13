@@ -54,7 +54,7 @@ tasks:
   generate:openapi:
     deps: [generate:openapi:backend, generate:openapi:frontend]
   generate:openapi:backend:
-    cmds: [go generate ./internal/openapi]
+    cmds: [go generate .]
   generate:openapi:frontend:
     dir: web
     cmds: [yarn openapi]
