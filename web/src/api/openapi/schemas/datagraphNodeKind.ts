@@ -13,6 +13,6 @@ export type DatagraphNodeKind =
 export const DatagraphNodeKind = {
   thread: "thread",
   reply: "reply",
-  cluster: "cluster",
+  node: "node",
   link: "link",
 } as const;

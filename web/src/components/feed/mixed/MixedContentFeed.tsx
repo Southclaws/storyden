@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { NewBadge } from "src/components/directory/DirectoryBadge";
-import { ClusterCardGrid } from "src/components/directory/datagraph/ClusterCardList";
+import { NodeCardGrid } from "src/components/directory/datagraph/NodeCardList";
 import { LinkCardRows } from "src/components/directory/links/LinkCardList";
 import { Heading2 } from "src/theme/components/Heading/Index";
 import { Link } from "src/theme/components/Link";
@@ -36,15 +36,15 @@ function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
 
   return (
     <LStack>
-      {data.clusters.length > 0 && (
+      {data.nodes.length > 0 && (
         <>
           <SectionHeader recent={recent} href="/directory">
             Directory
           </SectionHeader>
-          <ClusterCardGrid
+          <NodeCardGrid
             directoryPath={[]}
             context="generic"
-            clusters={data.clusters}
+            nodes={data.nodes}
           />
         </>
       )}

@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
-import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphBulkImport } from "src/components/directory/datagraph/DatagraphBulkImport/DatagraphBulkImport";
 import { Props } from "src/components/directory/datagraph/DatagraphBulkImport/useDatagraphBulkImport";
+import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 
 import { useDirectoryPath } from "../useDirectoryPath";
 
@@ -19,10 +19,10 @@ export function DatagraphBulkNodeScreen(props: Props) {
         onCreateNodeFromLink={props.onCreateNodeFromLink}
       />
 
-      <ClusterCardRows
+      <NodeCardRows
         directoryPath={directoryPath}
         context="directory"
-        clusters={props.node?.clusters ?? []}
+        nodes={props.node?.children ?? []}
       />
     </LStack>
   );

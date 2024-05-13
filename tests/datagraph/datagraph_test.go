@@ -39,7 +39,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			name1 := "test-cluster-1"
 			slug1 := name1 + uuid.NewString()
-			clus1, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
+			clus1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing clusters api",
@@ -57,7 +57,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			name2 := "test-cluster-2"
 			slug2 := name2 + uuid.NewString()
-			clus2, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
+			clus2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing clusters children",
@@ -66,7 +66,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			r.NotNil(clus2)
 			r.Equal(http.StatusOK, clus2.StatusCode())
 
-			cadd, err := cl.ClusterAddClusterWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
+			cadd, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())
@@ -79,7 +79,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			name3 := "test-cluster-3"
 			slug3 := name3 + uuid.NewString()
-			clus3, err := cl.ClusterCreateWithResponse(ctx, openapi.ClusterInitialProps{
+			clus3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing clusters children",
@@ -88,7 +88,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 			r.NotNil(clus3)
 			r.Equal(http.StatusOK, clus3.StatusCode())
 
-			cadd, err = cl.ClusterAddClusterWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
+			cadd, err = cl.NodeAddNodeWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())
@@ -118,49 +118,49 @@ func TestDatagraphDeletions(t *testing.T) {
 			// |- clus2
 			//    |- clus3
 
-			clus1, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions1"), e2e.WithSession(ctx, cj))
+			clus1, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions1"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus1.StatusCode())
 
-			clus2, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions2"), e2e.WithSession(ctx, cj))
+			clus2, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions2"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus2.StatusCode())
 
-			clus3, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions3"), e2e.WithSession(ctx, cj))
+			clus3, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions3"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus3.StatusCode())
 
-			cadd, err := cl.ClusterAddCluster(ctx, clus1.JSON200.Slug, clus2.JSON200.Slug, e2e.WithSession(ctx, cj))
+			cadd, err := cl.NodeAddNode(ctx, clus1.JSON200.Slug, clus2.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cadd.StatusCode)
 
-			cadd, err = cl.ClusterAddCluster(ctx, clus2.JSON200.Slug, clus3.JSON200.Slug, e2e.WithSession(ctx, cj))
+			cadd, err = cl.NodeAddNode(ctx, clus2.JSON200.Slug, clus3.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cadd.StatusCode)
 
-			cdel, err := cl.ClusterDeleteWithResponse(ctx, clus3.JSON200.Slug, nil, e2e.WithSession(ctx, cj))
+			cdel, err := cl.NodeDeleteWithResponse(ctx, clus3.JSON200.Slug, nil, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cdel.StatusCode())
 			a.Nil(cdel.JSON200.Destination)
 
-			clus2clus, err := cl.ClusterCreateWithResponse(ctx, uniqueCluster("deletions2child"), e2e.WithSession(ctx, cj))
+			clus2clus, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions2child"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus2clus.StatusCode())
 
-			cadd, err = cl.ClusterAddCluster(ctx, clus2.JSON200.Slug, clus2clus.JSON200.Slug, e2e.WithSession(ctx, cj))
+			cadd, err = cl.NodeAddNode(ctx, clus2.JSON200.Slug, clus2clus.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cadd.StatusCode)
 
-			cdel, err = cl.ClusterDeleteWithResponse(ctx, clus2.JSON200.Slug, &openapi.ClusterDeleteParams{
-				TargetCluster:     &clus1.JSON200.Slug,
-				MoveChildClusters: opt.New(true).Ptr(),
+			cdel, err = cl.NodeDeleteWithResponse(ctx, clus2.JSON200.Slug, &openapi.NodeDeleteParams{
+				TargetNode:     &clus1.JSON200.Slug,
+				MoveChildNodes: opt.New(true).Ptr(),
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cdel.StatusCode())
 			a.NotNil(cdel.JSON200.Destination)
 			a.Equal(clus1.JSON200.Id, cdel.JSON200.Destination.Id)
 
-			clus1get, err := cl.ClusterGetWithResponse(ctx, clus1.JSON200.Slug)
+			clus1get, err := cl.NodeGetWithResponse(ctx, clus1.JSON200.Slug)
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus1get.StatusCode())
 
@@ -169,8 +169,8 @@ func TestDatagraphDeletions(t *testing.T) {
 	}))
 }
 
-func uniqueCluster(name string) openapi.ClusterInitialProps {
-	return openapi.ClusterInitialProps{
+func uniqueCluster(name string) openapi.NodeInitialProps {
+	return openapi.NodeInitialProps{
 		Name:        name,
 		Slug:        name + uuid.NewString(),
 		Description: name,

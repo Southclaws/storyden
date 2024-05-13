@@ -4,8 +4,8 @@ import { isEmpty } from "lodash";
 import { FormProvider } from "react-hook-form";
 
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
-import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
 import { DatagraphNodeMenu } from "src/components/directory/datagraph/DatagraphNodeMenu/DatagraphNodeMenu";
+import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { CancelAction } from "src/components/site/Action/Cancel";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
@@ -121,15 +121,6 @@ export function DatagraphNodeScreen(props: Props) {
               )}
             </HStack>
 
-            {/* TODO: Links and link editing for clusters
-            {cluster.link && (
-              <Box w="full">
-                <Link href={cluster.link?.url} w="full" size="sm">
-                  {cluster.link?.url}
-                </Link>
-              </Box>
-            )} */}
-
             {editing ? (
               <Input
                 placeholder="Description"
@@ -150,37 +141,31 @@ export function DatagraphNodeScreen(props: Props) {
           }
         />
 
-        {node.type === "cluster" && (
-          <VStack alignItems="start" w="full">
-            {node.clusters.length === 0 && node.items.length === 0 && (
-              <Empty>Nothing inside</Empty>
-            )}
+        <VStack alignItems="start" w="full">
+          {node.children.length === 0 && <Empty>Nothing inside</Empty>}
 
-            {node && (node.clusters.length ?? 0) > 0 && (
-              <ClusterCardRows
-                directoryPath={directoryPath}
-                context="directory"
-                clusters={node.clusters}
-              />
-            )}
-          </VStack>
-        )}
+          {node && (node.children.length ?? 0) > 0 && (
+            <NodeCardRows
+              directoryPath={directoryPath}
+              context="directory"
+              nodes={node.children}
+            />
+          )}
+        </VStack>
 
-        {node.type === "item" && (
-          <VStack alignItems="start" w="full">
-            <Heading2>Member of</Heading2>
+        <VStack alignItems="start" w="full">
+          <Heading2>Member of</Heading2>
 
-            {node.clusters.length ? (
-              <ClusterCardRows
-                directoryPath={directoryPath}
-                context="directory"
-                clusters={node.clusters}
-              />
-            ) : (
-              <Empty>No Items</Empty>
-            )}
-          </VStack>
-        )}
+          {node.children.length ? (
+            <NodeCardRows
+              directoryPath={directoryPath}
+              context="directory"
+              nodes={node.children}
+            />
+          ) : (
+            <Empty>No Items</Empty>
+          )}
+        </VStack>
       </FormProvider>
     </styled.form>
   );

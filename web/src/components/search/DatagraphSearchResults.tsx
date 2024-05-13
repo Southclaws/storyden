@@ -54,7 +54,7 @@ function buildPermalink(d: DatagraphNode): string {
       return `/t/${d.slug}`;
     case "reply":
       return `/t/${d.slug}`;
-    case "cluster":
+    case "node":
       return `/directory/${d.slug}`;
     case "link":
       return `/l/${d.slug}`;

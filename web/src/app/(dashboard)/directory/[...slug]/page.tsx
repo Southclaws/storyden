@@ -1,12 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 
-import { ClusterGetOKResponse } from "src/api/openapi/schemas";
+import { NodeGetOKResponse } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
 import { getServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
-import { ClusterCreateManyScreen } from "src/screens/directory/datagraph/ClusterCreateManyScreen/ClusterCreateManyScreen";
-import { ClusterCreateScreen } from "src/screens/directory/datagraph/ClusterCreateScreen/ClusterCreateScreen";
-import { ClusterViewerScreen } from "src/screens/directory/datagraph/ClusterViewerScreen/ClusterViewerScreen";
+import { NodeCreateManyScreen } from "src/screens/directory/datagraph/NodeCreateManyScreen/NodeCreateManyScreen";
+import { NodeCreateScreen } from "src/screens/directory/datagraph/NodeCreateScreen/NodeCreateScreen";
+import { NodeViewerScreen } from "src/screens/directory/datagraph/NodeViewerScreen/NodeViewerScreen";
 import {
   Params,
   ParamsSchema,
@@ -26,37 +26,37 @@ export default async function Page(props: Props) {
 
   const [targetSlug, fallback, isNew] = getTargetSlug(slug);
 
-  const cluster = await server<ClusterGetOKResponse>({
-    url: `/v1/clusters/${targetSlug}`,
+  const node = await server<NodeGetOKResponse>({
+    url: `/v1/nodes/${targetSlug}`,
   });
 
-  if (cluster) {
+  if (node) {
     if (isNew) {
       if (!session) {
         redirect(`/login?return=${fallback}`);
       }
 
       if (bulk) {
-        return <ClusterCreateManyScreen cluster={cluster} />;
+        return <NodeCreateManyScreen node={node} />;
       }
 
-      return <ClusterCreateScreen session={session} />;
+      return <NodeCreateScreen session={session} />;
     }
 
-    return <ClusterViewerScreen slug={targetSlug} cluster={cluster} />;
+    return <NodeViewerScreen slug={targetSlug} node={node} />;
   }
 
-  // Creating a new item or cluster from the root: "/directory/new"
+  // Creating a new item or node from the root: "/directory/new"
   if (isNew) {
     if (!session) {
       redirect(`/login`); // TODO: ?return= back to this path.
     }
 
     if (bulk) {
-      return <ClusterCreateManyScreen />;
+      return <NodeCreateManyScreen />;
     }
 
-    return <ClusterCreateScreen session={session} />;
+    return <NodeCreateScreen session={session} />;
   }
 
   notFound();

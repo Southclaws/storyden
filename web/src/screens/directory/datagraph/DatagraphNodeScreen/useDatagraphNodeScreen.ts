@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { clusterAddAsset, clusterRemoveAsset } from "src/api/openapi/clusters";
+import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi/nodes";
 import { Asset, Visibility } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import {
@@ -113,11 +113,11 @@ export function useDatagraphNodeScreen({
   async function handleAssetUpload(asset: Asset) {
     if (!editing) return;
 
-    // We only want to run these updates for edits of existing clusters.
+    // We only want to run these updates for edits of existing nodes.
     if (!node.id) return;
 
     triggerSavingPopover();
-    await clusterAddAsset(node.slug, asset.id);
+    await nodeAddAsset(node.slug, asset.id);
   }
 
   async function handleAssetRemove(asset: Asset) {
@@ -125,7 +125,7 @@ export function useDatagraphNodeScreen({
     if (!node.id) return;
 
     triggerSavingPopover();
-    await clusterRemoveAsset(node.slug, asset.id);
+    await nodeRemoveAsset(node.slug, asset.id);
   }
 
   const handleSubmit = form.handleSubmit(handleSave);

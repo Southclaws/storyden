@@ -1,15 +1,15 @@
 import {
-  ClusterListOKResponse,
   LinkListOKResponse,
+  NodeListOKResponse,
 } from "src/api/openapi/schemas";
 import { server } from "src/api/server";
 import { Client } from "src/screens/directory/datagraph/DatagraphIndexScreen";
 
 export default async function Page() {
-  const [clusters, links] = await Promise.all([
-    server<ClusterListOKResponse>({ url: "/v1/clusters" }),
+  const [nodes, links] = await Promise.all([
+    server<NodeListOKResponse>({ url: "/v1/nodes" }),
     server<LinkListOKResponse>({ url: "/v1/links" }),
   ]);
 
-  return <Client clusters={clusters} links={links} />;
+  return <Client nodes={nodes} links={links} />;
 }

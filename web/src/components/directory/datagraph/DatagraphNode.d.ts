@@ -1,11 +1,11 @@
 import {
-  Cluster,
-  ClusterInitialProps,
-  ClusterWithItems,
+  Node,
+  NodeInitialProps,
+  NodeWithChildren,
 } from "src/api/openapi/schemas";
 
-export type DatagraphNode = Cluster;
+export type DatagraphNode = Node;
 
-export type DatagraphNodeWithRelations = ClusterWithItems;
+export type DatagraphNodeWithRelations = NodeWithChildren;
 
-export type DatagraphNodeInitialProps = ClusterInitialProps;
+export type DatagraphNodeInitialProps = NodeInitialProps;

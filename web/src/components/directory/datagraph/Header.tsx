@@ -1,11 +1,11 @@
-import { Cluster } from "src/api/openapi/schemas";
+import { Node } from "src/api/openapi/schemas";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Heading1 } from "src/theme/components/Heading/Index";
 import { Link } from "src/theme/components/Link";
 
 import { Box, HStack, Stack, VStack, styled } from "@/styled-system/jsx";
 
-type Props = Cluster;
+type Props = Node;
 
 export function DatagraphHeader(props: Props) {
   const asset = props.assets?.[0];
