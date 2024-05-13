@@ -1,6 +1,6 @@
-import { useClusterList } from "src/api/openapi/clusters";
+import { useNodeList } from "src/api/openapi/nodes";
 import {
-  ClusterListOKResponse,
+  NodeListOKResponse,
   ThreadListOKResponse,
   Visibility,
 } from "src/api/openapi/schemas";
@@ -8,46 +8,46 @@ import { useSession } from "src/auth";
 
 export type Props = {
   threads: ThreadListOKResponse;
-  clusters: ClusterListOKResponse;
+  nodes: NodeListOKResponse;
 };
 
 export function useDraftListScreen(props: Props) {
   const session = useSession();
   const {
-    data: clusters,
-    mutate: mutateClusters,
-    error: errorClusters,
-  } = useClusterList(
+    data: nodes,
+    mutate: mutateNodes,
+    error: errorNodes,
+  } = useNodeList(
     {
       visibility: [Visibility.draft],
     },
     {
       swr: {
-        fallbackData: props.clusters,
+        fallbackData: props.nodes,
       },
     },
   );
 
-  if (!clusters) {
+  if (!nodes) {
     return {
       ready: false as const,
-      error: errorClusters,
+      error: errorNodes,
     };
   }
 
-  const empty = clusters.clusters.length === 0;
+  const empty = nodes.nodes.length === 0;
 
   return {
     ready: true as const,
     empty,
     data: {
-      clusters: {
-        data: clusters,
-        mutate: mutateClusters,
+      nodes: {
+        data: nodes,
+        mutate: mutateNodes,
       },
     },
     mutate: {
-      mutateClusters,
+      mutateNodes,
     },
     session,
   };

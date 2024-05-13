@@ -1,14 +1,14 @@
 import { filter } from "lodash/fp";
 
-import { useClusterList } from "src/api/openapi/clusters";
 import { useLinkList } from "src/api/openapi/links";
+import { useNodeList } from "src/api/openapi/nodes";
 import {
-  ClusterList,
-  ClusterListParams,
-  ClusterListResult,
   LinkList,
   LinkListParams,
   LinkListResult,
+  NodeList,
+  NodeListParams,
+  NodeListResult,
   ThreadList,
   ThreadListParams,
   ThreadListResult,
@@ -19,13 +19,13 @@ import { threadDelete, useThreadList } from "src/api/openapi/threads";
 
 export type MixedContent = {
   threads: ThreadListResult;
-  clusters: ClusterListResult;
+  nodes: NodeListResult;
   links: LinkListResult;
 };
 
 export type MixedContentLists = {
   threads: ThreadList;
-  clusters: ClusterList;
+  nodes: NodeList;
   links: LinkList;
 };
 
@@ -36,12 +36,12 @@ export type MixedContentHandlers = {
 export type Props = {
   params?: {
     threads?: ThreadListParams;
-    clusters?: ClusterListParams;
+    nodes?: NodeListParams;
     links?: LinkListParams;
   };
   initialData?: {
     threads: ThreadListResult;
-    clusters: ClusterListResult;
+    nodes: NodeListResult;
     links: LinkListResult;
   };
 };
@@ -59,11 +59,11 @@ export function useFeed({ params, initialData }: Props) {
   });
 
   const {
-    data: clusters,
-    mutate: mutateClusters,
-    error: errorClusters,
-  } = useClusterList(params?.clusters, {
-    swr: { fallbackData: initialData?.clusters },
+    data: nodes,
+    mutate: mutateNodes,
+    error: errorNodes,
+  } = useNodeList(params?.nodes, {
+    swr: { fallbackData: initialData?.nodes },
   });
 
   const {
@@ -74,8 +74,8 @@ export function useFeed({ params, initialData }: Props) {
     swr: { fallbackData: initialData?.links },
   });
 
-  const isReady = threads && clusters && links;
-  const allErrors = errorThreads || errorClusters || errorLinks;
+  const isReady = threads && nodes && links;
+  const allErrors = errorThreads || errorNodes || errorLinks;
 
   if (!isReady) {
     return {
@@ -105,12 +105,12 @@ export function useFeed({ params, initialData }: Props) {
     ready: true as const,
     data: {
       threads,
-      clusters,
+      nodes,
       links,
     } satisfies MixedContent,
     mutate: {
       mutateThreads,
-      mutateClusters,
+      mutateNodes,
       mutateLinks,
     },
     handlers: {
