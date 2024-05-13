@@ -43,7 +43,7 @@ type service struct {
 func New(
 	l *zap.Logger,
 	as asset_manager.Service,
-	cr node.Repository,
+	nr node.Repository,
 	lr link.Repository,
 	sc url.Scraper,
 	semdex semdex.Indexer,

@@ -17,17 +17,17 @@ import (
 type Hydrator struct {
 	tr thread.Repository
 	rr reply.Repository
-	cr node.Repository
+	nr node.Repository
 	lr link.Repository
 }
 
 func New(
 	tr thread.Repository,
 	rr reply.Repository,
-	cr node.Repository,
+	nr node.Repository,
 	lr link.Repository,
 ) *Hydrator {
-	return &Hydrator{tr, rr, cr, lr}
+	return &Hydrator{tr, rr, nr, lr}
 }
 
 func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*datagraph.NodeReference, error) {
@@ -58,7 +58,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 		return sr, nil
 
 	case datagraph.KindNode:
-		c, err := h.cr.GetByID(ctx, datagraph.NodeID(sr.ID))
+		c, err := h.nr.GetByID(ctx, datagraph.NodeID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

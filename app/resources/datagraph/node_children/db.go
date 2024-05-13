@@ -17,11 +17,11 @@ import (
 
 type database struct {
 	db *ent.Client
-	cr node.Repository
+	nr node.Repository
 }
 
-func New(db *ent.Client, cr node.Repository) Repository {
-	return &database{db, cr}
+func New(db *ent.Client, nr node.Repository) Repository {
+	return &database{db, nr}
 }
 
 type options struct {
@@ -34,12 +34,12 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug
 		opt(&o)
 	}
 
-	fromNode, err := d.cr.Get(ctx, fromSlug)
+	fromNode, err := d.nr.Get(ctx, fromSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	toNode, err := d.cr.Get(ctx, toSlug)
+	toNode, err := d.nr.Get(ctx, toSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

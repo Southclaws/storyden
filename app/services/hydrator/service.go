@@ -29,20 +29,20 @@ func Build() fx.Option {
 type service struct {
 	l  *zap.Logger
 	tr thread.Repository
-	cr node.Repository
+	nr node.Repository
 	f  fetcher.Service
 }
 
 func New(
 	l *zap.Logger,
 	tr thread.Repository,
-	cr node.Repository,
+	nr node.Repository,
 	f fetcher.Service,
 ) Service {
 	return &service{
 		l:  l.With(zap.String("service", "hydrator")),
 		tr: tr,
-		cr: cr,
+		nr: nr,
 		f:  f,
 	}
 }
