@@ -574,21 +574,21 @@ func HasCollectionsWith(preds ...predicate.Collection) predicate.Account {
 	})
 }
 
-// HasClusters applies the HasEdge predicate on the "clusters" edge.
-func HasClusters() predicate.Account {
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ClustersTable, ClustersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClustersWith applies the HasEdge predicate on the "clusters" edge with a given conditions (other predicates).
-func HasClustersWith(preds ...predicate.Cluster) predicate.Account {
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
-		step := newClustersStep()
+		step := newNodesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

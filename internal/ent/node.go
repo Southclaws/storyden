@@ -11,12 +11,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/rs/xid"
 )
 
-// Cluster is the model entity for the Cluster schema.
-type Cluster struct {
+// Node is the model entity for the Node schema.
+type Node struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID xid.ID `json:"id,omitempty"`
@@ -34,28 +34,28 @@ type Cluster struct {
 	Description string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
 	Content *string `json:"content,omitempty"`
-	// ParentClusterID holds the value of the "parent_cluster_id" field.
-	ParentClusterID xid.ID `json:"parent_cluster_id,omitempty"`
+	// ParentNodeID holds the value of the "parent_node_id" field.
+	ParentNodeID xid.ID `json:"parent_node_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
-	Visibility cluster.Visibility `json:"visibility,omitempty"`
+	Visibility node.Visibility `json:"visibility,omitempty"`
 	// Properties holds the value of the "properties" field.
 	Properties any `json:"properties,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ClusterQuery when eager-loading is set.
-	Edges        ClusterEdges `json:"edges"`
+	// The values are being populated by the NodeQuery when eager-loading is set.
+	Edges        NodeEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// ClusterEdges holds the relations/edges for other nodes in the graph.
-type ClusterEdges struct {
+// NodeEdges holds the relations/edges for other nodes in the graph.
+type NodeEdges struct {
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
-	// A many-to-many recursive self reference. The parent cluster, if any.
-	Parent *Cluster `json:"parent,omitempty"`
-	// Clusters holds the value of the clusters edge.
-	Clusters []*Cluster `json:"clusters,omitempty"`
+	// A many-to-many recursive self reference. The parent node, if any.
+	Parent *Node `json:"parent,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
@@ -69,7 +69,7 @@ type ClusterEdges struct {
 
 // OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClusterEdges) OwnerOrErr() (*Account, error) {
+func (e NodeEdges) OwnerOrErr() (*Account, error) {
 	if e.Owner != nil {
 		return e.Owner, nil
 	} else if e.loadedTypes[0] {
@@ -80,27 +80,27 @@ func (e ClusterEdges) OwnerOrErr() (*Account, error) {
 
 // ParentOrErr returns the Parent value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ClusterEdges) ParentOrErr() (*Cluster, error) {
+func (e NodeEdges) ParentOrErr() (*Node, error) {
 	if e.Parent != nil {
 		return e.Parent, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: cluster.Label}
+		return nil, &NotFoundError{label: node.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent"}
 }
 
-// ClustersOrErr returns the Clusters value or an error if the edge
+// NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClusterEdges) ClustersOrErr() ([]*Cluster, error) {
+func (e NodeEdges) NodesOrErr() ([]*Node, error) {
 	if e.loadedTypes[2] {
-		return e.Clusters, nil
+		return e.Nodes, nil
 	}
-	return nil, &NotLoadedError{edge: "clusters"}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClusterEdges) AssetsOrErr() ([]*Asset, error) {
+func (e NodeEdges) AssetsOrErr() ([]*Asset, error) {
 	if e.loadedTypes[3] {
 		return e.Assets, nil
 	}
@@ -109,7 +109,7 @@ func (e ClusterEdges) AssetsOrErr() ([]*Asset, error) {
 
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClusterEdges) TagsOrErr() ([]*Tag, error) {
+func (e NodeEdges) TagsOrErr() ([]*Tag, error) {
 	if e.loadedTypes[4] {
 		return e.Tags, nil
 	}
@@ -118,7 +118,7 @@ func (e ClusterEdges) TagsOrErr() ([]*Tag, error) {
 
 // LinksOrErr returns the Links value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClusterEdges) LinksOrErr() ([]*Link, error) {
+func (e NodeEdges) LinksOrErr() ([]*Link, error) {
 	if e.loadedTypes[5] {
 		return e.Links, nil
 	}
@@ -126,17 +126,17 @@ func (e ClusterEdges) LinksOrErr() ([]*Link, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Cluster) scanValues(columns []string) ([]any, error) {
+func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cluster.FieldProperties:
+		case node.FieldProperties:
 			values[i] = new([]byte)
-		case cluster.FieldName, cluster.FieldSlug, cluster.FieldDescription, cluster.FieldContent, cluster.FieldVisibility:
+		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
 			values[i] = new(sql.NullString)
-		case cluster.FieldCreatedAt, cluster.FieldUpdatedAt, cluster.FieldDeletedAt:
+		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case cluster.FieldID, cluster.FieldParentClusterID, cluster.FieldAccountID:
+		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -146,194 +146,194 @@ func (*Cluster) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Cluster fields.
-func (c *Cluster) assignValues(columns []string, values []any) error {
+// to the Node fields.
+func (n *Node) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case cluster.FieldID:
+		case node.FieldID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				c.ID = *value
+				n.ID = *value
 			}
-		case cluster.FieldCreatedAt:
+		case node.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				n.CreatedAt = value.Time
 			}
-		case cluster.FieldUpdatedAt:
+		case node.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				n.UpdatedAt = value.Time
 			}
-		case cluster.FieldDeletedAt:
+		case node.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				c.DeletedAt = new(time.Time)
-				*c.DeletedAt = value.Time
+				n.DeletedAt = new(time.Time)
+				*n.DeletedAt = value.Time
 			}
-		case cluster.FieldName:
+		case node.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				c.Name = value.String
+				n.Name = value.String
 			}
-		case cluster.FieldSlug:
+		case node.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				c.Slug = value.String
+				n.Slug = value.String
 			}
-		case cluster.FieldDescription:
+		case node.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				c.Description = value.String
+				n.Description = value.String
 			}
-		case cluster.FieldContent:
+		case node.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field content", values[i])
 			} else if value.Valid {
-				c.Content = new(string)
-				*c.Content = value.String
+				n.Content = new(string)
+				*n.Content = value.String
 			}
-		case cluster.FieldParentClusterID:
+		case node.FieldParentNodeID:
 			if value, ok := values[i].(*xid.ID); !ok {
-				return fmt.Errorf("unexpected type %T for field parent_cluster_id", values[i])
+				return fmt.Errorf("unexpected type %T for field parent_node_id", values[i])
 			} else if value != nil {
-				c.ParentClusterID = *value
+				n.ParentNodeID = *value
 			}
-		case cluster.FieldAccountID:
+		case node.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				c.AccountID = *value
+				n.AccountID = *value
 			}
-		case cluster.FieldVisibility:
+		case node.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				c.Visibility = cluster.Visibility(value.String)
+				n.Visibility = node.Visibility(value.String)
 			}
-		case cluster.FieldProperties:
+		case node.FieldProperties:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field properties", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &c.Properties); err != nil {
+				if err := json.Unmarshal(*value, &n.Properties); err != nil {
 					return fmt.Errorf("unmarshal field properties: %w", err)
 				}
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			n.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Cluster.
+// Value returns the ent.Value that was dynamically selected and assigned to the Node.
 // This includes values selected through modifiers, order, etc.
-func (c *Cluster) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (n *Node) Value(name string) (ent.Value, error) {
+	return n.selectValues.Get(name)
 }
 
-// QueryOwner queries the "owner" edge of the Cluster entity.
-func (c *Cluster) QueryOwner() *AccountQuery {
-	return NewClusterClient(c.config).QueryOwner(c)
+// QueryOwner queries the "owner" edge of the Node entity.
+func (n *Node) QueryOwner() *AccountQuery {
+	return NewNodeClient(n.config).QueryOwner(n)
 }
 
-// QueryParent queries the "parent" edge of the Cluster entity.
-func (c *Cluster) QueryParent() *ClusterQuery {
-	return NewClusterClient(c.config).QueryParent(c)
+// QueryParent queries the "parent" edge of the Node entity.
+func (n *Node) QueryParent() *NodeQuery {
+	return NewNodeClient(n.config).QueryParent(n)
 }
 
-// QueryClusters queries the "clusters" edge of the Cluster entity.
-func (c *Cluster) QueryClusters() *ClusterQuery {
-	return NewClusterClient(c.config).QueryClusters(c)
+// QueryNodes queries the "nodes" edge of the Node entity.
+func (n *Node) QueryNodes() *NodeQuery {
+	return NewNodeClient(n.config).QueryNodes(n)
 }
 
-// QueryAssets queries the "assets" edge of the Cluster entity.
-func (c *Cluster) QueryAssets() *AssetQuery {
-	return NewClusterClient(c.config).QueryAssets(c)
+// QueryAssets queries the "assets" edge of the Node entity.
+func (n *Node) QueryAssets() *AssetQuery {
+	return NewNodeClient(n.config).QueryAssets(n)
 }
 
-// QueryTags queries the "tags" edge of the Cluster entity.
-func (c *Cluster) QueryTags() *TagQuery {
-	return NewClusterClient(c.config).QueryTags(c)
+// QueryTags queries the "tags" edge of the Node entity.
+func (n *Node) QueryTags() *TagQuery {
+	return NewNodeClient(n.config).QueryTags(n)
 }
 
-// QueryLinks queries the "links" edge of the Cluster entity.
-func (c *Cluster) QueryLinks() *LinkQuery {
-	return NewClusterClient(c.config).QueryLinks(c)
+// QueryLinks queries the "links" edge of the Node entity.
+func (n *Node) QueryLinks() *LinkQuery {
+	return NewNodeClient(n.config).QueryLinks(n)
 }
 
-// Update returns a builder for updating this Cluster.
-// Note that you need to call Cluster.Unwrap() before calling this method if this Cluster
+// Update returns a builder for updating this Node.
+// Note that you need to call Node.Unwrap() before calling this method if this Node
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Cluster) Update() *ClusterUpdateOne {
-	return NewClusterClient(c.config).UpdateOne(c)
+func (n *Node) Update() *NodeUpdateOne {
+	return NewNodeClient(n.config).UpdateOne(n)
 }
 
-// Unwrap unwraps the Cluster entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Node entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Cluster) Unwrap() *Cluster {
-	_tx, ok := c.config.driver.(*txDriver)
+func (n *Node) Unwrap() *Node {
+	_tx, ok := n.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Cluster is not a transactional entity")
+		panic("ent: Node is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	n.config.driver = _tx.drv
+	return n
 }
 
 // String implements the fmt.Stringer.
-func (c *Cluster) String() string {
+func (n *Node) String() string {
 	var builder strings.Builder
-	builder.WriteString("Cluster(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("Node(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", n.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(n.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := c.DeletedAt; v != nil {
+	if v := n.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(c.Name)
+	builder.WriteString(n.Name)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(c.Slug)
+	builder.WriteString(n.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
-	builder.WriteString(c.Description)
+	builder.WriteString(n.Description)
 	builder.WriteString(", ")
-	if v := c.Content; v != nil {
+	if v := n.Content; v != nil {
 		builder.WriteString("content=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("parent_cluster_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.ParentClusterID))
+	builder.WriteString("parent_node_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.ParentNodeID))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
-	builder.WriteString(fmt.Sprintf("%v", c.Visibility))
+	builder.WriteString(fmt.Sprintf("%v", n.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("properties=")
-	builder.WriteString(fmt.Sprintf("%v", c.Properties))
+	builder.WriteString(fmt.Sprintf("%v", n.Properties))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// Clusters is a parsable slice of Cluster.
-type Clusters []*Cluster
+// Nodes is a parsable slice of Node.
+type Nodes []*Node

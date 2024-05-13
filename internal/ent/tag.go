@@ -32,8 +32,8 @@ type Tag struct {
 type TagEdges struct {
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
-	// Clusters holds the value of the clusters edge.
-	Clusters []*Cluster `json:"clusters,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// Accounts holds the value of the accounts edge.
 	Accounts []*Account `json:"accounts,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -50,13 +50,13 @@ func (e TagEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
-// ClustersOrErr returns the Clusters value or an error if the edge
+// NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e TagEdges) ClustersOrErr() ([]*Cluster, error) {
+func (e TagEdges) NodesOrErr() ([]*Node, error) {
 	if e.loadedTypes[1] {
-		return e.Clusters, nil
+		return e.Nodes, nil
 	}
-	return nil, &NotLoadedError{edge: "clusters"}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // AccountsOrErr returns the Accounts value or an error if the edge
@@ -130,9 +130,9 @@ func (t *Tag) QueryPosts() *PostQuery {
 	return NewTagClient(t.config).QueryPosts(t)
 }
 
-// QueryClusters queries the "clusters" edge of the Tag entity.
-func (t *Tag) QueryClusters() *ClusterQuery {
-	return NewTagClient(t.config).QueryClusters(t)
+// QueryNodes queries the "nodes" edge of the Tag entity.
+func (t *Tag) QueryNodes() *NodeQuery {
+	return NewTagClient(t.config).QueryNodes(t)
 }
 
 // QueryAccounts queries the "accounts" edge of the Tag entity.

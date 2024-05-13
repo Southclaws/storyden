@@ -37,12 +37,12 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			// iurl := "https://picsum.photos/500/500"
 
-			name1 := "test-cluster-1"
+			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
 			clus1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name1,
 				Slug:        slug1,
-				Description: "testing clusters api",
+				Description: "testing nodes api",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus1)
@@ -50,17 +50,17 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			a.Equal(name1, clus1.JSON200.Name)
 			a.Equal(slug1, clus1.JSON200.Slug)
-			a.Equal("testing clusters api", clus1.JSON200.Description)
+			a.Equal("testing nodes api", clus1.JSON200.Description)
 			a.Equal(acc.ID.String(), string(clus1.JSON200.Owner.Id))
 
-			// Add a child cluster
+			// Add a child node
 
-			name2 := "test-cluster-2"
+			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
 			clus2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name2,
 				Slug:        slug2,
-				Description: "testing clusters children",
+				Description: "testing nodes children",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus2)
@@ -77,12 +77,12 @@ func TestDatagraphHappyPath(t *testing.T) {
 			// |- clus2
 			//    |- clus3
 
-			name3 := "test-cluster-3"
+			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
 			clus3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name3,
 				Slug:        slug3,
-				Description: "testing clusters children",
+				Description: "testing nodes children",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(clus3)
@@ -113,20 +113,20 @@ func TestDatagraphDeletions(t *testing.T) {
 
 			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
-			// Create three clusters in a tree
+			// Create three nodes in a tree
 			// clus1
 			// |- clus2
 			//    |- clus3
 
-			clus1, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions1"), e2e.WithSession(ctx, cj))
+			clus1, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions1"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus1.StatusCode())
 
-			clus2, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions2"), e2e.WithSession(ctx, cj))
+			clus2, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus2.StatusCode())
 
-			clus3, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions3"), e2e.WithSession(ctx, cj))
+			clus3, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions3"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus3.StatusCode())
 
@@ -143,7 +143,7 @@ func TestDatagraphDeletions(t *testing.T) {
 			r.Equal(http.StatusOK, cdel.StatusCode())
 			a.Nil(cdel.JSON200.Destination)
 
-			clus2clus, err := cl.NodeCreateWithResponse(ctx, uniqueCluster("deletions2child"), e2e.WithSession(ctx, cj))
+			clus2clus, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2child"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, clus2clus.StatusCode())
 
@@ -169,7 +169,7 @@ func TestDatagraphDeletions(t *testing.T) {
 	}))
 }
 
-func uniqueCluster(name string) openapi.NodeInitialProps {
+func uniqueNode(name string) openapi.NodeInitialProps {
 	return openapi.NodeInitialProps{
 		Name:        name,
 		Slug:        name + uuid.NewString(),

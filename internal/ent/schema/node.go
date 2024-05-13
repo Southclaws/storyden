@@ -8,53 +8,53 @@ import (
 	"github.com/rs/xid"
 )
 
-type Cluster struct {
+type Node struct {
 	ent.Schema
 }
 
-func (Cluster) Mixin() []ent.Mixin {
+func (Node) Mixin() []ent.Mixin {
 	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
 }
 
-func (Cluster) Fields() []ent.Field {
+func (Node) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("slug").Unique(),
 		field.String("description"),
 		field.String("content").Optional().Nillable(),
-		field.String("parent_cluster_id").GoType(xid.ID{}).Optional(),
+		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 		field.Any("properties").Optional(),
 	}
 }
 
-func (Cluster) Indexes() []ent.Index {
+func (Node) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("slug"),
 	}
 }
 
-func (Cluster) Edges() []ent.Edge {
+func (Node) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("owner", Account.Type).
-			Ref("clusters").
+			Ref("nodes").
 			Field("account_id").
 			Unique().
 			Required(),
 
-		edge.To("clusters", Cluster.Type).
+		edge.To("nodes", Node.Type).
 			From("parent").
 			Unique().
-			Field("parent_cluster_id").
-			Comment("A many-to-many recursive self reference. The parent cluster, if any."),
+			Field("parent_node_id").
+			Comment("A many-to-many recursive self reference. The parent node, if any."),
 
 		edge.To("assets", Asset.Type),
 
 		edge.From("tags", Tag.Type).
-			Ref("clusters"),
+			Ref("nodes"),
 
 		edge.From("links", Link.Type).
-			Ref("clusters"),
+			Ref("nodes"),
 	}
 }

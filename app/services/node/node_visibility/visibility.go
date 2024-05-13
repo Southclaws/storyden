@@ -1,4 +1,4 @@
-package cluster_visibility
+package node_visibility
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_children"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
@@ -19,14 +19,14 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Controller struct {
 	ar account.Repository
-	cr cluster.Repository
-	cc cluster_children.Repository
+	cr node.Repository
+	cc node_children.Repository
 }
 
 func New(
 	ar account.Repository,
-	cr cluster.Repository,
-	cc cluster_children.Repository,
+	cr node.Repository,
+	cc node_children.Repository,
 ) *Controller {
 	return &Controller{
 		ar: ar,
@@ -35,7 +35,7 @@ func New(
 	}
 }
 
-func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.ClusterSlug, visibility post.Visibility) (*datagraph.Cluster, error) {
+func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSlug, visibility post.Visibility) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -57,7 +57,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.Cluste
 		}
 	}
 
-	clus, err = m.cr.Update(ctx, clus.ID, cluster.WithVisibility(visibility))
+	clus, err = m.cr.Update(ctx, clus.ID, node.WithVisibility(visibility))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

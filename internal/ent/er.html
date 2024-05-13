@@ -46,20 +46,6 @@ erDiagram
         bool admin
         mapLBRACKstringRBRACKinterface {} metadata
     }
-    Cluster {
-        xidDOTID id
-        timeDOTTime created_at
-        timeDOTTime updated_at
-        timeDOTTime deleted_at
-        string name
-        string slug
-        string description
-        string content
-        xidDOTID parent_cluster_id
-        xidDOTID account_id
-        clusterDOTVisibility visibility
-        any properties
-    }
     Collection {
         xidDOTID id
         timeDOTTime created_at
@@ -76,6 +62,20 @@ erDiagram
         string domain
         string title
         string description
+    }
+    Node {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string name
+        string slug
+        string description
+        string content
+        xidDOTID parent_node_id
+        xidDOTID account_id
+        nodeDOTVisibility visibility
+        any properties
     }
     Notification {
         xidDOTID id
@@ -130,22 +130,22 @@ erDiagram
     	Account |o--o{ Authentication : "authentication/account"
     	Account }o--o{ Tag : "tags/accounts"
     	Account |o--o{ Collection : "collections/owner"
-    	Account |o--o{ Cluster : "clusters/owner"
+    	Account |o--o{ Node : "nodes/owner"
     	Account |o--o{ Asset : "assets/owner"
     	Category |o--o{ Post : "posts/category"
-    	Cluster |o--o{ Cluster : "clusters/parent"
-    	Cluster }o--o{ Asset : "assets/clusters"
     	Collection }o--o{ Post : "posts/collections"
     	Link }o--o{ Post : "posts/links"
-    	Link }o--o{ Cluster : "clusters/links"
+    	Link }o--o{ Node : "nodes/links"
     	Link }o--o{ Asset : "assets/links"
+    	Node |o--o{ Node : "nodes/parent"
+    	Node }o--o{ Asset : "assets/nodes"
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
-    	Tag }o--o{ Cluster : "clusters/tags"
+    	Tag }o--o{ Node : "nodes/tags"
 		</div>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 	<script src="https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js"></script>

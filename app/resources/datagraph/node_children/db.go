@@ -1,4 +1,4 @@
-package cluster_children
+package node_children
 
 import (
 	"context"
@@ -10,37 +10,36 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/internal/ent"
-	cluster_model "github.com/Southclaws/storyden/internal/ent/cluster"
+	node_model "github.com/Southclaws/storyden/internal/ent/node"
 )
 
 type database struct {
 	db *ent.Client
-	cr cluster.Repository
+	cr node.Repository
 }
 
-func New(db *ent.Client, cr cluster.Repository) Repository {
+func New(db *ent.Client, cr node.Repository) Repository {
 	return &database{db, cr}
 }
 
 type options struct {
-	moveClusters bool
-	moveItems    bool
+	moveNodes bool
 }
 
-func (d *database) Move(ctx context.Context, fromSlug datagraph.ClusterSlug, toSlug datagraph.ClusterSlug, opts ...Option) (*datagraph.Cluster, error) {
+func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug datagraph.NodeSlug, opts ...Option) (*datagraph.Node, error) {
 	o := options{}
 	for _, opt := range opts {
 		opt(&o)
 	}
 
-	fromCluster, err := d.cr.Get(ctx, fromSlug)
+	fromNode, err := d.cr.Get(ctx, fromSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	toCluster, err := d.cr.Get(ctx, toSlug)
+	toNode, err := d.cr.Get(ctx, toSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -51,16 +50,16 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.ClusterSlug, toS
 	}
 
 	err = func() (err error) {
-		if o.moveClusters {
-			clusters, err := d.db.Cluster.Query().Where(cluster_model.ParentClusterID(xid.ID(fromCluster.ID))).All(ctx)
+		if o.moveNodes {
+			nodes, err := d.db.Node.Query().Where(node_model.ParentNodeID(xid.ID(fromNode.ID))).All(ctx)
 			if err != nil {
 				return fault.Wrap(err)
 			}
-			childClusterIDs := dt.Map(clusters, func(c *ent.Cluster) xid.ID { return c.ID })
+			childNodeIDs := dt.Map(nodes, func(c *ent.Node) xid.ID { return c.ID })
 
-			err = d.db.Cluster.Update().
-				SetParentID(xid.ID(toCluster.ID)).
-				Where(cluster_model.IDIn(childClusterIDs...)).
+			err = d.db.Node.Update().
+				SetParentID(xid.ID(toNode.ID)).
+				Where(node_model.IDIn(childNodeIDs...)).
 				Exec(ctx)
 			if err != nil {
 				return fault.Wrap(err)
@@ -81,5 +80,5 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.ClusterSlug, toS
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return toCluster, nil
+	return toNode, nil
 }

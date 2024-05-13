@@ -1,4 +1,4 @@
-package cluster_traversal
+package node_traversal
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 )
 
 type Repository interface {
-	Root(ctx context.Context, opts ...Filter) ([]*datagraph.Cluster, error)
-	Subtree(ctx context.Context, id datagraph.ClusterID, opts ...Filter) ([]*datagraph.Cluster, error)
-	FilterSubtree(ctx context.Context, id datagraph.ClusterID, filter string) ([]*datagraph.Cluster, error)
+	Root(ctx context.Context, opts ...Filter) ([]*datagraph.Node, error)
+	Subtree(ctx context.Context, id datagraph.NodeID, opts ...Filter) ([]*datagraph.Node, error)
+	FilterSubtree(ctx context.Context, id datagraph.NodeID, filter string) ([]*datagraph.Node, error)
 }
 
 type filters struct {

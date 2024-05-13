@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -22,14 +22,14 @@ import (
 // LinkQuery is the builder for querying Link entities.
 type LinkQuery struct {
 	config
-	ctx          *QueryContext
-	order        []link.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Link
-	withPosts    *PostQuery
-	withClusters *ClusterQuery
-	withAssets   *AssetQuery
-	modifiers    []func(*sql.Selector)
+	ctx        *QueryContext
+	order      []link.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Link
+	withPosts  *PostQuery
+	withNodes  *NodeQuery
+	withAssets *AssetQuery
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -88,9 +88,9 @@ func (lq *LinkQuery) QueryPosts() *PostQuery {
 	return query
 }
 
-// QueryClusters chains the current query on the "clusters" edge.
-func (lq *LinkQuery) QueryClusters() *ClusterQuery {
-	query := (&ClusterClient{config: lq.config}).Query()
+// QueryNodes chains the current query on the "nodes" edge.
+func (lq *LinkQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: lq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := lq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +101,8 @@ func (lq *LinkQuery) QueryClusters() *ClusterQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, selector),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.ClustersTable, link.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.NodesTable, link.NodesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,14 +319,14 @@ func (lq *LinkQuery) Clone() *LinkQuery {
 		return nil
 	}
 	return &LinkQuery{
-		config:       lq.config,
-		ctx:          lq.ctx.Clone(),
-		order:        append([]link.OrderOption{}, lq.order...),
-		inters:       append([]Interceptor{}, lq.inters...),
-		predicates:   append([]predicate.Link{}, lq.predicates...),
-		withPosts:    lq.withPosts.Clone(),
-		withClusters: lq.withClusters.Clone(),
-		withAssets:   lq.withAssets.Clone(),
+		config:     lq.config,
+		ctx:        lq.ctx.Clone(),
+		order:      append([]link.OrderOption{}, lq.order...),
+		inters:     append([]Interceptor{}, lq.inters...),
+		predicates: append([]predicate.Link{}, lq.predicates...),
+		withPosts:  lq.withPosts.Clone(),
+		withNodes:  lq.withNodes.Clone(),
+		withAssets: lq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
@@ -344,14 +344,14 @@ func (lq *LinkQuery) WithPosts(opts ...func(*PostQuery)) *LinkQuery {
 	return lq
 }
 
-// WithClusters tells the query-builder to eager-load the nodes that are connected to
-// the "clusters" edge. The optional arguments are used to configure the query builder of the edge.
-func (lq *LinkQuery) WithClusters(opts ...func(*ClusterQuery)) *LinkQuery {
-	query := (&ClusterClient{config: lq.config}).Query()
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LinkQuery) WithNodes(opts ...func(*NodeQuery)) *LinkQuery {
+	query := (&NodeClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lq.withClusters = query
+	lq.withNodes = query
 	return lq
 }
 
@@ -446,7 +446,7 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 		_spec       = lq.querySpec()
 		loadedTypes = [3]bool{
 			lq.withPosts != nil,
-			lq.withClusters != nil,
+			lq.withNodes != nil,
 			lq.withAssets != nil,
 		}
 	)
@@ -478,10 +478,10 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 			return nil, err
 		}
 	}
-	if query := lq.withClusters; query != nil {
-		if err := lq.loadClusters(ctx, query, nodes,
-			func(n *Link) { n.Edges.Clusters = []*Cluster{} },
-			func(n *Link, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
+	if query := lq.withNodes; query != nil {
+		if err := lq.loadNodes(ctx, query, nodes,
+			func(n *Link) { n.Edges.Nodes = []*Node{} },
+			func(n *Link, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -556,7 +556,7 @@ func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*L
 	}
 	return nil
 }
-func (lq *LinkQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes []*Link, init func(*Link), assign func(*Link, *Cluster)) error {
+func (lq *LinkQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Link, init func(*Link), assign func(*Link, *Node)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Link)
 	nids := make(map[xid.ID]map[*Link]struct{})
@@ -568,11 +568,11 @@ func (lq *LinkQuery) loadClusters(ctx context.Context, query *ClusterQuery, node
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(link.ClustersTable)
-		s.Join(joinT).On(s.C(cluster.FieldID), joinT.C(link.ClustersPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(link.ClustersPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(link.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(link.NodesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(link.NodesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(link.ClustersPrimaryKey[0]))
+		s.Select(joinT.C(link.NodesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -602,14 +602,14 @@ func (lq *LinkQuery) loadClusters(ctx context.Context, query *ClusterQuery, node
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Cluster](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "clusters" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

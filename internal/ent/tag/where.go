@@ -194,21 +194,21 @@ func HasPostsWith(preds ...predicate.Post) predicate.Tag {
 	})
 }
 
-// HasClusters applies the HasEdge predicate on the "clusters" edge.
-func HasClusters() predicate.Tag {
+// HasNodes applies the HasEdge predicate on the "nodes" edge.
+func HasNodes() predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ClustersTable, ClustersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClustersWith applies the HasEdge predicate on the "clusters" edge with a given conditions (other predicates).
-func HasClustersWith(preds ...predicate.Cluster) predicate.Tag {
+// HasNodesWith applies the HasEdge predicate on the "nodes" edge with a given conditions (other predicates).
+func HasNodesWith(preds ...predicate.Node) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := newClustersStep()
+		step := newNodesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

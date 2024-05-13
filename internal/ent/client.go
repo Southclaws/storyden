@@ -20,9 +20,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -46,12 +46,12 @@ type Client struct {
 	Authentication *AuthenticationClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
-	// Cluster is the client for interacting with the Cluster builders.
-	Cluster *ClusterClient
 	// Collection is the client for interacting with the Collection builders.
 	Collection *CollectionClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
+	// Node is the client for interacting with the Node builders.
+	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
@@ -79,9 +79,9 @@ func (c *Client) init() {
 	c.Asset = NewAssetClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
-	c.Cluster = NewClusterClient(c.config)
 	c.Collection = NewCollectionClient(c.config)
 	c.Link = NewLinkClient(c.config)
+	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.React = NewReactClient(c.config)
@@ -184,9 +184,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
-		Cluster:        NewClusterClient(cfg),
 		Collection:     NewCollectionClient(cfg),
 		Link:           NewLinkClient(cfg),
+		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
 		Post:           NewPostClient(cfg),
 		React:          NewReactClient(cfg),
@@ -216,9 +216,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
-		Cluster:        NewClusterClient(cfg),
 		Collection:     NewCollectionClient(cfg),
 		Link:           NewLinkClient(cfg),
+		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
 		Post:           NewPostClient(cfg),
 		React:          NewReactClient(cfg),
@@ -254,8 +254,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Cluster, c.Collection,
-		c.Link, c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Collection, c.Link, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -265,8 +265,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Cluster, c.Collection,
-		c.Link, c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Collection, c.Link, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -283,12 +283,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Authentication.mutate(ctx, m)
 	case *CategoryMutation:
 		return c.Category.mutate(ctx, m)
-	case *ClusterMutation:
-		return c.Cluster.mutate(ctx, m)
 	case *CollectionMutation:
 		return c.Collection.mutate(ctx, m)
 	case *LinkMutation:
 		return c.Link.mutate(ctx, m)
+	case *NodeMutation:
+		return c.Node.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
 	case *PostMutation:
@@ -510,15 +510,15 @@ func (c *AccountClient) QueryCollections(a *Account) *CollectionQuery {
 	return query
 }
 
-// QueryClusters queries the clusters edge of a Account.
-func (c *AccountClient) QueryClusters(a *Account) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
+// QueryNodes queries the nodes edge of a Account.
+func (c *AccountClient) QueryNodes(a *Account) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.ClustersTable, account.ClustersColumn),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NodesTable, account.NodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -691,15 +691,15 @@ func (c *AssetClient) QueryPosts(a *Asset) *PostQuery {
 	return query
 }
 
-// QueryClusters queries the clusters edge of a Asset.
-func (c *AssetClient) QueryClusters(a *Asset) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
+// QueryNodes queries the nodes edge of a Asset.
+func (c *AssetClient) QueryNodes(a *Asset) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(asset.Table, asset.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, asset.ClustersTable, asset.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, asset.NodesTable, asset.NodesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1062,235 +1062,6 @@ func (c *CategoryClient) mutate(ctx context.Context, m *CategoryMutation) (Value
 	}
 }
 
-// ClusterClient is a client for the Cluster schema.
-type ClusterClient struct {
-	config
-}
-
-// NewClusterClient returns a client for the Cluster from the given config.
-func NewClusterClient(c config) *ClusterClient {
-	return &ClusterClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `cluster.Hooks(f(g(h())))`.
-func (c *ClusterClient) Use(hooks ...Hook) {
-	c.hooks.Cluster = append(c.hooks.Cluster, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `cluster.Intercept(f(g(h())))`.
-func (c *ClusterClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Cluster = append(c.inters.Cluster, interceptors...)
-}
-
-// Create returns a builder for creating a Cluster entity.
-func (c *ClusterClient) Create() *ClusterCreate {
-	mutation := newClusterMutation(c.config, OpCreate)
-	return &ClusterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Cluster entities.
-func (c *ClusterClient) CreateBulk(builders ...*ClusterCreate) *ClusterCreateBulk {
-	return &ClusterCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *ClusterClient) MapCreateBulk(slice any, setFunc func(*ClusterCreate, int)) *ClusterCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &ClusterCreateBulk{err: fmt.Errorf("calling to ClusterClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*ClusterCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &ClusterCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Cluster.
-func (c *ClusterClient) Update() *ClusterUpdate {
-	mutation := newClusterMutation(c.config, OpUpdate)
-	return &ClusterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ClusterClient) UpdateOne(cl *Cluster) *ClusterUpdateOne {
-	mutation := newClusterMutation(c.config, OpUpdateOne, withCluster(cl))
-	return &ClusterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ClusterClient) UpdateOneID(id xid.ID) *ClusterUpdateOne {
-	mutation := newClusterMutation(c.config, OpUpdateOne, withClusterID(id))
-	return &ClusterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Cluster.
-func (c *ClusterClient) Delete() *ClusterDelete {
-	mutation := newClusterMutation(c.config, OpDelete)
-	return &ClusterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ClusterClient) DeleteOne(cl *Cluster) *ClusterDeleteOne {
-	return c.DeleteOneID(cl.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ClusterClient) DeleteOneID(id xid.ID) *ClusterDeleteOne {
-	builder := c.Delete().Where(cluster.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ClusterDeleteOne{builder}
-}
-
-// Query returns a query builder for Cluster.
-func (c *ClusterClient) Query() *ClusterQuery {
-	return &ClusterQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeCluster},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Cluster entity by its id.
-func (c *ClusterClient) Get(ctx context.Context, id xid.ID) (*Cluster, error) {
-	return c.Query().Where(cluster.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ClusterClient) GetX(ctx context.Context, id xid.ID) *Cluster {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryOwner queries the owner edge of a Cluster.
-func (c *ClusterClient) QueryOwner(cl *Cluster) *AccountQuery {
-	query := (&AccountClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, cluster.OwnerTable, cluster.OwnerColumn),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryParent queries the parent edge of a Cluster.
-func (c *ClusterClient) QueryParent(cl *Cluster) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, cluster.ParentTable, cluster.ParentColumn),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryClusters queries the clusters edge of a Cluster.
-func (c *ClusterClient) QueryClusters(cl *Cluster) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, cluster.ClustersTable, cluster.ClustersColumn),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAssets queries the assets edge of a Cluster.
-func (c *ClusterClient) QueryAssets(cl *Cluster) *AssetQuery {
-	query := (&AssetClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(asset.Table, asset.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, cluster.AssetsTable, cluster.AssetsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTags queries the tags edge of a Cluster.
-func (c *ClusterClient) QueryTags(cl *Cluster) *TagQuery {
-	query := (&TagClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(tag.Table, tag.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, cluster.TagsTable, cluster.TagsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryLinks queries the links edge of a Cluster.
-func (c *ClusterClient) QueryLinks(cl *Cluster) *LinkQuery {
-	query := (&LinkClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(cluster.Table, cluster.FieldID, id),
-			sqlgraph.To(link.Table, link.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, cluster.LinksTable, cluster.LinksPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ClusterClient) Hooks() []Hook {
-	return c.hooks.Cluster
-}
-
-// Interceptors returns the client interceptors.
-func (c *ClusterClient) Interceptors() []Interceptor {
-	return c.inters.Cluster
-}
-
-func (c *ClusterClient) mutate(ctx context.Context, m *ClusterMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ClusterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ClusterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ClusterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ClusterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Cluster mutation op: %q", m.Op())
-	}
-}
-
 // CollectionClient is a client for the Collection schema.
 type CollectionClient struct {
 	config
@@ -1580,15 +1351,15 @@ func (c *LinkClient) QueryPosts(l *Link) *PostQuery {
 	return query
 }
 
-// QueryClusters queries the clusters edge of a Link.
-func (c *LinkClient) QueryClusters(l *Link) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
+// QueryNodes queries the nodes edge of a Link.
+func (c *LinkClient) QueryNodes(l *Link) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := l.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.ClustersTable, link.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.NodesTable, link.NodesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -1634,6 +1405,235 @@ func (c *LinkClient) mutate(ctx context.Context, m *LinkMutation) (Value, error)
 		return (&LinkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Link mutation op: %q", m.Op())
+	}
+}
+
+// NodeClient is a client for the Node schema.
+type NodeClient struct {
+	config
+}
+
+// NewNodeClient returns a client for the Node from the given config.
+func NewNodeClient(c config) *NodeClient {
+	return &NodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `node.Hooks(f(g(h())))`.
+func (c *NodeClient) Use(hooks ...Hook) {
+	c.hooks.Node = append(c.hooks.Node, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `node.Intercept(f(g(h())))`.
+func (c *NodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Node = append(c.inters.Node, interceptors...)
+}
+
+// Create returns a builder for creating a Node entity.
+func (c *NodeClient) Create() *NodeCreate {
+	mutation := newNodeMutation(c.config, OpCreate)
+	return &NodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Node entities.
+func (c *NodeClient) CreateBulk(builders ...*NodeCreate) *NodeCreateBulk {
+	return &NodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NodeClient) MapCreateBulk(slice any, setFunc func(*NodeCreate, int)) *NodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NodeCreateBulk{err: fmt.Errorf("calling to NodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Node.
+func (c *NodeClient) Update() *NodeUpdate {
+	mutation := newNodeMutation(c.config, OpUpdate)
+	return &NodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NodeClient) UpdateOne(n *Node) *NodeUpdateOne {
+	mutation := newNodeMutation(c.config, OpUpdateOne, withNode(n))
+	return &NodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NodeClient) UpdateOneID(id xid.ID) *NodeUpdateOne {
+	mutation := newNodeMutation(c.config, OpUpdateOne, withNodeID(id))
+	return &NodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Node.
+func (c *NodeClient) Delete() *NodeDelete {
+	mutation := newNodeMutation(c.config, OpDelete)
+	return &NodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NodeClient) DeleteOne(n *Node) *NodeDeleteOne {
+	return c.DeleteOneID(n.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NodeClient) DeleteOneID(id xid.ID) *NodeDeleteOne {
+	builder := c.Delete().Where(node.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NodeDeleteOne{builder}
+}
+
+// Query returns a query builder for Node.
+func (c *NodeClient) Query() *NodeQuery {
+	return &NodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Node entity by its id.
+func (c *NodeClient) Get(ctx context.Context, id xid.ID) (*Node, error) {
+	return c.Query().Where(node.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NodeClient) GetX(ctx context.Context, id xid.ID) *Node {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOwner queries the owner edge of a Node.
+func (c *NodeClient) QueryOwner(n *Node) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.OwnerTable, node.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParent queries the parent edge of a Node.
+func (c *NodeClient) QueryParent(n *Node) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.ParentTable, node.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNodes queries the nodes edge of a Node.
+func (c *NodeClient) QueryNodes(n *Node) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.NodesTable, node.NodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAssets queries the assets edge of a Node.
+func (c *NodeClient) QueryAssets(n *Node) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.AssetsTable, node.AssetsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTags queries the tags edge of a Node.
+func (c *NodeClient) QueryTags(n *Node) *TagQuery {
+	query := (&TagClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, node.TagsTable, node.TagsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLinks queries the links edge of a Node.
+func (c *NodeClient) QueryLinks(n *Node) *LinkQuery {
+	query := (&LinkClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, node.LinksTable, node.LinksPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NodeClient) Hooks() []Hook {
+	return c.hooks.Node
+}
+
+// Interceptors returns the client interceptors.
+func (c *NodeClient) Interceptors() []Interceptor {
+	return c.inters.Node
+}
+
+func (c *NodeClient) mutate(ctx context.Context, m *NodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Node mutation op: %q", m.Op())
 	}
 }
 
@@ -2650,15 +2650,15 @@ func (c *TagClient) QueryPosts(t *Tag) *PostQuery {
 	return query
 }
 
-// QueryClusters queries the clusters edge of a Tag.
-func (c *TagClient) QueryClusters(t *Tag) *ClusterQuery {
-	query := (&ClusterClient{config: c.config}).Query()
+// QueryNodes queries the nodes edge of a Tag.
+func (c *TagClient) QueryNodes(t *Tag) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, tag.ClustersTable, tag.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, tag.NodesTable, tag.NodesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -2710,12 +2710,12 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, Asset, Authentication, Category, Cluster, Collection, Link,
-		Notification, Post, React, Role, Setting, Tag []ent.Hook
+		Account, Asset, Authentication, Category, Collection, Link, Node, Notification,
+		Post, React, Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
-		Account, Asset, Authentication, Category, Cluster, Collection, Link,
-		Notification, Post, React, Role, Setting, Tag []ent.Interceptor
+		Account, Asset, Authentication, Category, Collection, Link, Node, Notification,
+		Post, React, Role, Setting, Tag []ent.Interceptor
 	}
 )
 

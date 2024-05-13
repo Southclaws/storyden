@@ -1,4 +1,4 @@
-package cluster
+package node
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_children"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
@@ -27,11 +27,11 @@ type Manager interface {
 		slug string,
 		desc string,
 		p Partial,
-	) (*datagraph.Cluster, error)
+	) (*datagraph.Node, error)
 
-	Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error)
-	Update(ctx context.Context, slug datagraph.ClusterSlug, p Partial) (*datagraph.Cluster, error)
-	Delete(ctx context.Context, slug datagraph.ClusterSlug, d DeleteOptions) (*datagraph.Cluster, error)
+	Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error)
+	Update(ctx context.Context, slug datagraph.NodeSlug, p Partial) (*datagraph.Node, error)
+	Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteOptions) (*datagraph.Node, error)
 }
 
 type Partial struct {
@@ -40,7 +40,7 @@ type Partial struct {
 	URL          opt.Optional[string]
 	Description  opt.Optional[string]
 	Content      opt.Optional[string]
-	Parent       opt.Optional[datagraph.ClusterSlug]
+	Parent       opt.Optional[datagraph.NodeSlug]
 	Visibility   opt.Optional[post.Visibility]
 	Properties   opt.Optional[any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
@@ -48,33 +48,32 @@ type Partial struct {
 }
 
 type DeleteOptions struct {
-	MoveTo   opt.Optional[datagraph.ClusterSlug]
-	Clusters bool
-	Items    bool
+	MoveTo opt.Optional[datagraph.NodeSlug]
+	Nodes  bool
 }
 
-func (p Partial) Opts() (opts []cluster.Option) {
-	p.Name.Call(func(value string) { opts = append(opts, cluster.WithName(value)) })
-	p.Slug.Call(func(value string) { opts = append(opts, cluster.WithSlug(value)) })
-	p.Description.Call(func(value string) { opts = append(opts, cluster.WithDescription(value)) })
-	p.Content.Call(func(value string) { opts = append(opts, cluster.WithContent(value)) })
-	p.Properties.Call(func(value any) { opts = append(opts, cluster.WithProperties(value)) })
-	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssets(value)) })
-	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, cluster.WithAssetsRemoved(value)) })
+func (p Partial) Opts() (opts []node.Option) {
+	p.Name.Call(func(value string) { opts = append(opts, node.WithName(value)) })
+	p.Slug.Call(func(value string) { opts = append(opts, node.WithSlug(value)) })
+	p.Description.Call(func(value string) { opts = append(opts, node.WithDescription(value)) })
+	p.Content.Call(func(value string) { opts = append(opts, node.WithContent(value)) })
+	p.Properties.Call(func(value any) { opts = append(opts, node.WithProperties(value)) })
+	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssets(value)) })
+	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssetsRemoved(value)) })
 	return
 }
 
 type service struct {
 	ar       account.Repository
-	cr       cluster.Repository
-	cc       cluster_children.Repository
+	cr       node.Repository
+	cc       node_children.Repository
 	hydrator hydrator.Service
 }
 
 func New(
 	ar account.Repository,
-	cr cluster.Repository,
-	cc cluster_children.Repository,
+	cr node.Repository,
+	cc node_children.Repository,
 	hydrator hydrator.Service,
 ) Manager {
 	return &service{
@@ -91,7 +90,7 @@ func (s *service) Create(ctx context.Context,
 	slug string,
 	desc string,
 	p Partial,
-) (*datagraph.Cluster, error) {
+) (*datagraph.Node, error) {
 	opts, err := s.applyOpts(ctx, p)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -105,7 +104,7 @@ func (s *service) Create(ctx context.Context,
 	return clus, nil
 }
 
-func (s *service) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagraph.Cluster, error) {
+func (s *service) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error) {
 	clus, err := s.cr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -114,7 +113,7 @@ func (s *service) Get(ctx context.Context, slug datagraph.ClusterSlug) (*datagra
 	return clus, nil
 }
 
-func (s *service) Update(ctx context.Context, slug datagraph.ClusterSlug, p Partial) (*datagraph.Cluster, error) {
+func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -144,7 +143,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.ClusterSlug, p Part
 	return clus, nil
 }
 
-func (s *service) Delete(ctx context.Context, slug datagraph.ClusterSlug, d DeleteOptions) (*datagraph.Cluster, error) {
+func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteOptions) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -161,20 +160,16 @@ func (s *service) Delete(ctx context.Context, slug datagraph.ClusterSlug, d Dele
 		}
 	}
 
-	destination, err := opt.MapErr(d.MoveTo, func(target datagraph.ClusterSlug) (datagraph.Cluster, error) {
-		opts := []cluster_children.Option{}
+	destination, err := opt.MapErr(d.MoveTo, func(target datagraph.NodeSlug) (datagraph.Node, error) {
+		opts := []node_children.Option{}
 
-		if d.Clusters {
-			opts = append(opts, cluster_children.MoveClusters())
-		}
-
-		if d.Items {
-			opts = append(opts, cluster_children.MoveItems())
+		if d.Nodes {
+			opts = append(opts, node_children.MoveNodes())
 		}
 
 		destination, err := s.cc.Move(ctx, slug, target, opts...)
 		if err != nil {
-			return datagraph.Cluster{}, fault.Wrap(err, fctx.With(ctx))
+			return datagraph.Node{}, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		return *destination, fault.Wrap(err, fctx.With(ctx))
@@ -191,17 +186,17 @@ func (s *service) Delete(ctx context.Context, slug datagraph.ClusterSlug, d Dele
 	return destination.Ptr(), nil
 }
 
-func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []cluster.Option) {
+func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []node.Option) {
 	text, textOK := partial.Content.Get()
 
 	if !textOK && !partial.URL.Ok() {
 		return
 	}
 
-	return s.hydrator.HydrateCluster(ctx, text, partial.URL)
+	return s.hydrator.HydrateNode(ctx, text, partial.URL)
 }
 
-func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, error) {
+func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, error) {
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
 		return s.ar.GetByID(ctx, aid)
 	})
@@ -217,7 +212,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, e
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		opts = append(opts, cluster.WithParent(parent.ID))
+		opts = append(opts, node.WithParent(parent.ID))
 	}
 
 	if acc, ok := acc.Get(); ok {
@@ -227,7 +222,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]cluster.Option, e
 				return
 			}
 
-			opts = append(opts, cluster.WithVisibility(value))
+			opts = append(opts, node.WithVisibility(value))
 		})
 	}
 

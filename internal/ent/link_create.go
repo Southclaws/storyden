@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
@@ -100,19 +100,19 @@ func (lc *LinkCreate) AddPosts(p ...*Post) *LinkCreate {
 	return lc.AddPostIDs(ids...)
 }
 
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
-func (lc *LinkCreate) AddClusterIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddClusterIDs(ids...)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (lc *LinkCreate) AddNodeIDs(ids ...xid.ID) *LinkCreate {
+	lc.mutation.AddNodeIDs(ids...)
 	return lc
 }
 
-// AddClusters adds the "clusters" edges to the Cluster entity.
-func (lc *LinkCreate) AddClusters(c ...*Cluster) *LinkCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddNodes adds the "nodes" edges to the Node entity.
+func (lc *LinkCreate) AddNodes(n ...*Node) *LinkCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return lc.AddClusterIDs(ids...)
+	return lc.AddNodeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -276,15 +276,15 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.ClustersIDs(); len(nodes) > 0 {
+	if nodes := lc.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   link.ClustersTable,
-			Columns: link.ClustersPrimaryKey,
+			Table:   link.NodesTable,
+			Columns: link.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

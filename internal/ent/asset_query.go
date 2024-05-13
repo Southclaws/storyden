@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -23,15 +23,15 @@ import (
 // AssetQuery is the builder for querying Asset entities.
 type AssetQuery struct {
 	config
-	ctx          *QueryContext
-	order        []asset.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Asset
-	withPosts    *PostQuery
-	withClusters *ClusterQuery
-	withLinks    *LinkQuery
-	withOwner    *AccountQuery
-	modifiers    []func(*sql.Selector)
+	ctx        *QueryContext
+	order      []asset.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Asset
+	withPosts  *PostQuery
+	withNodes  *NodeQuery
+	withLinks  *LinkQuery
+	withOwner  *AccountQuery
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -90,9 +90,9 @@ func (aq *AssetQuery) QueryPosts() *PostQuery {
 	return query
 }
 
-// QueryClusters chains the current query on the "clusters" edge.
-func (aq *AssetQuery) QueryClusters() *ClusterQuery {
-	query := (&ClusterClient{config: aq.config}).Query()
+// QueryNodes chains the current query on the "nodes" edge.
+func (aq *AssetQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -103,8 +103,8 @@ func (aq *AssetQuery) QueryClusters() *ClusterQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(asset.Table, asset.FieldID, selector),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, asset.ClustersTable, asset.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, asset.NodesTable, asset.NodesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -343,15 +343,15 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 		return nil
 	}
 	return &AssetQuery{
-		config:       aq.config,
-		ctx:          aq.ctx.Clone(),
-		order:        append([]asset.OrderOption{}, aq.order...),
-		inters:       append([]Interceptor{}, aq.inters...),
-		predicates:   append([]predicate.Asset{}, aq.predicates...),
-		withPosts:    aq.withPosts.Clone(),
-		withClusters: aq.withClusters.Clone(),
-		withLinks:    aq.withLinks.Clone(),
-		withOwner:    aq.withOwner.Clone(),
+		config:     aq.config,
+		ctx:        aq.ctx.Clone(),
+		order:      append([]asset.OrderOption{}, aq.order...),
+		inters:     append([]Interceptor{}, aq.inters...),
+		predicates: append([]predicate.Asset{}, aq.predicates...),
+		withPosts:  aq.withPosts.Clone(),
+		withNodes:  aq.withNodes.Clone(),
+		withLinks:  aq.withLinks.Clone(),
+		withOwner:  aq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -369,14 +369,14 @@ func (aq *AssetQuery) WithPosts(opts ...func(*PostQuery)) *AssetQuery {
 	return aq
 }
 
-// WithClusters tells the query-builder to eager-load the nodes that are connected to
-// the "clusters" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AssetQuery) WithClusters(opts ...func(*ClusterQuery)) *AssetQuery {
-	query := (&ClusterClient{config: aq.config}).Query()
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithNodes(opts ...func(*NodeQuery)) *AssetQuery {
+	query := (&NodeClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withClusters = query
+	aq.withNodes = query
 	return aq
 }
 
@@ -482,7 +482,7 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 		_spec       = aq.querySpec()
 		loadedTypes = [4]bool{
 			aq.withPosts != nil,
-			aq.withClusters != nil,
+			aq.withNodes != nil,
 			aq.withLinks != nil,
 			aq.withOwner != nil,
 		}
@@ -515,10 +515,10 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 			return nil, err
 		}
 	}
-	if query := aq.withClusters; query != nil {
-		if err := aq.loadClusters(ctx, query, nodes,
-			func(n *Asset) { n.Edges.Clusters = []*Cluster{} },
-			func(n *Asset, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
+	if query := aq.withNodes; query != nil {
+		if err := aq.loadNodes(ctx, query, nodes,
+			func(n *Asset) { n.Edges.Nodes = []*Node{} },
+			func(n *Asset, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -599,7 +599,7 @@ func (aq *AssetQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*
 	}
 	return nil
 }
-func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Cluster)) error {
+func (aq *AssetQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Node)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Asset)
 	nids := make(map[xid.ID]map[*Asset]struct{})
@@ -611,11 +611,11 @@ func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nod
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(asset.ClustersTable)
-		s.Join(joinT).On(s.C(cluster.FieldID), joinT.C(asset.ClustersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(asset.ClustersPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(asset.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(asset.NodesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(asset.NodesPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(asset.ClustersPrimaryKey[1]))
+		s.Select(joinT.C(asset.NodesPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -645,14 +645,14 @@ func (aq *AssetQuery) loadClusters(ctx context.Context, query *ClusterQuery, nod
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Cluster](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "clusters" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

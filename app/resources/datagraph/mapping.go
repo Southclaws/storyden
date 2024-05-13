@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
+func NodeFromModel(c *ent.Node) (*Node, error) {
 	accEdge, err := c.Edges.OwnerOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -22,7 +22,7 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	clusters, err := dt.MapErr(c.Edges.Clusters, ClusterFromModel)
+	nodes, err := dt.MapErr(c.Edges.Nodes, NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -34,8 +34,8 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 
 	assets := dt.Map(c.Edges.Assets, asset.FromModel)
 
-	return &Cluster{
-		ID:          ClusterID(c.ID),
+	return &Node{
+		ID:          NodeID(c.ID),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 		Name:        c.Name,
@@ -45,7 +45,7 @@ func ClusterFromModel(c *ent.Cluster) (*Cluster, error) {
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
 		Owner:       *pro,
-		Clusters:    clusters,
+		Nodes:       nodes,
 		Visibility:  visibility,
 		Properties:  c.Properties,
 	}, nil

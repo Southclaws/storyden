@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -27,7 +27,7 @@ type TagQuery struct {
 	inters       []Interceptor
 	predicates   []predicate.Tag
 	withPosts    *PostQuery
-	withClusters *ClusterQuery
+	withNodes    *NodeQuery
 	withAccounts *AccountQuery
 	modifiers    []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -88,9 +88,9 @@ func (tq *TagQuery) QueryPosts() *PostQuery {
 	return query
 }
 
-// QueryClusters chains the current query on the "clusters" edge.
-func (tq *TagQuery) QueryClusters() *ClusterQuery {
-	query := (&ClusterClient{config: tq.config}).Query()
+// QueryNodes chains the current query on the "nodes" edge.
+func (tq *TagQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -101,8 +101,8 @@ func (tq *TagQuery) QueryClusters() *ClusterQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, tag.ClustersTable, tag.ClustersPrimaryKey...),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, tag.NodesTable, tag.NodesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -325,7 +325,7 @@ func (tq *TagQuery) Clone() *TagQuery {
 		inters:       append([]Interceptor{}, tq.inters...),
 		predicates:   append([]predicate.Tag{}, tq.predicates...),
 		withPosts:    tq.withPosts.Clone(),
-		withClusters: tq.withClusters.Clone(),
+		withNodes:    tq.withNodes.Clone(),
 		withAccounts: tq.withAccounts.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
@@ -344,14 +344,14 @@ func (tq *TagQuery) WithPosts(opts ...func(*PostQuery)) *TagQuery {
 	return tq
 }
 
-// WithClusters tells the query-builder to eager-load the nodes that are connected to
-// the "clusters" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TagQuery) WithClusters(opts ...func(*ClusterQuery)) *TagQuery {
-	query := (&ClusterClient{config: tq.config}).Query()
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithNodes(opts ...func(*NodeQuery)) *TagQuery {
+	query := (&NodeClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withClusters = query
+	tq.withNodes = query
 	return tq
 }
 
@@ -446,7 +446,7 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 		_spec       = tq.querySpec()
 		loadedTypes = [3]bool{
 			tq.withPosts != nil,
-			tq.withClusters != nil,
+			tq.withNodes != nil,
 			tq.withAccounts != nil,
 		}
 	)
@@ -478,10 +478,10 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 			return nil, err
 		}
 	}
-	if query := tq.withClusters; query != nil {
-		if err := tq.loadClusters(ctx, query, nodes,
-			func(n *Tag) { n.Edges.Clusters = []*Cluster{} },
-			func(n *Tag, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
+	if query := tq.withNodes; query != nil {
+		if err := tq.loadNodes(ctx, query, nodes,
+			func(n *Tag) { n.Edges.Nodes = []*Node{} },
+			func(n *Tag, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -556,7 +556,7 @@ func (tq *TagQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Ta
 	}
 	return nil
 }
-func (tq *TagQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Cluster)) error {
+func (tq *TagQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Node)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Tag)
 	nids := make(map[xid.ID]map[*Tag]struct{})
@@ -568,11 +568,11 @@ func (tq *TagQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(tag.ClustersTable)
-		s.Join(joinT).On(s.C(cluster.FieldID), joinT.C(tag.ClustersPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(tag.ClustersPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(tag.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(tag.NodesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(tag.NodesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(tag.ClustersPrimaryKey[0]))
+		s.Select(joinT.C(tag.NodesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -602,14 +602,14 @@ func (tq *TagQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Cluster](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "clusters" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
