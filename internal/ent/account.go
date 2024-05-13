@@ -52,8 +52,8 @@ type AccountEdges struct {
 	Tags []*Tag `json:"tags,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
-	// Clusters holds the value of the clusters edge.
-	Clusters []*Cluster `json:"clusters,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -115,13 +115,13 @@ func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
-// ClustersOrErr returns the Clusters value or an error if the edge
+// NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e AccountEdges) ClustersOrErr() ([]*Cluster, error) {
+func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 	if e.loadedTypes[6] {
-		return e.Clusters, nil
+		return e.Nodes, nil
 	}
-	return nil, &NotLoadedError{edge: "clusters"}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // AssetsOrErr returns the Assets value or an error if the edge
@@ -253,9 +253,9 @@ func (a *Account) QueryCollections() *CollectionQuery {
 	return NewAccountClient(a.config).QueryCollections(a)
 }
 
-// QueryClusters queries the "clusters" edge of the Account entity.
-func (a *Account) QueryClusters() *ClusterQuery {
-	return NewAccountClient(a.config).QueryClusters(a)
+// QueryNodes queries the "nodes" edge of the Account entity.
+func (a *Account) QueryNodes() *NodeQuery {
+	return NewAccountClient(a.config).QueryNodes(a)
 }
 
 // QueryAssets queries the "assets" edge of the Account entity.

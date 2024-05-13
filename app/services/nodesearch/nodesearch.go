@@ -1,4 +1,4 @@
-package clustersearch
+package nodesearch
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 )
 
 type Search interface {
-	Search(ctx context.Context, query string, root datagraph.ClusterSlug) ([]*datagraph.Cluster, error)
+	Search(ctx context.Context, query string, root datagraph.NodeSlug) ([]*datagraph.Node, error)
 }
 
 type service struct {
@@ -19,8 +19,8 @@ func New(ec ent.Client) Search {
 	return &service{ec: ec}
 }
 
-func (s *service) Search(ctx context.Context, q string, root datagraph.ClusterSlug) ([]*datagraph.Cluster, error) {
-	// query := s.ec.Cluster.Query()
+func (s *service) Search(ctx context.Context, q string, root datagraph.NodeSlug) ([]*datagraph.Node, error) {
+	// query := s.ec.Node.Query()
 	// query.
 	return nil, nil
 }

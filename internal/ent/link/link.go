@@ -29,8 +29,8 @@ const (
 	FieldDescription = "description"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
-	// EdgeClusters holds the string denoting the clusters edge name in mutations.
-	EdgeClusters = "clusters"
+	// EdgeNodes holds the string denoting the nodes edge name in mutations.
+	EdgeNodes = "nodes"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the link in the database.
@@ -40,11 +40,11 @@ const (
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
-	// ClustersTable is the table that holds the clusters relation/edge. The primary key declared below.
-	ClustersTable = "link_clusters"
-	// ClustersInverseTable is the table name for the Cluster entity.
-	// It exists in this package in order to avoid circular dependency with the "cluster" package.
-	ClustersInverseTable = "clusters"
+	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
+	NodesTable = "link_nodes"
+	// NodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodesInverseTable = "nodes"
 	// AssetsTable is the table that holds the assets relation/edge. The primary key declared below.
 	AssetsTable = "link_assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -67,9 +67,9 @@ var (
 	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
 	// primary key for the posts relation (M2M).
 	PostsPrimaryKey = []string{"link_id", "post_id"}
-	// ClustersPrimaryKey and ClustersColumn2 are the table columns denoting the
-	// primary key for the clusters relation (M2M).
-	ClustersPrimaryKey = []string{"link_id", "cluster_id"}
+	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
+	// primary key for the nodes relation (M2M).
+	NodesPrimaryKey = []string{"link_id", "node_id"}
 	// AssetsPrimaryKey and AssetsColumn2 are the table columns denoting the
 	// primary key for the assets relation (M2M).
 	AssetsPrimaryKey = []string{"link_id", "asset_id"}
@@ -146,17 +146,17 @@ func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByClustersCount orders the results by clusters count.
-func ByClustersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByNodesCount orders the results by nodes count.
+func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClustersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
 	}
 }
 
-// ByClusters orders the results by clusters terms.
-func ByClusters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByNodes orders the results by nodes terms.
+func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClustersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -180,11 +180,11 @@ func newPostsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
 	)
 }
-func newClustersStep() *sqlgraph.Step {
+func newNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClustersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ClustersTable, ClustersPrimaryKey...),
+		sqlgraph.To(NodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {

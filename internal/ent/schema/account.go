@@ -43,7 +43,7 @@ func (Account) Edges() []ent.Edge {
 		edge.To("collections", Collection.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("clusters", Cluster.Type).
+		edge.To("nodes", Node.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
 
 		edge.To("assets", Asset.Type).

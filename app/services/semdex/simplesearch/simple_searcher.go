@@ -21,7 +21,7 @@ func NewParallelSearcher(ec *ent.Client) *ParallelSearcher {
 	return &ParallelSearcher{
 		searchers: []semdex.Searcher{
 			&postSearcher{ec},
-			&clusterSearcher{ec},
+			&nodeSearcher{ec},
 			&linkSearcher{ec},
 		},
 	}

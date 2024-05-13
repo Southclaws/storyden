@@ -1,4 +1,4 @@
-package clustertree
+package nodetree
 
 import (
 	"context"
@@ -9,30 +9,30 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Graph interface {
-	// Move moves a cluster from either orphan state or belonging to one cluster
-	// to another cluster essentially setting its parent slug to some/new value.
-	Move(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	// Move moves a node from either orphan state or belonging to one node
+	// to another node essentially setting its parent slug to some/new value.
+	Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error)
 
-	// Sever orphans a cluster by removing it from its parent to the root level.
-	Sever(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error)
+	// Sever orphans a node by removing it from its parent to the root level.
+	Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error)
 }
 
 type service struct {
-	cr cluster.Repository
+	cr node.Repository
 }
 
-func New(cr cluster.Repository) Graph {
+func New(cr node.Repository) Graph {
 	return &service{cr: cr}
 }
 
-func (s *service) Move(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error) {
+func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -54,7 +54,7 @@ func (s *service) Move(ctx context.Context, child datagraph.ClusterSlug, parent 
 		}
 	}
 
-	pclus, err = s.cr.Update(ctx, pclus.ID, cluster.WithChildClusterAdd(xid.ID(cclus.ID)))
+	pclus, err = s.cr.Update(ctx, pclus.ID, node.WithChildNodeAdd(xid.ID(cclus.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -62,7 +62,7 @@ func (s *service) Move(ctx context.Context, child datagraph.ClusterSlug, parent 
 	return pclus, nil
 }
 
-func (s *service) Sever(ctx context.Context, child datagraph.ClusterSlug, parent datagraph.ClusterSlug) (*datagraph.Cluster, error) {
+func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -84,7 +84,7 @@ func (s *service) Sever(ctx context.Context, child datagraph.ClusterSlug, parent
 		}
 	}
 
-	pclus, err = s.cr.Update(ctx, pclus.ID, cluster.WithChildClusterRemove(xid.ID(cclus.ID)))
+	pclus, err = s.cr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(cclus.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

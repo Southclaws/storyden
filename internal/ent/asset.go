@@ -42,8 +42,8 @@ type Asset struct {
 type AssetEdges struct {
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
-	// Clusters holds the value of the clusters edge.
-	Clusters []*Cluster `json:"clusters,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// Links holds the value of the links edge.
 	Links []*Link `json:"links,omitempty"`
 	// Owner holds the value of the owner edge.
@@ -62,13 +62,13 @@ func (e AssetEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
-// ClustersOrErr returns the Clusters value or an error if the edge
+// NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
-func (e AssetEdges) ClustersOrErr() ([]*Cluster, error) {
+func (e AssetEdges) NodesOrErr() ([]*Node, error) {
 	if e.loadedTypes[1] {
-		return e.Clusters, nil
+		return e.Nodes, nil
 	}
-	return nil, &NotLoadedError{edge: "clusters"}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // LinksOrErr returns the Links value or an error if the edge
@@ -181,9 +181,9 @@ func (a *Asset) QueryPosts() *PostQuery {
 	return NewAssetClient(a.config).QueryPosts(a)
 }
 
-// QueryClusters queries the "clusters" edge of the Asset entity.
-func (a *Asset) QueryClusters() *ClusterQuery {
-	return NewAssetClient(a.config).QueryClusters(a)
+// QueryNodes queries the "nodes" edge of the Asset entity.
+func (a *Asset) QueryNodes() *NodeQuery {
+	return NewAssetClient(a.config).QueryNodes(a)
 }
 
 // QueryLinks queries the "links" edge of the Asset entity.

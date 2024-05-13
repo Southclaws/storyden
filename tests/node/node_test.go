@@ -1,4 +1,4 @@
-package nodeter_test
+package node_test
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/tests/testutils"
 )
 
-func TestClustersHappyPath(t *testing.T) {
+func TestNodesHappyPath(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -38,15 +38,15 @@ func TestClustersHappyPath(t *testing.T) {
 
 			visibility := openapi.Published
 
-			name1 := "test-nodeter-1"
+			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			content1 := "# Clusters\n\nRich text content."
+			content1 := "# Nodes\n\nRich text content."
 			// iurl1 := "https://picsum.photos/200/200"
 			url1 := "https://southcla.ws"
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name1,
 				Slug:        slug1,
-				Description: "testing nodeters api",
+				Description: "testing nodes api",
 				Content:     &content1,
 				Url:         &url1,
 				Visibility:  &visibility, // Admin account can post directly to published
@@ -57,7 +57,7 @@ func TestClustersHappyPath(t *testing.T) {
 
 			a.Equal(name1, node1.JSON200.Name)
 			a.Equal(slug1, node1.JSON200.Slug)
-			a.Equal("testing nodeters api", node1.JSON200.Description)
+			a.Equal("testing nodes api", node1.JSON200.Description)
 			a.Equal(content1, *node1.JSON200.Content)
 			a.Equal(url1, node1.JSON200.Link.Url)
 			a.Equal(acc.ID.String(), string(node1.JSON200.Owner.Id))
@@ -71,12 +71,12 @@ func TestClustersHappyPath(t *testing.T) {
 
 			a.Equal(name1, node1get.JSON200.Name)
 			a.Equal(slug1, node1get.JSON200.Slug)
-			a.Equal("testing nodeters api", node1get.JSON200.Description)
+			a.Equal("testing nodes api", node1get.JSON200.Description)
 			a.Equal(acc.ID.String(), string(node1get.JSON200.Owner.Id))
 
 			// Update the one just created
 
-			name1 = "test-nodeter-1-UPDATED"
+			name1 = "test-node-1-UPDATED"
 			slug1 = name1 + uuid.NewString()
 			desc1 := "a new description"
 			cont1 := "# New content"
@@ -104,7 +104,7 @@ func TestClustersHappyPath(t *testing.T) {
 			a.Equal(url1, node1update.JSON200.Link.Url)
 			a.Equal(prop1, node1update.JSON200.Properties)
 
-			// List all root level nodeters
+			// List all root level nodes
 
 			clist, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{})
 			r.NoError(err)
@@ -115,14 +115,14 @@ func TestClustersHappyPath(t *testing.T) {
 
 			a.Contains(ids, node1.JSON200.Id)
 
-			// Add a child nodeter
+			// Add a child node
 
-			name2 := "test-nodeter-2"
+			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
 			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name2,
 				Slug:        slug2,
-				Description: "testing nodeters children",
+				Description: "testing nodes children",
 				Parent:      &slug1,
 				Visibility:  &visibility,
 			}, e2e.WithSession(ctx, cj))
@@ -130,7 +130,7 @@ func TestClustersHappyPath(t *testing.T) {
 			r.NotNil(node2)
 			r.Equal(http.StatusOK, node2.StatusCode())
 
-			// List all root level nodeters
+			// List all root level nodes
 
 			clist2, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{})
 			r.NoError(err)
@@ -147,12 +147,12 @@ func TestClustersHappyPath(t *testing.T) {
 			//    |- node3
 			// then query children of node2, expect node2+node3 only
 
-			name3 := "test-nodeter-3"
+			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
 			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name3,
 				Slug:        slug3,
-				Description: "testing nodeters children",
+				Description: "testing nodes children",
 				Visibility:  &visibility,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
@@ -167,7 +167,7 @@ func TestClustersHappyPath(t *testing.T) {
 			r.Equal(http.StatusOK, cadd.StatusCode())
 			r.Equal(node2.JSON200.Id, cadd.JSON200.Id)
 
-			// List all root level nodeters
+			// List all root level nodes
 
 			clist3, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{})
 			r.NoError(err)
@@ -215,7 +215,7 @@ func TestClustersHappyPath(t *testing.T) {
 	}))
 }
 
-func TestClustersFiltering(t *testing.T) {
+func TestNodesFiltering(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -234,13 +234,13 @@ func TestClustersFiltering(t *testing.T) {
 
 			visibility := openapi.Published
 
-			name1 := "test-nodeter-owned-by-1"
+			name1 := "test-node-owned-by-1"
 			slug1 := name1 + uuid.NewString()
-			content1 := "# Clusters\n\nOwned by Odin."
+			content1 := "# Nodes\n\nOwned by Odin."
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name1,
 				Slug:        slug1,
-				Description: "testing nodeters api",
+				Description: "testing nodes api",
 				Content:     &content1,
 				Visibility:  &visibility,
 			}, e2e.WithSession(ctx1, cj))
@@ -248,13 +248,13 @@ func TestClustersFiltering(t *testing.T) {
 			r.NotNil(node1)
 			r.Equal(http.StatusOK, node1.StatusCode())
 
-			name2 := "test-nodeter-owned-by-2"
+			name2 := "test-node-owned-by-2"
 			slug2 := name2 + uuid.NewString()
-			content2 := "# Clusters\n\nOwned by Frigg."
+			content2 := "# Nodes\n\nOwned by Frigg."
 			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name2,
 				Slug:        slug2,
-				Description: "testing nodeters api",
+				Description: "testing nodes api",
 				Content:     &content2,
 				Visibility:  &visibility,
 			}, e2e.WithSession(ctx2, cj))
@@ -289,7 +289,7 @@ func TestClustersFiltering(t *testing.T) {
 	}))
 }
 
-func TestClustersVisibility(t *testing.T) {
+func TestNodesVisibility(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -303,32 +303,32 @@ func TestClustersVisibility(t *testing.T) {
 			a := assert.New(t)
 
 			// Tests:
-			// - Admin can change visibility of anyone's nodeter
-			// - Admin can list non-published nodeters
-			// - Non-admin can not list non-published nodeters
-			// - Non-admin cannot update visibility of any nodeters
-			// - Author can list their own hidden nodeters
-			// - Author can update visibility of their own nodeters
+			// - Admin can change visibility of anyone's node
+			// - Admin can list non-published nodes
+			// - Non-admin can not list non-published nodes
+			// - Non-admin cannot update visibility of any nodes
+			// - Author can list their own hidden nodes
+			// - Author can update visibility of their own nodes
 
 			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 			ctxAuthor, accAuthor := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
 			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
 
-			// Author creates 3 nodeters
+			// Author creates 3 nodes
 
-			name1 := "TestClustersFiltering1"
+			name1 := "TestNodesFiltering1"
 			slug1 := name1 + uuid.NewString()
 			node1 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: name1, Slug: slug1, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
-			name2 := "TestClustersFiltering2"
+			name2 := "TestNodesFiltering2"
 			slug2 := name2 + uuid.NewString()
 			node2 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: name2, Slug: slug2, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
-			name3 := "TestClustersFiltering3"
+			name3 := "TestNodesFiltering3"
 			slug3 := name3 + uuid.NewString()
 			node3 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: name3, Slug: slug3, Description: ""}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
-			name4 := "TestClustersFiltering4"
+			name4 := "TestNodesFiltering4"
 			slug4 := name4 + uuid.NewString()
 			node4 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: name4, Slug: slug4, Description: ""}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
 
@@ -372,7 +372,7 @@ func TestClustersVisibility(t *testing.T) {
 
 			ids = dt.Map(clist.JSON200.Nodes, func(c openapi.Node) string { return c.Id })
 
-			a.Contains(ids, node1.JSON200.Id, "admin made this nodeter visible")
+			a.Contains(ids, node1.JSON200.Id, "admin made this node visible")
 			a.NotContains(ids, node2.JSON200.Id)
 			a.NotContains(ids, node3.JSON200.Id)
 			a.NotContains(ids, node4.JSON200.Id)
@@ -392,12 +392,12 @@ func TestClustersVisibility(t *testing.T) {
 
 			ids = dt.Map(clist.JSON200.Nodes, func(c openapi.Node) string { return c.Id })
 
-			a.Contains(ids, node1.JSON200.Id, "admin made this nodeter visible")
+			a.Contains(ids, node1.JSON200.Id, "admin made this node visible")
 			a.Contains(ids, node2.JSON200.Id)
 			a.NotContains(ids, node3.JSON200.Id)
 			a.NotContains(ids, node4.JSON200.Id)
 
-			// Author can list their own hidden nodeters, but not others.
+			// Author can list their own hidden nodes, but not others.
 
 			clist = testutils.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 				Visibility: &[]openapi.Visibility{openapi.Draft},
@@ -407,10 +407,10 @@ func TestClustersVisibility(t *testing.T) {
 
 			a.NotContains(ids, node1.JSON200.Id)
 			a.NotContains(ids, node2.JSON200.Id)
-			a.Contains(ids, node3.JSON200.Id, "this is the only nodeter not published above")
+			a.Contains(ids, node3.JSON200.Id, "this is the only node not published above")
 			a.NotContains(ids, node4.JSON200.Id, "owned by someone else, should not be visible")
 
-			// Admin can only list in-review nodeters, but not drafts.
+			// Admin can only list in-review nodes, but not drafts.
 
 			clist = testutils.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 				Visibility: &[]openapi.Visibility{openapi.Review},
@@ -446,7 +446,7 @@ func TestClustersVisibility(t *testing.T) {
 	}))
 }
 
-func TestClustersErrors(t *testing.T) {
+func TestNodesErrors(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(

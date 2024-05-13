@@ -7,8 +7,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
@@ -17,14 +17,14 @@ import (
 type Hydrator struct {
 	tr thread.Repository
 	rr reply.Repository
-	cr cluster.Repository
+	cr node.Repository
 	lr link.Repository
 }
 
 func New(
 	tr thread.Repository,
 	rr reply.Repository,
-	cr cluster.Repository,
+	cr node.Repository,
 	lr link.Repository,
 ) *Hydrator {
 	return &Hydrator{tr, rr, cr, lr}
@@ -57,8 +57,8 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 
 		return sr, nil
 
-	case datagraph.KindCluster:
-		c, err := h.cr.GetByID(ctx, datagraph.ClusterID(sr.ID))
+	case datagraph.KindNode:
+		c, err := h.cr.GetByID(ctx, datagraph.NodeID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

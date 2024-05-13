@@ -12,14 +12,14 @@ import (
 )
 
 type (
-	ClusterID   xid.ID
-	ClusterSlug string
+	NodeID   xid.ID
+	NodeSlug string
 )
 
-func (i ClusterID) String() string { return xid.ID(i).String() }
+func (i NodeID) String() string { return xid.ID(i).String() }
 
-type Cluster struct {
-	ID        ClusterID
+type Node struct {
+	ID        NodeID
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
@@ -30,19 +30,19 @@ type Cluster struct {
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
-	Parent      opt.Optional[*Cluster]
+	Parent      opt.Optional[*Node]
 	Visibility  post.Visibility
 	Properties  any
 
-	Clusters []*Cluster
+	Nodes []*Node
 }
 
-func (*Cluster) GetResourceName() string { return "cluster" }
+func (*Node) GetResourceName() string { return "node" }
 
-func (c *Cluster) GetID() xid.ID   { return xid.ID(c.ID) }
-func (c *Cluster) GetKind() Kind   { return KindCluster }
-func (c *Cluster) GetName() string { return c.Name }
-func (c *Cluster) GetSlug() string { return c.Slug }
-func (c *Cluster) GetDesc() string { return c.Description }
-func (c *Cluster) GetText() string { return c.Content.String() }
-func (c *Cluster) GetProps() any   { return nil }
+func (c *Node) GetID() xid.ID   { return xid.ID(c.ID) }
+func (c *Node) GetKind() Kind   { return KindNode }
+func (c *Node) GetName() string { return c.Name }
+func (c *Node) GetSlug() string { return c.Slug }
+func (c *Node) GetDesc() string { return c.Description }
+func (c *Node) GetText() string { return c.Content.String() }
+func (c *Node) GetProps() any   { return nil }

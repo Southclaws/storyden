@@ -9,9 +9,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -210,45 +210,6 @@ func init() {
 			return nil
 		}
 	}()
-	clusterMixin := schema.Cluster{}.Mixin()
-	clusterMixinFields0 := clusterMixin[0].Fields()
-	_ = clusterMixinFields0
-	clusterMixinFields1 := clusterMixin[1].Fields()
-	_ = clusterMixinFields1
-	clusterMixinFields2 := clusterMixin[2].Fields()
-	_ = clusterMixinFields2
-	clusterFields := schema.Cluster{}.Fields()
-	_ = clusterFields
-	// clusterDescCreatedAt is the schema descriptor for created_at field.
-	clusterDescCreatedAt := clusterMixinFields1[0].Descriptor()
-	// cluster.DefaultCreatedAt holds the default value on creation for the created_at field.
-	cluster.DefaultCreatedAt = clusterDescCreatedAt.Default.(func() time.Time)
-	// clusterDescUpdatedAt is the schema descriptor for updated_at field.
-	clusterDescUpdatedAt := clusterMixinFields2[0].Descriptor()
-	// cluster.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	cluster.DefaultUpdatedAt = clusterDescUpdatedAt.Default.(func() time.Time)
-	// cluster.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	cluster.UpdateDefaultUpdatedAt = clusterDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// clusterDescID is the schema descriptor for id field.
-	clusterDescID := clusterMixinFields0[0].Descriptor()
-	// cluster.DefaultID holds the default value on creation for the id field.
-	cluster.DefaultID = clusterDescID.Default.(func() xid.ID)
-	// cluster.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	cluster.IDValidator = func() func(string) error {
-		validators := clusterDescID.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(id string) error {
-			for _, fn := range fns {
-				if err := fn(id); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
 	collectionMixin := schema.Collection{}.Mixin()
 	collectionMixinFields0 := collectionMixin[0].Fields()
 	_ = collectionMixinFields0
@@ -306,6 +267,45 @@ func init() {
 	// link.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	link.IDValidator = func() func(string) error {
 		validators := linkDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	nodeMixin := schema.Node{}.Mixin()
+	nodeMixinFields0 := nodeMixin[0].Fields()
+	_ = nodeMixinFields0
+	nodeMixinFields1 := nodeMixin[1].Fields()
+	_ = nodeMixinFields1
+	nodeMixinFields2 := nodeMixin[2].Fields()
+	_ = nodeMixinFields2
+	nodeFields := schema.Node{}.Fields()
+	_ = nodeFields
+	// nodeDescCreatedAt is the schema descriptor for created_at field.
+	nodeDescCreatedAt := nodeMixinFields1[0].Descriptor()
+	// node.DefaultCreatedAt holds the default value on creation for the created_at field.
+	node.DefaultCreatedAt = nodeDescCreatedAt.Default.(func() time.Time)
+	// nodeDescUpdatedAt is the schema descriptor for updated_at field.
+	nodeDescUpdatedAt := nodeMixinFields2[0].Descriptor()
+	// node.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	node.DefaultUpdatedAt = nodeDescUpdatedAt.Default.(func() time.Time)
+	// node.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	node.UpdateDefaultUpdatedAt = nodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// nodeDescID is the schema descriptor for id field.
+	nodeDescID := nodeMixinFields0[0].Descriptor()
+	// node.DefaultID holds the default value on creation for the id field.
+	node.DefaultID = nodeDescID.Default.(func() xid.ID)
+	// node.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	node.IDValidator = func() func(string) error {
+		validators := nodeDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

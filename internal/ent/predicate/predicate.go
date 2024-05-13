@@ -18,14 +18,14 @@ type Authentication func(*sql.Selector)
 // Category is the predicate function for category builders.
 type Category func(*sql.Selector)
 
-// Cluster is the predicate function for cluster builders.
-type Cluster func(*sql.Selector)
-
 // Collection is the predicate function for collection builders.
 type Collection func(*sql.Selector)
 
 // Link is the predicate function for link builders.
 type Link func(*sql.Selector)
+
+// Node is the predicate function for node builders.
+type Node func(*sql.Selector)
 
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)

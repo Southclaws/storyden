@@ -14,8 +14,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -37,7 +37,7 @@ type AccountQuery struct {
 	withAuthentication *AuthenticationQuery
 	withTags           *TagQuery
 	withCollections    *CollectionQuery
-	withClusters       *ClusterQuery
+	withNodes          *NodeQuery
 	withAssets         *AssetQuery
 	modifiers          []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -208,9 +208,9 @@ func (aq *AccountQuery) QueryCollections() *CollectionQuery {
 	return query
 }
 
-// QueryClusters chains the current query on the "clusters" edge.
-func (aq *AccountQuery) QueryClusters() *ClusterQuery {
-	query := (&ClusterClient{config: aq.config}).Query()
+// QueryNodes chains the current query on the "nodes" edge.
+func (aq *AccountQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -221,8 +221,8 @@ func (aq *AccountQuery) QueryClusters() *ClusterQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, selector),
-			sqlgraph.To(cluster.Table, cluster.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.ClustersTable, account.ClustersColumn),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NodesTable, account.NodesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -450,7 +450,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withAuthentication: aq.withAuthentication.Clone(),
 		withTags:           aq.withTags.Clone(),
 		withCollections:    aq.withCollections.Clone(),
-		withClusters:       aq.withClusters.Clone(),
+		withNodes:          aq.withNodes.Clone(),
 		withAssets:         aq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
@@ -524,14 +524,14 @@ func (aq *AccountQuery) WithCollections(opts ...func(*CollectionQuery)) *Account
 	return aq
 }
 
-// WithClusters tells the query-builder to eager-load the nodes that are connected to
-// the "clusters" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithClusters(opts ...func(*ClusterQuery)) *AccountQuery {
-	query := (&ClusterClient{config: aq.config}).Query()
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithNodes(opts ...func(*NodeQuery)) *AccountQuery {
+	query := (&NodeClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withClusters = query
+	aq.withNodes = query
 	return aq
 }
 
@@ -631,7 +631,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			aq.withAuthentication != nil,
 			aq.withTags != nil,
 			aq.withCollections != nil,
-			aq.withClusters != nil,
+			aq.withNodes != nil,
 			aq.withAssets != nil,
 		}
 	)
@@ -698,10 +698,10 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			return nil, err
 		}
 	}
-	if query := aq.withClusters; query != nil {
-		if err := aq.loadClusters(ctx, query, nodes,
-			func(n *Account) { n.Edges.Clusters = []*Cluster{} },
-			func(n *Account, e *Cluster) { n.Edges.Clusters = append(n.Edges.Clusters, e) }); err != nil {
+	if query := aq.withNodes; query != nil {
+		if err := aq.loadNodes(ctx, query, nodes,
+			func(n *Account) { n.Edges.Nodes = []*Node{} },
+			func(n *Account, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -960,7 +960,7 @@ func (aq *AccountQuery) loadCollections(ctx context.Context, query *CollectionQu
 	}
 	return nil
 }
-func (aq *AccountQuery) loadClusters(ctx context.Context, query *ClusterQuery, nodes []*Account, init func(*Account), assign func(*Account, *Cluster)) error {
+func (aq *AccountQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Account, init func(*Account), assign func(*Account, *Node)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -971,10 +971,10 @@ func (aq *AccountQuery) loadClusters(ctx context.Context, query *ClusterQuery, n
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(cluster.FieldAccountID)
+		query.ctx.AppendFieldOnce(node.FieldAccountID)
 	}
-	query.Where(predicate.Cluster(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(account.ClustersColumn), fks...))
+	query.Where(predicate.Node(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.NodesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
