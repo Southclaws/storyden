@@ -25,11 +25,11 @@ type Graph interface {
 }
 
 type service struct {
-	cr node.Repository
+	nr node.Repository
 }
 
-func New(cr node.Repository) Graph {
-	return &service{cr: cr}
+func New(nr node.Repository) Graph {
+	return &service{nr: nr}
 }
 
 func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
@@ -38,12 +38,12 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cclus, err := s.cr.Get(ctx, child)
+	cclus, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pclus, err := s.cr.Get(ctx, parent)
+	pclus, err := s.nr.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -54,7 +54,7 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 		}
 	}
 
-	pclus, err = s.cr.Update(ctx, pclus.ID, node.WithChildNodeAdd(xid.ID(cclus.ID)))
+	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeAdd(xid.ID(cclus.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -68,12 +68,12 @@ func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent da
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cclus, err := s.cr.Get(ctx, child)
+	cclus, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pclus, err := s.cr.Get(ctx, parent)
+	pclus, err := s.nr.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -84,7 +84,7 @@ func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent da
 		}
 	}
 
-	pclus, err = s.cr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(cclus.ID)))
+	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(cclus.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

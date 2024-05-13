@@ -65,21 +65,21 @@ func (p Partial) Opts() (opts []node.Option) {
 
 type service struct {
 	ar       account.Repository
-	cr       node.Repository
-	cc       node_children.Repository
+	nr       node.Repository
+	nc       node_children.Repository
 	hydrator hydrator.Service
 }
 
 func New(
 	ar account.Repository,
-	cr node.Repository,
-	cc node_children.Repository,
+	nr node.Repository,
+	nc node_children.Repository,
 	hydrator hydrator.Service,
 ) Manager {
 	return &service{
 		ar:       ar,
-		cr:       cr,
-		cc:       cc,
+		nr:       nr,
+		nc:       nc,
 		hydrator: hydrator,
 	}
 }
@@ -96,7 +96,7 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.cr.Create(ctx, owner, name, slug, desc, opts...)
+	n, err := s.nr.Create(ctx, owner, name, slug, desc, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -105,7 +105,7 @@ func (s *service) Create(ctx context.Context,
 }
 
 func (s *service) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error) {
-	n, err := s.cr.Get(ctx, slug)
+	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -119,7 +119,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.cr.Get(ctx, slug)
+	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -135,7 +135,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err = s.cr.Update(ctx, n.ID, opts...)
+	n, err = s.nr.Update(ctx, n.ID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -149,7 +149,7 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.cr.Get(ctx, slug)
+	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -167,7 +167,7 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 			opts = append(opts, node_children.MoveNodes())
 		}
 
-		destination, err := s.cc.Move(ctx, slug, target, opts...)
+		destination, err := s.nc.Move(ctx, slug, target, opts...)
 		if err != nil {
 			return datagraph.Node{}, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -178,7 +178,7 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.cr.Delete(ctx, slug)
+	err = s.nr.Delete(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -207,7 +207,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, erro
 	opts := p.Opts()
 
 	if parentSlug, ok := p.Parent.Get(); ok {
-		parent, err := s.cr.Get(ctx, parentSlug)
+		parent, err := s.nr.Get(ctx, parentSlug)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

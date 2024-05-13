@@ -19,19 +19,19 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Controller struct {
 	ar account.Repository
-	cr node.Repository
-	cc node_children.Repository
+	nr node.Repository
+	nc node_children.Repository
 }
 
 func New(
 	ar account.Repository,
-	cr node.Repository,
-	cc node_children.Repository,
+	nr node.Repository,
+	nc node_children.Repository,
 ) *Controller {
 	return &Controller{
 		ar: ar,
-		cr: cr,
-		cc: cc,
+		nr: nr,
+		nc: nc,
 	}
 }
 
@@ -46,7 +46,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := m.cr.Get(ctx, slug)
+	n, err := m.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -57,7 +57,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		}
 	}
 
-	n, err = m.cr.Update(ctx, n.ID, node.WithVisibility(visibility))
+	n, err = m.nr.Update(ctx, n.ID, node.WithVisibility(visibility))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
