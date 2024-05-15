@@ -3,8 +3,33 @@
   "extends": [
     "config:recommended"
   ],
+  "schedule": [
+    "every weekend"
+  ],
   "ignorePaths": [
     "node_modules/**",
     "home/**"
+  ],
+  "packageRules": [
+    {
+      "matchCategories": [
+        "js"
+      ],
+      "groupName": "All web dependencies"
+    },
+    {
+      "matchCategories": [
+        "golang"
+      ],
+      "groupName": "All api dependencies"
+    },
+    {
+      "matchCategories": [
+        "node",
+        "docker",
+        "ci"
+      ],
+      "groupName": "All other dependencies"
+    }
   ]
 }
