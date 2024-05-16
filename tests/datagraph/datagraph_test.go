@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
@@ -39,60 +38,60 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			clus1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name1,
 				Slug:        slug1,
 				Description: "testing nodes api",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.NotNil(clus1)
-			r.Equal(http.StatusOK, clus1.StatusCode())
+			r.NotNil(node1)
+			r.Equal(http.StatusOK, node1.StatusCode())
 
-			a.Equal(name1, clus1.JSON200.Name)
-			a.Equal(slug1, clus1.JSON200.Slug)
-			a.Equal("testing nodes api", clus1.JSON200.Description)
-			a.Equal(acc.ID.String(), string(clus1.JSON200.Owner.Id))
+			a.Equal(name1, node1.JSON200.Name)
+			a.Equal(slug1, node1.JSON200.Slug)
+			a.Equal("testing nodes api", node1.JSON200.Description)
+			a.Equal(acc.ID.String(), string(node1.JSON200.Owner.Id))
 
 			// Add a child node
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
-			clus2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name2,
 				Slug:        slug2,
 				Description: "testing nodes children",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.NotNil(clus2)
-			r.Equal(http.StatusOK, clus2.StatusCode())
+			r.NotNil(node2)
+			r.Equal(http.StatusOK, node2.StatusCode())
 
 			cadd, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug2, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())
-			r.Equal(clus1.JSON200.Id, cadd.JSON200.Id)
+			r.Equal(node1.JSON200.Id, cadd.JSON200.Id)
 
 			// Add another child to this child
-			// clus1
-			// |- clus2
-			//    |- clus3
+			// node1
+			// |- node2
+			//    |- node3
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
-			clus3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:        name3,
 				Slug:        slug3,
 				Description: "testing nodes children",
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.NotNil(clus3)
-			r.Equal(http.StatusOK, clus3.StatusCode())
+			r.NotNil(node3)
+			r.Equal(http.StatusOK, node3.StatusCode())
 
 			cadd, err = cl.NodeAddNodeWithResponse(ctx, slug2, slug3, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(cadd)
 			r.Equal(http.StatusOK, cadd.StatusCode())
-			r.Equal(clus2.JSON200.Id, cadd.JSON200.Id)
+			r.Equal(node2.JSON200.Id, cadd.JSON200.Id)
 		}))
 	}))
 }
@@ -114,57 +113,56 @@ func TestDatagraphDeletions(t *testing.T) {
 			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
 			// Create three nodes in a tree
-			// clus1
-			// |- clus2
-			//    |- clus3
+			// node1
+			// |- node2
+			//    |- node3
 
-			clus1, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions1"), e2e.WithSession(ctx, cj))
+			node1, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions1"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.Equal(http.StatusOK, clus1.StatusCode())
+			r.Equal(http.StatusOK, node1.StatusCode())
 
-			clus2, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2"), e2e.WithSession(ctx, cj))
+			node2, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.Equal(http.StatusOK, clus2.StatusCode())
+			r.Equal(http.StatusOK, node2.StatusCode())
 
-			clus3, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions3"), e2e.WithSession(ctx, cj))
+			node3, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions3"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.Equal(http.StatusOK, clus3.StatusCode())
+			r.Equal(http.StatusOK, node3.StatusCode())
 
-			cadd, err := cl.NodeAddNode(ctx, clus1.JSON200.Slug, clus2.JSON200.Slug, e2e.WithSession(ctx, cj))
-			r.NoError(err)
-			r.Equal(http.StatusOK, cadd.StatusCode)
-
-			cadd, err = cl.NodeAddNode(ctx, clus2.JSON200.Slug, clus3.JSON200.Slug, e2e.WithSession(ctx, cj))
+			cadd, err := cl.NodeAddNode(ctx, node1.JSON200.Slug, node2.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cadd.StatusCode)
 
-			cdel, err := cl.NodeDeleteWithResponse(ctx, clus3.JSON200.Slug, nil, e2e.WithSession(ctx, cj))
+			cadd, err = cl.NodeAddNode(ctx, node2.JSON200.Slug, node3.JSON200.Slug, e2e.WithSession(ctx, cj))
+			r.NoError(err)
+			r.Equal(http.StatusOK, cadd.StatusCode)
+
+			cdel, err := cl.NodeDeleteWithResponse(ctx, node3.JSON200.Slug, nil, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cdel.StatusCode())
 			a.Nil(cdel.JSON200.Destination)
 
-			clus2clus, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2child"), e2e.WithSession(ctx, cj))
+			node2node, err := cl.NodeCreateWithResponse(ctx, uniqueNode("deletions2child"), e2e.WithSession(ctx, cj))
 			r.NoError(err)
-			r.Equal(http.StatusOK, clus2clus.StatusCode())
+			r.Equal(http.StatusOK, node2node.StatusCode())
 
-			cadd, err = cl.NodeAddNode(ctx, clus2.JSON200.Slug, clus2clus.JSON200.Slug, e2e.WithSession(ctx, cj))
+			cadd, err = cl.NodeAddNode(ctx, node2.JSON200.Slug, node2node.JSON200.Slug, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cadd.StatusCode)
 
-			cdel, err = cl.NodeDeleteWithResponse(ctx, clus2.JSON200.Slug, &openapi.NodeDeleteParams{
-				TargetNode:     &clus1.JSON200.Slug,
-				MoveChildNodes: opt.New(true).Ptr(),
+			cdel, err = cl.NodeDeleteWithResponse(ctx, node2.JSON200.Slug, &openapi.NodeDeleteParams{
+				TargetNode: &node1.JSON200.Slug,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, cdel.StatusCode())
 			a.NotNil(cdel.JSON200.Destination)
-			a.Equal(clus1.JSON200.Id, cdel.JSON200.Destination.Id)
+			a.Equal(node1.JSON200.Id, cdel.JSON200.Destination.Id)
 
-			clus1get, err := cl.NodeGetWithResponse(ctx, clus1.JSON200.Slug)
+			node1get, err := cl.NodeGetWithResponse(ctx, node1.JSON200.Slug)
 			r.NoError(err)
-			r.Equal(http.StatusOK, clus1get.StatusCode())
+			r.Equal(http.StatusOK, node1get.StatusCode())
 
-			a.Len(clus1get.JSON200.Children, 1)
+			a.Len(node1get.JSON200.Children, 1)
 		}))
 	}))
 }

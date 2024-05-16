@@ -48,8 +48,7 @@ type Partial struct {
 }
 
 type DeleteOptions struct {
-	MoveTo opt.Optional[datagraph.NodeSlug]
-	Nodes  bool
+	NewParent opt.Optional[datagraph.NodeSlug]
 }
 
 func (p Partial) Opts() (opts []node.Option) {
@@ -160,14 +159,8 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 		}
 	}
 
-	destination, err := opt.MapErr(d.MoveTo, func(target datagraph.NodeSlug) (datagraph.Node, error) {
-		opts := []node_children.Option{}
-
-		if d.Nodes {
-			opts = append(opts, node_children.MoveNodes())
-		}
-
-		destination, err := s.nc.Move(ctx, slug, target, opts...)
+	destination, err := opt.MapErr(d.NewParent, func(target datagraph.NodeSlug) (datagraph.Node, error) {
+		destination, err := s.nc.Move(ctx, slug, target)
 		if err != nil {
 			return datagraph.Node{}, fault.Wrap(err, fctx.With(ctx))
 		}

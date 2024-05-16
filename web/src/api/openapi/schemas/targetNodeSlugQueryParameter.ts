@@ -7,6 +7,8 @@
  */
 
 /**
- * Where to move child nodes.
+ * If set, child nodes will be moved to the target node. If not set, child
+nodes will be moved to the root.
+
  */
 export type TargetNodeSlugQueryParameter = string;
