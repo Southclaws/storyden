@@ -45,15 +45,9 @@ func WithPosts(ids ...xid.ID) Option {
 	}
 }
 
-func WithClusters(ids ...xid.ID) Option {
+func WithNodes(ids ...xid.ID) Option {
 	return func(lm *ent.LinkMutation) {
-		lm.AddClusterIDs(ids...)
-	}
-}
-
-func WithItems(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddItemIDs(ids...)
+		lm.AddNodeIDs(ids...)
 	}
 }
 

@@ -27,8 +27,7 @@ func (d *database) Get(ctx context.Context, slug string) (*WithRefs, error) {
 			pq.WithCategory()
 			pq.WithRoot()
 		}).
-		WithClusters().
-		WithItems()
+		WithNodes()
 
 	r, err := query.First(ctx)
 	if err != nil {

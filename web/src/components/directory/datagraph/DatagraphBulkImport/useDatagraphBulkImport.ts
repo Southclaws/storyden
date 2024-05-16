@@ -74,8 +74,8 @@ export function useDatagraphBulkImport(props: Props) {
   const { url } = form.watch();
   const urls = ManyLinkSchema.parse(url);
 
-  const urlToCluster = fromPairs(
-    props.node?.clusters.map((cluster) => [cluster.link?.url, cluster]),
+  const urlToNode = fromPairs(
+    props.node?.children.map((node) => [node.link?.url, node]),
   );
 
   async function handleCreateNodeFromLink(link: Link) {
@@ -95,7 +95,7 @@ export function useDatagraphBulkImport(props: Props) {
         try {
           const link = await linkCreate({ url });
 
-          const duplicate = urlToCluster[link.url];
+          const duplicate = urlToNode[link.url];
 
           if (duplicate) {
             setTasks((current) => ({
@@ -105,7 +105,7 @@ export function useDatagraphBulkImport(props: Props) {
                 link,
                 node: {
                   ...duplicate,
-                  type: "cluster",
+                  type: "node",
                 } as DatagraphNodeWithRelations,
               },
             }));

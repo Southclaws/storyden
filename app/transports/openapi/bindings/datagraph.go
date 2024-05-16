@@ -44,9 +44,9 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 	}, nil
 }
 
-func serialiseDatagraphNodeReference(v *datagraph.NodeReference) openapi.DatagraphItem {
-	return openapi.DatagraphItem{
-		Kind:        openapi.DatagraphItemKind(v.Kind.String()),
+func serialiseDatagraphNodeReference(v *datagraph.NodeReference) openapi.DatagraphNode {
+	return openapi.DatagraphNode{
+		Kind:        openapi.DatagraphNodeKind(v.Kind.String()),
 		Id:          v.ID.String(),
 		Name:        v.Name,
 		Slug:        v.Slug,

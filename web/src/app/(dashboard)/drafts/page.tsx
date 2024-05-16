@@ -1,5 +1,5 @@
 import {
-  ClusterListOKResponse,
+  NodeListOKResponse,
   ThreadListOKResponse,
   Visibility,
 } from "src/api/openapi/schemas";
@@ -7,17 +7,17 @@ import { server } from "src/api/server";
 import { DraftListScreen } from "src/screens/drafts/DraftListScreen";
 
 export default async function Page() {
-  const [threads, clusters] = await Promise.all([
+  const [threads, nodes] = await Promise.all([
     server<ThreadListOKResponse>({
       url: "/v1/threads",
       params: { visibility: [Visibility.draft] },
     }),
 
-    server<ClusterListOKResponse>({
-      url: "/v1/clusters",
+    server<NodeListOKResponse>({
+      url: "/v1/nodes",
       params: { visibility: [Visibility.draft] },
     }),
   ]);
 
-  return <DraftListScreen threads={threads} clusters={clusters} />;
+  return <DraftListScreen threads={threads} nodes={nodes} />;
 }

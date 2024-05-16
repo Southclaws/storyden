@@ -30,7 +30,7 @@ type OnlySearcher struct {
 }
 
 func (o *OnlySearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
-	return o.Searcher.Search(ctx, query)
+	return o.Searcher.Search(ctx, query) // nolint:wrapcheck
 }
 
 func (o *OnlySearcher) Index(ctx context.Context, object datagraph.Indexable) error {

@@ -15,9 +15,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/url"
@@ -44,8 +43,7 @@ type service struct {
 func New(
 	l *zap.Logger,
 	as asset_manager.Service,
-	cr cluster.Repository,
-	ir item.Repository,
+	nr node.Repository,
 	lr link.Repository,
 	sc url.Scraper,
 	semdex semdex.Indexer,

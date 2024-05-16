@@ -8,8 +8,8 @@
 import type { Visibility } from "./visibility";
 
 /**
- * Filter clusters with specific visibility values. Note that by
-default, only published clusters are returned. When 'draft' is
+ * Filter nodes with specific visibility values. Note that by
+default, only published nodes are returned. When 'draft' is
 specified, only drafts owned by the requesting account are included.
 When 'review' is specified, the request will fail if the requesting
 account is not an administrator.

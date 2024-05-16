@@ -1,32 +1,11 @@
 import {
-  Cluster,
-  ClusterInitialProps,
-  ClusterWithItems,
-  Item,
-  ItemInitialProps,
-  ItemWithParents,
+  Node,
+  NodeInitialProps,
+  NodeWithChildren,
 } from "src/api/openapi/schemas";
 
-export type DatagraphNode =
-  | ({
-      type: "cluster";
-    } & Cluster)
-  | ({
-      type: "item";
-    } & Item);
+export type DatagraphNode = Node;
 
-export type DatagraphNodeWithRelations =
-  | ({
-      type: "cluster";
-    } & ClusterWithItems)
-  | ({
-      type: "item";
-    } & ItemWithParents);
+export type DatagraphNodeWithRelations = NodeWithChildren;
 
-export type DatagraphNodeInitialProps =
-  | ({
-      type: "cluster";
-    } & ClusterInitialProps)
-  | ({
-      type: "item";
-    } & ItemInitialProps);
+export type DatagraphNodeInitialProps = NodeInitialProps;

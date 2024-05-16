@@ -12,8 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -59,8 +58,7 @@ func New(
 	post_repo reply.Repository,
 	react_repo react.Repository,
 	asset_repo asset.Repository,
-	cluster_repo cluster.Repository,
-	item_repo item.Repository,
+	node_repo node.Repository,
 ) (r Ready) {
 	if err := client.Schema.Create(context.Background()); err != nil {
 		panic(err)
@@ -77,7 +75,6 @@ func New(
 	accounts(account_repo, auth_repo)
 	categories(category_repo)
 	threads(thread_repo, post_repo, react_repo, asset_repo)
-	clusters_items(cluster_repo, item_repo, asset_repo)
 
 	return Ready{}
 }

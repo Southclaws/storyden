@@ -5,16 +5,14 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ClusterList } from "./clusterList";
 import type { CollectionList } from "./collectionList";
-import type { ItemList } from "./itemList";
+import type { NodeList } from "./nodeList";
 import type { PostList } from "./postList";
 import type { ThreadList } from "./threadList";
 
 export type LinkWithRefsAllOf = {
-  clusters: ClusterList;
   collections: CollectionList;
-  items: ItemList;
+  nodes: NodeList;
   posts: PostList;
   threads: ThreadList;
 };

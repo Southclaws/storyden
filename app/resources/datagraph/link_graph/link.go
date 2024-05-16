@@ -26,8 +26,7 @@ type WithRefs struct {
 	Assets      []*asset.Asset
 	Threads     []*thread.Thread
 	Replies     []*reply.Reply
-	Clusters    []*datagraph.Cluster
-	Items       []*datagraph.Item
+	Nodes       []*datagraph.Node
 	Related     datagraph.NodeReferenceList
 }
 
@@ -53,12 +52,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	clusterEdge, err := in.Edges.ClustersOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	itemEdge, err := in.Edges.ItemsOrErr()
+	nodeEdge, err := in.Edges.NodesOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -90,12 +84,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	clusters, err := dt.MapErr(clusterEdge, datagraph.ClusterFromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	items, err := dt.MapErr(itemEdge, datagraph.ItemFromModel)
+	nodes, err := dt.MapErr(nodeEdge, datagraph.NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -110,7 +99,6 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		Assets:      dt.Map(in.Edges.Assets, asset.FromModel),
 		Threads:     threads,
 		Replies:     replies,
-		Clusters:    clusters,
-		Items:       items,
+		Nodes:       nodes,
 	}, nil
 }
