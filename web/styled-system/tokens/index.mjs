@@ -11128,15 +11128,15 @@ const tokens = {
     "variable": "var(--colors-bg-disabled)"
   },
   "colors.bg.site": {
-    "value": "var(--colors-bg-site)",
+    "value": "var(--colors-accent-50)",
     "variable": "var(--colors-bg-site)"
   },
   "colors.bg.accent": {
-    "value": "var(--colors-bg-accent)",
+    "value": "var(--colors-accent-500)",
     "variable": "var(--colors-bg-accent)"
   },
   "colors.bg.opaque": {
-    "value": "var(--colors-bg-opaque)",
+    "value": "var(--colors-white)",
     "variable": "var(--colors-bg-opaque)"
   },
   "colors.fg.default": {
@@ -11156,7 +11156,7 @@ const tokens = {
     "variable": "var(--colors-fg-disabled)"
   },
   "colors.fg.accent": {
-    "value": "var(--colors-fg-accent)",
+    "value": "var(--colors-accent-100)",
     "variable": "var(--colors-fg-accent)"
   },
   "colors.border.default": {
