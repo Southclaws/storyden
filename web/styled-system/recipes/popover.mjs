@@ -44,6 +44,46 @@ const popoverSlotNames = [
   [
     "closeTrigger",
     "popover__closeTrigger"
+  ],
+  [
+    "arrow",
+    "popover__arrow"
+  ],
+  [
+    "arrowTip",
+    "popover__arrowTip"
+  ],
+  [
+    "anchor",
+    "popover__anchor"
+  ],
+  [
+    "trigger",
+    "popover__trigger"
+  ],
+  [
+    "indicator",
+    "popover__indicator"
+  ],
+  [
+    "positioner",
+    "popover__positioner"
+  ],
+  [
+    "content",
+    "popover__content"
+  ],
+  [
+    "title",
+    "popover__title"
+  ],
+  [
+    "description",
+    "popover__description"
+  ],
+  [
+    "closeTrigger",
+    "popover__closeTrigger"
   ]
 ]
 const popoverSlotFns = /* @__PURE__ */ popoverSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, popoverDefaultVariants, getSlotCompoundVariant(popoverCompoundVariants, slotName))])

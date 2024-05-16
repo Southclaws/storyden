@@ -3,12 +3,13 @@ import {
   defineSemanticTokens,
   defineTokens,
 } from "@pandacss/dev";
+import { createPreset } from "@park-ui/panda-preset";
 import { range } from "lodash";
 import { map } from "lodash/fp";
 
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
-import { card } from "src/theme/components/Card/recipe";
+import { richCard } from "src/theme/components/Card/recipe";
 import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
 import { headingInput } from "src/theme/components/HeadingInput/recipe";
@@ -61,59 +62,26 @@ const semanticTokens = defineSemanticTokens({
   },
   colors: {
     bg: {
-      default: {
-        value: { base: "{colors.white}", _osDark: "{colors.gray.800}" },
-      },
       site: {
-        value: { base: "{colors.accent.50}", _osDark: "{colors.gray.900}" },
+        value: { base: "{colors.accent.50}", _osDark: "{colors.gray.12}" },
       },
       accent: {
         value: { base: "{colors.accent.500}", _osDark: "{colors.accent.900}" },
       },
       opaque: {
-        value: { base: "{colors.white}", _osDark: "{colors.gray.800}" },
-      },
-      subtle: {
-        value: { base: "{colors.gray.200}", _osDark: "{colors.gray.800}" },
-      },
-      muted: {
-        value: { base: "{colors.gray.300}", _osDark: "{colors.gray.900}" },
-      },
-      emphasized: {
-        value: { base: "{colors.gray.400}", _osDark: "{colors.gray.500}" },
-      },
-      disabled: {
-        value: { base: "{colors.gray.300}", _osDark: "{colors.gray.400}" },
-      },
-      destructive: {
-        value: { base: "{colors.red.300}", _osDark: "{colors.red.400}" },
+        value: { base: "{colors.white}", _osDark: "{colors.gray.11}" },
       },
     },
     fg: {
-      default: {
-        value: { base: "{colors.gray.900}", _osDark: "{colors.gray.50}" },
-      },
-      muted: {
-        value: { base: "{colors.gray.600}", _osDark: "{colors.gray.200}" },
-      },
-      subtle: {
-        value: { base: "{colors.gray.500}", _osDark: "{colors.gray.500}" },
-      },
-      disabled: {
-        value: { base: "{colors.gray.400}", _osDark: "{colors.gray.600}" },
-      },
-      destructive: {
-        value: { base: "{colors.red.500}", _osDark: "{colors.red.400}" },
-      },
       accent: {
         value: { base: "{colors.accent.100}", _osDark: "{colors.accent.200}" },
       },
     },
     border: {
       default: { value: "{colors.blackAlpha.200}" },
-      muted: { value: "{colors.gray.500}" },
-      subtle: { value: "{colors.gray.300}" },
-      disabled: { value: "{colors.gray.400}" },
+      muted: { value: "{colors.gray.5}" },
+      subtle: { value: "{colors.gray.3}" },
+      disabled: { value: "{colors.gray.4}" },
 
       outline: { value: "{colors.blackAlpha.50}" },
       accent: { value: "{colors.bg.accent}" },
@@ -137,6 +105,16 @@ const semanticTokens = defineSemanticTokens({
 });
 
 export default defineConfig({
+  presets: [
+    "@pandacss/preset-base",
+    "@park-ui/panda-preset",
+    createPreset({
+      // NOTE: This is just for Park-ui's preset, the actual accent colour is
+      // set by the administrator and is a dynamic runtime value.
+      accentColor: "neutral",
+      additionalColors: ["*"],
+    }),
+  ],
   preflight: true,
   strictTokens: true,
   strictPropertyValues: true,
@@ -247,13 +225,13 @@ export default defineConfig({
       heading: heading,
       button: button,
       link: link,
-      menu: menu,
-      tabs: tabs,
-      select: select,
-      checkbox: checkbox,
-      popover: popover,
+      // menu: menu,
+      // tabs: tabs,
+      // select: select,
+      // checkbox: checkbox,
+      // popover: popover,
       skeleton: skeleton,
-      card: card,
+      richCard: richCard, // TODO: RENAME
     },
     extend: {
       semanticTokens,

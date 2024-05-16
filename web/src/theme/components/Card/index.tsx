@@ -6,7 +6,7 @@ import { Heading3 } from "../Heading/Index";
 
 import { cx } from "@/styled-system/css";
 import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
-import { CardVariantProps, card } from "@/styled-system/recipes";
+import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
 
 export type CardItem = {
   id: string;
@@ -17,7 +17,7 @@ export type CardItem = {
   controls?: React.ReactNode;
 };
 
-export type Props = CardItem & CardVariantProps;
+export type Props = CardItem & RichCardVariantProps;
 
 export function Card({
   children,
@@ -31,7 +31,7 @@ export function Card({
 }: PropsWithChildren<Props>) {
   const hasImage = Boolean(image);
 
-  const styles = card({
+  const styles = richCard({
     shape,
     size,
     mediaDisplay: hasImage ? "with" : "without",

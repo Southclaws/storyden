@@ -1,7 +1,7 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
-export const card = defineSlotRecipe({
-  className: "card",
+export const richCard = defineSlotRecipe({
+  className: "rich-card",
   slots: [
     // Global bits (span the entire card)
     "root",

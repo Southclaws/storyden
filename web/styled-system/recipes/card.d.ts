@@ -3,9 +3,7 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface CardVariant {
-  mediaDisplay: "with" | "without"
-shape: "box" | "row"
-size: "default" | "small"
+  
 }
 
 type CardVariantMap = {
@@ -13,12 +11,12 @@ type CardVariantMap = {
 }
 
 export type CardVariantProps = {
-  [key in keyof CardVariant]?: CardVariant[key] | undefined
+  [key in keyof CardVariant]?: ConditionalValue<CardVariant[key]> | undefined
 }
 
 export interface CardRecipe {
   __type: CardVariantProps
-  (props?: CardVariantProps): Pretty<Record<"root" | "mediaBackdropContainer" | "mediaBackdrop" | "contentContainer" | "mediaContainer" | "textArea" | "footer" | "title" | "text" | "media" | "mediaMissing" | "controlsOverlayContainer" | "controls", string>>
+  (props?: CardVariantProps): Pretty<Record<"root" | "header" | "body" | "footer" | "title" | "description" | "root" | "header" | "body" | "footer" | "title" | "description", string>>
   raw: (props?: CardVariantProps) => CardVariantProps
   variantMap: CardVariantMap
   variantKeys: Array<keyof CardVariant>

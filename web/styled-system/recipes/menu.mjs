@@ -66,6 +66,66 @@ const menuSlotNames = [
   [
     "itemGroup",
     "menu__itemGroup"
+  ],
+  [
+    "contextTrigger",
+    "menu__contextTrigger"
+  ],
+  [
+    "trigger",
+    "menu__trigger"
+  ],
+  [
+    "triggerItem",
+    "menu__triggerItem"
+  ],
+  [
+    "indicator",
+    "menu__indicator"
+  ],
+  [
+    "positioner",
+    "menu__positioner"
+  ],
+  [
+    "arrow",
+    "menu__arrow"
+  ],
+  [
+    "arrowTip",
+    "menu__arrowTip"
+  ],
+  [
+    "content",
+    "menu__content"
+  ],
+  [
+    "separator",
+    "menu__separator"
+  ],
+  [
+    "item",
+    "menu__item"
+  ],
+  [
+    "optionItem",
+    "menu__optionItem"
+  ],
+  [
+    "optionItemIndicator",
+    "menu__optionItemIndicator"
+  ],
+  [
+    "optionItemText",
+    "menu__optionItemText"
+  ],
+  [
+    "itemGroupLabel",
+    "menu__itemGroupLabel"
+  ],
+  [
+    "itemGroup",
+    "menu__itemGroup"
   ]
 ]
 const menuSlotFns = /* @__PURE__ */ menuSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, menuDefaultVariants, getSlotCompoundVariant(menuCompoundVariants, slotName))])
@@ -86,6 +146,7 @@ export const menu = /* @__PURE__ */ Object.assign(menuFn, {
   variantKeys: menuVariantKeys,
   variantMap: {
   "size": [
+    "xs",
     "sm",
     "md",
     "lg"

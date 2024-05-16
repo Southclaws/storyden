@@ -22,7 +22,7 @@ export interface Conditions {
 	"_collapsed": string
 	/** `@container (max-width: 300px)` */
 	"_containerSmall": string
-	/** `&:is(:hover, [data-hover])` */
+	/** `@media (hover: hover) and (pointer: fine) &:is(:hover, [data-hover])` */
 	"_hover": string
 	/** `&:is(:focus, [data-focus])` */
 	"_focus": string
@@ -190,6 +190,12 @@ export interface Conditions {
 	"_vertical": string
 	/** `@starting-style` */
 	"_starting": string
+	/** `&:is([data-state="off"])` */
+	"_off": string
+	/** `&:is([data-state="on"])` */
+	"_on": string
+	/** `&:is([data-state="under-value"])` */
+	"_underValue": string
 	/** `@media screen and (min-width: 40rem)` */
 	"sm": string
 	/** `@media screen and (min-width: 40rem) and (max-width: 47.9975rem)` */
@@ -240,30 +246,6 @@ export interface Conditions {
 	"lgTo2xl": string
 	/** `@media screen and (min-width: 80rem) and (max-width: 95.9975rem)` */
 	"xlTo2xl": string
-	/** `@container  (min-width: 20rem)` */
-	"@/xs": string
-	/** `@container  (min-width: 24rem)` */
-	"@/sm": string
-	/** `@container  (min-width: 28rem)` */
-	"@/md": string
-	/** `@container  (min-width: 32rem)` */
-	"@/lg": string
-	/** `@container  (min-width: 36rem)` */
-	"@/xl": string
-	/** `@container  (min-width: 42rem)` */
-	"@/2xl": string
-	/** `@container  (min-width: 48rem)` */
-	"@/3xl": string
-	/** `@container  (min-width: 56rem)` */
-	"@/4xl": string
-	/** `@container  (min-width: 64rem)` */
-	"@/5xl": string
-	/** `@container  (min-width: 72rem)` */
-	"@/6xl": string
-	/** `@container  (min-width: 80rem)` */
-	"@/7xl": string
-	/** `@container  (min-width: 90rem)` */
-	"@/8xl": string
 	/** The base (=no conditions) styles to apply  */
 	"base": string
 }

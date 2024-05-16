@@ -542,7 +542,7 @@ appearance?: ConditionalValue<WithEscapeHatch<OnlyKnown<"appearance", CssVars | 
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/aspect-ratio
    */
-aspectRatio?: ConditionalValue<WithEscapeHatch<UtilityValues["aspectRatio"] | CssVars>>
+aspectRatio?: ConditionalValue<WithEscapeHatch<CssProperties["aspectRatio"]>>
  azimuth?: ConditionalValue<WithEscapeHatch<CssProperties["azimuth"]>>
  /**
    * The **`backdrop-filter`** CSS property lets you apply graphical effects such as blurring or color shifting to the area behind an element. Because it applies to everything _behind_ the element, to see the effect you must make the element or its background at least partially transparent.
