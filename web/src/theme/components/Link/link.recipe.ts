@@ -14,4 +14,4 @@ export const link = defineRecipe({
   variants: {
     ...button.variants,
   },
-});
+} as any);

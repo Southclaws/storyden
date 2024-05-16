@@ -22,6 +22,22 @@ const checkboxSlotNames = [
   [
     "indicator",
     "checkbox__indicator"
+  ],
+  [
+    "root",
+    "checkbox__root"
+  ],
+  [
+    "label",
+    "checkbox__label"
+  ],
+  [
+    "control",
+    "checkbox__control"
+  ],
+  [
+    "indicator",
+    "checkbox__indicator"
   ]
 ]
 const checkboxSlotFns = /* @__PURE__ */ checkboxSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, checkboxDefaultVariants, getSlotCompoundVariant(checkboxCompoundVariants, slotName))])

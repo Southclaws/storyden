@@ -1516,6 +1516,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@park-ui/panda-preset@npm:^0.37.0":
+  version: 0.37.0
+  resolution: "@park-ui/panda-preset@npm:0.37.0"
+  dependencies:
+    "@ark-ui/anatomy": "npm:2.3.1"
+    "@radix-ui/colors": "npm:3.0.0"
+    deepmerge: "npm:4.3.1"
+    ts-pattern: "npm:5.1.1"
+  peerDependencies:
+    "@pandacss/dev": ">0.22.0"
+    "@pandacss/types": ">0.22.0"
+  checksum: 10c0/ffbcd8d3c50b364354e809117ac313e6757e8328f69ecdc8c31557f62c0cb337fffc7b9fa710947bd16dc1c019228fb5158807de4bd97731914feb89b63e9aa3
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -1527,6 +1542,13 @@ __metadata:
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: 10c0/4681e682abc006d25eb380d0cf3efc7557043f53b6aea7a5057d0d1e7df849a00e281cd8ea79c902a35a414d7919621fc2ba293ecec05f413598e0b23d5a1e63
+  languageName: node
+  linkType: hard
+
+"@radix-ui/colors@npm:3.0.0":
+  version: 3.0.0
+  resolution: "@radix-ui/colors@npm:3.0.0"
+  checksum: 10c0/612c6bb4efe987f2d49aaca2f785687d08150da59a248328bc2b4e187ece4ef731c1dc5c6a9430fffcac4af9e65cf2f89ceb9806f8809940c9eb238b79d2cf2f
   languageName: node
   linkType: hard
 
@@ -4466,6 +4488,13 @@ __metadata:
   version: 0.1.4
   resolution: "deep-is@npm:0.1.4"
   checksum: 10c0/7f0ee496e0dff14a573dc6127f14c95061b448b87b995fc96c017ce0a1e66af1675e73f1d6064407975bc4ea6ab679497a29fff7b5b9c4e99cb10797c1ad0b4c
+  languageName: node
+  linkType: hard
+
+"deepmerge@npm:4.3.1":
+  version: 4.3.1
+  resolution: "deepmerge@npm:4.3.1"
+  checksum: 10c0/e53481aaf1aa2c4082b5342be6b6d8ad9dfe387bc92ce197a66dea08bd4265904a087e75e464f14d1347cf2ac8afe1e4c16b266e0561cc5df29382d3c5f80044
   languageName: node
   linkType: hard
 
@@ -9248,7 +9277,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-pattern@npm:^5.1.1":
+"ts-pattern@npm:5.1.1, ts-pattern@npm:^5.1.1":
   version: 5.1.1
   resolution: "ts-pattern@npm:5.1.1"
   checksum: 10c0/20ec96d1d07b074585082c0378abdc1ecd0d9aaa3d4c2bf2d668f645693daad7b65734292704d90a8472a79080dfe8f2b36d8bdb01f6145d1f4351a51516e307
@@ -9653,6 +9682,7 @@ __metadata:
     "@heroicons/react": "npm:^2.1.3"
     "@hookform/resolvers": "npm:^3.3.4"
     "@pandacss/dev": "npm:^0.39.1"
+    "@park-ui/panda-preset": "npm:^0.37.0"
     "@simplewebauthn/browser": "npm:^10.0.0"
     "@simplewebauthn/types": "npm:^10.0.0"
     "@tiptap/core": "npm:^2.3.1"

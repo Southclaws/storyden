@@ -4,7 +4,6 @@ import type { CssProperties } from './system-types';
 import type { Tokens } from '../tokens/index';
 
 export interface UtilityValues {
-	aspectRatio: Tokens["aspectRatios"];
 	zIndex: Tokens["zIndex"];
 	top: Tokens["spacing"];
 	left: Tokens["spacing"];
@@ -159,7 +158,7 @@ export interface UtilityValues {
 	transitionDuration: Tokens["durations"];
 	transition: "all" | "common" | "background" | "colors" | "opacity" | "shadow" | "transform";
 	animation: Tokens["animations"];
-	animationName: "shimmer";
+	animationName: "shimmer" | "fade-in" | "fade-out" | "slide-in" | "slide-out" | "slide-in-left" | "slide-out-left" | "slide-in-right" | "slide-out-right" | "collapse-in" | "collapse-out" | "fadeIn" | "fadeOut" | "skeleton-pulse";
 	animationTimingFunction: Tokens["easings"];
 	animationDuration: Tokens["durations"];
 	animationDelay: Tokens["durations"];
@@ -206,8 +205,8 @@ export interface UtilityValues {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "current" | "black" | "white" | "transparent" | "rose" | "pink" | "fuchsia" | "purple" | "violet" | "indigo" | "blue" | "sky" | "cyan" | "teal" | "emerald" | "green" | "lime" | "yellow" | "amber" | "orange" | "red" | "neutral" | "stone" | "zinc" | "gray" | "slate" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
-	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "8xl" | "9xl";
+	colorPalette: "current" | "black" | "white" | "transparent" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "bronze" | "bronze.light" | "bronze.dark" | "brown" | "brown.light" | "brown.dark" | "crimson" | "crimson.light" | "crimson.dark" | "cyan" | "cyan.light" | "cyan.dark" | "gold" | "gold.light" | "gold.dark" | "grass" | "grass.light" | "grass.dark" | "gray" | "gray.light" | "gray.dark" | "green" | "green.light" | "green.dark" | "indigo" | "indigo.light" | "indigo.dark" | "iris" | "iris.light" | "iris.dark" | "jade" | "jade.light" | "jade.dark" | "lime" | "lime.light" | "lime.dark" | "mauve" | "mauve.light" | "mauve.dark" | "mint" | "mint.light" | "mint.dark" | "olive" | "olive.light" | "olive.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "plum" | "plum.light" | "plum.dark" | "purple" | "purple.light" | "purple.dark" | "red" | "red.light" | "red.dark" | "ruby" | "ruby.light" | "ruby.dark" | "sage" | "sage.light" | "sage.dark" | "sand" | "sand.light" | "sand.dark" | "sky" | "sky.light" | "sky.dark" | "slate" | "slate.light" | "slate.dark" | "teal" | "teal.light" | "teal.dark" | "tomato" | "tomato.light" | "tomato.dark" | "violet" | "violet.light" | "violet.dark" | "yellow" | "yellow.light" | "yellow.dark" | "neutral" | "neutral.light" | "neutral.dark" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
+	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
 }
 
 
