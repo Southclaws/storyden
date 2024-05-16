@@ -119,7 +119,6 @@ export * from "./linkTitle";
 export * from "./linkWithRefs";
 export * from "./linkWithRefsAllOf";
 export * from "./metadata";
-export * from "./moveChildNodesQueryParameter";
 export * from "./node";
 export * from "./nodeAddChildOKResponse";
 export * from "./nodeCommonProps";

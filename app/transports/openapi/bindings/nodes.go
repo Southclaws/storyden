@@ -202,8 +202,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 
 func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteRequestObject) (openapi.NodeDeleteResponseObject, error) {
 	destinationNode, err := c.ns.Delete(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.DeleteOptions{
-		MoveTo: opt.NewPtr((*datagraph.NodeSlug)(request.Params.TargetNode)),
-		Nodes:  opt.NewPtr(request.Params.MoveChildNodes).OrZero(),
+		NewParent: opt.NewPtr((*datagraph.NodeSlug)(request.Params.TargetNode)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

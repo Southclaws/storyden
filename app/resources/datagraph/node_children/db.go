@@ -24,16 +24,7 @@ func New(db *ent.Client, nr node.Repository) Repository {
 	return &database{db, nr}
 }
 
-type options struct {
-	moveNodes bool
-}
-
-func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug datagraph.NodeSlug, opts ...Option) (*datagraph.Node, error) {
-	o := options{}
-	for _, opt := range opts {
-		opt(&o)
-	}
-
+func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug datagraph.NodeSlug) (*datagraph.Node, error) {
 	fromNode, err := d.nr.Get(ctx, fromSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -49,24 +40,19 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = func() (err error) {
-		if o.moveNodes {
-			nodes, err := d.db.Node.Query().Where(node_model.ParentNodeID(xid.ID(fromNode.ID))).All(ctx)
-			if err != nil {
-				return fault.Wrap(err)
-			}
-			childNodeIDs := dt.Map(nodes, func(c *ent.Node) xid.ID { return c.ID })
+	nodes, err := d.db.Node.Query().
+		Select(node_model.FieldID).
+		Where(node_model.ParentNodeID(xid.ID(fromNode.ID))).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+	childNodeIDs := dt.Map(nodes, func(c *ent.Node) xid.ID { return c.ID })
 
-			err = d.db.Node.Update().
-				SetParentID(xid.ID(toNode.ID)).
-				Where(node_model.IDIn(childNodeIDs...)).
-				Exec(ctx)
-			if err != nil {
-				return fault.Wrap(err)
-			}
-		}
-		return
-	}()
+	err = d.db.Node.Update().
+		SetParentID(xid.ID(toNode.ID)).
+		Where(node_model.IDIn(childNodeIDs...)).
+		Exec(ctx)
 	if err != nil {
 		terr := tx.Rollback()
 		if terr != nil {

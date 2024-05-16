@@ -954,7 +954,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/TargetNodeSlugQuery"
-        - $ref: "#/components/parameters/MoveChildNodesQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1254,20 +1253,14 @@ components:
         $ref: "#/components/schemas/Identifier"
 
     TargetNodeSlugQuery:
-      description: Where to move child nodes.
+      description: |
+        If set, child nodes will be moved to the target node. If not set, child
+        nodes will be moved to the root.
       name: target_node
       in: query
       required: false
       schema:
         type: string
-
-    MoveChildNodesQuery:
-      description: Whether or not to move child nodes.
-      name: move_child_nodes
-      in: query
-      required: false
-      schema:
-        type: boolean
 
     LinkSlugParam:
       description: Unique link Slug.

@@ -7,13 +7,5 @@ import (
 )
 
 type Repository interface {
-	Move(ctx context.Context, slug datagraph.NodeSlug, parentSlug datagraph.NodeSlug, opts ...Option) (*datagraph.Node, error)
-}
-
-type Option func(*options)
-
-func MoveNodes() Option {
-	return func(o *options) {
-		o.moveNodes = true
-	}
+	Move(ctx context.Context, slug datagraph.NodeSlug, parentSlug datagraph.NodeSlug) (*datagraph.Node, error)
 }
