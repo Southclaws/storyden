@@ -10,16 +10,11 @@ import { map } from "lodash/fp";
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
 import { button } from "src/theme/components/Button/button.recipe";
 import { richCard } from "src/theme/components/Card/recipe";
-import { checkbox } from "src/theme/components/Checkbox/checkbox.recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
 import { headingInput } from "src/theme/components/HeadingInput/recipe";
 import { input } from "src/theme/components/Input/input.recipe";
 import { link } from "src/theme/components/Link/link.recipe";
-import { menu } from "src/theme/components/Menu/menu.recipe";
-import { popover } from "src/theme/components/Popover/popover.recipe";
-import { select } from "src/theme/components/Select/select.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
-import { tabs } from "src/theme/components/Tabs/tabs.recipe";
 
 // TODO: Dark mode = 40%
 const L = "80%";
@@ -63,18 +58,18 @@ const semanticTokens = defineSemanticTokens({
   colors: {
     bg: {
       site: {
-        value: { base: "{colors.accent.50}", _osDark: "{colors.gray.12}" },
+        value: { base: "{colors.accent.50}" },
       },
       accent: {
-        value: { base: "{colors.accent.500}", _osDark: "{colors.accent.900}" },
+        value: { base: "{colors.accent.500}" },
       },
       opaque: {
-        value: { base: "{colors.white}", _osDark: "{colors.gray.11}" },
+        value: { base: "{colors.white}" },
       },
     },
     fg: {
       accent: {
-        value: { base: "{colors.accent.100}", _osDark: "{colors.accent.200}" },
+        value: { base: "{colors.accent.100}" },
       },
     },
     border: {

@@ -57,7 +57,7 @@
   );
 
   /* TODO: https://github.com/cschroeter/park-ui/issues/312 */
-  color-scheme: only light;
+  color-scheme: light;
 }
 
 @supports (font-size: 1cqi) {
