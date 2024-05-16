@@ -48,13 +48,12 @@ const (
 	ContentKindThread ContentKind = "thread"
 )
 
-// Defines values for DatagraphItemKind.
+// Defines values for DatagraphNodeKind.
 const (
-	DatagraphItemKindCluster DatagraphItemKind = "cluster"
-	DatagraphItemKindItem    DatagraphItemKind = "item"
-	DatagraphItemKindLink    DatagraphItemKind = "link"
-	DatagraphItemKindReply   DatagraphItemKind = "reply"
-	DatagraphItemKindThread  DatagraphItemKind = "thread"
+	DatagraphNodeKindLink   DatagraphNodeKind = "link"
+	DatagraphNodeKindNode   DatagraphNodeKind = "node"
+	DatagraphNodeKindReply  DatagraphNodeKind = "reply"
+	DatagraphNodeKindThread DatagraphNodeKind = "thread"
 )
 
 // Defines values for OnboardingStatus.
@@ -476,268 +475,6 @@ type CategorySlug = string
 // CategorySlugList A list of category names.
 type CategorySlugList = []CategorySlug
 
-// Cluster defines model for Cluster.
-type Cluster struct {
-	Assets AssetList `json:"assets"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content *PostContent `json:"content,omitempty"`
-
-	// CreatedAt The time the resource was created.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// DeletedAt The time the resource was soft-deleted.
-	DeletedAt   *time.Time         `json:"deletedAt,omitempty"`
-	Description ClusterDescription `json:"description"`
-
-	// Id A unique identifier for this resource.
-	Id Identifier `json:"id"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link `json:"link,omitempty"`
-
-	// Misc Arbitrary extra data stored with the resource.
-	Misc *map[string]interface{} `json:"misc,omitempty"`
-	Name ClusterName             `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Parent A cluster is a group of items and other clusters. It serves as an
-	// abstraction for grouping structured data objects. It can represent
-	// things such as brands, manufacturers, authors, directors, etc. Clusters
-	// can be referenced in content posts and they also have their own content.
-	Parent *Cluster `json:"parent,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties Properties `json:"properties"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ClusterSlug `json:"slug"`
-
-	// UpdatedAt The time the resource was updated.
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	Visibility Visibility `json:"visibility"`
-}
-
-// ClusterCommonProps The main properties of a cluster.
-type ClusterCommonProps struct {
-	Assets AssetList `json:"assets"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent       `json:"content,omitempty"`
-	Description ClusterDescription `json:"description"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link       `json:"link,omitempty"`
-	Name ClusterName `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Parent A cluster is a group of items and other clusters. It serves as an
-	// abstraction for grouping structured data objects. It can represent
-	// things such as brands, manufacturers, authors, directors, etc. Clusters
-	// can be referenced in content posts and they also have their own content.
-	Parent *Cluster `json:"parent,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties Properties `json:"properties"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug       ClusterSlug `json:"slug"`
-	Visibility Visibility  `json:"visibility"`
-}
-
-// ClusterDescription defines model for ClusterDescription.
-type ClusterDescription = string
-
-// ClusterInitialProps defines model for ClusterInitialProps.
-type ClusterInitialProps struct {
-	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent       `json:"content,omitempty"`
-	Description ClusterDescription `json:"description"`
-	Name        ClusterName        `json:"name"`
-
-	// Parent A URL-safe slug for uniquely identifying resources.
-	Parent *ClusterSlug `json:"parent,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties *Properties `json:"properties,omitempty"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ClusterSlug `json:"slug"`
-
-	// Url A web address
-	Url        *URL        `json:"url,omitempty"`
-	Visibility *Visibility `json:"visibility,omitempty"`
-}
-
-// ClusterItem An item is an arbitrary object used for indexing any kind of structured
-// data for the purposes of archival, search, documentation, products, etc.
-// Items are similar to posts in terms of data model but are semantically
-// different when it comes to purpose.
-//
-// If you were to use Storyden to run a community for a video game for
-// example, items could be used to represent actual items from the game
-// which allows members to search for them as  well as reference them in
-// posts and other content.
-type ClusterItem = Item
-
-// ClusterItemList A list of items within the context of belonging to a cluster. Different
-// from an ItemList because we do not need to include the parent cluster
-// information inside each item since it's already available.
-type ClusterItemList = []ClusterItem
-
-// ClusterList defines model for ClusterList.
-type ClusterList = []Cluster
-
-// ClusterListResult defines model for ClusterListResult.
-type ClusterListResult struct {
-	Clusters    ClusterList `json:"clusters"`
-	CurrentPage int         `json:"current_page"`
-	NextPage    *int        `json:"next_page,omitempty"`
-	PageSize    int         `json:"page_size"`
-	Results     int         `json:"results"`
-	TotalPages  int         `json:"total_pages"`
-}
-
-// ClusterMutableProps Note: Properties are replace-all and are not merged with existing.
-type ClusterMutableProps struct {
-	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent        `json:"content,omitempty"`
-	Description *ClusterDescription `json:"description,omitempty"`
-	Name        *ClusterName        `json:"name,omitempty"`
-
-	// Parent A URL-safe slug for uniquely identifying resources.
-	Parent *ClusterSlug `json:"parent,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties *Properties `json:"properties,omitempty"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug *ClusterSlug `json:"slug,omitempty"`
-
-	// Url A web address
-	Url *URL `json:"url,omitempty"`
-}
-
-// ClusterName defines model for ClusterName.
-type ClusterName = string
-
-// ClusterSlug A URL-safe slug for uniquely identifying resources.
-type ClusterSlug = Slug
-
-// ClusterWithItems defines model for ClusterWithItems.
-type ClusterWithItems struct {
-	Assets   AssetList   `json:"assets"`
-	Clusters ClusterList `json:"clusters"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content *PostContent `json:"content,omitempty"`
-
-	// CreatedAt The time the resource was created.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// DeletedAt The time the resource was soft-deleted.
-	DeletedAt   *time.Time         `json:"deletedAt,omitempty"`
-	Description ClusterDescription `json:"description"`
-
-	// Id A unique identifier for this resource.
-	Id Identifier `json:"id"`
-
-	// Items A list of items within the context of belonging to a cluster. Different
-	// from an ItemList because we do not need to include the parent cluster
-	// information inside each item since it's already available.
-	Items ClusterItemList `json:"items"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link `json:"link,omitempty"`
-
-	// Misc Arbitrary extra data stored with the resource.
-	Misc *map[string]interface{} `json:"misc,omitempty"`
-	Name ClusterName             `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Parent A cluster is a group of items and other clusters. It serves as an
-	// abstraction for grouping structured data objects. It can represent
-	// things such as brands, manufacturers, authors, directors, etc. Clusters
-	// can be referenced in content posts and they also have their own content.
-	Parent *Cluster `json:"parent,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties     Properties        `json:"properties"`
-	Recomentations DatagraphItemList `json:"recomentations"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ClusterSlug `json:"slug"`
-
-	// UpdatedAt The time the resource was updated.
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	Visibility Visibility `json:"visibility"`
-}
-
 // Collection defines model for Collection.
 type Collection struct {
 	// CreatedAt The time the resource was created.
@@ -899,32 +636,32 @@ type CredentialRequestOptions struct {
 	PublicKey PublicKeyCredentialRequestOptions `json:"publicKey"`
 }
 
-// DatagraphItem defines model for DatagraphItem.
-type DatagraphItem struct {
+// DatagraphNode defines model for DatagraphNode.
+type DatagraphNode struct {
 	Description *string `json:"description,omitempty"`
 
 	// Id A unique identifier for this resource.
 	Id   Identifier        `json:"id"`
-	Kind DatagraphItemKind `json:"kind"`
+	Kind DatagraphNodeKind `json:"kind"`
 	Name string            `json:"name"`
 	Slug string            `json:"slug"`
 }
 
-// DatagraphItemKind defines model for DatagraphItemKind.
-type DatagraphItemKind string
+// DatagraphNodeKind defines model for DatagraphNodeKind.
+type DatagraphNodeKind string
 
-// DatagraphItemList defines model for DatagraphItemList.
-type DatagraphItemList = []DatagraphItem
+// DatagraphNodeList defines model for DatagraphNodeList.
+type DatagraphNodeList = []DatagraphNode
 
 // DatagraphRecommendations defines model for DatagraphRecommendations.
 type DatagraphRecommendations struct {
-	Recomentations DatagraphItemList `json:"recomentations"`
+	Recomentations DatagraphNodeList `json:"recomentations"`
 }
 
 // DatagraphSearchResult defines model for DatagraphSearchResult.
 type DatagraphSearchResult struct {
 	CurrentPage int               `json:"current_page"`
-	Items       DatagraphItemList `json:"items"`
+	Items       DatagraphNodeList `json:"items"`
 	NextPage    *int              `json:"next_page,omitempty"`
 	PageSize    int               `json:"page_size"`
 	Results     int               `json:"results"`
@@ -943,229 +680,6 @@ type Info struct {
 	// the Storyden installation is in for directing first-time setup steps.
 	OnboardingStatus OnboardingStatus `json:"onboarding_status"`
 	Title            string           `json:"title"`
-}
-
-// Item defines model for Item.
-type Item struct {
-	Assets AssetList `json:"assets"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content *PostContent `json:"content,omitempty"`
-
-	// CreatedAt The time the resource was created.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// DeletedAt The time the resource was soft-deleted.
-	DeletedAt   *time.Time      `json:"deletedAt,omitempty"`
-	Description ItemDescription `json:"description"`
-
-	// Id A unique identifier for this resource.
-	Id Identifier `json:"id"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link `json:"link,omitempty"`
-
-	// Misc Arbitrary extra data stored with the resource.
-	Misc *map[string]interface{} `json:"misc,omitempty"`
-	Name ItemName                `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties Properties `json:"properties"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ItemSlug `json:"slug"`
-
-	// UpdatedAt The time the resource was updated.
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	Visibility Visibility `json:"visibility"`
-}
-
-// ItemCommonProps The main properties for an item.
-type ItemCommonProps struct {
-	Assets AssetList `json:"assets"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent    `json:"content,omitempty"`
-	Description ItemDescription `json:"description"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link    `json:"link,omitempty"`
-	Name ItemName `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties Properties `json:"properties"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug       ItemSlug   `json:"slug"`
-	Visibility Visibility `json:"visibility"`
-}
-
-// ItemDescription defines model for ItemDescription.
-type ItemDescription = string
-
-// ItemInitialProps defines model for ItemInitialProps.
-type ItemInitialProps struct {
-	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent    `json:"content,omitempty"`
-	Description ItemDescription `json:"description"`
-	Name        ItemName        `json:"name"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties *Properties `json:"properties,omitempty"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ItemSlug `json:"slug"`
-
-	// Url A web address
-	Url        *URL        `json:"url,omitempty"`
-	Visibility *Visibility `json:"visibility,omitempty"`
-}
-
-// ItemList A list of items where each item includes all the information about its
-// parent cluster too. For use with APIs that want to provide a list of
-// items that may be part of different clusters.
-type ItemList = []ItemWithParents
-
-// ItemListResult defines model for ItemListResult.
-type ItemListResult struct {
-	CurrentPage int `json:"current_page"`
-
-	// Items A list of items where each item includes all the information about its
-	// parent cluster too. For use with APIs that want to provide a list of
-	// items that may be part of different clusters.
-	Items      ItemList `json:"items"`
-	NextPage   *int     `json:"next_page,omitempty"`
-	PageSize   int      `json:"page_size"`
-	Results    int      `json:"results"`
-	TotalPages int      `json:"total_pages"`
-}
-
-// ItemMutableProps Note: Properties are replace-all and are not merged with existing.
-type ItemMutableProps struct {
-	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content     *PostContent     `json:"content,omitempty"`
-	Description *ItemDescription `json:"description,omitempty"`
-	Name        *ItemName        `json:"name,omitempty"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties *Properties `json:"properties,omitempty"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug *ItemSlug `json:"slug,omitempty"`
-
-	// Url A web address
-	Url *URL `json:"url,omitempty"`
-}
-
-// ItemName defines model for ItemName.
-type ItemName = string
-
-// ItemSlug A URL-safe slug for uniquely identifying resources.
-type ItemSlug = Slug
-
-// ItemWithParents defines model for ItemWithParents.
-type ItemWithParents struct {
-	Assets   AssetList   `json:"assets"`
-	Clusters ClusterList `json:"clusters"`
-
-	// Content The body text of a post within a thread. The type is either a string or
-	// an object, depending on what was used during creation. Strings can be
-	// used for basic plain text or markdown content and objects are used for
-	// more complex types such as Slate.js editor documents.
-	Content *PostContent `json:"content,omitempty"`
-
-	// CreatedAt The time the resource was created.
-	CreatedAt time.Time `json:"createdAt"`
-
-	// DeletedAt The time the resource was soft-deleted.
-	DeletedAt   *time.Time      `json:"deletedAt,omitempty"`
-	Description ItemDescription `json:"description"`
-
-	// Id A unique identifier for this resource.
-	Id Identifier `json:"id"`
-
-	// Link A web address with content information such as title, description, etc.
-	Link *Link `json:"link,omitempty"`
-
-	// Misc Arbitrary extra data stored with the resource.
-	Misc *map[string]interface{} `json:"misc,omitempty"`
-	Name ItemName                `json:"name"`
-
-	// Owner A minimal reference to an account.
-	Owner ProfileReference `json:"owner"`
-
-	// Properties Arbitrary JSON object that can express any additional data for a
-	// resource object. This is intended for client implementations to use for
-	// extending objects with arbitrary information to satisfy product needs.
-	//
-	// For example, if you were building a book database, you could use the
-	// Properties of a cluster to specify publisher information such as date of
-	// founding, headquarters, size, etc. and then use the Properties of the
-	// items in that cluster to specify book information such as release date,
-	// number of pages, etc.
-	Properties     Properties        `json:"properties"`
-	Recomentations DatagraphItemList `json:"recomentations"`
-
-	// Slug A URL-safe slug for uniquely identifying resources.
-	Slug ItemSlug `json:"slug"`
-
-	// UpdatedAt The time the resource was updated.
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	Visibility Visibility `json:"visibility"`
 }
 
 // Link A web address with content information such as title, description, etc.
@@ -1216,18 +730,13 @@ type LinkTitle = string
 
 // LinkWithRefs defines model for LinkWithRefs.
 type LinkWithRefs struct {
-	Assets      AssetList        `json:"assets"`
-	Clusters    ClusterList      `json:"clusters"`
-	Collections CollectionList   `json:"collections"`
-	Description *LinkDescription `json:"description,omitempty"`
-	Domain      LinkDomain       `json:"domain"`
-
-	// Items A list of items where each item includes all the information about its
-	// parent cluster too. For use with APIs that want to provide a list of
-	// items that may be part of different clusters.
-	Items          ItemList          `json:"items"`
+	Assets         AssetList         `json:"assets"`
+	Collections    CollectionList    `json:"collections"`
+	Description    *LinkDescription  `json:"description,omitempty"`
+	Domain         LinkDomain        `json:"domain"`
+	Nodes          NodeList          `json:"nodes"`
 	Posts          PostList          `json:"posts"`
-	Recomentations DatagraphItemList `json:"recomentations"`
+	Recomentations DatagraphNodeList `json:"recomentations"`
 	Slug           LinkSlug          `json:"slug"`
 	Threads        ThreadList        `json:"threads"`
 	Title          *LinkTitle        `json:"title,omitempty"`
@@ -1238,6 +747,247 @@ type LinkWithRefs struct {
 
 // Metadata Arbitrary metadata for the resource.
 type Metadata map[string]interface{}
+
+// Node defines model for Node.
+type Node struct {
+	Assets AssetList `json:"assets"`
+
+	// Content The body text of a post within a thread. The type is either a string or
+	// an object, depending on what was used during creation. Strings can be
+	// used for basic plain text or markdown content and objects are used for
+	// more complex types such as Slate.js editor documents.
+	Content *PostContent `json:"content,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt   *time.Time      `json:"deletedAt,omitempty"`
+	Description NodeDescription `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Link A web address with content information such as title, description, etc.
+	Link *Link `json:"link,omitempty"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name NodeName                `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+
+	// Parent A node is a text document with children and assets. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Nodes
+	// can be referenced in content posts and they also have their own content.
+	Parent *Node `json:"parent,omitempty"`
+
+	// Properties Arbitrary JSON object that can express any additional data for a
+	// resource object. This is intended for client implementations to use for
+	// extending objects with arbitrary information to satisfy product needs.
+	//
+	// For example, if you were building a book database, you could use the
+	// Properties of a node to specify publisher information such as date of
+	// founding, headquarters, size, etc. and then use the Properties of the
+	// items in that node to specify book information such as release date,
+	// number of pages, etc.
+	Properties Properties `json:"properties"`
+
+	// Slug A URL-safe slug for uniquely identifying resources.
+	Slug NodeSlug `json:"slug"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt  time.Time  `json:"updatedAt"`
+	Visibility Visibility `json:"visibility"`
+}
+
+// NodeCommonProps The main properties of a node.
+type NodeCommonProps struct {
+	Assets AssetList `json:"assets"`
+
+	// Content The body text of a post within a thread. The type is either a string or
+	// an object, depending on what was used during creation. Strings can be
+	// used for basic plain text or markdown content and objects are used for
+	// more complex types such as Slate.js editor documents.
+	Content     *PostContent    `json:"content,omitempty"`
+	Description NodeDescription `json:"description"`
+
+	// Link A web address with content information such as title, description, etc.
+	Link *Link    `json:"link,omitempty"`
+	Name NodeName `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+
+	// Parent A node is a text document with children and assets. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Nodes
+	// can be referenced in content posts and they also have their own content.
+	Parent *Node `json:"parent,omitempty"`
+
+	// Properties Arbitrary JSON object that can express any additional data for a
+	// resource object. This is intended for client implementations to use for
+	// extending objects with arbitrary information to satisfy product needs.
+	//
+	// For example, if you were building a book database, you could use the
+	// Properties of a node to specify publisher information such as date of
+	// founding, headquarters, size, etc. and then use the Properties of the
+	// items in that node to specify book information such as release date,
+	// number of pages, etc.
+	Properties Properties `json:"properties"`
+
+	// Slug A URL-safe slug for uniquely identifying resources.
+	Slug       NodeSlug   `json:"slug"`
+	Visibility Visibility `json:"visibility"`
+}
+
+// NodeDescription defines model for NodeDescription.
+type NodeDescription = string
+
+// NodeInitialProps defines model for NodeInitialProps.
+type NodeInitialProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
+	// Content The body text of a post within a thread. The type is either a string or
+	// an object, depending on what was used during creation. Strings can be
+	// used for basic plain text or markdown content and objects are used for
+	// more complex types such as Slate.js editor documents.
+	Content     *PostContent    `json:"content,omitempty"`
+	Description NodeDescription `json:"description"`
+	Name        NodeName        `json:"name"`
+
+	// Parent A URL-safe slug for uniquely identifying resources.
+	Parent *NodeSlug `json:"parent,omitempty"`
+
+	// Properties Arbitrary JSON object that can express any additional data for a
+	// resource object. This is intended for client implementations to use for
+	// extending objects with arbitrary information to satisfy product needs.
+	//
+	// For example, if you were building a book database, you could use the
+	// Properties of a node to specify publisher information such as date of
+	// founding, headquarters, size, etc. and then use the Properties of the
+	// items in that node to specify book information such as release date,
+	// number of pages, etc.
+	Properties *Properties `json:"properties,omitempty"`
+
+	// Slug A URL-safe slug for uniquely identifying resources.
+	Slug NodeSlug `json:"slug"`
+
+	// Url A web address
+	Url        *URL        `json:"url,omitempty"`
+	Visibility *Visibility `json:"visibility,omitempty"`
+}
+
+// NodeList defines model for NodeList.
+type NodeList = []Node
+
+// NodeListResult defines model for NodeListResult.
+type NodeListResult struct {
+	CurrentPage int      `json:"current_page"`
+	NextPage    *int     `json:"next_page,omitempty"`
+	Nodes       NodeList `json:"nodes"`
+	PageSize    int      `json:"page_size"`
+	Results     int      `json:"results"`
+	TotalPages  int      `json:"total_pages"`
+}
+
+// NodeMutableProps Note: Properties are replace-all and are not merged with existing.
+type NodeMutableProps struct {
+	AssetIds *AssetIDs `json:"asset_ids,omitempty"`
+
+	// Content The body text of a post within a thread. The type is either a string or
+	// an object, depending on what was used during creation. Strings can be
+	// used for basic plain text or markdown content and objects are used for
+	// more complex types such as Slate.js editor documents.
+	Content     *PostContent     `json:"content,omitempty"`
+	Description *NodeDescription `json:"description,omitempty"`
+	Name        *NodeName        `json:"name,omitempty"`
+
+	// Parent A URL-safe slug for uniquely identifying resources.
+	Parent *NodeSlug `json:"parent,omitempty"`
+
+	// Properties Arbitrary JSON object that can express any additional data for a
+	// resource object. This is intended for client implementations to use for
+	// extending objects with arbitrary information to satisfy product needs.
+	//
+	// For example, if you were building a book database, you could use the
+	// Properties of a node to specify publisher information such as date of
+	// founding, headquarters, size, etc. and then use the Properties of the
+	// items in that node to specify book information such as release date,
+	// number of pages, etc.
+	Properties *Properties `json:"properties,omitempty"`
+
+	// Slug A URL-safe slug for uniquely identifying resources.
+	Slug *NodeSlug `json:"slug,omitempty"`
+
+	// Url A web address
+	Url *URL `json:"url,omitempty"`
+}
+
+// NodeName defines model for NodeName.
+type NodeName = string
+
+// NodeSlug A URL-safe slug for uniquely identifying resources.
+type NodeSlug = Slug
+
+// NodeWithChildren defines model for NodeWithChildren.
+type NodeWithChildren struct {
+	Assets   AssetList `json:"assets"`
+	Children NodeList  `json:"children"`
+
+	// Content The body text of a post within a thread. The type is either a string or
+	// an object, depending on what was used during creation. Strings can be
+	// used for basic plain text or markdown content and objects are used for
+	// more complex types such as Slate.js editor documents.
+	Content *PostContent `json:"content,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt   *time.Time      `json:"deletedAt,omitempty"`
+	Description NodeDescription `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Link A web address with content information such as title, description, etc.
+	Link *Link `json:"link,omitempty"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name NodeName                `json:"name"`
+
+	// Owner A minimal reference to an account.
+	Owner ProfileReference `json:"owner"`
+
+	// Parent A node is a text document with children and assets. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Nodes
+	// can be referenced in content posts and they also have their own content.
+	Parent *Node `json:"parent,omitempty"`
+
+	// Properties Arbitrary JSON object that can express any additional data for a
+	// resource object. This is intended for client implementations to use for
+	// extending objects with arbitrary information to satisfy product needs.
+	//
+	// For example, if you were building a book database, you could use the
+	// Properties of a node to specify publisher information such as date of
+	// founding, headquarters, size, etc. and then use the Properties of the
+	// items in that node to specify book information such as release date,
+	// number of pages, etc.
+	Properties     Properties        `json:"properties"`
+	Recomentations DatagraphNodeList `json:"recomentations"`
+
+	// Slug A URL-safe slug for uniquely identifying resources.
+	Slug NodeSlug `json:"slug"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt  time.Time  `json:"updatedAt"`
+	Visibility Visibility `json:"visibility"`
+}
 
 // OAuthCallback defines model for OAuthCallback.
 type OAuthCallback struct {
@@ -1434,9 +1184,9 @@ type ProfileReference struct {
 // extending objects with arbitrary information to satisfy product needs.
 //
 // For example, if you were building a book database, you could use the
-// Properties of a cluster to specify publisher information such as date of
+// Properties of a node to specify publisher information such as date of
 // founding, headquarters, size, etc. and then use the Properties of the
-// items in that cluster to specify book information such as release date,
+// items in that node to specify book information such as release date,
 // number of pages, etc.
 type Properties = any
 
@@ -1636,7 +1386,7 @@ type Thread struct {
 
 	// Reacts A list of reactions this post has had from people.
 	Reacts         ReactList         `json:"reacts"`
-	Recomentations DatagraphItemList `json:"recomentations"`
+	Recomentations DatagraphNodeList `json:"recomentations"`
 
 	// Short A short version of the thread's body text for use in previews.
 	Short *string `json:"short,omitempty"`
@@ -1826,12 +1576,6 @@ type AssetPathParam = string
 // CategoryIDParam A unique identifier for this resource.
 type CategoryIDParam = Identifier
 
-// ClusterSlugChildParam A unique identifier for this resource.
-type ClusterSlugChildParam = Identifier
-
-// ClusterSlugParam A unique identifier for this resource.
-type ClusterSlugParam = Identifier
-
 // CollectionIDParam A unique identifier for this resource.
 type CollectionIDParam = Identifier
 
@@ -1841,17 +1585,14 @@ type ContentLength = float32
 // IconSize defines model for IconSize.
 type IconSize string
 
-// ItemSlugParam A unique identifier for this resource.
-type ItemSlugParam = Identifier
-
 // LinkSlugParam defines model for LinkSlugParam.
 type LinkSlugParam = string
 
-// MoveChildClustersQuery defines model for MoveChildClustersQuery.
-type MoveChildClustersQuery = bool
+// NodeSlugChildParam A unique identifier for this resource.
+type NodeSlugChildParam = Identifier
 
-// MoveChildItemsQuery defines model for MoveChildItemsQuery.
-type MoveChildItemsQuery = bool
+// NodeSlugParam A unique identifier for this resource.
+type NodeSlugParam = Identifier
 
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
@@ -1865,8 +1606,8 @@ type PostIDParam = Identifier
 // SearchQuery defines model for SearchQuery.
 type SearchQuery = string
 
-// TargetClusterSlugQuery defines model for TargetClusterSlugQuery.
-type TargetClusterSlugQuery = string
+// TargetNodeSlugQuery defines model for TargetNodeSlugQuery.
+type TargetNodeSlugQuery = string
 
 // ThreadMarkParam A thread's ID and optional slug separated by a dash = it's unique mark.
 // This allows endpoints to respond to varying forms of a thread's ID.
@@ -1913,57 +1654,6 @@ type CategoryListOK = CategoryList
 // CategoryUpdateOK defines model for CategoryUpdateOK.
 type CategoryUpdateOK = Category
 
-// ClusterAddChildOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterAddChildOK = Cluster
-
-// ClusterAddItemOK The full properties of a cluster including all items and maybe child
-// clusters (depending on what the endpoint is configured or queried to do)
-// for rendering a single cluster on a view.
-type ClusterAddItemOK = ClusterWithItems
-
-// ClusterCreateOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterCreateOK = Cluster
-
-// ClusterDeleteOK defines model for ClusterDeleteOK.
-type ClusterDeleteOK struct {
-	// Destination A cluster is a group of items and other clusters. It serves as an
-	// abstraction for grouping structured data objects. It can represent
-	// things such as brands, manufacturers, authors, directors, etc. Clusters
-	// can be referenced in content posts and they also have their own content.
-	Destination *Cluster `json:"destination,omitempty"`
-}
-
-// ClusterGetOK The full properties of a cluster including all items and maybe child
-// clusters (depending on what the endpoint is configured or queried to do)
-// for rendering a single cluster on a view.
-type ClusterGetOK = ClusterWithItems
-
-// ClusterListOK defines model for ClusterListOK.
-type ClusterListOK = ClusterListResult
-
-// ClusterRemoveChildOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterRemoveChildOK = Cluster
-
-// ClusterRemoveItemOK The full properties of a cluster including all items and maybe child
-// clusters (depending on what the endpoint is configured or queried to do)
-// for rendering a single cluster on a view.
-type ClusterRemoveItemOK = ClusterWithItems
-
-// ClusterUpdateOK A cluster is a group of items and other clusters. It serves as an
-// abstraction for grouping structured data objects. It can represent
-// things such as brands, manufacturers, authors, directors, etc. Clusters
-// can be referenced in content posts and they also have their own content.
-type ClusterUpdateOK = Cluster
-
 // CollectionAddPostOK A collection is a group of threads owned by a user. It allows users to
 // curate their own lists of content from the site. Collections can only
 // contain root level posts (threads) with titles and slugs to link to.
@@ -2003,35 +1693,6 @@ type GetInfoOK = Info
 // related metadata from the request and associated services.
 type InternalServerError = APIError
 
-// ItemCreateOK An item is an arbitrary object used for indexing any kind of structured
-// data for the purposes of archival, search, documentation, products, etc.
-// Items are similar to posts in terms of data model but are semantically
-// different when it comes to purpose.
-//
-// If you were to use Storyden to run a community for a video game for
-// example, items could be used to represent actual items from the game
-// which allows members to search for them as  well as reference them in
-// posts and other content.
-type ItemCreateOK = Item
-
-// ItemGetOK Represents an item with the parent cluster information included. Used by
-// schemas that only want a single item along with its cluster information.
-type ItemGetOK = ItemWithParents
-
-// ItemListOK defines model for ItemListOK.
-type ItemListOK = ItemListResult
-
-// ItemUpdateOK An item is an arbitrary object used for indexing any kind of structured
-// data for the purposes of archival, search, documentation, products, etc.
-// Items are similar to posts in terms of data model but are semantically
-// different when it comes to purpose.
-//
-// If you were to use Storyden to run a community for a video game for
-// example, items could be used to represent actual items from the game
-// which allows members to search for them as  well as reference them in
-// posts and other content.
-type ItemUpdateOK = Item
-
 // LinkCreateOK A web address with content information such as title, description, etc.
 type LinkCreateOK = Link
 
@@ -2040,6 +1701,45 @@ type LinkGetOK = LinkWithRefs
 
 // LinkListOK defines model for LinkListOK.
 type LinkListOK = LinkListResult
+
+// NodeAddChildOK A node is a text document with children and assets. It serves as an
+// abstraction for grouping structured data objects. It can represent
+// things such as brands, manufacturers, authors, directors, etc. Nodes
+// can be referenced in content posts and they also have their own content.
+type NodeAddChildOK = Node
+
+// NodeCreateOK A node is a text document with children and assets. It serves as an
+// abstraction for grouping structured data objects. It can represent
+// things such as brands, manufacturers, authors, directors, etc. Nodes
+// can be referenced in content posts and they also have their own content.
+type NodeCreateOK = Node
+
+// NodeDeleteOK defines model for NodeDeleteOK.
+type NodeDeleteOK struct {
+	// Destination A node is a text document with children and assets. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Nodes
+	// can be referenced in content posts and they also have their own content.
+	Destination *Node `json:"destination,omitempty"`
+}
+
+// NodeGetOK The full properties of a node including all child nodes.
+type NodeGetOK = NodeWithChildren
+
+// NodeListOK defines model for NodeListOK.
+type NodeListOK = NodeListResult
+
+// NodeRemoveChildOK A node is a text document with children and assets. It serves as an
+// abstraction for grouping structured data objects. It can represent
+// things such as brands, manufacturers, authors, directors, etc. Nodes
+// can be referenced in content posts and they also have their own content.
+type NodeRemoveChildOK = Node
+
+// NodeUpdateOK A node is a text document with children and assets. It serves as an
+// abstraction for grouping structured data objects. It can represent
+// things such as brands, manufacturers, authors, directors, etc. Nodes
+// can be referenced in content posts and they also have their own content.
+type NodeUpdateOK = Node
 
 // PostCreateOK A new post within a thread of posts. A post may reply to another post in
 // the thread by specifying the `reply_to` property. The identifier in the
@@ -2105,26 +1805,20 @@ type CategoryUpdate = CategoryMutableProps
 // CategoryUpdateOrder defines model for CategoryUpdateOrder.
 type CategoryUpdateOrder = CategoryIdentifierList
 
-// ClusterCreate defines model for ClusterCreate.
-type ClusterCreate = ClusterInitialProps
-
-// ClusterUpdate Note: Properties are replace-all and are not merged with existing.
-type ClusterUpdate = ClusterMutableProps
-
 // CollectionCreate defines model for CollectionCreate.
 type CollectionCreate = CollectionInitialProps
 
 // CollectionUpdate defines model for CollectionUpdate.
 type CollectionUpdate = CollectionMutableProps
 
-// ItemCreate defines model for ItemCreate.
-type ItemCreate = ItemInitialProps
-
-// ItemUpdate Note: Properties are replace-all and are not merged with existing.
-type ItemUpdate = ItemMutableProps
-
 // LinkCreate defines model for LinkCreate.
 type LinkCreate = LinkInitialProps
+
+// NodeCreate defines model for NodeCreate.
+type NodeCreate = NodeInitialProps
+
+// NodeUpdate Note: Properties are replace-all and are not merged with existing.
+type NodeUpdate = NodeMutableProps
 
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
@@ -2171,40 +1865,6 @@ type AssetUploadParams struct {
 	ContentLength ContentLength `json:"Content-Length"`
 }
 
-// ClusterListParams defines parameters for ClusterList.
-type ClusterListParams struct {
-	// Q Search query string.
-	Q *SearchQuery `form:"q,omitempty" json:"q,omitempty"`
-
-	// Page Pagination query parameters.
-	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
-
-	// ClusterId List this cluster and all child clusters.
-	ClusterId *Identifier `form:"cluster_id,omitempty" json:"cluster_id,omitempty"`
-
-	// Author Show only results owned by this account.
-	Author *AccountHandle `form:"author,omitempty" json:"author,omitempty"`
-
-	// Visibility Filter clusters with specific visibility values. Note that by
-	// default, only published clusters are returned. When 'draft' is
-	// specified, only drafts owned by the requesting account are included.
-	// When 'review' is specified, the request will fail if the requesting
-	// account is not an administrator.
-	Visibility *VisibilityParam `form:"visibility,omitempty" json:"visibility,omitempty"`
-}
-
-// ClusterDeleteParams defines parameters for ClusterDelete.
-type ClusterDeleteParams struct {
-	// TargetCluster Where to move child clusters and items.
-	TargetCluster *TargetClusterSlugQuery `form:"target_cluster,omitempty" json:"target_cluster,omitempty"`
-
-	// MoveChildClusters Whether or not to move child clusters.
-	MoveChildClusters *MoveChildClustersQuery `form:"move_child_clusters,omitempty" json:"move_child_clusters,omitempty"`
-
-	// MoveChildItems Whether or not to move child items.
-	MoveChildItems *MoveChildItemsQuery `form:"move_child_items,omitempty" json:"move_child_items,omitempty"`
-}
-
 // DatagraphSearchParams defines parameters for DatagraphSearch.
 type DatagraphSearchParams struct {
 	// Q Search query string.
@@ -2223,19 +1883,6 @@ type IconUploadParams struct {
 // IconGetParamsIconSize defines parameters for IconGet.
 type IconGetParamsIconSize string
 
-// ItemListParams defines parameters for ItemList.
-type ItemListParams struct {
-	// Q Search query string.
-	Q *SearchQuery `form:"q,omitempty" json:"q,omitempty"`
-
-	// Visibility Filter clusters with specific visibility values. Note that by
-	// default, only published clusters are returned. When 'draft' is
-	// specified, only drafts owned by the requesting account are included.
-	// When 'review' is specified, the request will fail if the requesting
-	// account is not an administrator.
-	Visibility *VisibilityParam `form:"visibility,omitempty" json:"visibility,omitempty"`
-}
-
 // LinkListParams defines parameters for LinkList.
 type LinkListParams struct {
 	// Q Search query string.
@@ -2243,6 +1890,35 @@ type LinkListParams struct {
 
 	// Page Pagination query parameters.
 	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
+}
+
+// NodeListParams defines parameters for NodeList.
+type NodeListParams struct {
+	// Q Search query string.
+	Q *SearchQuery `form:"q,omitempty" json:"q,omitempty"`
+
+	// Page Pagination query parameters.
+	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
+
+	// NodeId List this node and all child nodes.
+	NodeId *Identifier `form:"node_id,omitempty" json:"node_id,omitempty"`
+
+	// Author Show only results owned by this account.
+	Author *AccountHandle `form:"author,omitempty" json:"author,omitempty"`
+
+	// Visibility Filter nodes with specific visibility values. Note that by
+	// default, only published nodes are returned. When 'draft' is
+	// specified, only drafts owned by the requesting account are included.
+	// When 'review' is specified, the request will fail if the requesting
+	// account is not an administrator.
+	Visibility *VisibilityParam `form:"visibility,omitempty" json:"visibility,omitempty"`
+}
+
+// NodeDeleteParams defines parameters for NodeDelete.
+type NodeDeleteParams struct {
+	// TargetNode If set, child nodes will be moved to the target node. If not set, child
+	// nodes will be moved to the root.
+	TargetNode *TargetNodeSlugQuery `form:"target_node,omitempty" json:"target_node,omitempty"`
 }
 
 // PostSearchParams defines parameters for PostSearch.
@@ -2326,32 +2002,23 @@ type CategoryCreateJSONRequestBody = CategoryInitialProps
 // CategoryUpdateJSONRequestBody defines body for CategoryUpdate for application/json ContentType.
 type CategoryUpdateJSONRequestBody = CategoryMutableProps
 
-// ClusterCreateJSONRequestBody defines body for ClusterCreate for application/json ContentType.
-type ClusterCreateJSONRequestBody = ClusterInitialProps
-
-// ClusterUpdateJSONRequestBody defines body for ClusterUpdate for application/json ContentType.
-type ClusterUpdateJSONRequestBody = ClusterMutableProps
-
-// ClusterUpdateVisibilityJSONRequestBody defines body for ClusterUpdateVisibility for application/json ContentType.
-type ClusterUpdateVisibilityJSONRequestBody = VisibilityMutationProps
-
 // CollectionCreateJSONRequestBody defines body for CollectionCreate for application/json ContentType.
 type CollectionCreateJSONRequestBody = CollectionInitialProps
 
 // CollectionUpdateJSONRequestBody defines body for CollectionUpdate for application/json ContentType.
 type CollectionUpdateJSONRequestBody = CollectionMutableProps
 
-// ItemCreateJSONRequestBody defines body for ItemCreate for application/json ContentType.
-type ItemCreateJSONRequestBody = ItemInitialProps
-
-// ItemUpdateJSONRequestBody defines body for ItemUpdate for application/json ContentType.
-type ItemUpdateJSONRequestBody = ItemMutableProps
-
-// ItemUpdateVisibilityJSONRequestBody defines body for ItemUpdateVisibility for application/json ContentType.
-type ItemUpdateVisibilityJSONRequestBody = VisibilityMutationProps
-
 // LinkCreateJSONRequestBody defines body for LinkCreate for application/json ContentType.
 type LinkCreateJSONRequestBody = LinkInitialProps
+
+// NodeCreateJSONRequestBody defines body for NodeCreate for application/json ContentType.
+type NodeCreateJSONRequestBody = NodeInitialProps
+
+// NodeUpdateJSONRequestBody defines body for NodeUpdate for application/json ContentType.
+type NodeUpdateJSONRequestBody = NodeMutableProps
+
+// NodeUpdateVisibilityJSONRequestBody defines body for NodeUpdateVisibility for application/json ContentType.
+type NodeUpdateVisibilityJSONRequestBody = VisibilityMutationProps
 
 // PostUpdateJSONRequestBody defines body for PostUpdate for application/json ContentType.
 type PostUpdateJSONRequestBody = PostMutableProps
@@ -2556,48 +2223,6 @@ type ClientInterface interface {
 
 	CategoryUpdate(ctx context.Context, categoryId CategoryIDParam, body CategoryUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ClusterList request
-	ClusterList(ctx context.Context, params *ClusterListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterCreateWithBody request with any body
-	ClusterCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ClusterCreate(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterDelete request
-	ClusterDelete(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterGet request
-	ClusterGet(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterUpdateWithBody request with any body
-	ClusterUpdateWithBody(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ClusterUpdate(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterRemoveAsset request
-	ClusterRemoveAsset(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterAddAsset request
-	ClusterAddAsset(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterRemoveCluster request
-	ClusterRemoveCluster(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterAddCluster request
-	ClusterAddCluster(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterRemoveItem request
-	ClusterRemoveItem(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterAddItem request
-	ClusterAddItem(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ClusterUpdateVisibilityWithBody request with any body
-	ClusterUpdateVisibilityWithBody(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ClusterUpdateVisibility(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// CollectionList request
 	CollectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2632,36 +2257,6 @@ type ClientInterface interface {
 	// IconGet request
 	IconGet(ctx context.Context, iconSize IconGetParamsIconSize, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ItemList request
-	ItemList(ctx context.Context, params *ItemListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemCreateWithBody request with any body
-	ItemCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ItemCreate(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemDelete request
-	ItemDelete(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemGet request
-	ItemGet(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemUpdateWithBody request with any body
-	ItemUpdateWithBody(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ItemUpdate(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemRemoveAsset request
-	ItemRemoveAsset(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemAddAsset request
-	ItemAddAsset(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ItemUpdateVisibilityWithBody request with any body
-	ItemUpdateVisibilityWithBody(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ItemUpdateVisibility(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// LinkList request
 	LinkList(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2672,6 +2267,42 @@ type ClientInterface interface {
 
 	// LinkGet request
 	LinkGet(ctx context.Context, linkSlug LinkSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeList request
+	NodeList(ctx context.Context, params *NodeListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeCreateWithBody request with any body
+	NodeCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	NodeCreate(ctx context.Context, body NodeCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeDelete request
+	NodeDelete(ctx context.Context, nodeSlug NodeSlugParam, params *NodeDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeGet request
+	NodeGet(ctx context.Context, nodeSlug NodeSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeUpdateWithBody request with any body
+	NodeUpdateWithBody(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	NodeUpdate(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeRemoveAsset request
+	NodeRemoveAsset(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeAddAsset request
+	NodeAddAsset(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeRemoveNode request
+	NodeRemoveNode(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeAddNode request
+	NodeAddNode(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NodeUpdateVisibilityWithBody request with any body
+	NodeUpdateVisibilityWithBody(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	NodeUpdateVisibility(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostSearch request
 	PostSearch(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3239,186 +2870,6 @@ func (c *Client) CategoryUpdate(ctx context.Context, categoryId CategoryIDParam,
 	return c.Client.Do(req)
 }
 
-func (c *Client) ClusterList(ctx context.Context, params *ClusterListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterListRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterCreateRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterCreate(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterCreateRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterDelete(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterDeleteRequest(c.Server, clusterSlug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterGet(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterGetRequest(c.Server, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterUpdateWithBody(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterUpdateRequestWithBody(c.Server, clusterSlug, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterUpdate(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterUpdateRequest(c.Server, clusterSlug, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterRemoveAsset(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterRemoveAssetRequest(c.Server, clusterSlug, assetId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterAddAsset(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterAddAssetRequest(c.Server, clusterSlug, assetId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterRemoveCluster(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterRemoveClusterRequest(c.Server, clusterSlug, clusterSlugChild)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterAddCluster(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterAddClusterRequest(c.Server, clusterSlug, clusterSlugChild)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterRemoveItem(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterRemoveItemRequest(c.Server, clusterSlug, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterAddItem(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterAddItemRequest(c.Server, clusterSlug, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterUpdateVisibilityWithBody(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterUpdateVisibilityRequestWithBody(c.Server, clusterSlug, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ClusterUpdateVisibility(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewClusterUpdateVisibilityRequest(c.Server, clusterSlug, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) CollectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCollectionListRequest(c.Server)
 	if err != nil {
@@ -3563,138 +3014,6 @@ func (c *Client) IconGet(ctx context.Context, iconSize IconGetParamsIconSize, re
 	return c.Client.Do(req)
 }
 
-func (c *Client) ItemList(ctx context.Context, params *ItemListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemListRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemCreateRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemCreate(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemCreateRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemDelete(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemDeleteRequest(c.Server, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemGet(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemGetRequest(c.Server, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemUpdateWithBody(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemUpdateRequestWithBody(c.Server, itemSlug, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemUpdate(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemUpdateRequest(c.Server, itemSlug, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemRemoveAsset(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemRemoveAssetRequest(c.Server, itemSlug, assetId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemAddAsset(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemAddAssetRequest(c.Server, itemSlug, assetId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemUpdateVisibilityWithBody(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemUpdateVisibilityRequestWithBody(c.Server, itemSlug, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ItemUpdateVisibility(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewItemUpdateVisibilityRequest(c.Server, itemSlug, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) LinkList(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewLinkListRequest(c.Server, params)
 	if err != nil {
@@ -3733,6 +3052,162 @@ func (c *Client) LinkCreate(ctx context.Context, body LinkCreateJSONRequestBody,
 
 func (c *Client) LinkGet(ctx context.Context, linkSlug LinkSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewLinkGetRequest(c.Server, linkSlug)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeList(ctx context.Context, params *NodeListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeCreate(ctx context.Context, body NodeCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeDelete(ctx context.Context, nodeSlug NodeSlugParam, params *NodeDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeDeleteRequest(c.Server, nodeSlug, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeGet(ctx context.Context, nodeSlug NodeSlugParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeGetRequest(c.Server, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeUpdateWithBody(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeUpdateRequestWithBody(c.Server, nodeSlug, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeUpdate(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeUpdateRequest(c.Server, nodeSlug, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeRemoveAsset(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeRemoveAssetRequest(c.Server, nodeSlug, assetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeAddAsset(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeAddAssetRequest(c.Server, nodeSlug, assetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeRemoveNode(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeRemoveNodeRequest(c.Server, nodeSlug, nodeSlugChild)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeAddNode(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeAddNodeRequest(c.Server, nodeSlug, nodeSlugChild)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeUpdateVisibilityWithBody(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeUpdateVisibilityRequestWithBody(c.Server, nodeSlug, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NodeUpdateVisibility(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNodeUpdateVisibilityRequest(c.Server, nodeSlug, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5024,621 +4499,6 @@ func NewCategoryUpdateRequestWithBody(server string, categoryId CategoryIDParam,
 	return req, nil
 }
 
-// NewClusterListRequest generates requests for ClusterList
-func NewClusterListRequest(server string, params *ClusterListParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Q != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "q", runtime.ParamLocationQuery, *params.Q); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.ClusterId != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "cluster_id", runtime.ParamLocationQuery, *params.ClusterId); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Author != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "author", runtime.ParamLocationQuery, *params.Author); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Visibility != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "visibility", runtime.ParamLocationQuery, *params.Visibility); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterCreateRequest calls the generic ClusterCreate builder with application/json body
-func NewClusterCreateRequest(server string, body ClusterCreateJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewClusterCreateRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewClusterCreateRequestWithBody generates requests for ClusterCreate with any type of body
-func NewClusterCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewClusterDeleteRequest generates requests for ClusterDelete
-func NewClusterDeleteRequest(server string, clusterSlug ClusterSlugParam, params *ClusterDeleteParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.TargetCluster != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "target_cluster", runtime.ParamLocationQuery, *params.TargetCluster); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.MoveChildClusters != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "move_child_clusters", runtime.ParamLocationQuery, *params.MoveChildClusters); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.MoveChildItems != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "move_child_items", runtime.ParamLocationQuery, *params.MoveChildItems); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterGetRequest generates requests for ClusterGet
-func NewClusterGetRequest(server string, clusterSlug ClusterSlugParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterUpdateRequest calls the generic ClusterUpdate builder with application/json body
-func NewClusterUpdateRequest(server string, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewClusterUpdateRequestWithBody(server, clusterSlug, "application/json", bodyReader)
-}
-
-// NewClusterUpdateRequestWithBody generates requests for ClusterUpdate with any type of body
-func NewClusterUpdateRequestWithBody(server string, clusterSlug ClusterSlugParam, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewClusterRemoveAssetRequest generates requests for ClusterRemoveAsset
-func NewClusterRemoveAssetRequest(server string, clusterSlug ClusterSlugParam, assetId AssetIDParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/assets/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterAddAssetRequest generates requests for ClusterAddAsset
-func NewClusterAddAssetRequest(server string, clusterSlug ClusterSlugParam, assetId AssetIDParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/assets/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterRemoveClusterRequest generates requests for ClusterRemoveCluster
-func NewClusterRemoveClusterRequest(server string, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug_child", runtime.ParamLocationPath, clusterSlugChild)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/clusters/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterAddClusterRequest generates requests for ClusterAddCluster
-func NewClusterAddClusterRequest(server string, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug_child", runtime.ParamLocationPath, clusterSlugChild)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/clusters/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterRemoveItemRequest generates requests for ClusterRemoveItem
-func NewClusterRemoveItemRequest(server string, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/items/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterAddItemRequest generates requests for ClusterAddItem
-func NewClusterAddItemRequest(server string, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/items/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewClusterUpdateVisibilityRequest calls the generic ClusterUpdateVisibility builder with application/json body
-func NewClusterUpdateVisibilityRequest(server string, clusterSlug ClusterSlugParam, body ClusterUpdateVisibilityJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewClusterUpdateVisibilityRequestWithBody(server, clusterSlug, "application/json", bodyReader)
-}
-
-// NewClusterUpdateVisibilityRequestWithBody generates requests for ClusterUpdateVisibility with any type of body
-func NewClusterUpdateVisibilityRequestWithBody(server string, clusterSlug ClusterSlugParam, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "cluster_slug", runtime.ParamLocationPath, clusterSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/clusters/%s/visibility", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 // NewCollectionListRequest generates requests for CollectionList
 func NewCollectionListRequest(server string) (*http.Request, error) {
 	var err error
@@ -6037,355 +4897,6 @@ func NewIconGetRequest(server string, iconSize IconGetParamsIconSize) (*http.Req
 	return req, nil
 }
 
-// NewItemListRequest generates requests for ItemList
-func NewItemListRequest(server string, params *ItemListParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Q != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "q", runtime.ParamLocationQuery, *params.Q); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Visibility != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "visibility", runtime.ParamLocationQuery, *params.Visibility); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewItemCreateRequest calls the generic ItemCreate builder with application/json body
-func NewItemCreateRequest(server string, body ItemCreateJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewItemCreateRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewItemCreateRequestWithBody generates requests for ItemCreate with any type of body
-func NewItemCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewItemDeleteRequest generates requests for ItemDelete
-func NewItemDeleteRequest(server string, itemSlug ItemSlugParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewItemGetRequest generates requests for ItemGet
-func NewItemGetRequest(server string, itemSlug ItemSlugParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewItemUpdateRequest calls the generic ItemUpdate builder with application/json body
-func NewItemUpdateRequest(server string, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewItemUpdateRequestWithBody(server, itemSlug, "application/json", bodyReader)
-}
-
-// NewItemUpdateRequestWithBody generates requests for ItemUpdate with any type of body
-func NewItemUpdateRequestWithBody(server string, itemSlug ItemSlugParam, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewItemRemoveAssetRequest generates requests for ItemRemoveAsset
-func NewItemRemoveAssetRequest(server string, itemSlug ItemSlugParam, assetId AssetIDParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s/assets/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewItemAddAssetRequest generates requests for ItemAddAsset
-func NewItemAddAssetRequest(server string, itemSlug ItemSlugParam, assetId AssetIDParam) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s/assets/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewItemUpdateVisibilityRequest calls the generic ItemUpdateVisibility builder with application/json body
-func NewItemUpdateVisibilityRequest(server string, itemSlug ItemSlugParam, body ItemUpdateVisibilityJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewItemUpdateVisibilityRequestWithBody(server, itemSlug, "application/json", bodyReader)
-}
-
-// NewItemUpdateVisibilityRequestWithBody generates requests for ItemUpdateVisibility with any type of body
-func NewItemUpdateVisibilityRequestWithBody(server string, itemSlug ItemSlugParam, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "item_slug", runtime.ParamLocationPath, itemSlug)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v1/items/%s/visibility", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 // NewLinkListRequest generates requests for LinkList
 func NewLinkListRequest(server string, params *LinkListParams) (*http.Request, error) {
 	var err error
@@ -6521,6 +5032,507 @@ func NewLinkGetRequest(server string, linkSlug LinkSlugParam) (*http.Request, er
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewNodeListRequest generates requests for NodeList
+func NewNodeListRequest(server string, params *NodeListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Q != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "q", runtime.ParamLocationQuery, *params.Q); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.NodeId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "node_id", runtime.ParamLocationQuery, *params.NodeId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Author != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "author", runtime.ParamLocationQuery, *params.Author); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Visibility != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "visibility", runtime.ParamLocationQuery, *params.Visibility); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeCreateRequest calls the generic NodeCreate builder with application/json body
+func NewNodeCreateRequest(server string, body NodeCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewNodeCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewNodeCreateRequestWithBody generates requests for NodeCreate with any type of body
+func NewNodeCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewNodeDeleteRequest generates requests for NodeDelete
+func NewNodeDeleteRequest(server string, nodeSlug NodeSlugParam, params *NodeDeleteParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.TargetNode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "target_node", runtime.ParamLocationQuery, *params.TargetNode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeGetRequest generates requests for NodeGet
+func NewNodeGetRequest(server string, nodeSlug NodeSlugParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeUpdateRequest calls the generic NodeUpdate builder with application/json body
+func NewNodeUpdateRequest(server string, nodeSlug NodeSlugParam, body NodeUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewNodeUpdateRequestWithBody(server, nodeSlug, "application/json", bodyReader)
+}
+
+// NewNodeUpdateRequestWithBody generates requests for NodeUpdate with any type of body
+func NewNodeUpdateRequestWithBody(server string, nodeSlug NodeSlugParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewNodeRemoveAssetRequest generates requests for NodeRemoveAsset
+func NewNodeRemoveAssetRequest(server string, nodeSlug NodeSlugParam, assetId AssetIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeAddAssetRequest generates requests for NodeAddAsset
+func NewNodeAddAssetRequest(server string, nodeSlug NodeSlugParam, assetId AssetIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "asset_id", runtime.ParamLocationPath, assetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s/assets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeRemoveNodeRequest generates requests for NodeRemoveNode
+func NewNodeRemoveNodeRequest(server string, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "node_slug_child", runtime.ParamLocationPath, nodeSlugChild)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s/nodes/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeAddNodeRequest generates requests for NodeAddNode
+func NewNodeAddNodeRequest(server string, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "node_slug_child", runtime.ParamLocationPath, nodeSlugChild)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s/nodes/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewNodeUpdateVisibilityRequest calls the generic NodeUpdateVisibility builder with application/json body
+func NewNodeUpdateVisibilityRequest(server string, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewNodeUpdateVisibilityRequestWithBody(server, nodeSlug, "application/json", bodyReader)
+}
+
+// NewNodeUpdateVisibilityRequestWithBody generates requests for NodeUpdateVisibility with any type of body
+func NewNodeUpdateVisibilityRequestWithBody(server string, nodeSlug NodeSlugParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "node_slug", runtime.ParamLocationPath, nodeSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/nodes/%s/visibility", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -7333,48 +6345,6 @@ type ClientWithResponsesInterface interface {
 
 	CategoryUpdateWithResponse(ctx context.Context, categoryId CategoryIDParam, body CategoryUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CategoryUpdateResponse, error)
 
-	// ClusterListWithResponse request
-	ClusterListWithResponse(ctx context.Context, params *ClusterListParams, reqEditors ...RequestEditorFn) (*ClusterListResponse, error)
-
-	// ClusterCreateWithBodyWithResponse request with any body
-	ClusterCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterCreateResponse, error)
-
-	ClusterCreateWithResponse(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterCreateResponse, error)
-
-	// ClusterDeleteWithResponse request
-	ClusterDeleteWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*ClusterDeleteResponse, error)
-
-	// ClusterGetWithResponse request
-	ClusterGetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*ClusterGetResponse, error)
-
-	// ClusterUpdateWithBodyWithResponse request with any body
-	ClusterUpdateWithBodyWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error)
-
-	ClusterUpdateWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error)
-
-	// ClusterRemoveAssetWithResponse request
-	ClusterRemoveAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ClusterRemoveAssetResponse, error)
-
-	// ClusterAddAssetWithResponse request
-	ClusterAddAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ClusterAddAssetResponse, error)
-
-	// ClusterRemoveClusterWithResponse request
-	ClusterRemoveClusterWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*ClusterRemoveClusterResponse, error)
-
-	// ClusterAddClusterWithResponse request
-	ClusterAddClusterWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*ClusterAddClusterResponse, error)
-
-	// ClusterRemoveItemWithResponse request
-	ClusterRemoveItemWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ClusterRemoveItemResponse, error)
-
-	// ClusterAddItemWithResponse request
-	ClusterAddItemWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ClusterAddItemResponse, error)
-
-	// ClusterUpdateVisibilityWithBodyWithResponse request with any body
-	ClusterUpdateVisibilityWithBodyWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterUpdateVisibilityResponse, error)
-
-	ClusterUpdateVisibilityWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterUpdateVisibilityResponse, error)
-
 	// CollectionListWithResponse request
 	CollectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CollectionListResponse, error)
 
@@ -7409,36 +6379,6 @@ type ClientWithResponsesInterface interface {
 	// IconGetWithResponse request
 	IconGetWithResponse(ctx context.Context, iconSize IconGetParamsIconSize, reqEditors ...RequestEditorFn) (*IconGetResponse, error)
 
-	// ItemListWithResponse request
-	ItemListWithResponse(ctx context.Context, params *ItemListParams, reqEditors ...RequestEditorFn) (*ItemListResponse, error)
-
-	// ItemCreateWithBodyWithResponse request with any body
-	ItemCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemCreateResponse, error)
-
-	ItemCreateWithResponse(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemCreateResponse, error)
-
-	// ItemDeleteWithResponse request
-	ItemDeleteWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemDeleteResponse, error)
-
-	// ItemGetWithResponse request
-	ItemGetWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemGetResponse, error)
-
-	// ItemUpdateWithBodyWithResponse request with any body
-	ItemUpdateWithBodyWithResponse(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error)
-
-	ItemUpdateWithResponse(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error)
-
-	// ItemRemoveAssetWithResponse request
-	ItemRemoveAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ItemRemoveAssetResponse, error)
-
-	// ItemAddAssetWithResponse request
-	ItemAddAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ItemAddAssetResponse, error)
-
-	// ItemUpdateVisibilityWithBodyWithResponse request with any body
-	ItemUpdateVisibilityWithBodyWithResponse(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemUpdateVisibilityResponse, error)
-
-	ItemUpdateVisibilityWithResponse(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemUpdateVisibilityResponse, error)
-
 	// LinkListWithResponse request
 	LinkListWithResponse(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*LinkListResponse, error)
 
@@ -7449,6 +6389,42 @@ type ClientWithResponsesInterface interface {
 
 	// LinkGetWithResponse request
 	LinkGetWithResponse(ctx context.Context, linkSlug LinkSlugParam, reqEditors ...RequestEditorFn) (*LinkGetResponse, error)
+
+	// NodeListWithResponse request
+	NodeListWithResponse(ctx context.Context, params *NodeListParams, reqEditors ...RequestEditorFn) (*NodeListResponse, error)
+
+	// NodeCreateWithBodyWithResponse request with any body
+	NodeCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeCreateResponse, error)
+
+	NodeCreateWithResponse(ctx context.Context, body NodeCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeCreateResponse, error)
+
+	// NodeDeleteWithResponse request
+	NodeDeleteWithResponse(ctx context.Context, nodeSlug NodeSlugParam, params *NodeDeleteParams, reqEditors ...RequestEditorFn) (*NodeDeleteResponse, error)
+
+	// NodeGetWithResponse request
+	NodeGetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, reqEditors ...RequestEditorFn) (*NodeGetResponse, error)
+
+	// NodeUpdateWithBodyWithResponse request with any body
+	NodeUpdateWithBodyWithResponse(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeUpdateResponse, error)
+
+	NodeUpdateWithResponse(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeUpdateResponse, error)
+
+	// NodeRemoveAssetWithResponse request
+	NodeRemoveAssetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*NodeRemoveAssetResponse, error)
+
+	// NodeAddAssetWithResponse request
+	NodeAddAssetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*NodeAddAssetResponse, error)
+
+	// NodeRemoveNodeWithResponse request
+	NodeRemoveNodeWithResponse(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*NodeRemoveNodeResponse, error)
+
+	// NodeAddNodeWithResponse request
+	NodeAddNodeWithResponse(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*NodeAddNodeResponse, error)
+
+	// NodeUpdateVisibilityWithBodyWithResponse request with any body
+	NodeUpdateVisibilityWithBodyWithResponse(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeUpdateVisibilityResponse, error)
+
+	NodeUpdateVisibilityWithResponse(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeUpdateVisibilityResponse, error)
 
 	// PostSearchWithResponse request
 	PostSearchWithResponse(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*PostSearchResponse, error)
@@ -8161,282 +7137,6 @@ func (r CategoryUpdateResponse) StatusCode() int {
 	return 0
 }
 
-type ClusterListResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterListOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterListResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterListResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterCreateResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterCreateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterCreateResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterCreateResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterDeleteResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterDeleteOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterDeleteResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterDeleteResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterGetOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterUpdateResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterUpdateResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterUpdateResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterRemoveAssetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterRemoveAssetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterRemoveAssetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterAddAssetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterAddAssetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterAddAssetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterRemoveClusterResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterRemoveChildOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterRemoveClusterResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterRemoveClusterResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterAddClusterResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterAddChildOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterAddClusterResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterAddClusterResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterRemoveItemResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterRemoveItemOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterRemoveItemResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterRemoveItemResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterAddItemResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterAddItemOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterAddItemResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterAddItemResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ClusterUpdateVisibilityResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ClusterUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ClusterUpdateVisibilityResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ClusterUpdateVisibilityResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type CollectionListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -8665,189 +7365,6 @@ func (r IconGetResponse) StatusCode() int {
 	return 0
 }
 
-type ItemListResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemListOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemListResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemListResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemCreateResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemCreateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemCreateResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemCreateResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemDeleteResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemDeleteResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemDeleteResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemGetOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemUpdateResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemUpdateResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemUpdateResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemRemoveAssetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemRemoveAssetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemRemoveAssetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemAddAssetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemAddAssetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemAddAssetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ItemUpdateVisibilityResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ItemUpdateOK
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r ItemUpdateVisibilityResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ItemUpdateVisibilityResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type LinkListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -8911,6 +7428,236 @@ func (r LinkGetResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r LinkGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeCreateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeDeleteOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeRemoveAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeRemoveAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeRemoveAssetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeAddAssetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeAddAssetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeAddAssetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeRemoveNodeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeRemoveChildOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeRemoveNodeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeRemoveNodeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeAddNodeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeAddChildOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeAddNodeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeAddNodeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type NodeUpdateVisibilityResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *NodeUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r NodeUpdateVisibilityResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NodeUpdateVisibilityResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -9585,138 +8332,6 @@ func (c *ClientWithResponses) CategoryUpdateWithResponse(ctx context.Context, ca
 	return ParseCategoryUpdateResponse(rsp)
 }
 
-// ClusterListWithResponse request returning *ClusterListResponse
-func (c *ClientWithResponses) ClusterListWithResponse(ctx context.Context, params *ClusterListParams, reqEditors ...RequestEditorFn) (*ClusterListResponse, error) {
-	rsp, err := c.ClusterList(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterListResponse(rsp)
-}
-
-// ClusterCreateWithBodyWithResponse request with arbitrary body returning *ClusterCreateResponse
-func (c *ClientWithResponses) ClusterCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterCreateResponse, error) {
-	rsp, err := c.ClusterCreateWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterCreateResponse(rsp)
-}
-
-func (c *ClientWithResponses) ClusterCreateWithResponse(ctx context.Context, body ClusterCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterCreateResponse, error) {
-	rsp, err := c.ClusterCreate(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterCreateResponse(rsp)
-}
-
-// ClusterDeleteWithResponse request returning *ClusterDeleteResponse
-func (c *ClientWithResponses) ClusterDeleteWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, params *ClusterDeleteParams, reqEditors ...RequestEditorFn) (*ClusterDeleteResponse, error) {
-	rsp, err := c.ClusterDelete(ctx, clusterSlug, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterDeleteResponse(rsp)
-}
-
-// ClusterGetWithResponse request returning *ClusterGetResponse
-func (c *ClientWithResponses) ClusterGetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, reqEditors ...RequestEditorFn) (*ClusterGetResponse, error) {
-	rsp, err := c.ClusterGet(ctx, clusterSlug, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterGetResponse(rsp)
-}
-
-// ClusterUpdateWithBodyWithResponse request with arbitrary body returning *ClusterUpdateResponse
-func (c *ClientWithResponses) ClusterUpdateWithBodyWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error) {
-	rsp, err := c.ClusterUpdateWithBody(ctx, clusterSlug, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterUpdateResponse(rsp)
-}
-
-func (c *ClientWithResponses) ClusterUpdateWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterUpdateResponse, error) {
-	rsp, err := c.ClusterUpdate(ctx, clusterSlug, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterUpdateResponse(rsp)
-}
-
-// ClusterRemoveAssetWithResponse request returning *ClusterRemoveAssetResponse
-func (c *ClientWithResponses) ClusterRemoveAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ClusterRemoveAssetResponse, error) {
-	rsp, err := c.ClusterRemoveAsset(ctx, clusterSlug, assetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterRemoveAssetResponse(rsp)
-}
-
-// ClusterAddAssetWithResponse request returning *ClusterAddAssetResponse
-func (c *ClientWithResponses) ClusterAddAssetWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ClusterAddAssetResponse, error) {
-	rsp, err := c.ClusterAddAsset(ctx, clusterSlug, assetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterAddAssetResponse(rsp)
-}
-
-// ClusterRemoveClusterWithResponse request returning *ClusterRemoveClusterResponse
-func (c *ClientWithResponses) ClusterRemoveClusterWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*ClusterRemoveClusterResponse, error) {
-	rsp, err := c.ClusterRemoveCluster(ctx, clusterSlug, clusterSlugChild, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterRemoveClusterResponse(rsp)
-}
-
-// ClusterAddClusterWithResponse request returning *ClusterAddClusterResponse
-func (c *ClientWithResponses) ClusterAddClusterWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam, reqEditors ...RequestEditorFn) (*ClusterAddClusterResponse, error) {
-	rsp, err := c.ClusterAddCluster(ctx, clusterSlug, clusterSlugChild, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterAddClusterResponse(rsp)
-}
-
-// ClusterRemoveItemWithResponse request returning *ClusterRemoveItemResponse
-func (c *ClientWithResponses) ClusterRemoveItemWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ClusterRemoveItemResponse, error) {
-	rsp, err := c.ClusterRemoveItem(ctx, clusterSlug, itemSlug, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterRemoveItemResponse(rsp)
-}
-
-// ClusterAddItemWithResponse request returning *ClusterAddItemResponse
-func (c *ClientWithResponses) ClusterAddItemWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ClusterAddItemResponse, error) {
-	rsp, err := c.ClusterAddItem(ctx, clusterSlug, itemSlug, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterAddItemResponse(rsp)
-}
-
-// ClusterUpdateVisibilityWithBodyWithResponse request with arbitrary body returning *ClusterUpdateVisibilityResponse
-func (c *ClientWithResponses) ClusterUpdateVisibilityWithBodyWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ClusterUpdateVisibilityResponse, error) {
-	rsp, err := c.ClusterUpdateVisibilityWithBody(ctx, clusterSlug, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterUpdateVisibilityResponse(rsp)
-}
-
-func (c *ClientWithResponses) ClusterUpdateVisibilityWithResponse(ctx context.Context, clusterSlug ClusterSlugParam, body ClusterUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*ClusterUpdateVisibilityResponse, error) {
-	rsp, err := c.ClusterUpdateVisibility(ctx, clusterSlug, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseClusterUpdateVisibilityResponse(rsp)
-}
-
 // CollectionListWithResponse request returning *CollectionListResponse
 func (c *ClientWithResponses) CollectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CollectionListResponse, error) {
 	rsp, err := c.CollectionList(ctx, reqEditors...)
@@ -9823,102 +8438,6 @@ func (c *ClientWithResponses) IconGetWithResponse(ctx context.Context, iconSize 
 	return ParseIconGetResponse(rsp)
 }
 
-// ItemListWithResponse request returning *ItemListResponse
-func (c *ClientWithResponses) ItemListWithResponse(ctx context.Context, params *ItemListParams, reqEditors ...RequestEditorFn) (*ItemListResponse, error) {
-	rsp, err := c.ItemList(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemListResponse(rsp)
-}
-
-// ItemCreateWithBodyWithResponse request with arbitrary body returning *ItemCreateResponse
-func (c *ClientWithResponses) ItemCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemCreateResponse, error) {
-	rsp, err := c.ItemCreateWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemCreateResponse(rsp)
-}
-
-func (c *ClientWithResponses) ItemCreateWithResponse(ctx context.Context, body ItemCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemCreateResponse, error) {
-	rsp, err := c.ItemCreate(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemCreateResponse(rsp)
-}
-
-// ItemDeleteWithResponse request returning *ItemDeleteResponse
-func (c *ClientWithResponses) ItemDeleteWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemDeleteResponse, error) {
-	rsp, err := c.ItemDelete(ctx, itemSlug, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemDeleteResponse(rsp)
-}
-
-// ItemGetWithResponse request returning *ItemGetResponse
-func (c *ClientWithResponses) ItemGetWithResponse(ctx context.Context, itemSlug ItemSlugParam, reqEditors ...RequestEditorFn) (*ItemGetResponse, error) {
-	rsp, err := c.ItemGet(ctx, itemSlug, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemGetResponse(rsp)
-}
-
-// ItemUpdateWithBodyWithResponse request with arbitrary body returning *ItemUpdateResponse
-func (c *ClientWithResponses) ItemUpdateWithBodyWithResponse(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error) {
-	rsp, err := c.ItemUpdateWithBody(ctx, itemSlug, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemUpdateResponse(rsp)
-}
-
-func (c *ClientWithResponses) ItemUpdateWithResponse(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemUpdateResponse, error) {
-	rsp, err := c.ItemUpdate(ctx, itemSlug, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemUpdateResponse(rsp)
-}
-
-// ItemRemoveAssetWithResponse request returning *ItemRemoveAssetResponse
-func (c *ClientWithResponses) ItemRemoveAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ItemRemoveAssetResponse, error) {
-	rsp, err := c.ItemRemoveAsset(ctx, itemSlug, assetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemRemoveAssetResponse(rsp)
-}
-
-// ItemAddAssetWithResponse request returning *ItemAddAssetResponse
-func (c *ClientWithResponses) ItemAddAssetWithResponse(ctx context.Context, itemSlug ItemSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*ItemAddAssetResponse, error) {
-	rsp, err := c.ItemAddAsset(ctx, itemSlug, assetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemAddAssetResponse(rsp)
-}
-
-// ItemUpdateVisibilityWithBodyWithResponse request with arbitrary body returning *ItemUpdateVisibilityResponse
-func (c *ClientWithResponses) ItemUpdateVisibilityWithBodyWithResponse(ctx context.Context, itemSlug ItemSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ItemUpdateVisibilityResponse, error) {
-	rsp, err := c.ItemUpdateVisibilityWithBody(ctx, itemSlug, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemUpdateVisibilityResponse(rsp)
-}
-
-func (c *ClientWithResponses) ItemUpdateVisibilityWithResponse(ctx context.Context, itemSlug ItemSlugParam, body ItemUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*ItemUpdateVisibilityResponse, error) {
-	rsp, err := c.ItemUpdateVisibility(ctx, itemSlug, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseItemUpdateVisibilityResponse(rsp)
-}
-
 // LinkListWithResponse request returning *LinkListResponse
 func (c *ClientWithResponses) LinkListWithResponse(ctx context.Context, params *LinkListParams, reqEditors ...RequestEditorFn) (*LinkListResponse, error) {
 	rsp, err := c.LinkList(ctx, params, reqEditors...)
@@ -9952,6 +8471,120 @@ func (c *ClientWithResponses) LinkGetWithResponse(ctx context.Context, linkSlug 
 		return nil, err
 	}
 	return ParseLinkGetResponse(rsp)
+}
+
+// NodeListWithResponse request returning *NodeListResponse
+func (c *ClientWithResponses) NodeListWithResponse(ctx context.Context, params *NodeListParams, reqEditors ...RequestEditorFn) (*NodeListResponse, error) {
+	rsp, err := c.NodeList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeListResponse(rsp)
+}
+
+// NodeCreateWithBodyWithResponse request with arbitrary body returning *NodeCreateResponse
+func (c *ClientWithResponses) NodeCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeCreateResponse, error) {
+	rsp, err := c.NodeCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) NodeCreateWithResponse(ctx context.Context, body NodeCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeCreateResponse, error) {
+	rsp, err := c.NodeCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeCreateResponse(rsp)
+}
+
+// NodeDeleteWithResponse request returning *NodeDeleteResponse
+func (c *ClientWithResponses) NodeDeleteWithResponse(ctx context.Context, nodeSlug NodeSlugParam, params *NodeDeleteParams, reqEditors ...RequestEditorFn) (*NodeDeleteResponse, error) {
+	rsp, err := c.NodeDelete(ctx, nodeSlug, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeDeleteResponse(rsp)
+}
+
+// NodeGetWithResponse request returning *NodeGetResponse
+func (c *ClientWithResponses) NodeGetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, reqEditors ...RequestEditorFn) (*NodeGetResponse, error) {
+	rsp, err := c.NodeGet(ctx, nodeSlug, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeGetResponse(rsp)
+}
+
+// NodeUpdateWithBodyWithResponse request with arbitrary body returning *NodeUpdateResponse
+func (c *ClientWithResponses) NodeUpdateWithBodyWithResponse(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeUpdateResponse, error) {
+	rsp, err := c.NodeUpdateWithBody(ctx, nodeSlug, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) NodeUpdateWithResponse(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeUpdateResponse, error) {
+	rsp, err := c.NodeUpdate(ctx, nodeSlug, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeUpdateResponse(rsp)
+}
+
+// NodeRemoveAssetWithResponse request returning *NodeRemoveAssetResponse
+func (c *ClientWithResponses) NodeRemoveAssetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*NodeRemoveAssetResponse, error) {
+	rsp, err := c.NodeRemoveAsset(ctx, nodeSlug, assetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeRemoveAssetResponse(rsp)
+}
+
+// NodeAddAssetWithResponse request returning *NodeAddAssetResponse
+func (c *ClientWithResponses) NodeAddAssetWithResponse(ctx context.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, reqEditors ...RequestEditorFn) (*NodeAddAssetResponse, error) {
+	rsp, err := c.NodeAddAsset(ctx, nodeSlug, assetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeAddAssetResponse(rsp)
+}
+
+// NodeRemoveNodeWithResponse request returning *NodeRemoveNodeResponse
+func (c *ClientWithResponses) NodeRemoveNodeWithResponse(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*NodeRemoveNodeResponse, error) {
+	rsp, err := c.NodeRemoveNode(ctx, nodeSlug, nodeSlugChild, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeRemoveNodeResponse(rsp)
+}
+
+// NodeAddNodeWithResponse request returning *NodeAddNodeResponse
+func (c *ClientWithResponses) NodeAddNodeWithResponse(ctx context.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam, reqEditors ...RequestEditorFn) (*NodeAddNodeResponse, error) {
+	rsp, err := c.NodeAddNode(ctx, nodeSlug, nodeSlugChild, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeAddNodeResponse(rsp)
+}
+
+// NodeUpdateVisibilityWithBodyWithResponse request with arbitrary body returning *NodeUpdateVisibilityResponse
+func (c *ClientWithResponses) NodeUpdateVisibilityWithBodyWithResponse(ctx context.Context, nodeSlug NodeSlugParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NodeUpdateVisibilityResponse, error) {
+	rsp, err := c.NodeUpdateVisibilityWithBody(ctx, nodeSlug, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeUpdateVisibilityResponse(rsp)
+}
+
+func (c *ClientWithResponses) NodeUpdateVisibilityWithResponse(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeUpdateVisibilityResponse, error) {
+	rsp, err := c.NodeUpdateVisibility(ctx, nodeSlug, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNodeUpdateVisibilityResponse(rsp)
 }
 
 // PostSearchWithResponse request returning *PostSearchResponse
@@ -11023,402 +9656,6 @@ func ParseCategoryUpdateResponse(rsp *http.Response) (*CategoryUpdateResponse, e
 	return response, nil
 }
 
-// ParseClusterListResponse parses an HTTP response from a ClusterListWithResponse call
-func ParseClusterListResponse(rsp *http.Response) (*ClusterListResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterListResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterListOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterCreateResponse parses an HTTP response from a ClusterCreateWithResponse call
-func ParseClusterCreateResponse(rsp *http.Response) (*ClusterCreateResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterCreateResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterCreateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterDeleteResponse parses an HTTP response from a ClusterDeleteWithResponse call
-func ParseClusterDeleteResponse(rsp *http.Response) (*ClusterDeleteResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterDeleteResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterDeleteOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterGetResponse parses an HTTP response from a ClusterGetWithResponse call
-func ParseClusterGetResponse(rsp *http.Response) (*ClusterGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterGetOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterUpdateResponse parses an HTTP response from a ClusterUpdateWithResponse call
-func ParseClusterUpdateResponse(rsp *http.Response) (*ClusterUpdateResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterUpdateResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterRemoveAssetResponse parses an HTTP response from a ClusterRemoveAssetWithResponse call
-func ParseClusterRemoveAssetResponse(rsp *http.Response) (*ClusterRemoveAssetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterRemoveAssetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterAddAssetResponse parses an HTTP response from a ClusterAddAssetWithResponse call
-func ParseClusterAddAssetResponse(rsp *http.Response) (*ClusterAddAssetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterAddAssetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterRemoveClusterResponse parses an HTTP response from a ClusterRemoveClusterWithResponse call
-func ParseClusterRemoveClusterResponse(rsp *http.Response) (*ClusterRemoveClusterResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterRemoveClusterResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterRemoveChildOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterAddClusterResponse parses an HTTP response from a ClusterAddClusterWithResponse call
-func ParseClusterAddClusterResponse(rsp *http.Response) (*ClusterAddClusterResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterAddClusterResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterAddChildOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterRemoveItemResponse parses an HTTP response from a ClusterRemoveItemWithResponse call
-func ParseClusterRemoveItemResponse(rsp *http.Response) (*ClusterRemoveItemResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterRemoveItemResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterRemoveItemOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterAddItemResponse parses an HTTP response from a ClusterAddItemWithResponse call
-func ParseClusterAddItemResponse(rsp *http.Response) (*ClusterAddItemResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterAddItemResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterAddItemOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseClusterUpdateVisibilityResponse parses an HTTP response from a ClusterUpdateVisibilityWithResponse call
-func ParseClusterUpdateVisibilityResponse(rsp *http.Response) (*ClusterUpdateVisibilityResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ClusterUpdateVisibilityResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ClusterUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseCollectionListResponse parses an HTTP response from a CollectionListWithResponse call
 func ParseCollectionListResponse(rsp *http.Response) (*CollectionListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -11735,263 +9972,6 @@ func ParseIconGetResponse(rsp *http.Response) (*IconGetResponse, error) {
 	return response, nil
 }
 
-// ParseItemListResponse parses an HTTP response from a ItemListWithResponse call
-func ParseItemListResponse(rsp *http.Response) (*ItemListResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemListResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemListOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemCreateResponse parses an HTTP response from a ItemCreateWithResponse call
-func ParseItemCreateResponse(rsp *http.Response) (*ItemCreateResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemCreateResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemCreateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemDeleteResponse parses an HTTP response from a ItemDeleteWithResponse call
-func ParseItemDeleteResponse(rsp *http.Response) (*ItemDeleteResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemDeleteResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemGetResponse parses an HTTP response from a ItemGetWithResponse call
-func ParseItemGetResponse(rsp *http.Response) (*ItemGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemGetOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemUpdateResponse parses an HTTP response from a ItemUpdateWithResponse call
-func ParseItemUpdateResponse(rsp *http.Response) (*ItemUpdateResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemUpdateResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemRemoveAssetResponse parses an HTTP response from a ItemRemoveAssetWithResponse call
-func ParseItemRemoveAssetResponse(rsp *http.Response) (*ItemRemoveAssetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemRemoveAssetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemAddAssetResponse parses an HTTP response from a ItemAddAssetWithResponse call
-func ParseItemAddAssetResponse(rsp *http.Response) (*ItemAddAssetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemAddAssetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseItemUpdateVisibilityResponse parses an HTTP response from a ItemUpdateVisibilityWithResponse call
-func ParseItemUpdateVisibilityResponse(rsp *http.Response) (*ItemUpdateVisibilityResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ItemUpdateVisibilityResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ItemUpdateOK
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseLinkListResponse parses an HTTP response from a LinkListWithResponse call
 func ParseLinkListResponse(rsp *http.Response) (*LinkListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -12074,6 +10054,336 @@ func ParseLinkGetResponse(rsp *http.Response) (*LinkGetResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest LinkGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeListResponse parses an HTTP response from a NodeListWithResponse call
+func ParseNodeListResponse(rsp *http.Response) (*NodeListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeCreateResponse parses an HTTP response from a NodeCreateWithResponse call
+func ParseNodeCreateResponse(rsp *http.Response) (*NodeCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeCreateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeDeleteResponse parses an HTTP response from a NodeDeleteWithResponse call
+func ParseNodeDeleteResponse(rsp *http.Response) (*NodeDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeDeleteOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeGetResponse parses an HTTP response from a NodeGetWithResponse call
+func ParseNodeGetResponse(rsp *http.Response) (*NodeGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeUpdateResponse parses an HTTP response from a NodeUpdateWithResponse call
+func ParseNodeUpdateResponse(rsp *http.Response) (*NodeUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeRemoveAssetResponse parses an HTTP response from a NodeRemoveAssetWithResponse call
+func ParseNodeRemoveAssetResponse(rsp *http.Response) (*NodeRemoveAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeRemoveAssetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeAddAssetResponse parses an HTTP response from a NodeAddAssetWithResponse call
+func ParseNodeAddAssetResponse(rsp *http.Response) (*NodeAddAssetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeAddAssetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeRemoveNodeResponse parses an HTTP response from a NodeRemoveNodeWithResponse call
+func ParseNodeRemoveNodeResponse(rsp *http.Response) (*NodeRemoveNodeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeRemoveNodeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeRemoveChildOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeAddNodeResponse parses an HTTP response from a NodeAddNodeWithResponse call
+func ParseNodeAddNodeResponse(rsp *http.Response) (*NodeAddNodeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeAddNodeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeAddChildOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNodeUpdateVisibilityResponse parses an HTTP response from a NodeUpdateVisibilityWithResponse call
+func ParseNodeUpdateVisibilityResponse(rsp *http.Response) (*NodeUpdateVisibilityResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NodeUpdateVisibilityResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest NodeUpdateOK
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12579,42 +10889,6 @@ type ServerInterface interface {
 	// (PATCH /v1/categories/{category_id})
 	CategoryUpdate(ctx echo.Context, categoryId CategoryIDParam) error
 
-	// (GET /v1/clusters)
-	ClusterList(ctx echo.Context, params ClusterListParams) error
-
-	// (POST /v1/clusters)
-	ClusterCreate(ctx echo.Context) error
-
-	// (DELETE /v1/clusters/{cluster_slug})
-	ClusterDelete(ctx echo.Context, clusterSlug ClusterSlugParam, params ClusterDeleteParams) error
-
-	// (GET /v1/clusters/{cluster_slug})
-	ClusterGet(ctx echo.Context, clusterSlug ClusterSlugParam) error
-
-	// (PATCH /v1/clusters/{cluster_slug})
-	ClusterUpdate(ctx echo.Context, clusterSlug ClusterSlugParam) error
-
-	// (DELETE /v1/clusters/{cluster_slug}/assets/{asset_id})
-	ClusterRemoveAsset(ctx echo.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam) error
-
-	// (PUT /v1/clusters/{cluster_slug}/assets/{asset_id})
-	ClusterAddAsset(ctx echo.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam) error
-
-	// (DELETE /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
-	ClusterRemoveCluster(ctx echo.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) error
-
-	// (PUT /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
-	ClusterAddCluster(ctx echo.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) error
-
-	// (DELETE /v1/clusters/{cluster_slug}/items/{item_slug})
-	ClusterRemoveItem(ctx echo.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) error
-
-	// (PUT /v1/clusters/{cluster_slug}/items/{item_slug})
-	ClusterAddItem(ctx echo.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) error
-
-	// (PATCH /v1/clusters/{cluster_slug}/visibility)
-	ClusterUpdateVisibility(ctx echo.Context, clusterSlug ClusterSlugParam) error
-
 	// (GET /v1/collections)
 	CollectionList(ctx echo.Context) error
 
@@ -12645,30 +10919,6 @@ type ServerInterface interface {
 	// (GET /v1/info/icon/{icon_size})
 	IconGet(ctx echo.Context, iconSize IconGetParamsIconSize) error
 
-	// (GET /v1/items)
-	ItemList(ctx echo.Context, params ItemListParams) error
-
-	// (POST /v1/items)
-	ItemCreate(ctx echo.Context) error
-
-	// (DELETE /v1/items/{item_slug})
-	ItemDelete(ctx echo.Context, itemSlug ItemSlugParam) error
-
-	// (GET /v1/items/{item_slug})
-	ItemGet(ctx echo.Context, itemSlug ItemSlugParam) error
-
-	// (PATCH /v1/items/{item_slug})
-	ItemUpdate(ctx echo.Context, itemSlug ItemSlugParam) error
-
-	// (DELETE /v1/items/{item_slug}/assets/{asset_id})
-	ItemRemoveAsset(ctx echo.Context, itemSlug ItemSlugParam, assetId AssetIDParam) error
-
-	// (PUT /v1/items/{item_slug}/assets/{asset_id})
-	ItemAddAsset(ctx echo.Context, itemSlug ItemSlugParam, assetId AssetIDParam) error
-
-	// (PATCH /v1/items/{item_slug}/visibility)
-	ItemUpdateVisibility(ctx echo.Context, itemSlug ItemSlugParam) error
-
 	// (GET /v1/links)
 	LinkList(ctx echo.Context, params LinkListParams) error
 
@@ -12677,6 +10927,36 @@ type ServerInterface interface {
 
 	// (GET /v1/links/{link_slug})
 	LinkGet(ctx echo.Context, linkSlug LinkSlugParam) error
+
+	// (GET /v1/nodes)
+	NodeList(ctx echo.Context, params NodeListParams) error
+
+	// (POST /v1/nodes)
+	NodeCreate(ctx echo.Context) error
+
+	// (DELETE /v1/nodes/{node_slug})
+	NodeDelete(ctx echo.Context, nodeSlug NodeSlugParam, params NodeDeleteParams) error
+
+	// (GET /v1/nodes/{node_slug})
+	NodeGet(ctx echo.Context, nodeSlug NodeSlugParam) error
+
+	// (PATCH /v1/nodes/{node_slug})
+	NodeUpdate(ctx echo.Context, nodeSlug NodeSlugParam) error
+
+	// (DELETE /v1/nodes/{node_slug}/assets/{asset_id})
+	NodeRemoveAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error
+
+	// (PUT /v1/nodes/{node_slug}/assets/{asset_id})
+	NodeAddAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error
+
+	// (DELETE /v1/nodes/{node_slug}/nodes/{node_slug_child})
+	NodeRemoveNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
+
+	// (PUT /v1/nodes/{node_slug}/nodes/{node_slug_child})
+	NodeAddNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
+
+	// (PATCH /v1/nodes/{node_slug}/visibility)
+	NodeUpdateVisibility(ctx echo.Context, nodeSlug NodeSlugParam) error
 
 	// (GET /v1/posts/search)
 	PostSearch(ctx echo.Context, params PostSearchParams) error
@@ -13126,312 +11406,6 @@ func (w *ServerInterfaceWrapper) CategoryUpdate(ctx echo.Context) error {
 	return err
 }
 
-// ClusterList converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterList(ctx echo.Context) error {
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ClusterListParams
-	// ------------- Optional query parameter "q" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "q", ctx.QueryParams(), &params.Q)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter q: %s", err))
-	}
-
-	// ------------- Optional query parameter "page" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
-	}
-
-	// ------------- Optional query parameter "cluster_id" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "cluster_id", ctx.QueryParams(), &params.ClusterId)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_id: %s", err))
-	}
-
-	// ------------- Optional query parameter "author" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "author", ctx.QueryParams(), &params.Author)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter author: %s", err))
-	}
-
-	// ------------- Optional query parameter "visibility" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "visibility", ctx.QueryParams(), &params.Visibility)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter visibility: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterList(ctx, params)
-	return err
-}
-
-// ClusterCreate converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterCreate(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterCreate(ctx)
-	return err
-}
-
-// ClusterDelete converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterDelete(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ClusterDeleteParams
-	// ------------- Optional query parameter "target_cluster" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "target_cluster", ctx.QueryParams(), &params.TargetCluster)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter target_cluster: %s", err))
-	}
-
-	// ------------- Optional query parameter "move_child_clusters" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "move_child_clusters", ctx.QueryParams(), &params.MoveChildClusters)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter move_child_clusters: %s", err))
-	}
-
-	// ------------- Optional query parameter "move_child_items" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "move_child_items", ctx.QueryParams(), &params.MoveChildItems)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter move_child_items: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterDelete(ctx, clusterSlug, params)
-	return err
-}
-
-// ClusterGet converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterGet(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterGet(ctx, clusterSlug)
-	return err
-}
-
-// ClusterUpdate converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterUpdate(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterUpdate(ctx, clusterSlug)
-	return err
-}
-
-// ClusterRemoveAsset converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterRemoveAsset(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "asset_id" -------------
-	var assetId AssetIDParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterRemoveAsset(ctx, clusterSlug, assetId)
-	return err
-}
-
-// ClusterAddAsset converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterAddAsset(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "asset_id" -------------
-	var assetId AssetIDParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterAddAsset(ctx, clusterSlug, assetId)
-	return err
-}
-
-// ClusterRemoveCluster converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterRemoveCluster(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "cluster_slug_child" -------------
-	var clusterSlugChild ClusterSlugChildParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug_child", ctx.Param("cluster_slug_child"), &clusterSlugChild, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug_child: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterRemoveCluster(ctx, clusterSlug, clusterSlugChild)
-	return err
-}
-
-// ClusterAddCluster converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterAddCluster(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "cluster_slug_child" -------------
-	var clusterSlugChild ClusterSlugChildParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug_child", ctx.Param("cluster_slug_child"), &clusterSlugChild, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug_child: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterAddCluster(ctx, clusterSlug, clusterSlugChild)
-	return err
-}
-
-// ClusterRemoveItem converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterRemoveItem(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterRemoveItem(ctx, clusterSlug, itemSlug)
-	return err
-}
-
-// ClusterAddItem converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterAddItem(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterAddItem(ctx, clusterSlug, itemSlug)
-	return err
-}
-
-// ClusterUpdateVisibility converts echo context to params.
-func (w *ServerInterfaceWrapper) ClusterUpdateVisibility(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "cluster_slug" -------------
-	var clusterSlug ClusterSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cluster_slug", ctx.Param("cluster_slug"), &clusterSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter cluster_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ClusterUpdateVisibility(ctx, clusterSlug)
-	return err
-}
-
 // CollectionList converts echo context to params.
 func (w *ServerInterfaceWrapper) CollectionList(ctx echo.Context) error {
 	var err error
@@ -13623,164 +11597,6 @@ func (w *ServerInterfaceWrapper) IconGet(ctx echo.Context) error {
 	return err
 }
 
-// ItemList converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemList(ctx echo.Context) error {
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ItemListParams
-	// ------------- Optional query parameter "q" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "q", ctx.QueryParams(), &params.Q)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter q: %s", err))
-	}
-
-	// ------------- Optional query parameter "visibility" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "visibility", ctx.QueryParams(), &params.Visibility)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter visibility: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemList(ctx, params)
-	return err
-}
-
-// ItemCreate converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemCreate(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemCreate(ctx)
-	return err
-}
-
-// ItemDelete converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemDelete(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemDelete(ctx, itemSlug)
-	return err
-}
-
-// ItemGet converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemGet(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemGet(ctx, itemSlug)
-	return err
-}
-
-// ItemUpdate converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemUpdate(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemUpdate(ctx, itemSlug)
-	return err
-}
-
-// ItemRemoveAsset converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemRemoveAsset(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	// ------------- Path parameter "asset_id" -------------
-	var assetId AssetIDParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemRemoveAsset(ctx, itemSlug, assetId)
-	return err
-}
-
-// ItemAddAsset converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemAddAsset(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	// ------------- Path parameter "asset_id" -------------
-	var assetId AssetIDParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemAddAsset(ctx, itemSlug, assetId)
-	return err
-}
-
-// ItemUpdateVisibility converts echo context to params.
-func (w *ServerInterfaceWrapper) ItemUpdateVisibility(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "item_slug" -------------
-	var itemSlug ItemSlugParam
-
-	err = runtime.BindStyledParameterWithOptions("simple", "item_slug", ctx.Param("item_slug"), &itemSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter item_slug: %s", err))
-	}
-
-	ctx.Set(BrowserScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ItemUpdateVisibility(ctx, itemSlug)
-	return err
-}
-
 // LinkList converts echo context to params.
 func (w *ServerInterfaceWrapper) LinkList(ctx echo.Context) error {
 	var err error
@@ -13830,6 +11646,246 @@ func (w *ServerInterfaceWrapper) LinkGet(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LinkGet(ctx, linkSlug)
+	return err
+}
+
+// NodeList converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeList(ctx echo.Context) error {
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params NodeListParams
+	// ------------- Optional query parameter "q" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "q", ctx.QueryParams(), &params.Q)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter q: %s", err))
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Optional query parameter "node_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "node_id", ctx.QueryParams(), &params.NodeId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_id: %s", err))
+	}
+
+	// ------------- Optional query parameter "author" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "author", ctx.QueryParams(), &params.Author)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter author: %s", err))
+	}
+
+	// ------------- Optional query parameter "visibility" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "visibility", ctx.QueryParams(), &params.Visibility)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter visibility: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeList(ctx, params)
+	return err
+}
+
+// NodeCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeCreate(ctx)
+	return err
+}
+
+// NodeDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params NodeDeleteParams
+	// ------------- Optional query parameter "target_node" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "target_node", ctx.QueryParams(), &params.TargetNode)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter target_node: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeDelete(ctx, nodeSlug, params)
+	return err
+}
+
+// NodeGet converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeGet(ctx, nodeSlug)
+	return err
+}
+
+// NodeUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeUpdate(ctx, nodeSlug)
+	return err
+}
+
+// NodeRemoveAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeRemoveAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	// ------------- Path parameter "asset_id" -------------
+	var assetId AssetIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeRemoveAsset(ctx, nodeSlug, assetId)
+	return err
+}
+
+// NodeAddAsset converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeAddAsset(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	// ------------- Path parameter "asset_id" -------------
+	var assetId AssetIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "asset_id", ctx.Param("asset_id"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asset_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeAddAsset(ctx, nodeSlug, assetId)
+	return err
+}
+
+// NodeRemoveNode converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeRemoveNode(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	// ------------- Path parameter "node_slug_child" -------------
+	var nodeSlugChild NodeSlugChildParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug_child", ctx.Param("node_slug_child"), &nodeSlugChild, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug_child: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeRemoveNode(ctx, nodeSlug, nodeSlugChild)
+	return err
+}
+
+// NodeAddNode converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeAddNode(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	// ------------- Path parameter "node_slug_child" -------------
+	var nodeSlugChild NodeSlugChildParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug_child", ctx.Param("node_slug_child"), &nodeSlugChild, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug_child: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeAddNode(ctx, nodeSlug, nodeSlugChild)
+	return err
+}
+
+// NodeUpdateVisibility converts echo context to params.
+func (w *ServerInterfaceWrapper) NodeUpdateVisibility(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "node_slug" -------------
+	var nodeSlug NodeSlugParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "node_slug", ctx.Param("node_slug"), &nodeSlug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter node_slug: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.NodeUpdateVisibility(ctx, nodeSlug)
 	return err
 }
 
@@ -14153,18 +12209,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.PATCH(baseURL+"/v1/categories", wrapper.CategoryUpdateOrder)
 	router.POST(baseURL+"/v1/categories", wrapper.CategoryCreate)
 	router.PATCH(baseURL+"/v1/categories/:category_id", wrapper.CategoryUpdate)
-	router.GET(baseURL+"/v1/clusters", wrapper.ClusterList)
-	router.POST(baseURL+"/v1/clusters", wrapper.ClusterCreate)
-	router.DELETE(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterDelete)
-	router.GET(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterGet)
-	router.PATCH(baseURL+"/v1/clusters/:cluster_slug", wrapper.ClusterUpdate)
-	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/assets/:asset_id", wrapper.ClusterRemoveAsset)
-	router.PUT(baseURL+"/v1/clusters/:cluster_slug/assets/:asset_id", wrapper.ClusterAddAsset)
-	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/clusters/:cluster_slug_child", wrapper.ClusterRemoveCluster)
-	router.PUT(baseURL+"/v1/clusters/:cluster_slug/clusters/:cluster_slug_child", wrapper.ClusterAddCluster)
-	router.DELETE(baseURL+"/v1/clusters/:cluster_slug/items/:item_slug", wrapper.ClusterRemoveItem)
-	router.PUT(baseURL+"/v1/clusters/:cluster_slug/items/:item_slug", wrapper.ClusterAddItem)
-	router.PATCH(baseURL+"/v1/clusters/:cluster_slug/visibility", wrapper.ClusterUpdateVisibility)
 	router.GET(baseURL+"/v1/collections", wrapper.CollectionList)
 	router.POST(baseURL+"/v1/collections", wrapper.CollectionCreate)
 	router.GET(baseURL+"/v1/collections/:collection_id", wrapper.CollectionGet)
@@ -14175,17 +12219,19 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/v1/info", wrapper.GetInfo)
 	router.POST(baseURL+"/v1/info/icon", wrapper.IconUpload)
 	router.GET(baseURL+"/v1/info/icon/:icon_size", wrapper.IconGet)
-	router.GET(baseURL+"/v1/items", wrapper.ItemList)
-	router.POST(baseURL+"/v1/items", wrapper.ItemCreate)
-	router.DELETE(baseURL+"/v1/items/:item_slug", wrapper.ItemDelete)
-	router.GET(baseURL+"/v1/items/:item_slug", wrapper.ItemGet)
-	router.PATCH(baseURL+"/v1/items/:item_slug", wrapper.ItemUpdate)
-	router.DELETE(baseURL+"/v1/items/:item_slug/assets/:asset_id", wrapper.ItemRemoveAsset)
-	router.PUT(baseURL+"/v1/items/:item_slug/assets/:asset_id", wrapper.ItemAddAsset)
-	router.PATCH(baseURL+"/v1/items/:item_slug/visibility", wrapper.ItemUpdateVisibility)
 	router.GET(baseURL+"/v1/links", wrapper.LinkList)
 	router.POST(baseURL+"/v1/links", wrapper.LinkCreate)
 	router.GET(baseURL+"/v1/links/:link_slug", wrapper.LinkGet)
+	router.GET(baseURL+"/v1/nodes", wrapper.NodeList)
+	router.POST(baseURL+"/v1/nodes", wrapper.NodeCreate)
+	router.DELETE(baseURL+"/v1/nodes/:node_slug", wrapper.NodeDelete)
+	router.GET(baseURL+"/v1/nodes/:node_slug", wrapper.NodeGet)
+	router.PATCH(baseURL+"/v1/nodes/:node_slug", wrapper.NodeUpdate)
+	router.DELETE(baseURL+"/v1/nodes/:node_slug/assets/:asset_id", wrapper.NodeRemoveAsset)
+	router.PUT(baseURL+"/v1/nodes/:node_slug/assets/:asset_id", wrapper.NodeAddAsset)
+	router.DELETE(baseURL+"/v1/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeRemoveNode)
+	router.PUT(baseURL+"/v1/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeAddNode)
+	router.PATCH(baseURL+"/v1/nodes/:node_slug/visibility", wrapper.NodeUpdateVisibility)
 	router.GET(baseURL+"/v1/posts/search", wrapper.PostSearch)
 	router.DELETE(baseURL+"/v1/posts/:post_id", wrapper.PostDelete)
 	router.PATCH(baseURL+"/v1/posts/:post_id", wrapper.PostUpdate)
@@ -14247,30 +12293,6 @@ type CategoryListOKJSONResponse CategoryList
 
 type CategoryUpdateOKJSONResponse Category
 
-type ClusterAddChildOKJSONResponse Cluster
-
-type ClusterAddItemOKJSONResponse ClusterWithItems
-
-type ClusterCreateOKJSONResponse Cluster
-
-type ClusterDeleteOKJSONResponse struct {
-	// Destination A cluster is a group of items and other clusters. It serves as an
-	// abstraction for grouping structured data objects. It can represent
-	// things such as brands, manufacturers, authors, directors, etc. Clusters
-	// can be referenced in content posts and they also have their own content.
-	Destination *Cluster `json:"destination,omitempty"`
-}
-
-type ClusterGetOKJSONResponse ClusterWithItems
-
-type ClusterListOKJSONResponse ClusterListResult
-
-type ClusterRemoveChildOKJSONResponse Cluster
-
-type ClusterRemoveItemOKJSONResponse ClusterWithItems
-
-type ClusterUpdateOKJSONResponse Cluster
-
 type CollectionAddPostOKJSONResponse Collection
 
 type CollectionCreateOKJSONResponse Collection
@@ -14291,19 +12313,31 @@ type GetInfoOKJSONResponse Info
 
 type InternalServerErrorJSONResponse APIError
 
-type ItemCreateOKJSONResponse Item
-
-type ItemGetOKJSONResponse ItemWithParents
-
-type ItemListOKJSONResponse ItemListResult
-
-type ItemUpdateOKJSONResponse Item
-
 type LinkCreateOKJSONResponse Link
 
 type LinkGetOKJSONResponse LinkWithRefs
 
 type LinkListOKJSONResponse LinkListResult
+
+type NodeAddChildOKJSONResponse Node
+
+type NodeCreateOKJSONResponse Node
+
+type NodeDeleteOKJSONResponse struct {
+	// Destination A node is a text document with children and assets. It serves as an
+	// abstraction for grouping structured data objects. It can represent
+	// things such as brands, manufacturers, authors, directors, etc. Nodes
+	// can be referenced in content posts and they also have their own content.
+	Destination *Node `json:"destination,omitempty"`
+}
+
+type NodeGetOKJSONResponse NodeWithChildren
+
+type NodeListOKJSONResponse NodeListResult
+
+type NodeRemoveChildOKJSONResponse Node
+
+type NodeUpdateOKJSONResponse Node
 
 type NotFoundResponse struct {
 }
@@ -15513,521 +13547,6 @@ func (response CategoryUpdatedefaultJSONResponse) VisitCategoryUpdateResponse(w 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ClusterListRequestObject struct {
-	Params ClusterListParams
-}
-
-type ClusterListResponseObject interface {
-	VisitClusterListResponse(w http.ResponseWriter) error
-}
-
-type ClusterList200JSONResponse struct{ ClusterListOKJSONResponse }
-
-func (response ClusterList200JSONResponse) VisitClusterListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterList404Response = NotFoundResponse
-
-func (response ClusterList404Response) VisitClusterListResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterListdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterListdefaultJSONResponse) VisitClusterListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterCreateRequestObject struct {
-	Body *ClusterCreateJSONRequestBody
-}
-
-type ClusterCreateResponseObject interface {
-	VisitClusterCreateResponse(w http.ResponseWriter) error
-}
-
-type ClusterCreate200JSONResponse struct{ ClusterCreateOKJSONResponse }
-
-func (response ClusterCreate200JSONResponse) VisitClusterCreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterCreate401Response = UnauthorisedResponse
-
-func (response ClusterCreate401Response) VisitClusterCreateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterCreatedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterCreatedefaultJSONResponse) VisitClusterCreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterDeleteRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	Params      ClusterDeleteParams
-}
-
-type ClusterDeleteResponseObject interface {
-	VisitClusterDeleteResponse(w http.ResponseWriter) error
-}
-
-type ClusterDelete200JSONResponse struct{ ClusterDeleteOKJSONResponse }
-
-func (response ClusterDelete200JSONResponse) VisitClusterDeleteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterDelete401Response = UnauthorisedResponse
-
-func (response ClusterDelete401Response) VisitClusterDeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterDelete404Response = NotFoundResponse
-
-func (response ClusterDelete404Response) VisitClusterDeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterDeletedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterDeletedefaultJSONResponse) VisitClusterDeleteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterGetRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-}
-
-type ClusterGetResponseObject interface {
-	VisitClusterGetResponse(w http.ResponseWriter) error
-}
-
-type ClusterGet200JSONResponse struct{ ClusterGetOKJSONResponse }
-
-func (response ClusterGet200JSONResponse) VisitClusterGetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterGet401Response = UnauthorisedResponse
-
-func (response ClusterGet401Response) VisitClusterGetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterGet404Response = NotFoundResponse
-
-func (response ClusterGet404Response) VisitClusterGetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterGetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterGetdefaultJSONResponse) VisitClusterGetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterUpdateRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	Body        *ClusterUpdateJSONRequestBody
-}
-
-type ClusterUpdateResponseObject interface {
-	VisitClusterUpdateResponse(w http.ResponseWriter) error
-}
-
-type ClusterUpdate200JSONResponse struct{ ClusterUpdateOKJSONResponse }
-
-func (response ClusterUpdate200JSONResponse) VisitClusterUpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterUpdate401Response = UnauthorisedResponse
-
-func (response ClusterUpdate401Response) VisitClusterUpdateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterUpdate404Response = NotFoundResponse
-
-func (response ClusterUpdate404Response) VisitClusterUpdateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterUpdatedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterUpdatedefaultJSONResponse) VisitClusterUpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterRemoveAssetRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	AssetId     AssetIDParam     `json:"asset_id"`
-}
-
-type ClusterRemoveAssetResponseObject interface {
-	VisitClusterRemoveAssetResponse(w http.ResponseWriter) error
-}
-
-type ClusterRemoveAsset200JSONResponse struct{ ClusterUpdateOKJSONResponse }
-
-func (response ClusterRemoveAsset200JSONResponse) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterRemoveAsset401Response = UnauthorisedResponse
-
-func (response ClusterRemoveAsset401Response) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterRemoveAsset404Response = NotFoundResponse
-
-func (response ClusterRemoveAsset404Response) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterRemoveAssetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterRemoveAssetdefaultJSONResponse) VisitClusterRemoveAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterAddAssetRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	AssetId     AssetIDParam     `json:"asset_id"`
-}
-
-type ClusterAddAssetResponseObject interface {
-	VisitClusterAddAssetResponse(w http.ResponseWriter) error
-}
-
-type ClusterAddAsset200JSONResponse struct{ ClusterUpdateOKJSONResponse }
-
-func (response ClusterAddAsset200JSONResponse) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterAddAsset401Response = UnauthorisedResponse
-
-func (response ClusterAddAsset401Response) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterAddAsset404Response = NotFoundResponse
-
-func (response ClusterAddAsset404Response) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterAddAssetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterAddAssetdefaultJSONResponse) VisitClusterAddAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterRemoveClusterRequestObject struct {
-	ClusterSlug      ClusterSlugParam      `json:"cluster_slug"`
-	ClusterSlugChild ClusterSlugChildParam `json:"cluster_slug_child"`
-}
-
-type ClusterRemoveClusterResponseObject interface {
-	VisitClusterRemoveClusterResponse(w http.ResponseWriter) error
-}
-
-type ClusterRemoveCluster200JSONResponse struct {
-	ClusterRemoveChildOKJSONResponse
-}
-
-func (response ClusterRemoveCluster200JSONResponse) VisitClusterRemoveClusterResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterRemoveCluster401Response = UnauthorisedResponse
-
-func (response ClusterRemoveCluster401Response) VisitClusterRemoveClusterResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterRemoveCluster404Response = NotFoundResponse
-
-func (response ClusterRemoveCluster404Response) VisitClusterRemoveClusterResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterRemoveClusterdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterRemoveClusterdefaultJSONResponse) VisitClusterRemoveClusterResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterAddClusterRequestObject struct {
-	ClusterSlug      ClusterSlugParam      `json:"cluster_slug"`
-	ClusterSlugChild ClusterSlugChildParam `json:"cluster_slug_child"`
-}
-
-type ClusterAddClusterResponseObject interface {
-	VisitClusterAddClusterResponse(w http.ResponseWriter) error
-}
-
-type ClusterAddCluster200JSONResponse struct{ ClusterAddChildOKJSONResponse }
-
-func (response ClusterAddCluster200JSONResponse) VisitClusterAddClusterResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterAddCluster401Response = UnauthorisedResponse
-
-func (response ClusterAddCluster401Response) VisitClusterAddClusterResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterAddCluster404Response = NotFoundResponse
-
-func (response ClusterAddCluster404Response) VisitClusterAddClusterResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterAddClusterdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterAddClusterdefaultJSONResponse) VisitClusterAddClusterResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterRemoveItemRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	ItemSlug    ItemSlugParam    `json:"item_slug"`
-}
-
-type ClusterRemoveItemResponseObject interface {
-	VisitClusterRemoveItemResponse(w http.ResponseWriter) error
-}
-
-type ClusterRemoveItem200JSONResponse struct {
-	ClusterRemoveItemOKJSONResponse
-}
-
-func (response ClusterRemoveItem200JSONResponse) VisitClusterRemoveItemResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterRemoveItem401Response = UnauthorisedResponse
-
-func (response ClusterRemoveItem401Response) VisitClusterRemoveItemResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterRemoveItem404Response = NotFoundResponse
-
-func (response ClusterRemoveItem404Response) VisitClusterRemoveItemResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterRemoveItemdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterRemoveItemdefaultJSONResponse) VisitClusterRemoveItemResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterAddItemRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	ItemSlug    ItemSlugParam    `json:"item_slug"`
-}
-
-type ClusterAddItemResponseObject interface {
-	VisitClusterAddItemResponse(w http.ResponseWriter) error
-}
-
-type ClusterAddItem200JSONResponse struct{ ClusterAddItemOKJSONResponse }
-
-func (response ClusterAddItem200JSONResponse) VisitClusterAddItemResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterAddItem401Response = UnauthorisedResponse
-
-func (response ClusterAddItem401Response) VisitClusterAddItemResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterAddItem404Response = NotFoundResponse
-
-func (response ClusterAddItem404Response) VisitClusterAddItemResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterAddItemdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterAddItemdefaultJSONResponse) VisitClusterAddItemResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ClusterUpdateVisibilityRequestObject struct {
-	ClusterSlug ClusterSlugParam `json:"cluster_slug"`
-	Body        *ClusterUpdateVisibilityJSONRequestBody
-}
-
-type ClusterUpdateVisibilityResponseObject interface {
-	VisitClusterUpdateVisibilityResponse(w http.ResponseWriter) error
-}
-
-type ClusterUpdateVisibility200JSONResponse struct{ ClusterUpdateOKJSONResponse }
-
-func (response ClusterUpdateVisibility200JSONResponse) VisitClusterUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ClusterUpdateVisibility401Response = UnauthorisedResponse
-
-func (response ClusterUpdateVisibility401Response) VisitClusterUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ClusterUpdateVisibility404Response = NotFoundResponse
-
-func (response ClusterUpdateVisibility404Response) VisitClusterUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ClusterUpdateVisibilitydefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ClusterUpdateVisibilitydefaultJSONResponse) VisitClusterUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
 type CollectionListRequestObject struct {
 }
 
@@ -16421,339 +13940,6 @@ func (response IconGetdefaultJSONResponse) VisitIconGetResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
-type ItemListRequestObject struct {
-	Params ItemListParams
-}
-
-type ItemListResponseObject interface {
-	VisitItemListResponse(w http.ResponseWriter) error
-}
-
-type ItemList200JSONResponse struct{ ItemListOKJSONResponse }
-
-func (response ItemList200JSONResponse) VisitItemListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemList404Response = NotFoundResponse
-
-func (response ItemList404Response) VisitItemListResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemListdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemListdefaultJSONResponse) VisitItemListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemCreateRequestObject struct {
-	Body *ItemCreateJSONRequestBody
-}
-
-type ItemCreateResponseObject interface {
-	VisitItemCreateResponse(w http.ResponseWriter) error
-}
-
-type ItemCreate200JSONResponse struct{ ItemCreateOKJSONResponse }
-
-func (response ItemCreate200JSONResponse) VisitItemCreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemCreate401Response = UnauthorisedResponse
-
-func (response ItemCreate401Response) VisitItemCreateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemCreatedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemCreatedefaultJSONResponse) VisitItemCreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemDeleteRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-}
-
-type ItemDeleteResponseObject interface {
-	VisitItemDeleteResponse(w http.ResponseWriter) error
-}
-
-type ItemDelete200Response struct {
-}
-
-func (response ItemDelete200Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(200)
-	return nil
-}
-
-type ItemDelete401Response = UnauthorisedResponse
-
-func (response ItemDelete401Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemDelete404Response = NotFoundResponse
-
-func (response ItemDelete404Response) VisitItemDeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemDeletedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemDeletedefaultJSONResponse) VisitItemDeleteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemGetRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-}
-
-type ItemGetResponseObject interface {
-	VisitItemGetResponse(w http.ResponseWriter) error
-}
-
-type ItemGet200JSONResponse struct{ ItemGetOKJSONResponse }
-
-func (response ItemGet200JSONResponse) VisitItemGetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemGet401Response = UnauthorisedResponse
-
-func (response ItemGet401Response) VisitItemGetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemGet404Response = NotFoundResponse
-
-func (response ItemGet404Response) VisitItemGetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemGetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemGetdefaultJSONResponse) VisitItemGetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemUpdateRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-	Body     *ItemUpdateJSONRequestBody
-}
-
-type ItemUpdateResponseObject interface {
-	VisitItemUpdateResponse(w http.ResponseWriter) error
-}
-
-type ItemUpdate200JSONResponse struct{ ItemUpdateOKJSONResponse }
-
-func (response ItemUpdate200JSONResponse) VisitItemUpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemUpdate401Response = UnauthorisedResponse
-
-func (response ItemUpdate401Response) VisitItemUpdateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemUpdate404Response = NotFoundResponse
-
-func (response ItemUpdate404Response) VisitItemUpdateResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemUpdatedefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemUpdatedefaultJSONResponse) VisitItemUpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemRemoveAssetRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-	AssetId  AssetIDParam  `json:"asset_id"`
-}
-
-type ItemRemoveAssetResponseObject interface {
-	VisitItemRemoveAssetResponse(w http.ResponseWriter) error
-}
-
-type ItemRemoveAsset200JSONResponse struct{ ItemUpdateOKJSONResponse }
-
-func (response ItemRemoveAsset200JSONResponse) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemRemoveAsset401Response = UnauthorisedResponse
-
-func (response ItemRemoveAsset401Response) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemRemoveAsset404Response = NotFoundResponse
-
-func (response ItemRemoveAsset404Response) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemRemoveAssetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemRemoveAssetdefaultJSONResponse) VisitItemRemoveAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemAddAssetRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-	AssetId  AssetIDParam  `json:"asset_id"`
-}
-
-type ItemAddAssetResponseObject interface {
-	VisitItemAddAssetResponse(w http.ResponseWriter) error
-}
-
-type ItemAddAsset200JSONResponse struct{ ItemUpdateOKJSONResponse }
-
-func (response ItemAddAsset200JSONResponse) VisitItemAddAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemAddAsset401Response = UnauthorisedResponse
-
-func (response ItemAddAsset401Response) VisitItemAddAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemAddAsset404Response = NotFoundResponse
-
-func (response ItemAddAsset404Response) VisitItemAddAssetResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemAddAssetdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemAddAssetdefaultJSONResponse) VisitItemAddAssetResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ItemUpdateVisibilityRequestObject struct {
-	ItemSlug ItemSlugParam `json:"item_slug"`
-	Body     *ItemUpdateVisibilityJSONRequestBody
-}
-
-type ItemUpdateVisibilityResponseObject interface {
-	VisitItemUpdateVisibilityResponse(w http.ResponseWriter) error
-}
-
-type ItemUpdateVisibility200JSONResponse struct{ ItemUpdateOKJSONResponse }
-
-func (response ItemUpdateVisibility200JSONResponse) VisitItemUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ItemUpdateVisibility401Response = UnauthorisedResponse
-
-func (response ItemUpdateVisibility401Response) VisitItemUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
-	return nil
-}
-
-type ItemUpdateVisibility404Response = NotFoundResponse
-
-func (response ItemUpdateVisibility404Response) VisitItemUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.WriteHeader(404)
-	return nil
-}
-
-type ItemUpdateVisibilitydefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response ItemUpdateVisibilitydefaultJSONResponse) VisitItemUpdateVisibilityResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
 type LinkListRequestObject struct {
 	Params LinkListParams
 }
@@ -16856,6 +14042,429 @@ type LinkGetdefaultJSONResponse struct {
 }
 
 func (response LinkGetdefaultJSONResponse) VisitLinkGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeListRequestObject struct {
+	Params NodeListParams
+}
+
+type NodeListResponseObject interface {
+	VisitNodeListResponse(w http.ResponseWriter) error
+}
+
+type NodeList200JSONResponse struct{ NodeListOKJSONResponse }
+
+func (response NodeList200JSONResponse) VisitNodeListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeList404Response = NotFoundResponse
+
+func (response NodeList404Response) VisitNodeListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeListdefaultJSONResponse) VisitNodeListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeCreateRequestObject struct {
+	Body *NodeCreateJSONRequestBody
+}
+
+type NodeCreateResponseObject interface {
+	VisitNodeCreateResponse(w http.ResponseWriter) error
+}
+
+type NodeCreate200JSONResponse struct{ NodeCreateOKJSONResponse }
+
+func (response NodeCreate200JSONResponse) VisitNodeCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeCreate401Response = UnauthorisedResponse
+
+func (response NodeCreate401Response) VisitNodeCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeCreatedefaultJSONResponse) VisitNodeCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeDeleteRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+	Params   NodeDeleteParams
+}
+
+type NodeDeleteResponseObject interface {
+	VisitNodeDeleteResponse(w http.ResponseWriter) error
+}
+
+type NodeDelete200JSONResponse struct{ NodeDeleteOKJSONResponse }
+
+func (response NodeDelete200JSONResponse) VisitNodeDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeDelete401Response = UnauthorisedResponse
+
+func (response NodeDelete401Response) VisitNodeDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeDelete404Response = NotFoundResponse
+
+func (response NodeDelete404Response) VisitNodeDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeDeletedefaultJSONResponse) VisitNodeDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeGetRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+}
+
+type NodeGetResponseObject interface {
+	VisitNodeGetResponse(w http.ResponseWriter) error
+}
+
+type NodeGet200JSONResponse struct{ NodeGetOKJSONResponse }
+
+func (response NodeGet200JSONResponse) VisitNodeGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeGet401Response = UnauthorisedResponse
+
+func (response NodeGet401Response) VisitNodeGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeGet404Response = NotFoundResponse
+
+func (response NodeGet404Response) VisitNodeGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeGetdefaultJSONResponse) VisitNodeGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeUpdateRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+	Body     *NodeUpdateJSONRequestBody
+}
+
+type NodeUpdateResponseObject interface {
+	VisitNodeUpdateResponse(w http.ResponseWriter) error
+}
+
+type NodeUpdate200JSONResponse struct{ NodeUpdateOKJSONResponse }
+
+func (response NodeUpdate200JSONResponse) VisitNodeUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeUpdate401Response = UnauthorisedResponse
+
+func (response NodeUpdate401Response) VisitNodeUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeUpdate404Response = NotFoundResponse
+
+func (response NodeUpdate404Response) VisitNodeUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeUpdatedefaultJSONResponse) VisitNodeUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeRemoveAssetRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+	AssetId  AssetIDParam  `json:"asset_id"`
+}
+
+type NodeRemoveAssetResponseObject interface {
+	VisitNodeRemoveAssetResponse(w http.ResponseWriter) error
+}
+
+type NodeRemoveAsset200JSONResponse struct{ NodeUpdateOKJSONResponse }
+
+func (response NodeRemoveAsset200JSONResponse) VisitNodeRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeRemoveAsset401Response = UnauthorisedResponse
+
+func (response NodeRemoveAsset401Response) VisitNodeRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeRemoveAsset404Response = NotFoundResponse
+
+func (response NodeRemoveAsset404Response) VisitNodeRemoveAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeRemoveAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeRemoveAssetdefaultJSONResponse) VisitNodeRemoveAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeAddAssetRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+	AssetId  AssetIDParam  `json:"asset_id"`
+}
+
+type NodeAddAssetResponseObject interface {
+	VisitNodeAddAssetResponse(w http.ResponseWriter) error
+}
+
+type NodeAddAsset200JSONResponse struct{ NodeUpdateOKJSONResponse }
+
+func (response NodeAddAsset200JSONResponse) VisitNodeAddAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeAddAsset401Response = UnauthorisedResponse
+
+func (response NodeAddAsset401Response) VisitNodeAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeAddAsset404Response = NotFoundResponse
+
+func (response NodeAddAsset404Response) VisitNodeAddAssetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeAddAssetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeAddAssetdefaultJSONResponse) VisitNodeAddAssetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeRemoveNodeRequestObject struct {
+	NodeSlug      NodeSlugParam      `json:"node_slug"`
+	NodeSlugChild NodeSlugChildParam `json:"node_slug_child"`
+}
+
+type NodeRemoveNodeResponseObject interface {
+	VisitNodeRemoveNodeResponse(w http.ResponseWriter) error
+}
+
+type NodeRemoveNode200JSONResponse struct{ NodeRemoveChildOKJSONResponse }
+
+func (response NodeRemoveNode200JSONResponse) VisitNodeRemoveNodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeRemoveNode401Response = UnauthorisedResponse
+
+func (response NodeRemoveNode401Response) VisitNodeRemoveNodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeRemoveNode404Response = NotFoundResponse
+
+func (response NodeRemoveNode404Response) VisitNodeRemoveNodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeRemoveNodedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeRemoveNodedefaultJSONResponse) VisitNodeRemoveNodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeAddNodeRequestObject struct {
+	NodeSlug      NodeSlugParam      `json:"node_slug"`
+	NodeSlugChild NodeSlugChildParam `json:"node_slug_child"`
+}
+
+type NodeAddNodeResponseObject interface {
+	VisitNodeAddNodeResponse(w http.ResponseWriter) error
+}
+
+type NodeAddNode200JSONResponse struct{ NodeAddChildOKJSONResponse }
+
+func (response NodeAddNode200JSONResponse) VisitNodeAddNodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeAddNode401Response = UnauthorisedResponse
+
+func (response NodeAddNode401Response) VisitNodeAddNodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeAddNode404Response = NotFoundResponse
+
+func (response NodeAddNode404Response) VisitNodeAddNodeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeAddNodedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeAddNodedefaultJSONResponse) VisitNodeAddNodeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type NodeUpdateVisibilityRequestObject struct {
+	NodeSlug NodeSlugParam `json:"node_slug"`
+	Body     *NodeUpdateVisibilityJSONRequestBody
+}
+
+type NodeUpdateVisibilityResponseObject interface {
+	VisitNodeUpdateVisibilityResponse(w http.ResponseWriter) error
+}
+
+type NodeUpdateVisibility200JSONResponse struct{ NodeUpdateOKJSONResponse }
+
+func (response NodeUpdateVisibility200JSONResponse) VisitNodeUpdateVisibilityResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NodeUpdateVisibility401Response = UnauthorisedResponse
+
+func (response NodeUpdateVisibility401Response) VisitNodeUpdateVisibilityResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type NodeUpdateVisibility404Response = NotFoundResponse
+
+func (response NodeUpdateVisibility404Response) VisitNodeUpdateVisibilityResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NodeUpdateVisibilitydefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response NodeUpdateVisibilitydefaultJSONResponse) VisitNodeUpdateVisibilityResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -17487,42 +15096,6 @@ type StrictServerInterface interface {
 	// (PATCH /v1/categories/{category_id})
 	CategoryUpdate(ctx context.Context, request CategoryUpdateRequestObject) (CategoryUpdateResponseObject, error)
 
-	// (GET /v1/clusters)
-	ClusterList(ctx context.Context, request ClusterListRequestObject) (ClusterListResponseObject, error)
-
-	// (POST /v1/clusters)
-	ClusterCreate(ctx context.Context, request ClusterCreateRequestObject) (ClusterCreateResponseObject, error)
-
-	// (DELETE /v1/clusters/{cluster_slug})
-	ClusterDelete(ctx context.Context, request ClusterDeleteRequestObject) (ClusterDeleteResponseObject, error)
-
-	// (GET /v1/clusters/{cluster_slug})
-	ClusterGet(ctx context.Context, request ClusterGetRequestObject) (ClusterGetResponseObject, error)
-
-	// (PATCH /v1/clusters/{cluster_slug})
-	ClusterUpdate(ctx context.Context, request ClusterUpdateRequestObject) (ClusterUpdateResponseObject, error)
-
-	// (DELETE /v1/clusters/{cluster_slug}/assets/{asset_id})
-	ClusterRemoveAsset(ctx context.Context, request ClusterRemoveAssetRequestObject) (ClusterRemoveAssetResponseObject, error)
-
-	// (PUT /v1/clusters/{cluster_slug}/assets/{asset_id})
-	ClusterAddAsset(ctx context.Context, request ClusterAddAssetRequestObject) (ClusterAddAssetResponseObject, error)
-
-	// (DELETE /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
-	ClusterRemoveCluster(ctx context.Context, request ClusterRemoveClusterRequestObject) (ClusterRemoveClusterResponseObject, error)
-
-	// (PUT /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child})
-	ClusterAddCluster(ctx context.Context, request ClusterAddClusterRequestObject) (ClusterAddClusterResponseObject, error)
-
-	// (DELETE /v1/clusters/{cluster_slug}/items/{item_slug})
-	ClusterRemoveItem(ctx context.Context, request ClusterRemoveItemRequestObject) (ClusterRemoveItemResponseObject, error)
-
-	// (PUT /v1/clusters/{cluster_slug}/items/{item_slug})
-	ClusterAddItem(ctx context.Context, request ClusterAddItemRequestObject) (ClusterAddItemResponseObject, error)
-
-	// (PATCH /v1/clusters/{cluster_slug}/visibility)
-	ClusterUpdateVisibility(ctx context.Context, request ClusterUpdateVisibilityRequestObject) (ClusterUpdateVisibilityResponseObject, error)
-
 	// (GET /v1/collections)
 	CollectionList(ctx context.Context, request CollectionListRequestObject) (CollectionListResponseObject, error)
 
@@ -17553,30 +15126,6 @@ type StrictServerInterface interface {
 	// (GET /v1/info/icon/{icon_size})
 	IconGet(ctx context.Context, request IconGetRequestObject) (IconGetResponseObject, error)
 
-	// (GET /v1/items)
-	ItemList(ctx context.Context, request ItemListRequestObject) (ItemListResponseObject, error)
-
-	// (POST /v1/items)
-	ItemCreate(ctx context.Context, request ItemCreateRequestObject) (ItemCreateResponseObject, error)
-
-	// (DELETE /v1/items/{item_slug})
-	ItemDelete(ctx context.Context, request ItemDeleteRequestObject) (ItemDeleteResponseObject, error)
-
-	// (GET /v1/items/{item_slug})
-	ItemGet(ctx context.Context, request ItemGetRequestObject) (ItemGetResponseObject, error)
-
-	// (PATCH /v1/items/{item_slug})
-	ItemUpdate(ctx context.Context, request ItemUpdateRequestObject) (ItemUpdateResponseObject, error)
-
-	// (DELETE /v1/items/{item_slug}/assets/{asset_id})
-	ItemRemoveAsset(ctx context.Context, request ItemRemoveAssetRequestObject) (ItemRemoveAssetResponseObject, error)
-
-	// (PUT /v1/items/{item_slug}/assets/{asset_id})
-	ItemAddAsset(ctx context.Context, request ItemAddAssetRequestObject) (ItemAddAssetResponseObject, error)
-
-	// (PATCH /v1/items/{item_slug}/visibility)
-	ItemUpdateVisibility(ctx context.Context, request ItemUpdateVisibilityRequestObject) (ItemUpdateVisibilityResponseObject, error)
-
 	// (GET /v1/links)
 	LinkList(ctx context.Context, request LinkListRequestObject) (LinkListResponseObject, error)
 
@@ -17585,6 +15134,36 @@ type StrictServerInterface interface {
 
 	// (GET /v1/links/{link_slug})
 	LinkGet(ctx context.Context, request LinkGetRequestObject) (LinkGetResponseObject, error)
+
+	// (GET /v1/nodes)
+	NodeList(ctx context.Context, request NodeListRequestObject) (NodeListResponseObject, error)
+
+	// (POST /v1/nodes)
+	NodeCreate(ctx context.Context, request NodeCreateRequestObject) (NodeCreateResponseObject, error)
+
+	// (DELETE /v1/nodes/{node_slug})
+	NodeDelete(ctx context.Context, request NodeDeleteRequestObject) (NodeDeleteResponseObject, error)
+
+	// (GET /v1/nodes/{node_slug})
+	NodeGet(ctx context.Context, request NodeGetRequestObject) (NodeGetResponseObject, error)
+
+	// (PATCH /v1/nodes/{node_slug})
+	NodeUpdate(ctx context.Context, request NodeUpdateRequestObject) (NodeUpdateResponseObject, error)
+
+	// (DELETE /v1/nodes/{node_slug}/assets/{asset_id})
+	NodeRemoveAsset(ctx context.Context, request NodeRemoveAssetRequestObject) (NodeRemoveAssetResponseObject, error)
+
+	// (PUT /v1/nodes/{node_slug}/assets/{asset_id})
+	NodeAddAsset(ctx context.Context, request NodeAddAssetRequestObject) (NodeAddAssetResponseObject, error)
+
+	// (DELETE /v1/nodes/{node_slug}/nodes/{node_slug_child})
+	NodeRemoveNode(ctx context.Context, request NodeRemoveNodeRequestObject) (NodeRemoveNodeResponseObject, error)
+
+	// (PUT /v1/nodes/{node_slug}/nodes/{node_slug_child})
+	NodeAddNode(ctx context.Context, request NodeAddNodeRequestObject) (NodeAddNodeResponseObject, error)
+
+	// (PATCH /v1/nodes/{node_slug}/visibility)
+	NodeUpdateVisibility(ctx context.Context, request NodeUpdateVisibilityRequestObject) (NodeUpdateVisibilityResponseObject, error)
 
 	// (GET /v1/posts/search)
 	PostSearch(ctx context.Context, request PostSearchRequestObject) (PostSearchResponseObject, error)
@@ -18417,329 +15996,6 @@ func (sh *strictHandler) CategoryUpdate(ctx echo.Context, categoryId CategoryIDP
 	return nil
 }
 
-// ClusterList operation middleware
-func (sh *strictHandler) ClusterList(ctx echo.Context, params ClusterListParams) error {
-	var request ClusterListRequestObject
-
-	request.Params = params
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterList(ctx.Request().Context(), request.(ClusterListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterList")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterListResponseObject); ok {
-		return validResponse.VisitClusterListResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterCreate operation middleware
-func (sh *strictHandler) ClusterCreate(ctx echo.Context) error {
-	var request ClusterCreateRequestObject
-
-	var body ClusterCreateJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterCreate(ctx.Request().Context(), request.(ClusterCreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterCreate")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterCreateResponseObject); ok {
-		return validResponse.VisitClusterCreateResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterDelete operation middleware
-func (sh *strictHandler) ClusterDelete(ctx echo.Context, clusterSlug ClusterSlugParam, params ClusterDeleteParams) error {
-	var request ClusterDeleteRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.Params = params
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterDelete(ctx.Request().Context(), request.(ClusterDeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterDelete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterDeleteResponseObject); ok {
-		return validResponse.VisitClusterDeleteResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterGet operation middleware
-func (sh *strictHandler) ClusterGet(ctx echo.Context, clusterSlug ClusterSlugParam) error {
-	var request ClusterGetRequestObject
-
-	request.ClusterSlug = clusterSlug
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterGet(ctx.Request().Context(), request.(ClusterGetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterGet")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterGetResponseObject); ok {
-		return validResponse.VisitClusterGetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterUpdate operation middleware
-func (sh *strictHandler) ClusterUpdate(ctx echo.Context, clusterSlug ClusterSlugParam) error {
-	var request ClusterUpdateRequestObject
-
-	request.ClusterSlug = clusterSlug
-
-	var body ClusterUpdateJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterUpdate(ctx.Request().Context(), request.(ClusterUpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterUpdate")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterUpdateResponseObject); ok {
-		return validResponse.VisitClusterUpdateResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterRemoveAsset operation middleware
-func (sh *strictHandler) ClusterRemoveAsset(ctx echo.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam) error {
-	var request ClusterRemoveAssetRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.AssetId = assetId
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterRemoveAsset(ctx.Request().Context(), request.(ClusterRemoveAssetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterRemoveAsset")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterRemoveAssetResponseObject); ok {
-		return validResponse.VisitClusterRemoveAssetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterAddAsset operation middleware
-func (sh *strictHandler) ClusterAddAsset(ctx echo.Context, clusterSlug ClusterSlugParam, assetId AssetIDParam) error {
-	var request ClusterAddAssetRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.AssetId = assetId
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterAddAsset(ctx.Request().Context(), request.(ClusterAddAssetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterAddAsset")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterAddAssetResponseObject); ok {
-		return validResponse.VisitClusterAddAssetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterRemoveCluster operation middleware
-func (sh *strictHandler) ClusterRemoveCluster(ctx echo.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) error {
-	var request ClusterRemoveClusterRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.ClusterSlugChild = clusterSlugChild
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterRemoveCluster(ctx.Request().Context(), request.(ClusterRemoveClusterRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterRemoveCluster")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterRemoveClusterResponseObject); ok {
-		return validResponse.VisitClusterRemoveClusterResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterAddCluster operation middleware
-func (sh *strictHandler) ClusterAddCluster(ctx echo.Context, clusterSlug ClusterSlugParam, clusterSlugChild ClusterSlugChildParam) error {
-	var request ClusterAddClusterRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.ClusterSlugChild = clusterSlugChild
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterAddCluster(ctx.Request().Context(), request.(ClusterAddClusterRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterAddCluster")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterAddClusterResponseObject); ok {
-		return validResponse.VisitClusterAddClusterResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterRemoveItem operation middleware
-func (sh *strictHandler) ClusterRemoveItem(ctx echo.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) error {
-	var request ClusterRemoveItemRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.ItemSlug = itemSlug
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterRemoveItem(ctx.Request().Context(), request.(ClusterRemoveItemRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterRemoveItem")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterRemoveItemResponseObject); ok {
-		return validResponse.VisitClusterRemoveItemResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterAddItem operation middleware
-func (sh *strictHandler) ClusterAddItem(ctx echo.Context, clusterSlug ClusterSlugParam, itemSlug ItemSlugParam) error {
-	var request ClusterAddItemRequestObject
-
-	request.ClusterSlug = clusterSlug
-	request.ItemSlug = itemSlug
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterAddItem(ctx.Request().Context(), request.(ClusterAddItemRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterAddItem")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterAddItemResponseObject); ok {
-		return validResponse.VisitClusterAddItemResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ClusterUpdateVisibility operation middleware
-func (sh *strictHandler) ClusterUpdateVisibility(ctx echo.Context, clusterSlug ClusterSlugParam) error {
-	var request ClusterUpdateVisibilityRequestObject
-
-	request.ClusterSlug = clusterSlug
-
-	var body ClusterUpdateVisibilityJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ClusterUpdateVisibility(ctx.Request().Context(), request.(ClusterUpdateVisibilityRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ClusterUpdateVisibility")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ClusterUpdateVisibilityResponseObject); ok {
-		return validResponse.VisitClusterUpdateVisibilityResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
 // CollectionList operation middleware
 func (sh *strictHandler) CollectionList(ctx echo.Context) error {
 	var request CollectionListRequestObject
@@ -19000,224 +16256,6 @@ func (sh *strictHandler) IconGet(ctx echo.Context, iconSize IconGetParamsIconSiz
 	return nil
 }
 
-// ItemList operation middleware
-func (sh *strictHandler) ItemList(ctx echo.Context, params ItemListParams) error {
-	var request ItemListRequestObject
-
-	request.Params = params
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemList(ctx.Request().Context(), request.(ItemListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemList")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemListResponseObject); ok {
-		return validResponse.VisitItemListResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemCreate operation middleware
-func (sh *strictHandler) ItemCreate(ctx echo.Context) error {
-	var request ItemCreateRequestObject
-
-	var body ItemCreateJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemCreate(ctx.Request().Context(), request.(ItemCreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemCreate")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemCreateResponseObject); ok {
-		return validResponse.VisitItemCreateResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemDelete operation middleware
-func (sh *strictHandler) ItemDelete(ctx echo.Context, itemSlug ItemSlugParam) error {
-	var request ItemDeleteRequestObject
-
-	request.ItemSlug = itemSlug
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemDelete(ctx.Request().Context(), request.(ItemDeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemDelete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemDeleteResponseObject); ok {
-		return validResponse.VisitItemDeleteResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemGet operation middleware
-func (sh *strictHandler) ItemGet(ctx echo.Context, itemSlug ItemSlugParam) error {
-	var request ItemGetRequestObject
-
-	request.ItemSlug = itemSlug
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemGet(ctx.Request().Context(), request.(ItemGetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemGet")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemGetResponseObject); ok {
-		return validResponse.VisitItemGetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemUpdate operation middleware
-func (sh *strictHandler) ItemUpdate(ctx echo.Context, itemSlug ItemSlugParam) error {
-	var request ItemUpdateRequestObject
-
-	request.ItemSlug = itemSlug
-
-	var body ItemUpdateJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemUpdate(ctx.Request().Context(), request.(ItemUpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemUpdate")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemUpdateResponseObject); ok {
-		return validResponse.VisitItemUpdateResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemRemoveAsset operation middleware
-func (sh *strictHandler) ItemRemoveAsset(ctx echo.Context, itemSlug ItemSlugParam, assetId AssetIDParam) error {
-	var request ItemRemoveAssetRequestObject
-
-	request.ItemSlug = itemSlug
-	request.AssetId = assetId
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemRemoveAsset(ctx.Request().Context(), request.(ItemRemoveAssetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemRemoveAsset")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemRemoveAssetResponseObject); ok {
-		return validResponse.VisitItemRemoveAssetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemAddAsset operation middleware
-func (sh *strictHandler) ItemAddAsset(ctx echo.Context, itemSlug ItemSlugParam, assetId AssetIDParam) error {
-	var request ItemAddAssetRequestObject
-
-	request.ItemSlug = itemSlug
-	request.AssetId = assetId
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemAddAsset(ctx.Request().Context(), request.(ItemAddAssetRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemAddAsset")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemAddAssetResponseObject); ok {
-		return validResponse.VisitItemAddAssetResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
-// ItemUpdateVisibility operation middleware
-func (sh *strictHandler) ItemUpdateVisibility(ctx echo.Context, itemSlug ItemSlugParam) error {
-	var request ItemUpdateVisibilityRequestObject
-
-	request.ItemSlug = itemSlug
-
-	var body ItemUpdateVisibilityJSONRequestBody
-	if err := ctx.Bind(&body); err != nil {
-		return err
-	}
-	request.Body = &body
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ItemUpdateVisibility(ctx.Request().Context(), request.(ItemUpdateVisibilityRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ItemUpdateVisibility")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(ItemUpdateVisibilityResponseObject); ok {
-		return validResponse.VisitItemUpdateVisibilityResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
-}
-
 // LinkList operation middleware
 func (sh *strictHandler) LinkList(ctx echo.Context, params LinkListParams) error {
 	var request LinkListRequestObject
@@ -19291,6 +16329,277 @@ func (sh *strictHandler) LinkGet(ctx echo.Context, linkSlug LinkSlugParam) error
 		return err
 	} else if validResponse, ok := response.(LinkGetResponseObject); ok {
 		return validResponse.VisitLinkGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeList operation middleware
+func (sh *strictHandler) NodeList(ctx echo.Context, params NodeListParams) error {
+	var request NodeListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeList(ctx.Request().Context(), request.(NodeListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeListResponseObject); ok {
+		return validResponse.VisitNodeListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeCreate operation middleware
+func (sh *strictHandler) NodeCreate(ctx echo.Context) error {
+	var request NodeCreateRequestObject
+
+	var body NodeCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeCreate(ctx.Request().Context(), request.(NodeCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeCreateResponseObject); ok {
+		return validResponse.VisitNodeCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeDelete operation middleware
+func (sh *strictHandler) NodeDelete(ctx echo.Context, nodeSlug NodeSlugParam, params NodeDeleteParams) error {
+	var request NodeDeleteRequestObject
+
+	request.NodeSlug = nodeSlug
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeDelete(ctx.Request().Context(), request.(NodeDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeDeleteResponseObject); ok {
+		return validResponse.VisitNodeDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeGet operation middleware
+func (sh *strictHandler) NodeGet(ctx echo.Context, nodeSlug NodeSlugParam) error {
+	var request NodeGetRequestObject
+
+	request.NodeSlug = nodeSlug
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeGet(ctx.Request().Context(), request.(NodeGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeGetResponseObject); ok {
+		return validResponse.VisitNodeGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeUpdate operation middleware
+func (sh *strictHandler) NodeUpdate(ctx echo.Context, nodeSlug NodeSlugParam) error {
+	var request NodeUpdateRequestObject
+
+	request.NodeSlug = nodeSlug
+
+	var body NodeUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeUpdate(ctx.Request().Context(), request.(NodeUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeUpdateResponseObject); ok {
+		return validResponse.VisitNodeUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeRemoveAsset operation middleware
+func (sh *strictHandler) NodeRemoveAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error {
+	var request NodeRemoveAssetRequestObject
+
+	request.NodeSlug = nodeSlug
+	request.AssetId = assetId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeRemoveAsset(ctx.Request().Context(), request.(NodeRemoveAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeRemoveAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeRemoveAssetResponseObject); ok {
+		return validResponse.VisitNodeRemoveAssetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeAddAsset operation middleware
+func (sh *strictHandler) NodeAddAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error {
+	var request NodeAddAssetRequestObject
+
+	request.NodeSlug = nodeSlug
+	request.AssetId = assetId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeAddAsset(ctx.Request().Context(), request.(NodeAddAssetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeAddAsset")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeAddAssetResponseObject); ok {
+		return validResponse.VisitNodeAddAssetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeRemoveNode operation middleware
+func (sh *strictHandler) NodeRemoveNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error {
+	var request NodeRemoveNodeRequestObject
+
+	request.NodeSlug = nodeSlug
+	request.NodeSlugChild = nodeSlugChild
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeRemoveNode(ctx.Request().Context(), request.(NodeRemoveNodeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeRemoveNode")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeRemoveNodeResponseObject); ok {
+		return validResponse.VisitNodeRemoveNodeResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeAddNode operation middleware
+func (sh *strictHandler) NodeAddNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error {
+	var request NodeAddNodeRequestObject
+
+	request.NodeSlug = nodeSlug
+	request.NodeSlugChild = nodeSlugChild
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeAddNode(ctx.Request().Context(), request.(NodeAddNodeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeAddNode")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeAddNodeResponseObject); ok {
+		return validResponse.VisitNodeAddNodeResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// NodeUpdateVisibility operation middleware
+func (sh *strictHandler) NodeUpdateVisibility(ctx echo.Context, nodeSlug NodeSlugParam) error {
+	var request NodeUpdateVisibilityRequestObject
+
+	request.NodeSlug = nodeSlug
+
+	var body NodeUpdateVisibilityJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NodeUpdateVisibility(ctx.Request().Context(), request.(NodeUpdateVisibilityRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NodeUpdateVisibility")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(NodeUpdateVisibilityResponseObject); ok {
+		return validResponse.VisitNodeUpdateVisibilityResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -19651,220 +16960,200 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"ePfw/wIAAP//o0/W9F8qAQA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

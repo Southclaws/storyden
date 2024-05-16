@@ -11,8 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -48,34 +47,19 @@ func (tu *TagUpdate) AddPosts(p ...*Post) *TagUpdate {
 	return tu.AddPostIDs(ids...)
 }
 
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
-func (tu *TagUpdate) AddClusterIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddClusterIDs(ids...)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (tu *TagUpdate) AddNodeIDs(ids ...xid.ID) *TagUpdate {
+	tu.mutation.AddNodeIDs(ids...)
 	return tu
 }
 
-// AddClusters adds the "clusters" edges to the Cluster entity.
-func (tu *TagUpdate) AddClusters(c ...*Cluster) *TagUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddNodes adds the "nodes" edges to the Node entity.
+func (tu *TagUpdate) AddNodes(n ...*Node) *TagUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return tu.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (tu *TagUpdate) AddItemIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddItemIDs(ids...)
-	return tu
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (tu *TagUpdate) AddItems(i ...*Item) *TagUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tu.AddItemIDs(ids...)
+	return tu.AddNodeIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
@@ -119,46 +103,25 @@ func (tu *TagUpdate) RemovePosts(p ...*Post) *TagUpdate {
 	return tu.RemovePostIDs(ids...)
 }
 
-// ClearClusters clears all "clusters" edges to the Cluster entity.
-func (tu *TagUpdate) ClearClusters() *TagUpdate {
-	tu.mutation.ClearClusters()
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (tu *TagUpdate) ClearNodes() *TagUpdate {
+	tu.mutation.ClearNodes()
 	return tu
 }
 
-// RemoveClusterIDs removes the "clusters" edge to Cluster entities by IDs.
-func (tu *TagUpdate) RemoveClusterIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemoveClusterIDs(ids...)
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (tu *TagUpdate) RemoveNodeIDs(ids ...xid.ID) *TagUpdate {
+	tu.mutation.RemoveNodeIDs(ids...)
 	return tu
 }
 
-// RemoveClusters removes "clusters" edges to Cluster entities.
-func (tu *TagUpdate) RemoveClusters(c ...*Cluster) *TagUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveNodes removes "nodes" edges to Node entities.
+func (tu *TagUpdate) RemoveNodes(n ...*Node) *TagUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return tu.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (tu *TagUpdate) ClearItems() *TagUpdate {
-	tu.mutation.ClearItems()
-	return tu
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (tu *TagUpdate) RemoveItemIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemoveItemIDs(ids...)
-	return tu
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (tu *TagUpdate) RemoveItems(i ...*Item) *TagUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tu.RemoveItemIDs(ids...)
+	return tu.RemoveNodeIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
@@ -269,28 +232,28 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.ClustersCleared() {
+	if tu.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedClustersIDs(); len(nodes) > 0 && !tu.mutation.ClustersCleared() {
+	if nodes := tu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !tu.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -298,60 +261,15 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.ClustersIDs(); len(nodes) > 0 {
+	if nodes := tu.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedItemsIDs(); len(nodes) > 0 && !tu.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -441,34 +359,19 @@ func (tuo *TagUpdateOne) AddPosts(p ...*Post) *TagUpdateOne {
 	return tuo.AddPostIDs(ids...)
 }
 
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
-func (tuo *TagUpdateOne) AddClusterIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddClusterIDs(ids...)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (tuo *TagUpdateOne) AddNodeIDs(ids ...xid.ID) *TagUpdateOne {
+	tuo.mutation.AddNodeIDs(ids...)
 	return tuo
 }
 
-// AddClusters adds the "clusters" edges to the Cluster entity.
-func (tuo *TagUpdateOne) AddClusters(c ...*Cluster) *TagUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddNodes adds the "nodes" edges to the Node entity.
+func (tuo *TagUpdateOne) AddNodes(n ...*Node) *TagUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return tuo.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (tuo *TagUpdateOne) AddItemIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddItemIDs(ids...)
-	return tuo
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (tuo *TagUpdateOne) AddItems(i ...*Item) *TagUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tuo.AddItemIDs(ids...)
+	return tuo.AddNodeIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
@@ -512,46 +415,25 @@ func (tuo *TagUpdateOne) RemovePosts(p ...*Post) *TagUpdateOne {
 	return tuo.RemovePostIDs(ids...)
 }
 
-// ClearClusters clears all "clusters" edges to the Cluster entity.
-func (tuo *TagUpdateOne) ClearClusters() *TagUpdateOne {
-	tuo.mutation.ClearClusters()
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (tuo *TagUpdateOne) ClearNodes() *TagUpdateOne {
+	tuo.mutation.ClearNodes()
 	return tuo
 }
 
-// RemoveClusterIDs removes the "clusters" edge to Cluster entities by IDs.
-func (tuo *TagUpdateOne) RemoveClusterIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemoveClusterIDs(ids...)
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (tuo *TagUpdateOne) RemoveNodeIDs(ids ...xid.ID) *TagUpdateOne {
+	tuo.mutation.RemoveNodeIDs(ids...)
 	return tuo
 }
 
-// RemoveClusters removes "clusters" edges to Cluster entities.
-func (tuo *TagUpdateOne) RemoveClusters(c ...*Cluster) *TagUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveNodes removes "nodes" edges to Node entities.
+func (tuo *TagUpdateOne) RemoveNodes(n ...*Node) *TagUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return tuo.RemoveClusterIDs(ids...)
-}
-
-// ClearItems clears all "items" edges to the Item entity.
-func (tuo *TagUpdateOne) ClearItems() *TagUpdateOne {
-	tuo.mutation.ClearItems()
-	return tuo
-}
-
-// RemoveItemIDs removes the "items" edge to Item entities by IDs.
-func (tuo *TagUpdateOne) RemoveItemIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemoveItemIDs(ids...)
-	return tuo
-}
-
-// RemoveItems removes "items" edges to Item entities.
-func (tuo *TagUpdateOne) RemoveItems(i ...*Item) *TagUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return tuo.RemoveItemIDs(ids...)
+	return tuo.RemoveNodeIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
@@ -692,28 +574,28 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.ClustersCleared() {
+	if tuo.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedClustersIDs(); len(nodes) > 0 && !tuo.mutation.ClustersCleared() {
+	if nodes := tuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !tuo.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -721,60 +603,15 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.ClustersIDs(); len(nodes) > 0 {
+	if nodes := tuo.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   tag.ClustersTable,
-			Columns: tag.ClustersPrimaryKey,
+			Table:   tag.NodesTable,
+			Columns: tag.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedItemsIDs(); len(nodes) > 0 && !tuo.mutation.ItemsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   tag.ItemsTable,
-			Columns: tag.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

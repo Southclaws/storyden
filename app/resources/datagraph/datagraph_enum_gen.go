@@ -12,11 +12,10 @@ type Kind struct {
 }
 
 var (
-	KindThread  = Kind{kindThread}
-	KindReply   = Kind{kindReply}
-	KindCluster = Kind{kindCluster}
-	KindItem    = Kind{kindItem}
-	KindLink    = Kind{kindLink}
+	KindThread = Kind{kindThread}
+	KindReply  = Kind{kindReply}
+	KindNode   = Kind{kindNode}
+	KindLink   = Kind{kindLink}
 )
 
 func (r Kind) Format(f fmt.State, verb rune) {
@@ -60,10 +59,8 @@ func NewKind(__iNpUt__ string) (Kind, error) {
 		return KindThread, nil
 	case string(kindReply):
 		return KindReply, nil
-	case string(kindCluster):
-		return KindCluster, nil
-	case string(kindItem):
-		return KindItem, nil
+	case string(kindNode):
+		return KindNode, nil
 	case string(kindLink):
 		return KindLink, nil
 	default:

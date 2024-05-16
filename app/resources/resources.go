@@ -8,13 +8,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_children"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster_traversal"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item_search"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link_graph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node_search"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/resources/profile_search"
@@ -42,11 +41,10 @@ func Build() fx.Option {
 			notification.New,
 			post_search.New,
 			collection.New,
-			cluster.New,
-			cluster_traversal.New,
-			cluster_children.New,
-			item.New,
-			item_search.New,
+			node.New,
+			node_traversal.New,
+			node_children.New,
+			node_search.New,
 			link.New,
 			link_graph.New,
 			profile_search.New,

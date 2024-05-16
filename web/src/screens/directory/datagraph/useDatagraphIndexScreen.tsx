@@ -1,43 +1,27 @@
-import { useClusterList } from "src/api/openapi/clusters";
-import { useItemList } from "src/api/openapi/items";
 import { useLinkList } from "src/api/openapi/links";
+import { useNodeList } from "src/api/openapi/nodes";
 import {
-  ClusterListOKResponse,
-  ItemListOKResponse,
   LinkListOKResponse,
+  NodeListOKResponse,
 } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 
 export type Props = {
-  clusters: ClusterListOKResponse;
-  items: ItemListOKResponse;
+  nodes: NodeListOKResponse;
   links: LinkListOKResponse;
 };
 
 export function useDatagraphIndexScreen(props: Props) {
   const session = useSession();
   const {
-    data: clusters,
-    mutate: mutateClusters,
-    error: errorClusters,
-  } = useClusterList(
+    data: nodes,
+    mutate: mutateNodes,
+    error: errorNodes,
+  } = useNodeList(
     {},
     {
       swr: {
-        fallbackData: props.clusters,
-      },
-    },
-  );
-
-  const {
-    data: items,
-    mutate: mutateItems,
-    error: errorItems,
-  } = useItemList(
-    {},
-    {
-      swr: {
-        fallbackData: props.items,
+        fallbackData: props.nodes,
       },
     },
   );
@@ -55,29 +39,22 @@ export function useDatagraphIndexScreen(props: Props) {
     },
   );
 
-  if (!clusters || !items || !links) {
+  if (!nodes || !links) {
     return {
       ready: false as const,
-      error: errorClusters || errorItems || errorLinks,
+      error: errorNodes || errorLinks,
     };
   }
 
-  const empty =
-    clusters.clusters.length === 0 &&
-    items.items.length === 0 &&
-    links.results === 0;
+  const empty = nodes.nodes.length === 0 && links.results === 0;
 
   return {
     ready: true as const,
     empty,
     data: {
-      clusters: {
-        data: clusters,
-        mutate: mutateClusters,
-      },
-      items: {
-        data: items,
-        mutate: mutateItems,
+      nodes: {
+        data: nodes,
+        mutate: mutateNodes,
       },
       links: {
         data: links,
@@ -85,8 +62,7 @@ export function useDatagraphIndexScreen(props: Props) {
       },
     },
     mutate: {
-      mutateClusters,
-      mutateItems,
+      mutateNodes,
     },
     session,
   };

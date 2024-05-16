@@ -15,9 +15,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/item"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -219,34 +218,19 @@ func (ac *AccountCreate) AddCollections(c ...*Collection) *AccountCreate {
 	return ac.AddCollectionIDs(ids...)
 }
 
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
-func (ac *AccountCreate) AddClusterIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddClusterIDs(ids...)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (ac *AccountCreate) AddNodeIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddNodeIDs(ids...)
 	return ac
 }
 
-// AddClusters adds the "clusters" edges to the Cluster entity.
-func (ac *AccountCreate) AddClusters(c ...*Cluster) *AccountCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddNodes adds the "nodes" edges to the Node entity.
+func (ac *AccountCreate) AddNodes(n ...*Node) *AccountCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return ac.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (ac *AccountCreate) AddItemIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddItemIDs(ids...)
-	return ac
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (ac *AccountCreate) AddItems(i ...*Item) *AccountCreate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return ac.AddItemIDs(ids...)
+	return ac.AddNodeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -509,31 +493,15 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.ClustersIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   account.ClustersTable,
-			Columns: []string{account.ClustersColumn},
+			Table:   account.NodesTable,
+			Columns: []string{account.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.ItemsTable,
-			Columns: []string{account.ItemsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

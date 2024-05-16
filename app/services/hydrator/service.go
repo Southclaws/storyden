@@ -9,8 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/datagraph/cluster"
-	"github.com/Southclaws/storyden/app/resources/datagraph/item"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/hydrator/extractor"
@@ -20,8 +19,7 @@ import (
 type Service interface {
 	HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option
 	HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option
-	HydrateCluster(ctx context.Context, body string, url opt.Optional[string]) []cluster.Option
-	HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option
+	HydrateNode(ctx context.Context, body string, url opt.Optional[string]) []node.Option
 }
 
 func Build() fx.Option {
@@ -31,23 +29,20 @@ func Build() fx.Option {
 type service struct {
 	l  *zap.Logger
 	tr thread.Repository
-	cr cluster.Repository
-	ir item.Repository
+	nr node.Repository
 	f  fetcher.Service
 }
 
 func New(
 	l *zap.Logger,
 	tr thread.Repository,
-	cr cluster.Repository,
-	ir item.Repository,
+	nr node.Repository,
 	f fetcher.Service,
 ) Service {
 	return &service{
 		l:  l.With(zap.String("service", "hydrator")),
 		tr: tr,
-		cr: cr,
-		ir: ir,
+		nr: nr,
 		f:  f,
 	}
 }
@@ -72,21 +67,12 @@ func (s *service) HydrateReply(ctx context.Context, body string, url opt.Optiona
 	}
 }
 
-func (s *service) HydrateCluster(ctx context.Context, body string, url opt.Optional[string]) []cluster.Option {
+func (s *service) HydrateNode(ctx context.Context, body string, url opt.Optional[string]) []node.Option {
 	_, links, assets := s.hydrate(ctx, body, url)
 
-	return []cluster.Option{
-		cluster.WithAssets(assets),
-		cluster.WithLinks(links...),
-	}
-}
-
-func (s *service) HydrateItem(ctx context.Context, body string, url opt.Optional[string]) []item.Option {
-	_, links, assets := s.hydrate(ctx, body, url)
-
-	return []item.Option{
-		item.WithAssets(assets),
-		item.WithLinks(links...),
+	return []node.Option{
+		node.WithAssets(assets),
+		node.WithLinks(links...),
 	}
 }
 

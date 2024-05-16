@@ -12,9 +12,9 @@ resource object. This is intended for client implementations to use for
 extending objects with arbitrary information to satisfy product needs.
 
 For example, if you were building a book database, you could use the
-Properties of a cluster to specify publisher information such as date of
+Properties of a node to specify publisher information such as date of
 founding, headquarters, size, etc. and then use the Properties of the
-items in that cluster to specify book information such as release date,
+items in that node to specify book information such as release date,
 number of pages, etc.
 
  */

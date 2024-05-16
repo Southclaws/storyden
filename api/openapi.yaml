@@ -53,14 +53,12 @@ tags:
     description: File uploads and downloads.
   - name: collections
     description: User curated collections of posts.
-  - name: clusters
-    description: Arbitrary item grouping pages for indexing structured content.
-  - name: items
-    description: Arbitrary item pages for indexing structured content.
+  - name: nodes
+    description: Structured knowledgebase content tree.
   - name: links
     description: Social bookmarks.
   - name: datagraph
-    description: Content graph (posts, clusters, items, links) APIs.
+    description: Content graph (posts, nodes, links) APIs.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -880,38 +878,38 @@ paths:
         "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
 
   #
-  #          888                   888
-  #          888                   888
-  #          888                   888
-  #  .d8888b 888 888  888 .d8888b  888888 .d88b.  888d888 .d8888b
-  # d88P"    888 888  888 88K      888   d8P  Y8b 888P"   88K
-  # 888      888 888  888 "Y8888b. 888   88888888 888     "Y8888b.
-  # Y88b.    888 Y88b 888      X88 Y88b. Y8b.     888          X88
-  #  "Y8888P 888  "Y88888  88888P'  "Y888 "Y8888  888      88888P'
+  #                        888
+  #                        888
+  #                        888
+  # 88888b.   .d88b.   .d88888  .d88b.  .d8888b
+  # 888 "88b d88""88b d88" 888 d8P  Y8b 88K
+  # 888  888 888  888 888  888 88888888 "Y8888b.
+  # 888  888 Y88..88P Y88b 888 Y8b.          X88
+  # 888  888  "Y88P"   "Y88888  "Y8888   88888P'
   #
 
-  /v1/clusters:
+  /v1/nodes:
     post:
-      operationId: ClusterCreate
+      operationId: NodeCreate
       description: |
-        Create a cluster for grouping items and other clusters together.
-      tags: [clusters]
-      requestBody: { $ref: "#/components/requestBodies/ClusterCreate" }
+        Create a node for curating structured knowledge together.
+      tags: [nodes]
+      requestBody: { $ref: "#/components/requestBodies/NodeCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterCreateOK" }
+        "200": { $ref: "#/components/responses/NodeCreateOK" }
     get:
-      operationId: ClusterList
+      operationId: NodeList
       description: |
-        List clusters using the given filters. Can be used to get a full tree.
-      tags: [clusters]
+        List nodes using the given filters. Can be used to get a full tree.
+      tags: [nodes]
       security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
-        - name: cluster_id
-          description: List this cluster and all child clusters.
+        - name: node_id
+          description: List this node and all child nodes.
           required: false
           in: query
           schema: { $ref: "#/components/schemas/Identifier" }
@@ -924,249 +922,112 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/ClusterListOK" }
+        "200": { $ref: "#/components/responses/NodeListOK" }
 
-  /v1/clusters/{cluster_slug}:
+  /v1/nodes/{node_slug}:
     get:
-      operationId: ClusterGet
-      description: Get a cluster by its URL slug.
-      tags: [clusters]
+      operationId: NodeGet
+      description: Get a node by its URL slug.
+      tags: [nodes]
       security: []
-      parameters: [$ref: "#/components/parameters/ClusterSlugParam"]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterGetOK" }
+        "200": { $ref: "#/components/responses/NodeGetOK" }
     patch:
-      operationId: ClusterUpdate
-      description: Update a cluster.
-      tags: [clusters]
-      parameters: [$ref: "#/components/parameters/ClusterSlugParam"]
-      requestBody: { $ref: "#/components/requestBodies/ClusterUpdate" }
+      operationId: NodeUpdate
+      description: Update a node.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+        "200": { $ref: "#/components/responses/NodeUpdateOK" }
     delete:
-      operationId: ClusterDelete
-      description: Delete a cluster and move all children to its parent or root.
-      tags: [clusters]
+      operationId: NodeDelete
+      description: Delete a node and move all children to its parent or root.
+      tags: [nodes]
       parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/TargetClusterSlugQuery"
-        - $ref: "#/components/parameters/MoveChildClustersQuery"
-        - $ref: "#/components/parameters/MoveChildItemsQuery"
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/TargetNodeSlugQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterDeleteOK" }
+        "200": { $ref: "#/components/responses/NodeDeleteOK" }
 
-  /v1/clusters/{cluster_slug}/visibility:
+  /v1/nodes/{node_slug}/visibility:
     patch:
-      operationId: ClusterUpdateVisibility
+      operationId: NodeUpdateVisibility
       description: |
-        Update the visibility of a cluster. When changed, this may trigger other
+        Update the visibility of a node. When changed, this may trigger other
         operations such as notifications/newsletters. Changing the visibility of
         anything to "published" is often accompanied by some other side effects.
-      tags: [clusters]
-      parameters: [$ref: "#/components/parameters/ClusterSlugParam"]
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
       requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+        "200": { $ref: "#/components/responses/NodeUpdateOK" }
 
-  /v1/clusters/{cluster_slug}/assets/{asset_id}:
+  /v1/nodes/{node_slug}/assets/{asset_id}:
     put:
-      operationId: ClusterAddAsset
-      description: Add an asset to a cluster.
-      tags: [clusters]
+      operationId: NodeAddAsset
+      description: Add an asset to a node.
+      tags: [nodes]
       parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
+        - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+        "200": { $ref: "#/components/responses/NodeUpdateOK" }
     delete:
-      operationId: ClusterRemoveAsset
-      description: Remove an asset from a cluster.
-      tags: [clusters]
+      operationId: NodeRemoveAsset
+      description: Remove an asset from a node.
+      tags: [nodes]
       parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
+        - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/AssetIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterUpdateOK" }
+        "200": { $ref: "#/components/responses/NodeUpdateOK" }
 
-  /v1/clusters/{cluster_slug}/clusters/{cluster_slug_child}:
+  /v1/nodes/{node_slug}/nodes/{node_slug_child}:
     put:
-      operationId: ClusterAddCluster
-      description: Set a cluster's parent to the specified cluster
-      tags: [clusters]
+      operationId: NodeAddNode
+      description: Set a node's parent to the specified node
+      tags: [nodes]
       parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/ClusterSlugChildParam"
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeSlugChildParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterAddChildOK" }
+        "200": { $ref: "#/components/responses/NodeAddChildOK" }
     delete:
-      operationId: ClusterRemoveCluster
+      operationId: NodeRemoveNode
       description: |
-        Remove a cluster from its parent cluster and back to the top level.
-      tags: [clusters]
+        Remove a node from its parent node and back to the top level.
+      tags: [nodes]
       parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/ClusterSlugChildParam"
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeSlugChildParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterRemoveChildOK" }
-
-  /v1/clusters/{cluster_slug}/items/{item_slug}:
-    put:
-      operationId: ClusterAddItem
-      description: Add an item to a cluster.
-      tags: [clusters]
-      parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/ItemSlugParam"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterAddItemOK" }
-    delete:
-      operationId: ClusterRemoveItem
-      description: Remove an item from a cluster.
-      tags: [clusters]
-      parameters:
-        - $ref: "#/components/parameters/ClusterSlugParam"
-        - $ref: "#/components/parameters/ItemSlugParam"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ClusterRemoveItemOK" }
-
-  #
-  # d8b 888
-  # Y8P 888
-  #     888
-  # 888 888888 .d88b.  88888b.d88b.  .d8888b
-  # 888 888   d8P  Y8b 888 "888 "88b 88K
-  # 888 888   88888888 888  888  888 "Y8888b.
-  # 888 Y88b. Y8b.     888  888  888      X88
-  # 888  "Y888 "Y8888  888  888  888  88888P'
-  #
-
-  /v1/items:
-    post:
-      operationId: ItemCreate
-      description: |
-        Create a item to represent a piece of structured data such as an item in
-        a video game, an article of clothing, a product in a store, etc.
-      tags: [items]
-      requestBody: { $ref: "#/components/requestBodies/ItemCreate" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemCreateOK" }
-    get:
-      operationId: ItemList
-      description: List all items using the filtering options.
-      tags: [items]
-      security: []
-      parameters:
-        - $ref: "#/components/parameters/SearchQuery"
-        - $ref: "#/components/parameters/VisibilityParam"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/ItemListOK" }
-
-  /v1/items/{item_slug}:
-    get:
-      operationId: ItemGet
-      description: Get a item by its URL slug.
-      tags: [items]
-      security: []
-      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemGetOK" }
-    patch:
-      operationId: ItemUpdate
-      description: Update a item.
-      tags: [items]
-      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
-      requestBody: { $ref: "#/components/requestBodies/ItemUpdate" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemUpdateOK" }
-    delete:
-      operationId: ItemDelete
-      description: Delete an item.
-      tags: [items]
-      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: Deleted }
-
-  /v1/items/{item_slug}/visibility:
-    patch:
-      operationId: ItemUpdateVisibility
-      description: Update the visibility of an item.
-      tags: [items]
-      parameters: [$ref: "#/components/parameters/ItemSlugParam"]
-      requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemUpdateOK" }
-
-  /v1/items/{item_slug}/assets/{asset_id}:
-    put:
-      operationId: ItemAddAsset
-      description: Add an asset to an item.
-      tags: [items]
-      parameters:
-        - $ref: "#/components/parameters/ItemSlugParam"
-        - $ref: "#/components/parameters/AssetIDParam"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemUpdateOK" }
-    delete:
-      operationId: ItemRemoveAsset
-      description: Remove an asset from an item.
-      tags: [items]
-      parameters:
-        - $ref: "#/components/parameters/ItemSlugParam"
-        - $ref: "#/components/parameters/AssetIDParam"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ItemUpdateOK" }
+        "200": { $ref: "#/components/responses/NodeRemoveChildOK" }
 
   #
   # 888 d8b          888
@@ -1375,53 +1236,31 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
-    ClusterSlugParam:
-      description: Unique cluster Slug.
-      name: cluster_slug
+    NodeSlugParam:
+      description: Unique node Slug.
+      name: node_slug
       in: path
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
 
-    ClusterSlugChildParam:
-      description: Unique cluster Slug.
-      name: cluster_slug_child
+    NodeSlugChildParam:
+      description: Unique node Slug.
+      name: node_slug_child
       in: path
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
 
-    TargetClusterSlugQuery:
-      description: Where to move child clusters and items.
-      name: target_cluster
+    TargetNodeSlugQuery:
+      description: |
+        If set, child nodes will be moved to the target node. If not set, child
+        nodes will be moved to the root.
+      name: target_node
       in: query
       required: false
       schema:
         type: string
-
-    MoveChildClustersQuery:
-      description: Whether or not to move child clusters.
-      name: move_child_clusters
-      in: query
-      required: false
-      schema:
-        type: boolean
-
-    MoveChildItemsQuery:
-      description: Whether or not to move child items.
-      name: move_child_items
-      in: query
-      required: false
-      schema:
-        type: boolean
-
-    ItemSlugParam:
-      description: Unique item Slug.
-      name: item_slug
-      in: path
-      required: true
-      schema:
-        $ref: "#/components/schemas/Identifier"
 
     LinkSlugParam:
       description: Unique link Slug.
@@ -1434,8 +1273,8 @@ components:
     VisibilityParam:
       name: visibility
       description: |
-        Filter clusters with specific visibility values. Note that by
-        default, only published clusters are returned. When 'draft' is
+        Filter nodes with specific visibility values. Note that by
+        default, only published nodes are returned. When 'draft' is
         specified, only drafts owned by the requesting account are included.
         When 'review' is specified, the request will fail if the requesting
         account is not an administrator.
@@ -1576,25 +1415,15 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/CollectionMutableProps" }
 
-    ClusterCreate:
+    NodeCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ClusterInitialProps" }
+          schema: { $ref: "#/components/schemas/NodeInitialProps" }
 
-    ClusterUpdate:
+    NodeUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ClusterMutableProps" }
-
-    ItemCreate:
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/ItemInitialProps" }
-
-    ItemUpdate:
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/ItemMutableProps" }
+          schema: { $ref: "#/components/schemas/NodeMutableProps" }
 
     LinkCreate:
       content:
@@ -1866,96 +1695,55 @@ components:
           schema:
             $ref: "#/components/schemas/Collection"
 
-    ClusterCreateOK:
-      description: Cluster created.
+    NodeCreateOK:
+      description: Node created.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Cluster"
+            $ref: "#/components/schemas/Node"
 
-    ClusterListOK:
-      description: Cluster list.
+    NodeListOK:
+      description: Node list.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ClusterListResult" }
+          schema: { $ref: "#/components/schemas/NodeListResult" }
 
-    ClusterGetOK:
-      description: Cluster information and content.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ClusterWithItems"
-
-    ClusterUpdateOK:
-      description: Cluster updated.
+    NodeGetOK:
+      description: Node information and content.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Cluster"
+            $ref: "#/components/schemas/NodeWithChildren"
 
-    ClusterDeleteOK:
-      description: Cluster deleted.
+    NodeUpdateOK:
+      description: Node updated.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Node"
+
+    NodeDeleteOK:
+      description: Node deleted.
       content:
         application/json:
           schema:
             properties:
               destination:
-                $ref: "#/components/schemas/Cluster"
+                $ref: "#/components/schemas/Node"
 
-    ClusterAddChildOK:
-      description: Cluster child added. Returns parent cluster.
+    NodeAddChildOK:
+      description: Node child added. Returns parent node.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Cluster"
+            $ref: "#/components/schemas/Node"
 
-    ClusterRemoveChildOK:
-      description: Cluster child removed. Returns parent cluster.
+    NodeRemoveChildOK:
+      description: Node child removed. Returns parent node.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Cluster"
-
-    ClusterAddItemOK:
-      description: Cluster content added. Returns parent cluster.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ClusterWithItems"
-
-    ClusterRemoveItemOK:
-      description: Cluster content removed. Returns parent cluster.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ClusterWithItems"
-
-    ItemCreateOK:
-      description: Item created.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Item"
-
-    ItemListOK:
-      description: Item list.
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/ItemListResult" }
-
-    ItemGetOK:
-      description: Item information and content.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ItemWithParents"
-
-    ItemUpdateOK:
-      description: Item updated.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Item"
+            $ref: "#/components/schemas/Node"
 
     LinkCreateOK:
       description: Link indexed
@@ -2141,9 +1929,9 @@ components:
         extending objects with arbitrary information to satisfy product needs.
 
         For example, if you were building a book database, you could use the
-        Properties of a cluster to specify publisher information such as date of
+        Properties of a node to specify publisher information such as date of
         founding, headquarters, size, etc. and then use the Properties of the
-        items in that cluster to specify book information such as release date,
+        items in that node to specify book information such as release date,
         number of pages, etc.
       type: object
       additionalProperties: true
@@ -3147,225 +2935,102 @@ components:
             A short version of the thread's body text for use in previews.
 
     #
-    #  .d8888b.  888                   888
-    # d88P  Y88b 888                   888
-    # 888    888 888                   888
-    # 888        888 888  888 .d8888b  888888 .d88b.  888d888
-    # 888        888 888  888 88K      888   d8P  Y8b 888P"
-    # 888    888 888 888  888 "Y8888b. 888   88888888 888
-    # Y88b  d88P 888 Y88b 888      X88 Y88b. Y8b.     888
-    #  "Y8888P"  888  "Y88888  88888P'  "Y888 "Y8888  888
+    # 888b    888               888
+    # 8888b   888               888
+    # 88888b  888               888
+    # 888Y88b 888  .d88b.   .d88888  .d88b.
+    # 888 Y88b888 d88""88b d88" 888 d8P  Y8b
+    # 888  Y88888 888  888 888  888 88888888
+    # 888   Y8888 Y88..88P Y88b 888 Y8b.
+    # 888    Y888  "Y88P"   "Y88888  "Y8888
     #
 
-    Cluster:
+    Node:
       description: |
-        A cluster is a group of items and other clusters. It serves as an
+        A node is a text document with children and assets. It serves as an
         abstraction for grouping structured data objects. It can represent
-        things such as brands, manufacturers, authors, directors, etc. Clusters
+        things such as brands, manufacturers, authors, directors, etc. Nodes
         can be referenced in content posts and they also have their own content.
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/ClusterCommonProps"
+        - $ref: "#/components/schemas/NodeCommonProps"
 
-    ClusterWithItems:
+    NodeWithChildren:
       description: |
-        The full properties of a cluster including all items and maybe child
-        clusters (depending on what the endpoint is configured or queried to do)
-        for rendering a single cluster on a view.
+        The full properties of a node including all child nodes.
       type: object
-      required: [items]
+      required: [children]
       allOf:
-        - $ref: "#/components/schemas/Cluster"
+        - $ref: "#/components/schemas/Node"
         - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [items, clusters]
+        - required: [children]
           properties:
-            items: { $ref: "#/components/schemas/ClusterItemList" }
-            clusters: { $ref: "#/components/schemas/ClusterList" }
+            children: { $ref: "#/components/schemas/NodeList" }
 
-    ClusterName:
+    NodeName:
       type: string
 
-    ClusterSlug:
+    NodeSlug:
       $ref: "#/components/schemas/Slug"
 
-    ClusterDescription:
+    NodeDescription:
       type: string
 
-    ClusterCommonProps:
-      description: The main properties of a cluster.
+    NodeCommonProps:
+      description: The main properties of a node.
       type: object
       required: [name, slug, assets, description, owner, visibility, properties]
       properties:
-        name: { $ref: "#/components/schemas/ClusterName" }
-        slug: { $ref: "#/components/schemas/ClusterSlug" }
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
         assets: { $ref: "#/components/schemas/AssetList" }
         link: { $ref: "#/components/schemas/Link" }
-        description: { $ref: "#/components/schemas/ClusterDescription" }
+        description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
-        parent: { $ref: "#/components/schemas/Cluster" }
+        parent: { $ref: "#/components/schemas/Node" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
-    ClusterList:
+    NodeList:
       type: array
-      items: { $ref: "#/components/schemas/Cluster" }
+      items: { $ref: "#/components/schemas/Node" }
 
-    ClusterListResult:
+    NodeListResult:
       allOf:
         - { $ref: "#/components/schemas/PaginatedResult" }
         - type: object
-          required: [clusters]
+          required: [nodes]
           properties:
-            clusters: { $ref: "#/components/schemas/ClusterList" }
+            nodes: { $ref: "#/components/schemas/NodeList" }
 
-    ClusterInitialProps:
+    NodeInitialProps:
       type: object
       required: [name, slug, description]
       properties:
-        name: { $ref: "#/components/schemas/ClusterName" }
-        slug: { $ref: "#/components/schemas/ClusterSlug" }
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/ClusterDescription" }
+        description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
-        parent: { $ref: "#/components/schemas/ClusterSlug" }
+        parent: { $ref: "#/components/schemas/NodeSlug" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
-    ClusterMutableProps:
+    NodeMutableProps:
       description: |
         Note: Properties are replace-all and are not merged with existing.
       type: object
       properties:
-        name: { $ref: "#/components/schemas/ClusterName" }
-        slug: { $ref: "#/components/schemas/ClusterSlug" }
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/ClusterDescription" }
+        description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
-        parent: { $ref: "#/components/schemas/ClusterSlug" }
-        properties: { $ref: "#/components/schemas/Properties" }
-
-    ClusterItemList:
-      description: |
-        A list of items within the context of belonging to a cluster. Different
-        from an ItemList because we do not need to include the parent cluster
-        information inside each item since it's already available.
-      type: array
-      items: { $ref: "#/components/schemas/ClusterItem" }
-
-    ClusterItem:
-      description: |
-        An item belonging to the enclosing cluster.
-      allOf:
-        - $ref: "#/components/schemas/Item"
-
-    #
-    # 8888888 888
-    #   888   888
-    #   888   888
-    #   888   888888 .d88b.  88888b.d88b.
-    #   888   888   d8P  Y8b 888 "888 "88b
-    #   888   888   88888888 888  888  888
-    #   888   Y88b. Y8b.     888  888  888
-    # 8888888  "Y888 "Y8888  888  888  888
-    #
-
-    Item:
-      description: |
-        An item is an arbitrary object used for indexing any kind of structured
-        data for the purposes of archival, search, documentation, products, etc.
-        Items are similar to posts in terms of data model but are semantically
-        different when it comes to purpose.
-
-        If you were to use Storyden to run a community for a video game for
-        example, items could be used to represent actual items from the game
-        which allows members to search for them as  well as reference them in
-        posts and other content.
-      type: object
-      allOf:
-        - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/ItemCommonProps"
-
-    ItemName:
-      type: string
-
-    ItemSlug:
-      $ref: "#/components/schemas/Slug"
-
-    ItemDescription:
-      type: string
-
-    ItemCommonProps:
-      description: The main properties for an item.
-      type: object
-      required: [name, slug, assets, description, owner, visibility, properties]
-      properties:
-        name: { $ref: "#/components/schemas/ItemName" }
-        slug: { $ref: "#/components/schemas/ItemSlug" }
-        assets: { $ref: "#/components/schemas/AssetList" }
-        link: { $ref: "#/components/schemas/Link" }
-        description: { $ref: "#/components/schemas/ItemDescription" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        owner: { $ref: "#/components/schemas/ProfileReference" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        properties: { $ref: "#/components/schemas/Properties" }
-
-    ItemWithParents:
-      description: |
-        Represents an item with the parent cluster information included. Used by
-        schemas that only want a single item along with its cluster information.
-      type: object
-      allOf:
-        - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/ItemCommonProps"
-        - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [clusters]
-          properties:
-            clusters: { $ref: "#/components/schemas/ClusterList" }
-
-    ItemList:
-      description: |
-        A list of items where each item includes all the information about its
-        parent cluster too. For use with APIs that want to provide a list of
-        items that may be part of different clusters.
-      type: array
-      items: { $ref: "#/components/schemas/ItemWithParents" }
-
-    ItemListResult:
-      allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
-        - type: object
-          required: [items]
-          properties:
-            items: { $ref: "#/components/schemas/ItemList" }
-
-    ItemInitialProps:
-      type: object
-      required: [name, slug, description]
-      properties:
-        name: { $ref: "#/components/schemas/ItemName" }
-        slug: { $ref: "#/components/schemas/ItemSlug" }
-        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
-        url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/ItemDescription" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        properties: { $ref: "#/components/schemas/Properties" }
-
-    ItemMutableProps:
-      description: |
-        Note: Properties are replace-all and are not merged with existing.
-      type: object
-      properties:
-        name: { $ref: "#/components/schemas/ItemName" }
-        slug: { $ref: "#/components/schemas/ItemSlug" }
-        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
-        url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/ItemDescription" }
-        content: { $ref: "#/components/schemas/PostContent" }
+        parent: { $ref: "#/components/schemas/NodeSlug" }
         properties: { $ref: "#/components/schemas/Properties" }
 
     #
@@ -3412,12 +3077,11 @@ components:
       allOf:
         - $ref: "#/components/schemas/Link"
         - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [threads, posts, clusters, items, collections]
+        - required: [threads, posts, nodes, collections]
           properties:
             threads: { $ref: "#/components/schemas/ThreadList" }
             posts: { $ref: "#/components/schemas/PostList" }
-            clusters: { $ref: "#/components/schemas/ClusterList" }
-            items: { $ref: "#/components/schemas/ItemList" }
+            nodes: { $ref: "#/components/schemas/NodeList" }
             collections: { $ref: "#/components/schemas/CollectionList" }
 
     LinkList:
@@ -3461,17 +3125,17 @@ components:
         - type: object
           required: [items]
           properties:
-            items: { $ref: "#/components/schemas/DatagraphItemList" }
+            items: { $ref: "#/components/schemas/DatagraphNodeList" }
 
-    DatagraphItemList:
+    DatagraphNodeList:
       type: array
-      items: { $ref: "#/components/schemas/DatagraphItem" }
+      items: { $ref: "#/components/schemas/DatagraphNode" }
 
-    DatagraphItem:
+    DatagraphNode:
       type: object
       required: [kind, id, name, slug]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        kind: { $ref: "#/components/schemas/DatagraphNodeKind" }
         id: { $ref: "#/components/schemas/Identifier" }
         name:
           type: string
@@ -3480,14 +3144,14 @@ components:
         description:
           type: string
 
-    DatagraphItemKind:
+    DatagraphNodeKind:
       type: string
-      enum: [thread, reply, cluster, item, link]
+      enum: [thread, reply, node, link]
 
     DatagraphRecommendations:
       required: [recomentations]
       properties:
-        recomentations: { $ref: "#/components/schemas/DatagraphItemList" }
+        recomentations: { $ref: "#/components/schemas/DatagraphNodeList" }
 
   securitySchemes:
     browser:

@@ -1,6 +1,6 @@
 "use client";
 
-import { ClusterCardRows } from "src/components/directory/datagraph/ClusterCardList";
+import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { Unready } from "src/components/site/Unready";
 import { Heading1 } from "src/theme/components/Heading/Index";
 
@@ -20,10 +20,10 @@ export function DraftListScreen(props: Props) {
     <VStack w="full" alignItems="start">
       <Heading1>Your drafts</Heading1>
 
-      <ClusterCardRows
+      <NodeCardRows
         directoryPath={directoryPath}
         context="generic"
-        clusters={data.clusters.data.clusters}
+        nodes={data.nodes.data.nodes}
       />
     </VStack>
   );

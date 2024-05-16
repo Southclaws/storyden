@@ -20,11 +20,11 @@ export type DirectoryPath = string[];
 /**
  * Paths within the /directory are quite flexible. This is mostly to simplify
  * the backend so we don't need to walk up the entire tree to find all the
- * parents of a given cluster or item.
+ * parents of a given node or item.
  *
  * What this means is that there's actually zero validation against the path. If
  * you visit `/directory/does/not/exist/actually-does-exist` then as long as the
- * `actually-does-exist` is a valid cluster or item slug, it will render fine.
+ * `actually-does-exist` is a valid node or item slug, it will render fine.
  *
  * But, we basically generate a tree-like path to give the impression that there
  * is a hierarchy. This function is the main helper for that. Basically, when
@@ -35,10 +35,10 @@ export type DirectoryPath = string[];
  * The new path will simply be the slug appended to the end unless the slug is
  * already in the current path. If it is, it slices the path at that point.
  *
- * For example, say you're at: `/directory/cluster-1/cluster-2/item-1` and the
- * page lists `cluster-2` as a parent of `item-1`, this function will be given:
- * `["cluster-1", "cluster-2", "item-1"]` and return `cluster-1/cluster-2` since
- * `cluster-2` is passed in as `end` and is already in the path.
+ * For example, say you're at: `/directory/node-1/node-2/item-1` and the
+ * page lists `node-2` as a parent of `item-1`, this function will be given:
+ * `["node-1", "node-2", "item-1"]` and return `node-1/node-2` since
+ * `node-2` is passed in as `end` and is already in the path.
  *
  * @param onto the DirectoryPath, basically a list of slugs from `[...slug]`.
  * @param end the slug of the target datagraph node.

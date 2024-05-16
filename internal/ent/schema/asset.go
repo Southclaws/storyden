@@ -38,10 +38,7 @@ func (Asset) Edges() []ent.Edge {
 		edge.From("posts", Post.Type).
 			Ref("assets"),
 
-		edge.From("clusters", Cluster.Type).
-			Ref("assets"),
-
-		edge.From("items", Item.Type).
+		edge.From("nodes", Node.Type).
 			Ref("assets"),
 
 		edge.From("links", Link.Type).

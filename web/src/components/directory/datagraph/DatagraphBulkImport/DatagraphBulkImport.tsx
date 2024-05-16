@@ -2,7 +2,7 @@ import { Button } from "src/theme/components/Button";
 import { Card, CardRows } from "src/theme/components/Card";
 import { Input } from "src/theme/components/Input";
 
-import { ClusterCard } from "../ClusterCard";
+import { NodeCard } from "../NodeCard";
 
 import { css } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
@@ -108,11 +108,11 @@ export function DatagraphBulkImport(props: Props) {
 
             case "created":
               return (
-                <ClusterCard
+                <NodeCard
                   key={task.node.id}
                   directoryPath={directoryPath}
                   context="directory"
-                  cluster={task.node}
+                  node={task.node}
                   shape="row"
                 />
               );

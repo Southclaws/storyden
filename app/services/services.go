@@ -10,16 +10,14 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
-	"github.com/Southclaws/storyden/app/services/cluster"
-	"github.com/Southclaws/storyden/app/services/cluster/cluster_visibility"
-	"github.com/Southclaws/storyden/app/services/clustertree"
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
-	"github.com/Southclaws/storyden/app/services/item_crud"
-	"github.com/Southclaws/storyden/app/services/item_tree"
 	"github.com/Southclaws/storyden/app/services/link_getter"
+	node "github.com/Southclaws/storyden/app/services/node"
+	node_visibility "github.com/Southclaws/storyden/app/services/node/node_visibility"
+	nodetree "github.com/Southclaws/storyden/app/services/nodetree"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -51,8 +49,7 @@ func Build() fx.Option {
 		fetcher.Build(),
 		weaviate.Build(),
 		fx.Provide(avatar_gen.New),
-		fx.Provide(cluster.New, clustertree.New, cluster_visibility.New),
-		fx.Provide(item_crud.New, item_tree.New),
+		fx.Provide(node.New, nodetree.New, node_visibility.New),
 		fx.Provide(link_getter.New),
 	)
 }

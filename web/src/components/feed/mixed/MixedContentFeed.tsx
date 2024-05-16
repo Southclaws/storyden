@@ -1,8 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { NewBadge } from "src/components/directory/DirectoryBadge";
-import { ClusterCardGrid } from "src/components/directory/datagraph/ClusterCardList";
-import { ItemCardGrid } from "src/components/directory/datagraph/ItemCardList";
+import { NodeCardGrid } from "src/components/directory/datagraph/NodeCardList";
 import { LinkCardRows } from "src/components/directory/links/LinkCardList";
 import { Heading2 } from "src/theme/components/Heading/Index";
 import { Link } from "src/theme/components/Link";
@@ -35,21 +34,17 @@ export function MixedContentFeed({ data }: Props) {
 function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
   const recent = false; // TODO: derive from created/updated dates of the chunks
 
-  const dontShowDirectoryHeaderTwice = Boolean(
-    !(data.clusters.length && data.items.length && !data.threads.length),
-  );
-
   return (
     <LStack>
-      {data.clusters.length > 0 && (
+      {data.nodes.length > 0 && (
         <>
           <SectionHeader recent={recent} href="/directory">
             Directory
           </SectionHeader>
-          <ClusterCardGrid
+          <NodeCardGrid
             directoryPath={[]}
             context="generic"
-            clusters={data.clusters}
+            nodes={data.nodes}
           />
         </>
       )}
@@ -69,17 +64,6 @@ function MixedContentFeedSection({ data }: { data: MixedContentChunk }) {
           {/* TODO: Update this to be a card row list */}
           {/* TODO: Also add the category to the thread IF it's being shown in a context where there are many threads from many categories */}
           <TextPostList posts={data.threads} />
-        </>
-      )}
-
-      {data.items.length > 0 && (
-        <>
-          {dontShowDirectoryHeaderTwice && (
-            <SectionHeader recent={recent} href="/directory">
-              Directory
-            </SectionHeader>
-          )}
-          <ItemCardGrid directoryPath={[]} items={data.items} />
         </>
       )}
 

@@ -14,9 +14,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/cluster"
-	"github.com/Southclaws/storyden/internal/ent/item"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
@@ -110,34 +109,19 @@ func (ac *AssetCreate) AddPosts(p ...*Post) *AssetCreate {
 	return ac.AddPostIDs(ids...)
 }
 
-// AddClusterIDs adds the "clusters" edge to the Cluster entity by IDs.
-func (ac *AssetCreate) AddClusterIDs(ids ...xid.ID) *AssetCreate {
-	ac.mutation.AddClusterIDs(ids...)
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (ac *AssetCreate) AddNodeIDs(ids ...xid.ID) *AssetCreate {
+	ac.mutation.AddNodeIDs(ids...)
 	return ac
 }
 
-// AddClusters adds the "clusters" edges to the Cluster entity.
-func (ac *AssetCreate) AddClusters(c ...*Cluster) *AssetCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddNodes adds the "nodes" edges to the Node entity.
+func (ac *AssetCreate) AddNodes(n ...*Node) *AssetCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
 	}
-	return ac.AddClusterIDs(ids...)
-}
-
-// AddItemIDs adds the "items" edge to the Item entity by IDs.
-func (ac *AssetCreate) AddItemIDs(ids ...xid.ID) *AssetCreate {
-	ac.mutation.AddItemIDs(ids...)
-	return ac
-}
-
-// AddItems adds the "items" edges to the Item entity.
-func (ac *AssetCreate) AddItems(i ...*Item) *AssetCreate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
-	}
-	return ac.AddItemIDs(ids...)
+	return ac.AddNodeIDs(ids...)
 }
 
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
@@ -312,31 +296,15 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.ClustersIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   asset.ClustersTable,
-			Columns: asset.ClustersPrimaryKey,
+			Table:   asset.NodesTable,
+			Columns: asset.NodesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cluster.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.ItemsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   asset.ItemsTable,
-			Columns: asset.ItemsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

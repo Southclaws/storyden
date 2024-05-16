@@ -41,10 +41,8 @@ const (
 	EdgeTags = "tags"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
-	// EdgeClusters holds the string denoting the clusters edge name in mutations.
-	EdgeClusters = "clusters"
-	// EdgeItems holds the string denoting the items edge name in mutations.
-	EdgeItems = "items"
+	// EdgeNodes holds the string denoting the nodes edge name in mutations.
+	EdgeNodes = "nodes"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the account in the database.
@@ -87,20 +85,13 @@ const (
 	CollectionsInverseTable = "collections"
 	// CollectionsColumn is the table column denoting the collections relation/edge.
 	CollectionsColumn = "account_collections"
-	// ClustersTable is the table that holds the clusters relation/edge.
-	ClustersTable = "clusters"
-	// ClustersInverseTable is the table name for the Cluster entity.
-	// It exists in this package in order to avoid circular dependency with the "cluster" package.
-	ClustersInverseTable = "clusters"
-	// ClustersColumn is the table column denoting the clusters relation/edge.
-	ClustersColumn = "account_id"
-	// ItemsTable is the table that holds the items relation/edge.
-	ItemsTable = "items"
-	// ItemsInverseTable is the table name for the Item entity.
-	// It exists in this package in order to avoid circular dependency with the "item" package.
-	ItemsInverseTable = "items"
-	// ItemsColumn is the table column denoting the items relation/edge.
-	ItemsColumn = "account_id"
+	// NodesTable is the table that holds the nodes relation/edge.
+	NodesTable = "nodes"
+	// NodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodesInverseTable = "nodes"
+	// NodesColumn is the table column denoting the nodes relation/edge.
+	NodesColumn = "account_id"
 	// AssetsTable is the table that holds the assets relation/edge.
 	AssetsTable = "assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -287,31 +278,17 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByClustersCount orders the results by clusters count.
-func ByClustersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByNodesCount orders the results by nodes count.
+func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClustersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
 	}
 }
 
-// ByClusters orders the results by clusters terms.
-func ByClusters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByNodes orders the results by nodes terms.
+func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClustersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByItemsCount orders the results by items count.
-func ByItemsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newItemsStep(), opts...)
-	}
-}
-
-// ByItems orders the results by items terms.
-func ByItems(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newItemsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -370,18 +347,11 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
 	)
 }
-func newClustersStep() *sqlgraph.Step {
+func newNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClustersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ClustersTable, ClustersColumn),
-	)
-}
-func newItemsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ItemsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ItemsTable, ItemsColumn),
+		sqlgraph.To(NodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {
