@@ -16,12 +16,11 @@ type weaviateSemdexer struct {
 	cn weaviate_client.WeaviateClassName
 }
 
-func newWeaviateSemdexer(lc fx.Lifecycle, wc *weaviate.Client, cn weaviate_client.WeaviateClassName) semdex.Semdexer {
+func newWeaviateSemdexer(wc *weaviate.Client, cn weaviate_client.WeaviateClassName) semdex.Semdexer {
 	return &weaviateSemdexer{wc, cn}
 }
 
 func newSemdexer(
-	lc fx.Lifecycle,
 	l *zap.Logger,
 	wc *weaviate.Client,
 	cn weaviate_client.WeaviateClassName,
@@ -29,10 +28,10 @@ func newSemdexer(
 	ss *simplesearch.ParallelSearcher,
 ) semdex.Semdexer {
 	if wc == nil {
-		return &semdex.OnlySearcher{ss}
+		return &semdex.OnlySearcher{Searcher: ss}
 	}
 
-	return &withHydration{l, newWeaviateSemdexer(lc, wc, cn), rh}
+	return &withHydration{l, newWeaviateSemdexer(wc, cn), rh}
 }
 
 func Build() fx.Option {

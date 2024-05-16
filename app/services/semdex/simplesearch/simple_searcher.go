@@ -38,7 +38,7 @@ func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.
 		eg.Go(func() error {
 			r, err := v.Search(ctx, query)
 			if err != nil {
-				return err
+				return err // nolint:wrapcheck
 			}
 
 			mx.Lock()
