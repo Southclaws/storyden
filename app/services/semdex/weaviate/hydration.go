@@ -19,7 +19,7 @@ type withHydration struct {
 }
 
 func (h *withHydration) Index(ctx context.Context, object datagraph.Indexable) error {
-	return h.wc.Index(ctx, object)
+	return h.wc.Index(ctx, object) // nolint:wrapcheck
 }
 
 func (h *withHydration) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
