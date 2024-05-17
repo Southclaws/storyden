@@ -78,11 +78,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           </styled.p>
 
           <styled.p>
-            <Link
-              size="xs"
-              color="blue.400"
-              href="https://www.storyden.org/docs"
-            >
+            <Link size="xs" color="blue.5" href="https://www.storyden.org/docs">
               Visit the docs
             </Link>{" "}
             for more info if you get stuck.

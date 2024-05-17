@@ -29,8 +29,8 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
       w="full"
       maxW="prose"
       borderRadius="2xl"
-      bgColor={complete ? "green.200" : "gray.100"}
-      color={{ _osDark: "gray.800", _osLight: "gray.800" }}
+      bgColor={complete ? "green.3" : "gray.2"}
+      color="gray.8"
     >
       <HStack w="full" gap="2">
         <Box>
@@ -58,16 +58,16 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
               (props.url ? (
                 <Link
                   href={props.url}
-                  bgColor={{ _osDark: "green.300", _osLight: "green.200" }}
-                  color={{ _osDark: "gray.800", _osLight: "gray.800" }}
+                  bgColor="green.3"
+                  color="gray.8"
                   size="xs"
                 >
                   Complete
                 </Link>
               ) : (
                 <Button
-                  bgColor={{ _osDark: "green.300", _osLight: "green.200" }}
-                  color={{ _osDark: "gray.800", _osLight: "gray.800" }}
+                  bgColor="green.3"
+                  color="gray.8"
                   size="xs"
                   onClick={props.onClick}
                 >

@@ -11147,6 +11147,10 @@ const tokens = {
     "value": "var(--colors-tomato-3)",
     "variable": "var(--colors-bg-destructive)"
   },
+  "colors.bg.error": {
+    "value": "var(--colors-tomato-2)",
+    "variable": "var(--colors-bg-error)"
+  },
   "colors.fg.default": {
     "value": "var(--colors-gray-12)",
     "variable": "var(--colors-fg-default)"

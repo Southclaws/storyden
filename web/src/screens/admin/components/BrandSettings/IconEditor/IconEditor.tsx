@@ -78,7 +78,7 @@ export function IconEditor(props: Props) {
           display="none"
           width="min"
           type="file"
-          bgColor="gray.100"
+          bgColor="gray.2"
           borderRadius="md"
           border="none"
           onChange={onFileChange}
