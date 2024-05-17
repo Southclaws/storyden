@@ -39,7 +39,7 @@ export function PostView(props: Props) {
           />
           <HStack>
             <Button onClick={onPublishEdit}>Update</Button>
-            <Button kind="ghost" onClick={onCancelEdit}>
+            <Button variant="ghost" onClick={onCancelEdit}>
               Cancel
             </Button>
           </HStack>

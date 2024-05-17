@@ -65,7 +65,7 @@ export function PaginationControls({
       {needStartJump && (
         <>
           <Link
-            kind="ghost"
+            variant="ghost"
             size="xs"
             href={`${path}?${new URLSearchParams({
               ...params,
@@ -88,7 +88,7 @@ export function PaginationControls({
 
         return (
           <Link
-            kind="ghost"
+            variant="ghost"
             backgroundColor={v === currentPage ? "bg.muted" : undefined}
             size="xs"
             key={v}
@@ -104,7 +104,7 @@ export function PaginationControls({
         <>
           <Sep />
           <Link
-            kind="ghost"
+            variant="ghost"
             size="xs"
             href={`${path}?${new URLSearchParams({
               ...params,

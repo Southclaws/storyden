@@ -1,13 +1,13 @@
 import { Link } from "src/api/openapi/schemas";
 import { CardGrid, CardRows } from "src/theme/components/Card";
 
-import { CardVariantProps } from "@/styled-system/recipes";
+import { RichCardVariantProps } from "@/styled-system/recipes";
 
 import { LinkCard } from "./LinkCard";
 
 type Props = {
   links: Link[];
-  size?: CardVariantProps["size"];
+  size?: RichCardVariantProps["size"];
 };
 
 export function LinkCardRows({ links, size }: Props) {

@@ -7,7 +7,7 @@ export function EmptyState() {
   return (
     <VStack height="full" justify="center" pb="32">
       <ThreadStaircase width="100%" />
-      <styled.p textAlign="center" fontStyle="italic" color="gray.500">
+      <styled.p textAlign="center" fontStyle="italic" color="gray.5">
         *tumbleweed*&nbsp;there&nbsp;are&nbsp;no&nbsp;posts...
         you&nbsp;could&nbsp;be&nbsp;the&nbsp;first!
       </styled.p>

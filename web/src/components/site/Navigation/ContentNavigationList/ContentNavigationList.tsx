@@ -41,13 +41,13 @@ export function ContentNavigationList() {
         {isAdmin && <CategoryCreateTrigger />}
       </LStack>
 
-      <LStack>
-        <Link w="full" size="xs" href="/directory">
+      <LStack gap="1">
+        <Link w="full" size="xs" variant="ghost" href="/directory">
           <BookOpenIcon />
           Knowledgebase
         </Link>
 
-        <Link w="full" size="xs" href="/p">
+        <Link w="full" size="xs" variant="ghost" href="/p">
           <UsersIcon />
           Member directory
         </Link>

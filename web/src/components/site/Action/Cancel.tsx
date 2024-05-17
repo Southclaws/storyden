@@ -8,7 +8,7 @@ export function CancelAction({
   ...props
 }: PropsWithChildren<ButtonProps>) {
   return (
-    <Button kind="ghost" size="xs" {...props}>
+    <Button variant="ghost" size="xs" {...props}>
       <XCircleIcon width="1.4em" /> {children}
     </Button>
   );

@@ -63,7 +63,7 @@ export function ContentComposer(props: ContentComposerProps) {
               <Button
                 type="button"
                 size="xs"
-                kind="ghost"
+                variant="ghost"
                 title="Change the kind of text"
               >
                 {match(format.text.active)
@@ -126,7 +126,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.bold.isActive ? "primary" : "ghost"}
+            variant={format.bold.isActive ? "subtle" : "ghost"}
             title="Toggle bold text"
             onClick={format.bold.toggle}
           >
@@ -135,7 +135,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.italic.isActive ? "primary" : "ghost"}
+            variant={format.italic.isActive ? "subtle" : "ghost"}
             title="Toggle italic text"
             onClick={format.italic.toggle}
           >
@@ -144,7 +144,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.strike.isActive ? "primary" : "ghost"}
+            variant={format.strike.isActive ? "subtle" : "ghost"}
             title="Toggle strikeout text"
             onClick={format.strike.toggle}
           >
@@ -153,7 +153,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.code.isActive ? "primary" : "ghost"}
+            variant={format.code.isActive ? "subtle" : "ghost"}
             title="Toggle inline code snippet"
             onClick={format.code.toggle}
           >
@@ -163,7 +163,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.blockquote.isActive ? "primary" : "ghost"}
+            variant={format.blockquote.isActive ? "subtle" : "ghost"}
             title="Toggle quote"
             onClick={format.blockquote.toggle}
           >
@@ -173,7 +173,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.pre.isActive ? "primary" : "ghost"}
+            variant={format.pre.isActive ? "subtle" : "ghost"}
             title="Toggle code block"
             onClick={format.pre.toggle}
           >
@@ -183,7 +183,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.bulletList.isActive ? "primary" : "ghost"}
+            variant={format.bulletList.isActive ? "subtle" : "ghost"}
             title="Toggle bullet points"
             onClick={format.bulletList.toggle}
           >
@@ -193,7 +193,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <Button
             type="button"
             size="xs"
-            kind={format.orderedList.isActive ? "primary" : "ghost"}
+            variant={format.orderedList.isActive ? "subtle" : "ghost"}
             title="Toggle numbered list"
             onClick={format.orderedList.toggle}
           >
@@ -203,7 +203,7 @@ export function ContentComposer(props: ContentComposerProps) {
           <label
             className={button({
               size: "xs",
-              kind: "ghost",
+              variant: "ghost",
             })}
             htmlFor="filepicker"
             title="Insert an image"

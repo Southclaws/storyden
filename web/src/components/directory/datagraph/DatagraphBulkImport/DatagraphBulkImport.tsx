@@ -96,7 +96,6 @@ export function DatagraphBulkImport(props: Props) {
                   <HStack>
                     <Button
                       size="xs"
-                      kind="primary"
                       onClick={() => handlers.handleCreateNodeFromLink(link)}
                     >
                       {props.node ? `Create in ${props.node?.name}` : "Create"}
@@ -162,35 +161,35 @@ function StateBadge({ state }: { state: State }) {
   switch (state) {
     case "idle":
       return (
-        <styled.div className={badge} bgColor="gray.100">
+        <styled.div className={badge} bgColor="gray.5">
           Idle
         </styled.div>
       );
 
     case "loading":
       return (
-        <styled.div className={badge} bgColor="blue.400">
+        <styled.div className={badge} bgColor="blue.4">
           Loading
         </styled.div>
       );
 
     case "success":
       return (
-        <styled.div className={badge} bgColor="green.500">
+        <styled.div className={badge} bgColor="green.5">
           Success
         </styled.div>
       );
 
     case "created":
       return (
-        <styled.div className={badge} bgColor="green.500">
+        <styled.div className={badge} bgColor="green.5">
           Created
         </styled.div>
       );
 
     case "error":
       return (
-        <styled.div className={badge} bgColor="red.500">
+        <styled.div className={badge} bgColor="red.5">
           Error
         </styled.div>
       );

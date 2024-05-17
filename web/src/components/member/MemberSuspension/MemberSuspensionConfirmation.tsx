@@ -24,7 +24,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
         {props.deletedAt ? (
           <Button
             w="full"
-            kind="destructive"
+            colorPalette="red"
             onClick={handlers.handleReinstate}
           >
             Reinstate
@@ -32,7 +32,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
         ) : (
           <Button
             w="full"
-            kind="destructive"
+            colorPalette="red"
             onClick={handlers.handleSuspension}
           >
             Suspend

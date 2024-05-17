@@ -16,14 +16,14 @@ export function MemberOptionsTrigger(props: Props) {
     <Box id="member-options-trigger">
       <Box display={{ base: "none", md: "block" }}>
         <MemberOptionsMenu {...props}>
-          <Button size="xs" kind="ghost">
+          <Button size="xs" variant="ghost">
             <EllipsisHorizontalIcon />
           </Button>
         </MemberOptionsMenu>
       </Box>
 
       <Box display={{ base: "block", md: "none" }}>
-        <Button size="xs" kind="ghost" onClick={onToggle}>
+        <Button size="xs" variant="ghost" onClick={onToggle}>
           <EllipsisHorizontalIcon />
         </Button>
 

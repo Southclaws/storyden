@@ -4,7 +4,7 @@ import { Button, ButtonProps } from "src/theme/components/Button";
 
 export function DashboardAction(props: ButtonProps) {
   return (
-    <Button title="Main navigation menu" kind="ghost" size="sm" {...props}>
+    <Button title="Main navigation menu" variant="ghost" size="sm" {...props}>
       <Bars3Icon />
     </Button>
   );

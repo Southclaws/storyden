@@ -33,7 +33,7 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
     >
       <HStack className={styles["topbar-left"]}>
         {/* TODO: Action? */}
-        <Button size="sm" variant="ghost" onClick={handleToggle}>
+        <Button size="md" p="0" variant="ghost" onClick={handleToggle}>
           <Sidebar open={sidebarState} />
         </Button>
         <Search />

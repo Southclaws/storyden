@@ -71,7 +71,7 @@ export function CollectionMenu(props: Props) {
 
               <MenuItemGroup id="create">
                 <MenuItem id="create-collection" closeOnSelect={false}>
-                  <CollectionCreateTrigger kind="blank" />
+                  <CollectionCreateTrigger variant="ghost" />
                 </MenuItem>
               </MenuItemGroup>
             </MenuContent>

@@ -19,7 +19,7 @@ export function CategoryCreateTrigger(
           w="full"
           justifyContent="start"
           size="xs"
-          kind="neutral"
+          variant="ghost"
           onClick={onOpen}
           {...props}
         >

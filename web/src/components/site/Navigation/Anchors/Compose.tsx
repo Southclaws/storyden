@@ -5,7 +5,7 @@ import { Link } from "src/theme/components/Link";
 
 export function ComposeAction(props: PropsWithChildren) {
   return (
-    <Link href="/new" kind="ghost" size="sm">
+    <Link href="/new" variant="ghost" size="sm">
       <PlusCircleIcon /> {props.children}
     </Link>
   );

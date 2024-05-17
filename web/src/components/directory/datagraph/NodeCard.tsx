@@ -9,7 +9,7 @@ import { Card } from "src/theme/components/Card";
 import { DirectoryBadge } from "../DirectoryBadge";
 
 import { HStack } from "@/styled-system/jsx";
-import { CardVariantProps } from "@/styled-system/recipes";
+import { RichCardVariantProps } from "@/styled-system/recipes";
 
 export type NodeCardContext = "directory" | "generic";
 
@@ -17,7 +17,7 @@ export type Props = {
   node: Node;
   directoryPath: DirectoryPath;
   context: NodeCardContext;
-} & CardVariantProps;
+} & RichCardVariantProps;
 
 export function NodeCard({ node, directoryPath, context, ...rest }: Props) {
   const slug = joinDirectoryPath(directoryPath, node.slug);
