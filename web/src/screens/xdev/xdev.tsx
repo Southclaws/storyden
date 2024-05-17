@@ -65,51 +65,47 @@ export function Palette({ accent_colour, theme }: any) {
 
       <HStack>
         <VStack>
-          <Button kind="neutral" size="xs">
+          <Button variant="ghost" size="xs">
             xs
           </Button>
-          <Button kind="neutral" size="sm">
+          <Button variant="ghost" size="sm">
             sm
           </Button>
-          <Button kind="neutral" size="md">
+          <Button variant="ghost" size="md">
             md
           </Button>
-          <Button kind="neutral" size="lg">
+          <Button variant="ghost" size="lg">
             lg
           </Button>
-          <Button kind="neutral" size="xl">
+          <Button variant="ghost" size="xl">
             xl
           </Button>
-          <Button kind="neutral" size="2xl">
+          <Button variant="ghost" size="2xl">
             2xl
           </Button>
         </VStack>
 
         <VStack>
-          <Button kind="neutral">Neutral</Button>
-          <Button kind="primary">Primary</Button>
-          <Button kind="destructive">Destructive</Button>
+          <Button variant="ghost">Neutral</Button>
+          <Button>Primary</Button>
+          <Button colorPalette="red">Destructive</Button>
         </VStack>
 
         <VStack>
-          <Button kind="neutral" disabled>
+          <Button variant="ghost" disabled>
             Neutral
           </Button>
-          <Button kind="primary" disabled>
-            Primary
-          </Button>
-          <Button kind="destructive" disabled>
+          <Button disabled>Primary</Button>
+          <Button colorPalette="red" disabled>
             Destructive
           </Button>
         </VStack>
 
         <VStack>
-          <Link href="/xdev" kind="neutral">
+          <Link href="/xdev" variant="ghost">
             Neutral internal
           </Link>
-          <Link href="#" kind="primary">
-            Primary
-          </Link>
+          <Link href="#">Primary</Link>
         </VStack>
       </HStack>
 
