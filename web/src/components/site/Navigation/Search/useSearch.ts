@@ -33,6 +33,7 @@ export function useSearch(props: Props) {
 
   const handleReset = async () => {
     form.reset();
+    // TODO: Only push to search if already on /search
     router.push("/search");
   };
 

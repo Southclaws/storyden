@@ -25,11 +25,17 @@ export function Search(props: Props) {
         defaultValue={props.query}
         background="bg.default"
         placeholder={`Search...`}
+        _focus={{
+          // NOTE: This disables the default focus behaviour styles for inputs.
+          boxShadow: "none" as any, // TODO: Fix types at Park-UI or Panda level
+          borderColor: "border.default",
+        }}
         {...form.register("q")}
       />
 
       {(props.query || data.q) && (
         <Button
+          variant="ghost"
           borderX="none"
           borderRadius="none"
           type="reset"
@@ -39,9 +45,11 @@ export function Search(props: Props) {
         </Button>
       )}
       <Button
+        variant="outline"
         flexShrink="0"
         borderLeft="none"
         borderLeftRadius="none"
+        borderColor="border.default"
         type="submit"
         width="min"
       >
