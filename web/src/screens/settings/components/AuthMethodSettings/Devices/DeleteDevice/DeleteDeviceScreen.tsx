@@ -25,10 +25,10 @@ export function RoleCreateScreen(props: WithDisclosure<Props>) {
         pb="3"
         gap="4"
       >
-        <Button w="full" size="sm" kind="neutral" onClick={props.onClose}>
+        <Button w="full" size="sm" variant="ghost" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button w="full" size="sm" kind="destructive" onClick={handleConfirm}>
+        <Button w="full" size="sm" colorPalette="red" onClick={handleConfirm}>
           Delete
         </Button>
       </HStack>

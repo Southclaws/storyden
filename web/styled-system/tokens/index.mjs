@@ -7347,6 +7347,74 @@ const tokens = {
     "value": "8px",
     "variable": "var(--blurs-frosted)"
   },
+  "opacity.0": {
+    "value": "0",
+    "variable": "var(--opacity-0)"
+  },
+  "opacity.1": {
+    "value": "0.1",
+    "variable": "var(--opacity-1)"
+  },
+  "opacity.2": {
+    "value": "0.2",
+    "variable": "var(--opacity-2)"
+  },
+  "opacity.3": {
+    "value": "0.3",
+    "variable": "var(--opacity-3)"
+  },
+  "opacity.4": {
+    "value": "0.4",
+    "variable": "var(--opacity-4)"
+  },
+  "opacity.5": {
+    "value": "0.5",
+    "variable": "var(--opacity-5)"
+  },
+  "opacity.6": {
+    "value": "0.6",
+    "variable": "var(--opacity-6)"
+  },
+  "opacity.7": {
+    "value": "0.7",
+    "variable": "var(--opacity-7)"
+  },
+  "opacity.8": {
+    "value": "0.8",
+    "variable": "var(--opacity-8)"
+  },
+  "opacity.9": {
+    "value": "0.9",
+    "variable": "var(--opacity-9)"
+  },
+  "opacity.full": {
+    "value": "1",
+    "variable": "var(--opacity-full)"
+  },
+  "borderWidths.none": {
+    "value": "0",
+    "variable": "var(--border-widths-none)"
+  },
+  "borderWidths.hairline": {
+    "value": "0.5px",
+    "variable": "var(--border-widths-hairline)"
+  },
+  "borderWidths.thin": {
+    "value": "1px",
+    "variable": "var(--border-widths-thin)"
+  },
+  "borderWidths.medium": {
+    "value": "3px",
+    "variable": "var(--border-widths-medium)"
+  },
+  "borderWidths.thick": {
+    "value": "3px",
+    "variable": "var(--border-widths-thick)"
+  },
+  "sizes.prose": {
+    "value": "65ch",
+    "variable": "var(--sizes-prose)"
+  },
   "colors.amber.1": {
     "value": "var(--colors-amber-1)",
     "variable": "var(--colors-amber-1)"
