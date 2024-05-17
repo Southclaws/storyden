@@ -22,7 +22,6 @@ import {
 
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
-import { AssetsInput } from "./AssetsInput";
 import { ContentInput } from "./ContentInput";
 import { TitleInput } from "./TitleInput";
 import { Props, useDatagraphNodeScreen } from "./useDatagraphNodeScreen";
@@ -36,7 +35,6 @@ export function DatagraphNodeScreen(props: Props) {
       handleVisibilityChange,
       handleDelete,
       handleAssetUpload,
-      handleAssetRemove,
     },
     directoryPath,
     editing,
@@ -105,13 +103,6 @@ export function DatagraphNodeScreen(props: Props) {
         </HStack>
 
         <VStack w="full" alignItems="start" gap="2">
-          <AssetsInput
-            editing={editing}
-            initialAssets={node.assets}
-            handleAssetUpload={handleAssetUpload}
-            handleAssetRemove={handleAssetRemove}
-          />
-
           <VStack alignItems="start" w="full" minW="0">
             <HStack w="full" justify="space-between" alignItems="end">
               {editing ? (
