@@ -40,7 +40,8 @@ export function ComposeForm(props: Props) {
             alignItems="end"
           >
             <Button
-              kind="neutral"
+              variant="ghost"
+              size="xs"
               disabled={!formContext.formState.isValid}
               onClick={onSave}
             >
@@ -48,7 +49,8 @@ export function ComposeForm(props: Props) {
             </Button>
 
             <Button
-              kind="primary"
+              variant="subtle"
+              size="xs"
               type="submit"
               disabled={!formContext.formState.isValid}
               // isLoading={formContext.formState.isSubmitting}
