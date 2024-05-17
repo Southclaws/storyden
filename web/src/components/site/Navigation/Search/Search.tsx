@@ -1,9 +1,8 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { styled } from "@/styled-system/jsx";
 
 import { Props, useSearch } from "./useSearch";

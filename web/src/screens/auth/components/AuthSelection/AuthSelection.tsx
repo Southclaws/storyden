@@ -1,9 +1,9 @@
 import { AuthProvider } from "src/api/openapi/schemas";
-import { Link } from "src/theme/components/Link";
+
+import { LinkButton } from "@/components/ui/link-button";
+import { styled } from "@/styled-system/jsx";
 
 import { getProviders } from "../../providers";
-
-import { styled } from "@/styled-system/jsx";
 
 export async function AuthSelection() {
   const { providers } = await getProviders();
@@ -22,14 +22,14 @@ export async function AuthSelection() {
     >
       {providers?.map((v: AuthProvider) => (
         <styled.li w="full" key={v.provider}>
-          <Link
+          <LinkButton
             size="sm"
             variant="ghost"
             w="full"
             href={v.link ?? `/auth/${v.provider}`}
           >
             {v.name}
-          </Link>
+          </LinkButton>
         </styled.li>
       ))}
     </styled.ul>

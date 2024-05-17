@@ -1,7 +1,6 @@
 /* eslint-disable */
 export * from './admonition';
 export * from './heading-input';
-export * from './heading';
 export * from './rich-card';
 export * from './badge';
 export * from './button';
@@ -52,3 +51,4 @@ export * from './toast';
 export * from './toggle-group';
 export * from './tooltip';
 export * from './tree-view';
+export * from './typography-heading';

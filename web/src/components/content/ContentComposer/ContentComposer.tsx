@@ -20,17 +20,10 @@ import {
 } from "lucide-react";
 import { match } from "ts-pattern";
 
-import { Button } from "src/theme/components/Button";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuPositioner,
-  MenuTrigger,
-} from "src/theme/components/Menu";
-
 import "./styles.css";
 
+import { Button } from "@/components/ui/button";
+import * as Menu from "@/components/ui/menu";
 import { css } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
@@ -54,12 +47,11 @@ export function ContentComposer(props: ContentComposerProps) {
     >
       {editor ? (
         <FloatingMenu editor={editor}>
-          <Menu
+          <Menu.Root
             size="sm"
-            userSelect="none"
             onSelect={(d) => format.text.set(d.value as any /* lazy */)}
           >
-            <MenuTrigger asChild>
+            <Menu.Trigger asChild>
               <Button
                 type="button"
                 size="xs"
@@ -78,51 +70,52 @@ export function ContentComposer(props: ContentComposerProps) {
                     <TextIcon />
                   ))}
               </Button>
-            </MenuTrigger>
+            </Menu.Trigger>
 
             <Portal>
               {/* NOTE: Because this is a portal, we need to reference this ID
               in the FloatingMenu unfocus logic so we don't hide the menu when
               this menu is opened as it's a portal and not a child element. */}
-              <MenuPositioner>
-                <MenuContent
+              <Menu.Positioner>
+                <Menu.Content
                   id="text-block-menu"
+                  userSelect="none"
                   backdropBlur="md"
                   backdropFilter="auto"
                 >
-                  <MenuItem id="p">
+                  <Menu.Item id="p">
                     <TextIcon />
                     &nbsp;Paragraph
-                  </MenuItem>
+                  </Menu.Item>
 
-                  <MenuItem id="h1" fontSize="lg" fontWeight="extrabold">
+                  <Menu.Item id="h1" fontSize="lg" fontWeight="extrabold">
                     <Heading1Icon />
                     &nbsp;Heading 1
-                  </MenuItem>
-                  <MenuItem id="h2" fontSize="md" fontWeight="extrabold">
+                  </Menu.Item>
+                  <Menu.Item id="h2" fontSize="md" fontWeight="extrabold">
                     <Heading2Icon />
                     &nbsp;Heading 2
-                  </MenuItem>
-                  <MenuItem id="h3" fontSize="md" fontWeight="bold">
+                  </Menu.Item>
+                  <Menu.Item id="h3" fontSize="md" fontWeight="bold">
                     <Heading3Icon />
                     &nbsp;Heading 3
-                  </MenuItem>
-                  <MenuItem id="h4" fontSize="md" fontWeight="medium">
+                  </Menu.Item>
+                  <Menu.Item id="h4" fontSize="md" fontWeight="medium">
                     <Heading4Icon />
                     &nbsp;Heading 4
-                  </MenuItem>
-                  <MenuItem id="h5" fontSize="sm" fontWeight="normal">
+                  </Menu.Item>
+                  <Menu.Item id="h5" fontSize="sm" fontWeight="normal">
                     <Heading5Icon />
                     &nbsp;Heading 5
-                  </MenuItem>
-                  <MenuItem id="h6" fontSize="sm" fontWeight="light">
+                  </Menu.Item>
+                  <Menu.Item id="h6" fontSize="sm" fontWeight="light">
                     <Heading6Icon />
                     &nbsp;Heading 6
-                  </MenuItem>
-                </MenuContent>
-              </MenuPositioner>
+                  </Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
             </Portal>
-          </Menu>
+          </Menu.Root>
           <Button
             type="button"
             size="xs"

@@ -2,11 +2,11 @@ import { PropsWithChildren, ReactNode } from "react";
 
 import { Empty } from "src/components/site/Empty";
 
-import { Heading3 } from "../Heading/Index";
-
 import { cx } from "@/styled-system/css";
 import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
 import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
+
+import { Heading3 } from "./typography-heading";
 
 export type CardItem = {
   id: string;

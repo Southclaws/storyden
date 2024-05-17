@@ -7,11 +7,10 @@ import { createPreset } from "@park-ui/panda-preset";
 import { range } from "lodash";
 import { map } from "lodash/fp";
 
-import { admonition } from "src/theme/components/Admonition/admonition.recipe";
-import { richCard } from "src/theme/components/Card/recipe";
-import { heading } from "src/theme/components/Heading/heading.recipe";
-import { headingInput } from "src/theme/components/HeadingInput/recipe";
-import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
+import { admonition } from "@/recipes/admonition";
+import { headingInput } from "@/recipes/heading-input";
+import { richCard } from "@/recipes/rich-card";
+import { typographyHeading } from "@/recipes/typography-heading";
 
 // TODO: Dark mode = 40%
 const L = "80%";
@@ -229,8 +228,7 @@ export default defineConfig({
     recipes: {
       admonition: admonition,
       headingInput: headingInput,
-      heading: heading,
-      skeleton: skeleton,
+      typographyHeading: typographyHeading,
       richCard: richCard,
     },
     extend: {

@@ -10,16 +10,11 @@ import { CancelAction } from "src/components/site/Action/Cancel";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
-import { Admonition } from "src/theme/components/Admonition";
-import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
-import { Input } from "src/theme/components/Input";
-import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverPositioner,
-} from "src/theme/components/Popover";
 
+import { Admonition } from "@/components/ui/admonition";
+import { Input } from "@/components/ui/input";
+import * as Popover from "@/components/ui/popover";
+import { Heading1, Heading2 } from "@/components/ui/typography-heading";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { ContentInput } from "./ContentInput";
@@ -72,8 +67,8 @@ export function DatagraphNodeScreen(props: Props) {
             {...form.register("slug")}
           />
           {isAllowedToEdit && (
-            <Popover open={isSaving} lazyMount>
-              <PopoverAnchor>
+            <Popover.Root open={isSaving} lazyMount>
+              <Popover.Anchor>
                 <HStack>
                   {editing ? (
                     <>
@@ -93,12 +88,12 @@ export function DatagraphNodeScreen(props: Props) {
                     onDelete={handleDelete}
                   />
                 </HStack>
-              </PopoverAnchor>
+              </Popover.Anchor>
 
-              <PopoverPositioner>
-                <PopoverContent p="2">Saved!</PopoverContent>
-              </PopoverPositioner>
-            </Popover>
+              <Popover.Positioner>
+                <Popover.Content p="2">Saved!</Popover.Content>
+              </Popover.Positioner>
+            </Popover.Root>
           )}
         </HStack>
 

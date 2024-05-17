@@ -1,6 +1,6 @@
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 
-import { Button, ButtonProps } from "src/theme/components/Button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
 export function MoreAction(props: ButtonProps) {
   return (

@@ -2,7 +2,8 @@ import { Controller, useFormContext } from "react-hook-form";
 
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { ContentComposerProps } from "src/components/content/ContentComposer/useContentComposer";
-import { FormControl } from "src/theme/components/FormControl";
+
+import { FormControl } from "@/components/ui/form/FormControl";
 
 import { Form } from "./useDatagraphNodeScreen";
 

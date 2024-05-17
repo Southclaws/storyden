@@ -1,6 +1,6 @@
-import { Button } from "src/theme/components/Button";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
+import { Button } from "@/components/ui/button";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useMemberSuspension } from "./useMemberSuspension";

@@ -1,7 +1,6 @@
 import AvatarEditor from "react-avatar-editor";
 
-import { Button } from "src/theme/components/Button";
-
+import { Button } from "@/components/ui/button";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 

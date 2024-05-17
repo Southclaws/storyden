@@ -2,9 +2,8 @@
 
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
 
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
 import { Props, useLoginForm } from "./useLoginForm";

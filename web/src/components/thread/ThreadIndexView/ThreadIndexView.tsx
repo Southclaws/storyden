@@ -3,9 +3,9 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { TextPostList } from "src/components/feed/text/TextPostList";
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useThreadIndexView } from "./useThreadIndexView";

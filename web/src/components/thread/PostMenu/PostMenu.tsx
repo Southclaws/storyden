@@ -7,17 +7,8 @@ import { format } from "date-fns/format";
 
 import { PostProps } from "src/api/openapi/schemas";
 import { MoreAction } from "src/components/site/Action/More";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuPositioner,
-  MenuSeparator,
-  MenuTrigger,
-} from "src/theme/components/Menu";
 
+import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { usePostMenu } from "./usePostMenu";
@@ -34,16 +25,16 @@ export function PostMenu(props: PostProps) {
   } = usePostMenu(props);
 
   return (
-    <Menu size="sm" lazyMount>
-      <MenuTrigger asChild>
+    <Menu.Root size="sm" lazyMount>
+      <Menu.Trigger asChild>
         <MoreAction />
-      </MenuTrigger>
+      </Menu.Trigger>
 
       <Portal>
-        <MenuPositioner>
-          <MenuContent minW="36">
-            <MenuItemGroup id="group">
-              <MenuItemGroupLabel
+        <Menu.Positioner>
+          <Menu.Content minW="36">
+            <Menu.ItemGroup id="group">
+              <Menu.ItemGroupLabel
                 htmlFor="user"
                 display="flex"
                 flexDir="column"
@@ -54,45 +45,45 @@ export function PostMenu(props: PostProps) {
                 <styled.time fontWeight="normal">
                   {format(new Date(props.createdAt), "yyyy-mm-dd")}
                 </styled.time>
-              </MenuItemGroupLabel>
+              </Menu.ItemGroupLabel>
 
-              <MenuSeparator />
+              <Menu.Separator />
 
-              <MenuItem id="copy-link" onClick={onCopyLink}>
+              <Menu.Item id="copy-link" onClick={onCopyLink}>
                 <HStack gap="1">
                   <LinkIcon width="1.4em" /> Copy link
                 </HStack>
-              </MenuItem>
+              </Menu.Item>
 
               {shareEnabled && (
-                <MenuItem id="share" onClick={onShare}>
+                <Menu.Item id="share" onClick={onShare}>
                   <HStack gap="1">
                     <ShareIcon width="1.4em" /> Share
                   </HStack>
-                </MenuItem>
+                </Menu.Item>
               )}
 
-              {/* <MenuItem>Reply</MenuItem> */}
+              {/* <Menu.Item>Reply</Menu.Item> */}
 
               {editEnabled && (
-                <MenuItem id="edit" onClick={onEdit}>
+                <Menu.Item id="edit" onClick={onEdit}>
                   <HStack gap="1">
                     <PencilIcon width="1.4em" /> Edit
                   </HStack>
-                </MenuItem>
+                </Menu.Item>
               )}
 
               {deleteEnabled && (
-                <MenuItem id="delete" onClick={onDelete}>
+                <Menu.Item id="delete" onClick={onDelete}>
                   <HStack gap="1">
                     <TrashIcon width="1.4em" /> Delete
                   </HStack>
-                </MenuItem>
+                </Menu.Item>
               )}
-            </MenuItemGroup>
-          </MenuContent>
-        </MenuPositioner>
+            </Menu.ItemGroup>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
-    </Menu>
+    </Menu.Root>
   );
 }

@@ -1,19 +1,18 @@
-import { Link } from "src/theme/components/Link";
-
+import { LinkButton } from "@/components/ui/link-button";
 import { StyleProps } from "@/styled-system/types";
 
 export function LoginAction(props: StyleProps) {
   return (
-    <Link href="/login" variant="ghost" size="sm" {...props}>
+    <LinkButton href="/login" variant="ghost" size="sm" {...props}>
       Login
-    </Link>
+    </LinkButton>
   );
 }
 
 export function RegisterAction(props: StyleProps) {
   return (
-    <Link href="/register" size="sm" {...props}>
+    <LinkButton href="/register" size="sm" {...props}>
       Register
-    </Link>
+    </LinkButton>
   );
 }

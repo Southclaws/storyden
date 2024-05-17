@@ -1,10 +1,10 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { Button } from "src/theme/components/Button";
-import { FormControl } from "src/theme/components/FormControl";
-import { FormFeedback } from "src/theme/components/FormFeedback";
-import { FormLabel } from "src/theme/components/FormLabel";
-import { Input } from "src/theme/components/Input";
 
+import { Button } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormFeedback } from "@/components/ui/form/FormFeedback";
+import { FormLabel } from "@/components/ui/form/FormLabel";
+import { Input } from "@/components/ui/input";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useCategoryEdit } from "./useCategoryEdit";

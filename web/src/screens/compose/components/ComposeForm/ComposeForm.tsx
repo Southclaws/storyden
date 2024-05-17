@@ -1,11 +1,10 @@
 import { FormProvider } from "react-hook-form";
 
-import { Button } from "src/theme/components/Button";
-
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";
 import { TitleInput } from "../TitleInput/TitleInput";
 
+import { Button } from "@/components/ui/button";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { Props, useComposeForm } from "./useComposeForm";

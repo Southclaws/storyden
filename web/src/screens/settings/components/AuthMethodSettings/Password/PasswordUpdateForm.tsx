@@ -1,7 +1,6 @@
-import { Admonition } from "src/theme/components/Admonition";
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Admonition } from "@/components/ui/admonition";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { usePasswordUpdate } from "./usePasswordUpdate";

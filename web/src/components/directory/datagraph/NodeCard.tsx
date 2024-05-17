@@ -4,10 +4,10 @@ import {
   DirectoryPath,
   joinDirectoryPath,
 } from "src/screens/directory/datagraph/directory-path";
-import { Card } from "src/theme/components/Card";
 
 import { DirectoryBadge } from "../DirectoryBadge";
 
+import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
 

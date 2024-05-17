@@ -4,10 +4,10 @@ import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
-import { Button } from "src/theme/components/Button";
-import { Heading1 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
+import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, Circle, HStack, styled } from "@/styled-system/jsx";
 
 import { Step, isComplete, statusToStep } from "./useChecklist";
@@ -56,14 +56,14 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
             {!complete &&
               isCurrent &&
               (props.url ? (
-                <Link
+                <LinkButton
                   href={props.url}
                   bgColor="green.3"
                   color="gray.8"
                   size="xs"
                 >
                   Complete
-                </Link>
+                </LinkButton>
               ) : (
                 <Button
                   bgColor="green.3"

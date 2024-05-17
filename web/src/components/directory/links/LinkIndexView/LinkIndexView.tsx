@@ -2,11 +2,11 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
 
 import { LinkCard } from "../LinkCard";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { LinkResultList } from "./LinkResultList";

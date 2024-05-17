@@ -2,10 +2,10 @@ import { ThreadReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-import { Card } from "src/theme/components/Card";
 
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
+import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 
 type Props = {

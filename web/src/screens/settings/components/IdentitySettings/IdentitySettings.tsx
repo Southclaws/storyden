@@ -1,9 +1,10 @@
 import { useSession } from "src/auth";
 import { Unready } from "src/components/site/Unready";
-import { Heading2 } from "src/theme/components/Heading/Index";
-import { Input } from "src/theme/components/Input";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
+
+import { Input } from "@/components/ui/input";
+import { Heading2 } from "@/components/ui/typography-heading";
 
 export function IdentitySettings() {
   const account = useSession();

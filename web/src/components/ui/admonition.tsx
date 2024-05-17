@@ -1,11 +1,11 @@
 import { Presence } from "@ark-ui/react";
 import type { PropsWithChildren } from "react";
 
-import { Button } from "../Button";
-
 import { css } from "@/styled-system/css";
 import { VStack, styled } from "@/styled-system/jsx";
 import { AdmonitionVariantProps, admonition } from "@/styled-system/recipes";
+
+import { Button } from "./button";
 
 export const _Admonition = styled("aside", admonition);
 

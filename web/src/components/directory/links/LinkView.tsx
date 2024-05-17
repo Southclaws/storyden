@@ -2,8 +2,8 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 import { LinkWithRefs } from "src/api/openapi/schemas";
 import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
-import { Link } from "src/theme/components/Link";
 
+import { LinkButton } from "@/components/ui/link-button";
 import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -30,9 +30,9 @@ export function LinkView({ link }: Props) {
             <ArrowTopRightOnSquareIcon height="1rem" />
           </LinkOverlay>
 
-          <Link w="min" size="xs" href={domainSearch}>
+          <LinkButton w="min" size="xs" href={domainSearch}>
             More from this site
-          </Link>
+          </LinkButton>
         </HStack>
 
         {link.title ? (
