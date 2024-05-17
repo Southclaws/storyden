@@ -37,7 +37,7 @@ export function RegisterForm(props: Props) {
         required
         {...register("identifier")}
       />
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.identifier?.message}
       </styled.p>
       <Flex alignItems="center" gap="2">
@@ -56,7 +56,7 @@ export function RegisterForm(props: Props) {
 
             <Button
               w="full"
-              kind="neutral"
+              variant="ghost"
               size="sm"
               type="button"
               onClick={handleWebauthn}
@@ -69,13 +69,13 @@ export function RegisterForm(props: Props) {
           </>
         )}
       </Flex>
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.token?.message}
       </styled.p>
-      <Button type="submit" w="full" kind="primary" onClick={handlePassword}>
+      <Button type="submit" w="full" onClick={handlePassword}>
         Register
       </Button>
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.root?.message}
       </styled.p>
     </styled.form>

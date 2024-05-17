@@ -11103,6 +11103,10 @@ const tokens = {
     "value": "var(--colors-tomato-8)",
     "variable": "var(--colors-fg-destructive)"
   },
+  "colors.fg.error": {
+    "value": "var(--colors-tomato-8)",
+    "variable": "var(--colors-fg-error)"
+  },
   "colors.border.default": {
     "value": "var(--colors-black-alpha-200)",
     "variable": "var(--colors-border-default)"
@@ -11794,6 +11798,10 @@ const tokens = {
   "colors.colorPalette.destructive": {
     "value": "var(--colors-color-palette-destructive)",
     "variable": "var(--colors-color-palette-destructive)"
+  },
+  "colors.colorPalette.error": {
+    "value": "var(--colors-color-palette-error)",
+    "variable": "var(--colors-color-palette-error)"
   },
   "colors.colorPalette.outline": {
     "value": "var(--colors-color-palette-outline)",
