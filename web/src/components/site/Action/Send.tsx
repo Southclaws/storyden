@@ -1,5 +1,6 @@
 import { SendIcon } from "src/components/graphics/SendIcon";
-import { Button, ButtonProps } from "src/theme/components/Button";
+
+import { Button, ButtonProps } from "@/components/ui/button";
 
 export function SendAction(props: ButtonProps) {
   return (

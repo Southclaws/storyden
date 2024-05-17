@@ -1,13 +1,12 @@
 import Image from "next/image";
 
-import { Link } from "src/theme/components/Link";
-import { getInfo } from "src/utils/info";
+import { LinkButton } from "@/components/ui/link-button";
+import { css } from "@/styled-system/css";
+import { VStack, styled } from "@/styled-system/jsx";
+import { getInfo } from "@/utils/info";
 
 import { AuthSelection } from "../components/AuthSelection/AuthSelection";
 import { getProviders } from "../providers";
-
-import { css } from "@/styled-system/css";
-import { VStack, styled } from "@/styled-system/jsx";
 
 import { RegisterForm } from "./RegisterForm";
 
@@ -58,9 +57,9 @@ export async function RegisterScreen() {
       </VStack>
 
       <p>
-        <Link size="xs" href="/login">
+        <LinkButton size="xs" href="/login">
           Sign in
-        </Link>
+        </LinkButton>
       </p>
     </VStack>
   );

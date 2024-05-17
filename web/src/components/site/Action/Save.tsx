@@ -1,7 +1,7 @@
 import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import { PropsWithChildren } from "react";
 
-import { Button, ButtonProps } from "src/theme/components/Button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
 export function SaveAction({
   children,

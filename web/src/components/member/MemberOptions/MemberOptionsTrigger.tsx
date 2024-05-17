@@ -1,8 +1,8 @@
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
 
-import { Button } from "src/theme/components/Button";
 import { useDisclosure } from "src/utils/useDisclosure";
 
+import { Button } from "@/components/ui/button";
 import { Box } from "@/styled-system/jsx";
 
 import { MemberOptionsMenu } from "./MemberOptionsMenu";

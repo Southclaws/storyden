@@ -3,12 +3,12 @@ import { PropsWithChildren } from "react";
 import { NewBadge } from "src/components/directory/DirectoryBadge";
 import { NodeCardGrid } from "src/components/directory/datagraph/NodeCardList";
 import { LinkCardRows } from "src/components/directory/links/LinkCardList";
-import { Heading2 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
 import { TextPostList } from "../text/TextPostList";
 import { MixedContent } from "../useFeed";
 
+import { LinkButton } from "@/components/ui/link-button";
+import { Heading2 } from "@/components/ui/typography-heading";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 import { MixedContentChunk, chunkData } from "./utils";
@@ -115,9 +115,9 @@ function SectionHeader({
       </HStack>
 
       {href && (
-        <Link size="xs" variant="ghost" href={href}>
+        <LinkButton size="xs" variant="ghost" href={href}>
           See all
-        </Link>
+        </LinkButton>
       )}
     </HStack>
   );

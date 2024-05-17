@@ -1,8 +1,8 @@
 import { Node } from "src/api/openapi/schemas";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
-import { Heading1 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
+import { LinkButton } from "@/components/ui/link-button";
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, HStack, Stack, VStack, styled } from "@/styled-system/jsx";
 
 type Props = Node;
@@ -28,9 +28,9 @@ export function DatagraphHeader(props: Props) {
 
         {props.link && (
           <Box w="full">
-            <Link href={props.link?.url} w="full" size="sm">
+            <LinkButton href={props.link?.url} w="full" size="sm">
               {props.link?.url}
-            </Link>
+            </LinkButton>
           </Box>
         )}
 

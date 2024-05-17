@@ -2,12 +2,11 @@
 
 import { groupBy, keys, partition } from "lodash";
 
-import { Button } from "src/theme/components/Button";
-import { Checkbox } from "src/theme/components/Checkbox";
-import { Link } from "src/theme/components/Link";
-import { getColourVariants } from "src/utils/colour";
-
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
+import { getColourVariants } from "@/utils/colour";
 
 export function Palette({ accent_colour, theme }: any) {
   const colours = getColourVariants(accent_colour);
@@ -102,10 +101,10 @@ export function Palette({ accent_colour, theme }: any) {
         </VStack>
 
         <VStack>
-          <Link href="/xdev" variant="ghost">
+          <LinkButton href="/xdev" variant="ghost">
             Neutral internal
-          </Link>
-          <Link href="#">Primary</Link>
+          </LinkButton>
+          <LinkButton href="#">Primary</LinkButton>
         </VStack>
       </HStack>
 

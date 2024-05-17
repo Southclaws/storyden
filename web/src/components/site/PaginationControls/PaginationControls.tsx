@@ -1,7 +1,6 @@
 import { range } from "lodash";
 
-import { Link } from "src/theme/components/Link";
-
+import { LinkButton } from "@/components/ui/link-button";
 import { HStack, styled } from "@/styled-system/jsx";
 
 const MAX_PAGES_SHOWN = 5;
@@ -64,7 +63,7 @@ export function PaginationControls({
     <HStack w="min" p="1">
       {needStartJump && (
         <>
-          <Link
+          <LinkButton
             variant="ghost"
             size="xs"
             href={`${path}?${new URLSearchParams({
@@ -74,7 +73,7 @@ export function PaginationControls({
             onClick={() => onClick(1)}
           >
             {1}
-          </Link>
+          </LinkButton>
           <Sep />
         </>
       )}
@@ -87,7 +86,7 @@ export function PaginationControls({
         });
 
         return (
-          <Link
+          <LinkButton
             variant="ghost"
             backgroundColor={v === currentPage ? "bg.muted" : undefined}
             size="xs"
@@ -96,14 +95,14 @@ export function PaginationControls({
             onClick={() => onClick(v)}
           >
             {pageName}
-          </Link>
+          </LinkButton>
         );
       })}
 
       {needEndJump && (
         <>
           <Sep />
-          <Link
+          <LinkButton
             variant="ghost"
             size="xs"
             href={`${path}?${new URLSearchParams({
@@ -113,7 +112,7 @@ export function PaginationControls({
             onClick={() => onClick(lastPage)}
           >
             {lastPage}
-          </Link>
+          </LinkButton>
         </>
       )}
     </HStack>

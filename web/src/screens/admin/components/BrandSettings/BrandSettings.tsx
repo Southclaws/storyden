@@ -1,15 +1,15 @@
 import { useGetInfo } from "src/api/openapi/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 import { Unready } from "src/components/site/Unready";
-import { Button } from "src/theme/components/Button";
-import { FormControl } from "src/theme/components/FormControl";
-import { FormHelperText } from "src/theme/components/FormHelperText";
-import { FormLabel } from "src/theme/components/FormLabel";
-import { Heading2 } from "src/theme/components/Heading/Index";
-import { Input } from "src/theme/components/Input";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
+import { Button } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormHelperText } from "@/components/ui/form/FormHelperText";
+import { FormLabel } from "@/components/ui/form/FormLabel";
+import { Input } from "@/components/ui/input";
+import { Heading2 } from "@/components/ui/typography-heading";
 import { Box, HStack, Stack, styled } from "@/styled-system/jsx";
 
 import { IconEditor } from "./IconEditor/IconEditor";

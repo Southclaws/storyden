@@ -1,5 +1,4 @@
 import { Sidebar } from "src/components/graphics/Sidebar/Sidebar";
-import { Button } from "src/theme/components/Button";
 
 import styles from "../navigation.module.css";
 
@@ -8,6 +7,7 @@ import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
 import { useNavigation } from "../useNavigation";
 
+import { Button } from "@/components/ui/button";
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";

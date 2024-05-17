@@ -1,7 +1,7 @@
 import { Link as LinkSchema } from "src/api/openapi/schemas";
-import { Card } from "src/theme/components/Card";
-import { Link } from "src/theme/components/Link";
 
+import { LinkButton } from "@/components/ui/link-button";
+import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
 
@@ -24,12 +24,12 @@ export function LinkCard({ link, ...rest }: Props) {
       {...rest}
     >
       <HStack>
-        <Link size="xs" href={`/l/${link.slug}`} variant="ghost">
+        <LinkButton size="xs" href={`/l/${link.slug}`} variant="ghost">
           View in directory
-        </Link>
-        <Link size="xs" href={domainSearch} variant="ghost">
+        </LinkButton>
+        <LinkButton size="xs" href={domainSearch} variant="ghost">
           More from this site
-        </Link>
+        </LinkButton>
       </HStack>
     </Card>
   );

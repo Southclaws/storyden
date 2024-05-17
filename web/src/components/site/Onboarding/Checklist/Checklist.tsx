@@ -2,10 +2,10 @@
 
 import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
-import { Button } from "src/theme/components/Button";
-import { Heading1, Heading2 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
+import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/link-button";
+import { Heading1, Heading2 } from "@/components/ui/typography-heading";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { ChecklistItem } from "./ChecklistItem";
@@ -78,9 +78,13 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           </styled.p>
 
           <styled.p>
-            <Link size="xs" color="blue.5" href="https://www.storyden.org/docs">
+            <LinkButton
+              size="xs"
+              color="blue.5"
+              href="https://www.storyden.org/docs"
+            >
               Visit the docs
-            </Link>{" "}
+            </LinkButton>{" "}
             for more info if you get stuck.
           </styled.p>
 

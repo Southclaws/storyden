@@ -1,7 +1,7 @@
 import { defineRecipe } from "@pandacss/dev";
 
-export const heading = defineRecipe({
-  className: "heading",
+export const typographyHeading = defineRecipe({
+  className: "typography-heading",
   base: {
     fontWeight: "semibold",
   },

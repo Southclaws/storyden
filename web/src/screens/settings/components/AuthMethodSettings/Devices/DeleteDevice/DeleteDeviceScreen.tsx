@@ -1,5 +1,4 @@
-import { Button } from "src/theme/components/Button";
-
+import { Button } from "@/components/ui/button";
 import { HStack, VStack } from "@/styled-system/jsx";
 
 import {

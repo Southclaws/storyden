@@ -2,8 +2,8 @@ import { CSSProperties, Ref, forwardRef } from "react";
 import { Control, Controller } from "react-hook-form";
 
 import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
-import { FormControl } from "src/theme/components/FormControl";
 
+import { FormControl } from "@/components/ui/form/FormControl";
 import { styled } from "@/styled-system/jsx";
 
 import { C, L, Props, useColourInput } from "./useColourInput";

@@ -1,9 +1,9 @@
 import { DatagraphNode, DatagraphSearchResult } from "src/api/openapi/schemas";
 import { EmptyState } from "src/components/feed/EmptyState";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { FeedItem } from "../feed/common/FeedItem/FeedItem";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {

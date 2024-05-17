@@ -1,11 +1,11 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import { Heading1 } from "src/theme/components/Heading/Index";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { CloseAction } from "../Action/Close";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
 
 type Props = {

@@ -3,18 +3,11 @@ import { PropsWithChildren } from "react";
 
 import { useSession } from "src/auth";
 import { Avatar } from "src/components/site/Avatar/Avatar";
-import {
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuSeparator,
-} from "src/theme/components/Menu";
-import { Menu, MenuPositioner, MenuTrigger } from "src/theme/components/Menu";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
 
+import * as Menu from "@/components/ui/menu";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { Props } from "./useMemberOptionsScreen";
@@ -28,14 +21,14 @@ export function MemberOptionsMenu({
   const showAdminOptions = session?.admin && props.handle !== session.handle;
 
   return (
-    <Menu size="sm" userSelect="none" onOpenChange={props.onOpenChange}>
-      <MenuTrigger asChild>{children}</MenuTrigger>
+    <Menu.Root size="sm" onOpenChange={props.onOpenChange}>
+      <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>
-        <MenuPositioner>
-          <MenuContent minW="48">
-            <MenuItemGroup id="group">
-              <MenuItemGroupLabel
+        <Menu.Positioner>
+          <Menu.Content minW="48" userSelect="none">
+            <Menu.ItemGroup id="group">
+              <Menu.ItemGroupLabel
                 htmlFor="group"
                 display="flex"
                 gap="2"
@@ -46,13 +39,13 @@ export function MemberOptionsMenu({
                   <styled.h1 color="fg.default">{props.name}</styled.h1>
                   <styled.h2 color="fg.subtle">@{props.handle}</styled.h2>
                 </VStack>
-              </MenuItemGroupLabel>
+              </Menu.ItemGroupLabel>
 
-              <MenuSeparator />
+              <Menu.Separator />
 
               {showAdminOptions && (
                 <MemberSuspensionTrigger {...props}>
-                  <MenuItem
+                  <Menu.Item
                     id="suspend"
                     color="fg.destructive"
                     _hover={{
@@ -61,13 +54,13 @@ export function MemberOptionsMenu({
                     }}
                   >
                     {props.deletedAt ? "Reinstate" : "Suspend"}
-                  </MenuItem>
+                  </Menu.Item>
                 </MemberSuspensionTrigger>
               )}
-            </MenuItemGroup>
-          </MenuContent>
-        </MenuPositioner>
+            </Menu.ItemGroup>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
-    </Menu>
+    </Menu.Root>
   );
 }

@@ -2,14 +2,8 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import { Button } from "src/theme/components/Button";
-import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverPositioner,
-} from "src/theme/components/Popover";
-
+import { Button } from "@/components/ui/button";
+import * as Popover from "@/components/ui/popover";
 import { styled } from "@/styled-system/jsx";
 
 import { Props, useReactList } from "./useReactList";
@@ -33,24 +27,24 @@ export function ReactList(props: Props) {
       ))}
 
       {authenticated && (
-        <Popover open={isOpen} lazyMount closeOnInteractOutside={false}>
-          <PopoverAnchor>
+        <Popover.Root open={isOpen} lazyMount closeOnInteractOutside={false}>
+          <Popover.Anchor>
             <Button size="xs" aria-label="add" onClick={handlers.handleTrigger}>
               <PlusIcon width="1.25em" />
             </Button>
-          </PopoverAnchor>
+          </Popover.Anchor>
 
-          <PopoverPositioner>
-            <PopoverContent ref={ref}>
+          <Popover.Positioner>
+            <Popover.Content ref={ref}>
               <Picker
                 data={data}
                 onEmojiSelect={handlers.handleSelect}
                 // TODO: When we do dark mode, this needs to be updated!
                 theme="light"
               />
-            </PopoverContent>
-          </PopoverPositioner>
-        </Popover>
+            </Popover.Content>
+          </Popover.Positioner>
+        </Popover.Root>
       )}
     </styled.ul>
   );

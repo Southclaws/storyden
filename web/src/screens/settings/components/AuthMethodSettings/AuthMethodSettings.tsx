@@ -1,7 +1,8 @@
 import { Unready } from "src/components/site/Unready";
-import { Heading2 } from "src/theme/components/Heading/Index";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
+
+import { Heading2 } from "@/components/ui/typography-heading";
 
 import { Devices } from "./Devices/Devices";
 import { OAuth } from "./OAuth/OAuth";

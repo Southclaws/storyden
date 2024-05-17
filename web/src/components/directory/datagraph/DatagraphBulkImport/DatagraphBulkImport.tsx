@@ -1,9 +1,8 @@
-import { Button } from "src/theme/components/Button";
-import { Card, CardRows } from "src/theme/components/Card";
-import { Input } from "src/theme/components/Input";
-
 import { NodeCard } from "../NodeCard";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardRows } from "@/components/ui/rich-card";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 

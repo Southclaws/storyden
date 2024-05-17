@@ -1,6 +1,6 @@
 import { Collection } from "src/api/openapi/schemas";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
 export function CollectionListItem(props: Collection) {

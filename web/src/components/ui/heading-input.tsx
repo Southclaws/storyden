@@ -10,20 +10,20 @@ import {
 } from "react";
 import {
   type HeadingInputVariantProps,
-  type HeadingVariantProps,
+  type TypographyHeadingVariantProps,
   headingInput,
 } from "styled-system/recipes";
 
 import { cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
-import { heading } from "@/styled-system/recipes";
+import { typographyHeading } from "@/styled-system/recipes";
 
 type CustomProps = {
   onValueChange: (s: string) => void;
 };
 
 export type HeadingInputProps = HeadingInputVariantProps &
-  HeadingVariantProps &
+  TypographyHeadingVariantProps &
   ComponentPropsWithoutRef<typeof ark.input> &
   CustomProps;
 
@@ -34,7 +34,7 @@ function HeadingInputWithRef(
   const { onValueChange, defaultValue, ...rest } = props;
   const [recipeProps, componentProps] = headingInput.splitVariantProps(rest);
 
-  const [headingProps] = heading.splitVariantProps(rest);
+  const [headingProps] = typographyHeading.splitVariantProps(rest);
 
   const handleInput = useCallback(
     (e: FormEvent<HTMLSpanElement>) => {
@@ -67,7 +67,7 @@ function HeadingInputWithRef(
       ref={ref}
       className={cx(
         headingInput({ ...recipeProps }),
-        heading({ ...headingProps }),
+        typographyHeading({ ...headingProps }),
       )}
       //
       // NOTE: We're doing a bit of a hack here in order to make this

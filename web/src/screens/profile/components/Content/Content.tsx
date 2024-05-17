@@ -1,18 +1,12 @@
 import { PublicProfile } from "src/api/openapi/schemas";
 import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
-import {
-  Tabs,
-  TabsContent,
-  TabsIndicator,
-  TabsList,
-  TabsTrigger,
-} from "src/theme/components/Tabs";
+
+import * as Tabs from "@/components/ui/tabs";
+import { Box, VStack } from "@/styled-system/jsx";
 
 import { CollectionList } from "../CollectionList/CollectionList";
 import { PostList } from "../PostList/PostList";
-
-import { Box, VStack } from "@/styled-system/jsx";
 
 import { useContent } from "./useContent";
 
@@ -23,33 +17,33 @@ export function Content(props: PublicProfile) {
 
   return (
     <VStack alignItems="start" w="full">
-      <Tabs width="full" variant="line" defaultValue="posts">
-        <TabsList>
-          <TabsTrigger value="posts">Posts</TabsTrigger>
-          <TabsTrigger value="replies">Replies</TabsTrigger>
-          <TabsTrigger value="collections">Collections</TabsTrigger>
-          <TabsIndicator />
-        </TabsList>
+      <Tabs.Root width="full" variant="line" defaultValue="posts">
+        <Tabs.List>
+          <Tabs.Trigger value="posts">Posts</Tabs.Trigger>
+          <Tabs.Trigger value="replies">Replies</Tabs.Trigger>
+          <Tabs.Trigger value="collections">Collections</Tabs.Trigger>
+          <Tabs.Indicator />
+        </Tabs.List>
 
-        <TabsContent value="posts">
+        <Tabs.Content value="posts">
           <TextPostList
             posts={content.data.threads.threads}
             onDelete={content.handlers.handleDeleteThread}
           />
-        </TabsContent>
+        </Tabs.Content>
 
-        <TabsContent value="replies">
+        <Tabs.Content value="replies">
           <Box>
             <PostList posts={content.data.posts} />
           </Box>
-        </TabsContent>
+        </Tabs.Content>
 
-        <TabsContent value="collections">
+        <Tabs.Content value="collections">
           <Box>
             <CollectionList collections={content.data.collections} />
           </Box>
-        </TabsContent>
-      </Tabs>
+        </Tabs.Content>
+      </Tabs.Root>
     </VStack>
   );
 }

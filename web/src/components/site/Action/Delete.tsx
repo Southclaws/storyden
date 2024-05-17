@@ -1,11 +1,11 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { MouseEvent, MouseEventHandler, PropsWithChildren } from "react";
 
-import { Button, ButtonProps } from "src/theme/components/Button";
 import { useDisclosure } from "src/utils/useDisclosure";
 
 import { ModalDrawer } from "../Modaldrawer/Modaldrawer";
 
+import { Button, ButtonProps } from "@/components/ui/button";
 import { HStack, VStack } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
