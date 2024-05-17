@@ -24,26 +24,20 @@ export default async function Page(props: Props) {
   const { slug } = ParamsSchema.parse(props.params);
   const session = await getServerSession();
 
-  const [targetSlug, fallback, isNew] = getTargetSlug(slug);
+  const [targetSlug, isNew] = getTargetSlug(slug);
 
-  const node = await server<NodeGetOKResponse>({
-    url: `/v1/nodes/${targetSlug}`,
-  });
+  if (targetSlug) {
+    const node = await server<NodeGetOKResponse>({
+      url: `/v1/nodes/${targetSlug}`,
+    });
 
-  if (node) {
-    if (isNew) {
-      if (!session) {
-        redirect(`/login?return=${fallback}`);
-      }
-
-      if (bulk) {
-        return <NodeCreateManyScreen node={node} />;
-      }
-
-      return <NodeCreateScreen session={session} />;
+    if (bulk) {
+      return <NodeCreateManyScreen />;
     }
 
-    return <NodeViewerScreen slug={targetSlug} node={node} />;
+    if (node) {
+      return <NodeViewerScreen slug={targetSlug} node={node} />;
+    }
   }
 
   // Creating a new item or node from the root: "/directory/new"
