@@ -16,7 +16,7 @@ export function CollectionCreateTrigger(
     <>
       {props.children ?? (
         <Button
-          w="full"
+          variant="subtle"
           justifyContent="start"
           size="sm"
           onClick={onOpen}
