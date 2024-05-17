@@ -4,10 +4,12 @@ import { PropsWithChildren } from "react";
 
 import { css, cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
-import { LinkVariant, link } from "@/styled-system/recipes";
+import { ButtonVariantProps, button } from "@/styled-system/recipes";
 import { StyleProps } from "@/styled-system/types";
 
-export type LinkProps = Partial<LinkVariant> & NextLinkProps & StyleProps;
+export type LinkProps = Partial<ButtonVariantProps> &
+  NextLinkProps &
+  StyleProps;
 
 export function Link({
   children,
@@ -15,9 +17,9 @@ export function Link({
   ...props
 }: PropsWithChildren<LinkProps>) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [vp, stripped] = link.splitVariantProps(props);
+  const [vp, stripped] = button.splitVariantProps(props);
 
-  const cn = cx(link(vp), css(stripped));
+  const cn = cx(button(vp), css(stripped));
 
   const isExternal = !href.toString().startsWith("/");
 
