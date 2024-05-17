@@ -1,28 +1,9 @@
 import { memo, splitProps } from '../helpers.mjs';
 import { createRecipe, mergeRecipes } from './create-recipe.mjs';
 
-const linkFn = /* @__PURE__ */ createRecipe('link', {
-  "kind": "neutral",
-  "size": "md"
-}, [])
+const linkFn = /* @__PURE__ */ createRecipe('link', {}, [])
 
-const linkVariantMap = {
-  "kind": [
-    "neutral",
-    "primary",
-    "destructive",
-    "ghost",
-    "blank"
-  ],
-  "size": [
-    "xs",
-    "sm",
-    "md",
-    "lg",
-    "xl",
-    "2xl"
-  ]
-}
+const linkVariantMap = {}
 
 const linkVariantKeys = Object.keys(linkVariantMap)
 
