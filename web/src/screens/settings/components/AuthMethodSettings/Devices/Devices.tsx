@@ -62,7 +62,9 @@ export function Devices(props: Props) {
         ))}
       </styled.ul>
 
-      <Button onClick={handleDeviceRegister}>Register this device</Button>
+      <Button variant="subtle" onClick={handleDeviceRegister}>
+        Register this device
+      </Button>
     </VStack>
   );
 }
