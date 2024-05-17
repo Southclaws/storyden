@@ -8,12 +8,9 @@ import { range } from "lodash";
 import { map } from "lodash/fp";
 
 import { admonition } from "src/theme/components/Admonition/admonition.recipe";
-import { button } from "src/theme/components/Button/button.recipe";
 import { richCard } from "src/theme/components/Card/recipe";
 import { heading } from "src/theme/components/Heading/heading.recipe";
 import { headingInput } from "src/theme/components/HeadingInput/recipe";
-import { input } from "src/theme/components/Input/input.recipe";
-import { link } from "src/theme/components/Link/link.recipe";
 import { skeleton } from "src/theme/components/Skeleton/skeleton.recipe";
 
 // TODO: Dark mode = 40%
@@ -35,26 +32,6 @@ const semanticTokens = defineSemanticTokens({
   blurs: {
     frosted: { value: "8px" },
   },
-  opacity: {
-    0: { value: "0" },
-    1: { value: "0.1" },
-    2: { value: "0.2" },
-    3: { value: "0.3" },
-    4: { value: "0.4" },
-    5: { value: "0.5" },
-    6: { value: "0.6" },
-    7: { value: "0.7" },
-    8: { value: "0.8" },
-    9: { value: "0.9" },
-    full: { value: "1" },
-  },
-  borderWidths: {
-    none: { value: "0" },
-    hairline: { value: "0.5px" },
-    thin: { value: "1px" },
-    medium: { value: "3px" },
-    thick: { value: "3px" },
-  },
   colors: {
     bg: {
       site: {
@@ -66,10 +43,16 @@ const semanticTokens = defineSemanticTokens({
       opaque: {
         value: { base: "{colors.white}" },
       },
+      destructive: {
+        value: { base: "{colors.tomato.3}" },
+      },
     },
     fg: {
       accent: {
         value: { base: "{colors.accent.100}" },
+      },
+      destructive: {
+        value: { base: "{colors.tomato.8}" },
       },
     },
     border: {
@@ -108,6 +91,7 @@ export default defineConfig({
       // set by the administrator and is a dynamic runtime value.
       accentColor: "neutral",
       additionalColors: ["*"],
+      borderRadius: "lg",
     }),
   ],
   preflight: true,
@@ -215,18 +199,10 @@ export default defineConfig({
   theme: {
     recipes: {
       admonition: admonition,
-      input: input,
       headingInput: headingInput,
       heading: heading,
-      button: button,
-      link: link,
-      // menu: menu,
-      // tabs: tabs,
-      // select: select,
-      // checkbox: checkbox,
-      // popover: popover,
       skeleton: skeleton,
-      richCard: richCard, // TODO: RENAME
+      richCard: richCard,
     },
     extend: {
       semanticTokens,
