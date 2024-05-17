@@ -30,7 +30,7 @@ export function PasswordUpdateForm() {
           placeholder="current password"
           {...register("old")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.old?.message}
         </styled.p>
         <Input
@@ -40,10 +40,10 @@ export function PasswordUpdateForm() {
           placeholder="new password"
           {...register("new")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.new?.message}
         </styled.p>
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.root?.message}
         </styled.p>
         <VStack alignItems="start" w="full">
