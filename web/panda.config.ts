@@ -54,6 +54,9 @@ const semanticTokens = defineSemanticTokens({
       destructive: {
         value: { base: "{colors.tomato.8}" },
       },
+      error: {
+        value: { base: "{colors.tomato.8}" },
+      },
     },
     border: {
       default: { value: "{colors.blackAlpha.200}" },
