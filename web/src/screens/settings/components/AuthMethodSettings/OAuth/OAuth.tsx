@@ -38,7 +38,9 @@ export function OAuth({ active, available }: Props) {
       <styled.ul display="flex" flexDir="column" gap="2" w="full">
         {available.map((v) => (
           <styled.li key={v.provider}>
-            <Link href={v.link}>{v.name}</Link>
+            <Link href={v.link} variant="subtle">
+              {v.name}
+            </Link>
           </styled.li>
         ))}
       </styled.ul>

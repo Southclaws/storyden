@@ -47,7 +47,9 @@ export function PasswordUpdateForm() {
           {errors.root?.message}
         </styled.p>
         <VStack alignItems="start" w="full">
-          <Button type="submit">Change password</Button>
+          <Button type="submit" variant="subtle">
+            Change password
+          </Button>
           <Admonition
             value={success}
             onChange={handleCloseNotification}
