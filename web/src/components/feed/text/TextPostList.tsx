@@ -16,7 +16,7 @@ export function TextPostList(props: Props) {
   }
 
   return (
-    <styled.ol width="full" display="flex" flexDirection="column" gap="4">
+    <styled.ol width="full" display="flex" flexDirection="column" gap="3">
       {props.posts.map((t) => (
         <TextPost
           key={t.id}
