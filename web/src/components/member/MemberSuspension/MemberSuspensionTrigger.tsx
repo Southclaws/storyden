@@ -28,7 +28,7 @@ export function MemberSuspensionTrigger({
           },
         )
       ) : (
-        <Button kind="destructive" onClick={onOpen}>
+        <Button colorPalette="red" onClick={onOpen}>
           {props.deletedAt ? "Reinstate" : "Suspend"}
         </Button>
       )}

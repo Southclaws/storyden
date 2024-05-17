@@ -42,7 +42,7 @@ export function CollectionCreateScreen(props: UseDisclosureProps) {
           <Button w="full" type="submit">
             Cancel
           </Button>
-          <Button w="full" type="submit" kind="primary">
+          <Button w="full" type="submit">
             Create
           </Button>
         </HStack>

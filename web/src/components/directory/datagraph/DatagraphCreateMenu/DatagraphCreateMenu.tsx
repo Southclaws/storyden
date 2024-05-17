@@ -23,7 +23,7 @@ export function DatagraphCreateMenu() {
   return (
     <Menu size="sm">
       <MenuTrigger asChild>
-        <Button size="xs">
+        <Button size="xs" variant="outline">
           <PlusCircleIcon /> Create
         </Button>
       </MenuTrigger>

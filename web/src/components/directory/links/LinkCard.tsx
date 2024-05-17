@@ -3,11 +3,11 @@ import { Card } from "src/theme/components/Card";
 import { Link } from "src/theme/components/Link";
 
 import { HStack } from "@/styled-system/jsx";
-import { CardVariantProps } from "@/styled-system/recipes";
+import { RichCardVariantProps } from "@/styled-system/recipes";
 
 export type Props = {
   link: LinkSchema;
-} & CardVariantProps;
+} & RichCardVariantProps;
 
 export function LinkCard({ link, ...rest }: Props) {
   const asset = link.assets?.[0] ?? undefined;
@@ -24,10 +24,10 @@ export function LinkCard({ link, ...rest }: Props) {
       {...rest}
     >
       <HStack>
-        <Link size="xs" href={`/l/${link.slug}`} kind="neutral">
+        <Link size="xs" href={`/l/${link.slug}`} variant="ghost">
           View in directory
         </Link>
-        <Link size="xs" href={domainSearch}>
+        <Link size="xs" href={domainSearch} variant="ghost">
           More from this site
         </Link>
       </HStack>

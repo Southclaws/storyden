@@ -4,7 +4,7 @@ import { Link } from "src/theme/components/Link";
 
 export function LinksAction() {
   return (
-    <Link href="/l" kind="ghost" size="sm">
+    <Link href="/l" variant="ghost" size="sm">
       <LinkIcon />
     </Link>
   );

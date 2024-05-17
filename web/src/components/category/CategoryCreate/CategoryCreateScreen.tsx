@@ -44,7 +44,7 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
           <Button w="full" type="submit" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button w="full" type="submit" kind="primary">
+          <Button w="full" type="submit">
             Create
           </Button>
         </HStack>

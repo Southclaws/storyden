@@ -6,7 +6,7 @@ import { Button, ButtonProps } from "src/theme/components/Button";
 export function BookmarkAction(props: ButtonProps & { bookmarked: boolean }) {
   const { bookmarked, ...rest } = props;
   return (
-    <Button kind="neutral" size="xs" {...rest}>
+    <Button variant="ghost" size="xs" {...rest}>
       {bookmarked ? (
         <BookmarkSavedIcon width="1.4em" />
       ) : (

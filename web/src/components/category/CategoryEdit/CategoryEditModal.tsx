@@ -10,7 +10,7 @@ import { HStack, VStack, styled } from "@/styled-system/jsx";
 import { Props, useCategoryEdit } from "./useCategoryEdit";
 
 export function CategoryEditModal(props: Props) {
-  const { register, onSubmit, errors } = useCategoryEdit(props);
+  const { register, onSubmit, onCancel, errors } = useCategoryEdit(props);
 
   return (
     <ModalDrawer
@@ -46,10 +46,10 @@ export function CategoryEditModal(props: Props) {
         </VStack>
 
         <HStack w="full" alignItems="center" justify="end" pb="3" gap="4">
-          <Button kind="ghost" size="sm" onClick={props.onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
             Cancel
           </Button>
-          <Button kind="primary" size="sm" type="submit">
+          <Button type="submit" size="sm">
             Save
           </Button>
         </HStack>

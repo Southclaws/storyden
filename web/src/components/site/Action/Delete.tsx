@@ -1,5 +1,5 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { PropsWithChildren } from "react";
+import { MouseEvent, MouseEventHandler, PropsWithChildren } from "react";
 
 import { Button, ButtonProps } from "src/theme/components/Button";
 import { useDisclosure } from "src/utils/useDisclosure";
@@ -7,21 +7,25 @@ import { useDisclosure } from "src/utils/useDisclosure";
 import { ModalDrawer } from "../Modaldrawer/Modaldrawer";
 
 import { HStack, VStack } from "@/styled-system/jsx";
+import { button } from "@/styled-system/recipes";
 
 type DeleteConfirmationProps = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  handleConfirm: () => void;
+  handleConfirm: MouseEventHandler<HTMLButtonElement>;
 };
 
+type ComponentProps = ButtonProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement>;
+
 export function useDeleteAction(props: {
-  onClick: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }): DeleteConfirmationProps {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  function handleConfirm() {
+  function handleConfirm(e: MouseEvent<HTMLButtonElement>) {
     onClose();
-    props.onClick();
+    props.onClick?.(e);
   }
 
   return {
@@ -34,13 +38,22 @@ export function useDeleteAction(props: {
 
 export function DeleteAction({
   children,
+  onClick,
   ...props
-}: PropsWithChildren<ButtonProps>) {
-  const deleteProps = useDeleteAction(props);
+}: PropsWithChildren<ComponentProps>) {
+  const [bvp] = button.splitVariantProps(props);
+  const deleteProps = useDeleteAction({
+    onClick,
+  });
 
   return (
     <>
-      <Button kind="destructive" size="xs" onClick={deleteProps.onOpen}>
+      <Button
+        colorPalette="red"
+        size="xs"
+        onClick={deleteProps.onOpen}
+        {...bvp}
+      >
         <TrashIcon width="0.5em" height="0.5em" />
         {children}
       </Button>
@@ -64,7 +77,7 @@ export function DeleteConfirmation({
           <Button w="full" onClick={onClose}>
             Cancel
           </Button>
-          <Button w="full" kind="destructive" onClick={handleConfirm}>
+          <Button w="full" colorPalette="red" onClick={handleConfirm}>
             Delete
           </Button>
         </HStack>

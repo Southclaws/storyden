@@ -62,7 +62,7 @@ export const Breadcrumbs_ = (
                   ? "white"
                   : visibility === "draft"
                     ? "accent"
-                    : "blue.500"
+                    : "blue.8"
               }
               borderStyle={
                 isCurrent && visibility !== "published" ? "dashed" : "none"

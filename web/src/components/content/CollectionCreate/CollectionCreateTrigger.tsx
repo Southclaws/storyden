@@ -19,7 +19,6 @@ export function CollectionCreateTrigger(
           w="full"
           justifyContent="start"
           size="sm"
-          kind="primary"
           onClick={onOpen}
           {...props}
         >
