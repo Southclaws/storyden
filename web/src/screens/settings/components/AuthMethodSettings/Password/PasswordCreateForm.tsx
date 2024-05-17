@@ -34,7 +34,7 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("newPassword")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.newPassword?.message}
         </styled.p>
         <Input
@@ -45,10 +45,10 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("confirmPassword")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.confirmPassword?.message}
         </styled.p>
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.root?.message}
         </styled.p>
         <VStack alignItems="start" w="full">
