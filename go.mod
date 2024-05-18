@@ -50,14 +50,14 @@ require (
 	github.com/oapi-codegen/echo-middleware v1.0.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/twilio/twilio-go v1.20.1
-	github.com/weaviate/weaviate v1.24.11
+	github.com/weaviate/weaviate v1.25.1
 	github.com/weaviate/weaviate-go-client/v4 v4.13.1
 	golang.org/x/sync v0.7.0
-	google.golang.org/api v0.178.0
+	google.golang.org/api v0.181.0
 )
 
 require (
-	cloud.google.com/go/auth v0.4.0 // indirect
+	cloud.google.com/go/auth v0.4.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
@@ -98,7 +98,7 @@ require (
 	golang.org/x/image v0.16.0 // indirect
 	golang.org/x/tools v0.21.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240506185236-b8a5c65736ae // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240506185236-b8a5c65736ae // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240513163218-0867130af1f8 // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	modernc.org/libc v1.50.5 // indirect
@@ -126,7 +126,7 @@ require (
 	github.com/go-openapi/inflect v0.21.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/go-resty/resty/v2 v2.12.0
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
