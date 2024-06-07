@@ -29,13 +29,14 @@ export const richCard = defineSlotRecipe({
   base: {
     root: {
       "--card-image-max-height": "50px",
+      "--card-border-radius": "radii.lg",
 
       containerType: "inline-size",
       display: "grid",
       width: "full",
       gap: "0",
       overflow: "hidden",
-      borderRadius: "lg",
+      borderRadius: "var(--card-border-radius)",
       boxShadow: "sm",
       minHeight: "0",
     },
@@ -120,7 +121,7 @@ export const richCard = defineSlotRecipe({
         root: {
           gridTemplateRows: "1fr auto",
           gridTemplateColumns: "1fr",
-          aspectRatio: "square",
+          aspectRatio: "1",
         },
         mediaBackdropContainer: {
           gridRow: "1 / 3",
@@ -132,11 +133,17 @@ export const richCard = defineSlotRecipe({
         },
         media: {
           objectPosition: "top",
+          // NOTE: This solves a small rendering issue on Chrome where the image
+          // ever so slightly overflows the border radius. The cause looks like
+          // it's due to a combination of the overflow hidden and object-fit.
+          borderBottomRadius: "calc(var(--card-border-radius) + 3px)",
         },
         mediaMissing: {
           gridRow: "1 / 2",
           gridColumn: "1 / 2",
           height: "full",
+          // NOTE: This padding is to center the Empty component. It's not
+          // really perfect but close enough! It's a bit of a hack.
           paddingBottom: "3lh",
         },
         contentContainer: {
