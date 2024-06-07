@@ -1,10 +1,10 @@
 import { PostProps } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
-import { Button } from "src/theme/components/Button";
 
 import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
 
+import { Button } from "@/components/ui/button";
 import { Flex, HStack } from "@/styled-system/jsx";
 
 import { usePostView } from "./usePostView";
@@ -39,7 +39,7 @@ export function PostView(props: Props) {
           />
           <HStack>
             <Button onClick={onPublishEdit}>Update</Button>
-            <Button kind="ghost" onClick={onCancelEdit}>
+            <Button variant="ghost" onClick={onCancelEdit}>
               Cancel
             </Button>
           </HStack>

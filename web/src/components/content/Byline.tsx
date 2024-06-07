@@ -20,7 +20,7 @@ export function Byline(props: Props) {
         gap="0"
         minWidth="0"
         fontSize="sm"
-        color="gray.500"
+        color="fg.subtle"
       >
         <ProfilePill profileReference={props.author} />
         <styled.span pr="2">•</styled.span>

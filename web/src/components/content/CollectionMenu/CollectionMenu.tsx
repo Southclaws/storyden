@@ -2,20 +2,11 @@ import { Portal } from "@ark-ui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 
 import { BookmarkAction } from "src/components/site/Action/Bookmark";
-import { Checkbox } from "src/theme/components/Checkbox";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuPositioner,
-  MenuSeparator,
-  MenuTrigger,
-} from "src/theme/components/Menu";
 
 import { CollectionCreateTrigger } from "../CollectionCreate/CollectionCreateTrigger";
 
+import { Checkbox } from "@/components/ui/checkbox";
+import * as Menu from "@/components/ui/menu";
 import { Box, Center, HStack } from "@/styled-system/jsx";
 
 import { Props, useCollectionMenu } from "./useCollectionMenu";
@@ -32,29 +23,28 @@ export function CollectionMenu(props: Props) {
       onKeyUp={handlers.handleKeyUp}
       tabIndex={1}
     >
-      <Menu
+      <Menu.Root
         size="sm"
         onOpenChange={handlers.handleOpenChange}
         closeOnSelect={!multiSelect}
-        userSelect="none"
         onSelect={handlers.handleSelect}
       >
-        <MenuTrigger asChild>
+        <Menu.Trigger asChild>
           <BookmarkAction bookmarked={isAlreadySaved} />
-        </MenuTrigger>
+        </Menu.Trigger>
 
         <Portal>
-          <MenuPositioner>
-            <MenuContent>
-              <MenuItemGroup id="group">
-                <MenuItemGroupLabel htmlFor="group">
+          <Menu.Positioner>
+            <Menu.Content userSelect="none">
+              <Menu.ItemGroup id="group">
+                <Menu.ItemGroupLabel htmlFor="group">
                   Add to collections
-                </MenuItemGroupLabel>
+                </Menu.ItemGroupLabel>
 
-                <MenuSeparator />
+                <Menu.Separator />
 
                 {collections.map((c) => (
-                  <MenuItem id={c.id} key={c.id}>
+                  <Menu.Item id={c.id} key={c.id}>
                     <HStack>
                       {multiSelect ? (
                         <Checkbox checked={c.hasPost} />
@@ -65,19 +55,19 @@ export function CollectionMenu(props: Props) {
                       )}
                       {c.name}
                     </HStack>
-                  </MenuItem>
+                  </Menu.Item>
                 ))}
-              </MenuItemGroup>
+              </Menu.ItemGroup>
 
-              <MenuItemGroup id="create">
-                <MenuItem id="create-collection" closeOnSelect={false}>
-                  <CollectionCreateTrigger kind="blank" />
-                </MenuItem>
-              </MenuItemGroup>
-            </MenuContent>
-          </MenuPositioner>
+              <Menu.ItemGroup id="create">
+                <Menu.Item id="create-collection" closeOnSelect={false}>
+                  <CollectionCreateTrigger variant="ghost" />
+                </Menu.Item>
+              </Menu.ItemGroup>
+            </Menu.Content>
+          </Menu.Positioner>
         </Portal>
-      </Menu>
+      </Menu.Root>
     </Box>
   );
 }

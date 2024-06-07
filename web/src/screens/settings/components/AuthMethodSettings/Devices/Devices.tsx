@@ -1,8 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 
-import { Button } from "src/theme/components/Button";
-import { Heading2, Heading3 } from "src/theme/components/Heading/Index";
-
+import { Button } from "@/components/ui/button";
+import { Heading2, Heading3 } from "@/components/ui/typography-heading";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { DeleteDeviceTrigger } from "./DeleteDevice/DeleteDeviceTrigger";
@@ -62,7 +61,9 @@ export function Devices(props: Props) {
         ))}
       </styled.ul>
 
-      <Button onClick={handleDeviceRegister}>Register this device</Button>
+      <Button variant="subtle" onClick={handleDeviceRegister}>
+        Register this device
+      </Button>
     </VStack>
   );
 }

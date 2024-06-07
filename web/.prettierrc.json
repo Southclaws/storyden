@@ -4,9 +4,9 @@
     ],
     "importOrder": [
         "^src/(.*)$",
-        "^.*\\.css$",
-        "^\\.\\.",
         "^@[./]",
+        "^\\.\\.",
+        "^.*\\.css$",
         "^[./]"
     ],
     "importOrderSeparation": true,

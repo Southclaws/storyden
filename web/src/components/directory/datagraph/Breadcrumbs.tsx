@@ -8,9 +8,9 @@ import {
   DirectoryPath,
   joinDirectoryPath,
 } from "src/screens/directory/datagraph/directory-path";
-import { Input } from "src/theme/components/Input";
-import { Link } from "src/theme/components/Link";
 
+import { Input } from "@/components/ui/input";
+import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack } from "@/styled-system/jsx";
 
 import { DatagraphCreateMenu } from "./DatagraphCreateMenu/DatagraphCreateMenu";
@@ -44,9 +44,9 @@ export const Breadcrumbs_ = (
 
   return (
     <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
-      <Link minW="min" href="/directory" size="xs">
+      <LinkButton minW="min" href="/directory" size="xs">
         Directory
-      </Link>
+      </LinkButton>
       {paths.map((p) => {
         const isCurrent = p === current && create === "show";
 
@@ -55,14 +55,14 @@ export const Breadcrumbs_ = (
             <Box flexShrink="0">
               <ChevronRightIcon width="1rem" />
             </Box>
-            <Link
+            <LinkButton
               flexShrink="0"
               borderColor={
                 isCurrent && visibility === "published"
                   ? "white"
                   : visibility === "draft"
                     ? "accent"
-                    : "blue.500"
+                    : "blue.8"
               }
               borderStyle={
                 isCurrent && visibility !== "published" ? "dashed" : "none"
@@ -78,7 +78,7 @@ export const Breadcrumbs_ = (
               {isCurrent && visibility && visibility !== "published" && (
                 <span>({visibility})</span>
               )}
-            </Link>
+            </LinkButton>
           </Fragment>
         );
       })}

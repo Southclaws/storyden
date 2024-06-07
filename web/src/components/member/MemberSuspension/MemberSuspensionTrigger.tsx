@@ -1,8 +1,9 @@
 import React, { PropsWithChildren } from "react";
 
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { Button } from "src/theme/components/Button";
 import { useDisclosure } from "src/utils/useDisclosure";
+
+import { Button } from "@/components/ui/button";
 
 import { MemberSuspensionConfirmation } from "./MemberSuspensionConfirmation";
 import { Props } from "./useMemberSuspension";
@@ -28,7 +29,7 @@ export function MemberSuspensionTrigger({
           },
         )
       ) : (
-        <Button kind="destructive" onClick={onOpen}>
+        <Button colorPalette="red" onClick={onOpen}>
           {props.deletedAt ? "Reinstate" : "Suspend"}
         </Button>
       )}

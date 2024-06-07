@@ -1,13 +1,12 @@
 import Image from "next/image";
 
-import { Link } from "src/theme/components/Link";
-import { getInfo } from "src/utils/info";
-
 import { AuthSelection } from "../components/AuthSelection/AuthSelection";
 import { getProviders } from "../providers";
 
+import { LinkButton } from "@/components/ui/link-button";
 import { css } from "@/styled-system/css";
 import { VStack, styled } from "@/styled-system/jsx";
+import { getInfo } from "@/utils/info";
 
 import { LoginForm } from "./LoginForm";
 
@@ -56,9 +55,9 @@ export async function LoginScreen() {
       </VStack>
 
       <p>
-        <Link size="xs" href="/register">
+        <LinkButton size="xs" href="/register">
           Register
-        </Link>
+        </LinkButton>
       </p>
     </VStack>
   );

@@ -2,13 +2,12 @@
 
 import { BookOpenIcon, UsersIcon } from "@heroicons/react/24/outline";
 
-import { CategoryCreateTrigger } from "src/components/category/CategoryCreate/CategoryCreateTrigger";
-import { Link } from "src/theme/components/Link";
+import { CategoryCreateTrigger } from "@/components/category/CategoryCreate/CategoryCreateTrigger";
+import { LinkButton } from "@/components/ui/link-button";
+import { Box, LStack, styled } from "@/styled-system/jsx";
 
 import { CategoryList } from "../../../category/CategoryList/CategoryList";
 import { useNavigation } from "../useNavigation";
-
-import { Box, LStack, styled } from "@/styled-system/jsx";
 
 export function ContentNavigationList() {
   const { isAdmin } = useNavigation();
@@ -41,16 +40,16 @@ export function ContentNavigationList() {
         {isAdmin && <CategoryCreateTrigger />}
       </LStack>
 
-      <LStack>
-        <Link w="full" size="xs" href="/directory">
+      <LStack gap="1">
+        <LinkButton w="full" size="xs" variant="ghost" href="/directory">
           <BookOpenIcon />
           Knowledgebase
-        </Link>
+        </LinkButton>
 
-        <Link w="full" size="xs" href="/p">
+        <LinkButton w="full" size="xs" variant="ghost" href="/p">
           <UsersIcon />
           Member directory
-        </Link>
+        </LinkButton>
       </LStack>
     </styled.nav>
   );

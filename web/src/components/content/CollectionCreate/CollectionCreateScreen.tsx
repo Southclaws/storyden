@@ -1,10 +1,10 @@
-import { Button } from "src/theme/components/Button";
-import { FormControl } from "src/theme/components/FormControl";
-import { FormHelperText } from "src/theme/components/FormHelperText";
-import { FormLabel } from "src/theme/components/FormLabel";
-import { Input } from "src/theme/components/Input";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
+import { Button } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormHelperText } from "@/components/ui/form/FormHelperText";
+import { FormLabel } from "@/components/ui/form/FormLabel";
+import { Input } from "@/components/ui/input";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { useCollectionCreate } from "./useCollectionCreate";
@@ -39,10 +39,10 @@ export function CollectionCreateScreen(props: UseDisclosureProps) {
         </FormControl>
 
         <HStack w="full" justify="space-between">
-          <Button w="full" type="submit">
+          <Button w="full" type="button">
             Cancel
           </Button>
-          <Button w="full" type="submit" kind="primary">
+          <Button w="full" type="submit">
             Create
           </Button>
         </HStack>

@@ -22,6 +22,7 @@ export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors },
@@ -54,8 +55,14 @@ export function useCategoryEdit(props: Props) {
     }
   });
 
+  function onCancel() {
+    reset();
+    props.onClose?.();
+  }
+
   return {
     onSubmit,
+    onCancel,
     register,
     errors,
   };

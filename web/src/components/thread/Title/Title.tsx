@@ -1,9 +1,9 @@
 import { Thread } from "src/api/openapi/schemas";
-import { Input } from "src/theme/components/Input";
 
 import { CategoryPill } from "../CategoryPill";
 import { LinkView } from "../LinkView/LinkView";
 
+import { Input } from "@/components/ui/input";
 import { styled } from "@/styled-system/jsx";
 
 import { useTitle } from "./useTitle";

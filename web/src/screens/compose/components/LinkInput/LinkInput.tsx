@@ -1,6 +1,6 @@
-import { FormControl } from "src/theme/components/FormControl";
-import { FormErrorText } from "src/theme/components/FormErrorText";
-import { Input } from "src/theme/components/Input";
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { Input } from "@/components/ui/input";
 
 import { useLinkInput } from "./useLinkInput";
 

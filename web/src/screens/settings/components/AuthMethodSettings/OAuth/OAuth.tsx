@@ -1,7 +1,7 @@
 import { AccountAuthMethod, AuthProvider } from "src/api/openapi/schemas";
-import { Heading3 } from "src/theme/components/Heading/Index";
-import { Link } from "src/theme/components/Link";
 
+import { LinkButton } from "@/components/ui/link-button";
+import { Heading3 } from "@/components/ui/typography-heading";
 import { VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -38,7 +38,9 @@ export function OAuth({ active, available }: Props) {
       <styled.ul display="flex" flexDir="column" gap="2" w="full">
         {available.map((v) => (
           <styled.li key={v.provider}>
-            <Link href={v.link}>{v.name}</Link>
+            <LinkButton href={v.link} variant="subtle">
+              {v.name}
+            </LinkButton>
           </styled.li>
         ))}
       </styled.ul>

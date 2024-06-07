@@ -36,6 +36,7 @@
       }
     ],
     "paths": {
+      "@/*": ["src/*"],
       "@/styled-system/*": ["styled-system/*"]
     }
   },

@@ -3,7 +3,7 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ButtonVariant {
-  kind: "neutral" | "primary" | "destructive" | "ghost" | "blank"
+  variant: "solid" | "outline" | "ghost" | "link" | "subtle"
 size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 
@@ -12,7 +12,7 @@ type ButtonVariantMap = {
 }
 
 export type ButtonVariantProps = {
-  [key in keyof ButtonVariant]?: ButtonVariant[key] | undefined
+  [key in keyof ButtonVariant]?: ConditionalValue<ButtonVariant[key]> | undefined
 }
 
 export interface ButtonRecipe {

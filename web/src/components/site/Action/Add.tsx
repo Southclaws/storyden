@@ -1,10 +1,10 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import { Button, ButtonProps } from "src/theme/components/Button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
 export function AddAction(props: ButtonProps) {
   return (
-    <Button kind="ghost" size="sm" {...props}>
+    <Button variant="ghost" size="sm" {...props}>
       <PlusIcon width="1.4em" />
     </Button>
   );

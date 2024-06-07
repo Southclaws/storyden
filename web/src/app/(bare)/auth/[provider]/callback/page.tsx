@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { oAuthProviderCallback } from "src/api/openapi/auth";
 import { Unready } from "src/components/site/Unready";
-import { Link } from "src/theme/components/Link";
-import { deriveError } from "src/utils/error";
 
+import { LinkButton } from "@/components/ui/link-button";
 import { Center, HStack, VStack } from "@/styled-system/jsx";
+import { deriveError } from "@/utils/error";
 
 export type Props = {
   params: {
@@ -57,8 +57,8 @@ export default function Page(props: Props) {
       </Unready>
 
       <HStack>
-        <Link href="/register">Back to register</Link>
-        <Link href="/login">Back to login</Link>
+        <LinkButton href="/register">Back to register</LinkButton>
+        <LinkButton href="/login">Back to login</LinkButton>
       </HStack>
     </VStack>
   );

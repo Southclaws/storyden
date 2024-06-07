@@ -3,17 +3,8 @@ import { format } from "date-fns/format";
 
 import { DeleteConfirmation } from "src/components/site/Action/Delete";
 import { MoreAction } from "src/components/site/Action/More";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuPositioner,
-  MenuSeparator,
-  MenuTrigger,
-} from "src/theme/components/Menu";
 
+import * as Menu from "@/components/ui/menu";
 import { styled } from "@/styled-system/jsx";
 
 import { Props, useDatagraphNodeMenu } from "./useDatagraphNodeMenu";
@@ -30,15 +21,15 @@ export function DatagraphNodeMenu(props: Props) {
         : "";
 
   return (
-    <Menu size="sm" lazyMount onSelect={handleSelect}>
-      <MenuTrigger asChild>
+    <Menu.Root size="sm" lazyMount onSelect={handleSelect}>
+      <Menu.Trigger asChild>
         <MoreAction size="xs" />
-      </MenuTrigger>
+      </Menu.Trigger>
       <Portal>
-        <MenuPositioner>
-          <MenuContent minW="36">
-            <MenuItemGroup id="user">
-              <MenuItemGroupLabel
+        <Menu.Positioner>
+          <Menu.Content minW="36">
+            <Menu.ItemGroup id="user">
+              <Menu.ItemGroupLabel
                 htmlFor="user"
                 display="flex"
                 flexDir="column"
@@ -51,40 +42,40 @@ export function DatagraphNodeMenu(props: Props) {
                 <styled.time fontWeight="normal">
                   {format(new Date(props.node.createdAt), "yyyy-mm-dd")}
                 </styled.time>
-              </MenuItemGroupLabel>
+              </Menu.ItemGroupLabel>
 
-              <MenuSeparator />
+              <Menu.Separator />
 
               {reviewFlow && (
                 <>
                   {reviewFlow.draftToReview && (
-                    <MenuItem id="review">Submit for review</MenuItem>
+                    <Menu.Item id="review">Submit for review</Menu.Item>
                   )}
                   {reviewFlow.reviewToPublsh && (
-                    <MenuItem id="publsh">Publish</MenuItem>
+                    <Menu.Item id="publsh">Publish</Menu.Item>
                   )}
                   {reviewFlow.publishToReview && (
-                    <MenuItem id="review">Unpublish</MenuItem>
+                    <Menu.Item id="review">Unpublish</Menu.Item>
                   )}
                   {reviewFlow.reviewToDraft && (
-                    <MenuItem id="draft">Revert to draft</MenuItem>
+                    <Menu.Item id="draft">Revert to draft</Menu.Item>
                   )}
                   {reviewFlow.draftToPublish && (
-                    <MenuItem id="publish">Force publish</MenuItem>
+                    <Menu.Item id="publish">Force publish</Menu.Item>
                   )}
                 </>
               )}
 
               {deleteEnabled && (
                 <>
-                  <MenuItem id="delete">Delete</MenuItem>
+                  <Menu.Item id="delete">Delete</Menu.Item>
                   <DeleteConfirmation {...deleteProps} />
                 </>
               )}
-            </MenuItemGroup>
-          </MenuContent>
-        </MenuPositioner>
+            </Menu.ItemGroup>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
-    </Menu>
+    </Menu.Root>
   );
 }

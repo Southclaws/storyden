@@ -1,7 +1,7 @@
 import { PublicProfile } from "src/api/openapi/schemas";
 import { Avatar } from "src/components/site/Avatar/Avatar";
-import { Heading2, Heading3 } from "src/theme/components/Heading/Index";
 
+import { Heading2, Heading3 } from "@/components/ui/typography-heading";
 import { HStack, VStack } from "@/styled-system/jsx";
 
 export function Header(props: PublicProfile) {

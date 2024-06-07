@@ -1,6 +1,6 @@
 import { Unready } from "src/components/site/Unready";
-import { Skeleton } from "src/theme/components/Skeleton";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { VStack } from "@/styled-system/jsx";
 
 import { ComposeForm } from "./components/ComposeForm/ComposeForm";

@@ -56,7 +56,8 @@
     var(--global-font-size-h6)
   );
 
-  /* color-scheme: only light; */
+  /* TODO: https://github.com/cschroeter/park-ui/issues/312 */
+  color-scheme: light;
 }
 
 @supports (font-size: 1cqi) {

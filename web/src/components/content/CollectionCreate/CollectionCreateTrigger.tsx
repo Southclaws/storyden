@@ -1,9 +1,9 @@
 import { FolderPlusIcon } from "@heroicons/react/24/outline";
 import { PropsWithChildren } from "react";
 
-import { Button } from "src/theme/components/Button";
 import { useDisclosure } from "src/utils/useDisclosure";
 
+import { Button } from "@/components/ui/button";
 import { ButtonVariantProps } from "@/styled-system/recipes";
 
 import { CollectionCreateModal } from "./CollectionCreateModal";
@@ -16,10 +16,9 @@ export function CollectionCreateTrigger(
     <>
       {props.children ?? (
         <Button
-          w="full"
+          variant="subtle"
           justifyContent="start"
           size="sm"
-          kind="primary"
           onClick={onOpen}
           {...props}
         >

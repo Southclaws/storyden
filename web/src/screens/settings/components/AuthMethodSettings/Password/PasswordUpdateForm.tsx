@@ -1,7 +1,6 @@
-import { Admonition } from "src/theme/components/Admonition";
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Admonition } from "@/components/ui/admonition";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { usePasswordUpdate } from "./usePasswordUpdate";
@@ -30,7 +29,7 @@ export function PasswordUpdateForm() {
           placeholder="current password"
           {...register("old")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.old?.message}
         </styled.p>
         <Input
@@ -40,14 +39,16 @@ export function PasswordUpdateForm() {
           placeholder="new password"
           {...register("new")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.new?.message}
         </styled.p>
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.root?.message}
         </styled.p>
         <VStack alignItems="start" w="full">
-          <Button type="submit">Change password</Button>
+          <Button type="submit" variant="subtle">
+            Change password
+          </Button>
           <Admonition
             value={success}
             onChange={handleCloseNotification}

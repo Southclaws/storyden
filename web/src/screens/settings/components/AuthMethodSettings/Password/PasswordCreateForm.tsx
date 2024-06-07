@@ -1,7 +1,6 @@
-import { Admonition } from "src/theme/components/Admonition";
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Admonition } from "@/components/ui/admonition";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { usePasswordCreate } from "./usePasswordCreate";
@@ -34,7 +33,7 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("newPassword")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.newPassword?.message}
         </styled.p>
         <Input
@@ -45,10 +44,10 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("confirmPassword")}
         />
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.confirmPassword?.message}
         </styled.p>
-        <styled.p color="red.600" fontSize="sm">
+        <styled.p color="fg.error" fontSize="sm">
           {errors.root?.message}
         </styled.p>
         <VStack alignItems="start" w="full">

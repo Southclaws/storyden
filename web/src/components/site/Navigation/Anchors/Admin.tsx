@@ -1,10 +1,11 @@
 import { CrownIcon } from "src/components/graphics/CrownIcon";
-import { Link } from "src/theme/components/Link";
+
+import { LinkButton } from "@/components/ui/link-button";
 
 export function AdminAction() {
   return (
-    <Link href="/admin" kind="ghost" size="sm" p="0">
+    <LinkButton href="/admin" variant="ghost" size="sm" p="0">
       <CrownIcon width="1.5em" />
-    </Link>
+    </LinkButton>
   );
 }
