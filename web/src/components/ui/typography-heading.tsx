@@ -5,11 +5,11 @@ import {
   TypographyHeadingVariantProps,
   typographyHeading,
 } from "@/styled-system/recipes";
-import { StyleProps } from "@/styled-system/types";
+import { JsxStyleProps } from "@/styled-system/types";
 
 type HeadingProps = PropsWithChildren<
   TypographyHeadingVariantProps &
-    StyleProps &
+    JsxStyleProps &
     DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>
 >;
 
