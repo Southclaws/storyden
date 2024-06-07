@@ -1,11 +1,11 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
 
-import { Link } from "src/theme/components/Link";
+import { LinkButton } from "@/components/ui/link-button";
 
 export function LinksAction() {
   return (
-    <Link href="/l" kind="ghost" size="sm">
+    <LinkButton href="/l" variant="ghost" size="sm">
       <LinkIcon />
-    </Link>
+    </LinkButton>
   );
 }

@@ -3,8 +3,7 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface LinkVariant {
-  kind: "neutral" | "primary" | "destructive" | "ghost" | "blank"
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+  
 }
 
 type LinkVariantMap = {

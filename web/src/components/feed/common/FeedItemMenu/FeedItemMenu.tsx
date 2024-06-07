@@ -2,17 +2,8 @@ import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuPositioner,
-  MenuSeparator,
-  MenuTrigger,
-} from "src/theme/components/Menu";
 
+import * as Menu from "@/components/ui/menu";
 import { styled } from "@/styled-system/jsx";
 
 import { Props, useFeedItemMenu } from "./useFeedItemMenu";
@@ -21,15 +12,15 @@ export function FeedItemMenu(props: Props) {
   const { shareEnabled, deleteEnabled, handleSelect } = useFeedItemMenu(props);
 
   return (
-    <Menu size="sm" lazyMount onSelect={handleSelect}>
-      <MenuTrigger asChild>
+    <Menu.Root size="sm" lazyMount onSelect={handleSelect}>
+      <Menu.Trigger asChild>
         <MoreAction />
-      </MenuTrigger>
+      </Menu.Trigger>
       <Portal>
-        <MenuPositioner>
-          <MenuContent minW="36">
-            <MenuItemGroup id="user">
-              <MenuItemGroupLabel
+        <Menu.Positioner>
+          <Menu.Content minW="36">
+            <Menu.ItemGroup id="user">
+              <Menu.ItemGroupLabel
                 htmlFor="user"
                 display="flex"
                 flexDir="column"
@@ -40,17 +31,17 @@ export function FeedItemMenu(props: Props) {
                 <styled.time fontWeight="normal">
                   {format(new Date(props.thread.createdAt), "yyyy-mm-dd")}
                 </styled.time>
-              </MenuItemGroupLabel>
+              </Menu.ItemGroupLabel>
 
-              <MenuSeparator />
+              <Menu.Separator />
 
-              <MenuItem id="copy-link">Copy link</MenuItem>
-              {shareEnabled && <MenuItem id="share">Share</MenuItem>}
-              {deleteEnabled && <MenuItem id="delete">Delete</MenuItem>}
-            </MenuItemGroup>
-          </MenuContent>
-        </MenuPositioner>
+              <Menu.Item id="copy-link">Copy link</Menu.Item>
+              {shareEnabled && <Menu.Item id="share">Share</Menu.Item>}
+              {deleteEnabled && <Menu.Item id="delete">Delete</Menu.Item>}
+            </Menu.ItemGroup>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
-    </Menu>
+    </Menu.Root>
   );
 }

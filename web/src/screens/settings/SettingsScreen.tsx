@@ -1,7 +1,6 @@
 "use client";
 
-import { Heading1 } from "src/theme/components/Heading/Index";
-
+import { Heading1 } from "@/components/ui/typography-heading";
 import { VStack } from "@/styled-system/jsx";
 
 import { AuthMethodSettings } from "./components/AuthMethodSettings/AuthMethodSettings";

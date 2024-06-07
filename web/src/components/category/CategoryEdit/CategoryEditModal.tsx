@@ -1,16 +1,16 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { Button } from "src/theme/components/Button";
-import { FormControl } from "src/theme/components/FormControl";
-import { FormFeedback } from "src/theme/components/FormFeedback";
-import { FormLabel } from "src/theme/components/FormLabel";
-import { Input } from "src/theme/components/Input";
 
+import { Button } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormFeedback } from "@/components/ui/form/FormFeedback";
+import { FormLabel } from "@/components/ui/form/FormLabel";
+import { Input } from "@/components/ui/input";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useCategoryEdit } from "./useCategoryEdit";
 
 export function CategoryEditModal(props: Props) {
-  const { register, onSubmit, errors } = useCategoryEdit(props);
+  const { register, onSubmit, onCancel, errors } = useCategoryEdit(props);
 
   return (
     <ModalDrawer
@@ -46,10 +46,10 @@ export function CategoryEditModal(props: Props) {
         </VStack>
 
         <HStack w="full" alignItems="center" justify="end" pb="3" gap="4">
-          <Button kind="ghost" size="sm" onClick={props.onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
             Cancel
           </Button>
-          <Button kind="primary" size="sm" type="submit">
+          <Button type="submit" size="sm">
             Save
           </Button>
         </HStack>

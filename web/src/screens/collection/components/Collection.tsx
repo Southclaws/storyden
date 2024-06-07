@@ -1,7 +1,7 @@
 import { CollectionWithItems } from "src/api/openapi/schemas";
 import { Timestamp } from "src/components/site/Timestamp";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Flex, VStack, styled } from "@/styled-system/jsx";
 
 import { CollectionItemList } from "./CollectionItemList";

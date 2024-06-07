@@ -2,8 +2,8 @@
 
 import ErrorBanner from "src/components/site/ErrorBanner";
 import { Unready } from "src/components/site/Unready";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { VStack } from "@/styled-system/jsx";
 
 import { BrandSettings } from "./components/BrandSettings/BrandSettings";

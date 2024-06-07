@@ -1,6 +1,6 @@
-import { Button } from "src/theme/components/Button";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
+import { Button } from "@/components/ui/button";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useMemberSuspension } from "./useMemberSuspension";
@@ -24,7 +24,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
         {props.deletedAt ? (
           <Button
             w="full"
-            kind="destructive"
+            colorPalette="red"
             onClick={handlers.handleReinstate}
           >
             Reinstate
@@ -32,7 +32,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
         ) : (
           <Button
             w="full"
-            kind="destructive"
+            colorPalette="red"
             onClick={handlers.handleSuspension}
           >
             Suspend

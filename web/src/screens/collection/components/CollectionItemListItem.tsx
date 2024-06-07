@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { CollectionItem } from "src/api/openapi/schemas";
 import { Byline } from "src/components/content/Byline";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Flex, styled } from "@/styled-system/jsx";
 
 type Props = { item: CollectionItem };

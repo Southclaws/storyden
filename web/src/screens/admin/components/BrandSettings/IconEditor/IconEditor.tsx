@@ -1,8 +1,8 @@
 import AvatarEditor from "react-avatar-editor";
 
-import { Button } from "src/theme/components/Button";
-
+import { Button } from "@/components/ui/button";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
+import { button } from "@/styled-system/recipes";
 
 import { Props, useIconEditor } from "./useIconEditor";
 
@@ -13,7 +13,7 @@ export function IconEditor(props: Props) {
     useIconEditor(props);
 
   return (
-    <VStack alignItems="start">
+    <VStack alignItems="start" w="min">
       <HStack>
         <Box borderRadius="lg" overflow="hidden">
           <AvatarEditor
@@ -78,14 +78,20 @@ export function IconEditor(props: Props) {
           display="none"
           width="min"
           type="file"
-          bgColor="gray.100"
+          bgColor="gray.2"
           borderRadius="md"
           border="none"
           onChange={onFileChange}
         />
-        <HStack>
-          <styled.label htmlFor="file-input">Edit icon</styled.label>
-          <Button onClick={onSave} disabled={saving}>
+        <HStack w="full">
+          <styled.label
+            htmlFor="file-input"
+            w="full"
+            className={button({ variant: "ghost" })}
+          >
+            Edit icon
+          </styled.label>
+          <Button variant="subtle" w="full" onClick={onSave} disabled={saving}>
             Save icon
           </Button>
         </HStack>

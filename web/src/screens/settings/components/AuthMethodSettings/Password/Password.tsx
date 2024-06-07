@@ -1,5 +1,4 @@
-import { Heading3 } from "src/theme/components/Heading/Index";
-
+import { Heading3 } from "@/components/ui/typography-heading";
 import { VStack } from "@/styled-system/jsx";
 
 import { PasswordCreateForm } from "./PasswordCreateForm";

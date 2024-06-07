@@ -1,10 +1,10 @@
 import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { Empty } from "../../site/Empty";
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
 

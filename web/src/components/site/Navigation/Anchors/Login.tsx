@@ -1,19 +1,18 @@
-import { Link } from "src/theme/components/Link";
+import { LinkButton } from "@/components/ui/link-button";
+import { JsxStyleProps } from "@/styled-system/types";
 
-import { StyleProps } from "@/styled-system/types";
-
-export function LoginAction(props: StyleProps) {
+export function LoginAction(props: JsxStyleProps) {
   return (
-    <Link href="/login" kind="neutral" size="sm" {...props}>
+    <LinkButton href="/login" variant="ghost" size="sm" {...props}>
       Login
-    </Link>
+    </LinkButton>
   );
 }
 
-export function RegisterAction(props: StyleProps) {
+export function RegisterAction(props: JsxStyleProps) {
   return (
-    <Link href="/register" kind="primary" size="sm" {...props}>
+    <LinkButton href="/register" size="sm" {...props}>
       Register
-    </Link>
+    </LinkButton>
   );
 }

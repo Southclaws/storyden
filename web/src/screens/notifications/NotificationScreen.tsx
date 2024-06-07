@@ -1,8 +1,8 @@
 "use client";
 
 import { Mailbox } from "src/components/graphics/Mailbox";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { Box } from "@/styled-system/jsx";
 
 export function NotificationScreen() {

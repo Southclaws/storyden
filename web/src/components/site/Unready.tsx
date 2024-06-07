@@ -3,8 +3,8 @@
 import { PropsWithChildren } from "react";
 
 import { APIError } from "src/api/openapi/schemas";
-import { Skeleton } from "src/theme/components/Skeleton";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { Flex } from "@/styled-system/jsx";
 
 import ErrorBanner from "./ErrorBanner";

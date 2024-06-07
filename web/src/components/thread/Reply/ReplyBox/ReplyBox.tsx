@@ -1,7 +1,7 @@
 import { Thread } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
-import { Button } from "src/theme/components/Button";
 
+import { Button } from "@/components/ui/button";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { useReplyBox } from "./useReplyBox";

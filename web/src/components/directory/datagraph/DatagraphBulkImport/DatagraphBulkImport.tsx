@@ -1,9 +1,8 @@
-import { Button } from "src/theme/components/Button";
-import { Card, CardRows } from "src/theme/components/Card";
-import { Input } from "src/theme/components/Input";
-
 import { NodeCard } from "../NodeCard";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardRows } from "@/components/ui/rich-card";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 
@@ -96,7 +95,6 @@ export function DatagraphBulkImport(props: Props) {
                   <HStack>
                     <Button
                       size="xs"
-                      kind="primary"
                       onClick={() => handlers.handleCreateNodeFromLink(link)}
                     >
                       {props.node ? `Create in ${props.node?.name}` : "Create"}
@@ -162,35 +160,35 @@ function StateBadge({ state }: { state: State }) {
   switch (state) {
     case "idle":
       return (
-        <styled.div className={badge} bgColor="gray.100">
+        <styled.div className={badge} bgColor="gray.5">
           Idle
         </styled.div>
       );
 
     case "loading":
       return (
-        <styled.div className={badge} bgColor="blue.400">
+        <styled.div className={badge} bgColor="blue.4">
           Loading
         </styled.div>
       );
 
     case "success":
       return (
-        <styled.div className={badge} bgColor="green.500">
+        <styled.div className={badge} bgColor="green.5">
           Success
         </styled.div>
       );
 
     case "created":
       return (
-        <styled.div className={badge} bgColor="green.500">
+        <styled.div className={badge} bgColor="green.5">
           Created
         </styled.div>
       );
 
     case "error":
       return (
-        <styled.div className={badge} bgColor="red.500">
+        <styled.div className={badge} bgColor="red.5">
           Error
         </styled.div>
       );

@@ -4,58 +4,50 @@ import Link from "next/link";
 
 import { joinDirectoryPath } from "src/screens/directory/datagraph/directory-path";
 import { useDirectoryPath } from "src/screens/directory/datagraph/useDirectoryPath";
-import { Button } from "src/theme/components/Button";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuItemGroup,
-  MenuItemGroupLabel,
-  MenuPositioner,
-  MenuSeparator,
-  MenuTrigger,
-} from "src/theme/components/Menu";
+
+import { Button } from "@/components/ui/button";
+import * as Menu from "@/components/ui/menu";
 
 export function DatagraphCreateMenu() {
   const directoryPath = useDirectoryPath();
   const jointNew = joinDirectoryPath(directoryPath, "new");
 
   return (
-    <Menu size="sm">
-      <MenuTrigger asChild>
-        <Button size="xs">
+    <Menu.Root size="sm">
+      <Menu.Trigger asChild>
+        <Button size="xs" variant="outline">
           <PlusCircleIcon /> Create
         </Button>
-      </MenuTrigger>
+      </Menu.Trigger>
       <Portal>
-        <MenuPositioner>
-          <MenuContent minW="36">
-            <MenuItemGroup id="user">
-              <MenuItemGroupLabel
+        <Menu.Positioner>
+          <Menu.Content minW="36">
+            <Menu.ItemGroup id="user">
+              <Menu.ItemGroupLabel
                 htmlFor="user"
                 display="flex"
                 flexDir="column"
                 userSelect="none"
               >
                 <p>Create a knowledgebase page</p>
-              </MenuItemGroupLabel>
+              </Menu.ItemGroupLabel>
 
-              <MenuSeparator />
+              <Menu.Separator />
 
               <Link href={`/directory/${jointNew}`}>
-                <MenuItem id="create-one">
+                <Menu.Item id="create-one">
                   <>Create one</>
-                </MenuItem>
+                </Menu.Item>
               </Link>
               <Link href={`/directory/${jointNew}?bulk`}>
-                <MenuItem id="create-many">
+                <Menu.Item id="create-many">
                   <>Create many</>
-                </MenuItem>
+                </Menu.Item>
               </Link>
-            </MenuItemGroup>
-          </MenuContent>
-        </MenuPositioner>
+            </Menu.ItemGroup>
+          </Menu.Content>
+        </Menu.Positioner>
       </Portal>
-    </Menu>
+    </Menu.Root>
   );
 }

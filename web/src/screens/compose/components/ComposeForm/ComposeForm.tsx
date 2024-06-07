@@ -1,11 +1,10 @@
 import { FormProvider } from "react-hook-form";
 
-import { Button } from "src/theme/components/Button";
-
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";
 import { TitleInput } from "../TitleInput/TitleInput";
 
+import { Button } from "@/components/ui/button";
 import { HStack, styled } from "@/styled-system/jsx";
 
 import { Props, useComposeForm } from "./useComposeForm";
@@ -40,7 +39,8 @@ export function ComposeForm(props: Props) {
             alignItems="end"
           >
             <Button
-              kind="neutral"
+              variant="ghost"
+              size="xs"
               disabled={!formContext.formState.isValid}
               onClick={onSave}
             >
@@ -48,7 +48,8 @@ export function ComposeForm(props: Props) {
             </Button>
 
             <Button
-              kind="primary"
+              variant="subtle"
+              size="xs"
               type="submit"
               disabled={!formContext.formState.isValid}
               // isLoading={formContext.formState.isSubmitting}

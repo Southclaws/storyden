@@ -1,34 +1,8 @@
 import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mjs';
 import { createRecipe } from './create-recipe.mjs';
 
-const cardDefaultVariants = {
-  "mediaDisplay": "with",
-  "shape": "box",
-  "size": "default"
-}
-const cardCompoundVariants = [
-  {
-    "size": "small",
-    "shape": "row",
-    "css": {
-      "root": {
-        "gridTemplateColumns": "1fr 2fr minmax(0, min-content)"
-      },
-      "text": {
-        "display": "none"
-      },
-      "title": {
-        "fontSize": "sm"
-      },
-      "controlsOverlayContainer": {
-        "display": "flex",
-        "justifyContent": "end",
-        "alignItems": "start",
-        "padding": "2"
-      }
-    }
-  }
-]
+const cardDefaultVariants = {}
+const cardCompoundVariants = []
 
 const cardSlotNames = [
   [
@@ -36,24 +10,12 @@ const cardSlotNames = [
     "card__root"
   ],
   [
-    "mediaBackdropContainer",
-    "card__mediaBackdropContainer"
+    "header",
+    "card__header"
   ],
   [
-    "mediaBackdrop",
-    "card__mediaBackdrop"
-  ],
-  [
-    "contentContainer",
-    "card__contentContainer"
-  ],
-  [
-    "mediaContainer",
-    "card__mediaContainer"
-  ],
-  [
-    "textArea",
-    "card__textArea"
+    "body",
+    "card__body"
   ],
   [
     "footer",
@@ -64,24 +26,32 @@ const cardSlotNames = [
     "card__title"
   ],
   [
-    "text",
-    "card__text"
+    "description",
+    "card__description"
   ],
   [
-    "media",
-    "card__media"
+    "root",
+    "card__root"
   ],
   [
-    "mediaMissing",
-    "card__mediaMissing"
+    "header",
+    "card__header"
   ],
   [
-    "controlsOverlayContainer",
-    "card__controlsOverlayContainer"
+    "body",
+    "card__body"
   ],
   [
-    "controls",
-    "card__controls"
+    "footer",
+    "card__footer"
+  ],
+  [
+    "title",
+    "card__title"
+  ],
+  [
+    "description",
+    "card__description"
   ]
 ]
 const cardSlotFns = /* @__PURE__ */ cardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, cardDefaultVariants, getSlotCompoundVariant(cardCompoundVariants, slotName))])
@@ -90,11 +60,7 @@ const cardFn = memo((props = {}) => {
   return Object.fromEntries(cardSlotFns.map(([slotName, slotFn]) => [slotName, slotFn.recipeFn(props)]))
 })
 
-const cardVariantKeys = [
-  "mediaDisplay",
-  "shape",
-  "size"
-]
+const cardVariantKeys = []
 const getVariantProps = (variants) => ({ ...cardDefaultVariants, ...compact(variants) })
 
 export const card = /* @__PURE__ */ Object.assign(cardFn, {
@@ -102,20 +68,7 @@ export const card = /* @__PURE__ */ Object.assign(cardFn, {
   __name__: 'card',
   raw: (props) => props,
   variantKeys: cardVariantKeys,
-  variantMap: {
-  "mediaDisplay": [
-    "with",
-    "without"
-  ],
-  "shape": [
-    "box",
-    "row"
-  ],
-  "size": [
-    "default",
-    "small"
-  ]
-},
+  variantMap: {},
   splitVariantProps(props) {
     return splitProps(props, cardVariantKeys)
   },

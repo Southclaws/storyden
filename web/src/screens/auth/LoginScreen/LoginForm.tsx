@@ -2,9 +2,8 @@
 
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
 
-import { Button } from "src/theme/components/Button";
-import { Input } from "src/theme/components/Input";
-
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
 import { Props, useLoginForm } from "./useLoginForm";
@@ -37,7 +36,7 @@ export function LoginForm(props: Props) {
         required
         {...register("identifier")}
       />
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.identifier?.message}
       </styled.p>
       <Flex alignItems="center" gap="2">
@@ -56,7 +55,7 @@ export function LoginForm(props: Props) {
 
             <Button
               w="full"
-              kind="neutral"
+              variant="ghost"
               size="sm"
               type="button"
               onClick={handleWebauthn}
@@ -69,13 +68,13 @@ export function LoginForm(props: Props) {
           </>
         )}
       </Flex>
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.token?.message}
       </styled.p>
-      <Button type="submit" w="full" kind="primary" onClick={handlePassword}>
+      <Button type="submit" w="full" onClick={handlePassword}>
         Login
       </Button>
-      <styled.p color="red.600" fontSize="sm">
+      <styled.p color="fg.error" fontSize="sm">
         {errors.root?.message}
       </styled.p>
     </styled.form>

@@ -3,9 +3,9 @@ import { Controller } from "react-hook-form";
 
 import { Category } from "src/api/openapi/schemas";
 import { Unready } from "src/components/site/Unready";
-import { FormControl } from "src/theme/components/FormControl";
-import { FormErrorText } from "src/theme/components/FormErrorText";
 
+import { FormControl } from "@/components/ui/form/FormControl";
+import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { styled } from "@/styled-system/jsx";
 
 import { useCategorySelect } from "./useCategorySelect";

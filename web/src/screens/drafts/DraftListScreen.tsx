@@ -2,10 +2,10 @@
 
 import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { Unready } from "src/components/site/Unready";
-import { Heading1 } from "src/theme/components/Heading/Index";
 
 import { useDirectoryPath } from "../directory/datagraph/useDirectoryPath";
 
+import { Heading1 } from "@/components/ui/typography-heading";
 import { VStack } from "@/styled-system/jsx";
 
 import { Props, useDraftListScreen } from "./useDraftListScreen";

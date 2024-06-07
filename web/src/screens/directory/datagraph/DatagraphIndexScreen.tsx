@@ -5,8 +5,8 @@ import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { LinkResultList } from "src/components/directory/links/LinkIndexView/LinkResultList";
 import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
-import { Heading2 } from "src/theme/components/Heading/Index";
 
+import { Heading2 } from "@/components/ui/typography-heading";
 import { Center, VStack } from "@/styled-system/jsx";
 
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
