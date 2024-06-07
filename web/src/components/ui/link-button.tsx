@@ -5,11 +5,11 @@ import { PropsWithChildren } from "react";
 import { css, cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 import { ButtonVariantProps, button } from "@/styled-system/recipes";
-import { StyleProps } from "@/styled-system/types";
+import { JsxStyleProps } from "@/styled-system/types";
 
 export type LinkProps = Partial<ButtonVariantProps> &
   NextLinkProps &
-  StyleProps;
+  JsxStyleProps;
 
 export function LinkButton({
   children,
