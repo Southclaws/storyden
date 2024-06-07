@@ -4,12 +4,12 @@ import { NewBadge } from "src/components/directory/DirectoryBadge";
 import { NodeCardGrid } from "src/components/directory/datagraph/NodeCardList";
 import { LinkCardRows } from "src/components/directory/links/LinkCardList";
 
-import { TextPostList } from "../text/TextPostList";
-import { MixedContent } from "../useFeed";
-
 import { LinkButton } from "@/components/ui/link-button";
 import { Heading2 } from "@/components/ui/typography-heading";
 import { HStack, LStack } from "@/styled-system/jsx";
+
+import { TextPostList } from "../text/TextPostList";
+import { MixedContent } from "../useFeed";
 
 import { MixedContentChunk, chunkData } from "./utils";
 
@@ -25,8 +25,6 @@ export function MixedContentFeed({ data }: Props) {
       {chunks.map((c: MixedContentChunk, i) => {
         const showHeader =
           i > 0 ? getChunkType(chunks[i - 1]) === getChunkType(c) : true;
-
-        console.log("FEED", i, getChunkType(chunks[i - 1]));
 
         return (
           <MixedContentFeedSection
