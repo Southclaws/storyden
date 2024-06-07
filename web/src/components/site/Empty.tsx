@@ -4,11 +4,15 @@ import { PropsWithChildren } from "react";
 import { css } from "@/styled-system/css";
 import { HStack, styled } from "@/styled-system/jsx";
 
+const iconStyles = css({ width: "6" });
+
 export function Empty({ children }: PropsWithChildren) {
   return (
     <HStack alignItems="center" color="fg.muted">
-      <CubeTransparentIcon className={css({ width: "6" })} />
-      <styled.p fontStyle="italic">{children}</styled.p>
+      <CubeTransparentIcon className={iconStyles} />
+      <styled.p fontStyle="italic" textWrap="nowrap">
+        {children}
+      </styled.p>
     </HStack>
   );
 }
