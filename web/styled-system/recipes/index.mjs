@@ -1,5 +1,6 @@
 export * from './admonition.mjs';
 export * from './heading-input.mjs';
+export * from './typography-heading.mjs';
 export * from './rich-card.mjs';
 export * from './badge.mjs';
 export * from './button.mjs';
@@ -50,4 +51,3 @@ export * from './toast.mjs';
 export * from './toggle-group.mjs';
 export * from './tooltip.mjs';
 export * from './tree-view.mjs';
-export * from './typography-heading.mjs';
