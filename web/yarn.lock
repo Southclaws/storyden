@@ -2145,7 +2145,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/core@npm:^2.3.1, @tiptap/core@npm:^2.4.0":
+"@tiptap/core@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/core@npm:2.4.0"
   peerDependencies:
@@ -2184,7 +2184,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-bullet-list@npm:^2.3.1, @tiptap/extension-bullet-list@npm:^2.4.0":
+"@tiptap/extension-bullet-list@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-bullet-list@npm:2.4.0"
   peerDependencies:
@@ -2221,7 +2221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-dropcursor@npm:^2.3.1, @tiptap/extension-dropcursor@npm:^2.4.0":
+"@tiptap/extension-dropcursor@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-dropcursor@npm:2.4.0"
   peerDependencies:
@@ -2243,7 +2243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-focus@npm:^2.3.1":
+"@tiptap/extension-focus@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-focus@npm:2.4.0"
   peerDependencies:
@@ -2301,7 +2301,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-image@npm:^2.3.1":
+"@tiptap/extension-image@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-image@npm:2.4.0"
   peerDependencies:
@@ -2319,7 +2319,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-list-item@npm:^2.3.1, @tiptap/extension-list-item@npm:^2.4.0":
+"@tiptap/extension-list-item@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-list-item@npm:2.4.0"
   peerDependencies:
@@ -2328,7 +2328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-mention@npm:^2.3.1":
+"@tiptap/extension-mention@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-mention@npm:2.4.0"
   peerDependencies:
@@ -2339,7 +2339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-ordered-list@npm:^2.3.1, @tiptap/extension-ordered-list@npm:^2.4.0":
+"@tiptap/extension-ordered-list@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-ordered-list@npm:2.4.0"
   peerDependencies:
@@ -2357,7 +2357,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-placeholder@npm:^2.3.1":
+"@tiptap/extension-placeholder@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/extension-placeholder@npm:2.4.0"
   peerDependencies:
@@ -2385,7 +2385,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/html@npm:^2.3.1":
+"@tiptap/html@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/html@npm:2.4.0"
   dependencies:
@@ -2397,7 +2397,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/pm@npm:^2.3.1":
+"@tiptap/pm@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/pm@npm:2.4.0"
   dependencies:
@@ -2423,7 +2423,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/react@npm:^2.3.1":
+"@tiptap/react@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/react@npm:2.4.0"
   dependencies:
@@ -2438,7 +2438,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/starter-kit@npm:^2.3.1":
+"@tiptap/starter-kit@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/starter-kit@npm:2.4.0"
   dependencies:
@@ -2465,7 +2465,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/suggestion@npm:^2.3.1":
+"@tiptap/suggestion@npm:^2.4.0":
   version: 2.4.0
   resolution: "@tiptap/suggestion@npm:2.4.0"
   peerDependencies:
@@ -9701,20 +9701,20 @@ __metadata:
     "@park-ui/panda-preset": "npm:^0.37.0"
     "@simplewebauthn/browser": "npm:^10.0.0"
     "@simplewebauthn/types": "npm:^10.0.0"
-    "@tiptap/core": "npm:^2.3.1"
-    "@tiptap/extension-bullet-list": "npm:^2.3.1"
-    "@tiptap/extension-dropcursor": "npm:^2.3.1"
-    "@tiptap/extension-focus": "npm:^2.3.1"
-    "@tiptap/extension-image": "npm:^2.3.1"
-    "@tiptap/extension-list-item": "npm:^2.3.1"
-    "@tiptap/extension-mention": "npm:^2.3.1"
-    "@tiptap/extension-ordered-list": "npm:^2.3.1"
-    "@tiptap/extension-placeholder": "npm:^2.3.1"
-    "@tiptap/html": "npm:^2.3.1"
-    "@tiptap/pm": "npm:^2.3.1"
-    "@tiptap/react": "npm:^2.3.1"
-    "@tiptap/starter-kit": "npm:^2.3.1"
-    "@tiptap/suggestion": "npm:^2.3.1"
+    "@tiptap/core": "npm:^2.4.0"
+    "@tiptap/extension-bullet-list": "npm:^2.4.0"
+    "@tiptap/extension-dropcursor": "npm:^2.4.0"
+    "@tiptap/extension-focus": "npm:^2.4.0"
+    "@tiptap/extension-image": "npm:^2.4.0"
+    "@tiptap/extension-list-item": "npm:^2.4.0"
+    "@tiptap/extension-mention": "npm:^2.4.0"
+    "@tiptap/extension-ordered-list": "npm:^2.4.0"
+    "@tiptap/extension-placeholder": "npm:^2.4.0"
+    "@tiptap/html": "npm:^2.4.0"
+    "@tiptap/pm": "npm:^2.4.0"
+    "@tiptap/react": "npm:^2.4.0"
+    "@tiptap/starter-kit": "npm:^2.4.0"
+    "@tiptap/suggestion": "npm:^2.4.0"
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
     "@types/node": "npm:^20.14.2"
     "@types/react": "npm:^18.3.3"
