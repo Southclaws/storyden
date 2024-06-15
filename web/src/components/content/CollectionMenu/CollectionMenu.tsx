@@ -18,14 +18,10 @@ export function CollectionMenu(props: Props) {
   if (!ready) return null;
 
   return (
-    <Box
-      onKeyDown={handlers.handleKeyDown}
-      onKeyUp={handlers.handleKeyUp}
-      tabIndex={1}
-    >
+    <Box onKeyDown={handlers.handleKeyDown} onKeyUp={handlers.handleKeyUp}>
       <Menu.Root
-        onOpenChange={handlers.handleOpenChange}
         closeOnSelect={!multiSelect}
+        onOpenChange={handlers.handleOpenChange}
         onSelect={handlers.handleSelect}
       >
         <Menu.Trigger asChild>
