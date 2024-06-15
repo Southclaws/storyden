@@ -30,7 +30,6 @@ export function DatagraphNodeMenu(props: Props) {
           <Menu.Content minW="36">
             <Menu.ItemGroup id="user">
               <Menu.ItemGroupLabel
-                htmlFor="user"
                 display="flex"
                 flexDir="column"
                 userSelect="none"
@@ -49,26 +48,26 @@ export function DatagraphNodeMenu(props: Props) {
               {reviewFlow && (
                 <>
                   {reviewFlow.draftToReview && (
-                    <Menu.Item id="review">Submit for review</Menu.Item>
+                    <Menu.Item value="review">Submit for review</Menu.Item>
                   )}
                   {reviewFlow.reviewToPublsh && (
-                    <Menu.Item id="publsh">Publish</Menu.Item>
+                    <Menu.Item value="publsh">Publish</Menu.Item>
                   )}
                   {reviewFlow.publishToReview && (
-                    <Menu.Item id="review">Unpublish</Menu.Item>
+                    <Menu.Item value="review">Unpublish</Menu.Item>
                   )}
                   {reviewFlow.reviewToDraft && (
-                    <Menu.Item id="draft">Revert to draft</Menu.Item>
+                    <Menu.Item value="draft">Revert to draft</Menu.Item>
                   )}
                   {reviewFlow.draftToPublish && (
-                    <Menu.Item id="publish">Force publish</Menu.Item>
+                    <Menu.Item value="publish">Force publish</Menu.Item>
                   )}
                 </>
               )}
 
               {deleteEnabled && (
                 <>
-                  <Menu.Item id="delete">Delete</Menu.Item>
+                  <Menu.Item value="delete">Delete</Menu.Item>
                   <DeleteConfirmation {...deleteProps} />
                 </>
               )}

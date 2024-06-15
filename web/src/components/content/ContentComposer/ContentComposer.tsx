@@ -20,13 +20,13 @@ import {
 } from "lucide-react";
 import { match } from "ts-pattern";
 
-import "./styles.css";
-
 import { Button } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { css } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
+
+import "./styles.css";
 
 import { FloatingMenu } from "./plugins/MenuPlugin";
 import { ContentComposerProps, useContentComposer } from "./useContentComposer";
@@ -83,32 +83,32 @@ export function ContentComposer(props: ContentComposerProps) {
                   backdropBlur="md"
                   backdropFilter="auto"
                 >
-                  <Menu.Item id="p">
+                  <Menu.Item value="p">
                     <TextIcon />
                     &nbsp;Paragraph
                   </Menu.Item>
 
-                  <Menu.Item id="h1" fontSize="lg" fontWeight="extrabold">
+                  <Menu.Item value="h1" fontSize="lg" fontWeight="extrabold">
                     <Heading1Icon />
                     &nbsp;Heading 1
                   </Menu.Item>
-                  <Menu.Item id="h2" fontSize="md" fontWeight="extrabold">
+                  <Menu.Item value="h2" fontSize="md" fontWeight="extrabold">
                     <Heading2Icon />
                     &nbsp;Heading 2
                   </Menu.Item>
-                  <Menu.Item id="h3" fontSize="md" fontWeight="bold">
+                  <Menu.Item value="h3" fontSize="md" fontWeight="bold">
                     <Heading3Icon />
                     &nbsp;Heading 3
                   </Menu.Item>
-                  <Menu.Item id="h4" fontSize="md" fontWeight="medium">
+                  <Menu.Item value="h4" fontSize="md" fontWeight="medium">
                     <Heading4Icon />
                     &nbsp;Heading 4
                   </Menu.Item>
-                  <Menu.Item id="h5" fontSize="sm" fontWeight="normal">
+                  <Menu.Item value="h5" fontSize="sm" fontWeight="normal">
                     <Heading5Icon />
                     &nbsp;Heading 5
                   </Menu.Item>
-                  <Menu.Item id="h6" fontSize="sm" fontWeight="light">
+                  <Menu.Item value="h6" fontSize="sm" fontWeight="light">
                     <Heading6Icon />
                     &nbsp;Heading 6
                   </Menu.Item>

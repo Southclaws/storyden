@@ -35,7 +35,6 @@ export function PostMenu(props: PostProps) {
           <Menu.Content minW="36">
             <Menu.ItemGroup id="group">
               <Menu.ItemGroupLabel
-                htmlFor="user"
                 display="flex"
                 flexDir="column"
                 userSelect="none"
@@ -49,14 +48,14 @@ export function PostMenu(props: PostProps) {
 
               <Menu.Separator />
 
-              <Menu.Item id="copy-link" onClick={onCopyLink}>
+              <Menu.Item value="copy-link" onClick={onCopyLink}>
                 <HStack gap="1">
                   <LinkIcon width="1.4em" /> Copy link
                 </HStack>
               </Menu.Item>
 
               {shareEnabled && (
-                <Menu.Item id="share" onClick={onShare}>
+                <Menu.Item value="share" onClick={onShare}>
                   <HStack gap="1">
                     <ShareIcon width="1.4em" /> Share
                   </HStack>
@@ -66,7 +65,7 @@ export function PostMenu(props: PostProps) {
               {/* <Menu.Item>Reply</Menu.Item> */}
 
               {editEnabled && (
-                <Menu.Item id="edit" onClick={onEdit}>
+                <Menu.Item value="edit" onClick={onEdit}>
                   <HStack gap="1">
                     <PencilIcon width="1.4em" /> Edit
                   </HStack>
@@ -74,7 +73,7 @@ export function PostMenu(props: PostProps) {
               )}
 
               {deleteEnabled && (
-                <Menu.Item id="delete" onClick={onDelete}>
+                <Menu.Item value="delete" onClick={onDelete}>
                   <HStack gap="1">
                     <TrashIcon width="1.4em" /> Delete
                   </HStack>
