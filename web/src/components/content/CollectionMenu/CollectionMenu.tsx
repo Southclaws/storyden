@@ -3,11 +3,11 @@ import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 
 import { BookmarkAction } from "src/components/site/Action/Bookmark";
 
-import { CollectionCreateTrigger } from "../CollectionCreate/CollectionCreateTrigger";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import * as Menu from "@/components/ui/menu";
 import { Box, Center, HStack } from "@/styled-system/jsx";
+
+import { CollectionCreateTrigger } from "../CollectionCreate/CollectionCreateTrigger";
 
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 
@@ -18,15 +18,10 @@ export function CollectionMenu(props: Props) {
   if (!ready) return null;
 
   return (
-    <Box
-      onKeyDown={handlers.handleKeyDown}
-      onKeyUp={handlers.handleKeyUp}
-      tabIndex={1}
-    >
+    <Box onKeyDown={handlers.handleKeyDown} onKeyUp={handlers.handleKeyUp}>
       <Menu.Root
-        size="sm"
-        onOpenChange={handlers.handleOpenChange}
         closeOnSelect={!multiSelect}
+        onOpenChange={handlers.handleOpenChange}
         onSelect={handlers.handleSelect}
       >
         <Menu.Trigger asChild>
@@ -37,14 +32,12 @@ export function CollectionMenu(props: Props) {
           <Menu.Positioner>
             <Menu.Content userSelect="none">
               <Menu.ItemGroup id="group">
-                <Menu.ItemGroupLabel htmlFor="group">
-                  Add to collections
-                </Menu.ItemGroupLabel>
+                <Menu.ItemGroupLabel>Add to collections</Menu.ItemGroupLabel>
 
                 <Menu.Separator />
 
                 {collections.map((c) => (
-                  <Menu.Item id={c.id} key={c.id}>
+                  <Menu.Item key={c.id} value={c.id}>
                     <HStack>
                       {multiSelect ? (
                         <Checkbox checked={c.hasPost} />
@@ -60,7 +53,7 @@ export function CollectionMenu(props: Props) {
               </Menu.ItemGroup>
 
               <Menu.ItemGroup id="create">
-                <Menu.Item id="create-collection" closeOnSelect={false}>
+                <Menu.Item value="create-collection" closeOnSelect={false}>
                   <CollectionCreateTrigger variant="ghost" />
                 </Menu.Item>
               </Menu.ItemGroup>

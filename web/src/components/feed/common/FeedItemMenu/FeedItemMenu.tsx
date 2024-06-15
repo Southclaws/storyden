@@ -12,7 +12,7 @@ export function FeedItemMenu(props: Props) {
   const { shareEnabled, deleteEnabled, handleSelect } = useFeedItemMenu(props);
 
   return (
-    <Menu.Root size="sm" lazyMount onSelect={handleSelect}>
+    <Menu.Root lazyMount onSelect={handleSelect}>
       <Menu.Trigger asChild>
         <MoreAction />
       </Menu.Trigger>
@@ -21,7 +21,6 @@ export function FeedItemMenu(props: Props) {
           <Menu.Content minW="36">
             <Menu.ItemGroup id="user">
               <Menu.ItemGroupLabel
-                htmlFor="user"
                 display="flex"
                 flexDir="column"
                 userSelect="none"
@@ -35,9 +34,9 @@ export function FeedItemMenu(props: Props) {
 
               <Menu.Separator />
 
-              <Menu.Item id="copy-link">Copy link</Menu.Item>
-              {shareEnabled && <Menu.Item id="share">Share</Menu.Item>}
-              {deleteEnabled && <Menu.Item id="delete">Delete</Menu.Item>}
+              <Menu.Item value="copy-link">Copy link</Menu.Item>
+              {shareEnabled && <Menu.Item value="share">Share</Menu.Item>}
+              {deleteEnabled && <Menu.Item value="delete">Delete</Menu.Item>}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

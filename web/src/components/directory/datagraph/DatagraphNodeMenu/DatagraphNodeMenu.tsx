@@ -1,4 +1,3 @@
-import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
 import { DeleteConfirmation } from "src/components/site/Action/Delete";
@@ -21,61 +20,59 @@ export function DatagraphNodeMenu(props: Props) {
         : "";
 
   return (
-    <Menu.Root size="sm" lazyMount onSelect={handleSelect}>
+    <Menu.Root onSelect={handleSelect}>
       <Menu.Trigger asChild>
         <MoreAction size="xs" />
       </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content minW="36">
-            <Menu.ItemGroup id="user">
-              <Menu.ItemGroupLabel
-                htmlFor="user"
-                display="flex"
-                flexDir="column"
-                userSelect="none"
-              >
-                <styled.span>
-                  {`Created by ${props.node.owner.name}`} {statusText}
-                </styled.span>
 
-                <styled.time fontWeight="normal">
-                  {format(new Date(props.node.createdAt), "yyyy-mm-dd")}
-                </styled.time>
-              </Menu.ItemGroupLabel>
+      <Menu.Positioner>
+        <Menu.Content minW="36">
+          <Menu.ItemGroup>
+            <Menu.ItemGroupLabel
+              display="flex"
+              flexDir="column"
+              userSelect="none"
+            >
+              <styled.span>
+                {`Created by ${props.node.owner.name}`} {statusText}
+              </styled.span>
 
-              <Menu.Separator />
+              <styled.time fontWeight="normal">
+                {format(new Date(props.node.createdAt), "yyyy-mm-dd")}
+              </styled.time>
+            </Menu.ItemGroupLabel>
 
-              {reviewFlow && (
-                <>
-                  {reviewFlow.draftToReview && (
-                    <Menu.Item id="review">Submit for review</Menu.Item>
-                  )}
-                  {reviewFlow.reviewToPublsh && (
-                    <Menu.Item id="publsh">Publish</Menu.Item>
-                  )}
-                  {reviewFlow.publishToReview && (
-                    <Menu.Item id="review">Unpublish</Menu.Item>
-                  )}
-                  {reviewFlow.reviewToDraft && (
-                    <Menu.Item id="draft">Revert to draft</Menu.Item>
-                  )}
-                  {reviewFlow.draftToPublish && (
-                    <Menu.Item id="publish">Force publish</Menu.Item>
-                  )}
-                </>
-              )}
+            <Menu.Separator />
 
-              {deleteEnabled && (
-                <>
-                  <Menu.Item id="delete">Delete</Menu.Item>
-                  <DeleteConfirmation {...deleteProps} />
-                </>
-              )}
-            </Menu.ItemGroup>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
+            {reviewFlow && (
+              <>
+                {reviewFlow.draftToReview && (
+                  <Menu.Item value="review">Submit for review</Menu.Item>
+                )}
+                {reviewFlow.reviewToPublsh && (
+                  <Menu.Item value="publsh">Publish</Menu.Item>
+                )}
+                {reviewFlow.publishToReview && (
+                  <Menu.Item value="review">Unpublish</Menu.Item>
+                )}
+                {reviewFlow.reviewToDraft && (
+                  <Menu.Item value="draft">Revert to draft</Menu.Item>
+                )}
+                {reviewFlow.draftToPublish && (
+                  <Menu.Item value="publish">Force publish</Menu.Item>
+                )}
+              </>
+            )}
+
+            {deleteEnabled && (
+              <>
+                <Menu.Item value="delete">Delete</Menu.Item>
+                <DeleteConfirmation {...deleteProps} />
+              </>
+            )}
+          </Menu.ItemGroup>
+        </Menu.Content>
+      </Menu.Positioner>
     </Menu.Root>
   );
 }

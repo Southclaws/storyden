@@ -5,10 +5,10 @@ import { useSession } from "src/auth";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
-import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
-
 import * as Menu from "@/components/ui/menu";
 import { VStack, styled } from "@/styled-system/jsx";
+
+import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
 
 import { Props } from "./useMemberOptionsScreen";
 
@@ -21,19 +21,14 @@ export function MemberOptionsMenu({
   const showAdminOptions = session?.admin && props.handle !== session.handle;
 
   return (
-    <Menu.Root size="sm" onOpenChange={props.onOpenChange}>
+    <Menu.Root onOpenChange={props.onOpenChange}>
       <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="48" userSelect="none">
             <Menu.ItemGroup id="group">
-              <Menu.ItemGroupLabel
-                htmlFor="group"
-                display="flex"
-                gap="2"
-                alignItems="center"
-              >
+              <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
                 <Avatar handle={props.handle} />
                 <VStack alignItems="start" gap="0">
                   <styled.h1 color="fg.default">{props.name}</styled.h1>
@@ -46,7 +41,7 @@ export function MemberOptionsMenu({
               {showAdminOptions && (
                 <MemberSuspensionTrigger {...props}>
                   <Menu.Item
-                    id="suspend"
+                    value="suspend"
                     color="fg.destructive"
                     _hover={{
                       color: "fg.destructive",
