@@ -1,5 +1,5 @@
-import { GetInfoOKResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { GetInfoOKResponse } from "@/api/openapi/schemas/getInfoOKResponse";
+import { server } from "@/api/server";
 
 import { FALLBACK_COLOUR } from "./colour";
 

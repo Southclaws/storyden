@@ -24,7 +24,6 @@ export function DatagraphCreateMenu() {
           <Menu.Content minW="36">
             <Menu.ItemGroup id="user">
               <Menu.ItemGroupLabel
-                htmlFor="user"
                 display="flex"
                 flexDir="column"
                 userSelect="none"
@@ -35,12 +34,12 @@ export function DatagraphCreateMenu() {
               <Menu.Separator />
 
               <Link href={`/directory/${jointNew}`}>
-                <Menu.Item id="create-one">
+                <Menu.Item value="create-one">
                   <>Create one</>
                 </Menu.Item>
               </Link>
               <Link href={`/directory/${jointNew}?bulk`}>
-                <Menu.Item id="create-many">
+                <Menu.Item value="create-many">
                   <>Create many</>
                 </Menu.Item>
               </Link>
