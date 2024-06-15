@@ -48,7 +48,6 @@ export function ContentComposer(props: ContentComposerProps) {
       {editor ? (
         <FloatingMenu editor={editor}>
           <Menu.Root
-            size="sm"
             onSelect={(d) => format.text.set(d.value as any /* lazy */)}
           >
             <Menu.Trigger asChild>
