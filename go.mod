@@ -15,7 +15,6 @@ require (
 	github.com/getkin/kin-openapi v0.124.0
 	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
 	github.com/gosimple/slug v1.14.0
-	github.com/jackc/pgx/v5 v5.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.12.0
@@ -37,7 +36,6 @@ require (
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/cixtor/readability v1.0.0
 	github.com/dboslee/lru v0.0.1
-	github.com/deepmap/oapi-codegen/v2 v2.1.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/glebarez/go-sqlite v1.22.0
@@ -49,6 +47,7 @@ require (
 	github.com/mileusna/useragent v1.3.4
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
 	github.com/oapi-codegen/echo-middleware v1.0.1
+	github.com/oapi-codegen/oapi-codegen/v2 v2.3.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/twilio/twilio-go v1.20.1
 	github.com/weaviate/weaviate v1.25.1
