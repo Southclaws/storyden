@@ -65,7 +65,7 @@ export const Item = withContext<
 export const ItemText = withContext<
   HTMLDivElement,
   Assign<JsxStyleProps, Menu.ItemTextProps>
->(Menu.ItemText, "optionItemText");
+>(Menu.ItemText, "itemText");
 
 export const Positioner = withContext<
   HTMLDivElement,
