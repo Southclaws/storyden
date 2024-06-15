@@ -25,7 +25,7 @@ export function PostMenu(props: PostProps) {
   } = usePostMenu(props);
 
   return (
-    <Menu.Root size="sm" lazyMount>
+    <Menu.Root lazyMount>
       <Menu.Trigger asChild>
         <MoreAction />
       </Menu.Trigger>

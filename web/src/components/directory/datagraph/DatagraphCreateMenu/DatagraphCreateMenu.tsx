@@ -13,7 +13,7 @@ export function DatagraphCreateMenu() {
   const jointNew = joinDirectoryPath(directoryPath, "new");
 
   return (
-    <Menu.Root size="sm">
+    <Menu.Root>
       <Menu.Trigger asChild>
         <Button size="xs" variant="outline">
           <PlusCircleIcon /> Create

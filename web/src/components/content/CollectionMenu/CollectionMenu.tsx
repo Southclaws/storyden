@@ -24,7 +24,6 @@ export function CollectionMenu(props: Props) {
       tabIndex={1}
     >
       <Menu.Root
-        size="sm"
         onOpenChange={handlers.handleOpenChange}
         closeOnSelect={!multiSelect}
         onSelect={handlers.handleSelect}

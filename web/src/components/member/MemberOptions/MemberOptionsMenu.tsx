@@ -21,7 +21,7 @@ export function MemberOptionsMenu({
   const showAdminOptions = session?.admin && props.handle !== session.handle;
 
   return (
-    <Menu.Root size="sm" onOpenChange={props.onOpenChange}>
+    <Menu.Root onOpenChange={props.onOpenChange}>
       <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>

@@ -12,7 +12,7 @@ export function FeedItemMenu(props: Props) {
   const { shareEnabled, deleteEnabled, handleSelect } = useFeedItemMenu(props);
 
   return (
-    <Menu.Root size="sm" lazyMount onSelect={handleSelect}>
+    <Menu.Root lazyMount onSelect={handleSelect}>
       <Menu.Trigger asChild>
         <MoreAction />
       </Menu.Trigger>
