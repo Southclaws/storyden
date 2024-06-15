@@ -15,7 +15,7 @@ require (
 	github.com/getkin/kin-openapi v0.124.0
 	github.com/gomarkdown/markdown v0.0.0-20240419095408-642f0ee99ae2
 	github.com/gosimple/slug v1.14.0
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jackc/pgx/v5 v5.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.12.0
