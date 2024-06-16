@@ -27,6 +27,14 @@ export default async function Page(props: Props) {
   const [targetSlug, isNew] = getTargetSlug(slug);
 
   if (targetSlug) {
+    if (isNew) {
+      if (!session) {
+        redirect(`/login`); // TODO: ?return= back to this path.
+      }
+
+      return <NodeCreateScreen session={session} />;
+    }
+
     const node = await server<NodeGetOKResponse>({
       url: `/v1/nodes/${targetSlug}`,
     });
