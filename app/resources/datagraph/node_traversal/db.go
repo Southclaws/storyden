@@ -69,34 +69,34 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Node, e
 	return nodes, nil
 }
 
-const ddl = `with recursive descendants (parent, descendant, depth) as (
+const ddl = `with recursive children (parent, id, depth) as (
     select
         parent_node_id,
         id,
-        1
+        0
     from
         nodes
-    union
-    all
+    where %s
+union
     select
         d.parent,
         s.id,
         d.depth + 1
     from
-        descendants d
-        join nodes s on d.descendant = s.parent_node_id
+        children d
+        join nodes s on d.id = s.parent_node_id
 )
 select
-    distinct c.id       node_id,
-    c.created_at        node_created_at,
-    c.updated_at        node_updated_at,
-    c.deleted_at        node_deleted_at,
-    c.name              node_name,
-    c.slug              node_slug,
-    c.description       node_description,
-    c.parent_node_id    node_parent_node_id,
-    c.account_id        node_account_id,
-    c.properties        node_properties,
+    distinct n.id       node_id,
+    n.created_at        node_created_at,
+    n.updated_at        node_updated_at,
+    n.deleted_at        node_deleted_at,
+    n.name              node_name,
+    n.slug              node_slug,
+    n.description       node_description,
+    n.parent_node_id    node_parent_node_id,
+    n.account_id        node_account_id,
+    n.properties        node_properties,
     a.id                owner_id,
     a.created_at        owner_created_at,
     a.updated_at        owner_updated_at,
@@ -106,9 +106,9 @@ select
     a.bio               owner_bio,
     a.admin             owner_admin
 from
-    descendants
-    inner join nodes c on c.id = descendants.descendant
-    inner join accounts a on a.id = c.account_id
+    children
+    inner join nodes n on n.id = children.id
+    inner join accounts a on a.id = n.account_id
 
 -- optional where clause
 %s
@@ -169,26 +169,20 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 
 	// NOTE: i fucking hate writing raw sql into source code...
 
+	var rootPredicate string
 	predicates := []string{}
 	args := []interface{}{}
+	argOffset := 1
 
 	if parentNodeID, ok := id.Get(); ok {
-		aidx := len(args) + 1
-		predicates = append(predicates, fmt.Sprintf(`(
-        (
-            descendant = $%d
-            and parent is not null
-        ) or
-        parent = $%d
-        or
-        c.id = $1
-    )`, aidx, aidx))
-
 		args = append(args, parentNodeID.String())
+		rootPredicate = "id is $1"
+	} else {
+		rootPredicate = "parent_node_id is null"
 	}
 
 	if f.accountSlug != nil {
-		aidx := len(args) + 1
+		aidx := len(args) + argOffset
 		predicates = append(predicates, fmt.Sprintf(
 			"a.handle = $%d",
 			aidx))
@@ -196,11 +190,20 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		args = append(args, *f.accountSlug)
 	}
 
+	if f.depth != nil {
+		aidx := len(args) + argOffset
+		predicates = append(predicates, fmt.Sprintf(
+			"depth <= $%d",
+			aidx))
+
+		args = append(args, *f.depth)
+	}
+
 	additional := ""
 	if len(predicates) > 0 {
 		additional = "where " + strings.Join(predicates, " AND ")
 	}
-	q := fmt.Sprintf(ddl, additional)
+	q := fmt.Sprintf(ddl, rootPredicate, additional)
 
 	r, err := d.raw.QueryxContext(ctx, q, args...)
 	if err != nil {
@@ -229,7 +232,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 	linkChildrenForParent = func(parent datagraph.Node) []*datagraph.Node {
 		filteredParent, isFilteringParent := id.Get()
 
-		return dt.Reduce(flat, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+		return dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
 			if p, ok := curr.Parent.Get(); ok && p.ID == parent.ID {
 				// Take a copy because our mutations cannot apply to `flat`.
 				copy := *curr
@@ -252,7 +255,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 	}
 
 	// Rebuild the flat list into the tree
-	nodes := dt.Reduce(flat, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+	nodes := dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
 
 		// If we're filtering for a specific node and the current iteration is
 		// that node, the children are aggregated for this node regardless.
