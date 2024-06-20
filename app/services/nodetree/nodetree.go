@@ -44,28 +44,39 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Get(ctx, child)
+	cnode, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pclus, err := s.nr.Get(ctx, parent)
+	pnode, err := s.nr.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !n.Owner.Admin {
-		if n.Owner.ID != accountID && pclus.Owner.ID != accountID {
+	if !cnode.Owner.Admin {
+		if cnode.Owner.ID != accountID && pnode.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
 
-	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeAdd(xid.ID(n.ID)))
+	// If the target parent is actually a child of the target child, sever this
+	// connection before adding the target child to the target parent.
+	if parentParent, ok := pnode.Parent.Get(); ok {
+		if parentParent.ID == cnode.ID {
+			cnode, err = s.nr.Update(ctx, cnode.ID, node.WithChildNodeRemove(xid.ID(pnode.ID)))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+		}
+	}
+
+	pnode, err = s.nr.Update(ctx, pnode.ID, node.WithChildNodeAdd(xid.ID(cnode.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return pclus, nil
+	return pnode, nil
 }
 
 func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
