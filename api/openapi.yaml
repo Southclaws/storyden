@@ -2966,7 +2966,9 @@ components:
         - $ref: "#/components/schemas/DatagraphRecommendations"
         - required: [children]
           properties:
-            children: { $ref: "#/components/schemas/NodeList" }
+            children:
+              type: array
+              items: { $ref: "#/components/schemas/NodeWithChildren" }
 
     NodeName:
       type: string
@@ -2993,6 +2995,10 @@ components:
         visibility: { $ref: "#/components/schemas/Visibility" }
         properties: { $ref: "#/components/schemas/Properties" }
 
+    NodeTree:
+      type: array
+      items: { $ref: "#/components/schemas/NodeWithChildren" }
+
     NodeList:
       type: array
       items: { $ref: "#/components/schemas/Node" }
@@ -3003,7 +3009,7 @@ components:
         - type: object
           required: [nodes]
           properties:
-            nodes: { $ref: "#/components/schemas/NodeList" }
+            nodes: { $ref: "#/components/schemas/NodeTree" }
 
     NodeInitialProps:
       type: object

@@ -5,8 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { NodeTree } from "./nodeTree";
+import type { NodeWithChildren } from "./nodeWithChildren";
 
-export type NodeListResultAllOf = {
-  nodes: NodeTree;
-};
+export type NodeTree = NodeWithChildren[];
