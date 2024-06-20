@@ -96,6 +96,10 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		opts = append(opts, node_traversal.WithOwner(*v))
 	}
 
+	if v := request.Params.Depth; v != nil {
+		opts = append(opts, node_traversal.WithDepth(uint(*v)))
+	}
+
 	visibilities, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

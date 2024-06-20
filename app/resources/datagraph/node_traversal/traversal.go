@@ -17,6 +17,7 @@ type Repository interface {
 type filters struct {
 	accountSlug *string
 	visibility  []post.Visibility
+	depth       *uint
 }
 
 type Filter func(*filters)
@@ -30,5 +31,11 @@ func WithOwner(v string) Filter {
 func WithVisibility(v ...post.Visibility) Filter {
 	return func(f *filters) {
 		f.visibility = v
+	}
+}
+
+func WithDepth(v uint) Filter {
+	return func(f *filters) {
+		f.depth = &v
 	}
 }

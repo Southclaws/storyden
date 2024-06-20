@@ -919,6 +919,7 @@ paths:
           in: query
           schema: { $ref: "#/components/schemas/AccountHandle" }
         - $ref: "#/components/parameters/VisibilityParam"
+        - $ref: "#/components/parameters/TreeDepthParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1283,6 +1284,18 @@ components:
       schema:
         type: array
         items: { $ref: "#/components/schemas/Visibility" }
+
+    TreeDepthParam:
+      name: depth
+      description: |
+        When set to a positive value, the nodes in the response will include all
+        child nodes up to the specified depth. When set to zero, then if the
+        request includes a node ID only that node will be returned, otherwise
+        only top-level (root) nodes will be returned.
+      required: false
+      in: query
+      schema:
+        type: integer
 
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
