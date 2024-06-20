@@ -39,7 +39,7 @@ type Node struct {
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
-	Parent      opt.Optional[*Node]
+	Parent      opt.Optional[Node]
 	Visibility  post.Visibility
 	Properties  any
 

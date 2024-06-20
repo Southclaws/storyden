@@ -22,6 +22,17 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	parent, err := opt.MapErr(opt.NewPtr(c.Edges.Parent), func(c ent.Node) (Node, error) {
+		p, err := NodeFromModel(&c)
+		if err != nil {
+			return Node{}, err
+		}
+		return *p, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	nodes, err := dt.MapErr(c.Edges.Nodes, NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -45,6 +56,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Description: c.Description,
 		Content:     opt.NewPtr(c.Content),
 		Owner:       *pro,
+		Parent:      parent,
 		Nodes:       nodes,
 		Visibility:  visibility,
 		Properties:  c.Properties,
