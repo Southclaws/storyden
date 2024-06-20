@@ -138,6 +138,7 @@ export * from "./nodeMutableProps";
 export * from "./nodeName";
 export * from "./nodeRemoveChildOKResponse";
 export * from "./nodeSlug";
+export * from "./nodeTree";
 export * from "./nodeUpdateBody";
 export * from "./nodeUpdateOKResponse";
 export * from "./nodeWithChildren";
