@@ -1,10 +1,10 @@
 import { useSession } from "src/auth";
 import { Unready } from "src/components/site/Unready";
 
-import { SettingsSection } from "../SettingsSection/SettingsSection";
-
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { Heading2 } from "@/components/ui/typography-heading";
+
+import { SettingsSection } from "../SettingsSection/SettingsSection";
 
 export function IdentitySettings() {
   const account = useSession();
@@ -13,7 +13,7 @@ export function IdentitySettings() {
 
   return (
     <SettingsSection>
-      <Heading2 size="md">Identity</Heading2>
+      <Heading size="md">Identity</Heading>
 
       <p>You cannot yet change your handle but this is coming soon!</p>
 

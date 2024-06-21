@@ -4,7 +4,7 @@ import { Navigation } from "src/components/site/Navigation/Navigation";
 
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
-export function Default(props: PropsWithChildren) {
+export async function Default(props: PropsWithChildren) {
   return (
     <Flex
       minHeight="dvh"

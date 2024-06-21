@@ -2,15 +2,15 @@ import { useGetInfo } from "src/api/openapi/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 import { Unready } from "src/components/site/Unready";
 
-import { SettingsSection } from "../SettingsSection/SettingsSection";
-
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { Heading2 } from "@/components/ui/typography-heading";
 import { Box, HStack, Stack, styled } from "@/styled-system/jsx";
+
+import { SettingsSection } from "../SettingsSection/SettingsSection";
 
 import { IconEditor } from "./IconEditor/IconEditor";
 import { Props, useBrandSettings } from "./useBrandSettings";
@@ -27,7 +27,7 @@ function BrandSettingsForm(props: Props) {
 
   return (
     <SettingsSection>
-      <Heading2 size="md">Brand settings</Heading2>
+      <Heading size="md">Brand settings</Heading>
 
       <styled.form
         width="full"

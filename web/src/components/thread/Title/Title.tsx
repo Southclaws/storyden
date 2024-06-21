@@ -1,10 +1,10 @@
 import { Thread } from "src/api/openapi/schemas";
 
+import { Heading } from "@/components/ui/heading";
+import { Input } from "@/components/ui/input";
+
 import { CategoryPill } from "../CategoryPill";
 import { LinkView } from "../LinkView/LinkView";
-
-import { Input } from "@/components/ui/input";
-import { styled } from "@/styled-system/jsx";
 
 import { useTitle } from "./useTitle";
 
@@ -17,9 +17,9 @@ export function Title(props: Thread) {
         {editing ? (
           <Input value={editingTitle} onChange={onTitleChange} />
         ) : (
-          <styled.h1 fontSize="heading.variable.1" fontWeight="bold">
+          <Heading fontSize="heading.variable.1" fontWeight="bold">
             {props.title}
-          </styled.h1>
+          </Heading>
         )}
       </div>
       {props.link && <LinkView link={props.link} asset={props.assets?.[0]} />}

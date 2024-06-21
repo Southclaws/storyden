@@ -1,3 +1,5 @@
+"use client";
+
 import { Box } from "@/styled-system/jsx";
 
 import { Checklist } from "./Checklist/Checklist";
