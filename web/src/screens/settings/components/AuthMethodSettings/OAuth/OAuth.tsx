@@ -1,7 +1,7 @@
 import { AccountAuthMethod, AuthProvider } from "src/api/openapi/schemas";
 
+import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { Heading3 } from "@/components/ui/typography-heading";
 import { VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -12,14 +12,14 @@ type Props = {
 export function OAuth({ active, available }: Props) {
   return (
     <VStack alignItems="start">
-      <Heading3 size="sm">Linked accounts</Heading3>
+      <Heading size="sm">Linked accounts</Heading>
 
       <styled.p>
         You can link as many accounts as you want to. Linked accounts allow you
         to log in easily and may also provide additional features.
       </styled.p>
 
-      <Heading3 size="xs">Active</Heading3>
+      <Heading size="xs">Active</Heading>
 
       {active.length ? (
         <styled.ul display="flex" flexDir="column" gap="2" w="full">
@@ -33,7 +33,7 @@ export function OAuth({ active, available }: Props) {
         <styled.p>You currently have no linked accounts.</styled.p>
       )}
 
-      <Heading3 size="xs">Available</Heading3>
+      <Heading size="xs">Available</Heading>
 
       <styled.ul display="flex" flexDir="column" gap="2" w="full">
         {available.map((v) => (

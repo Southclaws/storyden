@@ -12,9 +12,9 @@ import { SaveAction } from "src/components/site/Action/Save";
 import { Empty } from "src/components/site/Empty";
 
 import { Admonition } from "@/components/ui/admonition";
+import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import * as Popover from "@/components/ui/popover";
-import { Heading1, Heading2 } from "@/components/ui/typography-heading";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { ContentInput } from "./ContentInput";
@@ -103,7 +103,7 @@ export function DatagraphNodeScreen(props: Props) {
               {editing ? (
                 <TitleInput />
               ) : (
-                <Heading1>{node.name || "(untitled)"}</Heading1>
+                <Heading>{node.name || "(untitled)"}</Heading>
               )}
             </HStack>
 
@@ -140,7 +140,7 @@ export function DatagraphNodeScreen(props: Props) {
         </VStack>
 
         <VStack alignItems="start" w="full">
-          <Heading2>Member of</Heading2>
+          <Heading>Member of</Heading>
 
           {node.children.length ? (
             <NodeCardRows

@@ -1,7 +1,7 @@
 import { CollectionWithItems } from "src/api/openapi/schemas";
 import { Timestamp } from "src/components/site/Timestamp";
 
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Flex, VStack, styled } from "@/styled-system/jsx";
 
 import { CollectionItemList } from "./CollectionItemList";
@@ -9,7 +9,7 @@ import { CollectionItemList } from "./CollectionItemList";
 export function Collection(props: CollectionWithItems) {
   return (
     <VStack alignItems="start">
-      <Heading1 size="md">{props.name}</Heading1>
+      <Heading size="md">{props.name}</Heading>
       <Flex alignItems="center">
         <styled.p fontSize="sm">
           <styled.span>{props.description}</styled.span>

@@ -6,7 +6,7 @@ import { LinkResultList } from "src/components/directory/links/LinkIndexView/Lin
 import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
 
-import { Heading2 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Center, VStack } from "@/styled-system/jsx";
 
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
@@ -40,14 +40,14 @@ export function Client(props: Props) {
 
       {links.data.results > 0 && (
         <VStack w="full" alignItems="start">
-          <Heading2>New links</Heading2>
+          <Heading>New links</Heading>
           <LinkResultList links={links.data} show={3} />
         </VStack>
       )}
 
       {nodes.data.nodes.length > 0 && (
         <VStack w="full" alignItems="start">
-          <Heading2>Knowledgebase</Heading2>
+          <Heading>Knowledgebase</Heading>
           <NodeCardRows
             directoryPath={[]}
             context="directory"

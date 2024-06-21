@@ -3,7 +3,7 @@
 import ErrorBanner from "src/components/site/ErrorBanner";
 import { Unready } from "src/components/site/Unready";
 
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
 
 import { BrandSettings } from "./components/BrandSettings/BrandSettings";
@@ -18,7 +18,7 @@ export function AdminScreen() {
 
   return (
     <VStack alignItems="start" gap="4">
-      <Heading1 size="lg">Administration</Heading1>
+      <Heading size="lg">Administration</Heading>
 
       <BrandSettings />
     </VStack>

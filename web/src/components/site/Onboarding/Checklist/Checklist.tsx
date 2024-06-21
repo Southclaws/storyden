@@ -4,8 +4,8 @@ import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
 
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { Heading1, Heading2 } from "@/components/ui/typography-heading";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { ChecklistItem } from "./ChecklistItem";
@@ -21,7 +21,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
 
   return (
     <VStack width="full" height="full" justify="start" pt="4" pb="16">
-      <Heading1 size="lg">Welcome to Storyden!</Heading1>
+      <Heading size="lg">Welcome to Storyden!</Heading>
       <styled.p p="2" textAlign="center">
         Get your community set up
         <br />
@@ -72,7 +72,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
         </ChecklistItem>
 
         <VStack textAlign="center" px="2">
-          <Heading2 size="md">Invite your people</Heading2>
+          <Heading size="md">Invite your people</Heading>
           <styled.p>
             And you&apos;re ready to go! Spread the word and let the posts flow.
           </styled.p>
@@ -99,7 +99,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
       <hr />
 
       <VStack>
-        <Heading2 size="sm">Not an admin?</Heading2>
+        <Heading size="sm">Not an admin?</Heading>
 
         <p>
           This site is not quite ready to use but you can still browse around!

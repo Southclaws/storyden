@@ -2600,6 +2600,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/js-cookie@npm:^3":
+  version: 3.0.6
+  resolution: "@types/js-cookie@npm:3.0.6"
+  checksum: 10c0/173afaf5ea9d86c22395b9d2a00b6adb0006dcfef165d6dcb0395cdc32f5a5dcf9c3c60f97194119963a15849b8f85121e1ae730b03e40bc0c29b84396ba22f9
+  languageName: node
+  linkType: hard
+
 "@types/json-schema@npm:^7.0.11, @types/json-schema@npm:^7.0.4, @types/json-schema@npm:^7.0.7":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
@@ -7083,6 +7090,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-cookie@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "js-cookie@npm:3.0.5"
+  checksum: 10c0/04a0e560407b4489daac3a63e231d35f4e86f78bff9d792011391b49c59f721b513411cd75714c418049c8dc9750b20fcddad1ca5a2ca616c3aca4874cce5b3a
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -10527,6 +10541,7 @@ __metadata:
     "@tiptap/starter-kit": "npm:^2.4.0"
     "@tiptap/suggestion": "npm:^2.4.0"
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
+    "@types/js-cookie": "npm:^3"
     "@types/node": "npm:^20.14.2"
     "@types/react": "npm:^18.3.3"
     "@types/react-avatar-editor": "npm:^13.0.2"
@@ -10538,6 +10553,7 @@ __metadata:
     emoji-mart: "npm:^5.6.0"
     eslint: "npm:^8.57.0"
     eslint-config-next: "npm:^14.2.4"
+    js-cookie: "npm:^3.0.5"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.395.0"
     next: "npm:^14.2.4"

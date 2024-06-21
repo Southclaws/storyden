@@ -1,7 +1,11 @@
 /* eslint-disable react/display-name */
+import type { Assign, HTMLArkProps } from "@ark-ui/react";
 import React from "react";
-import type { TextVariantProps } from "styled-system/recipes";
-import type { HTMLStyledProps } from "styled-system/types";
+
+import { css, cx } from "@/styled-system/css";
+import { splitCssProps } from "@/styled-system/jsx";
+import { type TextVariantProps, text } from "@/styled-system/recipes";
+import type { JsxStyleProps } from "@/styled-system/types";
 
 type PolymorphicRef<C extends React.ElementType> =
   React.ComponentPropsWithRef<C>["ref"];
@@ -24,7 +28,10 @@ type PolymorphicComponentPropWithRef<
 > = PolymorphicComponentProp<C, Props> & { ref?: PolymorphicRef<C> };
 
 export type TextProps<C extends React.ElementType> =
-  PolymorphicComponentPropWithRef<C, HTMLStyledProps<C> & TextVariantProps>;
+  PolymorphicComponentPropWithRef<
+    C,
+    Assign<JsxStyleProps, HTMLArkProps<"p">> & TextVariantProps
+  >;
 
 type PolymorphicComponent = <C extends React.ElementType = "p">(
   props: TextProps<C>,
@@ -35,9 +42,18 @@ export const Text: PolymorphicComponent = React.forwardRef(
     props: TextProps<C>,
     ref?: PolymorphicRef<C>,
   ) => {
-    const { as, ...textProps } = props;
-    const Component = as || "p";
+    const [variantProps, textProps] = text.splitVariantProps(props);
+    const [cssProps, localProps] = splitCssProps(textProps);
+    const { className, ...otherProps } = localProps;
+    const styles = text(variantProps);
+    const Component = props.as || "p";
 
-    return <Component ref={ref} {...textProps} />;
+    return (
+      <Component
+        ref={ref}
+        className={cx(styles, css(cssProps), className)}
+        {...otherProps}
+      />
+    );
   },
 );

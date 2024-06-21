@@ -6,7 +6,7 @@ import { cx } from "@/styled-system/css";
 import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
 import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
 
-import { Heading3 } from "./typography-heading";
+import { Heading } from "./heading";
 
 export type CardItem = {
   id: string;
@@ -63,11 +63,11 @@ export function Card({
 
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
-          <Heading3 className={cx("fluid-font-size")}>
+          <Heading className={cx("fluid-font-size")}>
             <a href={url} className={styles.title}>
               {title || "(untitled)"}
             </a>
-          </Heading3>
+          </Heading>
 
           {text && <p className={styles.text}>{text}</p>}
         </div>

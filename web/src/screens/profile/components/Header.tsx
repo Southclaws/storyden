@@ -1,7 +1,7 @@
 import { PublicProfile } from "src/api/openapi/schemas";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 
-import { Heading2, Heading3 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { HStack, VStack } from "@/styled-system/jsx";
 
 export function Header(props: PublicProfile) {
@@ -18,8 +18,8 @@ export function Header(props: PublicProfile) {
           width="full"
           containerType="inline-size"
         >
-          <Heading2 size="lg">{props.name}</Heading2>
-          <Heading3
+          <Heading size="lg">{props.name}</Heading>
+          <Heading
             w="full"
             size="md"
             color="gray.500"
@@ -29,7 +29,7 @@ export function Header(props: PublicProfile) {
             overflow="hidden"
           >
             @{props.handle}
-          </Heading3>
+          </Heading>
         </VStack>
       </HStack>
     </VStack>

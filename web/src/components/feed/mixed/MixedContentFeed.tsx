@@ -4,8 +4,8 @@ import { NewBadge } from "src/components/directory/DirectoryBadge";
 import { NodeCardGrid } from "src/components/directory/datagraph/NodeCardList";
 import { LinkCardRows } from "src/components/directory/links/LinkCardList";
 
+import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { Heading2 } from "@/components/ui/typography-heading";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 import { TextPostList } from "../text/TextPostList";
@@ -108,7 +108,7 @@ function SectionHeader({
   return (
     <HStack justify="space-between" w="full">
       <HStack gap="2">
-        <Heading2 size="xs">{children}</Heading2>
+        <Heading>{children}</Heading>
         {recent && <NewBadge />}
       </HStack>
 

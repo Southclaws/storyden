@@ -1,12 +1,12 @@
 import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
 import { Anchor } from "src/components/site/Anchor";
 
-import { Empty } from "../../site/Empty";
-import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
-
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
+
+import { Empty } from "../../site/Empty";
+import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
 
 type Props = {
   thread: ThreadReference;
@@ -46,9 +46,9 @@ export function LinkPost(props: Props) {
           p="2"
         >
           <Flex width="full" justifyContent="space-between">
-            <Heading1 size="sm" lineClamp={1}>
+            <Heading size="sm" lineClamp={1}>
               <Anchor href={permalink}>{props.thread.title}</Anchor>
-            </Heading1>
+            </Heading>
           </Flex>
 
           <Box>

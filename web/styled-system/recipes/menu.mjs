@@ -8,8 +8,52 @@ const menuCompoundVariants = []
 
 const menuSlotNames = [
   [
+    "arrow",
+    "menu__arrow"
+  ],
+  [
+    "arrowTip",
+    "menu__arrowTip"
+  ],
+  [
+    "content",
+    "menu__content"
+  ],
+  [
     "contextTrigger",
     "menu__contextTrigger"
+  ],
+  [
+    "indicator",
+    "menu__indicator"
+  ],
+  [
+    "item",
+    "menu__item"
+  ],
+  [
+    "itemGroup",
+    "menu__itemGroup"
+  ],
+  [
+    "itemGroupLabel",
+    "menu__itemGroupLabel"
+  ],
+  [
+    "itemIndicator",
+    "menu__itemIndicator"
+  ],
+  [
+    "itemText",
+    "menu__itemText"
+  ],
+  [
+    "positioner",
+    "menu__positioner"
+  ],
+  [
+    "separator",
+    "menu__separator"
   ],
   [
     "trigger",
@@ -18,14 +62,6 @@ const menuSlotNames = [
   [
     "triggerItem",
     "menu__triggerItem"
-  ],
-  [
-    "indicator",
-    "menu__indicator"
-  ],
-  [
-    "positioner",
-    "menu__positioner"
   ],
   [
     "arrow",
@@ -40,36 +76,40 @@ const menuSlotNames = [
     "menu__content"
   ],
   [
-    "separator",
-    "menu__separator"
+    "contextTrigger",
+    "menu__contextTrigger"
+  ],
+  [
+    "indicator",
+    "menu__indicator"
   ],
   [
     "item",
     "menu__item"
   ],
   [
-    "optionItem",
-    "menu__optionItem"
-  ],
-  [
-    "optionItemIndicator",
-    "menu__optionItemIndicator"
-  ],
-  [
-    "optionItemText",
-    "menu__optionItemText"
+    "itemGroup",
+    "menu__itemGroup"
   ],
   [
     "itemGroupLabel",
     "menu__itemGroupLabel"
   ],
   [
-    "itemGroup",
-    "menu__itemGroup"
+    "itemIndicator",
+    "menu__itemIndicator"
   ],
   [
-    "contextTrigger",
-    "menu__contextTrigger"
+    "itemText",
+    "menu__itemText"
+  ],
+  [
+    "positioner",
+    "menu__positioner"
+  ],
+  [
+    "separator",
+    "menu__separator"
   ],
   [
     "trigger",
@@ -78,54 +118,6 @@ const menuSlotNames = [
   [
     "triggerItem",
     "menu__triggerItem"
-  ],
-  [
-    "indicator",
-    "menu__indicator"
-  ],
-  [
-    "positioner",
-    "menu__positioner"
-  ],
-  [
-    "arrow",
-    "menu__arrow"
-  ],
-  [
-    "arrowTip",
-    "menu__arrowTip"
-  ],
-  [
-    "content",
-    "menu__content"
-  ],
-  [
-    "separator",
-    "menu__separator"
-  ],
-  [
-    "item",
-    "menu__item"
-  ],
-  [
-    "optionItem",
-    "menu__optionItem"
-  ],
-  [
-    "optionItemIndicator",
-    "menu__optionItemIndicator"
-  ],
-  [
-    "optionItemText",
-    "menu__optionItemText"
-  ],
-  [
-    "itemGroupLabel",
-    "menu__itemGroupLabel"
-  ],
-  [
-    "itemGroup",
-    "menu__itemGroup"
   ]
 ]
 const menuSlotFns = /* @__PURE__ */ menuSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, menuDefaultVariants, getSlotCompoundVariant(menuCompoundVariants, slotName))])

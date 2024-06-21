@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import { Default } from "src/layouts/Default";
 import { getInfo } from "src/utils/info";
 
-export default function Layout({ children }: PropsWithChildren) {
+export default async function Layout({ children }: PropsWithChildren) {
   return <Default>{children}</Default>;
 }
 
