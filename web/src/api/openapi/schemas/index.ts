@@ -219,6 +219,7 @@ export * from "./threadReferenceAllOf";
 export * from "./threadTitle";
 export * from "./threadUpdateBody";
 export * from "./threadUpdateOKResponse";
+export * from "./treeDepthParamParameter";
 export * from "./unauthorisedResponse";
 export * from "./url";
 export * from "./userVerificationRequirement";
