@@ -11,10 +11,15 @@ export async function getServerSession() {
 
   if (!session) return;
 
-  const data = await server<AccountGetOKResponse>({
-    url: `/v1/accounts`,
-    cookie,
-  });
+  try {
 
-  return data;
+    const data = await server<AccountGetOKResponse>({
+      url: `/v1/accounts`,
+      cookie,
+    });
+    
+    return data;
+  } catch(e) {
+    return
+  }
 }
