@@ -187,7 +187,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 
 	if parentNodeID, ok := id.Get(); ok {
 		args = append(args, parentNodeID.String())
-		rootPredicate = fmt.Sprintf("id = %s::text", getPlaceholder())
+		rootPredicate = fmt.Sprintf("id = cast(%s as text)", getPlaceholder())
 	} else {
 		rootPredicate = "parent_node_id is null"
 	}
