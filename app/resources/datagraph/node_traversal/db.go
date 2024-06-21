@@ -106,7 +106,8 @@ select
     a.handle            owner_handle,
     a.name              owner_name,
     a.bio               owner_bio,
-    a.admin             owner_admin
+    a.admin             owner_admin,
+	depth
 from
     children
     inner join nodes n on n.id = children.id
@@ -139,6 +140,7 @@ type subtreeRow struct {
 	OwnerName        string          `db:"owner_name"`
 	OwnerBio         *string         `db:"owner_bio"`
 	OwnerAdmin       bool            `db:"owner_admin"`
+	Depth            int             `db:"depth"`
 }
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
@@ -176,29 +178,32 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 	var rootPredicate string
 	predicates := []string{}
 	args := []interface{}{}
-	argOffset := 1
+	argOffset := 0
+
+	getPlaceholder := func() string {
+		argOffset += 1
+		return fmt.Sprintf("$%d", argOffset)
+	}
 
 	if parentNodeID, ok := id.Get(); ok {
 		args = append(args, parentNodeID.String())
-		rootPredicate = "id is $1"
+		rootPredicate = fmt.Sprintf("id = %s::text", getPlaceholder())
 	} else {
 		rootPredicate = "parent_node_id is null"
 	}
 
 	if f.accountSlug != nil {
-		aidx := len(args) + argOffset
 		predicates = append(predicates, fmt.Sprintf(
-			"a.handle = $%d",
-			aidx))
+			"a.handle = %s",
+			getPlaceholder()))
 
 		args = append(args, *f.accountSlug)
 	}
 
 	if f.depth != nil {
-		aidx := len(args) + argOffset
 		predicates = append(predicates, fmt.Sprintf(
-			"depth <= $%d",
-			aidx))
+			"depth <= %s",
+			getPlaceholder()))
 
 		args = append(args, *f.depth)
 	}
