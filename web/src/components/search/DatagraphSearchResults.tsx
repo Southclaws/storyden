@@ -1,10 +1,10 @@
 import { DatagraphNode, DatagraphSearchResult } from "src/api/openapi/schemas";
 import { EmptyState } from "src/components/feed/EmptyState";
 
-import { FeedItem } from "../feed/common/FeedItem/FeedItem";
-
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
+
+import { FeedItem } from "../feed/common/FeedItem/FeedItem";
 
 type Props = {
   result: DatagraphSearchResult;
@@ -31,14 +31,14 @@ export function DatagraphResultItem(props: DatagraphNode) {
     <Box position="relative">
       <FeedItem>
         <Flex justifyContent="space-between">
-          <Heading1 size="sm">
+          <Heading size="sm">
             <LinkOverlay
               //as={NextLink} // TODO
               href={permalink}
             >
               {props.name}
             </LinkOverlay>
-          </Heading1>
+          </Heading>
         </Flex>
 
         <styled.p lineClamp={3}>{props.description}</styled.p>

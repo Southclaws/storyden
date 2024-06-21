@@ -1,8 +1,8 @@
 import { Unready } from "src/components/site/Unready";
 
-import { SettingsSection } from "../SettingsSection/SettingsSection";
+import { Heading } from "@/components/ui/heading";
 
-import { Heading2 } from "@/components/ui/typography-heading";
+import { SettingsSection } from "../SettingsSection/SettingsSection";
 
 import { Devices } from "./Devices/Devices";
 import { OAuth } from "./OAuth/OAuth";
@@ -18,7 +18,7 @@ export function AuthMethodSettings() {
 
   return (
     <SettingsSection gap="4">
-      <Heading2 size="md">Authentication methods</Heading2>
+      <Heading size="md">Authentication methods</Heading>
       <p>
         We recommend you add more than one method of authentication to your
         account. This will help you recover your account if you lose access to

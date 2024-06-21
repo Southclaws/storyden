@@ -3,10 +3,10 @@ import { Drawer } from "vaul";
 
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
-import { CloseAction } from "../Action/Close";
-
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
+
+import { CloseAction } from "../Action/Close";
 
 type Props = {
   title?: string;
@@ -40,7 +40,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               p="4"
             >
               <HStack w="full" justify="space-between">
-                <Heading1 size="md">{props.title}</Heading1>
+                <Heading size="md">{props.title}</Heading>
                 <CloseAction onClick={props.onClose} />
               </HStack>
 

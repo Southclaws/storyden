@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession } from "src/auth";
 import { AdminAction } from "src/components/site/Navigation/Anchors/Admin";
 import {
@@ -7,13 +9,18 @@ import {
 import { SettingsAction } from "src/components/site/Navigation/Anchors/Settings";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
+import { Account } from "@/api/openapi/schemas";
+import { HStack } from "@/styled-system/jsx";
+
 import { ComposeAction } from "../Anchors/Compose";
 import { DraftsAction } from "../Anchors/Drafts";
 
-import { HStack } from "@/styled-system/jsx";
+type Props = {
+  session: Account | undefined;
+};
 
-export function Toolbar() {
-  const account = useSession();
+export function Toolbar({ session }: Props) {
+  const account = useSession(session);
   return (
     <HStack w="full" gap="2" alignItems="center">
       {account ? (

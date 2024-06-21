@@ -3,10 +3,10 @@
 import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { Unready } from "src/components/site/Unready";
 
-import { useDirectoryPath } from "../directory/datagraph/useDirectoryPath";
-
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
+
+import { useDirectoryPath } from "../directory/datagraph/useDirectoryPath";
 
 import { Props, useDraftListScreen } from "./useDraftListScreen";
 
@@ -18,7 +18,7 @@ export function DraftListScreen(props: Props) {
 
   return (
     <VStack w="full" alignItems="start">
-      <Heading1>Your drafts</Heading1>
+      <Heading>Your drafts</Heading>
 
       <NodeCardRows
         directoryPath={directoryPath}

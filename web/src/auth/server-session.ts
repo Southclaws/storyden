@@ -11,7 +11,6 @@ export async function getServerSession() {
 
   if (!session) return;
 
-  // NOTE: Throws when no session
   const data = await server<AccountGetOKResponse>({
     url: `/v1/accounts`,
     cookie,

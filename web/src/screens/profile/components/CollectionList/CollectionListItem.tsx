@@ -1,6 +1,6 @@
 import { Collection } from "src/api/openapi/schemas";
 
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
 export function CollectionListItem(props: Collection) {
@@ -11,7 +11,7 @@ export function CollectionListItem(props: Collection) {
           <LinkOverlay
             href={`/p/${props.owner.handle}/collections/${props.id}`}
           >
-            <Heading1 size="md">{props.name}</Heading1>
+            <Heading size="md">{props.name}</Heading>
           </LinkOverlay>
           <p>{props.description}</p>
         </Flex>
