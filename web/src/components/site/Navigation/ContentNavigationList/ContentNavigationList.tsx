@@ -3,10 +3,11 @@
 import { BookOpenIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 import { CategoryCreateTrigger } from "@/components/category/CategoryCreate/CategoryCreateTrigger";
+import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, LStack, styled } from "@/styled-system/jsx";
 
-import { CategoryList } from "../../../category/CategoryList/CategoryList";
+import { DatagraphNavTree } from "../DatagraphNavTree/DatagraphNavTree";
 import { useNavigation } from "../useNavigation";
 
 export function ContentNavigationList() {
@@ -35,6 +36,7 @@ export function ContentNavigationList() {
           }}
         >
           <CategoryList />
+          <DatagraphNavTree />
         </Box>
 
         {isAdmin && <CategoryCreateTrigger />}
