@@ -35,7 +35,7 @@ export function chunkData(data: MixedContent): MixedContentChunk[] {
         id: i.toString(),
         threads: (v[0] as ThreadList) ?? [],
         nodes: (v[1] as NodeList) ?? [],
-        links: (v[3] as LinkList) ?? [],
+        links: (v[2] as LinkList) ?? [],
       }) satisfies MixedContentChunk,
   );
 
