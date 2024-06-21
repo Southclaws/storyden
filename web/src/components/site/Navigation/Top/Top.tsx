@@ -1,28 +1,21 @@
-import { Sidebar } from "src/components/graphics/Sidebar/Sidebar";
-
-import styles from "../navigation.module.css";
-
-import { Search } from "../Search/Search";
-import { Title } from "../components/Title";
-import { Toolbar } from "../components/Toolbar";
-import { useNavigation } from "../useNavigation";
-
-import { Button } from "@/components/ui/button";
+import { getServerSession } from "@/auth/server-session";
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
+import { getInfo } from "@/utils/info";
 
-type Props = {
-  onToggleSidebar: (t: boolean) => void;
-  sidebarState: boolean;
-};
+import { Search } from "../Search/Search";
+import { SidebarToggle } from "../Sidebar/SidebarToggle";
+import { getServerSidebarState } from "../Sidebar/server";
+import { Title } from "../components/Title";
+import { Toolbar } from "../components/Toolbar";
+import styles from "../navigation.module.css";
 
-export function Top({ onToggleSidebar, sidebarState }: Props) {
-  const { title } = useNavigation();
+export async function Top() {
+  const { title } = await getInfo();
+  const initialSidebarState = await getServerSidebarState();
 
-  function handleToggle() {
-    onToggleSidebar(!sidebarState);
-  }
+  const session = await getServerSession();
 
   return (
     <HStack
@@ -32,10 +25,7 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
       px="4"
     >
       <HStack className={styles["topbar-left"]}>
-        {/* TODO: Action? */}
-        <Button size="md" p="0" variant="ghost" onClick={handleToggle}>
-          <Sidebar open={sidebarState} />
-        </Button>
+        <SidebarToggle initialValue={initialSidebarState} />
         <Search />
       </HStack>
 
@@ -44,7 +34,7 @@ export function Top({ onToggleSidebar, sidebarState }: Props) {
       </HStack>
 
       <HStack className={styles["topbar-right"]}>
-        <Toolbar />
+        <Toolbar session={session} />
       </HStack>
     </HStack>
   );

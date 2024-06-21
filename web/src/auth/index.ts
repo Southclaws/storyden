@@ -1,6 +1,12 @@
 import { useAccountGet } from "src/api/openapi/accounts";
 
-export function useSession() {
-  const { data } = useAccountGet();
+import { Account } from "@/api/openapi/schemas";
+
+export function useSession(initial?: Account) {
+  const { data } = useAccountGet({
+    swr: {
+      fallbackData: initial,
+    },
+  });
   return data;
 }

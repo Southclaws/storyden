@@ -1,8 +1,8 @@
 import { Node } from "src/api/openapi/schemas";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
+import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, HStack, Stack, VStack, styled } from "@/styled-system/jsx";
 
 type Props = Node;
@@ -19,7 +19,7 @@ export function DatagraphHeader(props: Props) {
       gap="2"
     >
       <VStack alignItems="start" w="full" minW="0">
-        <Heading1>{props.name}</Heading1>
+        <Heading>{props.name}</Heading>
 
         <HStack>
           <styled.p color="fg.subtle">Maintained by</styled.p>

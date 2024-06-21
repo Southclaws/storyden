@@ -6,8 +6,8 @@ import { OnboardingStatus } from "src/api/openapi/schemas";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
 
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { Heading1 } from "@/components/ui/typography-heading";
 import { Box, Circle, HStack, styled } from "@/styled-system/jsx";
 
 import { Step, isComplete, statusToStep } from "./useChecklist";
@@ -51,7 +51,7 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
 
         <Box w="full">
           <HStack justify="space-between">
-            <Heading1 size="md">{props.title}</Heading1>
+            <Heading size="md">{props.title}</Heading>
 
             {!complete &&
               isCurrent &&

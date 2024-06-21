@@ -2,7 +2,7 @@
 
 import { Mailbox } from "src/components/graphics/Mailbox";
 
-import { Heading1 } from "@/components/ui/typography-heading";
+import { Heading } from "@/components/ui/heading";
 import { Box } from "@/styled-system/jsx";
 
 export function NotificationScreen() {
@@ -13,7 +13,7 @@ export function NotificationScreen() {
       </Box>
 
       <Box>
-        <Heading1 size="sm">Notifications</Heading1>
+        <Heading size="sm">Notifications</Heading>
         <p>You have no notifications.</p>
       </Box>
     </Box>
