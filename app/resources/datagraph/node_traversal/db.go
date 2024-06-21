@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -96,6 +97,7 @@ select
     n.description       node_description,
     n.parent_node_id    node_parent_node_id,
     n.account_id        node_account_id,
+    n.visibility        node_visibility,
     n.properties        node_properties,
     a.id                owner_id,
     a.created_at        owner_created_at,
@@ -118,24 +120,25 @@ order by
 `
 
 type subtreeRow struct {
-	NodeId           xid.ID     `db:"node_id"`
-	NodeCreatedAt    time.Time  `db:"node_created_at"`
-	NodeUpdatedAt    time.Time  `db:"node_updated_at"`
-	NodeDeletedAt    *time.Time `db:"node_deleted_at"`
-	NodeName         string     `db:"node_name"`
-	NodeSlug         string     `db:"node_slug"`
-	NodeDescription  string     `db:"node_description"`
-	NodeParentNodeId xid.ID     `db:"node_parent_node_id"`
-	NodeAccountId    xid.ID     `db:"node_account_id"`
-	NodeProperties   any        `db:"node_properties"`
-	OwnerId          xid.ID     `db:"owner_id"`
-	OwnerCreatedAt   time.Time  `db:"owner_created_at"`
-	OwnerUpdatedAt   time.Time  `db:"owner_updated_at"`
-	OwnerDeletedAt   *time.Time `db:"owner_deleted_at"`
-	OwnerHandle      string     `db:"owner_handle"`
-	OwnerName        string     `db:"owner_name"`
-	OwnerBio         *string    `db:"owner_bio"`
-	OwnerAdmin       bool       `db:"owner_admin"`
+	NodeId           xid.ID          `db:"node_id"`
+	NodeCreatedAt    time.Time       `db:"node_created_at"`
+	NodeUpdatedAt    time.Time       `db:"node_updated_at"`
+	NodeDeletedAt    *time.Time      `db:"node_deleted_at"`
+	NodeName         string          `db:"node_name"`
+	NodeSlug         string          `db:"node_slug"`
+	NodeDescription  string          `db:"node_description"`
+	NodeParentNodeId xid.ID          `db:"node_parent_node_id"`
+	NodeAccountId    xid.ID          `db:"node_account_id"`
+	NodeVisibility   post.Visibility `db:"node_visibility"`
+	NodeProperties   any             `db:"node_properties"`
+	OwnerId          xid.ID          `db:"owner_id"`
+	OwnerCreatedAt   time.Time       `db:"owner_created_at"`
+	OwnerUpdatedAt   time.Time       `db:"owner_updated_at"`
+	OwnerDeletedAt   *time.Time      `db:"owner_deleted_at"`
+	OwnerHandle      string          `db:"owner_handle"`
+	OwnerName        string          `db:"owner_name"`
+	OwnerBio         *string         `db:"owner_bio"`
+	OwnerAdmin       bool            `db:"owner_admin"`
 }
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
@@ -146,6 +149,7 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 		Name:        r.NodeName,
 		Slug:        r.NodeSlug,
 		Description: r.NodeDescription,
+		Visibility:  r.NodeVisibility,
 		Parent: opt.NewSafe(datagraph.Node{
 			ID: datagraph.NodeID(r.NodeParentNodeId),
 		}, !r.NodeParentNodeId.IsNil()),
@@ -226,6 +230,14 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 
 		flat = append(flat, n)
 	}
+
+	filtered := dt.Filter(flat, func(n *datagraph.Node) bool {
+		if len(f.visibility) > 0 {
+			return lo.Contains(f.visibility, n.Visibility)
+		} else {
+			return n.Visibility == post.VisibilityPublished
+		}
+	})
 
 	var linkChildrenForParent func(datagraph.Node) []*datagraph.Node
 
