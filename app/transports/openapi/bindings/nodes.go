@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -97,6 +96,10 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		opts = append(opts, node_traversal.WithOwner(*v))
 	}
 
+	if v := request.Params.Depth; v != nil {
+		opts = append(opts, node_traversal.WithDepth(uint(*v)))
+	}
+
 	visibilities, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -129,26 +132,19 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		opts = append(opts, node_traversal.WithVisibility(post.VisibilityPublished))
 	}
 
-	if id := request.Params.NodeId; id != nil {
-		cid, err := xid.FromString(*id)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-		}
+	nid, err := opt.MapErr(opt.NewPtr(request.Params.NodeId), datagraph.NodeIDFromString)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
 
-		cs, err = c.ntr.Subtree(ctx, datagraph.NodeID(cid), opts...)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	} else {
-		cs, err = c.ntr.Root(ctx, opts...)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+	cs, err = c.ntr.Subtree(ctx, nid, opts...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.NodeList200JSONResponse{
 		NodeListOKJSONResponse: openapi.NodeListOKJSONResponse{
-			Nodes: dt.Map(cs, serialiseNode),
+			Nodes: dt.Map(cs, serialiseNodeWithItems),
 		},
 	}, nil
 }
@@ -281,9 +277,11 @@ func serialiseNode(in *datagraph.Node) openapi.Node {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
-		Parent:      opt.Map(in.Parent, serialiseNode).Ptr(),
-		Visibility:  serialiseVisibility(in.Visibility),
-		Properties:  in.Properties,
+		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
+			return serialiseNode(&in)
+		}),
+		Visibility: serialiseVisibility(in.Visibility),
+		Properties: in.Properties,
 	}
 }
 
@@ -299,10 +297,12 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 		Description: in.Description,
 		Content:     in.Content.Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
-		Parent:      opt.Map(in.Parent, serialiseNode).Ptr(),
-		Visibility:  serialiseVisibility(in.Visibility),
-		Properties:  in.Properties,
-		Children:    dt.Map(in.Nodes, serialiseNode),
+		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
+			return serialiseNode(&in)
+		}),
+		Visibility: serialiseVisibility(in.Visibility),
+		Properties: in.Properties,
+		Children:   dt.Map(in.Nodes, serialiseNodeWithItems),
 	}
 }
 

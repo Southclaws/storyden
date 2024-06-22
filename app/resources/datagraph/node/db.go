@@ -103,6 +103,11 @@ func (d *database) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph
 				WithOwner().
 				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 		}).
+		WithParent(func(cq *ent.NodeQuery) {
+			cq.
+				WithAssets().
+				WithOwner()
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

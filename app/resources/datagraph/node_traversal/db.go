@@ -3,6 +3,7 @@ package node_traversal
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -11,6 +12,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -68,80 +70,77 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Node, e
 	return nodes, nil
 }
 
-const ddl = `with recursive descendants (parent, descendant, depth) as (
+const ddl = `with recursive children (parent, id, depth) as (
     select
         parent_node_id,
         id,
-        1
+        0
     from
         nodes
-    union
-    all
+    where %s
+union
     select
         d.parent,
         s.id,
         d.depth + 1
     from
-        descendants d
-        join nodes s on d.descendant = s.parent_node_id
+        children d
+        join nodes s on d.id = s.parent_node_id
 )
 select
-    c.id                node_id,
-    c.created_at        node_created_at,
-    c.updated_at        node_updated_at,
-    c.deleted_at        node_deleted_at,
-    c.name              node_name,
-    c.slug              node_slug,
-    c.description       node_description,
-    c.parent_node_id    node_parent_node_id,
-    c.account_id        node_account_id,
-    c.properties        node_properties,
-	a.id                owner_id,
-	a.created_at        owner_created_at,
-	a.updated_at        owner_updated_at,
-	a.deleted_at        owner_deleted_at,
-	a.handle            owner_handle,
-	a.name              owner_name,
-	a.bio               owner_bio,
-	a.admin             owner_admin
+    distinct n.id       node_id,
+    n.created_at        node_created_at,
+    n.updated_at        node_updated_at,
+    n.deleted_at        node_deleted_at,
+    n.name              node_name,
+    n.slug              node_slug,
+    n.description       node_description,
+    n.parent_node_id    node_parent_node_id,
+    n.account_id        node_account_id,
+    n.visibility        node_visibility,
+    n.properties        node_properties,
+    a.id                owner_id,
+    a.created_at        owner_created_at,
+    a.updated_at        owner_updated_at,
+    a.deleted_at        owner_deleted_at,
+    a.handle            owner_handle,
+    a.name              owner_name,
+    a.bio               owner_bio,
+    a.admin             owner_admin,
+	depth
 from
-    descendants
-    inner join nodes c on c.id = descendants.descendant
-    inner join accounts a on a.id = c.account_id
-where
-    (
-        (
-            descendant = $1
-            and parent is not null
-        ) or
-        parent = $1
-    )
-    -- additional filters
-    %s
-    -- end
+    children
+    inner join nodes n on n.id = children.id
+    inner join accounts a on a.id = n.account_id
+
+-- optional where clause
+%s
+
 order by
     depth
 `
 
 type subtreeRow struct {
-	NodeId           xid.ID     `db:"node_id"`
-	NodeCreatedAt    time.Time  `db:"node_created_at"`
-	NodeUpdatedAt    time.Time  `db:"node_updated_at"`
-	NodeDeletedAt    *time.Time `db:"node_deleted_at"`
-	NodeName         string     `db:"node_name"`
-	NodeSlug         string     `db:"node_slug"`
-	NodeDescription  string     `db:"node_description"`
-	NodeParentNodeId xid.ID     `db:"node_parent_node_id"`
-	NodeAccountId    xid.ID     `db:"node_account_id"`
-	NodeProperties   any        `db:"node_properties"`
-	OwnerId          xid.ID     `db:"owner_id"`
-	OwnerCreatedAt   time.Time  `db:"owner_created_at"`
-	OwnerUpdatedAt   time.Time  `db:"owner_updated_at"`
-	OwnerDeletedAt   *time.Time `db:"owner_deleted_at"`
-	OwnerHandle      string     `db:"owner_handle"`
-	OwnerName        string     `db:"owner_name"`
-	OwnerBio         *string    `db:"owner_bio"`
-	OwnerAdmin       bool       `db:"owner_admin"`
+	NodeId           xid.ID          `db:"node_id"`
+	NodeCreatedAt    time.Time       `db:"node_created_at"`
+	NodeUpdatedAt    time.Time       `db:"node_updated_at"`
+	NodeDeletedAt    *time.Time      `db:"node_deleted_at"`
+	NodeName         string          `db:"node_name"`
+	NodeSlug         string          `db:"node_slug"`
+	NodeDescription  string          `db:"node_description"`
+	NodeParentNodeId xid.ID          `db:"node_parent_node_id"`
+	NodeAccountId    xid.ID          `db:"node_account_id"`
+	NodeVisibility   post.Visibility `db:"node_visibility"`
+	NodeProperties   any             `db:"node_properties"`
+	OwnerId          xid.ID          `db:"owner_id"`
+	OwnerCreatedAt   time.Time       `db:"owner_created_at"`
+	OwnerUpdatedAt   time.Time       `db:"owner_updated_at"`
+	OwnerDeletedAt   *time.Time      `db:"owner_deleted_at"`
+	OwnerHandle      string          `db:"owner_handle"`
+	OwnerName        string          `db:"owner_name"`
+	OwnerBio         *string         `db:"owner_bio"`
+	OwnerAdmin       bool            `db:"owner_admin"`
+	Depth            int             `db:"depth"`
 }
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
@@ -152,6 +151,10 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 		Name:        r.NodeName,
 		Slug:        r.NodeSlug,
 		Description: r.NodeDescription,
+		Visibility:  r.NodeVisibility,
+		Parent: opt.NewSafe(datagraph.Node{
+			ID: datagraph.NodeID(r.NodeParentNodeId),
+		}, !r.NodeParentNodeId.IsNil()),
 		Owner: profile.Profile{
 			ID:      account_repo.AccountID(r.OwnerId),
 			Created: r.OwnerCreatedAt,
@@ -164,25 +167,59 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 	}, nil
 }
 
-func (d *database) Subtree(ctx context.Context, id datagraph.NodeID, fs ...Filter) ([]*datagraph.Node, error) {
+func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID], fs ...Filter) ([]*datagraph.Node, error) {
 	f := filters{}
 	for _, fn := range fs {
 		fn(&f)
 	}
 
-	predicates := ""
-	predicateN := 2
-	if f.accountSlug != nil {
-		predicates = fmt.Sprintf("%s AND a.handle = $%d", predicates, predicateN)
-		// predicateN++ // Do this when more predicates are added.
+	// NOTE: i fucking hate writing raw sql into source code...
+
+	var rootPredicate string
+	predicates := []string{}
+	args := []interface{}{}
+	argOffset := 0
+
+	getPlaceholder := func() string {
+		argOffset += 1
+		return fmt.Sprintf("$%d", argOffset)
 	}
 
-	r, err := d.raw.QueryxContext(ctx, fmt.Sprintf(ddl, predicates), id.String())
+	if parentNodeID, ok := id.Get(); ok {
+		args = append(args, parentNodeID.String())
+		rootPredicate = fmt.Sprintf("id = cast(%s as text)", getPlaceholder())
+	} else {
+		rootPredicate = "parent_node_id is null"
+	}
+
+	if f.accountSlug != nil {
+		predicates = append(predicates, fmt.Sprintf(
+			"a.handle = %s",
+			getPlaceholder()))
+
+		args = append(args, *f.accountSlug)
+	}
+
+	if f.depth != nil {
+		predicates = append(predicates, fmt.Sprintf(
+			"depth <= %s",
+			getPlaceholder()))
+
+		args = append(args, *f.depth)
+	}
+
+	additional := ""
+	if len(predicates) > 0 {
+		additional = "where " + strings.Join(predicates, " AND ")
+	}
+	q := fmt.Sprintf(ddl, rootPredicate, additional)
+
+	r, err := d.raw.QueryxContext(ctx, q, args...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes := []*datagraph.Node{}
+	flat := []*datagraph.Node{}
 
 	for r.Next() {
 		c := subtreeRow{}
@@ -196,8 +233,65 @@ func (d *database) Subtree(ctx context.Context, id datagraph.NodeID, fs ...Filte
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		nodes = append(nodes, n)
+		flat = append(flat, n)
 	}
+
+	filtered := dt.Filter(flat, func(n *datagraph.Node) bool {
+		if len(f.visibility) > 0 {
+			return lo.Contains(f.visibility, n.Visibility)
+		} else {
+			return n.Visibility == post.VisibilityPublished
+		}
+	})
+
+	var linkChildrenForParent func(datagraph.Node) []*datagraph.Node
+
+	linkChildrenForParent = func(parent datagraph.Node) []*datagraph.Node {
+		filteredParent, isFilteringParent := id.Get()
+
+		return dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+			if p, ok := curr.Parent.Get(); ok && p.ID == parent.ID {
+				// Take a copy because our mutations cannot apply to `flat`.
+				copy := *curr
+
+				copy.Nodes = linkChildrenForParent(copy)
+
+				// If the current iteration is not the root node of a parent
+				// node (a subtree query) then blank out the parent field since
+				// it's a waste to store this information in tree children.
+				if isFilteringParent && filteredParent != copy.ID {
+					copy.Parent = opt.NewEmpty[datagraph.Node]()
+				}
+
+				return append(prev, &copy)
+			}
+
+			return prev
+		}, []*datagraph.Node{})
+
+	}
+
+	// Rebuild the flat list into the tree
+	nodes := dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+
+		// If we're filtering for a specific node and the current iteration is
+		// that node, the children are aggregated for this node regardless.
+		filteredParent, ok := id.Get()
+		if ok && curr.ID == filteredParent {
+			curr.Nodes = linkChildrenForParent(*curr)
+			return append(prev, curr)
+		}
+
+		// If the current iteration has no parent, it's a root node. When there
+		// is no filtered parent the query may contain multiple root nodes.
+		_, hasParent := curr.Parent.Get()
+		if !hasParent {
+			curr.Nodes = linkChildrenForParent(*curr)
+			return append(prev, curr)
+		}
+
+		return prev
+	}, []*datagraph.Node{})
 
 	return nodes, nil
 }

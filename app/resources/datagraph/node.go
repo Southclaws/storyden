@@ -16,6 +16,15 @@ type (
 	NodeSlug string
 )
 
+func NodeIDFromString(id string) (NodeID, error) {
+	parsed, err := xid.FromString(id)
+	if err != nil {
+		return NodeID(xid.NilID()), err
+	}
+
+	return NodeID(parsed), nil
+}
+
 func (i NodeID) String() string { return xid.ID(i).String() }
 
 type Node struct {
@@ -30,7 +39,7 @@ type Node struct {
 	Description string
 	Content     opt.Optional[string]
 	Owner       profile.Profile
-	Parent      opt.Optional[*Node]
+	Parent      opt.Optional[Node]
 	Visibility  post.Visibility
 	Properties  any
 
