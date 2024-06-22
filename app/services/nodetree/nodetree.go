@@ -13,7 +13,9 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
-var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
+var errNotAuthorised = fault.New("not authorised", ftag.With(ftag.PermissionDenied))
+
+var ErrIdenticalParentChild = fault.New("cannot relate a node to itself", ftag.With(ftag.InvalidArgument))
 
 type Graph interface {
 	// Move moves a node from either orphan state or belonging to one node
@@ -33,42 +35,61 @@ func New(nr node.Repository) Graph {
 }
 
 func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
+	if child == parent {
+		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
+	}
+
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cclus, err := s.nr.Get(ctx, child)
+	cnode, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pclus, err := s.nr.Get(ctx, parent)
+	pnode, err := s.nr.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !cclus.Owner.Admin {
-		if cclus.Owner.ID != accountID && pclus.Owner.ID != accountID {
+	if !cnode.Owner.Admin {
+		if cnode.Owner.ID != accountID && pnode.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
 
-	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeAdd(xid.ID(cclus.ID)))
+	// If the target parent is actually a child of the target child, sever this
+	// connection before adding the target child to the target parent.
+	if parentParent, ok := pnode.Parent.Get(); ok {
+		if parentParent.ID == cnode.ID {
+			cnode, err = s.nr.Update(ctx, cnode.ID, node.WithChildNodeRemove(xid.ID(pnode.ID)))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+		}
+	}
+
+	pnode, err = s.nr.Update(ctx, pnode.ID, node.WithChildNodeAdd(xid.ID(cnode.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return pclus, nil
+	return pnode, nil
 }
 
 func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
+	if child == parent {
+		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
+	}
+
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cclus, err := s.nr.Get(ctx, child)
+	n, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -78,13 +99,13 @@ func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent da
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !cclus.Owner.Admin {
-		if cclus.Owner.ID != accountID && pclus.Owner.ID != accountID {
+	if !n.Owner.Admin {
+		if n.Owner.ID != accountID && pclus.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
 	}
 
-	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(cclus.ID)))
+	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(n.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
