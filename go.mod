@@ -40,7 +40,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/jackc/pgx/v4 v4.18.2
+	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lucasb-eyer/go-colorful v1.2.0
