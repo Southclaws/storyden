@@ -1,5 +1,4 @@
 import {
-  LinkListOKResponse,
   NodeListOKResponse,
   ThreadListOKResponse,
 } from "src/api/openapi/schemas";
@@ -14,10 +13,9 @@ export default async function Page() {
     // objects of all kinds based on a set of heuristics such as what's hot,
     // what's relevant to the account (if any) and what's been featured.
 
-    const [threads, nodes, links] = await Promise.all([
+    const [threads, nodes] = await Promise.all([
       server<ThreadListOKResponse>({ url: "/v1/threads" }),
       server<NodeListOKResponse>({ url: "/v1/nodes" }),
-      server<LinkListOKResponse>({ url: "/v1/links" }),
     ]);
 
     return (
@@ -25,7 +23,6 @@ export default async function Page() {
         initialData={{
           threads,
           nodes,
-          links,
         }}
       />
     );

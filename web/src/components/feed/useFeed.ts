@@ -1,11 +1,7 @@
 import { filter } from "lodash/fp";
 
-import { useLinkList } from "src/api/openapi/links";
 import { useNodeList } from "src/api/openapi/nodes";
 import {
-  LinkList,
-  LinkListParams,
-  LinkListResult,
   NodeList,
   NodeListParams,
   NodeListResult,
@@ -19,14 +15,12 @@ import { threadDelete, useThreadList } from "src/api/openapi/threads";
 
 export type MixedContent = {
   threads: ThreadListResult;
-  nodes: NodeListResult;
-  links: LinkListResult;
+  nodes?: NodeListResult;
 };
 
 export type MixedContentLists = {
   threads: ThreadList;
   nodes: NodeList;
-  links: LinkList;
 };
 
 export type MixedContentHandlers = {
@@ -37,12 +31,10 @@ export type Props = {
   params?: {
     threads?: ThreadListParams;
     nodes?: NodeListParams;
-    links?: LinkListParams;
   };
   initialData?: {
     threads: ThreadListResult;
-    nodes: NodeListResult;
-    links: LinkListResult;
+    nodes?: NodeListResult;
   };
 };
 
@@ -66,16 +58,8 @@ export function useFeed({ params, initialData }: Props) {
     swr: { fallbackData: initialData?.nodes },
   });
 
-  const {
-    data: links,
-    mutate: mutateLinks,
-    error: errorLinks,
-  } = useLinkList(params?.links, {
-    swr: { fallbackData: initialData?.links },
-  });
-
-  const isReady = threads && nodes && links;
-  const allErrors = errorThreads || errorNodes || errorLinks;
+  const isReady = threads && nodes;
+  const allErrors = errorThreads || errorNodes;
 
   if (!isReady) {
     return {
@@ -105,13 +89,11 @@ export function useFeed({ params, initialData }: Props) {
     ready: true as const,
     data: {
       threads,
-      nodes,
-      links,
+      nodes: initialData?.nodes ? nodes : undefined,
     } satisfies MixedContent,
     mutate: {
       mutateThreads,
       mutateNodes,
-      mutateLinks,
     },
     handlers: {
       handleDeleteThread,
