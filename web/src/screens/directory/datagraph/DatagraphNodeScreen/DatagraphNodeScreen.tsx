@@ -138,20 +138,6 @@ export function DatagraphNodeScreen(props: Props) {
             />
           )}
         </VStack>
-
-        <VStack alignItems="start" w="full">
-          <Heading>Member of</Heading>
-
-          {node.children.length ? (
-            <NodeCardRows
-              directoryPath={directoryPath}
-              context="directory"
-              nodes={node.children}
-            />
-          ) : (
-            <Empty>No Items</Empty>
-          )}
-        </VStack>
       </FormProvider>
     </styled.form>
   );
