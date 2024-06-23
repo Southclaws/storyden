@@ -1295,7 +1295,7 @@ components:
       required: false
       in: query
       schema:
-        type: integer
+        type: string
 
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.

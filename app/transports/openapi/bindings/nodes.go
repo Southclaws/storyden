@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -81,6 +82,18 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 }
 
 func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObject) (openapi.NodeListResponseObject, error) {
+	depth, err := opt.MapErr(opt.NewPtr(request.Params.Depth), func(s string) (int, error) {
+		v, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return 0, err
+		}
+
+		return max(0, int(v)), nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
 		return c.ar.GetByID(ctx, aid)
 	})
@@ -96,8 +109,8 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		opts = append(opts, node_traversal.WithOwner(*v))
 	}
 
-	if v := request.Params.Depth; v != nil {
-		opts = append(opts, node_traversal.WithDepth(uint(*v)))
+	if d, ok := depth.Get(); ok {
+		opts = append(opts, node_traversal.WithDepth(uint(d)))
 	}
 
 	visibilities, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
