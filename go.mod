@@ -49,7 +49,7 @@ require (
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/oapi-codegen/v2 v2.3.0
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/twilio/twilio-go v1.21.1
+	github.com/twilio/twilio-go v1.22.0
 	github.com/weaviate/weaviate v1.25.4
 	github.com/weaviate/weaviate-go-client/v4 v4.14.0
 	golang.org/x/sync v0.7.0
