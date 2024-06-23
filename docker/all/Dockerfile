@@ -1,4 +1,4 @@
-FROM golang:1.22 as api-builder
+FROM golang:1.22 AS api-builder
 
 RUN git config --global --add safe.directory /server
 
@@ -26,7 +26,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY ./web/package.json ./web/yarn.lock* ./
-RUN yarn --frozen-lockfile --ignore-scripts --network-timeout 1000000 install
+RUN corepack enable && yarn --frozen-lockfile --ignore-scripts --network-timeout 1000000 install
 
 #
 # BUILDER LAYER
