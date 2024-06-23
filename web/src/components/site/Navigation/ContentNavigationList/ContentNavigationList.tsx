@@ -36,13 +36,14 @@ export function ContentNavigationList() {
           }}
         >
           <CategoryList />
-          <DatagraphNavTree />
         </Box>
 
-        {isAdmin && <CategoryCreateTrigger />}
+        <DatagraphNavTree />
       </LStack>
 
       <LStack gap="1">
+        {isAdmin && <CategoryCreateTrigger />}
+
         <LinkButton w="full" size="xs" variant="ghost" href="/directory">
           <BookOpenIcon />
           Knowledgebase
