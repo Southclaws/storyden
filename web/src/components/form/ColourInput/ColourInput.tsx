@@ -17,7 +17,7 @@ export function ColourInput(props: Props) {
     "--angle": `${angle}deg`,
     "--thumb-size": "3em",
     "--circle-size": "200px",
-    "--colour": `oklch(${L} ${C} ${hue}deg)`,
+    "--colour": value,
     "--cursor": grabbing ? "grabbing" : "grab",
   } as CSSProperties;
 
