@@ -41,7 +41,7 @@ export function useColourInput(props: Props) {
     if (!props.value) return;
 
     try {
-      const colour = new Color(props.value);
+      const colour = new (Color as any)(props.value);
 
       const hue = angleToHue(colour.lch["h"] ?? 0);
 
