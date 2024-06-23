@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -128,6 +130,20 @@ func getDriver(databaseURL string) (string, string, error) {
 
 	case "sqlite", "sqlite3":
 		path, _ := strings.CutPrefix(databaseURL, u.Scheme+"://")
+
+		// NOTE: SQLite has a bug where if the path does not exist, it provides
+		// an incorrect and confusing error message about memory allocation. So
+		// we need to perform the checks against the path with a proper error.
+		if _, err := os.Stat(filepath.Dir(path)); err != nil {
+			if os.IsNotExist(err) {
+				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+					return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not create directory for sqlite database: %s", u)))
+				}
+			} else {
+				return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not read directory: %s", u)))
+			}
+		}
+
 		return "sqlite", path, nil
 
 	default:
