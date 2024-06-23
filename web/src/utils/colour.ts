@@ -89,7 +89,7 @@ export function getColourAsHex(colour: string) {
   return parseColourWithFallback(colour).to("srgb").toString({ format: "hex" });
 }
 
-function parseColourWithFallback(colour: string) {
+function parseColourWithFallback(colour: string): any {
   try {
     return new Color(colour);
   } catch (e) {
