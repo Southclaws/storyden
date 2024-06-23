@@ -27,7 +27,7 @@ export const darkClampC: [number, number] = [10, 14];
 export const darkContrast = 1.33;
 
 export function getColourVariants(colour: string): Record<string, string> {
-  const c = parseColourWithFallback(colour);
+  const c = parseColourWithFallback(colour) as any;
 
   const hue = getHue(c);
 
