@@ -13,4 +13,4 @@ request includes a node ID only that node will be returned, otherwise
 only top-level (root) nodes will be returned.
 
  */
-export type TreeDepthParamParameter = number;
+export type TreeDepthParamParameter = string;

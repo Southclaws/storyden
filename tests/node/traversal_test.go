@@ -31,7 +31,6 @@ func TestNodesTreeQuerying(t *testing.T) {
 		ar account.Repository,
 	) {
 		lc.Append(fx.StartHook(func() {
-
 			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
 
 			visibility := openapi.Published
@@ -90,7 +89,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 0
+				depth := "0"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth: &depth,
 				})
@@ -109,7 +108,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 1
+				depth := "1"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth: &depth,
 				})
@@ -132,7 +131,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 2
+				depth := "2"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth: &depth,
 				})
@@ -162,7 +161,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 2
+				depth := "2"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth:  &depth,
 					NodeId: &node1.JSON200.Id,
@@ -190,7 +189,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 2
+				depth := "2"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth:  &depth,
 					NodeId: &node2.JSON200.Id,
@@ -211,7 +210,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				depth := 2
+				depth := "2"
 				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
 					Depth:  &depth,
 					NodeId: &node3.JSON200.Id,
