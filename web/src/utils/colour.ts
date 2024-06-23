@@ -91,9 +91,9 @@ export function getColourAsHex(colour: string) {
 
 function parseColourWithFallback(colour: string): any {
   try {
-    return new Color(colour);
+    return new (Color as any)(colour);
   } catch (e) {
-    return new Color(FALLBACK_COLOUR);
+    return new (Color as any)(FALLBACK_COLOUR);
   }
 }
 
