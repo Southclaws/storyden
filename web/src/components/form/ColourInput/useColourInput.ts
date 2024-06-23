@@ -1,3 +1,5 @@
+"use client";
+
 import Color from "colorjs.io";
 import { useEffect, useRef, useState } from "react";
 
