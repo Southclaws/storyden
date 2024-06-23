@@ -1,6 +1,6 @@
 "use client";
 
-import Color from "colorjs.io";
+import { parseToHsl } from "polished";
 import { useEffect, useRef, useState } from "react";
 
 export type Props = {
@@ -10,11 +10,13 @@ export type Props = {
 };
 
 // TODO: Dark mode = 40%
-export const L = "80%";
+export const L = "80";
 
-export const C = "0.15";
+export const C = "15";
 
-export const lch = (hue: number) => `oklch(${L} ${C} ${hue})`;
+// TODO: Support LCH where supported.
+// export const lch = (hue: number) => `oklch(${L} ${C} ${hue})`;
+export const hsl = (hue: number) => `hsl(${hue}, ${C}%, ${L}%)`;
 
 const hueToAngle = (input: number) => {
   const shifted = input + 90;
@@ -43,20 +45,20 @@ export function useColourInput(props: Props) {
     if (!props.value) return;
 
     try {
-      const colour = new Color(props.value);
+      const colour = parseToHsl(props.value);
 
-      const hue = angleToHue(colour.lch["h"] ?? 0);
+      const hue = angleToHue(colour.hue ?? 0);
 
       if (hue) {
         setAngle(hue);
       }
-    } catch (_) {
+    } catch (e) {
       setAngle(Math.random() * 359);
     }
   }, [props.value]);
 
   const hue = hueToAngle(angle);
-  const value = `oklch(${L} ${C} ${hue}deg)`;
+  const value = hsl(hue);
 
   function onPointerMove(e: globalThis.PointerEvent) {
     if (!ref.current) return;
@@ -72,7 +74,7 @@ export function useColourInput(props: Props) {
     const angleTo = (Math.atan2(my - cy, mx - cx) * 180) / Math.PI;
 
     setAngle(angleTo);
-    props.onUpdate(`oklch(${L} ${C} ${hueToAngle(angleTo)}deg)`);
+    props.onUpdate(hsl(hueToAngle(angleTo)));
   }
 
   function onCleanup() {
