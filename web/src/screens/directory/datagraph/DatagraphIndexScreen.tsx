@@ -2,12 +2,11 @@
 
 import { Breadcrumbs } from "src/components/directory/datagraph/Breadcrumbs";
 import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
-import { LinkResultList } from "src/components/directory/links/LinkIndexView/LinkResultList";
-import { Empty } from "src/components/site/Empty";
 import { Unready } from "src/components/site/Unready";
 
+import { DirectoryEmptyState } from "@/components/directory/DirectoryEmptyState";
 import { Heading } from "@/components/ui/heading";
-import { Center, VStack } from "@/styled-system/jsx";
+import { LStack, VStack } from "@/styled-system/jsx";
 
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
 
@@ -16,46 +15,26 @@ export function Client(props: Props) {
 
   if (!ready) return <Unready {...error} />;
 
-  const { nodes, links } = data;
+  const { nodes } = data;
 
   return (
-    <VStack w="full" alignItems="start" gap="4">
+    <LStack gap="4">
       <Breadcrumbs directoryPath={[]} visibility="draft" create="show" />
 
       {empty ? (
-        <Center h="full">
-          <Empty>
-            This community knowledgebase is empty.
-            <br />
-            {session ? (
-              <>Be the first to contribute!</>
-            ) : (
-              <>Please log in to contribute.</>
-            )}
-          </Empty>
-        </Center>
+        <DirectoryEmptyState />
       ) : (
         <p>You can browse the community&apos;s knowledgebase here.</p>
       )}
 
-      {links.data.results > 0 && (
-        <VStack w="full" alignItems="start">
-          <Heading>New links</Heading>
-          <LinkResultList links={links.data} show={3} />
-        </VStack>
-      )}
-
       {nodes.data.nodes.length > 0 && (
-        <VStack w="full" alignItems="start">
-          <Heading>Knowledgebase</Heading>
-          <NodeCardRows
-            directoryPath={[]}
-            context="directory"
-            size="small"
-            {...nodes.data}
-          />
-        </VStack>
+        <NodeCardRows
+          directoryPath={[]}
+          context="directory"
+          size="small"
+          {...nodes.data}
+        />
       )}
-    </VStack>
+    </LStack>
   );
 }
