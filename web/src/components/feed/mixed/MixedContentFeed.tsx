@@ -85,17 +85,6 @@ function MixedContentFeedSection({
           <TextPostList posts={data.threads} />
         </>
       )}
-
-      {data.links.length > 0 && (
-        <>
-          {showHeader && (
-            <SectionHeader recent={recent} href="/directory">
-              Links
-            </SectionHeader>
-          )}
-          <LinkCardRows links={data.links} />
-        </>
-      )}
     </LStack>
   );
 }
@@ -125,6 +114,5 @@ function getChunkType(c: MixedContentChunk | undefined) {
   if (c === undefined) return undefined;
   if (c.nodes.length > 0) return "nodes" as const;
   if (c.threads.length > 0) return "threads" as const;
-  if (c.links.length > 0) return "links" as const;
   return undefined;
 }
