@@ -26,7 +26,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY ./web/package.json ./web/yarn.lock* ./
-RUN corepack enable && yarn --frozen-lockfile --ignore-scripts --network-timeout 1000000 install
+RUN corepack enable && yarn install --immutable --network-timeout 1000000
 
 #
 # BUILDER LAYER
