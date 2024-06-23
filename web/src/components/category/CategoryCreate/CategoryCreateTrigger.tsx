@@ -15,14 +15,7 @@ export function CategoryCreateTrigger(
   return (
     <>
       {props.children ?? (
-        <Button
-          w="full"
-          justifyContent="start"
-          size="xs"
-          variant="ghost"
-          onClick={onOpen}
-          {...props}
-        >
+        <Button w="full" size="xs" variant="ghost" onClick={onOpen} {...props}>
           <PlusIcon /> Create category
         </Button>
       )}
