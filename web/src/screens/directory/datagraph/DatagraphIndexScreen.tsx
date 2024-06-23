@@ -11,7 +11,7 @@ import { LStack, VStack } from "@/styled-system/jsx";
 import { Props, useDatagraphIndexScreen } from "./useDatagraphIndexScreen";
 
 export function Client(props: Props) {
-  const { ready, data, empty, error, session } = useDatagraphIndexScreen(props);
+  const { ready, data, empty, error } = useDatagraphIndexScreen(props);
 
   if (!ready) return <Unready {...error} />;
 
