@@ -40,7 +40,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/jackc/pgx/v4 v4.18.2
+	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lucasb-eyer/go-colorful v1.2.0
@@ -50,7 +50,7 @@ require (
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/oapi-codegen/v2 v2.3.0
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/twilio/twilio-go v1.21.1
+	github.com/twilio/twilio-go v1.22.0
 	github.com/weaviate/weaviate v1.25.4
 	github.com/weaviate/weaviate-go-client/v4 v4.14.0
 	golang.org/x/sync v0.7.0
