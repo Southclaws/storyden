@@ -10,6 +10,7 @@ import { map } from "lodash/fp";
 import { admonition } from "@/recipes/admonition";
 import { headingInput } from "@/recipes/heading-input";
 import { richCard } from "@/recipes/rich-card";
+import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
 
 // TODO: Dark mode = 40%
@@ -113,7 +114,7 @@ const semanticTokens = defineSemanticTokens({
 export default defineConfig({
   presets: [
     "@pandacss/preset-base",
-    "@park-ui/panda-preset",
+    // "@park-ui/panda-preset",
     createPreset({
       // NOTE: This is just for Park-ui's preset, the actual accent colour is
       // set by the administrator and is a dynamic runtime value.
@@ -230,6 +231,9 @@ export default defineConfig({
       headingInput: headingInput,
       typographyHeading: typographyHeading,
       richCard: richCard,
+    },
+    slotRecipes: {
+      treeView: treeView,
     },
     extend: {
       semanticTokens,

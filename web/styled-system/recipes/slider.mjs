@@ -42,42 +42,6 @@ const sliderSlotNames = [
   [
     "marker",
     "slider__marker"
-  ],
-  [
-    "root",
-    "slider__root"
-  ],
-  [
-    "label",
-    "slider__label"
-  ],
-  [
-    "thumb",
-    "slider__thumb"
-  ],
-  [
-    "valueText",
-    "slider__valueText"
-  ],
-  [
-    "track",
-    "slider__track"
-  ],
-  [
-    "range",
-    "slider__range"
-  ],
-  [
-    "control",
-    "slider__control"
-  ],
-  [
-    "markerGroup",
-    "slider__markerGroup"
-  ],
-  [
-    "marker",
-    "slider__marker"
   ]
 ]
 const sliderSlotFns = /* @__PURE__ */ sliderSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, sliderDefaultVariants, getSlotCompoundVariant(sliderCompoundVariants, slotName))])

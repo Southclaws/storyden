@@ -16,7 +16,7 @@ export type CollapsibleVariantProps = {
 
 export interface CollapsibleRecipe {
   __type: CollapsibleVariantProps
-  (props?: CollapsibleVariantProps): Pretty<Record<"root" | "trigger" | "content" | "root" | "trigger" | "content", string>>
+  (props?: CollapsibleVariantProps): Pretty<Record<"root" | "trigger" | "content", string>>
   raw: (props?: CollapsibleVariantProps) => CollapsibleVariantProps
   variantMap: CollapsibleVariantMap
   variantKeys: Array<keyof CollapsibleVariant>

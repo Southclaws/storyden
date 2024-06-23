@@ -24,26 +24,6 @@ const hoverCardSlotNames = [
   [
     "content",
     "hoverCard__content"
-  ],
-  [
-    "arrow",
-    "hoverCard__arrow"
-  ],
-  [
-    "arrowTip",
-    "hoverCard__arrowTip"
-  ],
-  [
-    "trigger",
-    "hoverCard__trigger"
-  ],
-  [
-    "positioner",
-    "hoverCard__positioner"
-  ],
-  [
-    "content",
-    "hoverCard__content"
   ]
 ]
 const hoverCardSlotFns = /* @__PURE__ */ hoverCardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, hoverCardDefaultVariants, getSlotCompoundVariant(hoverCardCompoundVariants, slotName))])

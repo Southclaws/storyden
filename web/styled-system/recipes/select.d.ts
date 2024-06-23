@@ -17,7 +17,7 @@ export type SelectVariantProps = {
 
 export interface SelectRecipe {
   __type: SelectVariantProps
-  (props?: SelectVariantProps): Pretty<Record<"label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "content" | "root" | "control" | "valueText" | "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "content" | "root" | "control" | "valueText", string>>
+  (props?: SelectVariantProps): Pretty<Record<"label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "content" | "root" | "control" | "valueText", string>>
   raw: (props?: SelectVariantProps) => SelectVariantProps
   variantMap: SelectVariantMap
   variantKeys: Array<keyof SelectVariant>

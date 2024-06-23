@@ -16,7 +16,7 @@ export type ToastVariantProps = {
 
 export interface ToastRecipe {
   __type: ToastVariantProps
-  (props?: ToastVariantProps): Pretty<Record<"group" | "root" | "title" | "description" | "actionTrigger" | "closeTrigger" | "group" | "root" | "title" | "description" | "actionTrigger" | "closeTrigger", string>>
+  (props?: ToastVariantProps): Pretty<Record<"group" | "root" | "title" | "description" | "actionTrigger" | "closeTrigger", string>>
   raw: (props?: ToastVariantProps) => ToastVariantProps
   variantMap: ToastVariantMap
   variantKeys: Array<keyof ToastVariant>

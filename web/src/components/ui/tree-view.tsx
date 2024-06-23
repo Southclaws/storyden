@@ -28,6 +28,7 @@ export interface TreeViewProps
   extends Assign<JsxStyleProps, TreeViewRootProps>,
     TreeViewVariantProps {
   data: TreeViewData;
+  onSelectMenu?: (value: string) => void;
 }
 
 export const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(

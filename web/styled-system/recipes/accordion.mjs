@@ -26,26 +26,6 @@ const accordionSlotNames = [
   [
     "itemIndicator",
     "accordion__itemIndicator"
-  ],
-  [
-    "root",
-    "accordion__root"
-  ],
-  [
-    "item",
-    "accordion__item"
-  ],
-  [
-    "itemTrigger",
-    "accordion__itemTrigger"
-  ],
-  [
-    "itemContent",
-    "accordion__itemContent"
-  ],
-  [
-    "itemIndicator",
-    "accordion__itemIndicator"
   ]
 ]
 const accordionSlotFns = /* @__PURE__ */ accordionSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, accordionDefaultVariants, getSlotCompoundVariant(accordionCompoundVariants, slotName))])

@@ -16,7 +16,7 @@ export type SplitterVariantProps = {
 
 export interface SplitterRecipe {
   __type: SplitterVariantProps
-  (props?: SplitterVariantProps): Pretty<Record<"root" | "panel" | "resizeTrigger" | "root" | "panel" | "resizeTrigger", string>>
+  (props?: SplitterVariantProps): Pretty<Record<"root" | "panel" | "resizeTrigger", string>>
   raw: (props?: SplitterVariantProps) => SplitterVariantProps
   variantMap: SplitterVariantMap
   variantKeys: Array<keyof SplitterVariant>

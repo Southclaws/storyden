@@ -32,34 +32,6 @@ const dialogSlotNames = [
   [
     "closeTrigger",
     "dialog__closeTrigger"
-  ],
-  [
-    "trigger",
-    "dialog__trigger"
-  ],
-  [
-    "backdrop",
-    "dialog__backdrop"
-  ],
-  [
-    "positioner",
-    "dialog__positioner"
-  ],
-  [
-    "content",
-    "dialog__content"
-  ],
-  [
-    "title",
-    "dialog__title"
-  ],
-  [
-    "description",
-    "dialog__description"
-  ],
-  [
-    "closeTrigger",
-    "dialog__closeTrigger"
   ]
 ]
 const dialogSlotFns = /* @__PURE__ */ dialogSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, dialogDefaultVariants, getSlotCompoundVariant(dialogCompoundVariants, slotName))])

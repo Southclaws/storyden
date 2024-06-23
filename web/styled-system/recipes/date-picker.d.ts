@@ -16,7 +16,7 @@ export type DatePickerVariantProps = {
 
 export interface DatePickerRecipe {
   __type: DatePickerVariantProps
-  (props?: DatePickerVariantProps): Pretty<Record<"root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view" | "root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view", string>>
+  (props?: DatePickerVariantProps): Pretty<Record<"root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view", string>>
   raw: (props?: DatePickerVariantProps) => DatePickerVariantProps
   variantMap: DatePickerVariantMap
   variantKeys: Array<keyof DatePickerVariant>

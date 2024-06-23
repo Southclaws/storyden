@@ -40,42 +40,6 @@ const editableSlotNames = [
   [
     "control",
     "editable__control"
-  ],
-  [
-    "root",
-    "editable__root"
-  ],
-  [
-    "area",
-    "editable__area"
-  ],
-  [
-    "label",
-    "editable__label"
-  ],
-  [
-    "preview",
-    "editable__preview"
-  ],
-  [
-    "input",
-    "editable__input"
-  ],
-  [
-    "editTrigger",
-    "editable__editTrigger"
-  ],
-  [
-    "submitTrigger",
-    "editable__submitTrigger"
-  ],
-  [
-    "cancelTrigger",
-    "editable__cancelTrigger"
-  ],
-  [
-    "control",
-    "editable__control"
   ]
 ]
 const editableSlotFns = /* @__PURE__ */ editableSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, editableDefaultVariants, getSlotCompoundVariant(editableCompoundVariants, slotName))])

@@ -15,14 +15,6 @@ const toggleGroupSlotNames = [
   [
     "item",
     "toggleGroup__item"
-  ],
-  [
-    "root",
-    "toggleGroup__root"
-  ],
-  [
-    "item",
-    "toggleGroup__item"
   ]
 ]
 const toggleGroupSlotFns = /* @__PURE__ */ toggleGroupSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, toggleGroupDefaultVariants, getSlotCompoundVariant(toggleGroupCompoundVariants, slotName))])

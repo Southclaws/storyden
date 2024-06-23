@@ -4,6 +4,7 @@ import { reduce } from "lodash/fp";
 
 import { useNodeList } from "@/api/openapi/nodes";
 import { NodeWithChildren } from "@/api/openapi/schemas";
+import { DatagraphNodeTree } from "@/components/directory/datagraph/DatagraphNodeTree/DatagraphNodeTree";
 import { Child, TreeView, TreeViewData } from "@/components/ui/tree-view";
 
 const recursivelyMapChildren = reduce<NodeWithChildren, Child[]>(
@@ -25,12 +26,12 @@ export function DatagraphNavTree() {
 
   if (!data) return null;
 
-  const children: Child[] = recursivelyMapChildren(data.nodes);
-
-  const root = {
-    label: "Root",
-    children,
-  } satisfies TreeViewData;
-
-  return <TreeView data={root} />;
+  return (
+    <DatagraphNodeTree
+      data={{
+        label: "Directory",
+        children: data.nodes,
+      }}
+    />
+  );
 }

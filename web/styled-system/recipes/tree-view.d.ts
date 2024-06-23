@@ -3,7 +3,7 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface TreeViewVariant {
-  
+  variant: "clamped" | "scrollable"
 }
 
 type TreeViewVariantMap = {

@@ -22,22 +22,6 @@ const pinInputSlotNames = [
   [
     "control",
     "pinInput__control"
-  ],
-  [
-    "root",
-    "pinInput__root"
-  ],
-  [
-    "label",
-    "pinInput__label"
-  ],
-  [
-    "input",
-    "pinInput__input"
-  ],
-  [
-    "control",
-    "pinInput__control"
   ]
 ]
 const pinInputSlotFns = /* @__PURE__ */ pinInputSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, pinInputDefaultVariants, getSlotCompoundVariant(pinInputCompoundVariants, slotName))])

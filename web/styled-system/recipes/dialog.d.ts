@@ -16,7 +16,7 @@ export type DialogVariantProps = {
 
 export interface DialogRecipe {
   __type: DialogVariantProps
-  (props?: DialogVariantProps): Pretty<Record<"trigger" | "backdrop" | "positioner" | "content" | "title" | "description" | "closeTrigger" | "trigger" | "backdrop" | "positioner" | "content" | "title" | "description" | "closeTrigger", string>>
+  (props?: DialogVariantProps): Pretty<Record<"trigger" | "backdrop" | "positioner" | "content" | "title" | "description" | "closeTrigger", string>>
   raw: (props?: DialogVariantProps) => DialogVariantProps
   variantMap: DialogVariantMap
   variantKeys: Array<keyof DialogVariant>

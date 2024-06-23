@@ -18,18 +18,6 @@ const avatarSlotNames = [
   [
     "fallback",
     "avatar__fallback"
-  ],
-  [
-    "root",
-    "avatar__root"
-  ],
-  [
-    "image",
-    "avatar__image"
-  ],
-  [
-    "fallback",
-    "avatar__fallback"
   ]
 ]
 const avatarSlotFns = /* @__PURE__ */ avatarSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, avatarDefaultVariants, getSlotCompoundVariant(avatarCompoundVariants, slotName))])

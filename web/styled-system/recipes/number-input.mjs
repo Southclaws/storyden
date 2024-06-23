@@ -34,34 +34,6 @@ const numberInputSlotNames = [
   [
     "scrubber",
     "numberInput__scrubber"
-  ],
-  [
-    "root",
-    "numberInput__root"
-  ],
-  [
-    "label",
-    "numberInput__label"
-  ],
-  [
-    "input",
-    "numberInput__input"
-  ],
-  [
-    "control",
-    "numberInput__control"
-  ],
-  [
-    "incrementTrigger",
-    "numberInput__incrementTrigger"
-  ],
-  [
-    "decrementTrigger",
-    "numberInput__decrementTrigger"
-  ],
-  [
-    "scrubber",
-    "numberInput__scrubber"
   ]
 ]
 const numberInputSlotFns = /* @__PURE__ */ numberInputSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, numberInputDefaultVariants, getSlotCompoundVariant(numberInputCompoundVariants, slotName))])

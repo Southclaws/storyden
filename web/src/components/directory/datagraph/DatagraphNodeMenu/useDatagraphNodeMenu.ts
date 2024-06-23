@@ -7,13 +7,13 @@ import { DatagraphNode } from "../DatagraphNode";
 export type Props = {
   node: DatagraphNode;
   onVisibilityChange?: (v: Visibility) => Promise<void>;
-  onDelete: () => void;
+  onDelete: (slug: string) => void;
 };
 
 export function useDatagraphNodeMenu(props: Props) {
   const account = useSession();
   const deleteProps = useDeleteAction({
-    onClick: props.onDelete,
+    onClick: () => props.onDelete(props.node.slug),
   });
 
   const isVisibilityChangeEnabled = props.onVisibilityChange ?? false;
