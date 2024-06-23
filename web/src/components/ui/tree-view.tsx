@@ -3,7 +3,6 @@ import {
   TreeView as ArkTreeView,
   type TreeViewRootProps,
 } from "@ark-ui/react/tree-view";
-import { CircleDashed, CircleIcon, DotIcon } from "lucide-react";
 import Link from "next/link";
 import { forwardRef } from "react";
 
