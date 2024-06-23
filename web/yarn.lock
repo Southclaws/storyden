@@ -5122,10 +5122,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colorjs.io@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "colorjs.io@npm:0.5.0"
-  checksum: 10c0/3fa5ed32f2bc62ea133d8df9b267a2bd2e33d3acb8f86bf057b125967f4b7ac607179df15fe4371e4f883760ea939a93a234d6b655fac605166d68e98a55a24d
+"colorjs.io@npm:^0.4.5":
+  version: 0.4.5
+  resolution: "colorjs.io@npm:0.4.5"
+  checksum: 10c0/4cc58d18223426bcb8caa558e7554002b62bf87bd20db06596abf5efe5ea65416266402db86b504ac5fa2c38360913dbb8e6ef7c4fa19a992fd1818d5710ef6f
   languageName: node
   linkType: hard
 
@@ -10556,7 +10556,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7.13.0"
     "@typescript-eslint/parser": "npm:^7.13.0"
     "@uidotdev/usehooks": "npm:^2.4.1"
-    colorjs.io: "npm:^0.5.0"
+    colorjs.io: "npm:^0.4.5"
     date-fns: "npm:^3.6.0"
     emoji-mart: "npm:^5.6.0"
     eslint: "npm:^8.57.0"

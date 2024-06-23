@@ -34,7 +34,7 @@
     "@tiptap/starter-kit": "^2.4.0",
     "@tiptap/suggestion": "^2.4.0",
     "@uidotdev/usehooks": "^2.4.1",
-    "colorjs.io": "^0.5.0",
+    "colorjs.io": "^0.4.5",
     "date-fns": "^3.6.0",
     "emoji-mart": "^5.6.0",
     "js-cookie": "^3.0.5",
