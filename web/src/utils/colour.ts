@@ -1,4 +1,4 @@
-import Color from "colorjs.io";
+import chroma from "chroma-js";
 import { readableColor } from "polished";
 
 export const FALLBACK_COLOUR = "#27b981";
@@ -27,11 +27,11 @@ export const darkClampC: [number, number] = [10, 14];
 export const darkContrast = 1.33;
 
 export function getColourVariants(colour: string): Record<string, string> {
-  const c = parseColourWithFallback(colour) as any;
+  const c = parseColourWithFallback(colour);
 
-  const hue = getHue(c);
+  const hue = c.oklch()[2];
 
-  const rgb = c.to("srgb").toString({ format: "hex" });
+  const rgb = c.hex();
 
   const textColour = readableColorWithFallback(rgb);
 
@@ -44,9 +44,7 @@ export function getColourVariants(colour: string): Record<string, string> {
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
-    const text = readableColorWithFallback(
-      parseColourWithFallback(fill).to("srgb").toString({ format: "hex" }),
-    );
+    const text = readableColorWithFallback(parseColourWithFallback(fill).hex());
 
     return {
       [`--accent-colour-flat-fill-${r}`]: fill,
@@ -64,9 +62,7 @@ export function getColourVariants(colour: string): Record<string, string> {
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
-    const text = readableColorWithFallback(
-      parseColourWithFallback(fill).to("srgb").toString({ format: "hex" }),
-    );
+    const text = readableColorWithFallback(parseColourWithFallback(fill).hex());
 
     return {
       [`--accent-colour-dark-fill-${r}`]: fill,
@@ -86,18 +82,18 @@ export function getColourVariants(colour: string): Record<string, string> {
 }
 
 export function getColourAsHex(colour: string) {
-  return parseColourWithFallback(colour).to("srgb").toString({ format: "hex" });
+  return parseColourWithFallback(colour).hex();
 }
 
-function parseColourWithFallback(colour: string): any {
+function parseColourWithFallback(colour: string) {
   try {
-    return new (Color as any)(colour);
+    return chroma(colour);
   } catch (e) {
-    return new (Color as any)(FALLBACK_COLOUR);
+    return chroma(FALLBACK_COLOUR);
   }
 }
 
-function getHue(c: Color) {
+function getHue(c) {
   const hue = c.oklch["h"];
   if (!hue) {
     return 0;
