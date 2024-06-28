@@ -19,6 +19,7 @@ export function TitleInput() {
             <HeadingInput
               id="name-input"
               size={"2xl" as any}
+              fontWeight="bold"
               placeholder="Name..."
               onValueChange={onChange}
               defaultValue={formState.defaultValues?.["name"]}

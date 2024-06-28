@@ -40,7 +40,6 @@ export function useNodeCreateScreen(props: Props) {
       name: node.name,
       slug: node.slug,
       url: node.url,
-      description: node.description,
       content: node.content,
       asset_ids: node.asset_ids,
       parent: parentSlug,

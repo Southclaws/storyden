@@ -46,20 +46,19 @@ export function useNodeViewerScreen(props: Props) {
   }
 
   async function handleSave(node: NodeInitialProps) {
-    await nodeUpdate(slug, {
+    const newNode = await nodeUpdate(slug, {
       name: node.name,
       slug: node.slug,
       asset_ids: node.asset_ids,
       url: node.url,
-      description: node.description,
       content: node.content,
       properties: node.properties,
     });
     await mutate();
 
     // Handle slug changes properly by redirecting to the new path.
-    if (node.slug !== slug) {
-      const newPath = replaceDirectoryPath(directoryPath, slug, node.slug);
+    if (newNode.slug !== slug) {
+      const newPath = replaceDirectoryPath(directoryPath, slug, newNode.slug);
       router.push(newPath);
     }
   }
