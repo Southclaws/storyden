@@ -15,7 +15,7 @@ import { styled } from "@/styled-system/jsx";
 
 // NOTE: This is the name of the component that will be used in the HTML.
 // It cannot be changed.
-const COMPONENT_NAME = "sd-image";
+const COMPONENT_NAME = "img";
 
 type Options = {
   handleFiles: (file: File[]) => Promise<Asset[]>;
