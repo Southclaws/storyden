@@ -13,6 +13,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -30,7 +31,7 @@ var (
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
-				Body: `Storyden is a platform for building communities.
+				Content: utils.Must(content.NewRichText(`Storyden is a platform for building communities.
 
 But not just another chat app or another forum site. Storyden is a modern take on oldschool bulletin board forums you may remember from the earlier days of the internet.
 
@@ -61,65 +62,65 @@ The code aims to be simple and accessible for either experienced software engine
 ## Future
 
 Storyden is still in development so please give the repository a watch if you're interested!
-`,
+`)),
 			},
 			{
 				ID:         post.ID(id("00000000000000001010")),
-				Body:       "first 😁",
+				Content:    utils.Must(content.NewRichText("first 😁")),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_004_Loki.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002010")),
-				Body:       "Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?",
+				Content:    utils.Must(content.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000003010")),
-				Body:       "Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.",
+				Content:    utils.Must(content.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_001_Odin.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000004010")),
-				Body:       "What about images and stuff?",
+				Content:    utils.Must(content.NewRichText("What about images and stuff?")),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_008_Heimdallr.ID},
 			},
 			{
 				ID: post.ID(id("00000000000000005010")),
-				Body: `oh you can do that like this:
+				Content: utils.Must(content.NewRichText(`oh you can do that like this:
 
 ![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
-`,
+`)),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_004_Loki.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000006010")),
-				Body:       `how did you do that??`,
+				Content:    utils.Must(content.NewRichText(`how did you do that??`)),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_005_Þórr.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000007010")),
-				Body:       `haha secret 😉`,
+				Content:    utils.Must(content.NewRichText(`haha secret 😉`)),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_004_Loki.ID},
 			},
 			{
 				ID: post.ID(id("00000000000000008010")),
-				Body: `It was mentioned above, use markdown:
+				Content: utils.Must(content.NewRichText(`It was mentioned above, use markdown:
 
 https://daringfireball.net/markdown
-`,
+`)),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000009010")),
-				Body:       "Thanks guys!",
+				Content:    utils.Must(content.NewRichText("Thanks guys!")),
 				RootPostID: post.ID(id("00000000000000000010")),
 				Author:     profile.Profile{ID: Account_008_Heimdallr.ID},
 			},
@@ -132,7 +133,7 @@ https://daringfireball.net/markdown
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
-				Body: `This post contains a list of resources for those of you who wish to contribute to Storyden.
+				Content: utils.Must(content.NewRichText(`This post contains a list of resources for those of you who wish to contribute to Storyden.
 
 What does contribution mean? Anything, large or small! Even if you spot a typo in the home page or in this demo data you can report it or even take a swing at fixing it!
 
@@ -151,17 +152,17 @@ And there's also a great community that's friends with Storyden called Makeroom,
 https://makeroom.club
 
 If I've missed anything, post in this thread and I'll add it here 😃
-`,
+`)),
 			},
 			{
 				ID:         post.ID(id("00000000000000001020")),
-				Body:       "Is there a wiki?",
+				Content:    utils.Must(content.NewRichText("Is there a wiki?")),
 				RootPostID: post.ID(id("00000000000000000020")),
 				Author:     profile.Profile{ID: Account_006_Freyja.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002020")),
-				Body:       "Not yet but they're working on it!",
+				Content:    utils.Must(content.NewRichText("Not yet but they're working on it!")),
 				RootPostID: post.ID(id("00000000000000000020")),
 				Author:     profile.Profile{ID: Account_002_Frigg.ID},
 			},
@@ -175,31 +176,31 @@ If I've missed anything, post in this thread and I'll add it here 😃
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
-				Body: `In this thread:
+				Content: utils.Must(content.NewRichText(`In this thread:
 
-Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
+Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
 			},
 			{
 				ID:         post.ID(id("00000000000000001030")),
-				Body:       "ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01,
+				Content:    utils.Must(content.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
 				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     profile.Profile{ID: Account_006_Freyja.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002030")),
-				Body:       markdownTest03,
+				Content:    utils.Must(content.NewRichText(markdownTest03)),
 				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     profile.Profile{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000003030")),
-				Body:       "That's pretty useful, here's mine:\n\n" + markdownTest02,
+				Content:    utils.Must(content.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
 				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     profile.Profile{ID: Account_007_Freyr.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000004030")),
-				Body:       "nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"),
+				Content:    utils.Must(content.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
 				RootPostID: post.ID(id("00000000000000000030")),
 				Author:     profile.Profile{ID: Account_004_Loki.ID},
 			},
@@ -263,7 +264,7 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`,
 		},
 		Posts: []*reply.Reply{
 			{
-				Body: ``,
+				Content: utils.Must(content.NewRichText("")),
 			},
 		},
 	}
@@ -300,8 +301,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			t.Category.ID,
 			t.Tags,
 			thread.WithID(t.ID),
-			thread.WithBody(first.Body),
-			thread.WithSummary(first.Body),
+			thread.WithContent(first.Content),
 			thread.WithVisibility(post.VisibilityPublished),
 			thread.WithAssets(assetIDs),
 		)
@@ -316,8 +316,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			p, err = pr.Create(ctx,
 				p.Author.ID,
 				th.ID,
-				reply.WithBody(p.Body),
-				reply.WithShort(p.Short),
+				reply.WithContent(p.Content),
 				reply.WithID(p.ID))
 			if err != nil {
 				if ent.IsConstraintError(err) {

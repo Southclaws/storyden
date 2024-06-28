@@ -88,6 +88,14 @@ func (nc *NodeCreate) SetDescription(s string) *NodeCreate {
 	return nc
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (nc *NodeCreate) SetNillableDescription(s *string) *NodeCreate {
+	if s != nil {
+		nc.SetDescription(*s)
+	}
+	return nc
+}
+
 // SetContent sets the "content" field.
 func (nc *NodeCreate) SetContent(s string) *NodeCreate {
 	nc.mutation.SetContent(s)
@@ -313,9 +321,6 @@ func (nc *NodeCreate) check() error {
 	if _, ok := nc.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Node.slug"`)}
 	}
-	if _, ok := nc.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Node.description"`)}
-	}
 	if _, ok := nc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Node.account_id"`)}
 	}
@@ -393,7 +398,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := nc.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := nc.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
@@ -623,6 +628,12 @@ func (u *NodeUpsert) UpdateDescription() *NodeUpsert {
 	return u
 }
 
+// ClearDescription clears the value of the "description" field.
+func (u *NodeUpsert) ClearDescription() *NodeUpsert {
+	u.SetNull(node.FieldDescription)
+	return u
+}
+
 // SetContent sets the "content" field.
 func (u *NodeUpsert) SetContent(v string) *NodeUpsert {
 	u.Set(node.FieldContent, v)
@@ -826,6 +837,13 @@ func (u *NodeUpsertOne) SetDescription(v string) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateDescription() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *NodeUpsertOne) ClearDescription() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearDescription()
 	})
 }
 
@@ -1212,6 +1230,13 @@ func (u *NodeUpsertBulk) SetDescription(v string) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateDescription() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *NodeUpsertBulk) ClearDescription() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearDescription()
 	})
 }
 

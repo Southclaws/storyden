@@ -54,7 +54,7 @@ func TestThreads(t *testing.T) {
 			a.Equal(slug.Make(cat1name), cat1create.JSON200.Slug)
 
 			thread1create, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
-				Body:       "this is a thread",
+				Body:       "<p>this is a thread</p>",
 				Category:   cat1create.JSON200.Id,
 				Visibility: openapi.Published,
 				Title:      "Thread testing",
@@ -67,7 +67,7 @@ func TestThreads(t *testing.T) {
 			a.Equal(acc.ID.String(), thread1create.JSON200.Author.Id)
 			a.Equal("Thread testing", thread1create.JSON200.Title)
 			a.Contains(thread1create.JSON200.Slug, "thread-testing")
-			a.Equal("this is a thread", thread1create.JSON200.Posts[0].Body)
+			a.Equal("<body><p>this is a thread</p></body>", thread1create.JSON200.Posts[0].Body)
 			a.Equal("this is a thread", *thread1create.JSON200.Short)
 			a.Equal(false, thread1create.JSON200.Pinned)
 			a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)

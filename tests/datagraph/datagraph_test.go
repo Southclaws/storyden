@@ -39,9 +39,8 @@ func TestDatagraphHappyPath(t *testing.T) {
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name1,
-				Slug:        slug1,
-				Description: "testing nodes api",
+				Name: name1,
+				Slug: &slug1,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(node1)
@@ -49,7 +48,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 
 			a.Equal(name1, node1.JSON200.Name)
 			a.Equal(slug1, node1.JSON200.Slug)
-			a.Equal("testing nodes api", node1.JSON200.Description)
+			a.Equal("", node1.JSON200.Description)
 			a.Equal(acc.ID.String(), string(node1.JSON200.Owner.Id))
 
 			// Add a child node
@@ -57,9 +56,8 @@ func TestDatagraphHappyPath(t *testing.T) {
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
 			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name2,
-				Slug:        slug2,
-				Description: "testing nodes children",
+				Name: name2,
+				Slug: &slug2,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(node2)
@@ -79,9 +77,8 @@ func TestDatagraphHappyPath(t *testing.T) {
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
 			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name3,
-				Slug:        slug3,
-				Description: "testing nodes children",
+				Name: name3,
+				Slug: &slug3,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.NotNil(node3)
@@ -168,9 +165,9 @@ func TestDatagraphDeletions(t *testing.T) {
 }
 
 func uniqueNode(name string) openapi.NodeInitialProps {
+	slug := name + uuid.NewString()
 	return openapi.NodeInitialProps{
-		Name:        name,
-		Slug:        name + uuid.NewString(),
-		Description: name,
+		Name: name,
+		Slug: &slug,
 	}
 }

@@ -5902,7 +5902,7 @@ func (m *NodeMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *NodeMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -5916,9 +5916,22 @@ func (m *NodeMutation) OldDescription(ctx context.Context) (v string, err error)
 	return oldValue.Description, nil
 }
 
+// ClearDescription clears the value of the "description" field.
+func (m *NodeMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[node.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *NodeMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[node.FieldDescription]
+	return ok
+}
+
 // ResetDescription resets all changes to the "description" field.
 func (m *NodeMutation) ResetDescription() {
 	m.description = nil
+	delete(m.clearedFields, node.FieldDescription)
 }
 
 // SetContent sets the "content" field.
@@ -6684,6 +6697,9 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldDeletedAt) {
 		fields = append(fields, node.FieldDeletedAt)
 	}
+	if m.FieldCleared(node.FieldDescription) {
+		fields = append(fields, node.FieldDescription)
+	}
 	if m.FieldCleared(node.FieldContent) {
 		fields = append(fields, node.FieldContent)
 	}
@@ -6709,6 +6725,9 @@ func (m *NodeMutation) ClearField(name string) error {
 	switch name {
 	case node.FieldDeletedAt:
 		m.ClearDeletedAt()
+		return nil
+	case node.FieldDescription:
+		m.ClearDescription()
 		return nil
 	case node.FieldContent:
 		m.ClearContent()

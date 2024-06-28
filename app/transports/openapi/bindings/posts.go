@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -47,8 +48,13 @@ func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	richContent, err := content.NewRichText(request.Body.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	partial := reply_service.Partial{
-		Body:    opt.New(request.Body.Body),
+		Content: opt.New(richContent),
 		ReplyTo: opt.Map(opt.NewPtr(request.Body.ReplyTo), deserialisePostID),
 		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
@@ -73,9 +79,14 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), content.NewRichText)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	partial := reply_service.Partial{
-		Body: opt.NewPtr(request.Body.Body),
-		Meta: opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Content: richContent,
+		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
 	post, err := p.reply_svc.Update(ctx, postID, partial)

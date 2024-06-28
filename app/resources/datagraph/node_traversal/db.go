@@ -94,7 +94,6 @@ select
     n.deleted_at        node_deleted_at,
     n.name              node_name,
     n.slug              node_slug,
-    n.description       node_description,
     n.parent_node_id    node_parent_node_id,
     n.account_id        node_account_id,
     n.visibility        node_visibility,
@@ -127,7 +126,6 @@ type subtreeRow struct {
 	NodeDeletedAt    *time.Time      `db:"node_deleted_at"`
 	NodeName         string          `db:"node_name"`
 	NodeSlug         string          `db:"node_slug"`
-	NodeDescription  string          `db:"node_description"`
 	NodeParentNodeId xid.ID          `db:"node_parent_node_id"`
 	NodeAccountId    xid.ID          `db:"node_account_id"`
 	NodeVisibility   post.Visibility `db:"node_visibility"`
@@ -145,13 +143,12 @@ type subtreeRow struct {
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
 	return &datagraph.Node{
-		ID:          datagraph.NodeID(r.NodeId),
-		CreatedAt:   r.NodeCreatedAt,
-		UpdatedAt:   r.NodeUpdatedAt,
-		Name:        r.NodeName,
-		Slug:        r.NodeSlug,
-		Description: r.NodeDescription,
-		Visibility:  r.NodeVisibility,
+		ID:         datagraph.NodeID(r.NodeId),
+		CreatedAt:  r.NodeCreatedAt,
+		UpdatedAt:  r.NodeUpdatedAt,
+		Name:       r.NodeName,
+		Slug:       r.NodeSlug,
+		Visibility: r.NodeVisibility,
 		Parent: opt.NewSafe(datagraph.Node{
 			ID: datagraph.NodeID(r.NodeParentNodeId),
 		}, !r.NodeParentNodeId.IsNil()),
@@ -268,12 +265,10 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 
 			return prev
 		}, []*datagraph.Node{})
-
 	}
 
 	// Rebuild the flat list into the tree
 	nodes := dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
-
 		// If we're filtering for a specific node and the current iteration is
 		// that node, the children are aggregated for this node regardless.
 		filteredParent, ok := id.Get()

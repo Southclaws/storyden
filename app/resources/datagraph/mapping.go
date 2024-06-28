@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -45,20 +46,24 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 
 	assets := dt.Map(c.Edges.Assets, asset.FromModel)
 
+	richContent, err := opt.MapErr(opt.NewPtr(c.Content), content.NewRichText)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Node{
-		ID:          NodeID(c.ID),
-		CreatedAt:   c.CreatedAt,
-		UpdatedAt:   c.UpdatedAt,
-		Name:        c.Name,
-		Slug:        c.Slug,
-		Assets:      assets,
-		Links:       dt.Map(c.Edges.Links, LinkFromModel),
-		Description: c.Description,
-		Content:     opt.NewPtr(c.Content),
-		Owner:       *pro,
-		Parent:      parent,
-		Nodes:       nodes,
-		Visibility:  visibility,
-		Properties:  c.Properties,
+		ID:         NodeID(c.ID),
+		CreatedAt:  c.CreatedAt,
+		UpdatedAt:  c.UpdatedAt,
+		Name:       c.Name,
+		Slug:       c.Slug,
+		Assets:     assets,
+		Links:      dt.Map(c.Edges.Links, LinkFromModel),
+		Content:    richContent,
+		Owner:      *pro,
+		Parent:     parent,
+		Nodes:      nodes,
+		Visibility: visibility,
+		Properties: c.Properties,
 	}, nil
 }

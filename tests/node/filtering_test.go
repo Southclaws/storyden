@@ -40,11 +40,10 @@ func TestNodesFiltering(t *testing.T) {
 			slug1 := name1 + uuid.NewString()
 			content1 := "# Nodes\n\nOwned by Odin."
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name1,
-				Slug:        slug1,
-				Description: "testing nodes api",
-				Content:     &content1,
-				Visibility:  &visibility,
+				Name:       name1,
+				Slug:       &slug1,
+				Content:    &content1,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx1, cj))
 			tests.Ok(t, err, node1)
 
@@ -52,11 +51,10 @@ func TestNodesFiltering(t *testing.T) {
 			slug2 := name2 + uuid.NewString()
 			content2 := "# Nodes\n\nOwned by Frigg."
 			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name2,
-				Slug:        slug2,
-				Description: "testing nodes api",
-				Content:     &content2,
-				Visibility:  &visibility,
+				Name:       name2,
+				Slug:       &slug2,
+				Content:    &content2,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx2, cj))
 			tests.Ok(t, err, node2)
 

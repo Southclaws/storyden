@@ -20,7 +20,6 @@ func (s *nodeSearcher) Search(ctx context.Context, query string) (datagraph.Node
 	cq := s.ec.Node.Query().Where(
 		node.Or(
 			node.NameContainsFold(query),
-			node.DescriptionContainsFold(query),
 			node.ContentContainsFold(query),
 		),
 	)
