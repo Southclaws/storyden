@@ -17,10 +17,8 @@ import { useDirectoryPath } from "../useDirectoryPath";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
-  slug: z.string().min(1, "Please enter a slug."),
-  description: z.string().min(1, "Please enter a short description."),
+  slug: z.string().optional(),
   content: z.string().optional(),
-  asset_ids: z.array(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -62,7 +60,6 @@ export function useDatagraphNodeScreen({
       slug: node.slug,
       description: node.description,
       content: node.content,
-      asset_ids: node.assets.map((a) => a.id),
     }),
     [node],
   );
