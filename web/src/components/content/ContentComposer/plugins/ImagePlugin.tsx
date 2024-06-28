@@ -29,14 +29,6 @@ function Component(props: NodeViewProps) {
       })}
     >
       <styled.img borderRadius="md" {...props.node.attrs} />
-      <NodeViewContent
-        className={css({
-          width: "full",
-          textAlign: "center",
-          fontStyle: "italic",
-          color: "fg.muted",
-        })}
-      />
     </NodeViewWrapper>
   );
 }
