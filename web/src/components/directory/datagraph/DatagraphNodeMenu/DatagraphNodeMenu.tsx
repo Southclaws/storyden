@@ -49,8 +49,8 @@ export function DatagraphNodeMenu(props: Props) {
                 {reviewFlow.draftToReview && (
                   <Menu.Item value="review">Submit for review</Menu.Item>
                 )}
-                {reviewFlow.reviewToPublsh && (
-                  <Menu.Item value="publsh">Publish</Menu.Item>
+                {reviewFlow.reviewToPublish && (
+                  <Menu.Item value="publish">Publish</Menu.Item>
                 )}
                 {reviewFlow.publishToReview && (
                   <Menu.Item value="review">Unpublish</Menu.Item>
