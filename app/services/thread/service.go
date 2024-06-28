@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
@@ -51,7 +52,7 @@ type Service interface {
 
 type Partial struct {
 	Title      opt.Optional[string]
-	Body       opt.Optional[string]
+	Content    opt.Optional[content.Rich]
 	Tags       opt.Optional[[]xid.ID]
 	Category   opt.Optional[xid.ID]
 	Visibility opt.Optional[post.Visibility]
@@ -61,7 +62,7 @@ type Partial struct {
 
 func (p Partial) Opts() (opts []thread.Option) {
 	p.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
-	p.Body.Call(func(v string) { opts = append(opts, thread.WithBody(v)) })
+	p.Content.Call(func(v content.Rich) { opts = append(opts, thread.WithContent(v)) })
 	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
 	p.Visibility.Call(func(v post.Visibility) { opts = append(opts, thread.WithVisibility(v)) })

@@ -13,6 +13,7 @@ import (
 
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -53,6 +54,11 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	tags := opt.NewPtr(request.Body.Tags)
 
+	richContent, err := content.NewRichText(request.Body.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		accountID,
@@ -61,8 +67,8 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		tags.OrZero(),
 		meta,
 		thread_service.Partial{
-			Body: opt.New(request.Body.Body),
-			URL:  opt.NewPtr(request.Body.Url),
+			Content: opt.New(richContent),
+			URL:     opt.NewPtr(request.Body.Url),
 		},
 	)
 	if err != nil {
@@ -85,9 +91,14 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), content.NewRichText)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:      opt.NewPtr(request.Body.Title),
-		Body:       opt.NewPtr(request.Body.Body),
+		Content:    richContent,
 		Tags:       opt.NewPtrMap(request.Body.Tags, tagsIDs),
 		Category:   opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Visibility: Visibility,

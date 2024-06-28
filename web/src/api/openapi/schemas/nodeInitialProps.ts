@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1
  */
 import type { AssetIDs } from "./assetIDs";
-import type { NodeDescription } from "./nodeDescription";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
 import type { Properties } from "./properties";
@@ -17,11 +16,10 @@ import type { Visibility } from "./visibility";
 export interface NodeInitialProps {
   asset_ids?: AssetIDs;
   content?: PostContent;
-  description: NodeDescription;
   name: NodeName;
   parent?: Slug;
   properties?: Properties;
-  slug: Slug;
+  slug?: Slug;
   url?: Url;
   visibility?: Visibility;
 }

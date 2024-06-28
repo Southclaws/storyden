@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
@@ -68,15 +69,10 @@ func WithTitle(v string) Option {
 	}
 }
 
-func WithSummary(v string) Option {
+func WithContent(v content.Rich) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetShort(v)
-	}
-}
-
-func WithBody(v string) Option {
-	return func(pm *ent.PostMutation) {
-		pm.SetBody(v)
+		pm.SetBody(v.HTML())
+		pm.SetShort(v.Short())
 	}
 }
 

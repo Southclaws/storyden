@@ -31,7 +31,7 @@ type Node struct {
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// Content holds the value of the "content" field.
 	Content *string `json:"content,omitempty"`
 	// ParentNodeID holds the value of the "parent_node_id" field.
@@ -194,7 +194,8 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				n.Description = value.String
+				n.Description = new(string)
+				*n.Description = value.String
 			}
 		case node.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -312,8 +313,10 @@ func (n *Node) String() string {
 	builder.WriteString("slug=")
 	builder.WriteString(n.Slug)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(n.Description)
+	if v := n.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	if v := n.Content; v != nil {
 		builder.WriteString("content=")

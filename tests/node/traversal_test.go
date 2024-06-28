@@ -45,43 +45,39 @@ func TestNodesTreeQuerying(t *testing.T) {
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name1,
-				Slug:        slug1,
-				Description: "i am at 🫚 root 🌲 level!",
-				Visibility:  &visibility,
+				Name:       name1,
+				Slug:       &slug1,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node1)
 
 			name2 := "test-node-2"
 			slug2 := name2 + uuid.NewString()
 			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name2,
-				Slug:        slug2,
-				Description: "child of node 1",
-				Parent:      &slug1,
-				Visibility:  &visibility,
+				Name:       name2,
+				Slug:       &slug2,
+				Parent:     &slug1,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node2)
 
 			name3 := "test-node-3"
 			slug3 := name3 + uuid.NewString()
 			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name3,
-				Slug:        slug3,
-				Description: "node 3 child of node 1",
-				Parent:      &slug1,
-				Visibility:  &visibility,
+				Name:       name3,
+				Slug:       &slug3,
+				Parent:     &slug1,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node3)
 
 			name4 := "test-node-4"
 			slug4 := name4 + uuid.NewString()
 			node4, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name4,
-				Slug:        slug4,
-				Description: "child of node 3",
-				Parent:      &slug3,
-				Visibility:  &visibility,
+				Name:       name4,
+				Slug:       &slug4,
+				Parent:     &slug3,
+				Visibility: &visibility,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node4)
 

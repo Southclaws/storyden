@@ -58,10 +58,9 @@ func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.
 
 func indexableToResult[T datagraph.Indexable](v T) *datagraph.NodeReference {
 	return &datagraph.NodeReference{
-		ID:          v.GetID(),
-		Kind:        v.GetKind(),
-		Name:        v.GetName(),
-		Description: v.GetDesc(),
-		Slug:        v.GetSlug(),
+		ID:   v.GetID(),
+		Kind: v.GetKind(),
+		Name: v.GetName(),
+		Slug: v.GetSlug(),
 	}
 }

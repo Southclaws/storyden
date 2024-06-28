@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -23,7 +24,6 @@ type Repository interface {
 		owner account.AccountID,
 		name string,
 		slug string,
-		desc string,
 		opts ...Option,
 	) (*datagraph.Node, error)
 
@@ -76,15 +76,10 @@ func WithLinks(ids ...xid.ID) Option {
 	}
 }
 
-func WithDescription(v string) Option {
+func WithContent(v content.Rich) Option {
 	return func(c *ent.NodeMutation) {
-		c.SetDescription(v)
-	}
-}
-
-func WithContent(v string) Option {
-	return func(c *ent.NodeMutation) {
-		c.SetContent(v)
+		c.SetContent(v.HTML())
+		c.SetDescription(v.Short())
 	}
 }
 
