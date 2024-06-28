@@ -103,19 +103,11 @@ export function DatagraphNodeScreen(props: Props) {
               {editing ? (
                 <TitleInput />
               ) : (
-                <Heading>{node.name || "(untitled)"}</Heading>
+                <Heading fontSize="heading.2" fontWeight="bold">
+                  {node.name || "(untitled)"}
+                </Heading>
               )}
             </HStack>
-
-            {editing ? (
-              <Input
-                placeholder="Description"
-                defaultValue={node.description}
-                {...form.register("description")}
-              />
-            ) : (
-              <styled.p>{node.description}</styled.p>
-            )}
           </VStack>
         </VStack>
 
