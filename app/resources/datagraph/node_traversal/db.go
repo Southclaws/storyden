@@ -15,11 +15,13 @@ import (
 	"github.com/samber/lo"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
+	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
@@ -241,12 +243,37 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		}
 	})
 
+	ids := dt.Map(filtered, func(n *datagraph.Node) xid.ID { return xid.ID(n.ID) })
+
+	// TODO: Build a table of pointers to look up each asset via node ID
+
+	relatedAssets := d.db.Asset.Query().
+		Where(asset.HasNodesWith(node.IDIn(ids...))).
+		WithNodes().
+		AllX(ctx)
+
+	hydrated := dt.Map(filtered, func(n *datagraph.Node) *datagraph.Node {
+		// NOTE: This is slow as fuck (2 nested loops lol) needs the
+		// aforementioned hash table lookup for node <> asset relations.
+		assets := dt.Filter(relatedAssets, func(a *ent.Asset) bool {
+			_, found := lo.Find(a.Edges.Nodes, func(an *ent.Node) bool {
+				return n.GetID() == an.ID
+			})
+
+			return found
+		})
+
+		n.Assets = dt.Map(assets, asset_repo.FromModel)
+
+		return n
+	})
+
 	var linkChildrenForParent func(datagraph.Node) []*datagraph.Node
 
 	linkChildrenForParent = func(parent datagraph.Node) []*datagraph.Node {
 		filteredParent, isFilteringParent := id.Get()
 
-		return dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+		return dt.Reduce(hydrated, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
 			if p, ok := curr.Parent.Get(); ok && p.ID == parent.ID {
 				// Take a copy because our mutations cannot apply to `flat`.
 				copy := *curr
@@ -268,7 +295,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 	}
 
 	// Rebuild the flat list into the tree
-	nodes := dt.Reduce(filtered, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+	nodes := dt.Reduce(hydrated, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
 		// If we're filtering for a specific node and the current iteration is
 		// that node, the children are aggregated for this node regardless.
 		filteredParent, ok := id.Get()
