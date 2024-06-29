@@ -174,7 +174,7 @@ func (d *database) List(
 		size = 100
 	}
 
-	query := d.db.Debug().Post.Query().Where(ent_post.First(true))
+	query := d.db.Post.Query().Where(ent_post.First(true))
 
 	for _, fn := range opts {
 		fn(query)
