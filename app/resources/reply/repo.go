@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -34,15 +35,10 @@ func WithID(id post.ID) Option {
 	}
 }
 
-func WithBody(v string) Option {
+func WithContent(v content.Rich) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetBody(string(v))
-	}
-}
-
-func WithShort(v string) Option {
-	return func(pm *ent.PostMutation) {
-		pm.SetShort(v)
+		pm.SetBody(v.HTML())
+		pm.SetShort(v.Short())
 	}
 }
 

@@ -20,7 +20,7 @@ func (Node) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("slug").Unique(),
-		field.String("description"),
+		field.String("description").Optional().Nillable(),
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),

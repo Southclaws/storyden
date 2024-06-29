@@ -13,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -58,13 +59,17 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Content), content.NewRichText)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	node, err := c.ns.Create(ctx,
 		session,
 		request.Body.Name,
-		request.Body.Slug,
-		request.Body.Description,
 		node_svc.Partial{
-			Content:    opt.NewPtr(request.Body.Content),
+			Slug:       opt.NewPtr(request.Body.Slug),
+			Content:    richContent,
 			Properties: opt.NewPtr(request.Body.Properties),
 			URL:        opt.NewPtr(request.Body.Url),
 			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
@@ -174,15 +179,19 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 }
 
 func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateRequestObject) (openapi.NodeUpdateResponseObject, error) {
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Content), content.NewRichText)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
-		Name:        opt.NewPtr(request.Body.Name),
-		Slug:        opt.NewPtr(request.Body.Slug),
-		AssetsAdd:   opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
-		URL:         opt.NewPtr(request.Body.Url),
-		Description: opt.NewPtr(request.Body.Description),
-		Content:     opt.NewPtr(request.Body.Content),
-		Parent:      opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
-		Properties:  opt.NewPtr(request.Body.Properties),
+		Name:       opt.NewPtr(request.Body.Name),
+		Slug:       opt.NewPtr(request.Body.Slug),
+		AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+		URL:        opt.NewPtr(request.Body.Url),
+		Content:    richContent,
+		Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+		Properties: opt.NewPtr(request.Body.Properties),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -287,8 +296,8 @@ func serialiseNode(in *datagraph.Node) openapi.Node {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Description,
-		Content:     in.Content.Ptr(),
+		Description: in.Content.OrZero().Short(),
+		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
 			return serialiseNode(&in)
@@ -307,8 +316,8 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Description,
-		Content:     in.Content.Ptr(),
+		Description: in.Content.OrZero().Short(),
+		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
 			return serialiseNode(&in)

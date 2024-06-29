@@ -7,9 +7,11 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
@@ -24,8 +26,6 @@ type Manager interface {
 	Create(ctx context.Context,
 		owner account.AccountID,
 		name string,
-		slug string,
-		desc string,
 		p Partial,
 	) (*datagraph.Node, error)
 
@@ -38,8 +38,7 @@ type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[string]
 	URL          opt.Optional[string]
-	Description  opt.Optional[string]
-	Content      opt.Optional[string]
+	Content      opt.Optional[content.Rich]
 	Parent       opt.Optional[datagraph.NodeSlug]
 	Visibility   opt.Optional[post.Visibility]
 	Properties   opt.Optional[any]
@@ -54,8 +53,7 @@ type DeleteOptions struct {
 func (p Partial) Opts() (opts []node.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, node.WithName(value)) })
 	p.Slug.Call(func(value string) { opts = append(opts, node.WithSlug(value)) })
-	p.Description.Call(func(value string) { opts = append(opts, node.WithDescription(value)) })
-	p.Content.Call(func(value string) { opts = append(opts, node.WithContent(value)) })
+	p.Content.Call(func(value content.Rich) { opts = append(opts, node.WithContent(value)) })
 	p.Properties.Call(func(value any) { opts = append(opts, node.WithProperties(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssetsRemoved(value)) })
@@ -86,8 +84,6 @@ func New(
 func (s *service) Create(ctx context.Context,
 	owner account.AccountID,
 	name string,
-	slug string,
-	desc string,
 	p Partial,
 ) (*datagraph.Node, error) {
 	opts, err := s.applyOpts(ctx, p)
@@ -95,7 +91,9 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Create(ctx, owner, name, slug, desc, opts...)
+	nodeSlug := p.Slug.Or(slug.Make(name))
+
+	n, err := s.nr.Create(ctx, owner, name, nodeSlug, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -52,7 +52,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 		}
 
 		sr.Name = r.RootThreadTitle
-		sr.Description = r.Short
+		sr.Description = r.Content.Short()
 		sr.Slug = r.RootThreadMark
 
 		return sr, nil
@@ -64,7 +64,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 		}
 
 		sr.Name = c.Name
-		sr.Description = c.Description
+		sr.Description = c.Content.OrZero().Short()
 
 		return sr, nil
 

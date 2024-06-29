@@ -24,7 +24,7 @@ export function useNodeCreateManyScreen(props: Props) {
       name: link.title || link.url,
       slug: link.slug,
       url: link.url,
-      description: link.description || "(No description)",
+      content: link.description,
       asset_ids: link.assets.map((asset) => asset.id),
       parent: parentSlug,
       visibility: "draft",

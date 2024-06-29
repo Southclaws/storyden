@@ -22,7 +22,7 @@ export function useDatagraphNodeMenu(props: Props) {
 
   // All possible visibility state transitions
   const draftToReview = props.node.visibility === "draft";
-  const reviewToPublsh = props.node.visibility !== "published" && isAdmin;
+  const reviewToPublish = props.node.visibility !== "published" && isAdmin;
   const publishToReview = props.node.visibility === "published" && isAdmin;
   const reviewToDraft = props.node.visibility === "review";
   const draftToPublish = props.node.visibility !== "published" && isAdmin;
@@ -31,7 +31,7 @@ export function useDatagraphNodeMenu(props: Props) {
   const reviewFlow = isVisibilityChangeEnabled
     ? {
         draftToReview,
-        reviewToPublsh,
+        reviewToPublish,
         publishToReview,
         reviewToDraft,
         draftToPublish,
@@ -59,7 +59,7 @@ export function useDatagraphNodeMenu(props: Props) {
         return;
 
       default:
-        throw new Error("unknown handler");
+        throw new Error(`unknown handler ${value}`);
     }
   }
 

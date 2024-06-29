@@ -9,17 +9,17 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
-	"github.com/Southclaws/storyden/app/services/hydrator/extractor"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
 type Service interface {
-	HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option
-	HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option
-	HydrateNode(ctx context.Context, body string, url opt.Optional[string]) []node.Option
+	HydrateThread(ctx context.Context, structured content.Rich, url opt.Optional[string]) []thread.Option
+	HydrateReply(ctx context.Context, structured content.Rich, url opt.Optional[string]) []reply.Option
+	HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []node.Option
 }
 
 func Build() fx.Option {
@@ -47,28 +47,26 @@ func New(
 	}
 }
 
-func (s *service) HydrateThread(ctx context.Context, body string, url opt.Optional[string]) []thread.Option {
-	short, links, assets := s.hydrate(ctx, body, url)
+func (s *service) HydrateThread(ctx context.Context, structured content.Rich, url opt.Optional[string]) []thread.Option {
+	links, assets := s.hydrate(ctx, structured, url)
 
 	return []thread.Option{
 		thread.WithAssets(assets),
 		thread.WithLinks(links...),
-		thread.WithSummary(short),
 	}
 }
 
-func (s *service) HydrateReply(ctx context.Context, body string, url opt.Optional[string]) []reply.Option {
-	short, links, assets := s.hydrate(ctx, body, url)
+func (s *service) HydrateReply(ctx context.Context, structured content.Rich, url opt.Optional[string]) []reply.Option {
+	links, assets := s.hydrate(ctx, structured, url)
 
 	return []reply.Option{
 		reply.WithAssets(assets...),
-		reply.WithShort(short),
 		reply.WithLinks(links...),
 	}
 }
 
-func (s *service) HydrateNode(ctx context.Context, body string, url opt.Optional[string]) []node.Option {
-	_, links, assets := s.hydrate(ctx, body, url)
+func (s *service) HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []node.Option {
+	links, assets := s.hydrate(ctx, structured, url)
 
 	return []node.Option{
 		node.WithAssets(assets),
@@ -78,10 +76,8 @@ func (s *service) HydrateNode(ctx context.Context, body string, url opt.Optional
 
 // hydrate takes the body and primary URL of a piece of content and fetches all
 // the links and produces a short summary of the post's body text.
-func (s *service) hydrate(ctx context.Context, body string, urls opt.Optional[string]) (string, []xid.ID, []asset.AssetID) {
-	structured := extractor.Destructure(body)
-
-	urls = append(urls, structured.Links...)
+func (s *service) hydrate(ctx context.Context, structured content.Rich, urls opt.Optional[string]) ([]xid.ID, []asset.AssetID) {
+	urls = append(urls, structured.Links()...)
 
 	links := []xid.ID{}
 	assets := []asset.AssetID{}
@@ -98,5 +94,5 @@ func (s *service) hydrate(ctx context.Context, body string, urls opt.Optional[st
 		assets = append(assets, ln.AssetIDs()...)
 	}
 
-	return structured.Short, links, assets
+	return links, assets
 }

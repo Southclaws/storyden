@@ -3026,13 +3026,12 @@ components:
 
     NodeInitialProps:
       type: object
-      required: [name, slug, description]
+      required: [name]
       properties:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -3047,7 +3046,6 @@ components:
         slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         url: { $ref: "#/components/schemas/URL" }
-        description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
         properties: { $ref: "#/components/schemas/Properties" }

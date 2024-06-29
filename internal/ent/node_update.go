@@ -102,6 +102,12 @@ func (nu *NodeUpdate) SetNillableDescription(s *string) *NodeUpdate {
 	return nu
 }
 
+// ClearDescription clears the value of the "description" field.
+func (nu *NodeUpdate) ClearDescription() *NodeUpdate {
+	nu.mutation.ClearDescription()
+	return nu
+}
+
 // SetContent sets the "content" field.
 func (nu *NodeUpdate) SetContent(s string) *NodeUpdate {
 	nu.mutation.SetContent(s)
@@ -458,6 +464,9 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 	}
+	if nu.mutation.DescriptionCleared() {
+		_spec.ClearField(node.FieldDescription, field.TypeString)
+	}
 	if value, ok := nu.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
 	}
@@ -798,6 +807,12 @@ func (nuo *NodeUpdateOne) SetNillableDescription(s *string) *NodeUpdateOne {
 	if s != nil {
 		nuo.SetDescription(*s)
 	}
+	return nuo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (nuo *NodeUpdateOne) ClearDescription() *NodeUpdateOne {
+	nuo.mutation.ClearDescription()
 	return nuo
 }
 
@@ -1186,6 +1201,9 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if value, ok := nuo.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
+	}
+	if nuo.mutation.DescriptionCleared() {
+		_spec.ClearField(node.FieldDescription, field.TypeString)
 	}
 	if value, ok := nuo.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
