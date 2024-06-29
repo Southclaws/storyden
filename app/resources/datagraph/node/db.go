@@ -31,7 +31,6 @@ func (d *database) Create(
 	owner account.AccountID,
 	name string,
 	slug string,
-	desc string,
 	opts ...Option,
 ) (*datagraph.Node, error) {
 	create := d.db.Node.Create()
@@ -40,7 +39,6 @@ func (d *database) Create(
 	mutate.SetOwnerID(xid.ID(owner))
 	mutate.SetName(name)
 	mutate.SetSlug(slug)
-	mutate.SetDescription(desc)
 
 	for _, fn := range opts {
 		fn(mutate)

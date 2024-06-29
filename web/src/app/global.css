@@ -111,12 +111,12 @@ body {
 
     font-size: var(--global-font-size-h1);
     font-size: var(--global-font-size-h1-variable);
-    font-weight: 800;
+    font-weight: 700;
   }
   h2 {
     font-size: var(--global-font-size-h2);
     font-size: var(--global-font-size-h2-variable);
-    font-weight: 800;
+    font-weight: 700;
   }
   h3 {
     font-size: var(--global-font-size-h3);

@@ -24,7 +24,7 @@ export function useNodeCreateScreen(props: Props) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     name: "",
-    slug: "",
+    slug: undefined as any, // TODO: Fix the types for this whole screen
     description: "",
     owner: props.session,
     properties: {},
@@ -40,7 +40,6 @@ export function useNodeCreateScreen(props: Props) {
       name: node.name,
       slug: node.slug,
       url: node.url,
-      description: node.description,
       content: node.content,
       asset_ids: node.asset_ids,
       parent: parentSlug,

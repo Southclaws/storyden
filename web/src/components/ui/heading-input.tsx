@@ -17,12 +17,14 @@ import {
 import { cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 import { typographyHeading } from "@/styled-system/recipes";
+import { JsxStyleProps } from "@/styled-system/types";
 
 type CustomProps = {
   onValueChange: (s: string) => void;
 };
 
-export type HeadingInputProps = HeadingInputVariantProps &
+export type HeadingInputProps = JsxStyleProps &
+  HeadingInputVariantProps &
   TypographyHeadingVariantProps &
   ComponentPropsWithoutRef<typeof ark.input> &
   CustomProps;

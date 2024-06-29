@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -58,6 +59,10 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 	}
 }
 
+func serialiseContentHTML(c content.Rich) string {
+	return c.HTML()
+}
+
 func serialiseThread(t *thread.Thread) openapi.Thread {
 	return openapi.Thread{
 		Author:    serialiseProfileReference(t.Author),
@@ -89,7 +94,7 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
 		RootId:    p.RootPostID.String(),
 		RootSlug:  p.RootThreadMark,
-		Body:      p.Body,
+		Body:      p.Content.HTML(),
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),

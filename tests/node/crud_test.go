@@ -38,23 +38,21 @@ func TestNodesHappyPath(t *testing.T) {
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()
-			content1 := "# Nodes\n\nRich text content."
-			// iurl1 := "https://picsum.photos/200/200"
+			content1 := "<h1>Nodes</h1><p>Rich text content.</p>"
 			url1 := "https://southcla.ws"
 			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
-				Name:        name1,
-				Slug:        slug1,
-				Description: "testing nodes api",
-				Content:     &content1,
-				Url:         &url1,
-				Visibility:  &visibility, // Admin account can post directly to published
+				Name:       name1,
+				Slug:       &slug1,
+				Content:    &content1,
+				Url:        &url1,
+				Visibility: &visibility, // Admin account can post directly to published
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node1)
 
 			a.Equal(name1, node1.JSON200.Name)
 			a.Equal(slug1, node1.JSON200.Slug)
-			a.Equal("testing nodes api", node1.JSON200.Description)
-			a.Equal(content1, *node1.JSON200.Content)
+			a.Equal("Rich text content.", node1.JSON200.Description)
+			a.Equal("<body><h1>Nodes</h1><p>Rich text content.</p></body>", *node1.JSON200.Content)
 			a.Equal(url1, node1.JSON200.Link.Url)
 			a.Equal(acc.ID.String(), string(node1.JSON200.Owner.Id))
 
@@ -65,37 +63,34 @@ func TestNodesHappyPath(t *testing.T) {
 
 			a.Equal(name1, node1get.JSON200.Name)
 			a.Equal(slug1, node1get.JSON200.Slug)
-			a.Equal("testing nodes api", node1get.JSON200.Description)
+			a.Equal("Rich text content.", node1get.JSON200.Description)
+			a.Equal("<body><h1>Nodes</h1><p>Rich text content.</p></body>", *node1get.JSON200.Content)
 			a.Equal(acc.ID.String(), string(node1get.JSON200.Owner.Id))
 
 			// Update the one just created
 
 			name1 = "test-node-1-UPDATED"
 			slug1 = name1 + uuid.NewString()
-			desc1 := "a new description"
-			cont1 := "# New content"
-			// iurl1 = "https://picsum.photos/500/500"
+			cont1 := "<h1>Nodes</h1><p>Newly changed content.</p>"
 			url1 = "https://cla.ws"
 			prop1 := any(map[string]any{
 				"key": "value",
 			})
 			node1update, err := cl.NodeUpdateWithResponse(ctx, node1.JSON200.Slug, openapi.NodeMutableProps{
-				Name:        &name1,
-				Slug:        &slug1,
-				Description: &desc1,
-				Content:     &cont1,
-				Url:         &url1,
-				Properties:  &prop1,
+				Name:       &name1,
+				Slug:       &slug1,
+				Content:    &cont1,
+				Url:        &url1,
+				Properties: &prop1,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node1update)
 
 			a.Equal(name1, node1update.JSON200.Name)
 			a.Equal(slug1, node1update.JSON200.Slug)
-			a.Equal(desc1, node1update.JSON200.Description)
-			a.Equal(cont1, *node1update.JSON200.Content)
+			a.Equal("Newly changed content.", node1update.JSON200.Description)
+			a.Equal("<body><h1>Nodes</h1><p>Newly changed content.</p></body>", *node1update.JSON200.Content)
 			a.Equal(url1, node1update.JSON200.Link.Url)
 			a.Equal(prop1, node1update.JSON200.Properties)
-
 		}))
 	}))
 }
