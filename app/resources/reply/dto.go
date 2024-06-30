@@ -43,7 +43,9 @@ func (*Reply) GetResourceName() string { return "post" }
 func (r *Reply) GetID() xid.ID           { return xid.ID(r.ID) }
 func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindReply }
 func (r *Reply) GetName() string         { return r.Content.Short() }
+func (r *Reply) GetSlug() string         { return r.RootThreadMark }
 func (r *Reply) GetText() string         { return r.Content.HTML() }
+func (r *Reply) GetDesc() string         { return r.Content.Short() }
 func (r *Reply) GetProps() any           { return r.Meta }
 
 func (p Reply) String() string {
