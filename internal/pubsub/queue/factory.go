@@ -84,9 +84,9 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 	return recv, nil
 }
 
-func (q *watermillQueue[T]) Publish(ctx context.Context, payloads ...pubsub.Message[T]) error {
-	messages, err := dt.MapErr(payloads, func(p pubsub.Message[T]) (*message.Message, error) {
-		payload, err := json.Marshal(p.Payload)
+func (q *watermillQueue[T]) Publish(ctx context.Context, payloads ...T) error {
+	messages, err := dt.MapErr(payloads, func(p T) (*message.Message, error) {
+		payload, err := json.Marshal(p)
 		if err != nil {
 			return nil, err
 		}
