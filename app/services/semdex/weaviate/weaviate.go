@@ -44,6 +44,7 @@ func Build() fx.Option {
 			fx.As(new(semdex.Indexer)),
 			fx.As(new(semdex.Searcher)),
 			fx.As(new(semdex.Recommender)),
+			fx.As(new(semdex.Retriever)),
 		),
 	)
 }

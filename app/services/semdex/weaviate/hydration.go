@@ -79,3 +79,28 @@ func (h *withHydration) Hydrate(ctx context.Context, results datagraph.NodeRefer
 
 	return hydrated, nil
 }
+
+func (h *withHydration) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {
+	rs, err := h.wc.GetAll(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results := datagraph.NodeReferenceList{}
+
+	// NOTE: Should probably be parallelised at some point...
+	for _, v := range rs {
+		r, err := h.rh.Hydrate(ctx, v)
+		if err != nil {
+			h.l.Warn("failed to hydrate search result",
+				zap.String("datagraph_kind", v.Kind.String()),
+				zap.String("result_id", v.ID.String()),
+				zap.Error(err))
+			continue
+		}
+
+		results = append(results, r)
+	}
+
+	return results, nil
+}

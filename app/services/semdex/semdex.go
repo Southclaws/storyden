@@ -19,10 +19,15 @@ type Recommender interface {
 	Recommend(ctx context.Context, object datagraph.Indexable) (datagraph.NodeReferenceList, error)
 }
 
+type Retriever interface {
+	GetAll(ctx context.Context) (datagraph.NodeReferenceList, error)
+}
+
 type Semdexer interface {
 	Indexer
 	Searcher
 	Recommender
+	Retriever
 }
 
 type OnlySearcher struct {
@@ -38,6 +43,10 @@ func (o *OnlySearcher) Index(ctx context.Context, object datagraph.Indexable) er
 }
 
 func (o *OnlySearcher) Recommend(ctx context.Context, object datagraph.Indexable) (datagraph.NodeReferenceList, error) {
+	return nil, nil
+}
+
+func (o *OnlySearcher) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {
 	return nil, nil
 }
 
