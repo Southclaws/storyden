@@ -21,5 +21,5 @@ type Subscriber[T any] interface {
 }
 
 type Publisher[T any] interface {
-	Publish(ctx context.Context, messages ...Message[T]) error
+	Publish(ctx context.Context, messages ...T) error
 }
