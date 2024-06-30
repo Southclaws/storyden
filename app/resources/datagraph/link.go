@@ -23,14 +23,6 @@ type Link struct {
 	Assets      []*asset.Asset
 }
 
-func (l *Link) GetID() xid.ID   { return xid.ID(l.ID) }
-func (l *Link) GetKind() Kind   { return KindLink }
-func (l *Link) GetName() string { return l.Title.String() }
-func (l *Link) GetSlug() string { return l.Slug }
-func (l *Link) GetDesc() string { return l.Description.String() }
-func (l *Link) GetText() string { return l.Description.String() }
-func (l *Link) GetProps() any   { return nil }
-
 func (l *Link) AssetIDs() []asset.AssetID {
 	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })
 }

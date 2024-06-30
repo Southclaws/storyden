@@ -7,7 +7,6 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/gosimple/slug"
 	"go.uber.org/fx"
@@ -18,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
-	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/url"
 )
 
@@ -33,11 +31,10 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l      *zap.Logger
-	as     asset_manager.Service
-	lr     link.Repository
-	sc     url.Scraper
-	semdex semdex.Indexer
+	l  *zap.Logger
+	as asset_manager.Service
+	lr link.Repository
+	sc url.Scraper
 }
 
 func New(
@@ -46,14 +43,12 @@ func New(
 	nr node.Repository,
 	lr link.Repository,
 	sc url.Scraper,
-	semdex semdex.Indexer,
 ) Service {
 	return &service{
-		l:      l.With(zap.String("service", "hydrator")),
-		as:     as,
-		lr:     lr,
-		sc:     sc,
-		semdex: semdex,
+		l:  l.With(zap.String("service", "hydrator")),
+		as: as,
+		lr: lr,
+		sc: sc,
 	}
 }
 
@@ -100,10 +95,6 @@ func (s *service) scrapeAndStore(ctx context.Context, url string) (*datagraph.Li
 
 	if a != nil {
 		ln.Assets = append(ln.Assets, a)
-	}
-
-	if err := s.semdex.Index(ctx, ln); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to index thread"))
 	}
 
 	return ln, nil

@@ -38,12 +38,5 @@ func (s *Getter) Get(ctx context.Context, slug string) (*link_graph.WithRefs, er
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	recommendations, err := s.rec.Recommend(ctx, ln)
-	if err != nil {
-		s.l.Warn("failed to aggregate recommendations", zap.Error(err))
-	} else {
-		ln.Related = append(ln.Related, recommendations...)
-	}
-
 	return ln, nil
 }

@@ -12,10 +12,8 @@ type Kind struct {
 }
 
 var (
-	KindThread = Kind{kindThread}
-	KindReply  = Kind{kindReply}
-	KindNode   = Kind{kindNode}
-	KindLink   = Kind{kindLink}
+	KindPost = Kind{kindPost}
+	KindNode = Kind{kindNode}
 )
 
 func (r Kind) Format(f fmt.State, verb rune) {
@@ -55,14 +53,10 @@ func (r *Kind) Scan(__iNpUt__ any) error {
 }
 func NewKind(__iNpUt__ string) (Kind, error) {
 	switch __iNpUt__ {
-	case string(kindThread):
-		return KindThread, nil
-	case string(kindReply):
-		return KindReply, nil
+	case string(kindPost):
+		return KindPost, nil
 	case string(kindNode):
 		return KindNode, nil
-	case string(kindLink):
-		return KindLink, nil
 	default:
 		return Kind{}, fmt.Errorf("invalid value for type 'Kind': '%s'", __iNpUt__)
 	}
