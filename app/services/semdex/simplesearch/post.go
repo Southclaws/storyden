@@ -33,7 +33,7 @@ func (s *postSearcher) Search(ctx context.Context, query string) (datagraph.Node
 		if p.Edges.Root == nil {
 			return &datagraph.NodeReference{
 				ID:          p.ID,
-				Kind:        datagraph.KindThread,
+				Kind:        datagraph.KindPost,
 				Name:        p.Title,
 				Description: p.Short,
 				Slug:        p.Slug,
@@ -41,7 +41,7 @@ func (s *postSearcher) Search(ctx context.Context, query string) (datagraph.Node
 		} else {
 			return &datagraph.NodeReference{
 				ID:          p.ID,
-				Kind:        datagraph.KindReply,
+				Kind:        datagraph.KindPost,
 				Name:        p.Edges.Root.Title,
 				Description: p.Short,
 				Slug:        p.Edges.Root.Slug,

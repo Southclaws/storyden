@@ -27,6 +27,9 @@ type Config struct {
 	S3Region              string `envconfig:"S3_REGION"`
 	S3AccessKey           string `envconfig:"S3_ACCESS_KEY"`
 	S3SecretKey           string `envconfig:"S3_SECRET_KEY"`
+
+	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
+	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`
 }
 
 func Build() fx.Option {

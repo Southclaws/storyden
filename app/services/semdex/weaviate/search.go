@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -67,23 +66,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		return nil, fault.New("weaviate response did not contain expected class data")
 	}
 
-	results, err := dt.MapErr(classData, func(v WeaviateObject) (*datagraph.NodeReference, error) {
-		id, err := xid.FromString(v.DatagraphID)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		dk, err := datagraph.NewKind(v.DatagraphType)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		return &datagraph.NodeReference{
-			ID:   id,
-			Kind: dk,
-			Name: v.Name,
-		}, nil
-	})
+	results, err := dt.MapErr(classData, mapToNodeReference)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

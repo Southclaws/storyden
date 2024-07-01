@@ -32,20 +32,7 @@ func New(
 
 func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*datagraph.NodeReference, error) {
 	switch sr.Kind {
-	case datagraph.KindThread:
-		t, err := h.tr.Get(ctx, post.ID(sr.ID))
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		sr.Name = t.Title
-		sr.Description = t.Short
-		sr.Slug = t.Slug
-
-		return sr, nil
-
-	case datagraph.KindReply:
-
+	case datagraph.KindPost:
 		r, err := h.rr.Get(ctx, post.ID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
@@ -65,17 +52,6 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 
 		sr.Name = c.Name
 		sr.Description = c.Content.OrZero().Short()
-
-		return sr, nil
-
-	case datagraph.KindLink:
-		ln, err := h.lr.GetByID(ctx, datagraph.LinkID(sr.ID))
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		sr.Name = ln.Title.OrZero()
-		sr.Description = ln.Description.OrZero()
 
 		return sr, nil
 

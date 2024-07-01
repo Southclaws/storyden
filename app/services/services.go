@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
+	"github.com/Southclaws/storyden/app/services/semdex/index_job"
 	"github.com/Southclaws/storyden/app/services/semdex/weaviate"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -48,6 +49,7 @@ func Build() fx.Option {
 		hydrator.Build(),
 		fetcher.Build(),
 		weaviate.Build(),
+		index_job.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node.New, nodetree.New, node_visibility.New),
 		fx.Provide(link_getter.New),
