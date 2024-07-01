@@ -57,6 +57,10 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 				return
 
 			case msg := <-ch:
+				if msg == nil {
+					q.log.Warn("nil message received by subscriber")
+					continue
+				}
 
 				var payload T
 				if err := json.Unmarshal(msg.Payload, &payload); err != nil {
