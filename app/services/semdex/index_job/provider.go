@@ -13,6 +13,7 @@ func Build() fx.Option {
 		fx.Provide(
 			queue.New[mq.IndexNode],
 			queue.New[mq.IndexPost],
+			queue.New[mq.IndexProfile],
 		),
 
 		fx.Provide(newIndexConsumer),

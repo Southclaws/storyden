@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -39,9 +40,9 @@ func WithName(name string) Option {
 	}
 }
 
-func WithBio(bio string) Option {
+func WithBio(v content.Rich) Option {
 	return func(a *Account) {
-		a.Bio = opt.New(bio)
+		a.Bio = v
 	}
 }
 

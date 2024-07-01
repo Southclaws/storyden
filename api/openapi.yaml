@@ -1982,6 +1982,11 @@ components:
       description: The unique @ handle of an account.
       example: Southclaws
 
+    AccountBio:
+      type: string
+      description: The rich-text bio for an account's public profile.
+      example: <body><p>hi, my name is</p><p>southclaws</p></body>
+
     ProfileReference:
       type: object
       description: A minimal reference to an account.
@@ -2407,14 +2412,14 @@ components:
         - $ref: "#/components/schemas/AccountCommonProps"
 
     AccountCommonProps:
-      required: [handle, name, admin]
+      required: [handle, name, bio, admin]
       properties:
         handle:
           $ref: "#/components/schemas/AccountHandle"
         name:
           $ref: "#/components/schemas/AccountName"
         bio:
-          type: string
+          $ref: "#/components/schemas/AccountBio"
         interests:
           $ref: "#/components/schemas/TagList"
         admin:
@@ -2428,7 +2433,7 @@ components:
         name:
           $ref: "#/components/schemas/AccountName"
         bio:
-          type: string
+          $ref: "#/components/schemas/AccountBio"
         interests:
           $ref: "#/components/schemas/TagListIDs"
 
@@ -2481,17 +2486,17 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [handle, name, createdAt, interests]
+        - required: [createdAt, handle, name, bio, interests]
           properties:
+            createdAt:
+              type: string
             handle:
               $ref: "#/components/schemas/AccountHandle"
             name:
               $ref: "#/components/schemas/AccountName"
             bio:
-              type: string
+              $ref: "#/components/schemas/AccountBio"
             image:
-              type: string
-            createdAt:
               type: string
             interests:
               $ref: "#/components/schemas/TagList"
