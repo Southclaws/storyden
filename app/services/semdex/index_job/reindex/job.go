@@ -20,6 +20,10 @@ func runReindexer(
 	qpost pubsub.Topic[mq.IndexPost],
 	re *reindexer,
 ) {
+	if re == nil {
+		return
+	}
+
 	lc.Append(fx.StartHook(func(_ context.Context) error {
 		err := re.reindexAll(ctx)
 		if err != nil {
