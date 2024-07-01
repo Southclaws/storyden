@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -19,8 +20,9 @@ import (
 type indexerConsumer struct {
 	l *zap.Logger
 
-	replyRepo reply.Repository
-	nodeRepo  node.Repository
+	replyRepo   reply.Repository
+	nodeRepo    node.Repository
+	accountRepo account.Repository
 
 	qnode pubsub.Topic[mq.IndexNode]
 	qpost pubsub.Topic[mq.IndexPost]
@@ -34,21 +36,24 @@ func newIndexConsumer(
 
 	replyRepo reply.Repository,
 	nodeRepo node.Repository,
+	accountRepo account.Repository,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qpost pubsub.Topic[mq.IndexPost],
+	qprofile pubsub.Topic[mq.IndexProfile],
 
 	indexer semdex.Indexer,
 	retriever semdex.Retriever,
 ) *indexerConsumer {
 	return &indexerConsumer{
-		l:         l,
-		replyRepo: replyRepo,
-		nodeRepo:  nodeRepo,
-		qnode:     qnode,
-		qpost:     qpost,
-		indexer:   indexer,
-		retriever: retriever,
+		l:           l,
+		replyRepo:   replyRepo,
+		nodeRepo:    nodeRepo,
+		accountRepo: accountRepo,
+		qnode:       qnode,
+		qpost:       qpost,
+		indexer:     indexer,
+		retriever:   retriever,
 	}
 }
 
@@ -68,4 +73,13 @@ func (i *indexerConsumer) indexNode(ctx context.Context, id datagraph.NodeID) er
 	}
 
 	return i.indexer.Index(ctx, p)
+}
+
+func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {
+	p, err := i.accountRepo.GetByID(ctx, id)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return i.indexer.Index(ctx, datagraph.ProfileFromAccount(p))
 }

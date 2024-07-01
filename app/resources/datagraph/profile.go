@@ -57,3 +57,16 @@ func ProfileFromModel(a *ent.Account) (*Profile, error) {
 		Interests: interests,
 	}, nil
 }
+
+func ProfileFromAccount(a *account.Account) *Profile {
+	return &Profile{
+		ID:        a.ID,
+		Created:   a.CreatedAt,
+		Deleted:   a.DeletedAt,
+		Handle:    a.Handle,
+		Name:      a.Name,
+		Bio:       a.Bio,
+		Admin:     a.Admin,
+		Interests: nil,
+	}
+}
