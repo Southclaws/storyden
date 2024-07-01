@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
@@ -126,6 +127,21 @@ func (cc *CollectionCreate) AddPosts(p ...*Post) *CollectionCreate {
 		ids[i] = p[i].ID
 	}
 	return cc.AddPostIDs(ids...)
+}
+
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (cc *CollectionCreate) AddNodeIDs(ids ...xid.ID) *CollectionCreate {
+	cc.mutation.AddNodeIDs(ids...)
+	return cc
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (cc *CollectionCreate) AddNodes(n ...*Node) *CollectionCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return cc.AddNodeIDs(ids...)
 }
 
 // Mutation returns the CollectionMutation object of the builder.
@@ -290,6 +306,22 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

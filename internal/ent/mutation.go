@@ -4007,6 +4007,9 @@ type CollectionMutation struct {
 	posts         map[xid.ID]struct{}
 	removedposts  map[xid.ID]struct{}
 	clearedposts  bool
+	nodes         map[xid.ID]struct{}
+	removednodes  map[xid.ID]struct{}
+	clearednodes  bool
 	done          bool
 	oldValue      func(context.Context) (*Collection, error)
 	predicates    []predicate.Collection
@@ -4389,6 +4392,60 @@ func (m *CollectionMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddNodeIDs adds the "nodes" edge to the Node entity by ids.
+func (m *CollectionMutation) AddNodeIDs(ids ...xid.ID) {
+	if m.nodes == nil {
+		m.nodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.nodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodes clears the "nodes" edge to the Node entity.
+func (m *CollectionMutation) ClearNodes() {
+	m.clearednodes = true
+}
+
+// NodesCleared reports if the "nodes" edge to the Node entity was cleared.
+func (m *CollectionMutation) NodesCleared() bool {
+	return m.clearednodes
+}
+
+// RemoveNodeIDs removes the "nodes" edge to the Node entity by IDs.
+func (m *CollectionMutation) RemoveNodeIDs(ids ...xid.ID) {
+	if m.removednodes == nil {
+		m.removednodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.nodes, ids[i])
+		m.removednodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodes returns the removed IDs of the "nodes" edge to the Node entity.
+func (m *CollectionMutation) RemovedNodesIDs() (ids []xid.ID) {
+	for id := range m.removednodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodesIDs returns the "nodes" edge IDs in the mutation.
+func (m *CollectionMutation) NodesIDs() (ids []xid.ID) {
+	for id := range m.nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodes resets all changes to the "nodes" edge.
+func (m *CollectionMutation) ResetNodes() {
+	m.nodes = nil
+	m.clearednodes = false
+	m.removednodes = nil
+}
+
 // Where appends a list predicates to the CollectionMutation builder.
 func (m *CollectionMutation) Where(ps ...predicate.Collection) {
 	m.predicates = append(m.predicates, ps...)
@@ -4590,12 +4647,15 @@ func (m *CollectionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CollectionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.owner != nil {
 		edges = append(edges, collection.EdgeOwner)
 	}
 	if m.posts != nil {
 		edges = append(edges, collection.EdgePosts)
+	}
+	if m.nodes != nil {
+		edges = append(edges, collection.EdgeNodes)
 	}
 	return edges
 }
@@ -4614,15 +4674,24 @@ func (m *CollectionMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case collection.EdgeNodes:
+		ids := make([]ent.Value, 0, len(m.nodes))
+		for id := range m.nodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CollectionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedposts != nil {
 		edges = append(edges, collection.EdgePosts)
+	}
+	if m.removednodes != nil {
+		edges = append(edges, collection.EdgeNodes)
 	}
 	return edges
 }
@@ -4637,18 +4706,27 @@ func (m *CollectionMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case collection.EdgeNodes:
+		ids := make([]ent.Value, 0, len(m.removednodes))
+		for id := range m.removednodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CollectionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedowner {
 		edges = append(edges, collection.EdgeOwner)
 	}
 	if m.clearedposts {
 		edges = append(edges, collection.EdgePosts)
+	}
+	if m.clearednodes {
+		edges = append(edges, collection.EdgeNodes)
 	}
 	return edges
 }
@@ -4661,6 +4739,8 @@ func (m *CollectionMutation) EdgeCleared(name string) bool {
 		return m.clearedowner
 	case collection.EdgePosts:
 		return m.clearedposts
+	case collection.EdgeNodes:
+		return m.clearednodes
 	}
 	return false
 }
@@ -4685,6 +4765,9 @@ func (m *CollectionMutation) ResetEdge(name string) error {
 		return nil
 	case collection.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case collection.EdgeNodes:
+		m.ResetNodes()
 		return nil
 	}
 	return fmt.Errorf("unknown Collection edge %s", name)
@@ -5554,38 +5637,41 @@ func (m *LinkMutation) ResetEdge(name string) error {
 // NodeMutation represents an operation that mutates the Node nodes in the graph.
 type NodeMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	updated_at    *time.Time
-	deleted_at    *time.Time
-	name          *string
-	slug          *string
-	description   *string
-	content       *string
-	visibility    *node.Visibility
-	properties    *any
-	clearedFields map[string]struct{}
-	owner         *xid.ID
-	clearedowner  bool
-	parent        *xid.ID
-	clearedparent bool
-	nodes         map[xid.ID]struct{}
-	removednodes  map[xid.ID]struct{}
-	clearednodes  bool
-	assets        map[xid.ID]struct{}
-	removedassets map[xid.ID]struct{}
-	clearedassets bool
-	tags          map[xid.ID]struct{}
-	removedtags   map[xid.ID]struct{}
-	clearedtags   bool
-	links         map[xid.ID]struct{}
-	removedlinks  map[xid.ID]struct{}
-	clearedlinks  bool
-	done          bool
-	oldValue      func(context.Context) (*Node, error)
-	predicates    []predicate.Node
+	op                 Op
+	typ                string
+	id                 *xid.ID
+	created_at         *time.Time
+	updated_at         *time.Time
+	deleted_at         *time.Time
+	name               *string
+	slug               *string
+	description        *string
+	content            *string
+	visibility         *node.Visibility
+	properties         *any
+	clearedFields      map[string]struct{}
+	owner              *xid.ID
+	clearedowner       bool
+	parent             *xid.ID
+	clearedparent      bool
+	nodes              map[xid.ID]struct{}
+	removednodes       map[xid.ID]struct{}
+	clearednodes       bool
+	assets             map[xid.ID]struct{}
+	removedassets      map[xid.ID]struct{}
+	clearedassets      bool
+	tags               map[xid.ID]struct{}
+	removedtags        map[xid.ID]struct{}
+	clearedtags        bool
+	links              map[xid.ID]struct{}
+	removedlinks       map[xid.ID]struct{}
+	clearedlinks       bool
+	collections        map[xid.ID]struct{}
+	removedcollections map[xid.ID]struct{}
+	clearedcollections bool
+	done               bool
+	oldValue           func(context.Context) (*Node, error)
+	predicates         []predicate.Node
 }
 
 var _ ent.Mutation = (*NodeMutation)(nil)
@@ -6449,6 +6535,60 @@ func (m *NodeMutation) ResetLinks() {
 	m.removedlinks = nil
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by ids.
+func (m *NodeMutation) AddCollectionIDs(ids ...xid.ID) {
+	if m.collections == nil {
+		m.collections = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.collections[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCollections clears the "collections" edge to the Collection entity.
+func (m *NodeMutation) ClearCollections() {
+	m.clearedcollections = true
+}
+
+// CollectionsCleared reports if the "collections" edge to the Collection entity was cleared.
+func (m *NodeMutation) CollectionsCleared() bool {
+	return m.clearedcollections
+}
+
+// RemoveCollectionIDs removes the "collections" edge to the Collection entity by IDs.
+func (m *NodeMutation) RemoveCollectionIDs(ids ...xid.ID) {
+	if m.removedcollections == nil {
+		m.removedcollections = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.collections, ids[i])
+		m.removedcollections[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCollections returns the removed IDs of the "collections" edge to the Collection entity.
+func (m *NodeMutation) RemovedCollectionsIDs() (ids []xid.ID) {
+	for id := range m.removedcollections {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CollectionsIDs returns the "collections" edge IDs in the mutation.
+func (m *NodeMutation) CollectionsIDs() (ids []xid.ID) {
+	for id := range m.collections {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCollections resets all changes to the "collections" edge.
+func (m *NodeMutation) ResetCollections() {
+	m.collections = nil
+	m.clearedcollections = false
+	m.removedcollections = nil
+}
+
 // Where appends a list predicates to the NodeMutation builder.
 func (m *NodeMutation) Where(ps ...predicate.Node) {
 	m.predicates = append(m.predicates, ps...)
@@ -6785,7 +6925,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -6803,6 +6943,9 @@ func (m *NodeMutation) AddedEdges() []string {
 	}
 	if m.links != nil {
 		edges = append(edges, node.EdgeLinks)
+	}
+	if m.collections != nil {
+		edges = append(edges, node.EdgeCollections)
 	}
 	return edges
 }
@@ -6843,13 +6986,19 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeCollections:
+		ids := make([]ent.Value, 0, len(m.collections))
+		for id := range m.collections {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -6861,6 +7010,9 @@ func (m *NodeMutation) RemovedEdges() []string {
 	}
 	if m.removedlinks != nil {
 		edges = append(edges, node.EdgeLinks)
+	}
+	if m.removedcollections != nil {
+		edges = append(edges, node.EdgeCollections)
 	}
 	return edges
 }
@@ -6893,13 +7045,19 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeCollections:
+		ids := make([]ent.Value, 0, len(m.removedcollections))
+		for id := range m.removedcollections {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -6917,6 +7075,9 @@ func (m *NodeMutation) ClearedEdges() []string {
 	}
 	if m.clearedlinks {
 		edges = append(edges, node.EdgeLinks)
+	}
+	if m.clearedcollections {
+		edges = append(edges, node.EdgeCollections)
 	}
 	return edges
 }
@@ -6937,6 +7098,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedtags
 	case node.EdgeLinks:
 		return m.clearedlinks
+	case node.EdgeCollections:
+		return m.clearedcollections
 	}
 	return false
 }
@@ -6976,6 +7139,9 @@ func (m *NodeMutation) ResetEdge(name string) error {
 		return nil
 	case node.EdgeLinks:
 		m.ResetLinks()
+		return nil
+	case node.EdgeCollections:
+		m.ResetCollections()
 		return nil
 	}
 	return fmt.Errorf("unknown Node edge %s", name)

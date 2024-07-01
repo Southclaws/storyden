@@ -56,5 +56,8 @@ func (Node) Edges() []ent.Edge {
 
 		edge.From("links", Link.Type).
 			Ref("nodes"),
+
+		edge.From("collections", Collection.Type).
+			Ref("nodes"),
 	}
 }

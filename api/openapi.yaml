@@ -847,7 +847,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionUpdateOK" }
-  /v1/collections/{collection_id}/items/{post_id}:
+  /v1/collections/{collection_id}/posts/{post_id}:
     put:
       operationId: CollectionAddPost
       description: |
@@ -2935,22 +2935,19 @@ components:
     CollectionItem:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/CollectionItemCommonProps"
+        - $ref: "#/components/schemas/DatagraphNode"
+        - $ref: "#/components/schemas/CollectionItemMetadata"
 
-    CollectionItemCommonProps:
+    CollectionItemMetadata:
       type: object
-      required: [author, slug, title, short]
+      required: [owner, added_at]
       properties:
-        author: { $ref: "#/components/schemas/ProfileReference" }
-        slug: { $ref: "#/components/schemas/ThreadMark" }
-        title:
+        owner:
+          $ref: "#/components/schemas/ProfileReference"
+        added_at:
           type: string
-          example: Hello world!
-          description: The title of the thread.
-        short:
-          type: string
-          description: |
-            A short version of the thread's body text for use in previews.
+          format: date-time
+          description: The time that the item was added to the collection.
 
     #
     # 888b    888               888

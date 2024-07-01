@@ -50,6 +50,8 @@ const (
 	EdgeTags = "tags"
 	// EdgeLinks holds the string denoting the links edge name in mutations.
 	EdgeLinks = "links"
+	// EdgeCollections holds the string denoting the collections edge name in mutations.
+	EdgeCollections = "collections"
 	// Table holds the table name of the node in the database.
 	Table = "nodes"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -82,6 +84,11 @@ const (
 	// LinksInverseTable is the table name for the Link entity.
 	// It exists in this package in order to avoid circular dependency with the "link" package.
 	LinksInverseTable = "links"
+	// CollectionsTable is the table that holds the collections relation/edge. The primary key declared below.
+	CollectionsTable = "collection_nodes"
+	// CollectionsInverseTable is the table name for the Collection entity.
+	// It exists in this package in order to avoid circular dependency with the "collection" package.
+	CollectionsInverseTable = "collections"
 )
 
 // Columns holds all SQL columns for node fields.
@@ -110,6 +117,9 @@ var (
 	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
 	// primary key for the links relation (M2M).
 	LinksPrimaryKey = []string{"link_id", "node_id"}
+	// CollectionsPrimaryKey and CollectionsColumn2 are the table columns denoting the
+	// primary key for the collections relation (M2M).
+	CollectionsPrimaryKey = []string{"collection_id", "node_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -289,6 +299,20 @@ func ByLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCollectionsCount orders the results by collections count.
+func ByCollectionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionsStep(), opts...)
+	}
+}
+
+// ByCollections orders the results by collections terms.
+func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -329,5 +353,12 @@ func newLinksStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LinksInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
+	)
+}
+func newCollectionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
 	)
 }

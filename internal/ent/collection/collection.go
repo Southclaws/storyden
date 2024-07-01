@@ -30,6 +30,8 @@ const (
 	EdgeOwner = "owner"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
+	// EdgeNodes holds the string denoting the nodes edge name in mutations.
+	EdgeNodes = "nodes"
 	// Table holds the table name of the collection in the database.
 	Table = "collections"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -44,6 +46,11 @@ const (
 	// PostsInverseTable is the table name for the Post entity.
 	// It exists in this package in order to avoid circular dependency with the "post" package.
 	PostsInverseTable = "posts"
+	// NodesTable is the table that holds the nodes relation/edge. The primary key declared below.
+	NodesTable = "collection_nodes"
+	// NodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	NodesInverseTable = "nodes"
 )
 
 // Columns holds all SQL columns for collection fields.
@@ -66,6 +73,9 @@ var (
 	// PostsPrimaryKey and PostsColumn2 are the table columns denoting the
 	// primary key for the posts relation (M2M).
 	PostsPrimaryKey = []string{"collection_id", "post_id"}
+	// NodesPrimaryKey and NodesColumn2 are the table columns denoting the
+	// primary key for the nodes relation (M2M).
+	NodesPrimaryKey = []string{"collection_id", "node_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -176,6 +186,20 @@ func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByNodesCount orders the results by nodes count.
+func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodesStep(), opts...)
+	}
+}
+
+// ByNodes orders the results by nodes terms.
+func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -188,5 +212,12 @@ func newPostsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PostsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
+	)
+}
+func newNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
 	)
 }

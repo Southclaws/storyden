@@ -16,17 +16,17 @@ export function CollectionItemListItem(props: Props) {
       <styled.article>
         <Flex justifyContent="space-between">
           <Heading size="sm">
-            <Link href={permalink}>{props.item.title}</Link>
+            <Link href={permalink}>{props.item.name}</Link>
           </Heading>
         </Flex>
 
-        <styled.p lineClamp={3}>{props.item.short}</styled.p>
+        <styled.p lineClamp={3}>{props.item.description}</styled.p>
       </styled.article>
 
       <Flex justifyContent="space-between">
         <Byline
           href={permalink}
-          author={props.item.author}
+          author={props.item.owner}
           time={new Date(props.item.createdAt)}
           updated={new Date(props.item.updatedAt)}
         />

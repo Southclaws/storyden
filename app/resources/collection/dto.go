@@ -5,11 +5,10 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
-	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -24,10 +23,15 @@ type Collection struct {
 	Owner       datagraph.Profile
 	Name        string
 	Description string
-	Items       []*Item
+	Items       []*CollectionItem
 }
 
 func (*Collection) GetResourceName() string { return "collection" }
+
+type CollectionItem struct {
+	Author datagraph.Profile
+	Item   datagraph.Indexable
+}
 
 func FromModel(c *ent.Collection) (*Collection, error) {
 	accEdge, err := c.Edges.OwnerOrErr()
@@ -40,18 +44,17 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	posts := opt.NewIf(c.Edges.Posts, func(p []*ent.Post) bool { return p != nil })
-
-	items, err := opt.MapErr[[]*ent.Post, []*Item](posts, func(p []*ent.Post) ([]*Item, error) {
-		ps, err := dt.MapErr(p, ItemFromModel)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-		return ps, nil
-	})
+	posts, err := dt.MapErr(c.Edges.Posts, MapCollectionPost)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
+
+	nodes, err := dt.MapErr(c.Edges.Nodes, MapCollectionNode)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	items := append(posts, nodes...)
 
 	return &Collection{
 		ID:          CollectionID(c.ID),
@@ -60,21 +63,11 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		Owner:       *pro,
 		Name:        c.Name,
 		Description: c.Description,
-		Items:       items.Or([]*Item{}),
+		Items:       items,
 	}, nil
 }
 
-type Item struct {
-	ID        post.ID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Slug      string
-	Author    datagraph.Profile
-	Title     string
-	Short     string
-}
-
-func ItemFromModel(p *ent.Post) (*Item, error) {
+func MapCollectionPost(p *ent.Post) (*CollectionItem, error) {
 	accEdge, err := p.Edges.AuthorOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -85,13 +78,35 @@ func ItemFromModel(p *ent.Post) (*Item, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	return &Item{
-		ID:        post.ID(p.ID),
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		Slug:      p.Slug,
-		Author:    *pro,
-		Title:     p.Title,
-		Short:     p.Short,
+	item, err := reply.FromModel(p)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CollectionItem{
+		Author: *pro,
+		Item:   item,
+	}, nil
+}
+
+func MapCollectionNode(p *ent.Node) (*CollectionItem, error) {
+	accEdge, err := p.Edges.OwnerOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	pro, err := datagraph.ProfileFromModel(accEdge)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	item, err := datagraph.NodeFromModel(p)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CollectionItem{
+		Author: *pro,
+		Item:   item,
 	}, nil
 }

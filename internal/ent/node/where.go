@@ -829,6 +829,29 @@ func HasLinksWith(preds ...predicate.Link) predicate.Node {
 	})
 }
 
+// HasCollections applies the HasEdge predicate on the "collections" edge.
+func HasCollections() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCollectionsWith applies the HasEdge predicate on the "collections" edge with a given conditions (other predicates).
+func HasCollectionsWith(preds ...predicate.Collection) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Node) predicate.Node {
 	return predicate.Node(sql.AndPredicates(predicates...))

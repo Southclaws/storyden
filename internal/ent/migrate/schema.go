@@ -371,6 +371,31 @@ var (
 			},
 		},
 	}
+	// CollectionNodesColumns holds the columns for the "collection_nodes" table.
+	CollectionNodesColumns = []*schema.Column{
+		{Name: "collection_id", Type: field.TypeString, Size: 20},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+	}
+	// CollectionNodesTable holds the schema information for the "collection_nodes" table.
+	CollectionNodesTable = &schema.Table{
+		Name:       "collection_nodes",
+		Columns:    CollectionNodesColumns,
+		PrimaryKey: []*schema.Column{CollectionNodesColumns[0], CollectionNodesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collection_nodes_collection_id",
+				Columns:    []*schema.Column{CollectionNodesColumns[0]},
+				RefColumns: []*schema.Column{CollectionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "collection_nodes_node_id",
+				Columns:    []*schema.Column{CollectionNodesColumns[1]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// LinkPostsColumns holds the columns for the "link_posts" table.
 	LinkPostsColumns = []*schema.Column{
 		{Name: "link_id", Type: field.TypeString, Size: 20},
@@ -588,6 +613,7 @@ var (
 		TagsTable,
 		AccountTagsTable,
 		CollectionPostsTable,
+		CollectionNodesTable,
 		LinkPostsTable,
 		LinkNodesTable,
 		LinkAssetsTable,
@@ -616,6 +642,8 @@ func init() {
 	AccountTagsTable.Annotation = &entsql.Annotation{}
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
+	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
+	CollectionNodesTable.ForeignKeys[1].RefTable = NodesTable
 	LinkPostsTable.ForeignKeys[0].RefTable = LinksTable
 	LinkPostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinkNodesTable.ForeignKeys[0].RefTable = LinksTable

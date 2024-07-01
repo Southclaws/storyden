@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -114,6 +115,21 @@ func (cu *CollectionUpdate) AddPosts(p ...*Post) *CollectionUpdate {
 	return cu.AddPostIDs(ids...)
 }
 
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (cu *CollectionUpdate) AddNodeIDs(ids ...xid.ID) *CollectionUpdate {
+	cu.mutation.AddNodeIDs(ids...)
+	return cu
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (cu *CollectionUpdate) AddNodes(n ...*Node) *CollectionUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return cu.AddNodeIDs(ids...)
+}
+
 // Mutation returns the CollectionMutation object of the builder.
 func (cu *CollectionUpdate) Mutation() *CollectionMutation {
 	return cu.mutation
@@ -144,6 +160,27 @@ func (cu *CollectionUpdate) RemovePosts(p ...*Post) *CollectionUpdate {
 		ids[i] = p[i].ID
 	}
 	return cu.RemovePostIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (cu *CollectionUpdate) ClearNodes() *CollectionUpdate {
+	cu.mutation.ClearNodes()
+	return cu
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (cu *CollectionUpdate) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdate {
+	cu.mutation.RemoveNodeIDs(ids...)
+	return cu
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (cu *CollectionUpdate) RemoveNodes(n ...*Node) *CollectionUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return cu.RemoveNodeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -296,6 +333,51 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !cu.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -400,6 +482,21 @@ func (cuo *CollectionUpdateOne) AddPosts(p ...*Post) *CollectionUpdateOne {
 	return cuo.AddPostIDs(ids...)
 }
 
+// AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
+func (cuo *CollectionUpdateOne) AddNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
+	cuo.mutation.AddNodeIDs(ids...)
+	return cuo
+}
+
+// AddNodes adds the "nodes" edges to the Node entity.
+func (cuo *CollectionUpdateOne) AddNodes(n ...*Node) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return cuo.AddNodeIDs(ids...)
+}
+
 // Mutation returns the CollectionMutation object of the builder.
 func (cuo *CollectionUpdateOne) Mutation() *CollectionMutation {
 	return cuo.mutation
@@ -430,6 +527,27 @@ func (cuo *CollectionUpdateOne) RemovePosts(p ...*Post) *CollectionUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return cuo.RemovePostIDs(ids...)
+}
+
+// ClearNodes clears all "nodes" edges to the Node entity.
+func (cuo *CollectionUpdateOne) ClearNodes() *CollectionUpdateOne {
+	cuo.mutation.ClearNodes()
+	return cuo
+}
+
+// RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
+func (cuo *CollectionUpdateOne) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
+	cuo.mutation.RemoveNodeIDs(ids...)
+	return cuo
+}
+
+// RemoveNodes removes "nodes" edges to Node entities.
+func (cuo *CollectionUpdateOne) RemoveNodes(n ...*Node) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return cuo.RemoveNodeIDs(ids...)
 }
 
 // Where appends a list predicates to the CollectionUpdate builder.
@@ -605,6 +723,51 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !cuo.mutation.NodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   collection.NodesTable,
+			Columns: collection.NodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
