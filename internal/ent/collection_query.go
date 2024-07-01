@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -27,6 +28,7 @@ type CollectionQuery struct {
 	predicates []predicate.Collection
 	withOwner  *AccountQuery
 	withPosts  *PostQuery
+	withNodes  *NodeQuery
 	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -102,6 +104,28 @@ func (cq *CollectionQuery) QueryPosts() *PostQuery {
 			sqlgraph.From(collection.Table, collection.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, collection.PostsTable, collection.PostsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodes chains the current query on the "nodes" edge.
+func (cq *CollectionQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, collection.NodesTable, collection.NodesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -303,6 +327,7 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 		predicates: append([]predicate.Collection{}, cq.predicates...),
 		withOwner:  cq.withOwner.Clone(),
 		withPosts:  cq.withPosts.Clone(),
+		withNodes:  cq.withNodes.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -328,6 +353,17 @@ func (cq *CollectionQuery) WithPosts(opts ...func(*PostQuery)) *CollectionQuery 
 		opt(query)
 	}
 	cq.withPosts = query
+	return cq
+}
+
+// WithNodes tells the query-builder to eager-load the nodes that are connected to
+// the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CollectionQuery) WithNodes(opts ...func(*NodeQuery)) *CollectionQuery {
+	query := (&NodeClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withNodes = query
 	return cq
 }
 
@@ -410,9 +446,10 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		nodes       = []*Collection{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			cq.withOwner != nil,
 			cq.withPosts != nil,
+			cq.withNodes != nil,
 		}
 	)
 	if cq.withOwner != nil {
@@ -452,6 +489,13 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		if err := cq.loadPosts(ctx, query, nodes,
 			func(n *Collection) { n.Edges.Posts = []*Post{} },
 			func(n *Collection, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withNodes; query != nil {
+		if err := cq.loadNodes(ctx, query, nodes,
+			func(n *Collection) { n.Edges.Nodes = []*Node{} },
+			func(n *Collection, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -544,6 +588,67 @@ func (cq *CollectionQuery) loadPosts(ctx context.Context, query *PostQuery, node
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "posts" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (cq *CollectionQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Node)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[xid.ID]*Collection)
+	nids := make(map[xid.ID]map[*Collection]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(collection.NodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(collection.NodesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(collection.NodesPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(collection.NodesPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Collection]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
