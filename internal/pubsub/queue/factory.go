@@ -54,9 +54,6 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 		for {
 			select {
 			case <-ctx.Done():
-				q.log.Error("context cancelled",
-					zap.Error(ctx.Err()))
-
 				return
 
 			case msg := <-ch:
