@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -22,7 +23,7 @@ type Account struct {
 	ID     AccountID
 	Handle string
 	Name   string
-	Bio    opt.Optional[string]
+	Bio    content.Rich
 	Admin  bool
 	Auths  []string
 
@@ -61,11 +62,16 @@ func FromModel(a *ent.Account) (*Account, error) {
 		return a.Service
 	})
 
+	bio, err := content.NewRichText(a.Bio)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Account{
 		ID:     AccountID(a.ID),
 		Handle: a.Handle,
 		Name:   a.Name,
-		Bio:    opt.New(a.Bio),
+		Bio:    bio,
 		Admin:  a.Admin,
 		Auths:  auths,
 

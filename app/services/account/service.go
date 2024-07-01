@@ -8,8 +8,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	authentication_repo "github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/internal/pubsub"
 )
 
 type Service interface {
@@ -35,7 +37,8 @@ type service struct {
 	auth_repo    authentication_repo.Repository
 	account_repo account.Repository
 
-	auth_svc *authentication.Manager
+	auth_svc   *authentication.Manager
+	indexQueue pubsub.Topic[mq.IndexProfile]
 }
 
 func New(
@@ -46,6 +49,7 @@ func New(
 	account_repo account.Repository,
 
 	auth_svc *authentication.Manager,
+	indexQueue pubsub.Topic[mq.IndexProfile],
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "account")),
@@ -53,5 +57,6 @@ func New(
 		auth_repo:    auth_repo,
 		account_repo: account_repo,
 		auth_svc:     auth_svc,
+		indexQueue:   indexQueue,
 	}
 }

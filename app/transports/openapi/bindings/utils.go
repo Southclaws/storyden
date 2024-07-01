@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -27,7 +26,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Id:        openapi.Identifier(acc.ID.String()),
 		Handle:    acc.Handle,
 		Name:      acc.Name,
-		Bio:       utils.Ref(acc.Bio.OrZero()),
+		Bio:       acc.Bio.HTML(),
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
@@ -103,7 +102,7 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 	}
 }
 
-func serialiseProfileReference(a profile.Profile) openapi.ProfileReference {
+func serialiseProfileReference(a datagraph.Profile) openapi.ProfileReference {
 	return openapi.ProfileReference{
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),

@@ -5,6 +5,7 @@ package datagraph
 type kindEnum string
 
 const (
-	kindPost kindEnum = "post"
-	kindNode kindEnum = "node"
+	kindPost    kindEnum = "post"
+	kindNode    kindEnum = "node"
+	kindProfile kindEnum = "profile"
 )

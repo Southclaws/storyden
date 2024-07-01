@@ -20,6 +20,10 @@ var policy = bluemonday.UGCPolicy()
 // MaxSummaryLength is the maximum length of the short summary text
 const MaxSummaryLength = 128
 
+// EmptyState is the default value for empty rich text. It could be an empty
+// string but on the read path, it'll get turned into this either way.
+const EmptyState = `<body></body>`
+
 type Rich struct {
 	html  *html.Node
 	short string
@@ -27,6 +31,10 @@ type Rich struct {
 }
 
 func (r Rich) HTML() string {
+	if r.html == nil {
+		return EmptyState
+	}
+
 	w := &bytes.Buffer{}
 
 	err := html.Render(w, r.html)

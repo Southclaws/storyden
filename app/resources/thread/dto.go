@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -29,7 +28,7 @@ type Thread struct {
 	Slug        string
 	Short       string
 	Pinned      bool
-	Author      profile.Profile
+	Author      datagraph.Profile
 	Tags        []string
 	Category    category.Category
 	Visibility  post.Visibility
@@ -70,7 +69,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 
 	category := category.FromModel(categoryEdge)
 
-	pro, err := profile.FromModel(authorEdge)
+	pro, err := datagraph.ProfileFromModel(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
