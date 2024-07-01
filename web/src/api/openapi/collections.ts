@@ -254,7 +254,7 @@ making the request. The post can be any published post of any kind.
  */
 export const collectionAddPost = (collectionId: string, postId: string) => {
   return fetcher<CollectionAddPostOKResponse>({
-    url: `/v1/collections/${collectionId}/items/${postId}`,
+    url: `/v1/collections/${collectionId}/posts/${postId}`,
     method: "PUT",
   });
 };
@@ -273,7 +273,7 @@ export const getCollectionAddPostMutationFetcher = (
 export const getCollectionAddPostMutationKey = (
   collectionId: string,
   postId: string,
-) => `/v1/collections/${collectionId}/items/${postId}` as const;
+) => `/v1/collections/${collectionId}/posts/${postId}` as const;
 
 export type CollectionAddPostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionAddPost>>
@@ -321,7 +321,7 @@ account making the request.
  */
 export const collectionRemovePost = (collectionId: string, postId: string) => {
   return fetcher<CollectionRemovePostOKResponse>({
-    url: `/v1/collections/${collectionId}/items/${postId}`,
+    url: `/v1/collections/${collectionId}/posts/${postId}`,
     method: "DELETE",
   });
 };
@@ -340,7 +340,7 @@ export const getCollectionRemovePostMutationFetcher = (
 export const getCollectionRemovePostMutationKey = (
   collectionId: string,
   postId: string,
-) => `/v1/collections/${collectionId}/items/${postId}` as const;
+) => `/v1/collections/${collectionId}/posts/${postId}` as const;
 
 export type CollectionRemovePostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionRemovePost>>
