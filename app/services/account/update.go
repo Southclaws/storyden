@@ -7,8 +7,10 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/mq"
 )
 
 type Partial struct {
@@ -37,6 +39,12 @@ func (s *service) Update(ctx context.Context, id account.AccountID, params Parti
 	acc, err := s.account_repo.Update(ctx, id, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.indexQueue.Publish(ctx, mq.IndexProfile{
+		ID: id,
+	}); err != nil {
+		s.l.Error("failed to publish index post message", zap.Error(err))
 	}
 
 	return acc, nil

@@ -17,6 +17,7 @@ func runIndexConsumer(
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qpost pubsub.Topic[mq.IndexPost],
+	qprofile pubsub.Topic[mq.IndexProfile],
 
 	ic *indexerConsumer,
 ) {
@@ -27,6 +28,11 @@ func runIndexConsumer(
 		}
 
 		postChan, err := qpost.Subscribe(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		profileChan, err := qprofile.Subscribe(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -46,6 +52,18 @@ func runIndexConsumer(
 		go func() {
 			for msg := range postChan {
 				if err := ic.indexPost(ctx, msg.Payload.ID); err != nil {
+					l.Error("failed to index post", zap.Error(err))
+					msg.Nack()
+					continue
+				}
+
+				msg.Ack()
+			}
+		}()
+
+		go func() {
+			for msg := range profileChan {
+				if err := ic.indexProfile(ctx, msg.Payload.ID); err != nil {
 					l.Error("failed to index post", zap.Error(err))
 					msg.Nack()
 					continue

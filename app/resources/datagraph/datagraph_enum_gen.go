@@ -12,8 +12,9 @@ type Kind struct {
 }
 
 var (
-	KindPost = Kind{kindPost}
-	KindNode = Kind{kindNode}
+	KindPost    = Kind{kindPost}
+	KindNode    = Kind{kindNode}
+	KindProfile = Kind{kindProfile}
 )
 
 func (r Kind) Format(f fmt.State, verb rune) {
@@ -57,6 +58,8 @@ func NewKind(__iNpUt__ string) (Kind, error) {
 		return KindPost, nil
 	case string(kindNode):
 		return KindNode, nil
+	case string(kindProfile):
+		return KindProfile, nil
 	default:
 		return Kind{}, fmt.Errorf("invalid value for type 'Kind': '%s'", __iNpUt__)
 	}

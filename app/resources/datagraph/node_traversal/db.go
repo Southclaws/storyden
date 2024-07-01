@@ -16,9 +16,9 @@ import (
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
@@ -144,6 +144,11 @@ type subtreeRow struct {
 }
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
+	bio, err := opt.MapErr(opt.NewPtr(r.OwnerBio), content.NewRichText)
+	if err != nil {
+		return nil, err
+	}
+
 	return &datagraph.Node{
 		ID:         datagraph.NodeID(r.NodeId),
 		CreatedAt:  r.NodeCreatedAt,
@@ -154,12 +159,12 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 		Parent: opt.NewSafe(datagraph.Node{
 			ID: datagraph.NodeID(r.NodeParentNodeId),
 		}, !r.NodeParentNodeId.IsNil()),
-		Owner: profile.Profile{
+		Owner: datagraph.Profile{
 			ID:      account_repo.AccountID(r.OwnerId),
 			Created: r.OwnerCreatedAt,
 			Handle:  r.OwnerHandle,
 			Name:    r.OwnerName,
-			Bio:     opt.NewPtr(r.OwnerBio).OrZero(),
+			Bio:     bio.OrZero(),
 			Admin:   r.OwnerAdmin,
 		},
 		Properties: r.NodeProperties,

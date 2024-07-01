@@ -66,7 +66,7 @@ func SeedAccount(ctx context.Context, r account.Repository, auth authentication.
 	acc, err := r.Create(ctx, v.Handle,
 		account.WithID(v.ID),
 		account.WithName(v.Name),
-		account.WithBio(v.Bio.OrZero()),
+		account.WithBio(v.Bio),
 		account.WithAdmin(v.Admin),
 	)
 	if err != nil {

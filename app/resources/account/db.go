@@ -35,7 +35,7 @@ func (d *database) Create(ctx context.Context, handle string, opts ...Option) (*
 		Create().
 		SetHandle(withrequired.Handle).
 		SetName(withrequired.Name).
-		SetNillableBio(utils.OptionalToPointer(withrequired.Bio)).
+		SetBio(withrequired.Bio.HTML()).
 		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
 		SetAdmin(withrequired.Admin).
 		Save(ctx)

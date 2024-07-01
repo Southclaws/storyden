@@ -12,12 +12,11 @@ import (
 	"github.com/Southclaws/opt"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile_search"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type Profiles struct {
@@ -94,7 +93,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 			Id:        openapi.Identifier(acc.ID.String()),
 			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
 			DeletedAt: acc.DeletedAt.Ptr(),
-			Bio:       utils.Ref(acc.Bio.OrZero()),
+			Bio:       acc.Bio.HTML(),
 			Handle:    acc.Handle,
 			Image:     &avatarURL,
 			Name:      acc.Name,
@@ -102,12 +101,12 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	}, nil
 }
 
-func serialiseProfile(in *profile.Profile) openapi.PublicProfile {
+func serialiseProfile(in *datagraph.Profile) openapi.PublicProfile {
 	return openapi.PublicProfile{
 		Id:        openapi.Identifier(in.ID.String()),
 		CreatedAt: in.Created.Format(time.RFC3339),
 		DeletedAt: in.Deleted.Ptr(),
-		Bio:       &in.Bio,
+		Bio:       in.Bio.HTML(),
 		Handle:    in.Handle,
 		// Image:     &avatarURL,
 		Name: in.Name,
