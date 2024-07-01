@@ -19,7 +19,7 @@ services:
       WITH_CREDENTIALS: "true"
 
   weaviate:
-    image: cr.weaviate.io/semitechnologies/weaviate:1.25.5
+    image: cr.weaviate.io/semitechnologies/weaviate:1.25.6
     restart: on-failure:0
     command:
       - --host
