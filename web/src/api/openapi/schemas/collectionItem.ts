@@ -5,7 +5,10 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { CollectionItemCommonProps } from "./collectionItemCommonProps";
+import type { CollectionItemMetadata } from "./collectionItemMetadata";
 import type { CommonProperties } from "./commonProperties";
+import type { DatagraphNode } from "./datagraphNode";
 
-export type CollectionItem = CommonProperties & CollectionItemCommonProps;
+export type CollectionItem = CommonProperties &
+  DatagraphNode &
+  CollectionItemMetadata;
