@@ -21,7 +21,7 @@ func (s *service) Get(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
 	}
 
-	recommendations, err := s.semdex.Recommend(ctx, thr)
+	recommendations, err := s.recommender.Recommend(ctx, thr)
 	if err != nil {
 		s.l.Warn("failed to aggregate recommendations", zap.Error(err))
 	} else {
