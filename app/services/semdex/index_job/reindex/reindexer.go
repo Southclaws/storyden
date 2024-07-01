@@ -33,16 +33,23 @@ type reindexer struct {
 func newReindexer(
 	l *zap.Logger,
 
-	ec *ent.Client,
 	qnode pubsub.Topic[mq.IndexNode],
 	qpost pubsub.Topic[mq.IndexPost],
 
 	indexer semdex.Indexer,
 	retriever semdex.Retriever,
 ) *reindexer {
+	// If the indexer is a searcher only, we don't need to reindex anything.
+	switch indexer.(type) {
+	case *semdex.OnlySearcher:
+		return nil
+	case *semdex.Empty:
+		return nil
+	}
+
 	return &reindexer{
-		l:         l,
-		ec:        ec,
+		l: l,
+
 		qnode:     qnode,
 		qpost:     qpost,
 		indexer:   indexer,
