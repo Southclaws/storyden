@@ -137,14 +137,14 @@ func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionW
 	}
 }
 
-func serialiseCollectionItem(in *collection.Item) openapi.CollectionItem {
+func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionItem {
 	return openapi.CollectionItem{
-		Id:        in.ID.String(),
-		CreatedAt: in.CreatedAt,
-		UpdatedAt: in.UpdatedAt,
-		Slug:      in.Slug,
-		Author:    serialiseProfileReference(in.Author),
-		Title:     in.Title,
-		Short:     in.Short,
+		Id:          in.Item.GetID().String(),
+		Kind:        openapi.DatagraphNodeKind(in.Item.GetKind().String()),
+		Name:        in.Item.GetName(),
+		Slug:        in.Item.GetSlug(),
+		Description: opt.New(in.Item.GetDesc()).Ptr(),
+
+		Owner: serialiseProfileReference(in.Author),
 	}
 }

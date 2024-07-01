@@ -49,6 +49,11 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 			pq.WithAuthor()
 			pq.WithCategory()
 			pq.WithTags()
+		}).
+		WithNodes(func(nq *ent.NodeQuery) {
+			nq.WithOwner()
+			nq.WithAssets()
+			nq.WithTags()
 		})
 
 	for _, fn := range filters {
@@ -77,6 +82,12 @@ func (d *database) Get(ctx context.Context, id CollectionID) (*Collection, error
 			pq.WithAuthor()
 			pq.WithCategory()
 			pq.WithTags()
+			pq.WithRoot()
+		}).
+		WithNodes(func(nq *ent.NodeQuery) {
+			nq.WithOwner()
+			nq.WithAssets()
+			nq.WithTags()
 		}).
 		Only(ctx)
 	if err != nil {
