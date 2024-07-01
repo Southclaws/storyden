@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -21,7 +21,7 @@ type Collection struct {
 	ID          CollectionID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Owner       profile.Profile
+	Owner       datagraph.Profile
 	Name        string
 	Description string
 	Items       []*Item
@@ -35,7 +35,7 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.FromModel(accEdge)
+	pro, err := datagraph.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -69,7 +69,7 @@ type Item struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Slug      string
-	Author    profile.Profile
+	Author    datagraph.Profile
 	Title     string
 	Short     string
 }
@@ -80,7 +80,7 @@ func ItemFromModel(p *ent.Post) (*Item, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.FromModel(accEdge)
+	pro, err := datagraph.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

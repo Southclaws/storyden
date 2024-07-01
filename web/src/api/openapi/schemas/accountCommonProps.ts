@@ -5,13 +5,14 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { TagList } from "./tagList";
 
 export interface AccountCommonProps {
   admin: boolean;
-  bio?: string;
+  bio: AccountBio;
   handle: AccountHandle;
   interests?: TagList;
   name: AccountName;

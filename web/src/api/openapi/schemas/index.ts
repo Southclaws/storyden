@@ -13,6 +13,7 @@ export * from "./accountAuthMethod";
 export * from "./accountAuthMethodList";
 export * from "./accountAuthMethods";
 export * from "./accountAuthProviderListOKResponse";
+export * from "./accountBio";
 export * from "./accountCommonProps";
 export * from "./accountGetAvatarResponse";
 export * from "./accountGetOKResponse";
