@@ -847,7 +847,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionUpdateOK" }
-  /v1/collections/{collection_id}/items/{post_id}:
+  /v1/collections/{collection_id}/posts/{post_id}:
     put:
       operationId: CollectionAddPost
       description: |
