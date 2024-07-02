@@ -39,7 +39,7 @@
     "emoji-mart": "^5.6.0",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.395.0",
+    "lucide-react": "^0.400.0",
     "next": "^14.2.4",
     "polished": "^4.3.1",
     "react": "^18.3.1",
@@ -57,8 +57,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.40.1",
-    "@pandacss/types": "^0.40.1",
+    "@pandacss/dev": "^0.41.0",
+    "@pandacss/types": "^0.41.0",
     "@park-ui/panda-preset": "^0.38.0",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -76,5 +76,5 @@
     "prettier": "^3.3.2",
     "typescript": "^5.4.5"
   },
-  "packageManager": "yarn@4.3.0"
+  "packageManager": "yarn@4.3.1"
 }
