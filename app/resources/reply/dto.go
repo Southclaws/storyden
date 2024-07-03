@@ -42,14 +42,18 @@ func (*Reply) GetResourceName() string { return "post" }
 func (r *Reply) GetID() xid.ID           { return xid.ID(r.ID) }
 func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindPost }
 func (r *Reply) GetName() string {
+	if xid.ID(r.RootPostID).IsZero() {
+		return r.RootThreadTitle
+	}
+
 	return fmt.Sprintf("reply to: %s", r.RootThreadTitle)
 }
 
 func (r *Reply) GetSlug() string {
-	if len(r.RootThreadMark) > 0 {
-		return r.RootThreadMark
+	if xid.ID(r.RootPostID).IsZero() {
+		return r.ID.String()
 	}
-	return r.ID.String()
+	return r.RootThreadMark
 }
 func (r *Reply) GetText() string { return r.Content.HTML() }
 func (r *Reply) GetDesc() string { return r.Content.Short() }
