@@ -1202,6 +1202,22 @@ func (c *CollectionClient) QueryPosts(co *Collection) *PostQuery {
 	return query
 }
 
+// QueryNodes queries the nodes edge of a Collection.
+func (c *CollectionClient) QueryNodes(co *Collection) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, collection.NodesTable, collection.NodesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CollectionClient) Hooks() []Hook {
 	return c.hooks.Collection
@@ -1605,6 +1621,22 @@ func (c *NodeClient) QueryLinks(n *Node) *LinkQuery {
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(link.Table, link.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, node.LinksTable, node.LinksPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCollections queries the collections edge of a Node.
+func (c *NodeClient) QueryCollections(n *Node) *CollectionQuery {
+	query := (&CollectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(collection.Table, collection.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, node.CollectionsTable, node.CollectionsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil

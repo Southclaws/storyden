@@ -42,9 +42,11 @@ type CollectionEdges struct {
 	Owner *Account `json:"owner,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Nodes holds the value of the nodes edge.
+	Nodes []*Node `json:"nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -65,6 +67,15 @@ func (e CollectionEdges) PostsOrErr() ([]*Post, error) {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
+}
+
+// NodesOrErr returns the Nodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e CollectionEdges) NodesOrErr() ([]*Node, error) {
+	if e.loadedTypes[2] {
+		return e.Nodes, nil
+	}
+	return nil, &NotLoadedError{edge: "nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -159,6 +170,11 @@ func (c *Collection) QueryOwner() *AccountQuery {
 // QueryPosts queries the "posts" edge of the Collection entity.
 func (c *Collection) QueryPosts() *PostQuery {
 	return NewCollectionClient(c.config).QueryPosts(c)
+}
+
+// QueryNodes queries the "nodes" edge of the Collection entity.
+func (c *Collection) QueryNodes() *NodeQuery {
+	return NewCollectionClient(c.config).QueryNodes(c)
 }
 
 // Update returns a builder for updating this Collection.

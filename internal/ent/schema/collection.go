@@ -29,5 +29,6 @@ func (Collection) Edges() []ent.Edge {
 			Unique(),
 
 		edge.To("posts", Post.Type),
+		edge.To("nodes", Node.Type),
 	}
 }
