@@ -41,11 +41,23 @@ func (*Reply) GetResourceName() string { return "post" }
 
 func (r *Reply) GetID() xid.ID           { return xid.ID(r.ID) }
 func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindPost }
-func (r *Reply) GetName() string         { return r.Content.Short() }
-func (r *Reply) GetSlug() string         { return r.RootThreadMark }
-func (r *Reply) GetText() string         { return r.Content.HTML() }
-func (r *Reply) GetDesc() string         { return r.Content.Short() }
-func (r *Reply) GetProps() any           { return r.Meta }
+func (r *Reply) GetName() string {
+	if xid.ID(r.RootPostID).IsZero() {
+		return r.RootThreadTitle
+	}
+
+	return fmt.Sprintf("reply to: %s", r.RootThreadTitle)
+}
+
+func (r *Reply) GetSlug() string {
+	if xid.ID(r.RootPostID).IsZero() {
+		return r.ID.String()
+	}
+	return r.RootThreadMark
+}
+func (r *Reply) GetText() string { return r.Content.HTML() }
+func (r *Reply) GetDesc() string { return r.Content.Short() }
+func (r *Reply) GetProps() any   { return r.Meta }
 
 func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Content.Short())
@@ -77,6 +89,19 @@ func FromModel(m *ent.Post) (*Reply, error) {
 
 	replyTo := replyTo(m)
 
+	var rootPostID post.ID
+	var rootThreadMark string
+	var rootThreadTitle string
+	if m.RootPostID == xid.NilID() {
+		// A root post was passed, which is still valid in some cases.
+		rootThreadMark = m.Slug
+		rootThreadTitle = m.Title
+	} else {
+		rootPostID = post.ID(m.RootPostID)
+		rootThreadMark = opt.NewPtr(m.Edges.Root).OrZero().Slug
+		rootThreadTitle = opt.NewPtr(m.Edges.Root).OrZero().Title
+	}
+
 	return &Reply{
 		ID: post.ID(m.ID),
 
@@ -88,9 +113,9 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
 		Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
 
-		RootPostID:      post.ID(m.RootPostID),
-		RootThreadMark:  opt.NewPtr(m.Edges.Root).OrZero().Slug,
-		RootThreadTitle: opt.NewPtr(m.Edges.Root).OrZero().Title,
+		RootPostID:      rootPostID,
+		RootThreadMark:  rootThreadMark,
+		RootThreadTitle: rootThreadTitle,
 
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

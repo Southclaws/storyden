@@ -6,6 +6,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -57,5 +58,17 @@ func WithPostAdd(id post.ID) Option {
 func WithPostRemove(id post.ID) Option {
 	return func(c *ent.CollectionMutation) {
 		c.RemovePostIDs(xid.ID(id))
+	}
+}
+
+func WithNodeAdd(id datagraph.NodeID) Option {
+	return func(c *ent.CollectionMutation) {
+		c.AddNodeIDs(xid.ID(id))
+	}
+}
+
+func WithNodeRemove(id datagraph.NodeID) Option {
+	return func(c *ent.CollectionMutation) {
+		c.RemoveNodeIDs(xid.ID(id))
 	}
 }

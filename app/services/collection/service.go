@@ -13,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -20,8 +21,13 @@ import (
 
 type Service interface {
 	Update(ctx context.Context, cid collection.CollectionID, partial Partial) (*collection.Collection, error)
-	Add(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error)
-	Remove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error)
+	Delete(ctx context.Context, cid collection.CollectionID) error
+
+	PostAdd(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error)
+	PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error)
+
+	NodeAdd(ctx context.Context, cid collection.CollectionID, pid datagraph.NodeID) (*collection.Collection, error)
+	NodeRemove(ctx context.Context, cid collection.CollectionID, pid datagraph.NodeID) (*collection.Collection, error)
 }
 
 type Partial struct {
@@ -74,7 +80,20 @@ func (s *service) Update(ctx context.Context, cid collection.CollectionID, parti
 	return col, nil
 }
 
-func (s *service) Add(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
+func (s *service) Delete(ctx context.Context, cid collection.CollectionID) error {
+	if err := s.authorise(ctx, cid); err != nil {
+		return err
+	}
+
+	err := s.collection_repo.Delete(ctx, cid)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *service) PostAdd(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
 	if err := s.authorise(ctx, cid); err != nil {
 		return nil, err
 	}
@@ -87,12 +106,38 @@ func (s *service) Add(ctx context.Context, cid collection.CollectionID, pid post
 	return col, nil
 }
 
-func (s *service) Remove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
+func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
 	if err := s.authorise(ctx, cid); err != nil {
 		return nil, err
 	}
 
 	col, err := s.collection_repo.Update(ctx, cid, collection.WithPostRemove(pid))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return col, nil
+}
+
+func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.Collection, error) {
+	if err := s.authorise(ctx, cid); err != nil {
+		return nil, err
+	}
+
+	col, err := s.collection_repo.Update(ctx, cid, collection.WithNodeAdd(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return col, nil
+}
+
+func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.Collection, error) {
+	if err := s.authorise(ctx, cid); err != nil {
+		return nil, err
+	}
+
+	col, err := s.collection_repo.Update(ctx, cid, collection.WithNodeRemove(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
