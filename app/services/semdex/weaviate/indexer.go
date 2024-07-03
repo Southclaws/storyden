@@ -24,17 +24,37 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable
 		return nil
 	}
 
-	_, err := s.wc.Data().Creator().
-		WithClassName(s.cn.String()).
-		WithID(wid).
-		WithProperties(map[string]any{
-			"datagraph_id":   sid.String(),
-			"datagraph_type": object.GetKind(),
-			"name":           object.GetName(),
-			"content":        content,
-			"props":          object.GetProps(),
-		}).
-		Do(ctx)
+	existing, err := s.wc.Data().ObjectsGetter().WithID(wid).Do(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(existing) > 0 {
+		err = s.wc.Data().Updater().
+			WithClassName(s.cn.String()).
+			WithID(wid).
+			WithProperties(map[string]any{
+				"datagraph_id":   sid.String(),
+				"datagraph_type": object.GetKind(),
+				"name":           object.GetName(),
+				"content":        content,
+				"props":          object.GetProps(),
+			}).
+			Do(ctx)
+	} else {
+		_, err = s.wc.Data().Creator().
+			WithClassName(s.cn.String()).
+			WithID(wid).
+			WithProperties(map[string]any{
+				"datagraph_id":   sid.String(),
+				"datagraph_type": object.GetKind(),
+				"name":           object.GetName(),
+				"content":        content,
+				"props":          object.GetProps(),
+			}).
+			Do(ctx)
+	}
+
 	if err != nil {
 		we := &weaviate_errors.WeaviateClientError{}
 		if errors.As(err, &we) {
