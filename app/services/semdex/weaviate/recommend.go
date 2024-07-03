@@ -32,7 +32,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 
 	withNearVector := w.wc.GraphQL().NearVectorArgBuilder().
 		WithVector(wobj.Vector).
-		WithDistance(0.5)
+		WithCertainty(0.5)
 
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
@@ -43,6 +43,7 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 		WithClassName(w.cn.String()).
 		WithFields(fields...).
 		WithNearVector(withNearVector).
+		WithAutocut(2).
 		WithLimit(10).
 		Do(ctx)
 	if err != nil {
