@@ -11,8 +11,7 @@ export type DatagraphNodeKind =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DatagraphNodeKind = {
-  thread: "thread",
-  reply: "reply",
+  post: "post",
   node: "node",
-  link: "link",
+  profile: "profile",
 } as const;

@@ -847,6 +847,17 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionUpdateOK" }
+    delete:
+      operationId: CollectionDelete
+      description: Delete a collection owned by the authenticated account.
+      tags: [collections]
+      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
   /v1/collections/{collection_id}/posts/{post_id}:
     put:
       operationId: CollectionAddPost
@@ -876,6 +887,36 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
+  /v1/collections/{collection_id}/nodes/{node_id}:
+    put:
+      operationId: CollectionAddNode
+      description: |
+        Add a node to a collection. The collection must be owned by the account
+        making the request. The node can be any published node or any node
+        not published but owned by the collection owner.
+      tags: [collections]
+      parameters:
+        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/NodeIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionAddNodeOK" }
+    delete:
+      operationId: CollectionRemoveNode
+      description: |
+        Remove a node from a collection. The collection must be owned by the
+        account making the request.
+      tags: [collections]
+      parameters:
+        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/NodeIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/CollectionRemoveNodeOK" }
 
   #
   #                        888
@@ -1173,6 +1214,14 @@ components:
     PostIDParam:
       description: Unique post ID.
       name: post_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    NodeIDParam:
+      description: Unique node ID.
+      name: node_id
       in: path
       required: true
       schema:
@@ -1702,6 +1751,20 @@ components:
             $ref: "#/components/schemas/Collection"
 
     CollectionRemovePostOK:
+      description: Collection content added.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+
+    CollectionAddNodeOK:
+      description: Collection content added.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+
+    CollectionRemoveNodeOK:
       description: Collection content added.
       content:
         application/json:
@@ -3165,7 +3228,7 @@ components:
 
     DatagraphNodeKind:
       type: string
-      enum: [thread, reply, node, link]
+      enum: [post, node, profile]
 
     DatagraphRecommendations:
       required: [recomentations]
