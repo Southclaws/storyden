@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/cixtor/readability"
 	"golang.org/x/net/html"
 )
@@ -25,7 +26,7 @@ func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) 
 	}
 
 	t := metatable(doc)
-	text, err := getArticleText(bytes.NewReader(buf), addr)
+	rc, text, err := getArticleContent(bytes.NewReader(buf), addr)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -35,18 +36,24 @@ func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) 
 		Description: description(t),
 		Text:        text,
 		Image:       t["og:image"],
+		Content:     rc,
 	}
 
 	return wc, nil
 }
 
-func getArticleText(r io.Reader, pageURL string) (string, error) {
+func getArticleContent(r io.Reader, pageURL string) (content.Rich, string, error) {
 	result, err := readability.New().Parse(r, pageURL)
 	if err != nil {
-		return "", fault.Wrap(err)
+		return content.Rich{}, "", fault.Wrap(err)
 	}
 
-	return result.TextContent, nil
+	rc, err := content.NewRichTextFromHTML(result.Node)
+	if err != nil {
+		return content.Rich{}, result.TextContent, nil
+	}
+
+	return rc, result.TextContent, nil
 }
 
 func metatable(doc *goquery.Document) map[string]string {

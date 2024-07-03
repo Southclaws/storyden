@@ -13,7 +13,7 @@ import (
 )
 
 //go:embed testdata/*.html
-var content embed.FS
+var testContent embed.FS
 
 const dir = "testdata"
 
@@ -22,7 +22,7 @@ func Test_webScraper_postprocess(t *testing.T) {
 	// a := assert.New(t)
 	ctx := context.Background()
 
-	es, err := content.ReadDir(dir)
+	es, err := testContent.ReadDir(dir)
 	r.NoError(err)
 
 	w := webScraper{}

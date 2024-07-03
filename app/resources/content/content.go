@@ -62,6 +62,10 @@ func NewRichText(raw string) (Rich, error) {
 		return Rich{}, fault.Wrap(err)
 	}
 
+	return NewRichTextFromHTML(htmlTree)
+}
+
+func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
 	bodyTree := &html.Node{}
 	textonly := strings.Builder{}
 	links := []string{}

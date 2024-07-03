@@ -7,6 +7,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/app/resources/content"
 )
 
 var errFailedToScrape = fault.New("failed to scrape")
@@ -20,6 +22,7 @@ type WebContent struct {
 	Description string
 	Text        string
 	Image       string
+	Content     content.Rich
 }
 
 func Build() fx.Option {
