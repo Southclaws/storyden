@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/rs/xid"
 )
 
 type Indexer interface {
@@ -21,6 +22,7 @@ type Recommender interface {
 
 type Retriever interface {
 	GetAll(ctx context.Context) (datagraph.NodeReferenceList, error)
+	// GetVectorFor(ctx context.Context, idx ...xid.ID) ([]float64, error)
 }
 
 type Semdexer interface {
@@ -47,6 +49,10 @@ func (o *OnlySearcher) Recommend(ctx context.Context, object datagraph.Indexable
 }
 
 func (o *OnlySearcher) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {
+	return nil, nil
+}
+
+func (o *OnlySearcher) GetVectorFor(ctx context.Context, idx ...xid.ID) ([]float64, error) {
 	return nil, nil
 }
 
