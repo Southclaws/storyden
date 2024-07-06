@@ -1921,6 +1921,7 @@ components:
       type: string
       enum:
         - draft
+        - unlisted
         - review
         - published
 

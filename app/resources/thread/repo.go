@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_category "github.com/Southclaws/storyden/internal/ent/category"
@@ -88,9 +89,9 @@ func WithCategory(v xid.ID) Option {
 	}
 }
 
-func WithVisibility(v post.Visibility) Option {
+func WithVisibility(v visibility.Visibility) Option {
 	return func(pm *ent.PostMutation) {
-		pm.SetVisibility(v.ToEnt())
+		pm.SetVisibility(ent_post.Visibility(v.String()))
 	}
 }
 
@@ -154,9 +155,9 @@ func HasCategories(ids []string) Query {
 	}
 }
 
-func HasStatus(status post.Visibility) Query {
+func HasStatus(status visibility.Visibility) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.VisibilityEQ(status.ToEnt()))
+		q.Where(ent_post.VisibilityEQ(ent_post.Visibility(status.String())))
 	}
 }
 

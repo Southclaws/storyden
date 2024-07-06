@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/pubsub"
@@ -29,7 +30,7 @@ type Service interface {
 		title string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
-		status post.Visibility,
+		status visibility.Visibility,
 		tags []string,
 		meta map[string]any,
 		partial Partial,
@@ -57,7 +58,7 @@ type Partial struct {
 	Content    opt.Optional[content.Rich]
 	Tags       opt.Optional[[]xid.ID]
 	Category   opt.Optional[xid.ID]
-	Visibility opt.Optional[post.Visibility]
+	Visibility opt.Optional[visibility.Visibility]
 	URL        opt.Optional[string]
 	Meta       opt.Optional[map[string]any]
 }
@@ -67,7 +68,7 @@ func (p Partial) Opts() (opts []thread.Option) {
 	p.Content.Call(func(v content.Rich) { opts = append(opts, thread.WithContent(v)) })
 	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
-	p.Visibility.Call(func(v post.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
+	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
 	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
 	return
 }

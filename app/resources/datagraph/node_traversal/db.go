@@ -19,7 +19,7 @@ import (
 	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
@@ -51,7 +51,7 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Node, e
 	}
 
 	if len(f.visibility) > 0 {
-		visibilityTypes := dt.Map(f.visibility, func(v post.Visibility) node.Visibility {
+		visibilityTypes := dt.Map(f.visibility, func(v visibility.Visibility) node.Visibility {
 			return node.Visibility(v.String())
 		})
 
@@ -123,25 +123,25 @@ order by
 `
 
 type subtreeRow struct {
-	NodeId           xid.ID          `db:"node_id"`
-	NodeCreatedAt    time.Time       `db:"node_created_at"`
-	NodeUpdatedAt    time.Time       `db:"node_updated_at"`
-	NodeDeletedAt    *time.Time      `db:"node_deleted_at"`
-	NodeName         string          `db:"node_name"`
-	NodeSlug         string          `db:"node_slug"`
-	NodeParentNodeId xid.ID          `db:"node_parent_node_id"`
-	NodeAccountId    xid.ID          `db:"node_account_id"`
-	NodeVisibility   post.Visibility `db:"node_visibility"`
-	NodeMetadata     *[]byte         `db:"node_metadata"`
-	OwnerId          xid.ID          `db:"owner_id"`
-	OwnerCreatedAt   time.Time       `db:"owner_created_at"`
-	OwnerUpdatedAt   time.Time       `db:"owner_updated_at"`
-	OwnerDeletedAt   *time.Time      `db:"owner_deleted_at"`
-	OwnerHandle      string          `db:"owner_handle"`
-	OwnerName        string          `db:"owner_name"`
-	OwnerBio         *string         `db:"owner_bio"`
-	OwnerAdmin       bool            `db:"owner_admin"`
-	Depth            int             `db:"depth"`
+	NodeId           xid.ID                `db:"node_id"`
+	NodeCreatedAt    time.Time             `db:"node_created_at"`
+	NodeUpdatedAt    time.Time             `db:"node_updated_at"`
+	NodeDeletedAt    *time.Time            `db:"node_deleted_at"`
+	NodeName         string                `db:"node_name"`
+	NodeSlug         string                `db:"node_slug"`
+	NodeParentNodeId xid.ID                `db:"node_parent_node_id"`
+	NodeAccountId    xid.ID                `db:"node_account_id"`
+	NodeVisibility   visibility.Visibility `db:"node_visibility"`
+	NodeMetadata     *[]byte               `db:"node_metadata"`
+	OwnerId          xid.ID                `db:"owner_id"`
+	OwnerCreatedAt   time.Time             `db:"owner_created_at"`
+	OwnerUpdatedAt   time.Time             `db:"owner_updated_at"`
+	OwnerDeletedAt   *time.Time            `db:"owner_deleted_at"`
+	OwnerHandle      string                `db:"owner_handle"`
+	OwnerName        string                `db:"owner_name"`
+	OwnerBio         *string               `db:"owner_bio"`
+	OwnerAdmin       bool                  `db:"owner_admin"`
+	Depth            int                   `db:"depth"`
 }
 
 func fromRow(r subtreeRow) (*datagraph.Node, error) {
@@ -253,9 +253,16 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 
 	filtered := dt.Filter(flat, func(n *datagraph.Node) bool {
 		if len(f.visibility) > 0 {
+			// filteringUnlisted := lo.Contains(f.visibility, visibility.VisibilityUnlisted)
+
+			// TODO: Get owner ID from session
+			// if filteringUnlisted && n.Owner.ID != "" {
+			// 	return false
+			// }
+
 			return lo.Contains(f.visibility, n.Visibility)
 		} else {
-			return n.Visibility == post.VisibilityPublished
+			return n.Visibility == visibility.VisibilityPublished
 		}
 	})
 

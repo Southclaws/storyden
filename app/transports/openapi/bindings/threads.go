@@ -14,8 +14,8 @@ import (
 	account_resource "github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -198,10 +198,10 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}, nil
 }
 
-func deserialiseThreadStatus(in openapi.Visibility) (post.Visibility, error) {
-	s, err := post.NewVisibility(string(in))
+func deserialiseThreadStatus(in openapi.Visibility) (visibility.Visibility, error) {
+	s, err := visibility.NewVisibility(string(in))
 	if err != nil {
-		return post.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		return visibility.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 
 	return s, nil

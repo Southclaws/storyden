@@ -5,7 +5,7 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 type Repository interface {
@@ -16,7 +16,7 @@ type Repository interface {
 
 type filters struct {
 	accountSlug *string
-	visibility  []post.Visibility
+	visibility  []visibility.Visibility
 	depth       *uint
 }
 
@@ -28,7 +28,7 @@ func WithOwner(v string) Filter {
 	}
 }
 
-func WithVisibility(v ...post.Visibility) Filter {
+func WithVisibility(v ...visibility.Visibility) Filter {
 	return func(f *filters) {
 		f.visibility = v
 	}
