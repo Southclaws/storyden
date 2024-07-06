@@ -179,7 +179,6 @@ export * from "./profileGetOKResponse";
 export * from "./profileListOKResponse";
 export * from "./profileListParams";
 export * from "./profileReference";
-export * from "./properties";
 export * from "./publicKeyCredential";
 export * from "./publicKeyCredentialClientExtensionResults";
 export * from "./publicKeyCredentialCreationOptions";

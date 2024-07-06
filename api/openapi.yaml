@@ -1998,21 +1998,6 @@ components:
       additionalProperties: true
       description: Arbitrary metadata for the resource.
 
-    Properties:
-      description: |
-        Arbitrary JSON object that can express any additional data for a
-        resource object. This is intended for client implementations to use for
-        extending objects with arbitrary information to satisfy product needs.
-
-        For example, if you were building a book database, you could use the
-        Properties of a node to specify publisher information such as date of
-        founding, headquarters, size, etc. and then use the Properties of the
-        items in that node to specify book information such as release date,
-        number of pages, etc.
-      type: object
-      additionalProperties: true
-      x-go-type: any
-
     PaginatedResult:
       description: To be composed with paginated resource responses.
       type: object
