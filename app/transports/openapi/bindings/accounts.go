@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -51,10 +52,16 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	links, err := opt.MapErr(opt.NewPtr(request.Body.Links), deserialiseExternalLinkList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	acc, err := i.as.Update(ctx, accountID, account.Partial{
 		Handle:    opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
 		Name:      opt.NewPtr(request.Body.Name),
 		Bio:       opt.NewPtr(request.Body.Bio),
+		Links:     links,
 		Interests: opt.NewPtrMap(request.Body.Interests, tagsIDs),
 	})
 	if err != nil {
@@ -63,6 +70,22 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 
 	return openapi.AccountUpdate200JSONResponse{
 		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+	}, nil
+}
+
+func deserialiseExternalLinkList(i openapi.ProfileExternalLinkList) ([]account_repo.ExternalLink, error) {
+	return dt.MapErr(i, deserialiseExternalLink)
+}
+
+func deserialiseExternalLink(l openapi.ProfileExternalLink) (account_repo.ExternalLink, error) {
+	u, err := url.Parse(string(l.Url))
+	if err != nil {
+		return account_repo.ExternalLink{}, err
+	}
+
+	return account_repo.ExternalLink{
+		Text: string(l.Text),
+		URL:  *u,
 	}, nil
 }
 

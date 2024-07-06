@@ -97,6 +97,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 			Handle:    acc.Handle,
 			Image:     &avatarURL,
 			Name:      acc.Name,
+			Links:     serialiseExternalLinks(acc.ExternalLinks),
 		},
 	}, nil
 }
@@ -108,6 +109,7 @@ func serialiseProfile(in *datagraph.Profile) openapi.PublicProfile {
 		DeletedAt: in.Deleted.Ptr(),
 		Bio:       in.Bio.HTML(),
 		Handle:    in.Handle,
+		Links:     serialiseExternalLinks(in.ExternalLinks),
 		// Image:     &avatarURL,
 		Name: in.Name,
 	}

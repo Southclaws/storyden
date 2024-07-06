@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
@@ -65,6 +66,8 @@ type AccountMutation struct {
 	name                  *string
 	bio                   *string
 	admin                 *bool
+	links                 *[]schema.ExternalLink
+	appendlinks           []schema.ExternalLink
 	clearedFields         map[string]struct{}
 	posts                 map[xid.ID]struct{}
 	removedposts          map[xid.ID]struct{}
@@ -475,6 +478,71 @@ func (m *AccountMutation) OldAdmin(ctx context.Context) (v bool, err error) {
 // ResetAdmin resets all changes to the "admin" field.
 func (m *AccountMutation) ResetAdmin() {
 	m.admin = nil
+}
+
+// SetLinks sets the "links" field.
+func (m *AccountMutation) SetLinks(sl []schema.ExternalLink) {
+	m.links = &sl
+	m.appendlinks = nil
+}
+
+// Links returns the value of the "links" field in the mutation.
+func (m *AccountMutation) Links() (r []schema.ExternalLink, exists bool) {
+	v := m.links
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLinks returns the old "links" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldLinks(ctx context.Context) (v []schema.ExternalLink, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLinks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLinks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLinks: %w", err)
+	}
+	return oldValue.Links, nil
+}
+
+// AppendLinks adds sl to the "links" field.
+func (m *AccountMutation) AppendLinks(sl []schema.ExternalLink) {
+	m.appendlinks = append(m.appendlinks, sl...)
+}
+
+// AppendedLinks returns the list of values that were appended to the "links" field in this mutation.
+func (m *AccountMutation) AppendedLinks() ([]schema.ExternalLink, bool) {
+	if len(m.appendlinks) == 0 {
+		return nil, false
+	}
+	return m.appendlinks, true
+}
+
+// ClearLinks clears the value of the "links" field.
+func (m *AccountMutation) ClearLinks() {
+	m.links = nil
+	m.appendlinks = nil
+	m.clearedFields[account.FieldLinks] = struct{}{}
+}
+
+// LinksCleared returns if the "links" field was cleared in this mutation.
+func (m *AccountMutation) LinksCleared() bool {
+	_, ok := m.clearedFields[account.FieldLinks]
+	return ok
+}
+
+// ResetLinks resets all changes to the "links" field.
+func (m *AccountMutation) ResetLinks() {
+	m.links = nil
+	m.appendlinks = nil
+	delete(m.clearedFields, account.FieldLinks)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
@@ -943,7 +1011,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -964,6 +1032,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.admin != nil {
 		fields = append(fields, account.FieldAdmin)
+	}
+	if m.links != nil {
+		fields = append(fields, account.FieldLinks)
 	}
 	return fields
 }
@@ -987,6 +1058,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Bio()
 	case account.FieldAdmin:
 		return m.Admin()
+	case account.FieldLinks:
+		return m.Links()
 	}
 	return nil, false
 }
@@ -1010,6 +1083,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldBio(ctx)
 	case account.FieldAdmin:
 		return m.OldAdmin(ctx)
+	case account.FieldLinks:
+		return m.OldLinks(ctx)
 	}
 	return nil, fmt.Errorf("unknown Account field %s", name)
 }
@@ -1068,6 +1143,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAdmin(v)
 		return nil
+	case account.FieldLinks:
+		v, ok := value.([]schema.ExternalLink)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLinks(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Account field %s", name)
 }
@@ -1104,6 +1186,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldBio) {
 		fields = append(fields, account.FieldBio)
 	}
+	if m.FieldCleared(account.FieldLinks) {
+		fields = append(fields, account.FieldLinks)
+	}
 	return fields
 }
 
@@ -1123,6 +1208,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ClearBio()
+		return nil
+	case account.FieldLinks:
+		m.ClearLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown Account nullable field %s", name)
@@ -1152,6 +1240,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldAdmin:
 		m.ResetAdmin()
+		return nil
+	case account.FieldLinks:
+		m.ResetLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown Account field %s", name)
@@ -5648,7 +5739,7 @@ type NodeMutation struct {
 	description        *string
 	content            *string
 	visibility         *node.Visibility
-	properties         *any
+	metadata           *map[string]interface{}
 	clearedFields      map[string]struct{}
 	owner              *xid.ID
 	clearedowner       bool
@@ -6190,53 +6281,53 @@ func (m *NodeMutation) ResetVisibility() {
 	m.visibility = nil
 }
 
-// SetProperties sets the "properties" field.
-func (m *NodeMutation) SetProperties(a any) {
-	m.properties = &a
+// SetMetadata sets the "metadata" field.
+func (m *NodeMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
 }
 
-// Properties returns the value of the "properties" field in the mutation.
-func (m *NodeMutation) Properties() (r any, exists bool) {
-	v := m.properties
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *NodeMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldProperties returns the old "properties" field's value of the Node entity.
+// OldMetadata returns the old "metadata" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldProperties(ctx context.Context) (v any, err error) {
+func (m *NodeMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProperties is only allowed on UpdateOne operations")
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProperties requires an ID field in the mutation")
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProperties: %w", err)
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
 	}
-	return oldValue.Properties, nil
+	return oldValue.Metadata, nil
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (m *NodeMutation) ClearProperties() {
-	m.properties = nil
-	m.clearedFields[node.FieldProperties] = struct{}{}
+// ClearMetadata clears the value of the "metadata" field.
+func (m *NodeMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[node.FieldMetadata] = struct{}{}
 }
 
-// PropertiesCleared returns if the "properties" field was cleared in this mutation.
-func (m *NodeMutation) PropertiesCleared() bool {
-	_, ok := m.clearedFields[node.FieldProperties]
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *NodeMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[node.FieldMetadata]
 	return ok
 }
 
-// ResetProperties resets all changes to the "properties" field.
-func (m *NodeMutation) ResetProperties() {
-	m.properties = nil
-	delete(m.clearedFields, node.FieldProperties)
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *NodeMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, node.FieldMetadata)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by id.
@@ -6654,8 +6745,8 @@ func (m *NodeMutation) Fields() []string {
 	if m.visibility != nil {
 		fields = append(fields, node.FieldVisibility)
 	}
-	if m.properties != nil {
-		fields = append(fields, node.FieldProperties)
+	if m.metadata != nil {
+		fields = append(fields, node.FieldMetadata)
 	}
 	return fields
 }
@@ -6685,8 +6776,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.AccountID()
 	case node.FieldVisibility:
 		return m.Visibility()
-	case node.FieldProperties:
-		return m.Properties()
+	case node.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -6716,8 +6807,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldAccountID(ctx)
 	case node.FieldVisibility:
 		return m.OldVisibility(ctx)
-	case node.FieldProperties:
-		return m.OldProperties(ctx)
+	case node.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown Node field %s", name)
 }
@@ -6797,12 +6888,12 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetVisibility(v)
 		return nil
-	case node.FieldProperties:
-		v, ok := value.(any)
+	case node.FieldMetadata:
+		v, ok := value.(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetProperties(v)
+		m.SetMetadata(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)
@@ -6846,8 +6937,8 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldParentNodeID) {
 		fields = append(fields, node.FieldParentNodeID)
 	}
-	if m.FieldCleared(node.FieldProperties) {
-		fields = append(fields, node.FieldProperties)
+	if m.FieldCleared(node.FieldMetadata) {
+		fields = append(fields, node.FieldMetadata)
 	}
 	return fields
 }
@@ -6875,8 +6966,8 @@ func (m *NodeMutation) ClearField(name string) error {
 	case node.FieldParentNodeID:
 		m.ClearParentNodeID()
 		return nil
-	case node.FieldProperties:
-		m.ClearProperties()
+	case node.FieldMetadata:
+		m.ClearMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Node nullable field %s", name)
@@ -6916,8 +7007,8 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldVisibility:
 		m.ResetVisibility()
 		return nil
-	case node.FieldProperties:
-		m.ResetProperties()
+	case node.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Node field %s", name)

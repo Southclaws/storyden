@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
@@ -20,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -123,6 +125,24 @@ func (au *AccountUpdate) SetNillableAdmin(b *bool) *AccountUpdate {
 	if b != nil {
 		au.SetAdmin(*b)
 	}
+	return au
+}
+
+// SetLinks sets the "links" field.
+func (au *AccountUpdate) SetLinks(sl []schema.ExternalLink) *AccountUpdate {
+	au.mutation.SetLinks(sl)
+	return au
+}
+
+// AppendLinks appends sl to the "links" field.
+func (au *AccountUpdate) AppendLinks(sl []schema.ExternalLink) *AccountUpdate {
+	au.mutation.AppendLinks(sl)
+	return au
+}
+
+// ClearLinks clears the value of the "links" field.
+func (au *AccountUpdate) ClearLinks() *AccountUpdate {
+	au.mutation.ClearLinks()
 	return au
 }
 
@@ -511,6 +531,17 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := au.mutation.Links(); ok {
+		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedLinks(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, account.FieldLinks, value)
+		})
+	}
+	if au.mutation.LinksCleared() {
+		_spec.ClearField(account.FieldLinks, field.TypeJSON)
 	}
 	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -982,6 +1013,24 @@ func (auo *AccountUpdateOne) SetNillableAdmin(b *bool) *AccountUpdateOne {
 	return auo
 }
 
+// SetLinks sets the "links" field.
+func (auo *AccountUpdateOne) SetLinks(sl []schema.ExternalLink) *AccountUpdateOne {
+	auo.mutation.SetLinks(sl)
+	return auo
+}
+
+// AppendLinks appends sl to the "links" field.
+func (auo *AccountUpdateOne) AppendLinks(sl []schema.ExternalLink) *AccountUpdateOne {
+	auo.mutation.AppendLinks(sl)
+	return auo
+}
+
+// ClearLinks clears the value of the "links" field.
+func (auo *AccountUpdateOne) ClearLinks() *AccountUpdateOne {
+	auo.mutation.ClearLinks()
+	return auo
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
@@ -1397,6 +1446,17 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := auo.mutation.Links(); ok {
+		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedLinks(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, account.FieldLinks, value)
+		})
+	}
+	if auo.mutation.LinksCleared() {
+		_spec.ClearField(account.FieldLinks, field.TypeJSON)
 	}
 	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

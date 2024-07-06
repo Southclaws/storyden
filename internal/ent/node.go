@@ -40,8 +40,8 @@ type Node struct {
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility node.Visibility `json:"visibility,omitempty"`
-	// Properties holds the value of the "properties" field.
-	Properties any `json:"properties,omitempty"`
+	// Metadata holds the value of the "metadata" field.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NodeQuery when eager-loading is set.
 	Edges        NodeEdges `json:"edges"`
@@ -141,7 +141,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldProperties:
+		case node.FieldMetadata:
 			values[i] = new([]byte)
 		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
 			values[i] = new(sql.NullString)
@@ -233,12 +233,12 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.Visibility = node.Visibility(value.String)
 			}
-		case node.FieldProperties:
+		case node.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field properties", values[i])
+				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &n.Properties); err != nil {
-					return fmt.Errorf("unmarshal field properties: %w", err)
+				if err := json.Unmarshal(*value, &n.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
 		default:
@@ -348,8 +348,8 @@ func (n *Node) String() string {
 	builder.WriteString("visibility=")
 	builder.WriteString(fmt.Sprintf("%v", n.Visibility))
 	builder.WriteString(", ")
-	builder.WriteString("properties=")
-	builder.WriteString(fmt.Sprintf("%v", n.Properties))
+	builder.WriteString("metadata=")
+	builder.WriteString(fmt.Sprintf("%v", n.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

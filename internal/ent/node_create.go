@@ -145,9 +145,9 @@ func (nc *NodeCreate) SetNillableVisibility(n *node.Visibility) *NodeCreate {
 	return nc
 }
 
-// SetProperties sets the "properties" field.
-func (nc *NodeCreate) SetProperties(a any) *NodeCreate {
-	nc.mutation.SetProperties(a)
+// SetMetadata sets the "metadata" field.
+func (nc *NodeCreate) SetMetadata(m map[string]interface{}) *NodeCreate {
+	nc.mutation.SetMetadata(m)
 	return nc
 }
 
@@ -424,9 +424,9 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
 	}
-	if value, ok := nc.mutation.Properties(); ok {
-		_spec.SetField(node.FieldProperties, field.TypeJSON, value)
-		_node.Properties = value
+	if value, ok := nc.mutation.Metadata(); ok {
+		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
 	}
 	if nodes := nc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -726,21 +726,21 @@ func (u *NodeUpsert) UpdateVisibility() *NodeUpsert {
 	return u
 }
 
-// SetProperties sets the "properties" field.
-func (u *NodeUpsert) SetProperties(v any) *NodeUpsert {
-	u.Set(node.FieldProperties, v)
+// SetMetadata sets the "metadata" field.
+func (u *NodeUpsert) SetMetadata(v map[string]interface{}) *NodeUpsert {
+	u.Set(node.FieldMetadata, v)
 	return u
 }
 
-// UpdateProperties sets the "properties" field to the value that was provided on create.
-func (u *NodeUpsert) UpdateProperties() *NodeUpsert {
-	u.SetExcluded(node.FieldProperties)
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateMetadata() *NodeUpsert {
+	u.SetExcluded(node.FieldMetadata)
 	return u
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (u *NodeUpsert) ClearProperties() *NodeUpsert {
-	u.SetNull(node.FieldProperties)
+// ClearMetadata clears the value of the "metadata" field.
+func (u *NodeUpsert) ClearMetadata() *NodeUpsert {
+	u.SetNull(node.FieldMetadata)
 	return u
 }
 
@@ -949,24 +949,24 @@ func (u *NodeUpsertOne) UpdateVisibility() *NodeUpsertOne {
 	})
 }
 
-// SetProperties sets the "properties" field.
-func (u *NodeUpsertOne) SetProperties(v any) *NodeUpsertOne {
+// SetMetadata sets the "metadata" field.
+func (u *NodeUpsertOne) SetMetadata(v map[string]interface{}) *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
-		s.SetProperties(v)
+		s.SetMetadata(v)
 	})
 }
 
-// UpdateProperties sets the "properties" field to the value that was provided on create.
-func (u *NodeUpsertOne) UpdateProperties() *NodeUpsertOne {
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateMetadata() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
-		s.UpdateProperties()
+		s.UpdateMetadata()
 	})
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (u *NodeUpsertOne) ClearProperties() *NodeUpsertOne {
+// ClearMetadata clears the value of the "metadata" field.
+func (u *NodeUpsertOne) ClearMetadata() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
-		s.ClearProperties()
+		s.ClearMetadata()
 	})
 }
 
@@ -1342,24 +1342,24 @@ func (u *NodeUpsertBulk) UpdateVisibility() *NodeUpsertBulk {
 	})
 }
 
-// SetProperties sets the "properties" field.
-func (u *NodeUpsertBulk) SetProperties(v any) *NodeUpsertBulk {
+// SetMetadata sets the "metadata" field.
+func (u *NodeUpsertBulk) SetMetadata(v map[string]interface{}) *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
-		s.SetProperties(v)
+		s.SetMetadata(v)
 	})
 }
 
-// UpdateProperties sets the "properties" field to the value that was provided on create.
-func (u *NodeUpsertBulk) UpdateProperties() *NodeUpsertBulk {
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateMetadata() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
-		s.UpdateProperties()
+		s.UpdateMetadata()
 	})
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (u *NodeUpsertBulk) ClearProperties() *NodeUpsertBulk {
+// ClearMetadata clears the value of the "metadata" field.
+func (u *NodeUpsertBulk) ClearMetadata() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
-		s.ClearProperties()
+		s.ClearMetadata()
 	})
 }
 

@@ -95,9 +95,9 @@ func WithVisibility(v post.Visibility) Option {
 	}
 }
 
-func WithProperties(v any) Option {
+func WithMetadata(v map[string]any) Option {
 	return func(c *ent.NodeMutation) {
-		c.SetProperties(v)
+		c.SetMetadata(v)
 	}
 }
 

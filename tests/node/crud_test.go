@@ -73,15 +73,15 @@ func TestNodesHappyPath(t *testing.T) {
 			slug1 = name1 + uuid.NewString()
 			cont1 := "<h1>Nodes</h1><p>Newly changed content.</p>"
 			url1 = "https://cla.ws"
-			prop1 := any(map[string]any{
+			prop1 := openapi.Metadata(map[string]any{
 				"key": "value",
 			})
 			node1update, err := cl.NodeUpdateWithResponse(ctx, node1.JSON200.Slug, openapi.NodeMutableProps{
-				Name:       &name1,
-				Slug:       &slug1,
-				Content:    &cont1,
-				Url:        &url1,
-				Properties: &prop1,
+				Name:    &name1,
+				Slug:    &slug1,
+				Content: &cont1,
+				Url:     &url1,
+				Meta:    &prop1,
 			}, e2e.WithSession(ctx, cj))
 			tests.Ok(t, err, node1update)
 
@@ -90,7 +90,7 @@ func TestNodesHappyPath(t *testing.T) {
 			a.Equal("Newly changed content.", node1update.JSON200.Description)
 			a.Equal("<body><h1>Nodes</h1><p>Newly changed content.</p></body>", *node1update.JSON200.Content)
 			a.Equal(url1, node1update.JSON200.Link.Url)
-			a.Equal(prop1, node1update.JSON200.Properties)
+			a.Equal(prop1, node1update.JSON200.Meta)
 		}))
 	}))
 }

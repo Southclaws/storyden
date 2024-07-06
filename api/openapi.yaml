@@ -2475,7 +2475,7 @@ components:
         - $ref: "#/components/schemas/AccountCommonProps"
 
     AccountCommonProps:
-      required: [handle, name, bio, admin]
+      required: [handle, name, bio, links, admin]
       properties:
         handle:
           $ref: "#/components/schemas/AccountHandle"
@@ -2485,6 +2485,8 @@ components:
           $ref: "#/components/schemas/AccountBio"
         interests:
           $ref: "#/components/schemas/TagList"
+        links:
+          $ref: "#/components/schemas/ProfileExternalLinkList"
         admin:
           type: boolean
 
@@ -2499,6 +2501,8 @@ components:
           $ref: "#/components/schemas/AccountBio"
         interests:
           $ref: "#/components/schemas/TagListIDs"
+        links:
+          $ref: "#/components/schemas/ProfileExternalLinkList"
 
     AccountAuthMethods:
       type: object
@@ -2549,7 +2553,7 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [createdAt, handle, name, bio, interests]
+        - required: [createdAt, handle, name, bio, interests, links]
           properties:
             createdAt:
               type: string
@@ -2563,6 +2567,22 @@ components:
               type: string
             interests:
               $ref: "#/components/schemas/TagList"
+            links:
+              $ref: "#/components/schemas/ProfileExternalLinkList"
+
+    ProfileExternalLinkList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ProfileExternalLink"
+
+    ProfileExternalLink:
+      type: object
+      required: [text, url]
+      properties:
+        text:
+          type: string
+        url:
+          type: string
 
     PublicProfileListResult:
       allOf:
@@ -3060,7 +3080,7 @@ components:
     NodeCommonProps:
       description: The main properties of a node.
       type: object
-      required: [name, slug, assets, description, owner, visibility, properties]
+      required: [name, slug, assets, description, owner, visibility, meta]
       properties:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
@@ -3071,7 +3091,7 @@ components:
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
         visibility: { $ref: "#/components/schemas/Visibility" }
-        properties: { $ref: "#/components/schemas/Properties" }
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     NodeTree:
       type: array
@@ -3100,7 +3120,7 @@ components:
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
         visibility: { $ref: "#/components/schemas/Visibility" }
-        properties: { $ref: "#/components/schemas/Properties" }
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     NodeMutableProps:
       description: |
@@ -3113,7 +3133,7 @@ components:
         url: { $ref: "#/components/schemas/URL" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
-        properties: { $ref: "#/components/schemas/Properties" }
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     #
     # 888      d8b          888

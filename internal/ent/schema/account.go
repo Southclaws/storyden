@@ -15,12 +15,18 @@ func (Account) Mixin() []ent.Mixin {
 	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
 }
 
+type ExternalLink struct {
+	Text string
+	URL  string
+}
+
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("handle").Unique().NotEmpty(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
 		field.Bool("admin").Default(false),
+		field.JSON("links", []ExternalLink{}).Optional(),
 	}
 }
 

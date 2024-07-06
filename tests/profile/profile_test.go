@@ -12,11 +12,13 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestPublicProfiles(t *testing.T) {
@@ -75,6 +77,91 @@ func TestPublicProfiles(t *testing.T) {
 			a.Equal(2147483647, list3.JSON200.CurrentPage)
 			a.Nil(list3.JSON200.NextPage)
 			a.Empty(list3.JSON200.Profiles)
+		}))
+	}))
+}
+
+func TestUpdateProfile(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *bindings.CookieJar,
+		ar account.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			handle1 := "user-" + xid.New().String()
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle1, "password"})
+			tests.Ok(t, err, acc1)
+			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
+
+			handle2 := "user-" + xid.New().String()
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle2, "password"})
+			tests.Ok(t, err, acc2)
+			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
+
+			t.Run("update_profile", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				// as guest
+				get1, err := cl.ProfileGetWithResponse(root, handle1)
+				tests.Ok(t, err, get1)
+				r.Equal(handle1, get1.JSON200.Handle)
+				r.Equal(handle1, get1.JSON200.Name)
+
+				// as another user
+				get2, err := cl.ProfileGetWithResponse(root, handle1, session2)
+				tests.Ok(t, err, get2)
+				r.Equal(handle1, get2.JSON200.Handle)
+				r.Equal(handle1, get2.JSON200.Name)
+
+				// update account profile
+				newbio := "new bio"
+				newhandle := "newhandle-" + xid.New().String()
+				newname := "newname"
+				newlinks := []openapi.ProfileExternalLink{
+					{Text: "link1", Url: "https://example.com"},
+				}
+
+				upd1, err := cl.AccountUpdateWithResponse(root, openapi.AccountUpdateJSONRequestBody{
+					Bio:    &newbio,
+					Handle: &newhandle,
+					Name:   &newname,
+					Links:  &newlinks,
+				}, session1)
+				tests.Ok(t, err, upd1)
+
+				a.Contains(upd1.JSON200.Bio, newbio)
+				a.Equal(newhandle, upd1.JSON200.Handle)
+				a.Equal(newname, upd1.JSON200.Name)
+				r.Len(newlinks, 1)
+				a.Equal(newlinks, upd1.JSON200.Links)
+
+				// old handle should not work
+				getold, err := cl.ProfileGetWithResponse(root, handle1)
+				tests.Status(t, err, getold, http.StatusNotFound)
+
+				// as guest
+				getAfterUpdateAsGuest, err := cl.ProfileGetWithResponse(root, newhandle)
+				tests.Ok(t, err, getAfterUpdateAsGuest)
+				a.Contains(getAfterUpdateAsGuest.JSON200.Bio, newbio)
+				a.Equal(newhandle, getAfterUpdateAsGuest.JSON200.Handle)
+				a.Equal(newname, getAfterUpdateAsGuest.JSON200.Name)
+				r.Len(newlinks, 1)
+				a.Equal(newlinks, getAfterUpdateAsGuest.JSON200.Links)
+
+				// as another user
+				getAfterUpdateAsUser2, err := cl.ProfileGetWithResponse(root, newhandle, session2)
+				tests.Ok(t, err, getAfterUpdateAsUser2)
+				a.Contains(getAfterUpdateAsUser2.JSON200.Bio, newbio)
+				a.Equal(newhandle, getAfterUpdateAsUser2.JSON200.Handle)
+				a.Equal(newname, getAfterUpdateAsUser2.JSON200.Name)
+				r.Len(newlinks, 1)
+				a.Equal(newlinks, getAfterUpdateAsUser2.JSON200.Links)
+			})
 		}))
 	}))
 }

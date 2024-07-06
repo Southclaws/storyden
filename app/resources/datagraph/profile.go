@@ -18,11 +18,12 @@ type Profile struct {
 	Created time.Time
 	Deleted opt.Optional[time.Time]
 
-	Handle    string
-	Name      string
-	Bio       content.Rich
-	Admin     bool
-	Interests []*tag.Tag
+	Handle        string
+	Name          string
+	Bio           content.Rich
+	Admin         bool
+	Interests     []*tag.Tag
+	ExternalLinks []account.ExternalLink
 }
 
 func (p *Profile) GetID() xid.ID   { return xid.ID(p.ID) }
@@ -60,13 +61,14 @@ func ProfileFromModel(a *ent.Account) (*Profile, error) {
 
 func ProfileFromAccount(a *account.Account) *Profile {
 	return &Profile{
-		ID:        a.ID,
-		Created:   a.CreatedAt,
-		Deleted:   a.DeletedAt,
-		Handle:    a.Handle,
-		Name:      a.Name,
-		Bio:       a.Bio,
-		Admin:     a.Admin,
-		Interests: nil,
+		ID:            a.ID,
+		Created:       a.CreatedAt,
+		Deleted:       a.DeletedAt,
+		Handle:        a.Handle,
+		Name:          a.Name,
+		Bio:           a.Bio,
+		Admin:         a.Admin,
+		Interests:     nil,
+		ExternalLinks: a.ExternalLinks,
 	}
 }

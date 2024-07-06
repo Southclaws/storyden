@@ -63,6 +63,6 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Parent:     parent,
 		Nodes:      nodes,
 		Visibility: visibility,
-		Properties: c.Properties,
+		Metadata:   c.Metadata,
 	}, nil
 }

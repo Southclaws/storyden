@@ -173,6 +173,8 @@ export * from "./postSearchParams";
 export * from "./postSearchResults";
 export * from "./postUpdateBody";
 export * from "./postUpdateOKResponse";
+export * from "./profileExternalLink";
+export * from "./profileExternalLinkList";
 export * from "./profileGetOKResponse";
 export * from "./profileListOKResponse";
 export * from "./profileListParams";
