@@ -19,6 +19,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "bio", Type: field.TypeString, Nullable: true},
 		{Name: "admin", Type: field.TypeBool, Default: false},
+		{Name: "links", Type: field.TypeJSON, Nullable: true},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
 	AccountsTable = &schema.Table{
@@ -159,7 +160,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "review", "published"}, Default: "draft"},
-		{Name: "properties", Type: field.TypeJSON, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "parent_node_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}

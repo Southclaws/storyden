@@ -27,11 +27,21 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Handle:    acc.Handle,
 		Name:      acc.Name,
 		Bio:       acc.Bio.HTML(),
+		Links:     serialiseExternalLinks(acc.ExternalLinks),
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
 		Admin:     acc.Admin,
 	}
+}
+
+func serialiseExternalLinks(in []account.ExternalLink) openapi.ProfileExternalLinkList {
+	return dt.Map(in, func(l account.ExternalLink) openapi.ProfileExternalLink {
+		return openapi.ProfileExternalLink{
+			Text: l.Text,
+			Url:  l.URL.String(),
+		}
+	})
 }
 
 func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {

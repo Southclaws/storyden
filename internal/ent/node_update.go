@@ -177,15 +177,15 @@ func (nu *NodeUpdate) SetNillableVisibility(n *node.Visibility) *NodeUpdate {
 	return nu
 }
 
-// SetProperties sets the "properties" field.
-func (nu *NodeUpdate) SetProperties(a any) *NodeUpdate {
-	nu.mutation.SetProperties(a)
+// SetMetadata sets the "metadata" field.
+func (nu *NodeUpdate) SetMetadata(m map[string]interface{}) *NodeUpdate {
+	nu.mutation.SetMetadata(m)
 	return nu
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (nu *NodeUpdate) ClearProperties() *NodeUpdate {
-	nu.mutation.ClearProperties()
+// ClearMetadata clears the value of the "metadata" field.
+func (nu *NodeUpdate) ClearMetadata() *NodeUpdate {
+	nu.mutation.ClearMetadata()
 	return nu
 }
 
@@ -513,11 +513,11 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := nu.mutation.Properties(); ok {
-		_spec.SetField(node.FieldProperties, field.TypeJSON, value)
+	if value, ok := nu.mutation.Metadata(); ok {
+		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
 	}
-	if nu.mutation.PropertiesCleared() {
-		_spec.ClearField(node.FieldProperties, field.TypeJSON)
+	if nu.mutation.MetadataCleared() {
+		_spec.ClearField(node.FieldMetadata, field.TypeJSON)
 	}
 	if nu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -966,15 +966,15 @@ func (nuo *NodeUpdateOne) SetNillableVisibility(n *node.Visibility) *NodeUpdateO
 	return nuo
 }
 
-// SetProperties sets the "properties" field.
-func (nuo *NodeUpdateOne) SetProperties(a any) *NodeUpdateOne {
-	nuo.mutation.SetProperties(a)
+// SetMetadata sets the "metadata" field.
+func (nuo *NodeUpdateOne) SetMetadata(m map[string]interface{}) *NodeUpdateOne {
+	nuo.mutation.SetMetadata(m)
 	return nuo
 }
 
-// ClearProperties clears the value of the "properties" field.
-func (nuo *NodeUpdateOne) ClearProperties() *NodeUpdateOne {
-	nuo.mutation.ClearProperties()
+// ClearMetadata clears the value of the "metadata" field.
+func (nuo *NodeUpdateOne) ClearMetadata() *NodeUpdateOne {
+	nuo.mutation.ClearMetadata()
 	return nuo
 }
 
@@ -1332,11 +1332,11 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	if value, ok := nuo.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := nuo.mutation.Properties(); ok {
-		_spec.SetField(node.FieldProperties, field.TypeJSON, value)
+	if value, ok := nuo.mutation.Metadata(); ok {
+		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
 	}
-	if nuo.mutation.PropertiesCleared() {
-		_spec.ClearField(node.FieldProperties, field.TypeJSON)
+	if nuo.mutation.MetadataCleared() {
+		_spec.ClearField(node.FieldMetadata, field.TypeJSON)
 	}
 	if nuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{

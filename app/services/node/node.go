@@ -41,7 +41,7 @@ type Partial struct {
 	Content      opt.Optional[content.Rich]
 	Parent       opt.Optional[datagraph.NodeSlug]
 	Visibility   opt.Optional[post.Visibility]
-	Properties   opt.Optional[any]
+	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
 }
@@ -54,7 +54,7 @@ func (p Partial) Opts() (opts []node.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, node.WithName(value)) })
 	p.Slug.Call(func(value string) { opts = append(opts, node.WithSlug(value)) })
 	p.Content.Call(func(value content.Rich) { opts = append(opts, node.WithContent(value)) })
-	p.Properties.Call(func(value any) { opts = append(opts, node.WithProperties(value)) })
+	p.Metadata.Call(func(value map[string]any) { opts = append(opts, node.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssetsRemoved(value)) })
 	return

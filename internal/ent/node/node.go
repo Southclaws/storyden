@@ -36,8 +36,8 @@ const (
 	FieldAccountID = "account_id"
 	// FieldVisibility holds the string denoting the visibility field in the database.
 	FieldVisibility = "visibility"
-	// FieldProperties holds the string denoting the properties field in the database.
-	FieldProperties = "properties"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
@@ -104,7 +104,7 @@ var Columns = []string{
 	FieldParentNodeID,
 	FieldAccountID,
 	FieldVisibility,
-	FieldProperties,
+	FieldMetadata,
 }
 
 var (

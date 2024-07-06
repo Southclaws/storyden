@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -111,6 +112,12 @@ func (ac *AccountCreate) SetNillableAdmin(b *bool) *AccountCreate {
 	if b != nil {
 		ac.SetAdmin(*b)
 	}
+	return ac
+}
+
+// SetLinks sets the "links" field.
+func (ac *AccountCreate) SetLinks(sl []schema.ExternalLink) *AccountCreate {
+	ac.mutation.SetLinks(sl)
 	return ac
 }
 
@@ -397,6 +404,10 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
 	}
+	if value, ok := ac.mutation.Links(); ok {
+		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
+		_node.Links = value
+	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -661,6 +672,24 @@ func (u *AccountUpsert) UpdateAdmin() *AccountUpsert {
 	return u
 }
 
+// SetLinks sets the "links" field.
+func (u *AccountUpsert) SetLinks(v []schema.ExternalLink) *AccountUpsert {
+	u.Set(account.FieldLinks, v)
+	return u
+}
+
+// UpdateLinks sets the "links" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateLinks() *AccountUpsert {
+	u.SetExcluded(account.FieldLinks)
+	return u
+}
+
+// ClearLinks clears the value of the "links" field.
+func (u *AccountUpsert) ClearLinks() *AccountUpsert {
+	u.SetNull(account.FieldLinks)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -807,6 +836,27 @@ func (u *AccountUpsertOne) SetAdmin(v bool) *AccountUpsertOne {
 func (u *AccountUpsertOne) UpdateAdmin() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetLinks sets the "links" field.
+func (u *AccountUpsertOne) SetLinks(v []schema.ExternalLink) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetLinks(v)
+	})
+}
+
+// UpdateLinks sets the "links" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateLinks() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateLinks()
+	})
+}
+
+// ClearLinks clears the value of the "links" field.
+func (u *AccountUpsertOne) ClearLinks() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearLinks()
 	})
 }
 
@@ -1123,6 +1173,27 @@ func (u *AccountUpsertBulk) SetAdmin(v bool) *AccountUpsertBulk {
 func (u *AccountUpsertBulk) UpdateAdmin() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetLinks sets the "links" field.
+func (u *AccountUpsertBulk) SetLinks(v []schema.ExternalLink) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetLinks(v)
+	})
+}
+
+// UpdateLinks sets the "links" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateLinks() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateLinks()
+	})
+}
+
+// ClearLinks clears the value of the "links" field.
+func (u *AccountUpsertBulk) ClearLinks() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearLinks()
 	})
 }
 

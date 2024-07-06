@@ -4,11 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
 type Option func(*Account)
@@ -75,6 +77,17 @@ func SetAdmin(status bool) Mutation {
 func SetInterests(interests []xid.ID) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.ClearTags().AddTagIDs(interests...)
+	}
+}
+
+func SetLinks(links []ExternalLink) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		u.SetLinks(dt.Map(links, func(i ExternalLink) schema.ExternalLink {
+			return schema.ExternalLink{
+				Text: i.Text,
+				URL:  i.URL.String(),
+			}
+		}))
 	}
 }
 

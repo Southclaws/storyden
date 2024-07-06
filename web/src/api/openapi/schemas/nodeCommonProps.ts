@@ -7,12 +7,12 @@
  */
 import type { AssetList } from "./assetList";
 import type { Link } from "./link";
+import type { Metadata } from "./metadata";
 import type { Node } from "./node";
 import type { NodeDescription } from "./nodeDescription";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
-import type { Properties } from "./properties";
 import type { Slug } from "./slug";
 import type { Visibility } from "./visibility";
 
@@ -24,10 +24,10 @@ export interface NodeCommonProps {
   content?: PostContent;
   description: NodeDescription;
   link?: Link;
+  meta: Metadata;
   name: NodeName;
   owner: ProfileReference;
   parent?: Node;
-  properties: Properties;
   slug: Slug;
   visibility: Visibility;
 }

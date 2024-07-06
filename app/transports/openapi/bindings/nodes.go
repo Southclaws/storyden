@@ -70,7 +70,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		node_svc.Partial{
 			Slug:       opt.NewPtr(request.Body.Slug),
 			Content:    richContent,
-			Properties: opt.NewPtr(request.Body.Properties),
+			Metadata:   opt.NewPtr((*map[string]any)(request.Body.Meta)),
 			URL:        opt.NewPtr(request.Body.Url),
 			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
@@ -185,13 +185,13 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 	}
 
 	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
-		Name:       opt.NewPtr(request.Body.Name),
-		Slug:       opt.NewPtr(request.Body.Slug),
-		AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
-		URL:        opt.NewPtr(request.Body.Url),
-		Content:    richContent,
-		Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
-		Properties: opt.NewPtr(request.Body.Properties),
+		Name:      opt.NewPtr(request.Body.Name),
+		Slug:      opt.NewPtr(request.Body.Slug),
+		AssetsAdd: opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+		URL:       opt.NewPtr(request.Body.Url),
+		Content:   richContent,
+		Parent:    opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+		Metadata:  opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -303,7 +303,7 @@ func serialiseNode(in *datagraph.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
 		Visibility: serialiseVisibility(in.Visibility),
-		Properties: in.Properties,
+		Meta:       in.Metadata,
 	}
 }
 
@@ -323,7 +323,7 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 			return serialiseNode(&in)
 		}),
 		Visibility: serialiseVisibility(in.Visibility),
-		Properties: in.Properties,
+		Meta:       in.Metadata,
 		Children:   dt.Map(in.Nodes, serialiseNodeWithItems),
 	}
 }

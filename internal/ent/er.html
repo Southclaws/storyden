@@ -15,6 +15,7 @@ erDiagram
         string name
         string bio
         bool admin
+        LBRACKRBRACKschemaDOTExternalLink links
     }
     Asset {
         xidDOTID id
@@ -75,7 +76,7 @@ erDiagram
         xidDOTID parent_node_id
         xidDOTID account_id
         nodeDOTVisibility visibility
-        any properties
+        mapLBRACKstringRBRACKinterface {} metadata
     }
     Notification {
         xidDOTID id

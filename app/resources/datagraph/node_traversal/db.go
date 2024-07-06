@@ -2,6 +2,7 @@ package node_traversal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -99,7 +100,7 @@ select
     n.parent_node_id    node_parent_node_id,
     n.account_id        node_account_id,
     n.visibility        node_visibility,
-    n.properties        node_properties,
+    n.metadata        node_metadata,
     a.id                owner_id,
     a.created_at        owner_created_at,
     a.updated_at        owner_updated_at,
@@ -131,7 +132,7 @@ type subtreeRow struct {
 	NodeParentNodeId xid.ID          `db:"node_parent_node_id"`
 	NodeAccountId    xid.ID          `db:"node_account_id"`
 	NodeVisibility   post.Visibility `db:"node_visibility"`
-	NodeProperties   any             `db:"node_properties"`
+	NodeMetadata     *[]byte         `db:"node_metadata"`
 	OwnerId          xid.ID          `db:"owner_id"`
 	OwnerCreatedAt   time.Time       `db:"owner_created_at"`
 	OwnerUpdatedAt   time.Time       `db:"owner_updated_at"`
@@ -148,6 +149,16 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	meta := opt.NewPtrMap(r.NodeMetadata, func(b []byte) map[string]any {
+		meta := map[string]any{}
+		err = json.Unmarshal(b, &meta)
+		if err != nil {
+			return nil
+		}
+
+		return meta
+	})
 
 	return &datagraph.Node{
 		ID:         datagraph.NodeID(r.NodeId),
@@ -167,7 +178,7 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 			Bio:     bio.OrZero(),
 			Admin:   r.OwnerAdmin,
 		},
-		Properties: r.NodeProperties,
+		Metadata: meta.OrZero(),
 	}, nil
 }
 

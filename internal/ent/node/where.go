@@ -681,14 +681,14 @@ func VisibilityNotIn(vs ...Visibility) predicate.Node {
 	return predicate.Node(sql.FieldNotIn(FieldVisibility, vs...))
 }
 
-// PropertiesIsNil applies the IsNil predicate on the "properties" field.
-func PropertiesIsNil() predicate.Node {
-	return predicate.Node(sql.FieldIsNull(FieldProperties))
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldMetadata))
 }
 
-// PropertiesNotNil applies the NotNil predicate on the "properties" field.
-func PropertiesNotNil() predicate.Node {
-	return predicate.Node(sql.FieldNotNull(FieldProperties))
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldMetadata))
 }
 
 // HasOwner applies the HasEdge predicate on the "owner" edge.

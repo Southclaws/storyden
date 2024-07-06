@@ -8,6 +8,7 @@
 import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { TagList } from "./tagList";
 
 export interface AccountCommonProps {
@@ -15,5 +16,6 @@ export interface AccountCommonProps {
   bio: AccountBio;
   handle: AccountHandle;
   interests?: TagList;
+  links: ProfileExternalLinkList;
   name: AccountName;
 }

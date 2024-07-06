@@ -436,6 +436,16 @@ func AdminNEQ(v bool) predicate.Account {
 	return predicate.Account(sql.FieldNEQ(FieldAdmin, v))
 }
 
+// LinksIsNil applies the IsNil predicate on the "links" field.
+func LinksIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldLinks))
+}
+
+// LinksNotNil applies the NotNil predicate on the "links" field.
+func LinksNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldLinks))
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

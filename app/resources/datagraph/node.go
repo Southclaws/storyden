@@ -40,7 +40,7 @@ type Node struct {
 	Owner      Profile
 	Parent     opt.Optional[Node]
 	Visibility post.Visibility
-	Properties any
+	Metadata   map[string]any
 
 	Nodes []*Node
 }

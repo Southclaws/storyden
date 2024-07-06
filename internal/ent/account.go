@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/rs/xid"
 )
 
@@ -32,6 +34,8 @@ type Account struct {
 	Bio string `json:"bio,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
+	// Links holds the value of the "links" field.
+	Links []schema.ExternalLink `json:"links,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
 	Edges        AccountEdges `json:"edges"`
@@ -138,6 +142,8 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case account.FieldLinks:
+			values[i] = new([]byte)
 		case account.FieldAdmin:
 			values[i] = new(sql.NullBool)
 		case account.FieldHandle, account.FieldName, account.FieldBio:
@@ -209,6 +215,14 @@ func (a *Account) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
 				a.Admin = value.Bool
+			}
+		case account.FieldLinks:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field links", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Links); err != nil {
+					return fmt.Errorf("unmarshal field links: %w", err)
+				}
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -308,6 +322,9 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", a.Admin))
+	builder.WriteString(", ")
+	builder.WriteString("links=")
+	builder.WriteString(fmt.Sprintf("%v", a.Links))
 	builder.WriteByte(')')
 	return builder.String()
 }
