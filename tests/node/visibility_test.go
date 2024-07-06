@@ -34,8 +34,8 @@ func TestNodesVisibility(t *testing.T) {
 			a := assert.New(t)
 
 			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, accAuthor := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
+			ctxAuthor, accAuthor := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
 
 			t.Run("public_only", func(t *testing.T) {
 				t.Parallel()
@@ -209,16 +209,43 @@ func TestNodesVisibility(t *testing.T) {
 				a.NotContains(ids, node4.JSON200.Id, "")
 			})
 
+			t.Run("author_submmits_unlisted", func(t *testing.T) {
+				t.Parallel()
+
+				node1 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr()}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+				node2 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr()}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+				node3 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n3", Slug: opt.New(uuid.NewString()).Ptr()}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+				node4 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n4", Slug: opt.New(uuid.NewString()).Ptr()}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+
+				update3 := testutils.AssertRequest(
+					cl.NodeUpdateVisibilityWithResponse(ctx, node3.JSON200.Slug, openapi.VisibilityMutationProps{
+						Visibility: openapi.Unlisted,
+					}, e2e.WithSession(ctxAuthor, cj)),
+				)(t, http.StatusOK)
+				a.Equal(openapi.Unlisted, update3.JSON200.Visibility)
+
+				clist := testutils.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
+					// Visibility: &[]openapi.Visibility{openapi.Unlisted},
+				}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+
+				ids := dt.Map(clist.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
+
+				a.NotContains(ids, node1.JSON200.Id)
+				a.NotContains(ids, node2.JSON200.Id)
+				a.NotContains(ids, node3.JSON200.Id, "")
+				a.NotContains(ids, node4.JSON200.Id, "")
+			})
+
 			t.Run("visibility_affects_children", func(t *testing.T) {
 				t.Parallel()
 
 				published := openapi.Published
 				draft := openapi.Draft
 
-				node1 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+				node1 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 				node2 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				node3 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n3", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published, Parent: &node1.JSON200.Slug}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				node4 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n4", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published, Parent: &node1.JSON200.Slug}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				node3 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n3", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published, Parent: &node1.JSON200.Slug}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				node4 := testutils.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n4", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published, Parent: &node1.JSON200.Slug}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
 				clist := testutils.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 type (
@@ -39,7 +39,7 @@ type Node struct {
 	Content    opt.Optional[content.Rich]
 	Owner      Profile
 	Parent     opt.Optional[Node]
-	Visibility post.Visibility
+	Visibility visibility.Visibility
 	Metadata   map[string]any
 
 	Nodes []*Node

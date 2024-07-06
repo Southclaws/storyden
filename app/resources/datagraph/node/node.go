@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
@@ -89,9 +89,9 @@ func WithParent(v datagraph.NodeID) Option {
 	}
 }
 
-func WithVisibility(v post.Visibility) Option {
+func WithVisibility(v visibility.Visibility) Option {
 	return func(c *ent.NodeMutation) {
-		c.SetVisibility(node.Visibility(v.ToEnt()))
+		c.SetVisibility(node.Visibility(v.String()))
 	}
 }
 

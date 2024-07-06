@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
 )
@@ -302,7 +303,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			t.Tags,
 			thread.WithID(t.ID),
 			thread.WithContent(first.Content),
-			thread.WithVisibility(post.VisibilityPublished),
+			thread.WithVisibility(visibility.VisibilityPublished),
 			thread.WithAssets(assetIDs),
 		)
 		if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
@@ -15,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 )
@@ -40,7 +41,7 @@ type Partial struct {
 	URL          opt.Optional[string]
 	Content      opt.Optional[content.Rich]
 	Parent       opt.Optional[datagraph.NodeSlug]
-	Visibility   opt.Optional[post.Visibility]
+	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
@@ -86,6 +87,22 @@ func (s *service) Create(ctx context.Context,
 	name string,
 	p Partial,
 ) (*datagraph.Node, error) {
+	if v, ok := p.Visibility.Get(); ok {
+		if v == visibility.VisibilityPublished {
+			acc, err := s.ar.GetByID(ctx, owner)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			if !acc.Admin {
+				return nil, fault.Wrap(errNotAuthorised,
+					fctx.With(ctx),
+					fmsg.WithDesc("non admin cannot publish nodes", "You do not have permission to publish, please submit as draft, review or unlisted."),
+				)
+			}
+		}
+	}
+
 	opts, err := s.applyOpts(ctx, p)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -207,9 +224,9 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, erro
 	}
 
 	if acc, ok := acc.Get(); ok {
-		p.Visibility.Call(func(value post.Visibility) {
+		p.Visibility.Call(func(value visibility.Visibility) {
 			// Only admins can immediately post to the public feed.
-			if value == post.VisibilityPublished && !acc.Admin {
+			if value == visibility.VisibilityPublished && !acc.Admin {
 				return
 			}
 
