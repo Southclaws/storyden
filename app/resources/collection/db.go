@@ -3,7 +3,6 @@ package collection
 import (
 	"context"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -12,8 +11,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/collection"
-	"github.com/Southclaws/storyden/internal/ent/collectionnode"
-	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 )
 
 type database struct {
@@ -110,10 +107,6 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 				fn(nil, nq)
 			}
 		}).
-		Order(
-			collection.ByCollectionNodes(sql.OrderByField(collectionnode.FieldCreatedAt)),
-			collection.ByCollectionPosts(sql.OrderByField(collectionpost.FieldCreatedAt)),
-		).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
