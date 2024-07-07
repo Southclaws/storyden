@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -24,18 +25,19 @@ import (
 // NodeQuery is the builder for querying Node entities.
 type NodeQuery struct {
 	config
-	ctx             *QueryContext
-	order           []node.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Node
-	withOwner       *AccountQuery
-	withParent      *NodeQuery
-	withNodes       *NodeQuery
-	withAssets      *AssetQuery
-	withTags        *TagQuery
-	withLinks       *LinkQuery
-	withCollections *CollectionQuery
-	modifiers       []func(*sql.Selector)
+	ctx                 *QueryContext
+	order               []node.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Node
+	withOwner           *AccountQuery
+	withParent          *NodeQuery
+	withNodes           *NodeQuery
+	withAssets          *AssetQuery
+	withTags            *TagQuery
+	withLinks           *LinkQuery
+	withCollections     *CollectionQuery
+	withCollectionNodes *CollectionNodeQuery
+	modifiers           []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -219,6 +221,28 @@ func (nq *NodeQuery) QueryCollections() *CollectionQuery {
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(collection.Table, collection.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, node.CollectionsTable, node.CollectionsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCollectionNodes chains the current query on the "collection_nodes" edge.
+func (nq *NodeQuery) QueryCollectionNodes() *CollectionNodeQuery {
+	query := (&CollectionNodeClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(collectionnode.Table, collectionnode.NodeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.CollectionNodesTable, node.CollectionNodesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -413,18 +437,19 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		return nil
 	}
 	return &NodeQuery{
-		config:          nq.config,
-		ctx:             nq.ctx.Clone(),
-		order:           append([]node.OrderOption{}, nq.order...),
-		inters:          append([]Interceptor{}, nq.inters...),
-		predicates:      append([]predicate.Node{}, nq.predicates...),
-		withOwner:       nq.withOwner.Clone(),
-		withParent:      nq.withParent.Clone(),
-		withNodes:       nq.withNodes.Clone(),
-		withAssets:      nq.withAssets.Clone(),
-		withTags:        nq.withTags.Clone(),
-		withLinks:       nq.withLinks.Clone(),
-		withCollections: nq.withCollections.Clone(),
+		config:              nq.config,
+		ctx:                 nq.ctx.Clone(),
+		order:               append([]node.OrderOption{}, nq.order...),
+		inters:              append([]Interceptor{}, nq.inters...),
+		predicates:          append([]predicate.Node{}, nq.predicates...),
+		withOwner:           nq.withOwner.Clone(),
+		withParent:          nq.withParent.Clone(),
+		withNodes:           nq.withNodes.Clone(),
+		withAssets:          nq.withAssets.Clone(),
+		withTags:            nq.withTags.Clone(),
+		withLinks:           nq.withLinks.Clone(),
+		withCollections:     nq.withCollections.Clone(),
+		withCollectionNodes: nq.withCollectionNodes.Clone(),
 		// clone intermediate query.
 		sql:  nq.sql.Clone(),
 		path: nq.path,
@@ -508,6 +533,17 @@ func (nq *NodeQuery) WithCollections(opts ...func(*CollectionQuery)) *NodeQuery 
 	return nq
 }
 
+// WithCollectionNodes tells the query-builder to eager-load the nodes that are connected to
+// the "collection_nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *NodeQuery {
+	query := (&CollectionNodeClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withCollectionNodes = query
+	return nq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -586,7 +622,7 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	var (
 		nodes       = []*Node{}
 		_spec       = nq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [8]bool{
 			nq.withOwner != nil,
 			nq.withParent != nil,
 			nq.withNodes != nil,
@@ -594,6 +630,7 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			nq.withTags != nil,
 			nq.withLinks != nil,
 			nq.withCollections != nil,
+			nq.withCollectionNodes != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -661,6 +698,13 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 		if err := nq.loadCollections(ctx, query, nodes,
 			func(n *Node) { n.Edges.Collections = []*Collection{} },
 			func(n *Node, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := nq.withCollectionNodes; query != nil {
+		if err := nq.loadCollectionNodes(ctx, query, nodes,
+			func(n *Node) { n.Edges.CollectionNodes = []*CollectionNode{} },
+			func(n *Node, e *CollectionNode) { n.Edges.CollectionNodes = append(n.Edges.CollectionNodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -996,6 +1040,36 @@ func (nq *NodeQuery) loadCollections(ctx context.Context, query *CollectionQuery
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (nq *NodeQuery) loadCollectionNodes(ctx context.Context, query *CollectionNodeQuery, nodes []*Node, init func(*Node), assign func(*Node, *CollectionNode)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(collectionnode.FieldNodeID)
+	}
+	query.Where(predicate.CollectionNode(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.CollectionNodesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.NodeID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "node_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
 	}
 	return nil
 }

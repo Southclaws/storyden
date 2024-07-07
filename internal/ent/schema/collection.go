@@ -28,7 +28,9 @@ func (Collection) Edges() []ent.Edge {
 			Ref("collections").
 			Unique(),
 
-		edge.To("posts", Post.Type),
-		edge.To("nodes", Node.Type),
+		edge.To("posts", Post.Type).
+			Through("collection_posts", CollectionPost.Type),
+		edge.To("nodes", Node.Type).
+			Through("collection_nodes", CollectionNode.Type),
 	}
 }

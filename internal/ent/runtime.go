@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -249,6 +251,112 @@ func init() {
 			return nil
 		}
 	}()
+	collectionnodeMixin := schema.CollectionNode{}.Mixin()
+	collectionnodeMixinFields0 := collectionnodeMixin[0].Fields()
+	_ = collectionnodeMixinFields0
+	collectionnodeFields := schema.CollectionNode{}.Fields()
+	_ = collectionnodeFields
+	// collectionnodeDescCreatedAt is the schema descriptor for created_at field.
+	collectionnodeDescCreatedAt := collectionnodeMixinFields0[0].Descriptor()
+	// collectionnode.DefaultCreatedAt holds the default value on creation for the created_at field.
+	collectionnode.DefaultCreatedAt = collectionnodeDescCreatedAt.Default.(func() time.Time)
+	// collectionnodeDescCollectionID is the schema descriptor for collection_id field.
+	collectionnodeDescCollectionID := collectionnodeFields[0].Descriptor()
+	// collectionnode.DefaultCollectionID holds the default value on creation for the collection_id field.
+	collectionnode.DefaultCollectionID = collectionnodeDescCollectionID.Default.(func() xid.ID)
+	// collectionnode.CollectionIDValidator is a validator for the "collection_id" field. It is called by the builders before save.
+	collectionnode.CollectionIDValidator = func() func(string) error {
+		validators := collectionnodeDescCollectionID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(collection string) error {
+			for _, fn := range fns {
+				if err := fn(collection); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// collectionnodeDescNodeID is the schema descriptor for node_id field.
+	collectionnodeDescNodeID := collectionnodeFields[1].Descriptor()
+	// collectionnode.DefaultNodeID holds the default value on creation for the node_id field.
+	collectionnode.DefaultNodeID = collectionnodeDescNodeID.Default.(func() xid.ID)
+	// collectionnode.NodeIDValidator is a validator for the "node_id" field. It is called by the builders before save.
+	collectionnode.NodeIDValidator = func() func(string) error {
+		validators := collectionnodeDescNodeID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(node string) error {
+			for _, fn := range fns {
+				if err := fn(node); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// collectionnodeDescMembershipType is the schema descriptor for membership_type field.
+	collectionnodeDescMembershipType := collectionnodeFields[2].Descriptor()
+	// collectionnode.DefaultMembershipType holds the default value on creation for the membership_type field.
+	collectionnode.DefaultMembershipType = collectionnodeDescMembershipType.Default.(string)
+	collectionpostMixin := schema.CollectionPost{}.Mixin()
+	collectionpostMixinFields0 := collectionpostMixin[0].Fields()
+	_ = collectionpostMixinFields0
+	collectionpostFields := schema.CollectionPost{}.Fields()
+	_ = collectionpostFields
+	// collectionpostDescCreatedAt is the schema descriptor for created_at field.
+	collectionpostDescCreatedAt := collectionpostMixinFields0[0].Descriptor()
+	// collectionpost.DefaultCreatedAt holds the default value on creation for the created_at field.
+	collectionpost.DefaultCreatedAt = collectionpostDescCreatedAt.Default.(func() time.Time)
+	// collectionpostDescCollectionID is the schema descriptor for collection_id field.
+	collectionpostDescCollectionID := collectionpostFields[0].Descriptor()
+	// collectionpost.DefaultCollectionID holds the default value on creation for the collection_id field.
+	collectionpost.DefaultCollectionID = collectionpostDescCollectionID.Default.(func() xid.ID)
+	// collectionpost.CollectionIDValidator is a validator for the "collection_id" field. It is called by the builders before save.
+	collectionpost.CollectionIDValidator = func() func(string) error {
+		validators := collectionpostDescCollectionID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(collection string) error {
+			for _, fn := range fns {
+				if err := fn(collection); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// collectionpostDescPostID is the schema descriptor for post_id field.
+	collectionpostDescPostID := collectionpostFields[1].Descriptor()
+	// collectionpost.DefaultPostID holds the default value on creation for the post_id field.
+	collectionpost.DefaultPostID = collectionpostDescPostID.Default.(func() xid.ID)
+	// collectionpost.PostIDValidator is a validator for the "post_id" field. It is called by the builders before save.
+	collectionpost.PostIDValidator = func() func(string) error {
+		validators := collectionpostDescPostID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(post string) error {
+			for _, fn := range fns {
+				if err := fn(post); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// collectionpostDescMembershipType is the schema descriptor for membership_type field.
+	collectionpostDescMembershipType := collectionpostFields[2].Descriptor()
+	// collectionpost.DefaultMembershipType holds the default value on creation for the membership_type field.
+	collectionpost.DefaultMembershipType = collectionpostDescMembershipType.Default.(string)
 	linkMixin := schema.Link{}.Mixin()
 	linkMixinFields0 := linkMixin[0].Fields()
 	_ = linkMixinFields0

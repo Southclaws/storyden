@@ -6,6 +6,7 @@ const (
 	ActionCreate Action = "create"
 	ActionRead   Action = "read"
 	ActionUpdate Action = "update"
+	ActionSubmit Action = "submit"
 	ActionDelete Action = "delete"
 )
 

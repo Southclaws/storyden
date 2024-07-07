@@ -13,21 +13,25 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	collection_svc "github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/collection/collection_read"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Collections struct {
-	collection_repo collection.Repository
-	collection_svc  collection_svc.Service
+	collection_repo    collection.Repository
+	collection_svc     collection_svc.Service
+	collection_querier collection_read.CollectionQuerier
 }
 
 func NewCollections(
 	collection_repo collection.Repository,
 	collection_svc collection_svc.Service,
+	collection_querier collection_read.CollectionQuerier,
 ) Collections {
 	return Collections{
-		collection_repo: collection_repo,
-		collection_svc:  collection_svc,
+		collection_repo:    collection_repo,
+		collection_svc:     collection_svc,
+		collection_querier: collection_querier,
 	}
 }
 
@@ -43,7 +47,7 @@ func (i *Collections) CollectionCreate(ctx context.Context, request openapi.Coll
 	}
 
 	return openapi.CollectionCreate200JSONResponse{
-		CollectionCreateOKJSONResponse: openapi.CollectionCreateOKJSONResponse(serialiseCollection(coll)),
+		CollectionCreateOKJSONResponse: openapi.CollectionCreateOKJSONResponse(serialiseCollection(&coll.Collection)),
 	}, nil
 }
 
@@ -63,7 +67,7 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 }
 
 func (i *Collections) CollectionGet(ctx context.Context, request openapi.CollectionGetRequestObject) (openapi.CollectionGetResponseObject, error) {
-	coll, err := i.collection_repo.Get(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	coll, err := i.collection_querier.GetCollection(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -85,7 +89,7 @@ func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.Coll
 	}
 
 	return openapi.CollectionUpdate200JSONResponse{
-		CollectionUpdateOKJSONResponse: openapi.CollectionUpdateOKJSONResponse(serialiseCollection(c)),
+		CollectionUpdateOKJSONResponse: openapi.CollectionUpdateOKJSONResponse(serialiseCollection(&c.Collection)),
 	}, nil
 }
 
@@ -107,7 +111,7 @@ func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.Col
 	}
 
 	return openapi.CollectionAddPost200JSONResponse{
-		CollectionAddPostOKJSONResponse: openapi.CollectionAddPostOKJSONResponse(serialiseCollection(c)),
+		CollectionAddPostOKJSONResponse: openapi.CollectionAddPostOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -120,7 +124,7 @@ func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.
 	}
 
 	return openapi.CollectionRemovePost200JSONResponse{
-		CollectionRemovePostOKJSONResponse: openapi.CollectionRemovePostOKJSONResponse(serialiseCollection(c)),
+		CollectionRemovePostOKJSONResponse: openapi.CollectionRemovePostOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -133,7 +137,7 @@ func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.Col
 	}
 
 	return openapi.CollectionAddNode200JSONResponse{
-		CollectionAddNodeOKJSONResponse: openapi.CollectionAddNodeOKJSONResponse(serialiseCollection(c)),
+		CollectionAddNodeOKJSONResponse: openapi.CollectionAddNodeOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -146,7 +150,7 @@ func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.
 	}
 
 	return openapi.CollectionRemoveNode200JSONResponse{
-		CollectionRemoveNodeOKJSONResponse: openapi.CollectionRemoveNodeOKJSONResponse(serialiseCollection(c)),
+		CollectionRemoveNodeOKJSONResponse: openapi.CollectionRemoveNodeOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -161,7 +165,7 @@ func serialiseCollection(in *collection.Collection) openapi.Collection {
 	}
 }
 
-func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionWithItems {
+func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.CollectionWithItems {
 	return openapi.CollectionWithItems{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,
@@ -175,12 +179,13 @@ func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionW
 
 func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionItem {
 	return openapi.CollectionItem{
-		Id:          in.Item.GetID().String(),
-		Kind:        openapi.DatagraphNodeKind(in.Item.GetKind().String()),
-		Name:        in.Item.GetName(),
-		Slug:        in.Item.GetSlug(),
-		Description: opt.New(in.Item.GetDesc()).Ptr(),
-
-		Owner: serialiseProfileReference(in.Author),
+		Id:             in.Item.GetID().String(),
+		AddedAt:        in.Added,
+		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
+		Owner:          serialiseProfileReference(in.Author),
+		Kind:           openapi.DatagraphNodeKind(in.Item.GetKind().String()),
+		Name:           in.Item.GetName(),
+		Slug:           in.Item.GetSlug(),
+		Description:    opt.New(in.Item.GetDesc()).Ptr(),
 	}
 }

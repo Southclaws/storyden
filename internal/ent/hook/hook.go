@@ -69,6 +69,30 @@ func (f CollectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionMutation", m)
 }
 
+// The CollectionNodeFunc type is an adapter to allow the use of ordinary
+// function as CollectionNode mutator.
+type CollectionNodeFunc func(context.Context, *ent.CollectionNodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CollectionNodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CollectionNodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionNodeMutation", m)
+}
+
+// The CollectionPostFunc type is an adapter to allow the use of ordinary
+// function as CollectionPost mutator.
+type CollectionPostFunc func(context.Context, *ent.CollectionPostMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CollectionPostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CollectionPostMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionPostMutation", m)
+}
+
 // The LinkFunc type is an adapter to allow the use of ordinary
 // function as Link mutator.
 type LinkFunc func(context.Context, *ent.LinkMutation) (ent.Value, error)
