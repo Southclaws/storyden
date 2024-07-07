@@ -114,8 +114,8 @@ func TestCollectionSubmissions(t *testing.T) {
 				tests.Ok(t, err, gets1)
 				r.Len(gets1.JSON200.Items, 4)
 
-				a.Equal(openapi.Submission, gets1.JSON200.Items[0].MembershipType)
-				a.Equal(openapi.Submission, gets1.JSON200.Items[1].MembershipType)
+				a.Equal(openapi.SubmissionReview, gets1.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.SubmissionReview, gets1.JSON200.Items[1].MembershipType)
 
 				// acc2 can see the node in the collection
 				gets2, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session2)
@@ -127,8 +127,8 @@ func TestCollectionSubmissions(t *testing.T) {
 				// from the list, however posts are not yet properly filtered
 				// and are always treated as published so the post is present.
 
-				a.Equal(openapi.Submission, gets1.JSON200.Items[0].MembershipType)
-				a.Equal(openapi.Submission, gets1.JSON200.Items[1].MembershipType)
+				a.Equal(openapi.SubmissionReview, gets1.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.SubmissionReview, gets1.JSON200.Items[1].MembershipType)
 			})
 
 			t.Run("submit_unlisted_node_to_someone_elses_collection", func(t *testing.T) {
@@ -150,12 +150,12 @@ func TestCollectionSubmissions(t *testing.T) {
 				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)
 				tests.Ok(t, err, submitnode)
 
-				// guest cannot see
+				// guest can see unlisted items
 				getGuest, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
 				tests.Ok(t, err, getGuest)
 				a.Len(getGuest.JSON200.Items, 0)
 
-				// unrelated user cannot see
+				// unrelated can see unlisted items
 				getUnrelated, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session3)
 				tests.Ok(t, err, getUnrelated)
 				r.Len(getUnrelated.JSON200.Items, 0)
@@ -164,13 +164,46 @@ func TestCollectionSubmissions(t *testing.T) {
 				getOwner, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, getOwner)
 				r.Len(getOwner.JSON200.Items, 1)
-				a.Equal(openapi.Submission, getOwner.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.SubmissionReview, getOwner.JSON200.Items[0].MembershipType)
 
 				// acc2 can see the node in the collection
 				getSubmitter, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
 				tests.Ok(t, err, getSubmitter)
 				r.Len(getSubmitter.JSON200.Items, 1)
-				a.Equal(openapi.Submission, getSubmitter.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.SubmissionReview, getSubmitter.JSON200.Items[0].MembershipType)
+			})
+
+			t.Run("accept_submission", func(t *testing.T) {
+				t.Parallel()
+				r := require.New(t)
+				a := assert.New(t)
+
+				unlisted := openapi.Unlisted
+
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "c2",
+					Description: "owned by acc1",
+				}, session1)
+				tests.Ok(t, err, col)
+
+				unlistedNode, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
+				tests.Ok(t, err, unlistedNode)
+
+				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)
+				tests.Ok(t, err, submitnode)
+
+				getOwner, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
+				tests.Ok(t, err, getOwner)
+				r.Len(getOwner.JSON200.Items, 1)
+				a.Equal(openapi.SubmissionReview, getOwner.JSON200.Items[0].MembershipType)
+
+				acceptNode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session1)
+				tests.Ok(t, err, acceptNode)
+
+				getOwner2, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
+				tests.Ok(t, err, getOwner2)
+				r.Len(getOwner2.JSON200.Items, 1)
+				a.Equal(openapi.SubmissionAccepted, getOwner2.JSON200.Items[0].MembershipType)
 			})
 		}))
 	}))

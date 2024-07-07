@@ -5,6 +5,7 @@ package collection
 type membershipTypeEnum string
 
 const (
-	membershipTypeNormal     membershipTypeEnum = "normal"
-	membershipTypeSubmission membershipTypeEnum = "submission"
+	membershipTypeNormal             membershipTypeEnum = "normal"
+	membershipTypeSubmissionReview   membershipTypeEnum = "submission_review"
+	membershipTypeSubmissionAccepted membershipTypeEnum = "submission_accepted"
 )

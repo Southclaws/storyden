@@ -21,7 +21,7 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Create(ctx context.Context, owner account.AccountID, name string, desc string, opts ...Option) (*Collection, error) {
+func (d *database) Create(ctx context.Context, owner account.AccountID, name string, desc string, opts ...Option) (*CollectionWithItems, error) {
 	create := d.db.Collection.Create()
 	mutate := create.Mutation()
 
@@ -65,7 +65,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	all, err := dt.MapErr(cols, FromModel)
+	all, err := dt.MapErr(cols, MapCollection)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -73,7 +73,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 	return all, nil
 }
 
-func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*Collection, error) {
+func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*CollectionWithItems, error) {
 	filters = append(filters, func(pcq *ent.CollectionPostQuery, ncq *ent.CollectionNodeQuery) {
 		if pcq != nil {
 			pcq.WithPost(func(pq *ent.PostQuery) {
@@ -112,10 +112,10 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return FromModel(col)
+	return MapCollectionWithItems(col)
 }
 
-func (d *database) Update(ctx context.Context, id CollectionID, opts ...Option) (*Collection, error) {
+func (d *database) Update(ctx context.Context, id CollectionID, opts ...Option) (*CollectionWithItems, error) {
 	create := d.db.Collection.UpdateOneID(xid.ID(id))
 	mutate := create.Mutation()
 

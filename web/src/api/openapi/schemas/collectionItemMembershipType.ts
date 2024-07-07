@@ -12,5 +12,6 @@ export type CollectionItemMembershipType =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CollectionItemMembershipType = {
   normal: "normal",
-  submission: "submission",
+  submission_review: "submission_review",
+  submission_accepted: "submission_accepted",
 } as const;

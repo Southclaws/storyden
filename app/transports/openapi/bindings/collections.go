@@ -47,7 +47,7 @@ func (i *Collections) CollectionCreate(ctx context.Context, request openapi.Coll
 	}
 
 	return openapi.CollectionCreate200JSONResponse{
-		CollectionCreateOKJSONResponse: openapi.CollectionCreateOKJSONResponse(serialiseCollection(coll)),
+		CollectionCreateOKJSONResponse: openapi.CollectionCreateOKJSONResponse(serialiseCollection(&coll.Collection)),
 	}, nil
 }
 
@@ -89,7 +89,7 @@ func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.Coll
 	}
 
 	return openapi.CollectionUpdate200JSONResponse{
-		CollectionUpdateOKJSONResponse: openapi.CollectionUpdateOKJSONResponse(serialiseCollection(c)),
+		CollectionUpdateOKJSONResponse: openapi.CollectionUpdateOKJSONResponse(serialiseCollection(&c.Collection)),
 	}, nil
 }
 
@@ -111,7 +111,7 @@ func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.Col
 	}
 
 	return openapi.CollectionAddPost200JSONResponse{
-		CollectionAddPostOKJSONResponse: openapi.CollectionAddPostOKJSONResponse(serialiseCollection(c)),
+		CollectionAddPostOKJSONResponse: openapi.CollectionAddPostOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -124,7 +124,7 @@ func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.
 	}
 
 	return openapi.CollectionRemovePost200JSONResponse{
-		CollectionRemovePostOKJSONResponse: openapi.CollectionRemovePostOKJSONResponse(serialiseCollection(c)),
+		CollectionRemovePostOKJSONResponse: openapi.CollectionRemovePostOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -137,7 +137,7 @@ func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.Col
 	}
 
 	return openapi.CollectionAddNode200JSONResponse{
-		CollectionAddNodeOKJSONResponse: openapi.CollectionAddNodeOKJSONResponse(serialiseCollection(c)),
+		CollectionAddNodeOKJSONResponse: openapi.CollectionAddNodeOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -150,7 +150,7 @@ func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.
 	}
 
 	return openapi.CollectionRemoveNode200JSONResponse{
-		CollectionRemoveNodeOKJSONResponse: openapi.CollectionRemoveNodeOKJSONResponse(serialiseCollection(c)),
+		CollectionRemoveNodeOKJSONResponse: openapi.CollectionRemoveNodeOKJSONResponse(serialiseCollectionWithItems(c)),
 	}, nil
 }
 
@@ -165,7 +165,7 @@ func serialiseCollection(in *collection.Collection) openapi.Collection {
 	}
 }
 
-func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionWithItems {
+func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.CollectionWithItems {
 	return openapi.CollectionWithItems{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,

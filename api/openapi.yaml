@@ -1748,28 +1748,28 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Collection"
+            $ref: "#/components/schemas/CollectionWithItems"
 
     CollectionRemovePostOK:
       description: Collection content added.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Collection"
+            $ref: "#/components/schemas/CollectionWithItems"
 
     CollectionAddNodeOK:
       description: Collection content added.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Collection"
+            $ref: "#/components/schemas/CollectionWithItems"
 
     CollectionRemoveNodeOK:
       description: Collection content added.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Collection"
+            $ref: "#/components/schemas/CollectionWithItems"
 
     NodeCreateOK:
       description: Node created.
@@ -3022,7 +3022,7 @@ components:
 
     CollectionItemMembershipType:
       type: string
-      enum: [normal, submission]
+      enum: [normal, submission_review, submission_accepted]
 
     #
     # 888b    888               888

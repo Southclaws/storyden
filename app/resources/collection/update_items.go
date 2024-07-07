@@ -5,85 +5,140 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 )
 
-type itemOptions struct {
-	cid      xid.ID
-	posts    []*ent.CollectionPostCreate
-	nodes    []*ent.CollectionNodeCreate
-	removals *ent.CollectionMutation
+type itemChange struct {
+	id     xid.ID
+	mt     MembershipType
+	t      datagraph.Kind
+	remove bool
 }
 
-func WithPostAdd(id post.ID, mt MembershipType) ItemOption {
-	return func(tx *ent.Tx, c *itemOptions) {
-		c.posts = append(c.posts, tx.CollectionPost.Create().
-			SetCollectionID(c.cid).
-			SetPostID(xid.ID(id)).
-			SetMembershipType(mt.String()),
-		)
+type itemChanges []itemChange
+
+func WithPost(id post.ID, mt MembershipType) ItemOption {
+	return func(c *itemChanges) {
+		*c = append(*c, itemChange{
+			id: xid.ID(id),
+			mt: mt,
+			t:  datagraph.KindPost,
+		})
 	}
 }
 
 func WithPostRemove(id post.ID) ItemOption {
-	return func(tx *ent.Tx, c *itemOptions) {
-		c.removals.RemovePostIDs(xid.ID(id))
+	return func(c *itemChanges) {
+		*c = append(*c, itemChange{
+			id:     xid.ID(id),
+			t:      datagraph.KindPost,
+			remove: true,
+		})
 	}
 }
 
-func WithNodeAdd(id datagraph.NodeID, mt MembershipType) ItemOption {
-	return func(tx *ent.Tx, c *itemOptions) {
-		c.nodes = append(c.nodes, tx.CollectionNode.Create().
-			SetCollectionID(c.cid).
-			SetNodeID(xid.ID(id)).
-			SetMembershipType(mt.String()),
-		)
+func WithNode(id datagraph.NodeID, mt MembershipType) ItemOption {
+	return func(c *itemChanges) {
+		*c = append(*c, itemChange{
+			id: xid.ID(id),
+			mt: mt,
+			t:  datagraph.KindNode,
+		})
 	}
 }
 
 func WithNodeRemove(id datagraph.NodeID) ItemOption {
-	return func(tx *ent.Tx, c *itemOptions) {
-		c.removals.RemoveNodeIDs(xid.ID(id))
+	return func(c *itemChanges) {
+		*c = append(*c, itemChange{
+			id:     xid.ID(id),
+			t:      datagraph.KindNode,
+			remove: true,
+		})
 	}
 }
 
-func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*Collection, error) {
+func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*CollectionWithItems, error) {
 	err := ent.WithTx(ctx, d.db, func(tx *ent.Tx) error {
-		removals := tx.Collection.UpdateOneID(xid.ID(id))
-
-		options := itemOptions{
-			cid:      xid.ID(id),
-			posts:    []*ent.CollectionPostCreate{},
-			nodes:    []*ent.CollectionNodeCreate{},
-			removals: removals.Mutation(),
-		}
+		options := itemChanges{}
 
 		for _, fn := range opts {
-			fn(tx, &options)
+			fn(&options)
 		}
 
-		if len(removals.Mutation().RemovedEdges()) > 0 {
-			err := removals.Exec(ctx)
-			if err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
+		cid := xid.ID(id)
+
+		for _, op := range options {
+			var err error
+
+			switch op.t {
+			case datagraph.KindPost:
+				predicate := collectionpost.And(
+					collectionpost.CollectionID(cid),
+					collectionpost.PostID(op.id),
+				)
+
+				if op.remove {
+					_, err = tx.CollectionPost.Delete().Where(predicate).Exec(ctx)
+				} else {
+					exists, exerr := tx.CollectionPost.Query().Where(predicate).Exist(ctx)
+					if exerr != nil {
+						return exerr
+					}
+
+					if exists {
+						err = tx.CollectionPost.Update().
+							SetMembershipType(op.mt.String()).
+							Exec(ctx)
+					} else {
+						err = tx.CollectionPost.Create().
+							SetCollectionID(cid).
+							SetPostID(op.id).
+							SetMembershipType(op.mt.String()).
+							Exec(ctx)
+					}
+				}
+
+			case datagraph.KindNode:
+				predicate := collectionnode.And(
+					collectionnode.CollectionID(cid),
+					collectionnode.NodeID(op.id),
+				)
+
+				if op.remove {
+					_, err = tx.CollectionNode.Delete().Where(
+						collectionnode.CollectionID(xid.ID(id)),
+						collectionnode.NodeID(op.id),
+					).Exec(ctx)
+				} else {
+					exists, exerr := tx.CollectionNode.Query().Where(predicate).Exist(ctx)
+					if exerr != nil {
+						return exerr
+					}
+
+					if exists {
+						err = tx.CollectionNode.Update().
+							SetMembershipType(op.mt.String()).
+							Exec(ctx)
+					} else {
+						err = tx.CollectionNode.Create().
+							SetCollectionID(cid).
+							SetNodeID(op.id).
+							SetMembershipType(op.mt.String()).
+							Exec(ctx)
+					}
+
+				}
 			}
-		}
-
-		for _, p := range options.posts {
-			err := p.OnConflict().Ignore().DoNothing().Exec(ctx)
 			if err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
-			}
-		}
-
-		for _, n := range options.nodes {
-			err := n.OnConflict().Ignore().DoNothing().Exec(ctx)
-			if err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
+				return err
 			}
 		}
 
@@ -94,4 +149,50 @@ func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...Ite
 	}
 
 	return d.Get(ctx, id)
+}
+
+func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID) (*CollectionItemStatus, error) {
+	r, err := d.db.Collection.Query().
+		Where(collection.ID(xid.ID(id))).
+		WithOwner().
+		WithCollectionPosts(func(cnq *ent.CollectionPostQuery) {
+			cnq.Where(collectionpost.PostID(itemID)).
+				WithPost(func(pq *ent.PostQuery) {
+					pq.WithAuthor()
+				})
+		}).
+		WithCollectionNodes(func(cnq *ent.CollectionNodeQuery) {
+			cnq.Where(collectionnode.NodeID(itemID)).
+				WithNode(func(nq *ent.NodeQuery) {
+					nq.WithOwner()
+				})
+		}).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	item, err := func() (_ opt.Optional[CollectionItem], err error) {
+		var i *CollectionItem
+		if len(r.Edges.CollectionNodes) > 0 {
+			i, err = MapCollectionNode(r.Edges.CollectionNodes[0])
+		}
+		if len(r.Edges.CollectionPosts) > 0 {
+			i, err = MapCollectionPost(r.Edges.CollectionPosts[0])
+		}
+		return opt.NewPtr(i), err
+	}()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	collection, err := MapCollection(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CollectionItemStatus{
+		Collection: *collection,
+		Item:       item,
+	}, nil
 }
