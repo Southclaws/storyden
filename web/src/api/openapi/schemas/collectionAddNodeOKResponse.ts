@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { Collection } from "./collection";
+import type { CollectionWithItems } from "./collectionWithItems";
 
 /**
  * Collection content added.
  */
-export type CollectionAddNodeOKResponse = Collection;
+export type CollectionAddNodeOKResponse = CollectionWithItems;

@@ -16,6 +16,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -43,6 +45,8 @@ const (
 	TypeAuthentication = "Authentication"
 	TypeCategory       = "Category"
 	TypeCollection     = "Collection"
+	TypeCollectionNode = "CollectionNode"
+	TypeCollectionPost = "CollectionPost"
 	TypeLink           = "Link"
 	TypeNode           = "Node"
 	TypeNotification   = "Notification"
@@ -4862,6 +4866,904 @@ func (m *CollectionMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Collection edge %s", name)
+}
+
+// CollectionNodeMutation represents an operation that mutates the CollectionNode nodes in the graph.
+type CollectionNodeMutation struct {
+	config
+	op                Op
+	typ               string
+	created_at        *time.Time
+	membership_type   *string
+	clearedFields     map[string]struct{}
+	collection        *xid.ID
+	clearedcollection bool
+	node              *xid.ID
+	clearednode       bool
+	done              bool
+	oldValue          func(context.Context) (*CollectionNode, error)
+	predicates        []predicate.CollectionNode
+}
+
+var _ ent.Mutation = (*CollectionNodeMutation)(nil)
+
+// collectionnodeOption allows management of the mutation configuration using functional options.
+type collectionnodeOption func(*CollectionNodeMutation)
+
+// newCollectionNodeMutation creates new mutation for the CollectionNode entity.
+func newCollectionNodeMutation(c config, op Op, opts ...collectionnodeOption) *CollectionNodeMutation {
+	m := &CollectionNodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCollectionNode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CollectionNodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CollectionNodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CollectionNodeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CollectionNodeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CollectionNodeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCollectionID sets the "collection_id" field.
+func (m *CollectionNodeMutation) SetCollectionID(x xid.ID) {
+	m.collection = &x
+}
+
+// CollectionID returns the value of the "collection_id" field in the mutation.
+func (m *CollectionNodeMutation) CollectionID() (r xid.ID, exists bool) {
+	v := m.collection
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCollectionID resets all changes to the "collection_id" field.
+func (m *CollectionNodeMutation) ResetCollectionID() {
+	m.collection = nil
+}
+
+// SetNodeID sets the "node_id" field.
+func (m *CollectionNodeMutation) SetNodeID(x xid.ID) {
+	m.node = &x
+}
+
+// NodeID returns the value of the "node_id" field in the mutation.
+func (m *CollectionNodeMutation) NodeID() (r xid.ID, exists bool) {
+	v := m.node
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNodeID resets all changes to the "node_id" field.
+func (m *CollectionNodeMutation) ResetNodeID() {
+	m.node = nil
+}
+
+// SetMembershipType sets the "membership_type" field.
+func (m *CollectionNodeMutation) SetMembershipType(s string) {
+	m.membership_type = &s
+}
+
+// MembershipType returns the value of the "membership_type" field in the mutation.
+func (m *CollectionNodeMutation) MembershipType() (r string, exists bool) {
+	v := m.membership_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMembershipType resets all changes to the "membership_type" field.
+func (m *CollectionNodeMutation) ResetMembershipType() {
+	m.membership_type = nil
+}
+
+// ClearCollection clears the "collection" edge to the Collection entity.
+func (m *CollectionNodeMutation) ClearCollection() {
+	m.clearedcollection = true
+	m.clearedFields[collectionnode.FieldCollectionID] = struct{}{}
+}
+
+// CollectionCleared reports if the "collection" edge to the Collection entity was cleared.
+func (m *CollectionNodeMutation) CollectionCleared() bool {
+	return m.clearedcollection
+}
+
+// CollectionIDs returns the "collection" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CollectionID instead. It exists only for internal usage by the builders.
+func (m *CollectionNodeMutation) CollectionIDs() (ids []xid.ID) {
+	if id := m.collection; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCollection resets all changes to the "collection" edge.
+func (m *CollectionNodeMutation) ResetCollection() {
+	m.collection = nil
+	m.clearedcollection = false
+}
+
+// ClearNode clears the "node" edge to the Node entity.
+func (m *CollectionNodeMutation) ClearNode() {
+	m.clearednode = true
+	m.clearedFields[collectionnode.FieldNodeID] = struct{}{}
+}
+
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *CollectionNodeMutation) NodeCleared() bool {
+	return m.clearednode
+}
+
+// NodeIDs returns the "node" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *CollectionNodeMutation) NodeIDs() (ids []xid.ID) {
+	if id := m.node; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetNode resets all changes to the "node" edge.
+func (m *CollectionNodeMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
+}
+
+// Where appends a list predicates to the CollectionNodeMutation builder.
+func (m *CollectionNodeMutation) Where(ps ...predicate.CollectionNode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CollectionNodeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CollectionNodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.CollectionNode, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CollectionNodeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CollectionNodeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (CollectionNode).
+func (m *CollectionNodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CollectionNodeMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, collectionnode.FieldCreatedAt)
+	}
+	if m.collection != nil {
+		fields = append(fields, collectionnode.FieldCollectionID)
+	}
+	if m.node != nil {
+		fields = append(fields, collectionnode.FieldNodeID)
+	}
+	if m.membership_type != nil {
+		fields = append(fields, collectionnode.FieldMembershipType)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CollectionNodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case collectionnode.FieldCreatedAt:
+		return m.CreatedAt()
+	case collectionnode.FieldCollectionID:
+		return m.CollectionID()
+	case collectionnode.FieldNodeID:
+		return m.NodeID()
+	case collectionnode.FieldMembershipType:
+		return m.MembershipType()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CollectionNodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema CollectionNode does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionNodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case collectionnode.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case collectionnode.FieldCollectionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCollectionID(v)
+		return nil
+	case collectionnode.FieldNodeID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeID(v)
+		return nil
+	case collectionnode.FieldMembershipType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMembershipType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionNode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CollectionNodeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CollectionNodeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionNodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CollectionNode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CollectionNodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CollectionNodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CollectionNodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CollectionNode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CollectionNodeMutation) ResetField(name string) error {
+	switch name {
+	case collectionnode.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case collectionnode.FieldCollectionID:
+		m.ResetCollectionID()
+		return nil
+	case collectionnode.FieldNodeID:
+		m.ResetNodeID()
+		return nil
+	case collectionnode.FieldMembershipType:
+		m.ResetMembershipType()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionNode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CollectionNodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.collection != nil {
+		edges = append(edges, collectionnode.EdgeCollection)
+	}
+	if m.node != nil {
+		edges = append(edges, collectionnode.EdgeNode)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CollectionNodeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case collectionnode.EdgeCollection:
+		if id := m.collection; id != nil {
+			return []ent.Value{*id}
+		}
+	case collectionnode.EdgeNode:
+		if id := m.node; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CollectionNodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CollectionNodeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CollectionNodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedcollection {
+		edges = append(edges, collectionnode.EdgeCollection)
+	}
+	if m.clearednode {
+		edges = append(edges, collectionnode.EdgeNode)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CollectionNodeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case collectionnode.EdgeCollection:
+		return m.clearedcollection
+	case collectionnode.EdgeNode:
+		return m.clearednode
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CollectionNodeMutation) ClearEdge(name string) error {
+	switch name {
+	case collectionnode.EdgeCollection:
+		m.ClearCollection()
+		return nil
+	case collectionnode.EdgeNode:
+		m.ClearNode()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionNode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CollectionNodeMutation) ResetEdge(name string) error {
+	switch name {
+	case collectionnode.EdgeCollection:
+		m.ResetCollection()
+		return nil
+	case collectionnode.EdgeNode:
+		m.ResetNode()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionNode edge %s", name)
+}
+
+// CollectionPostMutation represents an operation that mutates the CollectionPost nodes in the graph.
+type CollectionPostMutation struct {
+	config
+	op                Op
+	typ               string
+	created_at        *time.Time
+	membership_type   *string
+	clearedFields     map[string]struct{}
+	collection        *xid.ID
+	clearedcollection bool
+	post              *xid.ID
+	clearedpost       bool
+	done              bool
+	oldValue          func(context.Context) (*CollectionPost, error)
+	predicates        []predicate.CollectionPost
+}
+
+var _ ent.Mutation = (*CollectionPostMutation)(nil)
+
+// collectionpostOption allows management of the mutation configuration using functional options.
+type collectionpostOption func(*CollectionPostMutation)
+
+// newCollectionPostMutation creates new mutation for the CollectionPost entity.
+func newCollectionPostMutation(c config, op Op, opts ...collectionpostOption) *CollectionPostMutation {
+	m := &CollectionPostMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCollectionPost,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CollectionPostMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CollectionPostMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CollectionPostMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CollectionPostMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CollectionPostMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCollectionID sets the "collection_id" field.
+func (m *CollectionPostMutation) SetCollectionID(x xid.ID) {
+	m.collection = &x
+}
+
+// CollectionID returns the value of the "collection_id" field in the mutation.
+func (m *CollectionPostMutation) CollectionID() (r xid.ID, exists bool) {
+	v := m.collection
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCollectionID resets all changes to the "collection_id" field.
+func (m *CollectionPostMutation) ResetCollectionID() {
+	m.collection = nil
+}
+
+// SetPostID sets the "post_id" field.
+func (m *CollectionPostMutation) SetPostID(x xid.ID) {
+	m.post = &x
+}
+
+// PostID returns the value of the "post_id" field in the mutation.
+func (m *CollectionPostMutation) PostID() (r xid.ID, exists bool) {
+	v := m.post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPostID resets all changes to the "post_id" field.
+func (m *CollectionPostMutation) ResetPostID() {
+	m.post = nil
+}
+
+// SetMembershipType sets the "membership_type" field.
+func (m *CollectionPostMutation) SetMembershipType(s string) {
+	m.membership_type = &s
+}
+
+// MembershipType returns the value of the "membership_type" field in the mutation.
+func (m *CollectionPostMutation) MembershipType() (r string, exists bool) {
+	v := m.membership_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMembershipType resets all changes to the "membership_type" field.
+func (m *CollectionPostMutation) ResetMembershipType() {
+	m.membership_type = nil
+}
+
+// ClearCollection clears the "collection" edge to the Collection entity.
+func (m *CollectionPostMutation) ClearCollection() {
+	m.clearedcollection = true
+	m.clearedFields[collectionpost.FieldCollectionID] = struct{}{}
+}
+
+// CollectionCleared reports if the "collection" edge to the Collection entity was cleared.
+func (m *CollectionPostMutation) CollectionCleared() bool {
+	return m.clearedcollection
+}
+
+// CollectionIDs returns the "collection" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CollectionID instead. It exists only for internal usage by the builders.
+func (m *CollectionPostMutation) CollectionIDs() (ids []xid.ID) {
+	if id := m.collection; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCollection resets all changes to the "collection" edge.
+func (m *CollectionPostMutation) ResetCollection() {
+	m.collection = nil
+	m.clearedcollection = false
+}
+
+// ClearPost clears the "post" edge to the Post entity.
+func (m *CollectionPostMutation) ClearPost() {
+	m.clearedpost = true
+	m.clearedFields[collectionpost.FieldPostID] = struct{}{}
+}
+
+// PostCleared reports if the "post" edge to the Post entity was cleared.
+func (m *CollectionPostMutation) PostCleared() bool {
+	return m.clearedpost
+}
+
+// PostIDs returns the "post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PostID instead. It exists only for internal usage by the builders.
+func (m *CollectionPostMutation) PostIDs() (ids []xid.ID) {
+	if id := m.post; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPost resets all changes to the "post" edge.
+func (m *CollectionPostMutation) ResetPost() {
+	m.post = nil
+	m.clearedpost = false
+}
+
+// Where appends a list predicates to the CollectionPostMutation builder.
+func (m *CollectionPostMutation) Where(ps ...predicate.CollectionPost) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CollectionPostMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CollectionPostMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.CollectionPost, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CollectionPostMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CollectionPostMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (CollectionPost).
+func (m *CollectionPostMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CollectionPostMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, collectionpost.FieldCreatedAt)
+	}
+	if m.collection != nil {
+		fields = append(fields, collectionpost.FieldCollectionID)
+	}
+	if m.post != nil {
+		fields = append(fields, collectionpost.FieldPostID)
+	}
+	if m.membership_type != nil {
+		fields = append(fields, collectionpost.FieldMembershipType)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CollectionPostMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case collectionpost.FieldCreatedAt:
+		return m.CreatedAt()
+	case collectionpost.FieldCollectionID:
+		return m.CollectionID()
+	case collectionpost.FieldPostID:
+		return m.PostID()
+	case collectionpost.FieldMembershipType:
+		return m.MembershipType()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CollectionPostMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema CollectionPost does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionPostMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case collectionpost.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case collectionpost.FieldCollectionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCollectionID(v)
+		return nil
+	case collectionpost.FieldPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostID(v)
+		return nil
+	case collectionpost.FieldMembershipType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMembershipType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionPost field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CollectionPostMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CollectionPostMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionPostMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown CollectionPost numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CollectionPostMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CollectionPostMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CollectionPostMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CollectionPost nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CollectionPostMutation) ResetField(name string) error {
+	switch name {
+	case collectionpost.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case collectionpost.FieldCollectionID:
+		m.ResetCollectionID()
+		return nil
+	case collectionpost.FieldPostID:
+		m.ResetPostID()
+		return nil
+	case collectionpost.FieldMembershipType:
+		m.ResetMembershipType()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionPost field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CollectionPostMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.collection != nil {
+		edges = append(edges, collectionpost.EdgeCollection)
+	}
+	if m.post != nil {
+		edges = append(edges, collectionpost.EdgePost)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CollectionPostMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case collectionpost.EdgeCollection:
+		if id := m.collection; id != nil {
+			return []ent.Value{*id}
+		}
+	case collectionpost.EdgePost:
+		if id := m.post; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CollectionPostMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CollectionPostMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CollectionPostMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedcollection {
+		edges = append(edges, collectionpost.EdgeCollection)
+	}
+	if m.clearedpost {
+		edges = append(edges, collectionpost.EdgePost)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CollectionPostMutation) EdgeCleared(name string) bool {
+	switch name {
+	case collectionpost.EdgeCollection:
+		return m.clearedcollection
+	case collectionpost.EdgePost:
+		return m.clearedpost
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CollectionPostMutation) ClearEdge(name string) error {
+	switch name {
+	case collectionpost.EdgeCollection:
+		m.ClearCollection()
+		return nil
+	case collectionpost.EdgePost:
+		m.ClearPost()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionPost unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CollectionPostMutation) ResetEdge(name string) error {
+	switch name {
+	case collectionpost.EdgeCollection:
+		m.ResetCollection()
+		return nil
+	case collectionpost.EdgePost:
+		m.ResetPost()
+		return nil
+	}
+	return fmt.Errorf("unknown CollectionPost edge %s", name)
 }
 
 // LinkMutation represents an operation that mutates the Link nodes in the graph.

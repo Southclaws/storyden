@@ -21,6 +21,12 @@ type Category func(*sql.Selector)
 // Collection is the predicate function for collection builders.
 type Collection func(*sql.Selector)
 
+// CollectionNode is the predicate function for collectionnode builders.
+type CollectionNode func(*sql.Selector)
+
+// CollectionPost is the predicate function for collectionpost builders.
+type CollectionPost func(*sql.Selector)
+
 // Link is the predicate function for link builders.
 type Link func(*sql.Selector)
 

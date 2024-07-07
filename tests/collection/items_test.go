@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/rs/xid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
@@ -50,12 +49,6 @@ func TestCollectionItems(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, collection1)
 
-			collection2, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-				Name:        "c2",
-				Description: "owned by acc2",
-			}, session2)
-			tests.Ok(t, err, collection2)
-
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,
 				Colour:      "",
@@ -71,23 +64,25 @@ func TestCollectionItems(t *testing.T) {
 				Title:      "thread",
 			}
 
+			published := openapi.Published
+
 			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
 			tests.Ok(t, err, thread1create)
 
 			thread2create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session2)
 			tests.Ok(t, err, thread2create)
 
-			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr()}, session1)
+			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node1create)
 
-			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr()}, session2)
+			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node2create)
 
 			t.Run("unauthorised", func(t *testing.T) {
 				t.Parallel()
 
-				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session2)
-				tests.Status(t, err, addPost1, http.StatusUnauthorized)
+				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id)
+				tests.Status(t, err, addPost1, http.StatusForbidden)
 			})
 
 			t.Run("add_remove_items", func(t *testing.T) {
@@ -111,37 +106,40 @@ func TestCollectionItems(t *testing.T) {
 
 				// These must be in order of addition
 
-				matchThreadToItem(t, thread1create.JSON200, get1.JSON200.Items[0])
+				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[0])
 				matchThreadToItem(t, thread2create.JSON200, get1.JSON200.Items[1])
 				matchNodeToItem(t, node1create.JSON200, get1.JSON200.Items[2])
-				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[3])
+				matchThreadToItem(t, thread1create.JSON200, get1.JSON200.Items[3])
+
+				removePost1, err := cl.CollectionRemovePostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, removePost1)
+				removePost2, err := cl.CollectionRemoveNodeWithResponse(root, collection1.JSON200.Id, node1create.JSON200.Id, session1)
+				tests.Ok(t, err, removePost2)
+
+				get2, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id)
+				tests.Ok(t, err, get2)
+
+				r.Len(get2.JSON200.Items, 2)
+
+				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[0])
+				matchThreadToItem(t, thread2create.JSON200, get1.JSON200.Items[1])
+			})
+
+			t.Run("add_idempotent", func(t *testing.T) {
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "x1",
+					Description: "owned by acc1",
+				}, session1)
+				tests.Ok(t, err, col)
+
+				// Add the same post twice, should not error and be a no-op
+
+				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addPost1)
+
+				addPost1again, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addPost1again)
 			})
 		}))
 	}))
-}
-
-func matchThreadToItem(t *testing.T, thread *openapi.Thread, item openapi.CollectionItem) {
-	t.Helper()
-	a := assert.New(t)
-
-	a.Equal(openapi.DatagraphNodeKindPost, item.Kind)
-	a.Equal(thread.Id, item.Id)
-	// a.Equal(thread.CreatedAt, item.CreatedAt) // TODO
-	a.Equal(thread.Title, item.Name)
-	a.Contains(thread.Slug, item.Slug)
-	a.Equal(thread.Short, item.Description)
-	a.Equal(thread.Author, item.Owner)
-}
-
-func matchNodeToItem(t *testing.T, node *openapi.Node, item openapi.CollectionItem) {
-	t.Helper()
-	a := assert.New(t)
-
-	a.Equal(openapi.DatagraphNodeKindNode, item.Kind)
-	a.Equal(node.Id, item.Id)
-	// a.Equal(node.CreatedAt, item.CreatedAt) // TODO
-	a.Equal(node.Name, item.Name)
-	a.Contains(node.Slug, item.Slug)
-	a.Equal(node.Description, *item.Description)
-	a.Equal(node.Owner, item.Owner)
 }
