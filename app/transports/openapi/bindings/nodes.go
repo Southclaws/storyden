@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_traversal"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	node_svc "github.com/Southclaws/storyden/app/services/node"
 	"github.com/Southclaws/storyden/app/services/node/node_visibility"
@@ -132,10 +132,10 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		if v, ok := visibilities.Get(); ok {
 			opts = append(opts, node_traversal.WithVisibility(v...))
 
-			if lo.Contains(v, post.VisibilityDraft) {
+			if lo.Contains(v, visibility.VisibilityDraft) {
 				// If the result is to contain drafts, only show the account's.
 				opts = append(opts, node_traversal.WithOwner(a.Handle))
-			} else if lo.Contains(v, post.VisibilityReview) {
+			} else if lo.Contains(v, visibility.VisibilityReview) {
 				// If the result is to contain nodes that are in-review, then
 				// we need to check if the requesting account is an admin first.
 				if !a.Admin {
@@ -147,7 +147,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		// When the request is not made by an authenticated account, we do not
 		// permit any visibility other than "published".
 
-		opts = append(opts, node_traversal.WithVisibility(post.VisibilityPublished))
+		opts = append(opts, node_traversal.WithVisibility(visibility.VisibilityPublished))
 	}
 
 	nid, err := opt.MapErr(opt.NewPtr(request.Params.NodeId), datagraph.NodeIDFromString)
@@ -203,7 +203,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 }
 
 func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUpdateVisibilityRequestObject) (openapi.NodeUpdateVisibilityResponseObject, error) {
-	v, err := post.NewVisibility(string(request.Body.Visibility))
+	v, err := visibility.NewVisibility(string(request.Body.Visibility))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

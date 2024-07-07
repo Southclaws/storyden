@@ -12,11 +12,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
 )
@@ -199,20 +199,20 @@ func serialiseLink(in *datagraph.Link) openapi.Link {
 	}
 }
 
-func deserialiseVisibility(in openapi.Visibility) (post.Visibility, error) {
-	v, err := post.NewVisibility(string(in))
+func deserialiseVisibility(in openapi.Visibility) (visibility.Visibility, error) {
+	v, err := visibility.NewVisibility(string(in))
 	if err != nil {
-		return post.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+		return visibility.Visibility{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 
 	return v, nil
 }
 
-func serialiseVisibility(in post.Visibility) openapi.Visibility {
+func serialiseVisibility(in visibility.Visibility) openapi.Visibility {
 	return openapi.Visibility(in.String())
 }
 
-func deserialiseVisibilityList(in []openapi.Visibility) ([]post.Visibility, error) {
+func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility, error) {
 	v, err := dt.MapErr(in, deserialiseVisibility)
 	if err != nil {
 		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
@@ -221,6 +221,6 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]post.Visibility, erro
 	return v, nil
 }
 
-func serialiseVisibilityList(in []post.Visibility) []openapi.Visibility {
+func serialiseVisibilityList(in []visibility.Visibility) []openapi.Visibility {
 	return dt.Map(in, serialiseVisibility)
 }

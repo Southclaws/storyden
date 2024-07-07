@@ -11,6 +11,7 @@ export type Visibility = (typeof Visibility)[keyof typeof Visibility];
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const Visibility = {
   draft: "draft",
+  unlisted: "unlisted",
   review: "review",
   published: "published",
 } as const;

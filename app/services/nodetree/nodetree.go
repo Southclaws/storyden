@@ -8,14 +8,19 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 var errNotAuthorised = fault.New("not authorised", ftag.With(ftag.PermissionDenied))
 
-var ErrIdenticalParentChild = fault.New("cannot relate a node to itself", ftag.With(ftag.InvalidArgument))
+var (
+	ErrIdenticalParentChild = fault.New("cannot relate a node to itself", ftag.With(ftag.InvalidArgument))
+	ErrVisibilityRules      = fault.New("requested relationship violates visibility rules", ftag.With(ftag.InvalidArgument))
+)
 
 type Graph interface {
 	// Move moves a node from either orphan state or belonging to one node
@@ -28,10 +33,11 @@ type Graph interface {
 
 type service struct {
 	nr node.Repository
+	ar account.Repository
 }
 
-func New(nr node.Repository) Graph {
-	return &service{nr: nr}
+func New(nr node.Repository, ar account.Repository) Graph {
+	return &service{nr: nr, ar: ar}
 }
 
 func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
@@ -40,6 +46,11 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 	}
 
 	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := s.ar.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -54,7 +65,13 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !cnode.Owner.Admin {
+	passesVisibilityRules := visibilityRules[pnode.Visibility][cnode.Visibility]
+
+	if !passesVisibilityRules {
+		return nil, fault.Wrap(ErrVisibilityRules, fctx.With(ctx))
+	}
+
+	if !acc.Admin {
 		if cnode.Owner.ID != accountID && pnode.Owner.ID != accountID {
 			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 		}
@@ -111,4 +128,34 @@ func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent da
 	}
 
 	return pclus, nil
+}
+
+// visibilityRules defines the rules for which visibility levels can be nested.
+//
+//	--------------------- PARENT ------------------ CHILD ---------------------
+var visibilityRules = map[visibility.Visibility]map[visibility.Visibility]bool{
+	visibility.VisibilityDraft: {
+		visibility.VisibilityDraft:     true,  // draft nodes can only ever contain other draft nodes.
+		visibility.VisibilityUnlisted:  false, //
+		visibility.VisibilityReview:    false, //
+		visibility.VisibilityPublished: false, //
+	},
+	visibility.VisibilityUnlisted: {
+		visibility.VisibilityDraft:     false, // unlisted nodes can only ever contain other unlisted nodes.
+		visibility.VisibilityUnlisted:  true,  //
+		visibility.VisibilityReview:    false, //
+		visibility.VisibilityPublished: false, //
+	},
+	visibility.VisibilityReview: {
+		visibility.VisibilityDraft:     true,  // a submission may contain children, the author may be submitting an entire tree of information and the admin can approve the whole subtree at once.
+		visibility.VisibilityUnlisted:  false, // review nodes cannot contain unlisted nodes, for the same reason as published below.
+		visibility.VisibilityReview:    true,  // review nodes can contain other review nodes, such as the above review+draft example above.
+		visibility.VisibilityPublished: false, // review nodes cannot contain published nodes, it should be impossible to get into this state but if it happens, the parent node being "review" state would prevent any child nodes from being viewed anyway.
+	},
+	visibility.VisibilityPublished: {
+		visibility.VisibilityDraft:     true,  // published can contain drafts, this is how review submissions work.
+		visibility.VisibilityUnlisted:  false, // published cannot contain unlisted, unlisted nodes are intended for "personal" use not sharing globally with the entire world, but they can be accessed if given a URL for example.
+		visibility.VisibilityReview:    true,  // published can contain review nodes, this is how the submission review process works.
+		visibility.VisibilityPublished: true,  // obviously, published can contain other published nodes.
+	},
 }

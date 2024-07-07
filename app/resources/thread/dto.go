@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -31,7 +32,7 @@ type Thread struct {
 	Author      datagraph.Profile
 	Tags        []string
 	Category    category.Category
-	Visibility  post.Visibility
+	Visibility  visibility.Visibility
 	Posts       []*reply.Reply
 	Reacts      []*react.React
 	Meta        map[string]any
@@ -127,7 +128,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		Author:      *pro,
 		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Category:    *category,
-		Visibility:  post.NewVisibilityFromEnt(m.Visibility),
+		Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 		Posts:       posts,
 		Reacts:      dt.Map(m.Edges.Reacts, react.FromModel),
 		Meta:        m.Metadata,
