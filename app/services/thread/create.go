@@ -12,16 +12,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 func (s *service) Create(ctx context.Context,
 	title string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
-	status post.Visibility,
+	status visibility.Visibility,
 	tags []string,
 	meta map[string]any,
 	partial Partial,

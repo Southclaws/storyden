@@ -7,7 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -38,7 +38,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	visibility, err := post.NewVisibility(c.Visibility.String())
+	visibility, err := visibility.NewVisibility(c.Visibility.String())
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

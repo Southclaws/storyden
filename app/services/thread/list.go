@@ -11,8 +11,8 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 type Params struct {
@@ -31,7 +31,7 @@ func (s *service) List(ctx context.Context,
 ) (*thread.Result, error) {
 	q := []thread.Query{
 		// User's drafts are always private so we always filter published only.
-		thread.HasStatus(post.VisibilityPublished),
+		thread.HasStatus(visibility.VisibilityPublished),
 		thread.HasNotBeenDeleted(),
 	}
 

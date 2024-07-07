@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
@@ -35,7 +35,7 @@ func New(
 	}
 }
 
-func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSlug, visibility post.Visibility) (*datagraph.Node, error) {
+func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSlug, vis visibility.Visibility) (*datagraph.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -57,12 +57,12 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		}
 	}
 
-	n, err = m.nr.Update(ctx, n.ID, node.WithVisibility(visibility))
+	n, err = m.nr.Update(ctx, n.ID, node.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if visibility == post.VisibilityPublished {
+	if vis == visibility.VisibilityPublished {
 		// TODO: Emit events, send notifications, etc.
 	}
 
