@@ -50,12 +50,6 @@ func TestCollectionItems(t *testing.T) {
 			}, session1)
 			tests.Ok(t, err, collection1)
 
-			collection2, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-				Name:        "c2",
-				Description: "owned by acc2",
-			}, session2)
-			tests.Ok(t, err, collection2)
-
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,
 				Colour:      "",
@@ -133,6 +127,19 @@ func TestCollectionItems(t *testing.T) {
 			})
 
 			t.Run("add_idempotent", func(t *testing.T) {
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "x1",
+					Description: "owned by acc1",
+				}, session1)
+				tests.Ok(t, err, col)
+
+				// Add the same post twice, should not error and be a no-op
+
+				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addPost1)
+
+				addPost1again, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addPost1again)
 			})
 		}))
 	}))
