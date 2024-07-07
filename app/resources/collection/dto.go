@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -24,7 +25,11 @@ type Collection struct {
 	Owner       datagraph.Profile
 	Name        string
 	Description string
-	Items       CollectionItems
+}
+
+type CollectionWithItems struct {
+	Collection
+	Items CollectionItems
 }
 
 func (*Collection) GetResourceName() string { return "collection" }
@@ -36,13 +41,18 @@ type CollectionItem struct {
 	Item           datagraph.Indexable
 }
 
+type CollectionItemStatus struct {
+	Collection Collection
+	Item       opt.Optional[CollectionItem]
+}
+
 type CollectionItems []*CollectionItem
 
 func (a CollectionItems) Len() int           { return len(a) }
 func (a CollectionItems) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a CollectionItems) Less(i, j int) bool { return a[i].Added.After(a[j].Added) }
 
-func FromModel(c *ent.Collection) (*Collection, error) {
+func MapCollection(c *ent.Collection) (*Collection, error) {
 	accEdge, err := c.Edges.OwnerOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -51,6 +61,22 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 	pro, err := datagraph.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
+	}
+
+	return &Collection{
+		ID:          CollectionID(c.ID),
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+		Owner:       *pro,
+		Name:        c.Name,
+		Description: c.Description,
+	}, nil
+}
+
+func MapCollectionWithItems(c *ent.Collection) (*CollectionWithItems, error) {
+	col, err := MapCollection(c)
+	if err != nil {
+		return nil, err
 	}
 
 	posts, err := dt.MapErr(c.Edges.CollectionPosts, MapCollectionPost)
@@ -67,15 +93,12 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 
 	sort.Sort(items)
 
-	return &Collection{
-		ID:          CollectionID(c.ID),
-		CreatedAt:   c.CreatedAt,
-		UpdatedAt:   c.UpdatedAt,
-		Owner:       *pro,
-		Name:        c.Name,
-		Description: c.Description,
-		Items:       items,
-	}, nil
+	colWithItems := &CollectionWithItems{
+		Collection: *col,
+		Items:      items,
+	}
+
+	return colWithItems, nil
 }
 
 func MapCollectionPost(n *ent.CollectionPost) (*CollectionItem, error) {

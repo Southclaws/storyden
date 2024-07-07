@@ -44,7 +44,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		}
 		defaultConfig.DatabaseURL = url
 	} else {
-		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)"
+		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)&cache=shared"
 	}
 
 	ctx, cf := context.WithCancel(context.Background())

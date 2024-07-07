@@ -17,7 +17,7 @@ import (
 
 type (
 	Option     func(*ent.CollectionMutation)
-	ItemOption func(*ent.Tx, *itemOptions)
+	ItemOption func(*itemChanges)
 	Filter     func(*ent.CollectionQuery)
 	ItemFilter func(*ent.CollectionPostQuery, *ent.CollectionNodeQuery)
 )
@@ -27,13 +27,15 @@ type Repository interface {
 		owner account.AccountID,
 		name string,
 		desc string,
-		opts ...Option) (*Collection, error)
+		opts ...Option) (*CollectionWithItems, error)
 
 	List(ctx context.Context, filters ...Filter) ([]*Collection, error)
-	Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*Collection, error)
+	Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*CollectionWithItems, error)
 
-	Update(ctx context.Context, id CollectionID, opts ...Option) (*Collection, error)
-	UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*Collection, error)
+	ProbeItem(ctx context.Context, id CollectionID, item xid.ID) (*CollectionItemStatus, error)
+
+	Update(ctx context.Context, id CollectionID, opts ...Option) (*CollectionWithItems, error)
+	UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*CollectionWithItems, error)
 
 	Delete(ctx context.Context, id CollectionID) error
 }

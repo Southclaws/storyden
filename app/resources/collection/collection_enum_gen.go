@@ -12,8 +12,9 @@ type MembershipType struct {
 }
 
 var (
-	MembershipTypeNormal     = MembershipType{membershipTypeNormal}
-	MembershipTypeSubmission = MembershipType{membershipTypeSubmission}
+	MembershipTypeNormal             = MembershipType{membershipTypeNormal}
+	MembershipTypeSubmissionReview   = MembershipType{membershipTypeSubmissionReview}
+	MembershipTypeSubmissionAccepted = MembershipType{membershipTypeSubmissionAccepted}
 )
 
 func (r MembershipType) Format(f fmt.State, verb rune) {
@@ -55,8 +56,10 @@ func NewMembershipType(__iNpUt__ string) (MembershipType, error) {
 	switch __iNpUt__ {
 	case string(membershipTypeNormal):
 		return MembershipTypeNormal, nil
-	case string(membershipTypeSubmission):
-		return MembershipTypeSubmission, nil
+	case string(membershipTypeSubmissionReview):
+		return MembershipTypeSubmissionReview, nil
+	case string(membershipTypeSubmissionAccepted):
+		return MembershipTypeSubmissionAccepted, nil
 	default:
 		return MembershipType{}, fmt.Errorf("invalid value for type 'MembershipType': '%s'", __iNpUt__)
 	}

@@ -28,7 +28,7 @@ type CollectionQuerier struct {
 	Session session.SessionProvider
 }
 
-func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.Collection, error) {
+func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.CollectionWithItems, error) {
 	acc := r.Session.AccountOpt(ctx).OrZero()
 
 	col, err := r.Repo.Get(ctx, id)
@@ -67,11 +67,9 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 		// TODO: Apply to posts as well, but this needs some more work on post
 		// data structure sharing and exposing visibility of the thread properly
 
-		if vis != visibility.VisibilityPublished || i.MembershipType == collection.MembershipTypeSubmission {
-			// Don't reveal unlisted collection items unless the requesting acc
+		if vis == visibility.VisibilityDraft || i.MembershipType == collection.MembershipTypeSubmissionReview {
+			// Don't reveal draft collection items unless the requesting account
 			// is either the owner of the collection or the owner of the item.
-
-			// If the owner of the node is the requesting account, show it.
 			return accountOwnsItem
 		}
 
