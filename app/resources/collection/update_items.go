@@ -52,15 +52,6 @@ func WithNodeRemove(id datagraph.NodeID) ItemOption {
 }
 
 func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*Collection, error) {
-	// NOTE 1:
-	//
-	// Due to a bug in either Postgres or Ent, there's no way to apply a unique
-	// constraint on-conflict action to adding nodes/posts to a collection. This
-	// means the constraint check must be done manually via error checking.
-	// Fortunately, for this particular case, no updates need to be made to the
-	// edge on adding new items to a collection but it's still a very hacky fix.
-	//
-
 	err := ent.WithTx(ctx, d.db, func(tx *ent.Tx) error {
 		removals := tx.Collection.UpdateOneID(xid.ID(id))
 
@@ -83,25 +74,15 @@ func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...Ite
 		}
 
 		for _, p := range options.posts {
-			err := p.Exec(ctx)
+			err := p.OnConflict().Ignore().DoNothing().Exec(ctx)
 			if err != nil {
-				if ent.IsConstraintError(err) {
-					// SEE NOTE 1
-					continue
-				}
-
 				return fault.Wrap(err, fctx.With(ctx))
 			}
 		}
 
 		for _, n := range options.nodes {
-			err := n.Exec(ctx)
+			err := n.OnConflict().Ignore().DoNothing().Exec(ctx)
 			if err != nil {
-				if ent.IsConstraintError(err) {
-					// SEE NOTE 1
-					continue
-				}
-
 				return fault.Wrap(err, fctx.With(ctx))
 			}
 		}
