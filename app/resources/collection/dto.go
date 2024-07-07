@@ -1,6 +1,7 @@
 package collection
 
 import (
+	"sort"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -23,15 +24,23 @@ type Collection struct {
 	Owner       datagraph.Profile
 	Name        string
 	Description string
-	Items       []*CollectionItem
+	Items       CollectionItems
 }
 
 func (*Collection) GetResourceName() string { return "collection" }
 
 type CollectionItem struct {
-	Author datagraph.Profile
-	Item   datagraph.Indexable
+	Added          time.Time
+	MembershipType MembershipType
+	Author         datagraph.Profile
+	Item           datagraph.Indexable
 }
+
+type CollectionItems []*CollectionItem
+
+func (a CollectionItems) Len() int           { return len(a) }
+func (a CollectionItems) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CollectionItems) Less(i, j int) bool { return a[i].Added.After(a[j].Added) }
 
 func FromModel(c *ent.Collection) (*Collection, error) {
 	accEdge, err := c.Edges.OwnerOrErr()
@@ -44,17 +53,19 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	posts, err := dt.MapErr(c.Edges.Posts, MapCollectionPost)
+	posts, err := dt.MapErr(c.Edges.CollectionPosts, MapCollectionPost)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	nodes, err := dt.MapErr(c.Edges.Nodes, MapCollectionNode)
+	nodes, err := dt.MapErr(c.Edges.CollectionNodes, MapCollectionNode)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	items := append(posts, nodes...)
+	items := CollectionItems(append(posts, nodes...))
+
+	sort.Sort(items)
 
 	return &Collection{
 		ID:          CollectionID(c.ID),
@@ -67,10 +78,17 @@ func FromModel(c *ent.Collection) (*Collection, error) {
 	}, nil
 }
 
-func MapCollectionPost(p *ent.Post) (*CollectionItem, error) {
+func MapCollectionPost(n *ent.CollectionPost) (*CollectionItem, error) {
+	p := n.Edges.Post
+
 	accEdge, err := p.Edges.AuthorOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
+	}
+
+	mt, err := NewMembershipType(n.MembershipType)
+	if err != nil {
+		return nil, err
 	}
 
 	pro, err := datagraph.ProfileFromModel(accEdge)
@@ -84,15 +102,24 @@ func MapCollectionPost(p *ent.Post) (*CollectionItem, error) {
 	}
 
 	return &CollectionItem{
-		Author: *pro,
-		Item:   item,
+		Added:          n.CreatedAt,
+		MembershipType: mt,
+		Author:         *pro,
+		Item:           item,
 	}, nil
 }
 
-func MapCollectionNode(p *ent.Node) (*CollectionItem, error) {
+func MapCollectionNode(n *ent.CollectionNode) (*CollectionItem, error) {
+	p := n.Edges.Node
+
 	accEdge, err := p.Edges.OwnerOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
+	}
+
+	mt, err := NewMembershipType(n.MembershipType)
+	if err != nil {
+		return nil, err
 	}
 
 	pro, err := datagraph.ProfileFromModel(accEdge)
@@ -106,7 +133,9 @@ func MapCollectionNode(p *ent.Node) (*CollectionItem, error) {
 	}
 
 	return &CollectionItem{
-		Author: *pro,
-		Item:   item,
+		Added:          n.CreatedAt,
+		MembershipType: mt,
+		Author:         *pro,
+		Item:           item,
 	}, nil
 }

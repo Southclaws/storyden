@@ -64,9 +64,11 @@ type NodeEdges struct {
 	Links []*Link `json:"links,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
+	// CollectionNodes holds the value of the collection_nodes edge.
+	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -134,6 +136,15 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
+}
+
+// CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
+	if e.loadedTypes[7] {
+		return e.CollectionNodes, nil
+	}
+	return nil, &NotLoadedError{edge: "collection_nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -287,6 +298,11 @@ func (n *Node) QueryLinks() *LinkQuery {
 // QueryCollections queries the "collections" edge of the Node entity.
 func (n *Node) QueryCollections() *CollectionQuery {
 	return NewNodeClient(n.config).QueryCollections(n)
+}
+
+// QueryCollectionNodes queries the "collection_nodes" edge of the Node entity.
+func (n *Node) QueryCollectionNodes() *CollectionNodeQuery {
+	return NewNodeClient(n.config).QueryCollectionNodes(n)
 }
 
 // Update returns a builder for updating this Node.

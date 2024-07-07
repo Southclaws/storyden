@@ -13,21 +13,25 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	collection_svc "github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/collection/collection_read"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Collections struct {
-	collection_repo collection.Repository
-	collection_svc  collection_svc.Service
+	collection_repo    collection.Repository
+	collection_svc     collection_svc.Service
+	collection_querier collection_read.CollectionQuerier
 }
 
 func NewCollections(
 	collection_repo collection.Repository,
 	collection_svc collection_svc.Service,
+	collection_querier collection_read.CollectionQuerier,
 ) Collections {
 	return Collections{
-		collection_repo: collection_repo,
-		collection_svc:  collection_svc,
+		collection_repo:    collection_repo,
+		collection_svc:     collection_svc,
+		collection_querier: collection_querier,
 	}
 }
 
@@ -63,7 +67,7 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 }
 
 func (i *Collections) CollectionGet(ctx context.Context, request openapi.CollectionGetRequestObject) (openapi.CollectionGetResponseObject, error) {
-	coll, err := i.collection_repo.Get(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	coll, err := i.collection_querier.GetCollection(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -175,12 +179,13 @@ func serialiseCollectionWithItems(in *collection.Collection) openapi.CollectionW
 
 func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionItem {
 	return openapi.CollectionItem{
-		Id:          in.Item.GetID().String(),
-		Kind:        openapi.DatagraphNodeKind(in.Item.GetKind().String()),
-		Name:        in.Item.GetName(),
-		Slug:        in.Item.GetSlug(),
-		Description: opt.New(in.Item.GetDesc()).Ptr(),
-
-		Owner: serialiseProfileReference(in.Author),
+		Id:             in.Item.GetID().String(),
+		AddedAt:        in.Added,
+		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
+		Owner:          serialiseProfileReference(in.Author),
+		Kind:           openapi.DatagraphNodeKind(in.Item.GetKind().String()),
+		Name:           in.Item.GetName(),
+		Slug:           in.Item.GetSlug(),
+		Description:    opt.New(in.Item.GetDesc()).Ptr(),
 	}
 }

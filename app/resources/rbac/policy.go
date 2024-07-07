@@ -11,14 +11,15 @@ import (
 )
 
 var (
-	permissionCreate           = restrict.Permission{Action: ActionCreate}
-	permissionRead             = restrict.Permission{Action: ActionRead}
-	permissionUpdateThread     = restrict.Permission{Preset: "update_thread"}
-	permissionUpdatePost       = restrict.Permission{Preset: "update_post"}
-	permissionDeleteThread     = restrict.Permission{Preset: "delete_thread"}
-	permissionDeletePost       = restrict.Permission{Preset: "delete_post"}
-	permissionUpdateCollection = restrict.Permission{Preset: "update_collection"}
-	permissionDeleteCollection = restrict.Permission{Preset: "delete_collection"}
+	permissionCreate             = restrict.Permission{Action: ActionCreate}
+	permissionRead               = restrict.Permission{Action: ActionRead}
+	permissionUpdateThread       = restrict.Permission{Preset: "update_thread"}
+	permissionUpdatePost         = restrict.Permission{Preset: "update_post"}
+	permissionDeleteThread       = restrict.Permission{Preset: "delete_thread"}
+	permissionDeletePost         = restrict.Permission{Preset: "delete_post"}
+	permissionUpdateCollection   = restrict.Permission{Preset: "update_collection"}
+	permissionDeleteCollection   = restrict.Permission{Preset: "delete_collection"}
+	permissionSubmitToCollection = restrict.Permission{Preset: "submit_to_collection"}
 )
 
 var defaultGrants = restrict.GrantsMap{
@@ -39,6 +40,7 @@ var defaultGrants = restrict.GrantsMap{
 		&permissionRead,
 		&permissionUpdateCollection,
 		&permissionDeleteCollection,
+		&permissionSubmitToCollection,
 	},
 }
 
@@ -144,6 +146,33 @@ var updateCollection = restrict.Permission{
 	},
 }
 
+type collectionSubmitCondition struct{}
+
+func (c *collectionSubmitCondition) Type() string { return "collection_access" }
+func (c *collectionSubmitCondition) Check(request *restrict.AccessRequest) error {
+	acc := request.Subject.(*account.Account)
+	col := request.Resource.(*collection.Collection)
+
+	if col.Owner.ID == acc.ID {
+		return nil
+	}
+
+	if acc.Admin {
+		return nil
+	}
+
+	// Currently there are no rules to prevent any user from submitting anything
+	// to any collection, this will change in future so for now this is a no-op.
+	return nil
+}
+
+var submitToCollection = restrict.Permission{
+	Action: ActionSubmit,
+	Conditions: restrict.Conditions{
+		&collectionSubmitCondition{},
+	},
+}
+
 var deleteCollection = restrict.Permission{
 	Action: ActionDelete,
 	Conditions: restrict.Conditions{
@@ -157,11 +186,12 @@ var defaultPolicy = &restrict.PolicyDefinition{
 		OwnerRole.ID:    &OwnerRole,
 	},
 	PermissionPresets: restrict.PermissionPresets{
-		"update_thread":     &updateThread,
-		"update_post":       &updatePost,
-		"delete_thread":     &deleteThread,
-		"delete_post":       &deletePost,
-		"update_collection": &updateCollection,
-		"delete_collection": &deleteCollection,
+		"update_thread":        &updateThread,
+		"update_post":          &updatePost,
+		"delete_thread":        &deleteThread,
+		"delete_post":          &deletePost,
+		"update_collection":    &updateCollection,
+		"submit_to_collection": &submitToCollection,
+		"delete_collection":    &deleteCollection,
 	},
 }

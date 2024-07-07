@@ -78,6 +78,7 @@ export * from "./collectionGetOKResponse";
 export * from "./collectionInitialProps";
 export * from "./collectionItem";
 export * from "./collectionItemList";
+export * from "./collectionItemMembershipType";
 export * from "./collectionItemMetadata";
 export * from "./collectionList";
 export * from "./collectionListOKResponse";

@@ -71,23 +71,25 @@ func TestCollectionItems(t *testing.T) {
 				Title:      "thread",
 			}
 
+			published := openapi.Published
+
 			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
 			tests.Ok(t, err, thread1create)
 
 			thread2create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session2)
 			tests.Ok(t, err, thread2create)
 
-			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr()}, session1)
+			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node1create)
 
-			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr()}, session2)
+			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
 			tests.Ok(t, err, node2create)
 
 			t.Run("unauthorised", func(t *testing.T) {
 				t.Parallel()
 
-				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session2)
-				tests.Status(t, err, addPost1, http.StatusUnauthorized)
+				addPost1, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id)
+				tests.Status(t, err, addPost1, http.StatusForbidden)
 			})
 
 			t.Run("add_remove_items", func(t *testing.T) {
@@ -111,10 +113,26 @@ func TestCollectionItems(t *testing.T) {
 
 				// These must be in order of addition
 
-				matchThreadToItem(t, thread1create.JSON200, get1.JSON200.Items[0])
+				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[0])
 				matchThreadToItem(t, thread2create.JSON200, get1.JSON200.Items[1])
 				matchNodeToItem(t, node1create.JSON200, get1.JSON200.Items[2])
-				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[3])
+				matchThreadToItem(t, thread1create.JSON200, get1.JSON200.Items[3])
+
+				removePost1, err := cl.CollectionRemovePostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, removePost1)
+				removePost2, err := cl.CollectionRemoveNodeWithResponse(root, collection1.JSON200.Id, node1create.JSON200.Id, session1)
+				tests.Ok(t, err, removePost2)
+
+				get2, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id)
+				tests.Ok(t, err, get2)
+
+				r.Len(get2.JSON200.Items, 2)
+
+				matchNodeToItem(t, node2create.JSON200, get1.JSON200.Items[0])
+				matchThreadToItem(t, thread2create.JSON200, get1.JSON200.Items[1])
+			})
+
+			t.Run("add_idempotent", func(t *testing.T) {
 			})
 		}))
 	}))
