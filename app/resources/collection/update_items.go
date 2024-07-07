@@ -2,9 +2,7 @@ package collection
 
 import (
 	"context"
-	"fmt"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
@@ -16,8 +14,8 @@ import (
 
 type itemOptions struct {
 	cid      xid.ID
-	posts    []*ent.CollectionPostUpsertOne
-	nodes    []*ent.CollectionNodeUpsertOne
+	posts    []*ent.CollectionPostCreate
+	nodes    []*ent.CollectionNodeCreate
 	removals *ent.CollectionMutation
 }
 
@@ -26,8 +24,8 @@ func WithPostAdd(id post.ID, mt MembershipType) ItemOption {
 		c.posts = append(c.posts, tx.CollectionPost.Create().
 			SetCollectionID(c.cid).
 			SetPostID(xid.ID(id)).
-			SetMembershipType(mt.String()).
-			OnConflict(sql.ResolveWithNewValues()))
+			SetMembershipType(mt.String()),
+		)
 	}
 }
 
@@ -42,8 +40,8 @@ func WithNodeAdd(id datagraph.NodeID, mt MembershipType) ItemOption {
 		c.nodes = append(c.nodes, tx.CollectionNode.Create().
 			SetCollectionID(c.cid).
 			SetNodeID(xid.ID(id)).
-			SetMembershipType(mt.String()).
-			OnConflict(sql.ResolveWithNewValues()))
+			SetMembershipType(mt.String()),
+		)
 	}
 }
 
@@ -54,57 +52,62 @@ func WithNodeRemove(id datagraph.NodeID) ItemOption {
 }
 
 func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*Collection, error) {
-	tx, err := d.db.Tx(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	defer func() {
-		if err != nil {
-			rerr := tx.Rollback()
-			if rerr != nil {
-				err = fault.Wrap(
-					fmt.Errorf("rollback failed: %w: original error: %w", rerr, err),
-					fctx.With(ctx),
-				)
+	// NOTE 1:
+	//
+	// Due to a bug in either Postgres or Ent, there's no way to apply a unique
+	// constraint on-conflict action to adding nodes/posts to a collection. This
+	// means the constraint check must be done manually via error checking.
+	// Fortunately, for this particular case, no updates need to be made to the
+	// edge on adding new items to a collection but it's still a very hacky fix.
+	//
+
+	err := ent.WithTx(ctx, d.db, func(tx *ent.Tx) error {
+		removals := tx.Collection.UpdateOneID(xid.ID(id))
+
+		options := itemOptions{
+			cid:      xid.ID(id),
+			posts:    []*ent.CollectionPostCreate{},
+			nodes:    []*ent.CollectionNodeCreate{},
+			removals: removals.Mutation(),
+		}
+
+		for _, fn := range opts {
+			fn(tx, &options)
+		}
+
+		if len(removals.Mutation().RemovedEdges()) > 0 {
+			err := removals.Exec(ctx)
+			if err != nil {
+				return fault.Wrap(err, fctx.With(ctx))
 			}
 		}
-	}()
 
-	removals := tx.Collection.UpdateOneID(xid.ID(id))
+		for _, p := range options.posts {
+			err := p.Exec(ctx)
+			if err != nil {
+				if ent.IsConstraintError(err) {
+					// SEE NOTE 1
+					continue
+				}
 
-	options := itemOptions{
-		cid:      xid.ID(id),
-		posts:    []*ent.CollectionPostUpsertOne{},
-		nodes:    []*ent.CollectionNodeUpsertOne{},
-		removals: removals.Mutation(),
-	}
-
-	for _, fn := range opts {
-		fn(tx, &options)
-	}
-
-	if len(removals.Mutation().RemovedEdges()) > 0 {
-		err := removals.Exec(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+				return fault.Wrap(err, fctx.With(ctx))
+			}
 		}
-	}
 
-	for _, p := range options.posts {
-		err = p.Exec(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+		for _, n := range options.nodes {
+			err := n.Exec(ctx)
+			if err != nil {
+				if ent.IsConstraintError(err) {
+					// SEE NOTE 1
+					continue
+				}
+
+				return fault.Wrap(err, fctx.With(ctx))
+			}
 		}
-	}
 
-	for _, n := range options.nodes {
-		err = n.Exec(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
-	err = tx.Commit()
+		return nil
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

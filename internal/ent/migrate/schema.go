@@ -193,6 +193,13 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_collection_post",
+				Unique:  true,
+				Columns: []*schema.Column{CollectionPostsColumns[2], CollectionPostsColumns[3]},
+			},
+		},
 	}
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
