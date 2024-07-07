@@ -12,8 +12,9 @@ import {
   ThreadReference,
 } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
-import { useFeedState } from "src/components/feed/useFeedState";
 import { useDisclosure } from "src/utils/useDisclosure";
+
+import { useFeedMutation } from "@/components/feed/useFeed";
 
 export type Props = {
   thread: ThreadReference;
@@ -40,7 +41,7 @@ const hydrateState = (
 export function useCollectionMenu({ thread }: Props) {
   const account = useSession();
   const { data, error } = useCollectionList();
-  const { mutate } = useFeedState();
+  const mutate = useFeedMutation();
 
   const [multiSelect, setMultiSelect] = useState(false);
   const [selected, setSelected] = useState(0);
@@ -93,7 +94,7 @@ export function useCollectionMenu({ thread }: Props) {
           await collectionAddPost(id, thread.id);
         }
 
-        await mutate?.mutateThreads();
+        await mutate();
     }
   };
 

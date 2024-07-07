@@ -1,4 +1,5 @@
 import { filter } from "lodash/fp";
+import { useSWRConfig } from "swr";
 
 import { useNodeList } from "src/api/openapi/nodes";
 import {
@@ -11,7 +12,11 @@ import {
   ThreadMark,
   ThreadReference,
 } from "src/api/openapi/schemas";
-import { threadDelete, useThreadList } from "src/api/openapi/threads";
+import {
+  getThreadListKey,
+  threadDelete,
+  useThreadList,
+} from "src/api/openapi/threads";
 
 export type MixedContent = {
   threads: ThreadListResult;
@@ -98,5 +103,17 @@ export function useFeed({ params, initialData }: Props) {
     handlers: {
       handleDeleteThread,
     } satisfies MixedContentHandlers,
+  };
+}
+
+export function useFeedMutation() {
+  const { mutate } = useSWRConfig();
+
+  const threadQueryMutationKey = getThreadListKey()[0];
+
+  return async () => {
+    await mutate(
+      (key) => Array.isArray(key) && key[0].startsWith(threadQueryMutationKey),
+    );
   };
 }
