@@ -21,6 +21,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -48,6 +50,10 @@ type Client struct {
 	Category *CategoryClient
 	// Collection is the client for interacting with the Collection builders.
 	Collection *CollectionClient
+	// CollectionNode is the client for interacting with the CollectionNode builders.
+	CollectionNode *CollectionNodeClient
+	// CollectionPost is the client for interacting with the CollectionPost builders.
+	CollectionPost *CollectionPostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Node is the client for interacting with the Node builders.
@@ -80,6 +86,8 @@ func (c *Client) init() {
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
 	c.Collection = NewCollectionClient(c.config)
+	c.CollectionNode = NewCollectionNodeClient(c.config)
+	c.CollectionPost = NewCollectionPostClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
@@ -185,6 +193,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Collection:     NewCollectionClient(cfg),
+		CollectionNode: NewCollectionNodeClient(cfg),
+		CollectionPost: NewCollectionPostClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -217,6 +227,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
 		Collection:     NewCollectionClient(cfg),
+		CollectionNode: NewCollectionNodeClient(cfg),
+		CollectionPost: NewCollectionPostClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -254,8 +266,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Collection, c.Link, c.Node,
-		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
+		c.CollectionNode, c.CollectionPost, c.Link, c.Node, c.Notification, c.Post,
+		c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -265,8 +278,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Collection, c.Link, c.Node,
-		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
+		c.CollectionNode, c.CollectionPost, c.Link, c.Node, c.Notification, c.Post,
+		c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -285,6 +299,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Category.mutate(ctx, m)
 	case *CollectionMutation:
 		return c.Collection.mutate(ctx, m)
+	case *CollectionNodeMutation:
+		return c.CollectionNode.mutate(ctx, m)
+	case *CollectionPostMutation:
+		return c.CollectionPost.mutate(ctx, m)
 	case *LinkMutation:
 		return c.Link.mutate(ctx, m)
 	case *NodeMutation:
@@ -1218,6 +1236,38 @@ func (c *CollectionClient) QueryNodes(co *Collection) *NodeQuery {
 	return query
 }
 
+// QueryCollectionPosts queries the collection_posts edge of a Collection.
+func (c *CollectionClient) QueryCollectionPosts(co *Collection) *CollectionPostQuery {
+	query := (&CollectionPostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(collectionpost.Table, collectionpost.CollectionColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, collection.CollectionPostsTable, collection.CollectionPostsColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCollectionNodes queries the collection_nodes edge of a Collection.
+func (c *CollectionClient) QueryCollectionNodes(co *Collection) *CollectionNodeQuery {
+	query := (&CollectionNodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(collectionnode.Table, collectionnode.CollectionColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, collection.CollectionNodesTable, collection.CollectionNodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CollectionClient) Hooks() []Hook {
 	return c.hooks.Collection
@@ -1240,6 +1290,238 @@ func (c *CollectionClient) mutate(ctx context.Context, m *CollectionMutation) (V
 		return (&CollectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Collection mutation op: %q", m.Op())
+	}
+}
+
+// CollectionNodeClient is a client for the CollectionNode schema.
+type CollectionNodeClient struct {
+	config
+}
+
+// NewCollectionNodeClient returns a client for the CollectionNode from the given config.
+func NewCollectionNodeClient(c config) *CollectionNodeClient {
+	return &CollectionNodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `collectionnode.Hooks(f(g(h())))`.
+func (c *CollectionNodeClient) Use(hooks ...Hook) {
+	c.hooks.CollectionNode = append(c.hooks.CollectionNode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `collectionnode.Intercept(f(g(h())))`.
+func (c *CollectionNodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CollectionNode = append(c.inters.CollectionNode, interceptors...)
+}
+
+// Create returns a builder for creating a CollectionNode entity.
+func (c *CollectionNodeClient) Create() *CollectionNodeCreate {
+	mutation := newCollectionNodeMutation(c.config, OpCreate)
+	return &CollectionNodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CollectionNode entities.
+func (c *CollectionNodeClient) CreateBulk(builders ...*CollectionNodeCreate) *CollectionNodeCreateBulk {
+	return &CollectionNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CollectionNodeClient) MapCreateBulk(slice any, setFunc func(*CollectionNodeCreate, int)) *CollectionNodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CollectionNodeCreateBulk{err: fmt.Errorf("calling to CollectionNodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CollectionNodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CollectionNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CollectionNode.
+func (c *CollectionNodeClient) Update() *CollectionNodeUpdate {
+	mutation := newCollectionNodeMutation(c.config, OpUpdate)
+	return &CollectionNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CollectionNodeClient) UpdateOne(cn *CollectionNode) *CollectionNodeUpdateOne {
+	mutation := newCollectionNodeMutation(c.config, OpUpdateOne)
+	mutation.collection = &cn.CollectionID
+	mutation.node = &cn.NodeID
+	return &CollectionNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CollectionNode.
+func (c *CollectionNodeClient) Delete() *CollectionNodeDelete {
+	mutation := newCollectionNodeMutation(c.config, OpDelete)
+	return &CollectionNodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for CollectionNode.
+func (c *CollectionNodeClient) Query() *CollectionNodeQuery {
+	return &CollectionNodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCollectionNode},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryCollection queries the collection edge of a CollectionNode.
+func (c *CollectionNodeClient) QueryCollection(cn *CollectionNode) *CollectionQuery {
+	return c.Query().
+		Where(collectionnode.CollectionID(cn.CollectionID), collectionnode.NodeID(cn.NodeID)).
+		QueryCollection()
+}
+
+// QueryNode queries the node edge of a CollectionNode.
+func (c *CollectionNodeClient) QueryNode(cn *CollectionNode) *NodeQuery {
+	return c.Query().
+		Where(collectionnode.CollectionID(cn.CollectionID), collectionnode.NodeID(cn.NodeID)).
+		QueryNode()
+}
+
+// Hooks returns the client hooks.
+func (c *CollectionNodeClient) Hooks() []Hook {
+	return c.hooks.CollectionNode
+}
+
+// Interceptors returns the client interceptors.
+func (c *CollectionNodeClient) Interceptors() []Interceptor {
+	return c.inters.CollectionNode
+}
+
+func (c *CollectionNodeClient) mutate(ctx context.Context, m *CollectionNodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CollectionNodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CollectionNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CollectionNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CollectionNodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CollectionNode mutation op: %q", m.Op())
+	}
+}
+
+// CollectionPostClient is a client for the CollectionPost schema.
+type CollectionPostClient struct {
+	config
+}
+
+// NewCollectionPostClient returns a client for the CollectionPost from the given config.
+func NewCollectionPostClient(c config) *CollectionPostClient {
+	return &CollectionPostClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `collectionpost.Hooks(f(g(h())))`.
+func (c *CollectionPostClient) Use(hooks ...Hook) {
+	c.hooks.CollectionPost = append(c.hooks.CollectionPost, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `collectionpost.Intercept(f(g(h())))`.
+func (c *CollectionPostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CollectionPost = append(c.inters.CollectionPost, interceptors...)
+}
+
+// Create returns a builder for creating a CollectionPost entity.
+func (c *CollectionPostClient) Create() *CollectionPostCreate {
+	mutation := newCollectionPostMutation(c.config, OpCreate)
+	return &CollectionPostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CollectionPost entities.
+func (c *CollectionPostClient) CreateBulk(builders ...*CollectionPostCreate) *CollectionPostCreateBulk {
+	return &CollectionPostCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CollectionPostClient) MapCreateBulk(slice any, setFunc func(*CollectionPostCreate, int)) *CollectionPostCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CollectionPostCreateBulk{err: fmt.Errorf("calling to CollectionPostClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CollectionPostCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CollectionPostCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CollectionPost.
+func (c *CollectionPostClient) Update() *CollectionPostUpdate {
+	mutation := newCollectionPostMutation(c.config, OpUpdate)
+	return &CollectionPostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CollectionPostClient) UpdateOne(cp *CollectionPost) *CollectionPostUpdateOne {
+	mutation := newCollectionPostMutation(c.config, OpUpdateOne)
+	mutation.collection = &cp.CollectionID
+	mutation.post = &cp.PostID
+	return &CollectionPostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CollectionPost.
+func (c *CollectionPostClient) Delete() *CollectionPostDelete {
+	mutation := newCollectionPostMutation(c.config, OpDelete)
+	return &CollectionPostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for CollectionPost.
+func (c *CollectionPostClient) Query() *CollectionPostQuery {
+	return &CollectionPostQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCollectionPost},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryCollection queries the collection edge of a CollectionPost.
+func (c *CollectionPostClient) QueryCollection(cp *CollectionPost) *CollectionQuery {
+	return c.Query().
+		Where(collectionpost.CollectionID(cp.CollectionID), collectionpost.PostID(cp.PostID)).
+		QueryCollection()
+}
+
+// QueryPost queries the post edge of a CollectionPost.
+func (c *CollectionPostClient) QueryPost(cp *CollectionPost) *PostQuery {
+	return c.Query().
+		Where(collectionpost.CollectionID(cp.CollectionID), collectionpost.PostID(cp.PostID)).
+		QueryPost()
+}
+
+// Hooks returns the client hooks.
+func (c *CollectionPostClient) Hooks() []Hook {
+	return c.hooks.CollectionPost
+}
+
+// Interceptors returns the client interceptors.
+func (c *CollectionPostClient) Interceptors() []Interceptor {
+	return c.inters.CollectionPost
+}
+
+func (c *CollectionPostClient) mutate(ctx context.Context, m *CollectionPostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CollectionPostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CollectionPostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CollectionPostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CollectionPostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CollectionPost mutation op: %q", m.Op())
 	}
 }
 
@@ -1637,6 +1919,22 @@ func (c *NodeClient) QueryCollections(n *Node) *CollectionQuery {
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(collection.Table, collection.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, node.CollectionsTable, node.CollectionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCollectionNodes queries the collection_nodes edge of a Node.
+func (c *NodeClient) QueryCollectionNodes(n *Node) *CollectionNodeQuery {
+	query := (&CollectionNodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(collectionnode.Table, collectionnode.NodeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.CollectionNodesTable, node.CollectionNodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -2742,12 +3040,14 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, Asset, Authentication, Category, Collection, Link, Node, Notification,
-		Post, React, Role, Setting, Tag []ent.Hook
+		Account, Asset, Authentication, Category, Collection, CollectionNode,
+		CollectionPost, Link, Node, Notification, Post, React, Role, Setting,
+		Tag []ent.Hook
 	}
 	inters struct {
-		Account, Asset, Authentication, Category, Collection, Link, Node, Notification,
-		Post, React, Role, Setting, Tag []ent.Interceptor
+		Account, Asset, Authentication, Category, Collection, CollectionNode,
+		CollectionPost, Link, Node, Notification, Post, React, Role, Setting,
+		Tag []ent.Interceptor
 	}
 )
 

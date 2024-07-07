@@ -55,6 +55,18 @@ erDiagram
         string description
         collectionDOTVisibility visibility
     }
+    CollectionNode {
+        timeDOTTime created_at
+        xidDOTID collection_id
+        xidDOTID node_id
+        string membership_type
+    }
+    CollectionPost {
+        timeDOTTime created_at
+        xidDOTID collection_id
+        xidDOTID post_id
+        string membership_type
+    }
     Link {
         xidDOTID id
         timeDOTTime created_at
@@ -136,6 +148,10 @@ erDiagram
     	Category |o--o{ Post : "posts/category"
     	Collection }o--o{ Post : "posts/collections"
     	Collection }o--o{ Node : "nodes/collections"
+    	CollectionNode }o--o| Collection : "collection"
+    	CollectionNode }o--o| Node : "node"
+    	CollectionPost }o--o| Collection : "collection"
+    	CollectionPost }o--o| Post : "post"
     	Link }o--o{ Post : "posts/links"
     	Link }o--o{ Node : "nodes/links"
     	Link }o--o{ Asset : "assets/links"

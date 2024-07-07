@@ -5,15 +5,21 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
+	ent_node "github.com/Southclaws/storyden/internal/ent/node"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
 type (
-	Option func(*ent.CollectionMutation)
-	Filter func(*ent.CollectionQuery)
+	Option     func(*ent.CollectionMutation)
+	ItemOption func(*ent.Tx, *itemOptions)
+	Filter     func(*ent.CollectionQuery)
+	ItemFilter func(*ent.CollectionPostQuery, *ent.CollectionNodeQuery)
 )
 
 type Repository interface {
@@ -24,11 +30,30 @@ type Repository interface {
 		opts ...Option) (*Collection, error)
 
 	List(ctx context.Context, filters ...Filter) ([]*Collection, error)
-	Get(ctx context.Context, id CollectionID) (*Collection, error)
+	Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*Collection, error)
 
 	Update(ctx context.Context, id CollectionID, opts ...Option) (*Collection, error)
+	UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*Collection, error)
 
 	Delete(ctx context.Context, id CollectionID) error
+}
+
+func WithVisibility(v ...visibility.Visibility) ItemFilter {
+	return func(pq *ent.CollectionPostQuery, nq *ent.CollectionNodeQuery) {
+		pv := dt.Map(v, func(v visibility.Visibility) ent_post.Visibility { return ent_post.Visibility(v.String()) })
+		pq.Where(
+			collectionpost.HasPostWith(
+				ent_post.VisibilityIn(pv...),
+			),
+		)
+
+		nv := dt.Map(v, func(v visibility.Visibility) ent_node.Visibility { return ent_node.Visibility(v.String()) })
+		nq.Where(
+			collectionnode.HasNodeWith(
+				ent_node.VisibilityIn(nv...),
+			),
+		)
+	}
 }
 
 func WithID(id CollectionID) Option {
@@ -46,29 +71,5 @@ func WithName(v string) Option {
 func WithDescription(v string) Option {
 	return func(c *ent.CollectionMutation) {
 		c.SetDescription(v)
-	}
-}
-
-func WithPostAdd(id post.ID) Option {
-	return func(c *ent.CollectionMutation) {
-		c.AddPostIDs(xid.ID(id))
-	}
-}
-
-func WithPostRemove(id post.ID) Option {
-	return func(c *ent.CollectionMutation) {
-		c.RemovePostIDs(xid.ID(id))
-	}
-}
-
-func WithNodeAdd(id datagraph.NodeID) Option {
-	return func(c *ent.CollectionMutation) {
-		c.AddNodeIDs(xid.ID(id))
-	}
-}
-
-func WithNodeRemove(id datagraph.NodeID) Option {
-	return func(c *ent.CollectionMutation) {
-		c.RemoveNodeIDs(xid.ID(id))
 	}
 }

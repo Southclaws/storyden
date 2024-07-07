@@ -12,7 +12,7 @@ var (
 	// AccountsColumns holds the columns for the "accounts" table.
 	AccountsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "handle", Type: field.TypeString, Unique: true},
@@ -30,7 +30,7 @@ var (
 	// AssetsColumns holds the columns for the "assets" table.
 	AssetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "filename", Type: field.TypeString},
 		{Name: "url", Type: field.TypeString},
@@ -61,7 +61,7 @@ var (
 	// AuthenticationsColumns holds the columns for the "authentications" table.
 	AuthenticationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "service", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
@@ -93,7 +93,7 @@ var (
 	// CategoriesColumns holds the columns for the "categories" table.
 	CategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "slug", Type: field.TypeString, Unique: true},
@@ -112,7 +112,7 @@ var (
 	// CollectionsColumns holds the columns for the "collections" table.
 	CollectionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
@@ -133,10 +133,71 @@ var (
 			},
 		},
 	}
+	// CollectionNodesColumns holds the columns for the "collection_nodes" table.
+	CollectionNodesColumns = []*schema.Column{
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "membership_type", Type: field.TypeString, Default: "normal"},
+		{Name: "collection_id", Type: field.TypeString, Size: 20},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+	}
+	// CollectionNodesTable holds the schema information for the "collection_nodes" table.
+	CollectionNodesTable = &schema.Table{
+		Name:       "collection_nodes",
+		Columns:    CollectionNodesColumns,
+		PrimaryKey: []*schema.Column{CollectionNodesColumns[2], CollectionNodesColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collection_nodes_collections_collection",
+				Columns:    []*schema.Column{CollectionNodesColumns[2]},
+				RefColumns: []*schema.Column{CollectionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "collection_nodes_nodes_node",
+				Columns:    []*schema.Column{CollectionNodesColumns[3]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_collection_node",
+				Unique:  true,
+				Columns: []*schema.Column{CollectionNodesColumns[2], CollectionNodesColumns[3]},
+			},
+		},
+	}
+	// CollectionPostsColumns holds the columns for the "collection_posts" table.
+	CollectionPostsColumns = []*schema.Column{
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "membership_type", Type: field.TypeString, Default: "normal"},
+		{Name: "collection_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// CollectionPostsTable holds the schema information for the "collection_posts" table.
+	CollectionPostsTable = &schema.Table{
+		Name:       "collection_posts",
+		Columns:    CollectionPostsColumns,
+		PrimaryKey: []*schema.Column{CollectionPostsColumns[2], CollectionPostsColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collection_posts_collections_collection",
+				Columns:    []*schema.Column{CollectionPostsColumns[2]},
+				RefColumns: []*schema.Column{CollectionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "collection_posts_posts_post",
+				Columns:    []*schema.Column{CollectionPostsColumns[3]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "url", Type: field.TypeString, Unique: true},
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "domain", Type: field.TypeString},
@@ -152,7 +213,7 @@ var (
 	// NodesColumns holds the columns for the "nodes" table.
 	NodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
@@ -194,7 +255,7 @@ var (
 	// NotificationsColumns holds the columns for the "notifications" table.
 	NotificationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
 		{Name: "link", Type: field.TypeString},
@@ -209,7 +270,7 @@ var (
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "first", Type: field.TypeBool},
@@ -260,7 +321,7 @@ var (
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "emoji", Type: field.TypeString},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "post_id", Type: field.TypeString, Size: 20},
@@ -288,7 +349,7 @@ var (
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Unique: true},
 	}
@@ -313,7 +374,7 @@ var (
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "name", Type: field.TypeString, Unique: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
@@ -343,56 +404,6 @@ var (
 				Symbol:     "account_tags_tag_id",
 				Columns:    []*schema.Column{AccountTagsColumns[1]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// CollectionPostsColumns holds the columns for the "collection_posts" table.
-	CollectionPostsColumns = []*schema.Column{
-		{Name: "collection_id", Type: field.TypeString, Size: 20},
-		{Name: "post_id", Type: field.TypeString, Size: 20},
-	}
-	// CollectionPostsTable holds the schema information for the "collection_posts" table.
-	CollectionPostsTable = &schema.Table{
-		Name:       "collection_posts",
-		Columns:    CollectionPostsColumns,
-		PrimaryKey: []*schema.Column{CollectionPostsColumns[0], CollectionPostsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "collection_posts_collection_id",
-				Columns:    []*schema.Column{CollectionPostsColumns[0]},
-				RefColumns: []*schema.Column{CollectionsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "collection_posts_post_id",
-				Columns:    []*schema.Column{CollectionPostsColumns[1]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// CollectionNodesColumns holds the columns for the "collection_nodes" table.
-	CollectionNodesColumns = []*schema.Column{
-		{Name: "collection_id", Type: field.TypeString, Size: 20},
-		{Name: "node_id", Type: field.TypeString, Size: 20},
-	}
-	// CollectionNodesTable holds the schema information for the "collection_nodes" table.
-	CollectionNodesTable = &schema.Table{
-		Name:       "collection_nodes",
-		Columns:    CollectionNodesColumns,
-		PrimaryKey: []*schema.Column{CollectionNodesColumns[0], CollectionNodesColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "collection_nodes_collection_id",
-				Columns:    []*schema.Column{CollectionNodesColumns[0]},
-				RefColumns: []*schema.Column{CollectionsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "collection_nodes_node_id",
-				Columns:    []*schema.Column{CollectionNodesColumns[1]},
-				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -604,6 +615,8 @@ var (
 		AuthenticationsTable,
 		CategoriesTable,
 		CollectionsTable,
+		CollectionNodesTable,
+		CollectionPostsTable,
 		LinksTable,
 		NodesTable,
 		NotificationsTable,
@@ -613,8 +626,6 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
-		CollectionPostsTable,
-		CollectionNodesTable,
 		LinkPostsTable,
 		LinkNodesTable,
 		LinkAssetsTable,
@@ -630,6 +641,10 @@ func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
+	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
+	CollectionNodesTable.ForeignKeys[1].RefTable = NodesTable
+	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
+	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = NodesTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
@@ -641,10 +656,6 @@ func init() {
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	AccountTagsTable.Annotation = &entsql.Annotation{}
-	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
-	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
-	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
-	CollectionNodesTable.ForeignKeys[1].RefTable = NodesTable
 	LinkPostsTable.ForeignKeys[0].RefTable = LinksTable
 	LinkPostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinkNodesTable.ForeignKeys[0].RefTable = LinksTable

@@ -58,6 +58,7 @@ func (Node) Edges() []ent.Edge {
 			Ref("nodes"),
 
 		edge.From("collections", Collection.Type).
-			Ref("nodes"),
+			Ref("nodes").
+			Through("collection_nodes", CollectionNode.Type),
 	}
 }

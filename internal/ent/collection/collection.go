@@ -32,6 +32,10 @@ const (
 	EdgePosts = "posts"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
 	EdgeNodes = "nodes"
+	// EdgeCollectionPosts holds the string denoting the collection_posts edge name in mutations.
+	EdgeCollectionPosts = "collection_posts"
+	// EdgeCollectionNodes holds the string denoting the collection_nodes edge name in mutations.
+	EdgeCollectionNodes = "collection_nodes"
 	// Table holds the table name of the collection in the database.
 	Table = "collections"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -51,6 +55,20 @@ const (
 	// NodesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodesInverseTable = "nodes"
+	// CollectionPostsTable is the table that holds the collection_posts relation/edge.
+	CollectionPostsTable = "collection_posts"
+	// CollectionPostsInverseTable is the table name for the CollectionPost entity.
+	// It exists in this package in order to avoid circular dependency with the "collectionpost" package.
+	CollectionPostsInverseTable = "collection_posts"
+	// CollectionPostsColumn is the table column denoting the collection_posts relation/edge.
+	CollectionPostsColumn = "collection_id"
+	// CollectionNodesTable is the table that holds the collection_nodes relation/edge.
+	CollectionNodesTable = "collection_nodes"
+	// CollectionNodesInverseTable is the table name for the CollectionNode entity.
+	// It exists in this package in order to avoid circular dependency with the "collectionnode" package.
+	CollectionNodesInverseTable = "collection_nodes"
+	// CollectionNodesColumn is the table column denoting the collection_nodes relation/edge.
+	CollectionNodesColumn = "collection_id"
 )
 
 // Columns holds all SQL columns for collection fields.
@@ -201,6 +219,34 @@ func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCollectionPostsCount orders the results by collection_posts count.
+func ByCollectionPostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionPostsStep(), opts...)
+	}
+}
+
+// ByCollectionPosts orders the results by collection_posts terms.
+func ByCollectionPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionPostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCollectionNodesCount orders the results by collection_nodes count.
+func ByCollectionNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionNodesStep(), opts...)
+	}
+}
+
+// ByCollectionNodes orders the results by collection_nodes terms.
+func ByCollectionNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -220,5 +266,19 @@ func newNodesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
+	)
+}
+func newCollectionPostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionPostsInverseTable, CollectionPostsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CollectionPostsTable, CollectionPostsColumn),
+	)
+}
+func newCollectionNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionNodesInverseTable, CollectionNodesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CollectionNodesTable, CollectionNodesColumn),
 	)
 }

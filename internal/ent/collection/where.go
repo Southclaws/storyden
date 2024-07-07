@@ -375,6 +375,52 @@ func HasNodesWith(preds ...predicate.Node) predicate.Collection {
 	})
 }
 
+// HasCollectionPosts applies the HasEdge predicate on the "collection_posts" edge.
+func HasCollectionPosts() predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CollectionPostsTable, CollectionPostsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCollectionPostsWith applies the HasEdge predicate on the "collection_posts" edge with a given conditions (other predicates).
+func HasCollectionPostsWith(preds ...predicate.CollectionPost) predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := newCollectionPostsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCollectionNodes applies the HasEdge predicate on the "collection_nodes" edge.
+func HasCollectionNodes() predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CollectionNodesTable, CollectionNodesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCollectionNodesWith applies the HasEdge predicate on the "collection_nodes" edge with a given conditions (other predicates).
+func HasCollectionNodesWith(preds ...predicate.CollectionNode) predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := newCollectionNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Collection) predicate.Collection {
 	return predicate.Collection(sql.AndPredicates(predicates...))

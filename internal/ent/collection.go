@@ -44,9 +44,13 @@ type CollectionEdges struct {
 	Posts []*Post `json:"posts,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// CollectionPosts holds the value of the collection_posts edge.
+	CollectionPosts []*CollectionPost `json:"collection_posts,omitempty"`
+	// CollectionNodes holds the value of the collection_nodes edge.
+	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -76,6 +80,24 @@ func (e CollectionEdges) NodesOrErr() ([]*Node, error) {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
+}
+
+// CollectionPostsOrErr returns the CollectionPosts value or an error if the edge
+// was not loaded in eager-loading.
+func (e CollectionEdges) CollectionPostsOrErr() ([]*CollectionPost, error) {
+	if e.loadedTypes[3] {
+		return e.CollectionPosts, nil
+	}
+	return nil, &NotLoadedError{edge: "collection_posts"}
+}
+
+// CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e CollectionEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
+	if e.loadedTypes[4] {
+		return e.CollectionNodes, nil
+	}
+	return nil, &NotLoadedError{edge: "collection_nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -175,6 +197,16 @@ func (c *Collection) QueryPosts() *PostQuery {
 // QueryNodes queries the "nodes" edge of the Collection entity.
 func (c *Collection) QueryNodes() *NodeQuery {
 	return NewCollectionClient(c.config).QueryNodes(c)
+}
+
+// QueryCollectionPosts queries the "collection_posts" edge of the Collection entity.
+func (c *Collection) QueryCollectionPosts() *CollectionPostQuery {
+	return NewCollectionClient(c.config).QueryCollectionPosts(c)
+}
+
+// QueryCollectionNodes queries the "collection_nodes" edge of the Collection entity.
+func (c *Collection) QueryCollectionNodes() *CollectionNodeQuery {
+	return NewCollectionClient(c.config).QueryCollectionNodes(c)
 }
 
 // Update returns a builder for updating this Collection.

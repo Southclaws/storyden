@@ -24,6 +24,10 @@ type Tx struct {
 	Category *CategoryClient
 	// Collection is the client for interacting with the Collection builders.
 	Collection *CollectionClient
+	// CollectionNode is the client for interacting with the CollectionNode builders.
+	CollectionNode *CollectionNodeClient
+	// CollectionPost is the client for interacting with the CollectionPost builders.
+	CollectionPost *CollectionPostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Node is the client for interacting with the Node builders.
@@ -176,6 +180,8 @@ func (tx *Tx) init() {
 	tx.Authentication = NewAuthenticationClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
 	tx.Collection = NewCollectionClient(tx.config)
+	tx.CollectionNode = NewCollectionNodeClient(tx.config)
+	tx.CollectionPost = NewCollectionPostClient(tx.config)
 	tx.Link = NewLinkClient(tx.config)
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)

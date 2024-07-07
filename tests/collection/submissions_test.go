@@ -1,0 +1,177 @@
+package collection_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/rs/xid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
+
+	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/transports/openapi"
+	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/Southclaws/storyden/tests"
+)
+
+func TestCollectionSubmissions(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *bindings.CookieJar,
+		ar account.Repository,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, ar, seed.Account_001_Odin)
+			adminSession := e2e.WithSession(adminCtx, cj)
+
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{xid.New().String(), "password"})
+			tests.Ok(t, err, acc1)
+			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
+
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{xid.New().String(), "password"})
+			tests.Ok(t, err, acc2)
+			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
+
+			acc3, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{xid.New().String(), "password"})
+			tests.Ok(t, err, acc3)
+			session3 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))), cj)
+
+			collection1, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+				Name:        "c1",
+				Description: "owned by acc1",
+			}, session1)
+			tests.Ok(t, err, collection1)
+
+			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Admin:       false,
+				Colour:      "",
+				Description: "cat",
+				Name:        xid.New().String(),
+			}, adminSession)
+			tests.Ok(t, err, cat1)
+
+			threadCreateProps := openapi.ThreadInitialProps{
+				Body:       "<p>this is a thread</p>",
+				Category:   cat1.JSON200.Id,
+				Visibility: openapi.Published,
+				Title:      "thread",
+			}
+
+			published := openapi.Published
+
+			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
+			tests.Ok(t, err, thread1create)
+
+			thread2create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session2)
+			tests.Ok(t, err, thread2create)
+
+			node1create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			tests.Ok(t, err, node1create)
+
+			node2create, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &published}, adminSession)
+			tests.Ok(t, err, node2create)
+
+			t.Run("submit_published_to_someone_elses_collection", func(t *testing.T) {
+				t.Parallel()
+				r := require.New(t)
+				a := assert.New(t)
+
+				// Owner adds a thread and a node to their own collection
+				addpost, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addpost)
+				addnode, err := cl.CollectionAddNodeWithResponse(root, collection1.JSON200.Id, node1create.JSON200.Id, session1)
+				tests.Ok(t, err, addnode)
+
+				// Non-owner submits a thread and a node to Owner's collection
+				submitnode, err := cl.CollectionAddNodeWithResponse(root, collection1.JSON200.Id, node2create.JSON200.Id, session2)
+				tests.Ok(t, err, submitnode)
+				submitpost, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread2create.JSON200.Id, session2)
+				tests.Ok(t, err, submitpost)
+
+				// guest cannot see the node in the collection
+				get1, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id)
+				tests.Ok(t, err, get1)
+				r.Len(get1.JSON200.Items, 2)
+
+				// unrelated user, acc 3, cannot see the node in the collection
+				gets3, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session3)
+				tests.Ok(t, err, gets3)
+				r.Len(gets3.JSON200.Items, 2)
+
+				// acc1 can see the node in the collection
+				gets1, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session1)
+				tests.Ok(t, err, gets1)
+				r.Len(gets1.JSON200.Items, 4)
+
+				a.Equal(openapi.Submission, gets1.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.Submission, gets1.JSON200.Items[1].MembershipType)
+
+				// acc2 can see the node in the collection
+				gets2, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session2)
+				tests.Ok(t, err, gets2)
+				r.Len(gets2.JSON200.Items, 3)
+				// NOTE: This is 3 because currently the owner of the submission
+				// is not stored and filtering is performed against the owner of
+				// the resource itself. Which removes both node2 and thread2
+				// from the list, however posts are not yet properly filtered
+				// and are always treated as published so the post is present.
+
+				a.Equal(openapi.Submission, gets1.JSON200.Items[0].MembershipType)
+				a.Equal(openapi.Submission, gets1.JSON200.Items[1].MembershipType)
+			})
+
+			t.Run("submit_unlisted_node_to_someone_elses_collection", func(t *testing.T) {
+				t.Parallel()
+				r := require.New(t)
+				a := assert.New(t)
+
+				unlisted := openapi.Unlisted
+
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "c2",
+					Description: "owned by acc1",
+				}, session1)
+				tests.Ok(t, err, col)
+
+				unlistedNode, err := cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Content: opt.New("<p>hi</p>").Ptr(), Visibility: &unlisted}, session2)
+				tests.Ok(t, err, unlistedNode)
+
+				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)
+				tests.Ok(t, err, submitnode)
+
+				// guest cannot see
+				getGuest, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
+				tests.Ok(t, err, getGuest)
+				a.Len(getGuest.JSON200.Items, 0)
+
+				// unrelated user cannot see
+				getUnrelated, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session3)
+				tests.Ok(t, err, getUnrelated)
+				r.Len(getUnrelated.JSON200.Items, 0)
+
+				// acc1 can see the node in the collection
+				getOwner, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
+				tests.Ok(t, err, getOwner)
+				r.Len(getOwner.JSON200.Items, 1)
+				a.Equal(openapi.Submission, getOwner.JSON200.Items[0].MembershipType)
+
+				// acc2 can see the node in the collection
+				getSubmitter, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
+				tests.Ok(t, err, getSubmitter)
+				r.Len(getSubmitter.JSON200.Items, 1)
+				a.Equal(openapi.Submission, getSubmitter.JSON200.Items[0].MembershipType)
+			})
+		}))
+	}))
+}

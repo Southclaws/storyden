@@ -63,7 +63,7 @@ func New(
 }
 
 func (s *service) Update(ctx context.Context, cid collection.CollectionID, partial Partial) (*collection.Collection, error) {
-	if err := s.authorise(ctx, cid); err != nil {
+	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func (s *service) Update(ctx context.Context, cid collection.CollectionID, parti
 }
 
 func (s *service) Delete(ctx context.Context, cid collection.CollectionID) error {
-	if err := s.authorise(ctx, cid); err != nil {
+	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
 		return err
 	}
 
@@ -94,11 +94,17 @@ func (s *service) Delete(ctx context.Context, cid collection.CollectionID) error
 }
 
 func (s *service) PostAdd(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
-	if err := s.authorise(ctx, cid); err != nil {
+	err, isSubmission := s.authoriseSubmission(ctx, cid)
+	if err != nil {
 		return nil, err
 	}
 
-	col, err := s.collection_repo.Update(ctx, cid, collection.WithPostAdd(pid))
+	mt := collection.MembershipTypeNormal
+	if isSubmission {
+		mt = collection.MembershipTypeSubmission
+	}
+
+	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithPostAdd(pid, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -107,11 +113,11 @@ func (s *service) PostAdd(ctx context.Context, cid collection.CollectionID, pid 
 }
 
 func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.Collection, error) {
-	if err := s.authorise(ctx, cid); err != nil {
+	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
 		return nil, err
 	}
 
-	col, err := s.collection_repo.Update(ctx, cid, collection.WithPostRemove(pid))
+	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithPostRemove(pid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -120,11 +126,17 @@ func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, p
 }
 
 func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.Collection, error) {
-	if err := s.authorise(ctx, cid); err != nil {
+	err, isSubmission := s.authoriseSubmission(ctx, cid)
+	if err != nil {
 		return nil, err
 	}
 
-	col, err := s.collection_repo.Update(ctx, cid, collection.WithNodeAdd(id))
+	mt := collection.MembershipTypeNormal
+	if isSubmission {
+		mt = collection.MembershipTypeSubmission
+	}
+
+	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithNodeAdd(id, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -133,11 +145,11 @@ func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id d
 }
 
 func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.Collection, error) {
-	if err := s.authorise(ctx, cid); err != nil {
+	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
 		return nil, err
 	}
 
-	col, err := s.collection_repo.Update(ctx, cid, collection.WithNodeRemove(id))
+	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithNodeRemove(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -145,7 +157,7 @@ func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, i
 	return col, nil
 }
 
-func (s *service) authorise(ctx context.Context, cid collection.CollectionID) error {
+func (s *service) authoriseDirectUpdate(ctx context.Context, cid collection.CollectionID) error {
 	aid, err := session.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -170,4 +182,33 @@ func (s *service) authorise(ctx context.Context, cid collection.CollectionID) er
 	}
 
 	return nil
+}
+
+func (s *service) authoriseSubmission(ctx context.Context, cid collection.CollectionID) (error, bool) {
+	aid, err := session.GetAccountID(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx)), false
+	}
+
+	acc, err := s.account_repo.GetByID(ctx, aid)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx)), false
+	}
+
+	col, err := s.collection_repo.Get(ctx, cid)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx)), false
+	}
+
+	if err := s.rbac.Authorize(&restrict.AccessRequest{
+		Subject:  acc,
+		Resource: col,
+		Actions:  []string{rbac.ActionSubmit},
+	}); err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize")), false
+	}
+
+	isSubmission := col.Owner.ID != acc.ID
+
+	return nil, isSubmission
 }

@@ -3,6 +3,7 @@ package collection
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -11,6 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/collectionnode"
+	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 )
 
 type database struct {
@@ -73,22 +76,44 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 	return all, nil
 }
 
-func (d *database) Get(ctx context.Context, id CollectionID) (*Collection, error) {
+func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilter) (*Collection, error) {
+	filters = append(filters, func(pcq *ent.CollectionPostQuery, ncq *ent.CollectionNodeQuery) {
+		if pcq != nil {
+			pcq.WithPost(func(pq *ent.PostQuery) {
+				pq.WithAuthor()
+				pq.WithCategory()
+				pq.WithTags()
+				pq.WithRoot()
+			})
+		}
+
+		if ncq != nil {
+			ncq.WithNode(func(nq *ent.NodeQuery) {
+				nq.WithOwner()
+				nq.WithAssets()
+				nq.WithTags()
+			})
+		}
+	})
+
 	col, err := d.db.Collection.
 		Query().
 		Where(collection.ID(xid.ID(id))).
 		WithOwner().
-		WithPosts(func(pq *ent.PostQuery) {
-			pq.WithAuthor()
-			pq.WithCategory()
-			pq.WithTags()
-			pq.WithRoot()
+		WithCollectionPosts(func(pq *ent.CollectionPostQuery) {
+			for _, fn := range filters {
+				fn(pq, nil)
+			}
 		}).
-		WithNodes(func(nq *ent.NodeQuery) {
-			nq.WithOwner()
-			nq.WithAssets()
-			nq.WithTags()
+		WithCollectionNodes(func(nq *ent.CollectionNodeQuery) {
+			for _, fn := range filters {
+				fn(nil, nq)
+			}
 		}).
+		Order(
+			collection.ByCollectionNodes(sql.OrderByField(collectionnode.FieldCreatedAt)),
+			collection.ByCollectionPosts(sql.OrderByField(collectionpost.FieldCreatedAt)),
+		).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
