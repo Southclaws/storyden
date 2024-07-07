@@ -66,86 +66,81 @@ func WithNodeRemove(id datagraph.NodeID) ItemOption {
 }
 
 func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*CollectionWithItems, error) {
-	err := ent.WithTx(ctx, d.db, func(tx *ent.Tx) error {
-		options := itemChanges{}
+	options := itemChanges{}
 
-		for _, fn := range opts {
-			fn(&options)
-		}
+	for _, fn := range opts {
+		fn(&options)
+	}
 
-		cid := xid.ID(id)
+	cid := xid.ID(id)
 
-		for _, op := range options {
-			var err error
+	for _, op := range options {
+		var err error
 
-			switch op.t {
-			case datagraph.KindPost:
-				predicate := collectionpost.And(
-					collectionpost.CollectionID(cid),
-					collectionpost.PostID(op.id),
-				)
+		switch op.t {
+		case datagraph.KindPost:
+			predicate := collectionpost.And(
+				collectionpost.CollectionID(cid),
+				collectionpost.PostID(op.id),
+			)
 
-				if op.remove {
-					_, err = tx.CollectionPost.Delete().Where(predicate).Exec(ctx)
-				} else {
-					exists, exerr := tx.CollectionPost.Query().Where(predicate).Exist(ctx)
-					if exerr != nil {
-						return exerr
-					}
-
-					if exists {
-						err = tx.CollectionPost.Update().
-							SetMembershipType(op.mt.String()).
-							Exec(ctx)
-					} else {
-						err = tx.CollectionPost.Create().
-							SetCollectionID(cid).
-							SetPostID(op.id).
-							SetMembershipType(op.mt.String()).
-							Exec(ctx)
-					}
+			if op.remove {
+				_, err = d.db.CollectionPost.Delete().Where(predicate).Exec(ctx)
+			} else {
+				exists, exerr := d.db.CollectionPost.Query().Where(predicate).Exist(ctx)
+				if exerr != nil {
+					return nil, exerr
 				}
 
-			case datagraph.KindNode:
-				predicate := collectionnode.And(
-					collectionnode.CollectionID(cid),
+				if exists {
+					err = d.db.CollectionPost.Update().
+						Where(predicate).
+						SetMembershipType(op.mt.String()).
+						Exec(ctx)
+				} else {
+					err = d.db.CollectionPost.Create().
+						SetCollectionID(cid).
+						SetPostID(op.id).
+						SetMembershipType(op.mt.String()).
+						Exec(ctx)
+				}
+			}
+
+		case datagraph.KindNode:
+			predicate := collectionnode.And(
+				collectionnode.CollectionID(cid),
+				collectionnode.NodeID(op.id),
+			)
+
+			if op.remove {
+				_, err = d.db.CollectionNode.Delete().Where(
+					collectionnode.CollectionID(xid.ID(id)),
 					collectionnode.NodeID(op.id),
-				)
-
-				if op.remove {
-					_, err = tx.CollectionNode.Delete().Where(
-						collectionnode.CollectionID(xid.ID(id)),
-						collectionnode.NodeID(op.id),
-					).Exec(ctx)
-				} else {
-					exists, exerr := tx.CollectionNode.Query().Where(predicate).Exist(ctx)
-					if exerr != nil {
-						return exerr
-					}
-
-					if exists {
-						err = tx.CollectionNode.Update().
-							SetMembershipType(op.mt.String()).
-							Exec(ctx)
-					} else {
-						err = tx.CollectionNode.Create().
-							SetCollectionID(cid).
-							SetNodeID(op.id).
-							SetMembershipType(op.mt.String()).
-							Exec(ctx)
-					}
-
+				).Exec(ctx)
+			} else {
+				exists, exerr := d.db.CollectionNode.Query().Where(predicate).Exist(ctx)
+				if exerr != nil {
+					return nil, exerr
 				}
-			}
-			if err != nil {
-				return err
+
+				if exists {
+					err = d.db.CollectionNode.Update().
+						Where(predicate).
+						SetMembershipType(op.mt.String()).
+						Exec(ctx)
+				} else {
+					err = d.db.CollectionNode.Create().
+						SetCollectionID(cid).
+						SetNodeID(op.id).
+						SetMembershipType(op.mt.String()).
+						Exec(ctx)
+				}
+
 			}
 		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return d.Get(ctx, id)
