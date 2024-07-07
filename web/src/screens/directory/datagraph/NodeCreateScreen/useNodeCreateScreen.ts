@@ -27,7 +27,7 @@ export function useNodeCreateScreen(props: Props) {
     slug: undefined as any, // TODO: Fix the types for this whole screen
     description: "",
     owner: props.session,
-    properties: {},
+    meta: {},
     children: [],
     assets: [],
     visibility: "draft",

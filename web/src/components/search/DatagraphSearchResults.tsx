@@ -50,13 +50,11 @@ export function DatagraphResultItem(props: DatagraphNode) {
 
 function buildPermalink(d: DatagraphNode): string {
   switch (d.kind) {
-    case "thread":
+    case "post":
       return `/t/${d.slug}`;
-    case "reply":
+    case "profile":
       return `/t/${d.slug}`;
     case "node":
       return `/directory/${d.slug}`;
-    case "link":
-      return `/l/${d.slug}`;
   }
 }

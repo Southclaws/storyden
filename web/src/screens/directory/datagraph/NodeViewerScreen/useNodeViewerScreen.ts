@@ -52,7 +52,7 @@ export function useNodeViewerScreen(props: Props) {
       asset_ids: node.asset_ids,
       url: node.url,
       content: node.content,
-      properties: node.properties,
+      meta: node.meta,
     });
     await mutate();
 
