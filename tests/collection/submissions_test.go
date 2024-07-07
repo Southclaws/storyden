@@ -47,12 +47,6 @@ func TestCollectionSubmissions(t *testing.T) {
 			tests.Ok(t, err, acc3)
 			session3 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))), cj)
 
-			collection1, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-				Name:        "c1",
-				Description: "owned by acc1",
-			}, session1)
-			tests.Ok(t, err, collection1)
-
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,
 				Colour:      "",
@@ -87,30 +81,36 @@ func TestCollectionSubmissions(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "c1",
+					Description: "owned by acc1",
+				}, session1)
+				tests.Ok(t, err, col)
+
 				// Owner adds a thread and a node to their own collection
-				addpost, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
+				addpost, err := cl.CollectionAddPostWithResponse(root, col.JSON200.Id, thread1create.JSON200.Id, session1)
 				tests.Ok(t, err, addpost)
-				addnode, err := cl.CollectionAddNodeWithResponse(root, collection1.JSON200.Id, node1create.JSON200.Id, session1)
+				addnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, node1create.JSON200.Id, session1)
 				tests.Ok(t, err, addnode)
 
 				// Non-owner submits a thread and a node to Owner's collection
-				submitnode, err := cl.CollectionAddNodeWithResponse(root, collection1.JSON200.Id, node2create.JSON200.Id, session2)
+				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, node2create.JSON200.Id, session2)
 				tests.Ok(t, err, submitnode)
-				submitpost, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread2create.JSON200.Id, session2)
+				submitpost, err := cl.CollectionAddPostWithResponse(root, col.JSON200.Id, thread2create.JSON200.Id, session2)
 				tests.Ok(t, err, submitpost)
 
 				// guest cannot see the node in the collection
-				get1, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id)
+				get1, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
 				tests.Ok(t, err, get1)
 				r.Len(get1.JSON200.Items, 2)
 
 				// unrelated user, acc 3, cannot see the node in the collection
-				gets3, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session3)
+				gets3, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session3)
 				tests.Ok(t, err, gets3)
 				r.Len(gets3.JSON200.Items, 2)
 
 				// acc1 can see the node in the collection
-				gets1, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session1)
+				gets1, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, gets1)
 				r.Len(gets1.JSON200.Items, 4)
 
@@ -118,7 +118,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				a.Equal(openapi.SubmissionReview, gets1.JSON200.Items[1].MembershipType)
 
 				// acc2 can see the node in the collection
-				gets2, err := cl.CollectionGetWithResponse(root, collection1.JSON200.Id, session2)
+				gets2, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
 				tests.Ok(t, err, gets2)
 				r.Len(gets2.JSON200.Items, 3)
 				// NOTE: This is 3 because currently the owner of the submission
@@ -150,23 +150,23 @@ func TestCollectionSubmissions(t *testing.T) {
 				submitnode, err := cl.CollectionAddNodeWithResponse(root, col.JSON200.Id, unlistedNode.JSON200.Id, session2)
 				tests.Ok(t, err, submitnode)
 
-				// guest can see unlisted items
+				// guest cannot see items in review
 				getGuest, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
 				tests.Ok(t, err, getGuest)
 				a.Len(getGuest.JSON200.Items, 0)
 
-				// unrelated can see unlisted items
+				// unrelated cannot see items in review
 				getUnrelated, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session3)
 				tests.Ok(t, err, getUnrelated)
 				r.Len(getUnrelated.JSON200.Items, 0)
 
-				// acc1 can see the node in the collection
+				// acc1 can the node that's submitted and in review
 				getOwner, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, getOwner)
 				r.Len(getOwner.JSON200.Items, 1)
 				a.Equal(openapi.SubmissionReview, getOwner.JSON200.Items[0].MembershipType)
 
-				// acc2 can see the node in the collection
+				// acc2 can the node that's submitted and in review
 				getSubmitter, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
 				tests.Ok(t, err, getSubmitter)
 				r.Len(getSubmitter.JSON200.Items, 1)
