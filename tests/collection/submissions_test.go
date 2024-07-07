@@ -164,12 +164,14 @@ func TestCollectionSubmissions(t *testing.T) {
 				getOwner, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, getOwner)
 				r.Len(getOwner.JSON200.Items, 1)
+				a.Equal(unlistedNode.JSON200.Id, getOwner.JSON200.Items[0].Id)
 				a.Equal(openapi.SubmissionReview, getOwner.JSON200.Items[0].MembershipType)
 
 				// acc2 can the node that's submitted and in review
 				getSubmitter, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
 				tests.Ok(t, err, getSubmitter)
 				r.Len(getSubmitter.JSON200.Items, 1)
+				a.Equal(unlistedNode.JSON200.Id, getSubmitter.JSON200.Items[0].Id)
 				a.Equal(openapi.SubmissionReview, getSubmitter.JSON200.Items[0].MembershipType)
 			})
 
