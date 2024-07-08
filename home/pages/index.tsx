@@ -920,7 +920,7 @@ function Footer() {
     >
       <HStack gap={[2, 3, 4]}>
         <VStack alignItems="end" fontSize="sm" color="hsla(265, 56%, 42%, 1)">
-          <styled.a href="https://discord.gg/bFkJDvpcmg">
+          <styled.a href="https://discord.gg/XF6ZBGF9XF">
             <HStack>
               <styled.p>Discord</styled.p>
               <Discord width="1.2em" />
