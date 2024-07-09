@@ -2918,10 +2918,12 @@ components:
 
     Asset:
       type: object
-      required: [id, url, mime_type, width, height]
+      required: [id, filename, url, mime_type, width, height]
       properties:
         id:
           $ref: "#/components/schemas/AssetID"
+        filename:
+          type: string
         url:
           type: string
         mime_type:
@@ -2930,6 +2932,17 @@ components:
           type: number
         height:
           type: number
+
+    AssetSourceURL:
+      description:
+        An asset source URL holds the address of an off-platform media asset
+        which is not hosted on a Storyden instance. It may represent a source
+        URL for an intended download or an asset which is stored elsewhere.
+      type: string
+
+    AssetSourceList:
+      type: array
+      items: { $ref: "#/components/schemas/AssetSourceURL" }
 
     #
     #  .d8888b.           888 888                   888    d8b
@@ -3108,6 +3121,7 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
+        asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
@@ -3122,6 +3136,7 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
+        asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }

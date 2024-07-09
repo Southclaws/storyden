@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
+	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -45,6 +46,7 @@ type Partial struct {
 	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
+	AssetSources opt.Optional[[]string]
 }
 
 type DeleteOptions struct {
@@ -66,6 +68,7 @@ type service struct {
 	nr       node.Repository
 	nc       node_children.Repository
 	hydrator hydrator.Service
+	fs       fetcher.Service
 }
 
 func New(
@@ -73,12 +76,14 @@ func New(
 	nr node.Repository,
 	nc node_children.Repository,
 	hydrator hydrator.Service,
+	fs fetcher.Service,
 ) Manager {
 	return &service{
 		ar:       ar,
 		nr:       nr,
 		nc:       nc,
 		hydrator: hydrator,
+		fs:       fs,
 	}
 }
 
@@ -106,6 +111,17 @@ func (s *service) Create(ctx context.Context,
 	opts, err := s.applyOpts(ctx, p)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if v, ok := p.AssetSources.Get(); ok {
+		for _, source := range v {
+			a, err := s.fs.Copy(ctx, source)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			opts = append(opts, node.WithAssets([]asset.AssetID{a.ID}))
+		}
 	}
 
 	nodeSlug := p.Slug.Or(slug.Make(name))
@@ -147,6 +163,17 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 	opts, err := s.applyOpts(ctx, p)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if v, ok := p.AssetSources.Get(); ok {
+		for _, source := range v {
+			a, err := s.fs.Copy(ctx, source)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			opts = append(opts, node.WithAssets([]asset.AssetID{a.ID}))
+		}
 	}
 
 	n, err = s.nr.Update(ctx, n.ID, opts...)
