@@ -62,6 +62,7 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 		Name:      opt.NewPtr(request.Body.Name),
 		Bio:       opt.NewPtr(request.Body.Bio),
 		Links:     links,
+		Meta:      opt.NewPtr((*map[string]any)(request.Body.Meta)),
 		Interests: opt.NewPtrMap(request.Body.Interests, tagsIDs),
 	})
 	if err != nil {

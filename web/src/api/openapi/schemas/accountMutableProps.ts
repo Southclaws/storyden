@@ -8,6 +8,7 @@
 import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { TagListIDs } from "./tagListIDs";
 
@@ -16,5 +17,6 @@ export interface AccountMutableProps {
   handle?: AccountHandle;
   interests?: TagListIDs;
   links?: ProfileExternalLinkList;
+  meta?: Metadata;
   name?: AccountName;
 }

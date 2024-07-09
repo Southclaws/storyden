@@ -20,6 +20,7 @@ var (
 		{Name: "bio", Type: field.TypeString, Nullable: true},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
 	AccountsTable = &schema.Table{

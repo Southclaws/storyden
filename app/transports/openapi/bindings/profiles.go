@@ -98,6 +98,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 			Image:     &avatarURL,
 			Name:      acc.Name,
 			Links:     serialiseExternalLinks(acc.ExternalLinks),
+			Meta:      acc.Metadata,
 		},
 	}, nil
 }
@@ -110,6 +111,7 @@ func serialiseProfile(in *datagraph.Profile) openapi.PublicProfile {
 		Bio:       in.Bio.HTML(),
 		Handle:    in.Handle,
 		Links:     serialiseExternalLinks(in.ExternalLinks),
+		Meta:      in.Metadata,
 		// Image:     &avatarURL,
 		Name: in.Name,
 	}
