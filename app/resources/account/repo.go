@@ -91,6 +91,12 @@ func SetLinks(links []ExternalLink) Mutation {
 	}
 }
 
+func SetMetadata(m map[string]any) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		u.SetMetadata(m)
+	}
+}
+
 func SetDeleted(t opt.Optional[time.Time]) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		if v, ok := t.Get(); ok {

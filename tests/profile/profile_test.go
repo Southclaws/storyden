@@ -125,12 +125,16 @@ func TestUpdateProfile(t *testing.T) {
 				newlinks := []openapi.ProfileExternalLink{
 					{Text: "link1", Url: "https://example.com"},
 				}
+				newmeta := openapi.Metadata{
+					"some": "data",
+				}
 
 				upd1, err := cl.AccountUpdateWithResponse(root, openapi.AccountUpdateJSONRequestBody{
 					Bio:    &newbio,
 					Handle: &newhandle,
 					Name:   &newname,
 					Links:  &newlinks,
+					Meta:   &newmeta,
 				}, session1)
 				tests.Ok(t, err, upd1)
 
@@ -139,6 +143,7 @@ func TestUpdateProfile(t *testing.T) {
 				a.Equal(newname, upd1.JSON200.Name)
 				r.Len(newlinks, 1)
 				a.Equal(newlinks, upd1.JSON200.Links)
+				a.Equal(newmeta, upd1.JSON200.Meta)
 
 				// old handle should not work
 				getold, err := cl.ProfileGetWithResponse(root, handle1)
@@ -152,6 +157,7 @@ func TestUpdateProfile(t *testing.T) {
 				a.Equal(newname, getAfterUpdateAsGuest.JSON200.Name)
 				r.Len(newlinks, 1)
 				a.Equal(newlinks, getAfterUpdateAsGuest.JSON200.Links)
+				a.Equal(newmeta, getAfterUpdateAsGuest.JSON200.Meta)
 
 				// as another user
 				getAfterUpdateAsUser2, err := cl.ProfileGetWithResponse(root, newhandle, session2)
@@ -161,6 +167,7 @@ func TestUpdateProfile(t *testing.T) {
 				a.Equal(newname, getAfterUpdateAsUser2.JSON200.Name)
 				r.Len(newlinks, 1)
 				a.Equal(newlinks, getAfterUpdateAsUser2.JSON200.Links)
+				a.Equal(newmeta, getAfterUpdateAsUser2.JSON200.Meta)
 			})
 		}))
 	}))

@@ -27,6 +27,7 @@ func (Account) Fields() []ent.Field {
 		field.String("bio").Optional(),
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
+		field.JSON("metadata", map[string]any{}).Optional(),
 	}
 }
 

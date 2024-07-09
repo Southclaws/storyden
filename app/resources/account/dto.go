@@ -29,6 +29,7 @@ type Account struct {
 	Admin         bool
 	Auths         []string
 	ExternalLinks []ExternalLink
+	Metadata      map[string]any
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -88,6 +89,7 @@ func FromModel(a *ent.Account) (*Account, error) {
 		Admin:         a.Admin,
 		Auths:         auths,
 		ExternalLinks: links,
+		Metadata:      a.Metadata,
 
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,

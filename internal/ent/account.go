@@ -36,6 +36,8 @@ type Account struct {
 	Admin bool `json:"admin,omitempty"`
 	// Links holds the value of the "links" field.
 	Links []schema.ExternalLink `json:"links,omitempty"`
+	// Metadata holds the value of the "metadata" field.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
 	Edges        AccountEdges `json:"edges"`
@@ -142,7 +144,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case account.FieldLinks:
+		case account.FieldLinks, account.FieldMetadata:
 			values[i] = new([]byte)
 		case account.FieldAdmin:
 			values[i] = new(sql.NullBool)
@@ -222,6 +224,14 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &a.Links); err != nil {
 					return fmt.Errorf("unmarshal field links: %w", err)
+				}
+			}
+		case account.FieldMetadata:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field metadata", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
 		default:
@@ -325,6 +335,9 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("links=")
 	builder.WriteString(fmt.Sprintf("%v", a.Links))
+	builder.WriteString(", ")
+	builder.WriteString("metadata=")
+	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }
