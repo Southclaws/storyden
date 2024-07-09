@@ -8,6 +8,7 @@
 import type { Identifier } from "./identifier";
 
 export interface Asset {
+  filename: string;
   height: number;
   id: Identifier;
   mime_type: string;

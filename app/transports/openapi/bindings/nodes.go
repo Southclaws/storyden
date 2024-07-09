@@ -68,13 +68,14 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		session,
 		request.Body.Name,
 		node_svc.Partial{
-			Slug:       opt.NewPtr(request.Body.Slug),
-			Content:    richContent,
-			Metadata:   opt.NewPtr((*map[string]any)(request.Body.Meta)),
-			URL:        opt.NewPtr(request.Body.Url),
-			AssetsAdd:  opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
-			Parent:     opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
-			Visibility: vis,
+			Slug:         opt.NewPtr(request.Body.Slug),
+			Content:      richContent,
+			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
+			URL:          opt.NewPtr(request.Body.Url),
+			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
+			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+			Visibility:   vis,
 		},
 	)
 	if err != nil {
@@ -185,13 +186,14 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 	}
 
 	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
-		Name:      opt.NewPtr(request.Body.Name),
-		Slug:      opt.NewPtr(request.Body.Slug),
-		AssetsAdd: opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
-		URL:       opt.NewPtr(request.Body.Url),
-		Content:   richContent,
-		Parent:    opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
-		Metadata:  opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Name:         opt.NewPtr(request.Body.Name),
+		Slug:         opt.NewPtr(request.Body.Slug),
+		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
+		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
+		URL:          opt.NewPtr(request.Body.Url),
+		Content:      richContent,
+		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -330,4 +332,12 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 
 func deserialiseNodeSlug(in string) datagraph.NodeSlug {
 	return datagraph.NodeSlug(in)
+}
+
+func deserialiseAssetSources(in openapi.AssetSourceList) []string {
+	return dt.Map(in, deserialiseAssetSourceURL)
+}
+
+func deserialiseAssetSourceURL(in openapi.AssetSourceURL) string {
+	return string(in)
 }
