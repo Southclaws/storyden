@@ -15,7 +15,7 @@ import (
 	"google.golang.org/api/option"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/app/services/avatar"

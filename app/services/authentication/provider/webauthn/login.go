@@ -13,7 +13,7 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 )
 
 func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {

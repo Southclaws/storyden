@@ -4,8 +4,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/authentication"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
