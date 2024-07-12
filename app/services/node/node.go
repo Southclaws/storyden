@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
