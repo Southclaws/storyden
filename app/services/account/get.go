@@ -10,8 +10,8 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/authentication"
-	authentication_repo "github.com/Southclaws/storyden/app/resources/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	authentication_repo "github.com/Southclaws/storyden/app/resources/account/authentication"
 	authentication_service "github.com/Southclaws/storyden/app/services/authentication"
 )
 
