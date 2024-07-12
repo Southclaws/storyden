@@ -24,6 +24,7 @@ var errEmptyLink = fault.New("empty link")
 
 type Service interface {
 	Fetch(ctx context.Context, url string) (*datagraph.Link, error)
+	Copy(ctx context.Context, url string) (*asset.Asset, error)
 }
 
 func Build() fx.Option {
@@ -80,7 +81,7 @@ func (s *service) scrapeAndStore(ctx context.Context, url string) (*datagraph.Li
 
 	var a *asset.Asset
 	if wc.Image != "" {
-		a, err = s.copy(ctx, wc.Image)
+		a, err = s.Copy(ctx, wc.Image)
 		if err != nil {
 			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", url))
 		} else {
@@ -100,7 +101,7 @@ func (s *service) scrapeAndStore(ctx context.Context, url string) (*datagraph.Li
 	return ln, nil
 }
 
-func (s *service) copy(ctx context.Context, url string) (*asset.Asset, error) {
+func (s *service) Copy(ctx context.Context, url string) (*asset.Asset, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
