@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
@@ -32,11 +32,11 @@ type Graph interface {
 }
 
 type service struct {
-	nr node.Repository
+	nr library.Repository
 	ar account.Repository
 }
 
-func New(nr node.Repository, ar account.Repository) Graph {
+func New(nr library.Repository, ar account.Repository) Graph {
 	return &service{nr: nr, ar: ar}
 }
 
@@ -81,14 +81,14 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 	// connection before adding the target child to the target parent.
 	if parentParent, ok := pnode.Parent.Get(); ok {
 		if parentParent.ID == cnode.ID {
-			cnode, err = s.nr.Update(ctx, cnode.ID, node.WithChildNodeRemove(xid.ID(pnode.ID)))
+			cnode, err = s.nr.Update(ctx, cnode.ID, library.WithChildNodeRemove(xid.ID(pnode.ID)))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
 	}
 
-	pnode, err = s.nr.Update(ctx, pnode.ID, node.WithChildNodeAdd(xid.ID(cnode.ID)))
+	pnode, err = s.nr.Update(ctx, pnode.ID, library.WithChildNodeAdd(xid.ID(cnode.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -122,7 +122,7 @@ func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent da
 		}
 	}
 
-	pclus, err = s.nr.Update(ctx, pclus.ID, node.WithChildNodeRemove(xid.ID(n.ID)))
+	pclus, err = s.nr.Update(ctx, pclus.ID, library.WithChildNodeRemove(xid.ID(n.ID)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -150,7 +150,7 @@ var visibilityRules = map[visibility.Visibility]map[visibility.Visibility]bool{
 		visibility.VisibilityDraft:     true,  // a submission may contain children, the author may be submitting an entire tree of information and the admin can approve the whole subtree at once.
 		visibility.VisibilityUnlisted:  false, // review nodes cannot contain unlisted nodes, for the same reason as published below.
 		visibility.VisibilityReview:    true,  // review nodes can contain other review nodes, such as the above review+draft example above.
-		visibility.VisibilityPublished: false, // review nodes cannot contain published nodes, it should be impossible to get into this state but if it happens, the parent node being "review" state would prevent any child nodes from being viewed anyway.
+		visibility.VisibilityPublished: false, // review nodes cannot contain published nodes, it should be impossible to get into this state but if it happens, the parent library being "review" state would prevent any child nodes from being viewed anyway.
 	},
 	visibility.VisibilityPublished: {
 		visibility.VisibilityDraft:     true,  // published can contain drafts, this is how review submissions work.

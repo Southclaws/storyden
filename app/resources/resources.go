@@ -9,10 +9,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link/link_graph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_children"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_search"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/library/node_search"
+	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -41,7 +41,7 @@ func Build() fx.Option {
 			notification.New,
 			post_search.New,
 			collection.New,
-			node.New,
+			library.New,
 			node_traversal.New,
 			node_children.New,
 			node_search.New,

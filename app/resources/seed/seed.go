@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -58,7 +58,7 @@ func New(
 	post_repo reply.Repository,
 	react_repo react.Repository,
 	asset_repo asset.Repository,
-	node_repo node.Repository,
+	node_repo library.Repository,
 ) (r Ready) {
 	if err := client.Schema.Create(context.Background()); err != nil {
 		panic(err)

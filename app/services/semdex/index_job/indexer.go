@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -21,7 +21,7 @@ type indexerConsumer struct {
 	l *zap.Logger
 
 	replyRepo   reply.Repository
-	nodeRepo    node.Repository
+	nodeRepo    library.Repository
 	accountRepo account.Repository
 
 	qnode pubsub.Topic[mq.IndexNode]
@@ -35,7 +35,7 @@ func newIndexConsumer(
 	l *zap.Logger,
 
 	replyRepo reply.Repository,
-	nodeRepo node.Repository,
+	nodeRepo library.Repository,
 	accountRepo account.Repository,
 
 	qnode pubsub.Topic[mq.IndexNode],

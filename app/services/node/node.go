@@ -1,4 +1,4 @@
-package node
+package library
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_children"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
@@ -53,19 +53,19 @@ type DeleteOptions struct {
 	NewParent opt.Optional[datagraph.NodeSlug]
 }
 
-func (p Partial) Opts() (opts []node.Option) {
-	p.Name.Call(func(value string) { opts = append(opts, node.WithName(value)) })
-	p.Slug.Call(func(value string) { opts = append(opts, node.WithSlug(value)) })
-	p.Content.Call(func(value content.Rich) { opts = append(opts, node.WithContent(value)) })
-	p.Metadata.Call(func(value map[string]any) { opts = append(opts, node.WithMetadata(value)) })
-	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssets(value)) })
-	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node.WithAssetsRemoved(value)) })
+func (p Partial) Opts() (opts []library.Option) {
+	p.Name.Call(func(value string) { opts = append(opts, library.WithName(value)) })
+	p.Slug.Call(func(value string) { opts = append(opts, library.WithSlug(value)) })
+	p.Content.Call(func(value content.Rich) { opts = append(opts, library.WithContent(value)) })
+	p.Metadata.Call(func(value map[string]any) { opts = append(opts, library.WithMetadata(value)) })
+	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssets(value)) })
+	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssetsRemoved(value)) })
 	return
 }
 
 type service struct {
 	ar       account.Repository
-	nr       node.Repository
+	nr       library.Repository
 	nc       node_children.Repository
 	hydrator hydrator.Service
 	fs       fetcher.Service
@@ -73,7 +73,7 @@ type service struct {
 
 func New(
 	ar account.Repository,
-	nr node.Repository,
+	nr library.Repository,
 	nc node_children.Repository,
 	hydrator hydrator.Service,
 	fs fetcher.Service,
@@ -120,7 +120,7 @@ func (s *service) Create(ctx context.Context,
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			opts = append(opts, node.WithAssets([]asset.AssetID{a.ID}))
+			opts = append(opts, library.WithAssets([]asset.AssetID{a.ID}))
 		}
 	}
 
@@ -172,7 +172,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			opts = append(opts, node.WithAssets([]asset.AssetID{a.ID}))
+			opts = append(opts, library.WithAssets([]asset.AssetID{a.ID}))
 		}
 	}
 
@@ -221,7 +221,7 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 	return destination.Ptr(), nil
 }
 
-func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []node.Option) {
+func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []library.Option) {
 	text, textOK := partial.Content.Get()
 
 	if !textOK && !partial.URL.Ok() {
@@ -231,7 +231,7 @@ func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []node
 	return s.hydrator.HydrateNode(ctx, text, partial.URL)
 }
 
-func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, error) {
+func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, error) {
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
 		return s.ar.GetByID(ctx, aid)
 	})
@@ -247,7 +247,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, erro
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		opts = append(opts, node.WithParent(parent.ID))
+		opts = append(opts, library.WithParent(parent.ID))
 	}
 
 	if acc, ok := acc.Get(); ok {
@@ -257,7 +257,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]node.Option, erro
 				return
 			}
 
-			opts = append(opts, node.WithVisibility(value))
+			opts = append(opts, library.WithVisibility(value))
 		})
 	}
 

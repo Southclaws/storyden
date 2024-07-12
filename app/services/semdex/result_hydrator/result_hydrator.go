@@ -8,7 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -17,14 +17,14 @@ import (
 type Hydrator struct {
 	tr thread.Repository
 	rr reply.Repository
-	nr node.Repository
+	nr library.Repository
 	lr link.Repository
 }
 
 func New(
 	tr thread.Repository,
 	rr reply.Repository,
-	nr node.Repository,
+	nr library.Repository,
 	lr link.Repository,
 ) *Hydrator {
 	return &Hydrator{tr, rr, nr, lr}

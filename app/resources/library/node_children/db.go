@@ -10,17 +10,17 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
-	node_model "github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
 type database struct {
 	db *ent.Client
-	nr node.Repository
+	nr library.Repository
 }
 
-func New(db *ent.Client, nr node.Repository) Repository {
+func New(db *ent.Client, nr library.Repository) Repository {
 	return &database{db, nr}
 }
 
@@ -41,8 +41,8 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug
 	}
 
 	nodes, err := d.db.Node.Query().
-		Select(node_model.FieldID).
-		Where(node_model.ParentNodeID(xid.ID(fromNode.ID))).
+		Select(node.FieldID).
+		Where(node.ParentNodeID(xid.ID(fromNode.ID))).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -51,7 +51,7 @@ func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug
 
 	err = d.db.Node.Update().
 		SetParentID(xid.ID(toNode.ID)).
-		Where(node_model.IDIn(childNodeIDs...)).
+		Where(node.IDIn(childNodeIDs...)).
 		Exec(ctx)
 	if err != nil {
 		terr := tx.Rollback()
