@@ -1,4 +1,4 @@
-package datagraph
+package library
 
 import (
 	"time"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
@@ -35,9 +36,9 @@ type Node struct {
 	Name       string
 	Slug       string
 	Assets     []*asset.Asset
-	Links      Links
+	Links      datagraph.Links
 	Content    opt.Optional[content.Rich]
-	Owner      Profile
+	Owner      datagraph.Profile
 	Parent     opt.Optional[Node]
 	Visibility visibility.Visibility
 	Metadata   map[string]any
@@ -47,10 +48,10 @@ type Node struct {
 
 func (*Node) GetResourceName() string { return "node" }
 
-func (c *Node) GetID() xid.ID   { return xid.ID(c.ID) }
-func (c *Node) GetKind() Kind   { return KindNode }
-func (c *Node) GetName() string { return c.Name }
-func (c *Node) GetSlug() string { return c.Slug }
-func (c *Node) GetDesc() string { return c.Content.OrZero().Short() }
-func (c *Node) GetText() string { return c.Content.OrZero().HTML() }
-func (c *Node) GetProps() any   { return nil }
+func (c *Node) GetID() xid.ID           { return xid.ID(c.ID) }
+func (c *Node) GetKind() datagraph.Kind { return datagraph.KindNode }
+func (c *Node) GetName() string         { return c.Name }
+func (c *Node) GetSlug() string         { return c.Slug }
+func (c *Node) GetDesc() string         { return c.Content.OrZero().Short() }
+func (c *Node) GetText() string         { return c.Content.OrZero().HTML() }
+func (c *Node) GetProps() any           { return nil }

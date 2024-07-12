@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -150,7 +151,7 @@ func MapCollectionNode(n *ent.CollectionNode) (*CollectionItem, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := datagraph.NodeFromModel(p)
+	item, err := library.NodeFromModel(p)
 	if err != nil {
 		return nil, err
 	}

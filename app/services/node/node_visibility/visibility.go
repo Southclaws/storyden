@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -35,7 +34,7 @@ func New(
 	}
 }
 
-func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSlug, vis visibility.Visibility) (*datagraph.Node, error) {
+func (m *Controller) ChangeVisibility(ctx context.Context, slug library.NodeSlug, vis visibility.Visibility) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

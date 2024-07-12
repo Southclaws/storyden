@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -25,22 +24,22 @@ type Repository interface {
 		name string,
 		slug string,
 		opts ...Option,
-	) (*datagraph.Node, error)
+	) (*Node, error)
 
-	Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error)
-	GetByID(ctx context.Context, id datagraph.NodeID) (*datagraph.Node, error)
+	Get(ctx context.Context, slug NodeSlug) (*Node, error)
+	GetByID(ctx context.Context, id NodeID) (*Node, error)
 
 	// Update a node by ID.
 	// NOTE: slug based update is not supported at the repo level because you'll
 	// probably always have a node ID in context anyway and it makes changing
 	// the actual slug a bit more complex due to the naïve implementation.
-	Update(ctx context.Context, id datagraph.NodeID, opts ...Option) (*datagraph.Node, error)
+	Update(ctx context.Context, id NodeID, opts ...Option) (*Node, error)
 
 	// Delete removes a node permanently, it does not manage children.
-	Delete(ctx context.Context, slug datagraph.NodeSlug) error
+	Delete(ctx context.Context, slug NodeSlug) error
 }
 
-func WithID(id datagraph.NodeID) Option {
+func WithID(id NodeID) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetID(xid.ID(id))
 	}
@@ -83,7 +82,7 @@ func WithContent(v content.Rich) Option {
 	}
 }
 
-func WithParent(v datagraph.NodeID) Option {
+func WithParent(v NodeID) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetParentID(xid.ID(v))
 	}

@@ -12,7 +12,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -32,7 +31,7 @@ func (d *database) Create(
 	name string,
 	slug string,
 	opts ...Option,
-) (*datagraph.Node, error) {
+) (*Node, error) {
 	create := d.db.Node.Create()
 	mutate := create.Mutation()
 
@@ -56,10 +55,10 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, datagraph.NodeSlug(col.Slug))
+	return d.Get(ctx, NodeSlug(col.Slug))
 }
 
-func (d *database) List(ctx context.Context, filters ...Filter) ([]*datagraph.Node, error) {
+func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error) {
 	q := d.db.Node.
 		Query().
 		WithOwner().
@@ -78,7 +77,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*datagraph.No
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	all, err := dt.MapErr(cols, datagraph.NodeFromModel)
+	all, err := dt.MapErr(cols, NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -86,7 +85,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*datagraph.No
 	return all, nil
 }
 
-func (d *database) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error) {
+func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 	col, err := d.db.Node.
 		Query().
 		Where(node.Slug(string(slug))).
@@ -111,7 +110,7 @@ func (d *database) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := datagraph.NodeFromModel(col)
+	r, err := NodeFromModel(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -119,7 +118,7 @@ func (d *database) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph
 	return r, nil
 }
 
-func (d *database) GetByID(ctx context.Context, id datagraph.NodeID) (*datagraph.Node, error) {
+func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 	col, err := d.db.Node.
 		Query().
 		Where(node.ID(xid.ID(id))).
@@ -139,7 +138,7 @@ func (d *database) GetByID(ctx context.Context, id datagraph.NodeID) (*datagraph
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := datagraph.NodeFromModel(col)
+	r, err := NodeFromModel(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -147,7 +146,7 @@ func (d *database) GetByID(ctx context.Context, id datagraph.NodeID) (*datagraph
 	return r, nil
 }
 
-func (d *database) Update(ctx context.Context, id datagraph.NodeID, opts ...Option) (*datagraph.Node, error) {
+func (d *database) Update(ctx context.Context, id NodeID, opts ...Option) (*Node, error) {
 	create := d.db.Node.UpdateOneID(xid.ID(id))
 	mutate := create.Mutation()
 
@@ -160,10 +159,10 @@ func (d *database) Update(ctx context.Context, id datagraph.NodeID, opts ...Opti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, datagraph.NodeSlug(c.Slug))
+	return d.Get(ctx, NodeSlug(c.Slug))
 }
 
-func (d *database) Delete(ctx context.Context, slug datagraph.NodeSlug) error {
+func (d *database) Delete(ctx context.Context, slug NodeSlug) error {
 	update := d.db.Node.Delete().Where(node.Slug(string(slug)))
 
 	_, err := update.Exec(ctx)

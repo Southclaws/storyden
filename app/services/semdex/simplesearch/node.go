@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
@@ -29,7 +30,7 @@ func (s *nodeSearcher) Search(ctx context.Context, query string) (datagraph.Node
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(rs, datagraph.NodeFromModel)
+	nodes, err := dt.MapErr(rs, library.NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

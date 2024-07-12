@@ -9,6 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -25,7 +26,7 @@ type WithRefs struct {
 	Assets      []*asset.Asset
 	Threads     []*thread.Thread
 	Replies     []*reply.Reply
-	Nodes       []*datagraph.Node
+	Nodes       []*library.Node
 	Related     datagraph.NodeReferenceList
 }
 
@@ -75,7 +76,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	nodes, err := dt.MapErr(nodeEdge, datagraph.NodeFromModel)
+	nodes, err := dt.MapErr(nodeEdge, library.NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

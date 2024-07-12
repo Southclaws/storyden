@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 type Repository interface {
-	Root(ctx context.Context, opts ...Filter) ([]*datagraph.Node, error)
-	Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID], opts ...Filter) ([]*datagraph.Node, error)
-	FilterSubtree(ctx context.Context, id datagraph.NodeID, filter string) ([]*datagraph.Node, error)
+	Root(ctx context.Context, opts ...Filter) ([]*library.Node, error)
+	Subtree(ctx context.Context, id opt.Optional[library.NodeID], opts ...Filter) ([]*library.Node, error)
+	FilterSubtree(ctx context.Context, id library.NodeID, filter string) ([]*library.Node, error)
 }
 
 type filters struct {

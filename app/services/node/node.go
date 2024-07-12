@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -29,11 +28,11 @@ type Manager interface {
 		owner account.AccountID,
 		name string,
 		p Partial,
-	) (*datagraph.Node, error)
+	) (*library.Node, error)
 
-	Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error)
-	Update(ctx context.Context, slug datagraph.NodeSlug, p Partial) (*datagraph.Node, error)
-	Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteOptions) (*datagraph.Node, error)
+	Get(ctx context.Context, slug library.NodeSlug) (*library.Node, error)
+	Update(ctx context.Context, slug library.NodeSlug, p Partial) (*library.Node, error)
+	Delete(ctx context.Context, slug library.NodeSlug, d DeleteOptions) (*library.Node, error)
 }
 
 type Partial struct {
@@ -41,7 +40,7 @@ type Partial struct {
 	Slug         opt.Optional[string]
 	URL          opt.Optional[string]
 	Content      opt.Optional[content.Rich]
-	Parent       opt.Optional[datagraph.NodeSlug]
+	Parent       opt.Optional[library.NodeSlug]
 	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
@@ -50,7 +49,7 @@ type Partial struct {
 }
 
 type DeleteOptions struct {
-	NewParent opt.Optional[datagraph.NodeSlug]
+	NewParent opt.Optional[library.NodeSlug]
 }
 
 func (p Partial) Opts() (opts []library.Option) {
@@ -91,7 +90,7 @@ func (s *service) Create(ctx context.Context,
 	owner account.AccountID,
 	name string,
 	p Partial,
-) (*datagraph.Node, error) {
+) (*library.Node, error) {
 	if v, ok := p.Visibility.Get(); ok {
 		if v == visibility.VisibilityPublished {
 			acc, err := s.ar.GetByID(ctx, owner)
@@ -134,7 +133,7 @@ func (s *service) Create(ctx context.Context,
 	return n, nil
 }
 
-func (s *service) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.Node, error) {
+func (s *service) Get(ctx context.Context, slug library.NodeSlug) (*library.Node, error) {
 	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -143,7 +142,7 @@ func (s *service) Get(ctx context.Context, slug datagraph.NodeSlug) (*datagraph.
 	return n, nil
 }
 
-func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial) (*datagraph.Node, error) {
+func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -184,7 +183,7 @@ func (s *service) Update(ctx context.Context, slug datagraph.NodeSlug, p Partial
 	return n, nil
 }
 
-func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteOptions) (*datagraph.Node, error) {
+func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOptions) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -201,10 +200,10 @@ func (s *service) Delete(ctx context.Context, slug datagraph.NodeSlug, d DeleteO
 		}
 	}
 
-	destination, err := opt.MapErr(d.NewParent, func(target datagraph.NodeSlug) (datagraph.Node, error) {
+	destination, err := opt.MapErr(d.NewParent, func(target library.NodeSlug) (library.Node, error) {
 		destination, err := s.nc.Move(ctx, slug, target)
 		if err != nil {
-			return datagraph.Node{}, fault.Wrap(err, fctx.With(ctx))
+			return library.Node{}, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		return *destination, fault.Wrap(err, fctx.With(ctx))

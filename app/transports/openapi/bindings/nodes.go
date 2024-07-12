@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -107,7 +107,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	var cs []*datagraph.Node
+	var cs []*library.Node
 
 	opts := []node_traversal.Filter{}
 
@@ -151,7 +151,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		opts = append(opts, node_traversal.WithVisibility(visibility.VisibilityPublished))
 	}
 
-	nid, err := opt.MapErr(opt.NewPtr(request.Params.NodeId), datagraph.NodeIDFromString)
+	nid, err := opt.MapErr(opt.NewPtr(request.Params.NodeId), library.NodeIDFromString)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -169,7 +169,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.ns.Get(ctx, datagraph.NodeSlug(request.NodeSlug))
+	node, err := c.ns.Get(ctx, library.NodeSlug(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -185,7 +185,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         opt.NewPtr(request.Body.Slug),
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
@@ -210,7 +210,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.nv.ChangeVisibility(ctx, datagraph.NodeSlug(request.NodeSlug), v)
+	node, err := c.nv.ChangeVisibility(ctx, library.NodeSlug(request.NodeSlug), v)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -221,8 +221,8 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 }
 
 func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteRequestObject) (openapi.NodeDeleteResponseObject, error) {
-	destinationNode, err := c.ns.Delete(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.DeleteOptions{
-		NewParent: opt.NewPtr((*datagraph.NodeSlug)(request.Params.TargetNode)),
+	destinationNode, err := c.ns.Delete(ctx, library.NodeSlug(request.NodeSlug), node_svc.DeleteOptions{
+		NewParent: opt.NewPtr((*library.NodeSlug)(request.Params.TargetNode)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -230,7 +230,7 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 
 	return openapi.NodeDelete200JSONResponse{
 		NodeDeleteOKJSONResponse: openapi.NodeDeleteOKJSONResponse{
-			Destination: opt.Map(opt.NewPtr(destinationNode), func(in datagraph.Node) openapi.Node {
+			Destination: opt.Map(opt.NewPtr(destinationNode), func(in library.Node) openapi.Node {
 				return serialiseNode(&in)
 			}).Ptr(),
 		},
@@ -240,7 +240,7 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
 		AssetsAdd: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
@@ -255,7 +255,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveAssetRequestObject) (openapi.NodeRemoveAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	node, err := c.ns.Update(ctx, datagraph.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
 		AssetsRemove: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
@@ -268,7 +268,7 @@ func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveA
 }
 
 func (c *Nodes) NodeAddNode(ctx context.Context, request openapi.NodeAddNodeRequestObject) (openapi.NodeAddNodeResponseObject, error) {
-	node, err := c.ntree.Move(ctx, datagraph.NodeSlug(request.NodeSlugChild), datagraph.NodeSlug(request.NodeSlug))
+	node, err := c.ntree.Move(ctx, library.NodeSlug(request.NodeSlugChild), library.NodeSlug(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -279,7 +279,7 @@ func (c *Nodes) NodeAddNode(ctx context.Context, request openapi.NodeAddNodeRequ
 }
 
 func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNodeRequestObject) (openapi.NodeRemoveNodeResponseObject, error) {
-	node, err := c.ntree.Sever(ctx, datagraph.NodeSlug(request.NodeSlugChild), datagraph.NodeSlug(request.NodeSlug))
+	node, err := c.ntree.Sever(ctx, library.NodeSlug(request.NodeSlugChild), library.NodeSlug(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -289,7 +289,7 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 	}, nil
 }
 
-func serialiseNode(in *datagraph.Node) openapi.Node {
+func serialiseNode(in *library.Node) openapi.Node {
 	return openapi.Node{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,
@@ -301,7 +301,7 @@ func serialiseNode(in *datagraph.Node) openapi.Node {
 		Description: in.Content.OrZero().Short(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
-		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
+		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
 		Visibility: serialiseVisibility(in.Visibility),
@@ -309,7 +309,7 @@ func serialiseNode(in *datagraph.Node) openapi.Node {
 	}
 }
 
-func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
+func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	return openapi.NodeWithChildren{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,
@@ -321,7 +321,7 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 		Description: in.Content.OrZero().Short(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
-		Parent: opt.PtrMap(in.Parent, func(in datagraph.Node) openapi.Node {
+		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
 		Visibility: serialiseVisibility(in.Visibility),
@@ -330,8 +330,8 @@ func serialiseNodeWithItems(in *datagraph.Node) openapi.NodeWithChildren {
 	}
 }
 
-func deserialiseNodeSlug(in string) datagraph.NodeSlug {
-	return datagraph.NodeSlug(in)
+func deserialiseNodeSlug(in string) library.NodeSlug {
+	return library.NodeSlug(in)
 }
 
 func deserialiseAssetSources(in openapi.AssetSourceList) []string {
