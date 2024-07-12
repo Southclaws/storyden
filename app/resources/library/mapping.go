@@ -1,12 +1,12 @@
-package datagraph
+package library
 
 import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
-
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -17,7 +17,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := ProfileFromModel(accEdge)
+	pro, err := datagraph.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -57,7 +57,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Name:       c.Name,
 		Slug:       c.Slug,
 		Assets:     assets,
-		Links:      dt.Map(c.Edges.Links, LinkFromModel),
+		Links:      dt.Map(c.Edges.Links, datagraph.LinkFromModel),
 		Content:    richContent,
 		Owner:      *pro,
 		Parent:     parent,

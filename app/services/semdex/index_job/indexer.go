@@ -66,7 +66,7 @@ func (i *indexerConsumer) indexPost(ctx context.Context, id post.ID) error {
 	return i.indexer.Index(ctx, p)
 }
 
-func (i *indexerConsumer) indexNode(ctx context.Context, id datagraph.NodeID) error {
+func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) error {
 	p, err := i.nodeRepo.GetByID(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

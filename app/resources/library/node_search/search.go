@@ -9,14 +9,14 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
 type Search interface {
-	Search(ctx context.Context, opts ...Option) ([]*datagraph.Node, error)
+	Search(ctx context.Context, opts ...Option) ([]*library.Node, error)
 }
 
 type query struct {
@@ -50,7 +50,7 @@ func New(db *ent.Client, raw *sqlx.DB) Search {
 	}
 }
 
-func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Node, error) {
+func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, error) {
 	q := &query{}
 
 	for _, fn := range opts {
@@ -74,7 +74,7 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*datagraph.Node
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(r, datagraph.NodeFromModel)
+	nodes, err := dt.MapErr(r, library.NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -14,7 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -27,8 +27,8 @@ type Service interface {
 	PostAdd(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.CollectionWithItems, error)
 	PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.CollectionWithItems, error)
 
-	NodeAdd(ctx context.Context, cid collection.CollectionID, pid datagraph.NodeID) (*collection.CollectionWithItems, error)
-	NodeRemove(ctx context.Context, cid collection.CollectionID, pid datagraph.NodeID) (*collection.CollectionWithItems, error)
+	NodeAdd(ctx context.Context, cid collection.CollectionID, pid library.NodeID) (*collection.CollectionWithItems, error)
+	NodeRemove(ctx context.Context, cid collection.CollectionID, pid library.NodeID) (*collection.CollectionWithItems, error)
 }
 
 type Partial struct {
@@ -121,7 +121,7 @@ func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, p
 	return col, nil
 }
 
-func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.CollectionWithItems, error) {
+func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id library.NodeID) (*collection.CollectionWithItems, error) {
 	err, mt := s.authoriseSubmission(ctx, cid, xid.ID(id))
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id d
 	return col, nil
 }
 
-func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, id datagraph.NodeID) (*collection.CollectionWithItems, error) {
+func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, id library.NodeID) (*collection.CollectionWithItems, error) {
 	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
 		return nil, err
 	}

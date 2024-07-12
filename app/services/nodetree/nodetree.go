@@ -9,7 +9,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -25,10 +24,10 @@ var (
 type Graph interface {
 	// Move moves a node from either orphan state or belonging to one node
 	// to another node essentially setting its parent slug to some/new value.
-	Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error)
+	Move(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error)
 
 	// Sever orphans a node by removing it from its parent to the root level.
-	Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error)
+	Sever(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error)
 }
 
 type service struct {
@@ -40,7 +39,7 @@ func New(nr library.Repository, ar account.Repository) Graph {
 	return &service{nr: nr, ar: ar}
 }
 
-func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
+func (s *service) Move(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error) {
 	if child == parent {
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}
@@ -96,7 +95,7 @@ func (s *service) Move(ctx context.Context, child datagraph.NodeSlug, parent dat
 	return pnode, nil
 }
 
-func (s *service) Sever(ctx context.Context, child datagraph.NodeSlug, parent datagraph.NodeSlug) (*datagraph.Node, error) {
+func (s *service) Sever(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error) {
 	if child == parent {
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}

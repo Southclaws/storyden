@@ -45,7 +45,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 		return sr, nil
 
 	case datagraph.KindNode:
-		c, err := h.nr.GetByID(ctx, datagraph.NodeID(sr.ID))
+		c, err := h.nr.GetByID(ctx, library.NodeID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

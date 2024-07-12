@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -24,7 +23,7 @@ func New(db *ent.Client, nr library.Repository) Repository {
 	return &database{db, nr}
 }
 
-func (d *database) Move(ctx context.Context, fromSlug datagraph.NodeSlug, toSlug datagraph.NodeSlug) (*datagraph.Node, error) {
+func (d *database) Move(ctx context.Context, fromSlug library.NodeSlug, toSlug library.NodeSlug) (*library.Node, error) {
 	fromNode, err := d.nr.Get(ctx, fromSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

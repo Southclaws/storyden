@@ -19,6 +19,7 @@ import (
 	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
@@ -35,7 +36,7 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 	return &database{db, raw}
 }
 
-func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Node, error) {
+func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, error) {
 	query := d.db.Node.Query().
 		Where(node.ParentNodeIDIsNil()).
 		WithOwner().
@@ -65,7 +66,7 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*datagraph.Node, e
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(cs, datagraph.NodeFromModel)
+	nodes, err := dt.MapErr(cs, library.NodeFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -144,7 +145,7 @@ type subtreeRow struct {
 	Depth            int                   `db:"depth"`
 }
 
-func fromRow(r subtreeRow) (*datagraph.Node, error) {
+func fromRow(r subtreeRow) (*library.Node, error) {
 	bio, err := opt.MapErr(opt.NewPtr(r.OwnerBio), content.NewRichText)
 	if err != nil {
 		return nil, err
@@ -160,15 +161,15 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 		return meta
 	})
 
-	return &datagraph.Node{
-		ID:         datagraph.NodeID(r.NodeId),
+	return &library.Node{
+		ID:         library.NodeID(r.NodeId),
 		CreatedAt:  r.NodeCreatedAt,
 		UpdatedAt:  r.NodeUpdatedAt,
 		Name:       r.NodeName,
 		Slug:       r.NodeSlug,
 		Visibility: r.NodeVisibility,
-		Parent: opt.NewSafe(datagraph.Node{
-			ID: datagraph.NodeID(r.NodeParentNodeId),
+		Parent: opt.NewSafe(library.Node{
+			ID: library.NodeID(r.NodeParentNodeId),
 		}, !r.NodeParentNodeId.IsNil()),
 		Owner: datagraph.Profile{
 			ID:      account_repo.AccountID(r.OwnerId),
@@ -182,7 +183,7 @@ func fromRow(r subtreeRow) (*datagraph.Node, error) {
 	}, nil
 }
 
-func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID], fs ...Filter) ([]*datagraph.Node, error) {
+func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], fs ...Filter) ([]*library.Node, error) {
 	f := filters{}
 	for _, fn := range fs {
 		fn(&f)
@@ -234,7 +235,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	flat := []*datagraph.Node{}
+	flat := []*library.Node{}
 
 	for r.Next() {
 		c := subtreeRow{}
@@ -251,7 +252,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		flat = append(flat, n)
 	}
 
-	filtered := dt.Filter(flat, func(n *datagraph.Node) bool {
+	filtered := dt.Filter(flat, func(n *library.Node) bool {
 		if len(f.visibility) > 0 {
 			// filteringUnlisted := lo.Contains(f.visibility, visibility.VisibilityUnlisted)
 
@@ -266,7 +267,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		}
 	})
 
-	ids := dt.Map(filtered, func(n *datagraph.Node) xid.ID { return xid.ID(n.ID) })
+	ids := dt.Map(filtered, func(n *library.Node) xid.ID { return xid.ID(n.ID) })
 
 	// TODO: Build a table of pointers to look up each asset via node ID
 
@@ -275,7 +276,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		WithNodes().
 		AllX(ctx)
 
-	hydrated := dt.Map(filtered, func(n *datagraph.Node) *datagraph.Node {
+	hydrated := dt.Map(filtered, func(n *library.Node) *library.Node {
 		// NOTE: This is slow as fuck (2 nested loops lol) needs the
 		// aforementioned hash table lookup for node <> asset relations.
 		assets := dt.Filter(relatedAssets, func(a *ent.Asset) bool {
@@ -291,12 +292,12 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		return n
 	})
 
-	var linkChildrenForParent func(datagraph.Node) []*datagraph.Node
+	var linkChildrenForParent func(library.Node) []*library.Node
 
-	linkChildrenForParent = func(parent datagraph.Node) []*datagraph.Node {
+	linkChildrenForParent = func(parent library.Node) []*library.Node {
 		filteredParent, isFilteringParent := id.Get()
 
-		return dt.Reduce(hydrated, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+		return dt.Reduce(hydrated, func(prev []*library.Node, curr *library.Node) []*library.Node {
 			if p, ok := curr.Parent.Get(); ok && p.ID == parent.ID {
 				// Take a copy because our mutations cannot apply to `flat`.
 				copy := *curr
@@ -307,18 +308,18 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 				// node (a subtree query) then blank out the parent field since
 				// it's a waste to store this information in tree children.
 				if isFilteringParent && filteredParent != copy.ID {
-					copy.Parent = opt.NewEmpty[datagraph.Node]()
+					copy.Parent = opt.NewEmpty[library.Node]()
 				}
 
 				return append(prev, &copy)
 			}
 
 			return prev
-		}, []*datagraph.Node{})
+		}, []*library.Node{})
 	}
 
 	// Rebuild the flat list into the tree
-	nodes := dt.Reduce(hydrated, func(prev []*datagraph.Node, curr *datagraph.Node) []*datagraph.Node {
+	nodes := dt.Reduce(hydrated, func(prev []*library.Node, curr *library.Node) []*library.Node {
 		// If we're filtering for a specific node and the current iteration is
 		// that node, the children are aggregated for this node regardless.
 		filteredParent, ok := id.Get()
@@ -336,11 +337,11 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[datagraph.NodeID
 		}
 
 		return prev
-	}, []*datagraph.Node{})
+	}, []*library.Node{})
 
 	return nodes, nil
 }
 
-func (d *database) FilterSubtree(ctx context.Context, id datagraph.NodeID, filter string) ([]*datagraph.Node, error) {
+func (d *database) FilterSubtree(ctx context.Context, id library.NodeID, filter string) ([]*library.Node, error) {
 	return nil, nil
 }
