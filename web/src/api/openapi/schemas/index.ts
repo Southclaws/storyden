@@ -32,6 +32,8 @@ export * from "./assetGetOKResponse";
 export * from "./assetID";
 export * from "./assetIDs";
 export * from "./assetList";
+export * from "./assetSourceList";
+export * from "./assetSourceURL";
 export * from "./assetUploadBody";
 export * from "./assetUploadOKResponse";
 export * from "./attestationConveyancePreference";

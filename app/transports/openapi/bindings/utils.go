@@ -158,6 +158,7 @@ func serialiseReact(r *react.React) openapi.React {
 func serialiseAssetReference(a *asset.Asset) openapi.Asset {
 	return openapi.Asset{
 		Id:       a.ID.String(),
+		Filename: a.Name.String(),
 		Url:      a.URL,
 		MimeType: a.Metadata.GetMIMEType(),
 		Width:    float32(a.Metadata.GetWidth()),

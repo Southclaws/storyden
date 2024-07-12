@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { AssetIDs } from "./assetIDs";
+import type { AssetSourceList } from "./assetSourceList";
 import type { Metadata } from "./metadata";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
@@ -18,6 +19,7 @@ import type { Url } from "./url";
  */
 export interface NodeMutableProps {
   asset_ids?: AssetIDs;
+  asset_sources?: AssetSourceList;
   content?: PostContent;
   meta?: Metadata;
   name?: NodeName;
