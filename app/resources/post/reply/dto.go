@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -21,7 +22,7 @@ type Reply struct {
 	ID post.ID
 
 	Content         content.Rich
-	Author          datagraph.Profile
+	Author          profile.Public
 	RootPostID      post.ID
 	RootThreadMark  string
 	RootThreadTitle string
@@ -77,7 +78,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := datagraph.ProfileFromModel(authorEdge)
+	pro, err := profile.ProfileFromModel(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

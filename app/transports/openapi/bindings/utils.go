@@ -5,6 +5,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -113,7 +114,7 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 	}
 }
 
-func serialiseProfileReference(a datagraph.Profile) openapi.ProfileReference {
+func serialiseProfileReference(a profile.Public) openapi.ProfileReference {
 	return openapi.ProfileReference{
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),

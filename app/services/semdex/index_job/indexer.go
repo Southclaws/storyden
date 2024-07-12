@@ -3,16 +3,16 @@ package index_job
 import (
 	"context"
 
-	"go.uber.org/zap"
-
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"go.uber.org/zap"
+
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/pubsub"
 )
@@ -81,5 +81,5 @@ func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return i.indexer.Index(ctx, datagraph.ProfileFromAccount(p))
+	return i.indexer.Index(ctx, profile.ProfileFromAccount(p))
 }

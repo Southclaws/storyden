@@ -4,9 +4,11 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -17,7 +19,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := datagraph.ProfileFromModel(accEdge)
+	pro, err := profile.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

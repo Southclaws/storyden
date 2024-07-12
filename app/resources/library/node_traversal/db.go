@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -18,7 +19,6 @@ import (
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
 	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -171,7 +171,7 @@ func fromRow(r subtreeRow) (*library.Node, error) {
 		Parent: opt.NewSafe(library.Node{
 			ID: library.NodeID(r.NodeParentNodeId),
 		}, !r.NodeParentNodeId.IsNil()),
-		Owner: datagraph.Profile{
+		Owner: profile.Public{
 			ID:      account_repo.AccountID(r.OwnerId),
 			Created: r.OwnerCreatedAt,
 			Handle:  r.OwnerHandle,

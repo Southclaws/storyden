@@ -1,4 +1,4 @@
-package datagraph
+package profile
 
 import (
 	"time"
@@ -9,11 +9,12 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type Profile struct {
+type Public struct {
 	ID      account.AccountID
 	Created time.Time
 	Deleted opt.Optional[time.Time]
@@ -27,15 +28,15 @@ type Profile struct {
 	Metadata      map[string]any
 }
 
-func (p *Profile) GetID() xid.ID   { return xid.ID(p.ID) }
-func (p *Profile) GetKind() Kind   { return KindProfile }
-func (p *Profile) GetName() string { return p.Name }
-func (p *Profile) GetSlug() string { return p.Handle }
-func (p *Profile) GetDesc() string { return p.Bio.Short() }
-func (p *Profile) GetText() string { return p.Bio.HTML() }
-func (p *Profile) GetProps() any   { return nil }
+func (p *Public) GetID() xid.ID           { return xid.ID(p.ID) }
+func (p *Public) GetKind() datagraph.Kind { return datagraph.KindProfile }
+func (p *Public) GetName() string         { return p.Name }
+func (p *Public) GetSlug() string         { return p.Handle }
+func (p *Public) GetDesc() string         { return p.Bio.Short() }
+func (p *Public) GetText() string         { return p.Bio.HTML() }
+func (p *Public) GetProps() any           { return nil }
 
-func ProfileFromModel(a *ent.Account) (*Profile, error) {
+func ProfileFromModel(a *ent.Account) (*Public, error) {
 	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {
 		return &tag.Tag{
 			ID:   t.ID.String(),
@@ -48,7 +49,7 @@ func ProfileFromModel(a *ent.Account) (*Profile, error) {
 		return nil, err
 	}
 
-	return &Profile{
+	return &Public{
 		ID:        account.AccountID(a.ID),
 		Created:   a.CreatedAt,
 		Deleted:   opt.NewPtr(a.DeletedAt),
@@ -61,8 +62,8 @@ func ProfileFromModel(a *ent.Account) (*Profile, error) {
 	}, nil
 }
 
-func ProfileFromAccount(a *account.Account) *Profile {
-	return &Profile{
+func ProfileFromAccount(a *account.Account) *Public {
+	return &Public{
 		ID:            a.ID,
 		Created:       a.CreatedAt,
 		Deleted:       a.DeletedAt,
