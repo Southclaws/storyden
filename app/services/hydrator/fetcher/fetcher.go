@@ -14,8 +14,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/link"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/url"
 )
