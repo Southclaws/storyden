@@ -1,4 +1,4 @@
-package node_test
+package library_test
 
 import (
 	"context"

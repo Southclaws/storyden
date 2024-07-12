@@ -9,8 +9,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_children"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
@@ -19,13 +19,13 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Controller struct {
 	ar account.Repository
-	nr node.Repository
+	nr library.Repository
 	nc node_children.Repository
 }
 
 func New(
 	ar account.Repository,
-	nr node.Repository,
+	nr library.Repository,
 	nc node_children.Repository,
 ) *Controller {
 	return &Controller{
@@ -57,7 +57,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug datagraph.NodeSl
 		}
 	}
 
-	n, err = m.nr.Update(ctx, n.ID, node.WithVisibility(vis))
+	n, err = m.nr.Update(ctx, n.ID, library.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
