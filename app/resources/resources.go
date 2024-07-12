@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph/link"
-	"github.com/Southclaws/storyden/app/resources/datagraph/link_graph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/link/link_graph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_children"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_search"
