@@ -19,6 +19,7 @@ type Partial struct {
 	Bio       opt.Optional[string]
 	Interests opt.Optional[[]xid.ID]
 	Links     opt.Optional[[]account.ExternalLink]
+	Meta      opt.Optional[map[string]any]
 }
 
 func (s *service) Update(ctx context.Context, id account.AccountID, params Partial) (*account.Account, error) {
@@ -38,6 +39,9 @@ func (s *service) Update(ctx context.Context, id account.AccountID, params Parti
 	}
 	if v, ok := params.Links.Get(); ok {
 		opts = append(opts, account.SetLinks(v))
+	}
+	if v, ok := params.Meta.Get(); ok {
+		opts = append(opts, account.SetMetadata(v))
 	}
 
 	acc, err := s.account_repo.Update(ctx, id, opts...)

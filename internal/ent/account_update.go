@@ -146,6 +146,18 @@ func (au *AccountUpdate) ClearLinks() *AccountUpdate {
 	return au
 }
 
+// SetMetadata sets the "metadata" field.
+func (au *AccountUpdate) SetMetadata(m map[string]interface{}) *AccountUpdate {
+	au.mutation.SetMetadata(m)
+	return au
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (au *AccountUpdate) ClearMetadata() *AccountUpdate {
+	au.mutation.ClearMetadata()
+	return au
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (au *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddPostIDs(ids...)
@@ -542,6 +554,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.LinksCleared() {
 		_spec.ClearField(account.FieldLinks, field.TypeJSON)
+	}
+	if value, ok := au.mutation.Metadata(); ok {
+		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
+	}
+	if au.mutation.MetadataCleared() {
+		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
 	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1031,6 +1049,18 @@ func (auo *AccountUpdateOne) ClearLinks() *AccountUpdateOne {
 	return auo
 }
 
+// SetMetadata sets the "metadata" field.
+func (auo *AccountUpdateOne) SetMetadata(m map[string]interface{}) *AccountUpdateOne {
+	auo.mutation.SetMetadata(m)
+	return auo
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (auo *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
+	auo.mutation.ClearMetadata()
+	return auo
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
@@ -1457,6 +1487,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if auo.mutation.LinksCleared() {
 		_spec.ClearField(account.FieldLinks, field.TypeJSON)
+	}
+	if value, ok := auo.mutation.Metadata(); ok {
+		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
+	}
+	if auo.mutation.MetadataCleared() {
+		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
 	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

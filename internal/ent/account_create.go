@@ -121,6 +121,12 @@ func (ac *AccountCreate) SetLinks(sl []schema.ExternalLink) *AccountCreate {
 	return ac
 }
 
+// SetMetadata sets the "metadata" field.
+func (ac *AccountCreate) SetMetadata(m map[string]interface{}) *AccountCreate {
+	ac.mutation.SetMetadata(m)
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AccountCreate) SetID(x xid.ID) *AccountCreate {
 	ac.mutation.SetID(x)
@@ -408,6 +414,10 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
 		_node.Links = value
 	}
+	if value, ok := ac.mutation.Metadata(); ok {
+		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
+	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -690,6 +700,24 @@ func (u *AccountUpsert) ClearLinks() *AccountUpsert {
 	return u
 }
 
+// SetMetadata sets the "metadata" field.
+func (u *AccountUpsert) SetMetadata(v map[string]interface{}) *AccountUpsert {
+	u.Set(account.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateMetadata() *AccountUpsert {
+	u.SetExcluded(account.FieldMetadata)
+	return u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AccountUpsert) ClearMetadata() *AccountUpsert {
+	u.SetNull(account.FieldMetadata)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -857,6 +885,27 @@ func (u *AccountUpsertOne) UpdateLinks() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearLinks() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearLinks()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *AccountUpsertOne) SetMetadata(v map[string]interface{}) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateMetadata() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AccountUpsertOne) ClearMetadata() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearMetadata()
 	})
 }
 
@@ -1194,6 +1243,27 @@ func (u *AccountUpsertBulk) UpdateLinks() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearLinks() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearLinks()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *AccountUpsertBulk) SetMetadata(v map[string]interface{}) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateMetadata() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *AccountUpsertBulk) ClearMetadata() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearMetadata()
 	})
 }
 

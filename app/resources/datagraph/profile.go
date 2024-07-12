@@ -24,6 +24,7 @@ type Profile struct {
 	Admin         bool
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
+	Metadata      map[string]any
 }
 
 func (p *Profile) GetID() xid.ID   { return xid.ID(p.ID) }
@@ -56,6 +57,7 @@ func ProfileFromModel(a *ent.Account) (*Profile, error) {
 		Bio:       bio,
 		Admin:     a.Admin,
 		Interests: interests,
+		Metadata:  a.Metadata,
 	}, nil
 }
 
@@ -70,5 +72,6 @@ func ProfileFromAccount(a *account.Account) *Profile {
 		Admin:         a.Admin,
 		Interests:     nil,
 		ExternalLinks: a.ExternalLinks,
+		Metadata:      a.Metadata,
 	}
 }

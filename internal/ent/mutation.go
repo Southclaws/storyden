@@ -72,6 +72,7 @@ type AccountMutation struct {
 	admin                 *bool
 	links                 *[]schema.ExternalLink
 	appendlinks           []schema.ExternalLink
+	metadata              *map[string]interface{}
 	clearedFields         map[string]struct{}
 	posts                 map[xid.ID]struct{}
 	removedposts          map[xid.ID]struct{}
@@ -549,6 +550,55 @@ func (m *AccountMutation) ResetLinks() {
 	delete(m.clearedFields, account.FieldLinks)
 }
 
+// SetMetadata sets the "metadata" field.
+func (m *AccountMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *AccountMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *AccountMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[account.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *AccountMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[account.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *AccountMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, account.FieldMetadata)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
 func (m *AccountMutation) AddPostIDs(ids ...xid.ID) {
 	if m.posts == nil {
@@ -1015,7 +1065,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -1039,6 +1089,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.links != nil {
 		fields = append(fields, account.FieldLinks)
+	}
+	if m.metadata != nil {
+		fields = append(fields, account.FieldMetadata)
 	}
 	return fields
 }
@@ -1064,6 +1117,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Admin()
 	case account.FieldLinks:
 		return m.Links()
+	case account.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -1089,6 +1144,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldAdmin(ctx)
 	case account.FieldLinks:
 		return m.OldLinks(ctx)
+	case account.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown Account field %s", name)
 }
@@ -1154,6 +1211,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLinks(v)
 		return nil
+	case account.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Account field %s", name)
 }
@@ -1193,6 +1257,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldLinks) {
 		fields = append(fields, account.FieldLinks)
 	}
+	if m.FieldCleared(account.FieldMetadata) {
+		fields = append(fields, account.FieldMetadata)
+	}
 	return fields
 }
 
@@ -1215,6 +1282,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldLinks:
 		m.ClearLinks()
+		return nil
+	case account.FieldMetadata:
+		m.ClearMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Account nullable field %s", name)
@@ -1247,6 +1317,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldLinks:
 		m.ResetLinks()
+		return nil
+	case account.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Account field %s", name)

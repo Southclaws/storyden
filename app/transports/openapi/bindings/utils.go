@@ -28,6 +28,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Name:      acc.Name,
 		Bio:       acc.Bio.HTML(),
 		Links:     serialiseExternalLinks(acc.ExternalLinks),
+		Meta:      acc.Metadata,
 		CreatedAt: acc.CreatedAt,
 		UpdatedAt: acc.UpdatedAt,
 		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
