@@ -31,6 +31,8 @@ const (
 	FieldAdmin = "admin"
 	// FieldLinks holds the string denoting the links field in the database.
 	FieldLinks = "links"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
@@ -114,6 +116,7 @@ var Columns = []string{
 	FieldBio,
 	FieldAdmin,
 	FieldLinks,
+	FieldMetadata,
 }
 
 var (

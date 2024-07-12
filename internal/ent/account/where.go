@@ -446,6 +446,16 @@ func LinksNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldLinks))
 }
 
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldMetadata))
+}
+
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldMetadata))
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

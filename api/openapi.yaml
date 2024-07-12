@@ -2461,7 +2461,7 @@ components:
         - $ref: "#/components/schemas/AccountCommonProps"
 
     AccountCommonProps:
-      required: [handle, name, bio, links, admin]
+      required: [handle, name, bio, links, meta, admin]
       properties:
         handle:
           $ref: "#/components/schemas/AccountHandle"
@@ -2473,6 +2473,8 @@ components:
           $ref: "#/components/schemas/TagList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
         admin:
           type: boolean
 
@@ -2489,6 +2491,8 @@ components:
           $ref: "#/components/schemas/TagListIDs"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
 
     AccountAuthMethods:
       type: object
@@ -2539,7 +2543,7 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [createdAt, handle, name, bio, interests, links]
+        - required: [createdAt, handle, name, bio, interests, links, meta]
           properties:
             createdAt:
               type: string
@@ -2555,6 +2559,8 @@ components:
               $ref: "#/components/schemas/TagList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
+            meta:
+              $ref: "#/components/schemas/Metadata"
 
     ProfileExternalLinkList:
       type: array
