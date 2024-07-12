@@ -11,8 +11,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/resources/reply"
 )
 
 type Service interface {

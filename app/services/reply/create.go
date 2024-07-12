@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 )
 
 func (s *service) Create(

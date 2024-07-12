@@ -6,7 +6,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/thread"
 )
 
