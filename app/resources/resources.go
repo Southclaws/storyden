@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_search"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/notification"
-	"github.com/Southclaws/storyden/app/resources/post_search"
+	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/profile_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
