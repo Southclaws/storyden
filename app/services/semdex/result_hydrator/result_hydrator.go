@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 )
 
 type Hydrator struct {
