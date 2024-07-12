@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
