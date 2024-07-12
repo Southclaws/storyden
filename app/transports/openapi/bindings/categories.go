@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/category"
+	"github.com/Southclaws/storyden/app/resources/post/category"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
