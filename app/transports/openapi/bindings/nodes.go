@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/datagraph/node/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	node_svc "github.com/Southclaws/storyden/app/services/node"
