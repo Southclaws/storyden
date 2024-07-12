@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
 )
@@ -22,7 +22,7 @@ type Result struct {
 	TotalPages  int
 	CurrentPage int
 	NextPage    opt.Optional[int]
-	Profiles    []*datagraph.Profile
+	Profiles    []*profile.Public
 }
 
 type Repository interface {
@@ -79,7 +79,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, datagraph.ProfileFromModel)
+	profiles, err := dt.MapErr(r, profile.ProfileFromModel)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

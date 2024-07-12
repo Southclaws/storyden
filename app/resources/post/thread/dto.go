@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -29,7 +30,7 @@ type Thread struct {
 	Slug        string
 	Short       string
 	Pinned      bool
-	Author      datagraph.Profile
+	Author      profile.Public
 	Tags        []string
 	Category    category.Category
 	Visibility  visibility.Visibility
@@ -70,7 +71,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 
 	category := category.FromModel(categoryEdge)
 
-	pro, err := datagraph.ProfileFromModel(authorEdge)
+	pro, err := profile.ProfileFromModel(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
