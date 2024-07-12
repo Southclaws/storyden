@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	post_model "github.com/Southclaws/storyden/internal/ent/post"
 )

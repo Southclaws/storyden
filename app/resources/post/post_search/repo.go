@@ -5,7 +5,7 @@ import (
 
 	"github.com/Southclaws/dt"
 
-	post_resource "github.com/Southclaws/storyden/app/resources/reply"
+	post_resource "github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/post"
