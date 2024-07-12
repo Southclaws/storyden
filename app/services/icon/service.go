@@ -23,8 +23,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"

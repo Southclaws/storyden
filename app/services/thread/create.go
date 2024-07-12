@@ -12,8 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 

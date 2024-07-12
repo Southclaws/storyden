@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph/node"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
