@@ -12,8 +12,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/account/session"
 	"github.com/Southclaws/storyden/app/services/semdex"
@@ -48,7 +48,7 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 		var vis visibility.Visibility
 
 		switch n := i.Item.(type) {
-		case *datagraph.Node:
+		case *library.Node:
 			vis = n.Visibility
 			ownerID = n.Owner.ID
 

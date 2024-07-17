@@ -2,12 +2,12 @@ package mq
 
 import (
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 )
 
 type IndexNode struct {
-	ID datagraph.NodeID
+	ID library.NodeID
 }
 
 type IndexPost struct {

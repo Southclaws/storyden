@@ -9,7 +9,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 )
 
 var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not point to a valid thread ID")
