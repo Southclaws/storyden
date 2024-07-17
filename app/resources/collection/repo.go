@@ -9,6 +9,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	ent_node "github.com/Southclaws/storyden/internal/ent/node"
@@ -73,5 +75,17 @@ func WithName(v string) Option {
 func WithDescription(v string) Option {
 	return func(c *ent.CollectionMutation) {
 		c.SetDescription(v)
+	}
+}
+
+func WithOwnerID(v account.AccountID) Filter {
+	return func(c *ent.CollectionQuery) {
+		c.Where(collection.HasOwnerWith(ent_account.ID(xid.ID(v))))
+	}
+}
+
+func WithOwnerHandle(v string) Filter {
+	return func(c *ent.CollectionQuery) {
+		c.Where(collection.HasOwnerWith(ent_account.Handle(v)))
 	}
 }

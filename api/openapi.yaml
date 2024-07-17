@@ -816,6 +816,7 @@ paths:
       description: List all collections using the filtering options.
       tags: [collections]
       security: []
+      parameters: [{ $ref: "#/components/parameters/AccountHandleQueryParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1200,6 +1201,15 @@ components:
       name: account_handle
       in: path
       required: true
+      schema:
+        $ref: "#/components/schemas/AccountHandle"
+
+    AccountHandleQueryParam:
+      description: Account handle.
+      example: southclaws
+      name: account_handle
+      in: query
+      required: false
       schema:
         $ref: "#/components/schemas/AccountHandle"
 

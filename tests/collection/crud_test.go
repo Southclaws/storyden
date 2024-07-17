@@ -35,11 +35,13 @@ func TestCollectionCRUD(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, ar, seed.Account_001_Odin)
 
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{xid.New().String(), "password"})
+			handle1 := xid.New().String()
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
 			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
 
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{xid.New().String(), "password"})
+			handle2 := xid.New().String()
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
 			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
 
@@ -173,7 +175,7 @@ func TestCollectionCRUD(t *testing.T) {
 
 				id := col.JSON200.Id
 
-				list1, err := cl.CollectionListWithResponse(root)
+				list1, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{})
 				tests.Ok(t, err, list1)
 
 				foundCol, foundOk := lo.Find(list1.JSON200.Collections, func(c openapi.Collection) bool { return c.Id == id })
@@ -181,6 +183,40 @@ func TestCollectionCRUD(t *testing.T) {
 				a.Equal("c1", foundCol.Name)
 				a.Equal("c1 desc", foundCol.Description)
 				a.Equal(acc1.JSON200.Id, foundCol.Owner.Id)
+			})
+
+			t.Run("list_filter_by_owner", func(t *testing.T) {
+				t.Parallel()
+				a := assert.New(t)
+
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name:        "c1",
+					Description: "c1 desc",
+				}, session1)
+				tests.Ok(t, err, col)
+				a.Equal("c1", col.JSON200.Name)
+				a.Equal("c1 desc", col.JSON200.Description)
+
+				id := col.JSON200.Id
+
+				list1, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &handle1,
+				})
+				tests.Ok(t, err, list1)
+
+				foundCol, foundOk := lo.Find(list1.JSON200.Collections, func(c openapi.Collection) bool { return c.Id == id })
+				a.True(foundOk)
+				a.Equal("c1", foundCol.Name)
+				a.Equal("c1 desc", foundCol.Description)
+				a.Equal(acc1.JSON200.Id, foundCol.Owner.Id)
+
+				list2, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &handle2,
+				})
+				tests.Ok(t, err, list2)
+
+				foundCol, foundOk = lo.Find(list2.JSON200.Collections, func(c openapi.Collection) bool { return c.Id == id })
+				a.False(foundOk)
 			})
 		}))
 	}))
