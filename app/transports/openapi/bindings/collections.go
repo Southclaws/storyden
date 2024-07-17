@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	collection_svc "github.com/Southclaws/storyden/app/services/collection"
@@ -131,7 +131,7 @@ func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.
 func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.CollectionAddNodeRequestObject) (openapi.CollectionAddNodeResponseObject, error) {
 	c, err := i.collection_svc.NodeAdd(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
-		datagraph.NodeID(deserialiseID(request.NodeId)))
+		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -144,7 +144,7 @@ func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.Col
 func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.CollectionRemoveNodeRequestObject) (openapi.CollectionRemoveNodeResponseObject, error) {
 	c, err := i.collection_svc.NodeRemove(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
-		datagraph.NodeID(deserialiseID(request.NodeId)))
+		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

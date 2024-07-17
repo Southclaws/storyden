@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	authentication_repo "github.com/Southclaws/storyden/app/resources/authentication"
+	authentication_repo "github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
 )

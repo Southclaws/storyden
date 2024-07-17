@@ -13,7 +13,6 @@ require (
 	github.com/el-mike/restrict v1.0.0
 	github.com/forPelevin/gomoji v1.2.0
 	github.com/getkin/kin-openapi v0.126.0
-	github.com/gomarkdown/markdown v0.0.0-20240626202925-2eda941fd024
 	github.com/gosimple/slug v1.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -100,7 +99,6 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.mongodb.org/mongo-driver v1.15.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
@@ -124,7 +122,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.73
-	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
 require (
@@ -164,7 +161,6 @@ require (
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	go.uber.org/multierr v1.11.0
 	golang.org/x/crypto v0.25.0
-	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.27.0
 	golang.org/x/sys v0.22.0 // indirect

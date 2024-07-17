@@ -7,10 +7,12 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/reply"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -22,7 +24,7 @@ type Collection struct {
 	ID          CollectionID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Owner       datagraph.Profile
+	Owner       profile.Public
 	Name        string
 	Description string
 }
@@ -37,7 +39,7 @@ func (*Collection) GetResourceName() string { return "collection" }
 type CollectionItem struct {
 	Added          time.Time
 	MembershipType MembershipType
-	Author         datagraph.Profile
+	Author         profile.Public
 	Item           datagraph.Indexable
 }
 
@@ -58,7 +60,7 @@ func MapCollection(c *ent.Collection) (*Collection, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := datagraph.ProfileFromModel(accEdge)
+	pro, err := profile.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -114,7 +116,7 @@ func MapCollectionPost(n *ent.CollectionPost) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := datagraph.ProfileFromModel(accEdge)
+	pro, err := profile.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -145,12 +147,12 @@ func MapCollectionNode(n *ent.CollectionNode) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := datagraph.ProfileFromModel(accEdge)
+	pro, err := profile.ProfileFromModel(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := datagraph.NodeFromModel(p)
+	item, err := library.NodeFromModel(p)
 	if err != nil {
 		return nil, err
 	}

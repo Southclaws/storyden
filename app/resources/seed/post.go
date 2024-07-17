@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/app/resources/reply"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -28,7 +28,7 @@ var (
 	Post_01_Welcome = thread.Thread{
 		ID:       post.ID(id("00000000000000000010")),
 		Title:    "Welcome to Storyden!",
-		Author:   datagraph.Profile{ID: Account_001_Odin.ID},
+		Author:   profile.Public{ID: Account_001_Odin.ID},
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -69,25 +69,25 @@ Storyden is still in development so please give the repository a watch if you're
 				ID:         post.ID(id("00000000000000001010")),
 				Content:    utils.Must(content.NewRichText("first 😁")),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_004_Loki.ID},
+				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002010")),
 				Content:    utils.Must(content.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_002_Frigg.ID},
+				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000003010")),
 				Content:    utils.Must(content.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_001_Odin.ID},
+				Author:     profile.Public{ID: Account_001_Odin.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000004010")),
 				Content:    utils.Must(content.NewRichText("What about images and stuff?")),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_008_Heimdallr.ID},
+				Author:     profile.Public{ID: Account_008_Heimdallr.ID},
 			},
 			{
 				ID: post.ID(id("00000000000000005010")),
@@ -96,19 +96,19 @@ Storyden is still in development so please give the repository a watch if you're
 ![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
 `)),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_004_Loki.ID},
+				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000006010")),
 				Content:    utils.Must(content.NewRichText(`how did you do that??`)),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_005_Þórr.ID},
+				Author:     profile.Public{ID: Account_005_Þórr.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000007010")),
 				Content:    utils.Must(content.NewRichText(`haha secret 😉`)),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_004_Loki.ID},
+				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
 				ID: post.ID(id("00000000000000008010")),
@@ -117,20 +117,20 @@ Storyden is still in development so please give the repository a watch if you're
 https://daringfireball.net/markdown
 `)),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_002_Frigg.ID},
+				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000009010")),
 				Content:    utils.Must(content.NewRichText("Thanks guys!")),
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     datagraph.Profile{ID: Account_008_Heimdallr.ID},
+				Author:     profile.Public{ID: Account_008_Heimdallr.ID},
 			},
 		},
 	}
 	Post_02_HowToContribute = thread.Thread{
 		ID:       post.ID(id("00000000000000000020")),
 		Title:    "How to contribute",
-		Author:   datagraph.Profile{ID: Account_001_Odin.ID},
+		Author:   profile.Public{ID: Account_001_Odin.ID},
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -159,13 +159,13 @@ If I've missed anything, post in this thread and I'll add it here 😃
 				ID:         post.ID(id("00000000000000001020")),
 				Content:    utils.Must(content.NewRichText("Is there a wiki?")),
 				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     datagraph.Profile{ID: Account_006_Freyja.ID},
+				Author:     profile.Public{ID: Account_006_Freyja.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002020")),
 				Content:    utils.Must(content.NewRichText("Not yet but they're working on it!")),
 				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     datagraph.Profile{ID: Account_002_Frigg.ID},
+				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 		},
 	}
@@ -173,7 +173,7 @@ If I've missed anything, post in this thread and I'll add it here 😃
 	Post_03_LoremIpsum = thread.Thread{
 		ID:       post.ID(id("00000000000000000030")),
 		Title:    "The lorem ipsum thread",
-		Author:   datagraph.Profile{ID: Account_005_Þórr.ID},
+		Author:   profile.Public{ID: Account_005_Þórr.ID},
 		Category: Category_01_General,
 		Posts: []*reply.Reply{
 			{
@@ -185,25 +185,25 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
 				ID:         post.ID(id("00000000000000001030")),
 				Content:    utils.Must(content.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     datagraph.Profile{ID: Account_006_Freyja.ID},
+				Author:     profile.Public{ID: Account_006_Freyja.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000002030")),
 				Content:    utils.Must(content.NewRichText(markdownTest03)),
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     datagraph.Profile{ID: Account_002_Frigg.ID},
+				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000003030")),
 				Content:    utils.Must(content.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     datagraph.Profile{ID: Account_007_Freyr.ID},
+				Author:     profile.Public{ID: Account_007_Freyr.ID},
 			},
 			{
 				ID:         post.ID(id("00000000000000004030")),
 				Content:    utils.Must(content.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     datagraph.Profile{ID: Account_004_Loki.ID},
+				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 		},
 	}
@@ -211,7 +211,7 @@ Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
 	Post_04_Photos = thread.Thread{
 		ID:       post.ID(id("00000000000000000040")),
 		Title:    "Trip to Iceland",
-		Author:   datagraph.Profile{ID: Account_005_Þórr.ID},
+		Author:   profile.Public{ID: Account_005_Þórr.ID},
 		Category: Category_02_Photos,
 		Assets: []*asset.Asset{
 			{

@@ -12,8 +12,8 @@ import (
 	"github.com/Southclaws/opt"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile_search"
+	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -103,7 +103,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	}, nil
 }
 
-func serialiseProfile(in *datagraph.Profile) openapi.PublicProfile {
+func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 	return openapi.PublicProfile{
 		Id:        openapi.Identifier(in.ID.String()),
 		CreatedAt: in.Created.Format(time.RFC3339),

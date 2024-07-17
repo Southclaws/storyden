@@ -5,17 +5,18 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/category"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/app/resources/reply"
 	"github.com/Southclaws/storyden/app/resources/tag"
-	"github.com/Southclaws/storyden/app/resources/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -113,7 +114,7 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 	}
 }
 
-func serialiseProfileReference(a datagraph.Profile) openapi.ProfileReference {
+func serialiseProfileReference(a profile.Public) openapi.ProfileReference {
 	return openapi.ProfileReference{
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),

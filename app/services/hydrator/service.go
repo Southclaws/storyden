@@ -10,16 +10,16 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
-	"github.com/Southclaws/storyden/app/resources/reply"
-	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 )
 
 type Service interface {
 	HydrateThread(ctx context.Context, structured content.Rich, url opt.Optional[string]) []thread.Option
 	HydrateReply(ctx context.Context, structured content.Rich, url opt.Optional[string]) []reply.Option
-	HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []node.Option
+	HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []library.Option
 }
 
 func Build() fx.Option {
@@ -29,14 +29,14 @@ func Build() fx.Option {
 type service struct {
 	l  *zap.Logger
 	tr thread.Repository
-	nr node.Repository
+	nr library.Repository
 	f  fetcher.Service
 }
 
 func New(
 	l *zap.Logger,
 	tr thread.Repository,
-	nr node.Repository,
+	nr library.Repository,
 	f fetcher.Service,
 ) Service {
 	return &service{
@@ -65,12 +65,12 @@ func (s *service) HydrateReply(ctx context.Context, structured content.Rich, url
 	}
 }
 
-func (s *service) HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []node.Option {
+func (s *service) HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []library.Option {
 	links, assets := s.hydrate(ctx, structured, url)
 
-	return []node.Option{
-		node.WithAssets(assets),
-		node.WithLinks(links...),
+	return []library.Option{
+		library.WithAssets(assets),
+		library.WithLinks(links...),
 	}
 }
 

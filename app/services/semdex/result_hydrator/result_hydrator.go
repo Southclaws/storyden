@@ -7,24 +7,24 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/link"
-	"github.com/Southclaws/storyden/app/resources/datagraph/node"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/reply"
-	"github.com/Southclaws/storyden/app/resources/thread"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 )
 
 type Hydrator struct {
 	tr thread.Repository
 	rr reply.Repository
-	nr node.Repository
+	nr library.Repository
 	lr link.Repository
 }
 
 func New(
 	tr thread.Repository,
 	rr reply.Repository,
-	nr node.Repository,
+	nr library.Repository,
 	lr link.Repository,
 ) *Hydrator {
 	return &Hydrator{tr, rr, nr, lr}
@@ -45,7 +45,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, sr *datagraph.NodeReference) (*d
 		return sr, nil
 
 	case datagraph.KindNode:
-		c, err := h.nr.GetByID(ctx, datagraph.NodeID(sr.ID))
+		c, err := h.nr.GetByID(ctx, library.NodeID(sr.ID))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

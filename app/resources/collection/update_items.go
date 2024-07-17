@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -45,7 +46,7 @@ func WithPostRemove(id post.ID) ItemOption {
 	}
 }
 
-func WithNode(id datagraph.NodeID, mt MembershipType) ItemOption {
+func WithNode(id library.NodeID, mt MembershipType) ItemOption {
 	return func(c *itemChanges) {
 		*c = append(*c, itemChange{
 			id: xid.ID(id),
@@ -55,7 +56,7 @@ func WithNode(id datagraph.NodeID, mt MembershipType) ItemOption {
 	}
 }
 
-func WithNodeRemove(id datagraph.NodeID) ItemOption {
+func WithNodeRemove(id library.NodeID) ItemOption {
 	return func(c *itemChanges) {
 		*c = append(*c, itemChange{
 			id:     xid.ID(id),
