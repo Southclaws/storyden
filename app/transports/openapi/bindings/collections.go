@@ -52,7 +52,13 @@ func (i *Collections) CollectionCreate(ctx context.Context, request openapi.Coll
 }
 
 func (i *Collections) CollectionList(ctx context.Context, request openapi.CollectionListRequestObject) (openapi.CollectionListResponseObject, error) {
-	colls, err := i.collection_repo.List(ctx)
+	filters := []collection.Filter{}
+
+	if v := request.Params.AccountHandle; v != nil {
+		filters = append(filters, collection.WithOwnerHandle(*v))
+	}
+
+	colls, err := i.collection_repo.List(ctx, filters...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

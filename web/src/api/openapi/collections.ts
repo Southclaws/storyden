@@ -19,6 +19,7 @@ import type {
   CollectionCreateOKResponse,
   CollectionGetOKResponse,
   CollectionListOKResponse,
+  CollectionListParams,
   CollectionRemoveNodeOKResponse,
   CollectionRemovePostOKResponse,
   CollectionUpdateBody,
@@ -86,14 +87,16 @@ export const useCollectionCreate = <
 /**
  * List all collections using the filtering options.
  */
-export const collectionList = () => {
+export const collectionList = (params?: CollectionListParams) => {
   return fetcher<CollectionListOKResponse>({
     url: `/v1/collections`,
     method: "GET",
+    params,
   });
 };
 
-export const getCollectionListKey = () => [`/v1/collections`] as const;
+export const getCollectionListKey = (params?: CollectionListParams) =>
+  [`/v1/collections`, ...(params ? [params] : [])] as const;
 
 export type CollectionListQueryResult = NonNullable<
   Awaited<ReturnType<typeof collectionList>>
@@ -104,18 +107,22 @@ export type CollectionListQueryError =
 
 export const useCollectionList = <
   TError = NotFoundResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<Awaited<ReturnType<typeof collectionList>>, TError> & {
-    swrKey?: Key;
-    enabled?: boolean;
-  };
-}) => {
+>(
+  params?: CollectionListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof collectionList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getCollectionListKey() : null));
-  const swrFn = () => collectionList();
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getCollectionListKey(params) : null));
+  const swrFn = () => collectionList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
