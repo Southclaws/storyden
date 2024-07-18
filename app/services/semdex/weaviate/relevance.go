@@ -30,12 +30,12 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 		{Name: "_additional", Fields: []graphql.Field{{Name: "distance"}}},
 	}
 
-	r, err := w.wc.GraphQL().Get().
+	r, err := mergeErrors(w.wc.GraphQL().Get().
 		WithNearObject(&near).
 		WithClassName(w.cn.String()).
 		WithFields(fields...).
 		WithWhere(where).
-		Do(ctx)
+		Do(ctx))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
