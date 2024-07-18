@@ -10,13 +10,16 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/account/session"
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/rs/xid"
 )
 
 type CollectionQuerier struct {
@@ -24,12 +27,13 @@ type CollectionQuerier struct {
 
 	Logger  *zap.Logger
 	Repo    collection.Repository
-	Semdex  semdex.Retriever
+	Semdex  semdex.RelevanceScorer
 	Session session.SessionProvider
 }
 
 func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.CollectionWithItems, error) {
-	acc := r.Session.AccountOpt(ctx).OrZero()
+	session := r.Session.AccountOpt(ctx)
+	acc := session.OrZero()
 
 	col, err := r.Repo.Get(ctx, id)
 	if err != nil {
@@ -75,6 +79,25 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 
 		return true
 	})
+
+	if acc, ok := session.Get(); ok && r.Semdex != nil {
+		pro := profile.ProfileFromAccount(&acc)
+		ids := dt.Map(col.Items, func(i *collection.CollectionItem) xid.ID { return i.Item.GetID() })
+
+		scores, err := r.Semdex.ScoreRelevance(ctx, pro, ids...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		col.Items = dt.Map(col.Items, func(i *collection.CollectionItem) *collection.CollectionItem {
+			score, ok := scores[i.Item.GetID()]
+			if ok {
+				i.RelevanceScore = opt.New(score)
+			}
+
+			return i
+		})
+	}
 
 	return col, nil
 }

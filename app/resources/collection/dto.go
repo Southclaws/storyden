@@ -41,6 +41,7 @@ type CollectionItem struct {
 	MembershipType MembershipType
 	Author         profile.Public
 	Item           datagraph.Indexable
+	RelevanceScore opt.Optional[float64]
 }
 
 type CollectionItemStatus struct {
