@@ -2,7 +2,6 @@ package weaviate
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -14,6 +13,10 @@ import (
 
 type WeaviateAdditional struct {
 	Distance float64 `json:"distance"`
+	Summary  []struct {
+		Property string `json:"property"`
+		Result   string `json:"result"`
+	} `json:"summary"`
 }
 
 type WeaviateObject struct {
@@ -55,13 +58,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	j, err := json.Marshal(result.Data)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	parsed := WeaviateResponse{}
-	err = json.Unmarshal(j, &parsed)
+	parsed, err := mapResponseObjects(result.Data)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

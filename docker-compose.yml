@@ -39,12 +39,18 @@ services:
       PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
       DEFAULT_VECTORIZER_MODULE: "text2vec-transformers"
       # ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
-      ENABLE_MODULES: "text2vec-transformers"
+      ENABLE_MODULES: "text2vec-transformers,sum-transformers"
       CLUSTER_HOSTNAME: "node1"
       TRANSFORMERS_INFERENCE_API: http://t2v-transformers:8080
+      SUM_INFERENCE_API: http://sum-transformers:8080
 
   t2v-transformers:
     image: semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
+    environment:
+      ENABLE_CUDA: 0
+
+  sum-transformers:
+    image: cr.weaviate.io/semitechnologies/sum-transformers:facebook-bart-large-cnn-1.2.0
     environment:
       ENABLE_CUDA: 0
 

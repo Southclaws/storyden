@@ -17,3 +17,7 @@ type IndexPost struct {
 type IndexProfile struct {
 	ID account.AccountID
 }
+
+type SummariseNode struct {
+	ID library.NodeID
+}
