@@ -15,10 +15,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
+	"github.com/Southclaws/storyden/internal/pubsub"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -63,11 +65,12 @@ func (p Partial) Opts() (opts []library.Option) {
 }
 
 type service struct {
-	ar       account.Repository
-	nr       library.Repository
-	nc       node_children.Repository
-	hydrator hydrator.Service
-	fs       fetcher.Service
+	ar         account.Repository
+	nr         library.Repository
+	nc         node_children.Repository
+	hydrator   hydrator.Service
+	fs         fetcher.Service
+	indexQueue pubsub.Topic[mq.IndexNode]
 }
 
 func New(
@@ -76,13 +79,15 @@ func New(
 	nc node_children.Repository,
 	hydrator hydrator.Service,
 	fs fetcher.Service,
+	indexQueue pubsub.Topic[mq.IndexNode],
 ) Manager {
 	return &service{
-		ar:       ar,
-		nr:       nr,
-		nc:       nc,
-		hydrator: hydrator,
-		fs:       fs,
+		ar:         ar,
+		nr:         nr,
+		nc:         nc,
+		hydrator:   hydrator,
+		fs:         fs,
+		indexQueue: indexQueue,
 	}
 }
 
@@ -127,6 +132,10 @@ func (s *service) Create(ctx context.Context,
 
 	n, err := s.nr.Create(ctx, owner, name, nodeSlug, opts...)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -177,6 +186,10 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 
 	n, err = s.nr.Update(ctx, n.ID, opts...)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
