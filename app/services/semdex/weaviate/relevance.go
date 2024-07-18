@@ -21,7 +21,7 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 
 	where := filters.Where().
 		WithPath([]string{"datagraph_id"}).
-		WithOperator(filters.Equal).
+		WithOperator(filters.ContainsAny).
 		WithValueString(sids...)
 
 	fields := []graphql.Field{
