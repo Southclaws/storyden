@@ -45,12 +45,12 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		WithFusionType(graphql.RelativeScore).
 		WithQuery(q)
 
-	result, err := s.wc.GraphQL().Get().
+	result, err := mergeErrors(s.wc.GraphQL().Get().
 		WithClassName(s.cn.String()).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
-		Do(context.Background())
+		Do(context.Background()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
