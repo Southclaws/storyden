@@ -24,6 +24,10 @@ type RelevanceScorer interface {
 	ScoreRelevance(ctx context.Context, object datagraph.Indexable, idx ...xid.ID) (map[xid.ID]float64, error)
 }
 
+type Summariser interface {
+	Summarise(ctx context.Context, object datagraph.Indexable) (string, error)
+}
+
 type Retriever interface {
 	GetAll(ctx context.Context) (datagraph.NodeReferenceList, error)
 	// GetVectorFor(ctx context.Context, idx ...xid.ID) ([]float64, error)
@@ -35,6 +39,7 @@ type Semdexer interface {
 	Recommender
 	Retriever
 	RelevanceScorer
+	Summariser
 }
 
 type OnlySearcher struct {
@@ -55,6 +60,10 @@ func (o *OnlySearcher) Recommend(ctx context.Context, object datagraph.Indexable
 
 func (o *OnlySearcher) ScoreRelevance(ctx context.Context, object datagraph.Indexable, idx ...xid.ID) (map[xid.ID]float64, error) {
 	return nil, nil
+}
+
+func (o *OnlySearcher) Summarise(ctx context.Context, object datagraph.Indexable) (string, error) {
+	return "", nil
 }
 
 func (o *OnlySearcher) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {

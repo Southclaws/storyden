@@ -298,7 +298,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Content.OrZero().Short(),
+		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
@@ -318,7 +318,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Content.OrZero().Short(),
+		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {

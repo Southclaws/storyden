@@ -53,18 +53,19 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	}
 
 	return &Node{
-		ID:         NodeID(c.ID),
-		CreatedAt:  c.CreatedAt,
-		UpdatedAt:  c.UpdatedAt,
-		Name:       c.Name,
-		Slug:       c.Slug,
-		Assets:     assets,
-		Links:      dt.Map(c.Edges.Links, datagraph.LinkFromModel),
-		Content:    richContent,
-		Owner:      *pro,
-		Parent:     parent,
-		Nodes:      nodes,
-		Visibility: visibility,
-		Metadata:   c.Metadata,
+		ID:          NodeID(c.ID),
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+		Name:        c.Name,
+		Slug:        c.Slug,
+		Assets:      assets,
+		Links:       dt.Map(c.Edges.Links, datagraph.LinkFromModel),
+		Content:     richContent,
+		Description: opt.NewPtr(c.Description),
+		Owner:       *pro,
+		Parent:      parent,
+		Nodes:       nodes,
+		Visibility:  visibility,
+		Metadata:    c.Metadata,
 	}, nil
 }

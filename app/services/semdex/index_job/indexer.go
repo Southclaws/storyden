@@ -24,8 +24,9 @@ type indexerConsumer struct {
 	nodeRepo    library.Repository
 	accountRepo account.Repository
 
-	qnode pubsub.Topic[mq.IndexNode]
-	qpost pubsub.Topic[mq.IndexPost]
+	qnode    pubsub.Topic[mq.IndexNode]
+	qnodesum pubsub.Topic[mq.SummariseNode]
+	qpost    pubsub.Topic[mq.IndexPost]
 
 	indexer   semdex.Indexer
 	retriever semdex.Retriever
@@ -39,6 +40,7 @@ func newIndexConsumer(
 	accountRepo account.Repository,
 
 	qnode pubsub.Topic[mq.IndexNode],
+	qnodesum pubsub.Topic[mq.SummariseNode],
 	qpost pubsub.Topic[mq.IndexPost],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
@@ -51,6 +53,7 @@ func newIndexConsumer(
 		nodeRepo:    nodeRepo,
 		accountRepo: accountRepo,
 		qnode:       qnode,
+		qnodesum:    qnodesum,
 		qpost:       qpost,
 		indexer:     indexer,
 		retriever:   retriever,
@@ -67,12 +70,22 @@ func (i *indexerConsumer) indexPost(ctx context.Context, id post.ID) error {
 }
 
 func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) error {
-	p, err := i.nodeRepo.GetByID(ctx, id)
+	n, err := i.nodeRepo.GetByID(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return i.indexer.Index(ctx, p)
+	err = i.indexer.Index(ctx, n)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = i.qnodesum.Publish(ctx, mq.SummariseNode{ID: n.ID})
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
 
 func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {

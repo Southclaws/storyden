@@ -109,3 +109,7 @@ func (h *withHydration) GetAll(ctx context.Context) (datagraph.NodeReferenceList
 func (h *withHydration) ScoreRelevance(ctx context.Context, object datagraph.Indexable, idx ...xid.ID) (map[xid.ID]float64, error) {
 	return h.wc.ScoreRelevance(ctx, object, idx...)
 }
+
+func (h *withHydration) Summarise(ctx context.Context, object datagraph.Indexable) (string, error) {
+	return h.wc.Summarise(ctx, object)
+}
