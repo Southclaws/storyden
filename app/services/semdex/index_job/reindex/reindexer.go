@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/semdex"
@@ -92,7 +93,29 @@ func (r *reindexer) reindexAll(ctx context.Context) error {
 }
 
 func (r *reindexer) reindexNodes(ctx context.Context, indexed []*datagraph.NodeReference) error {
-	r.l.Debug("reindexing all unindexed nodes")
+	nodes, err := r.ec.Node.Query().Select(entpost.FieldID).All(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	indexedIDs := dt.Map(indexed, func(i *datagraph.NodeReference) xid.ID { return i.ID })
+	postIDs := dt.Map(nodes, func(p *ent.Node) xid.ID { return p.ID })
+
+	intersection := lo.Without(postIDs, indexedIDs...)
+
+	r.l.Debug("reindexing all unindexed nodes",
+		zap.Int("all_nodes", len(nodes)),
+		zap.Int("indexed_nodes", len(indexed)),
+		zap.Int("unindexed_nodes", len(intersection)),
+	)
+
+	messages := dt.Map(intersection, func(id xid.ID) mq.IndexNode {
+		return mq.IndexNode{ID: library.NodeID(id)}
+	})
+
+	if err := r.qnode.Publish(ctx, messages...); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return nil
 }
