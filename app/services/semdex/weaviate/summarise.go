@@ -47,7 +47,7 @@ func (s *weaviateSemdexer) Summarise(ctx context.Context, object datagraph.Index
 	classData := parsed.Get[s.cn.String()]
 
 	if len(classData) != 1 {
-		return "", fault.New("expected exactly one result")
+		return "", fault.Newf("expected exactly one result, got %d", len(classData))
 	}
 
 	if classData[0].Additional.Summary == nil || len(classData[0].Additional.Summary) != 1 {
