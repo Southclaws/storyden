@@ -30,7 +30,7 @@ func runSummariseConsumer(
 		go func() {
 			for msg := range nodeChan {
 				if err := ic.summariseNode(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index node", zap.Error(err))
+					l.Error("failed to summarise node", zap.Error(err))
 				}
 
 				msg.Ack()
