@@ -93,6 +93,7 @@ paths:
       security: []
       tags: [misc]
       responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
         "200":
           description: OK
           content:
@@ -111,6 +112,7 @@ paths:
       security: []
       tags: [misc]
       responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
         "200":
           description: OK
           content:
@@ -1813,6 +1815,7 @@ components:
       content:
         application/json:
           schema:
+            type: object
             properties:
               destination:
                 $ref: "#/components/schemas/Node"

@@ -35,12 +35,12 @@ export const getGetVersionKey = () => [`/version`] as const;
 export type GetVersionQueryResult = NonNullable<
   Awaited<ReturnType<typeof getVersion>>
 >;
-export type GetVersionQueryError = unknown;
+export type GetVersionQueryError = InternalServerErrorResponse;
 
 /**
  * @summary Get the software version string.
  */
-export const useGetVersion = <TError = unknown>(options?: {
+export const useGetVersion = <TError = InternalServerErrorResponse>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getVersion>>, TError> & {
     swrKey?: Key;
     enabled?: boolean;
@@ -79,12 +79,12 @@ export const getGetSpecKey = () => [`/openapi.json`] as const;
 export type GetSpecQueryResult = NonNullable<
   Awaited<ReturnType<typeof getSpec>>
 >;
-export type GetSpecQueryError = unknown;
+export type GetSpecQueryError = InternalServerErrorResponse;
 
 /**
  * @summary Get the OpenAPI 3.0 specification as JSON.
  */
-export const useGetSpec = <TError = unknown>(options?: {
+export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getSpec>>, TError> & {
     swrKey?: Key;
     enabled?: boolean;
