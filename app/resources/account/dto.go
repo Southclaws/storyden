@@ -22,14 +22,16 @@ type AccountID xid.ID
 func (u AccountID) String() string { return xid.ID(u).String() }
 
 type Account struct {
-	ID            AccountID
-	Handle        string
-	Name          string
-	Bio           content.Rich
-	Admin         bool
-	Auths         []string
-	ExternalLinks []ExternalLink
-	Metadata      map[string]any
+	ID             AccountID
+	Handle         string
+	Name           string
+	Bio            content.Rich
+	Admin          bool
+	Auths          []string
+	EmailAddresses []*EmailAddress
+	VerifiedStatus VerifiedStatus
+	ExternalLinks  []ExternalLink
+	Metadata       map[string]any
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -81,15 +83,24 @@ func FromModel(a *ent.Account) (*Account, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	verifiedStatus := VerifiedStatusNone
+	if len(dt.Filter(a.Edges.Emails, func(e *ent.Email) bool { return e.Verified })) > 0 {
+		verifiedStatus = VerifiedStatusVerifiedEmail
+	}
+
+	emails := dt.Map(a.Edges.Emails, MapEmail)
+
 	return &Account{
-		ID:            AccountID(a.ID),
-		Handle:        a.Handle,
-		Name:          a.Name,
-		Bio:           bio,
-		Admin:         a.Admin,
-		Auths:         auths,
-		ExternalLinks: links,
-		Metadata:      a.Metadata,
+		ID:             AccountID(a.ID),
+		Handle:         a.Handle,
+		Name:           a.Name,
+		Bio:            bio,
+		Admin:          a.Admin,
+		Auths:          auths,
+		EmailAddresses: emails,
+		VerifiedStatus: verifiedStatus,
+		ExternalLinks:  links,
+		Metadata:       a.Metadata,
 
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,

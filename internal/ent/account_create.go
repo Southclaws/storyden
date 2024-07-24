@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -139,6 +140,21 @@ func (ac *AccountCreate) SetNillableID(x *xid.ID) *AccountCreate {
 		ac.SetID(*x)
 	}
 	return ac
+}
+
+// AddEmailIDs adds the "emails" edge to the Email entity by IDs.
+func (ac *AccountCreate) AddEmailIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddEmailIDs(ids...)
+	return ac
+}
+
+// AddEmails adds the "emails" edges to the Email entity.
+func (ac *AccountCreate) AddEmails(e ...*Email) *AccountCreate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEmailIDs(ids...)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -417,6 +433,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
+	}
+	if nodes := ac.mutation.EmailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

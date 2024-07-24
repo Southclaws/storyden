@@ -68,6 +68,14 @@ erDiagram
         xidDOTID post_id
         string membership_type
     }
+    Email {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        string email_address
+        bool verified
+        bool is_auth
+    }
     Link {
         xidDOTID id
         timeDOTTime created_at
@@ -139,6 +147,7 @@ erDiagram
         timeDOTTime created_at
         string name
     }
+    	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ Authentication : "authentication/account"
