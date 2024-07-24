@@ -55,6 +55,7 @@ func (d *database) GetByID(ctx context.Context, id AccountID) (*Account, error) 
 		Query().
 		Where(account.ID(xid.ID(id))).
 		WithTags().
+		WithEmails().
 		WithAuthentication()
 
 	account, err := q.Only(ctx)

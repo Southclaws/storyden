@@ -24,16 +24,26 @@ import (
 
 func serialiseAccount(acc *account.Account) openapi.Account {
 	return openapi.Account{
-		Id:        openapi.Identifier(acc.ID.String()),
-		Handle:    acc.Handle,
-		Name:      acc.Name,
-		Bio:       acc.Bio.HTML(),
-		Links:     serialiseExternalLinks(acc.ExternalLinks),
-		Meta:      acc.Metadata,
-		CreatedAt: acc.CreatedAt,
-		UpdatedAt: acc.UpdatedAt,
-		DeletedAt: utils.OptionalToPointer(acc.DeletedAt),
-		Admin:     acc.Admin,
+		Id:             openapi.Identifier(acc.ID.String()),
+		Handle:         acc.Handle,
+		Name:           acc.Name,
+		Bio:            acc.Bio.HTML(),
+		Links:          serialiseExternalLinks(acc.ExternalLinks),
+		Meta:           acc.Metadata,
+		CreatedAt:      acc.CreatedAt,
+		UpdatedAt:      acc.UpdatedAt,
+		DeletedAt:      utils.OptionalToPointer(acc.DeletedAt),
+		Admin:          acc.Admin,
+		VerifiedStatus: openapi.AccountVerifiedStatus(acc.VerifiedStatus.String()),
+		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddress),
+	}
+}
+
+func serialiseEmailAddress(in *account.EmailAddress) openapi.AccountEmailAddress {
+	return openapi.AccountEmailAddress{
+		EmailAddress: in.Email.Address,
+		IsAuth:       in.IsAuth,
+		Verified:     in.Verified,
 	}
 }
 

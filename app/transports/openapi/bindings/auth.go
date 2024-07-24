@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
@@ -22,6 +23,7 @@ import (
 
 type Authentication struct {
 	p      *password.Provider
+	ep     *email_only.Provider
 	sm     *CookieJar
 	ar     account.Repository
 	am     *authentication.Manager
@@ -31,11 +33,12 @@ type Authentication struct {
 func NewAuthentication(
 	cfg config.Config,
 	p *password.Provider,
+	ep *email_only.Provider,
 	ar account.Repository,
 	sm *CookieJar,
 	am *authentication.Manager,
 ) Authentication {
-	return Authentication{p, sm, ar, am, cfg.CookieDomain}
+	return Authentication{p, ep, sm, ar, am, cfg.CookieDomain}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {

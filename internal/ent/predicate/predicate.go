@@ -27,6 +27,9 @@ type CollectionNode func(*sql.Selector)
 // CollectionPost is the predicate function for collectionpost builders.
 type CollectionPost func(*sql.Selector)
 
+// Email is the predicate function for email builders.
+type Email func(*sql.Selector)
+
 // Link is the predicate function for link builders.
 type Link func(*sql.Selector)
 

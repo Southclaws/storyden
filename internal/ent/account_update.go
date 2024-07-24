@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -158,6 +159,21 @@ func (au *AccountUpdate) ClearMetadata() *AccountUpdate {
 	return au
 }
 
+// AddEmailIDs adds the "emails" edge to the Email entity by IDs.
+func (au *AccountUpdate) AddEmailIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddEmailIDs(ids...)
+	return au
+}
+
+// AddEmails adds the "emails" edges to the Email entity.
+func (au *AccountUpdate) AddEmails(e ...*Email) *AccountUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEmailIDs(ids...)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (au *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddPostIDs(ids...)
@@ -281,6 +297,27 @@ func (au *AccountUpdate) AddAssets(a ...*Asset) *AccountUpdate {
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
+}
+
+// ClearEmails clears all "emails" edges to the Email entity.
+func (au *AccountUpdate) ClearEmails() *AccountUpdate {
+	au.mutation.ClearEmails()
+	return au
+}
+
+// RemoveEmailIDs removes the "emails" edge to Email entities by IDs.
+func (au *AccountUpdate) RemoveEmailIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveEmailIDs(ids...)
+	return au
+}
+
+// RemoveEmails removes "emails" edges to Email entities.
+func (au *AccountUpdate) RemoveEmails(e ...*Email) *AccountUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEmailIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -560,6 +597,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if au.mutation.EmailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !au.mutation.EmailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EmailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if au.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1061,6 +1143,21 @@ func (auo *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
 	return auo
 }
 
+// AddEmailIDs adds the "emails" edge to the Email entity by IDs.
+func (auo *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddEmailIDs(ids...)
+	return auo
+}
+
+// AddEmails adds the "emails" edges to the Email entity.
+func (auo *AccountUpdateOne) AddEmails(e ...*Email) *AccountUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEmailIDs(ids...)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
@@ -1184,6 +1281,27 @@ func (auo *AccountUpdateOne) AddAssets(a ...*Asset) *AccountUpdateOne {
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
+}
+
+// ClearEmails clears all "emails" edges to the Email entity.
+func (auo *AccountUpdateOne) ClearEmails() *AccountUpdateOne {
+	auo.mutation.ClearEmails()
+	return auo
+}
+
+// RemoveEmailIDs removes the "emails" edge to Email entities by IDs.
+func (auo *AccountUpdateOne) RemoveEmailIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveEmailIDs(ids...)
+	return auo
+}
+
+// RemoveEmails removes "emails" edges to Email entities.
+func (auo *AccountUpdateOne) RemoveEmails(e ...*Email) *AccountUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEmailIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -1493,6 +1611,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if auo.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if auo.mutation.EmailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !auo.mutation.EmailsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EmailsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EmailsTable,
+			Columns: []string{account.EmailsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if auo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{

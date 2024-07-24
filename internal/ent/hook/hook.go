@@ -93,6 +93,18 @@ func (f CollectionPostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionPostMutation", m)
 }
 
+// The EmailFunc type is an adapter to allow the use of ordinary
+// function as Email mutator.
+type EmailFunc func(context.Context, *ent.EmailMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EmailMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmailMutation", m)
+}
+
 // The LinkFunc type is an adapter to allow the use of ordinary
 // function as Link mutator.
 type LinkFunc func(context.Context, *ent.LinkMutation) (ent.Value, error)

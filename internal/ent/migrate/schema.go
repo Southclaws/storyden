@@ -202,6 +202,29 @@ var (
 			},
 		},
 	}
+	// EmailsColumns holds the columns for the "emails" table.
+	EmailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "email_address", Type: field.TypeString, Unique: true, Size: 254},
+		{Name: "verified", Type: field.TypeBool, Default: "false"},
+		{Name: "is_auth", Type: field.TypeBool, Default: "false"},
+		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// EmailsTable holds the schema information for the "emails" table.
+	EmailsTable = &schema.Table{
+		Name:       "emails",
+		Columns:    EmailsColumns,
+		PrimaryKey: []*schema.Column{EmailsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "emails_accounts_emails",
+				Columns:    []*schema.Column{EmailsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -625,6 +648,7 @@ var (
 		CollectionsTable,
 		CollectionNodesTable,
 		CollectionPostsTable,
+		EmailsTable,
 		LinksTable,
 		NodesTable,
 		NotificationsTable,
@@ -653,6 +677,7 @@ func init() {
 	CollectionNodesTable.ForeignKeys[1].RefTable = NodesTable
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
+	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = NodesTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable

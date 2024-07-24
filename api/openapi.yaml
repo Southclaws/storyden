@@ -281,6 +281,52 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /v1/auth/email/signup:
+    post:
+      operationId: AuthEmailSignup
+      description: |
+        Register a new account with an email and optional password. The password
+        requirement is dependent on how the instance is configured for account
+        authentication with email addresses (password vs magic link.)
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /v1/auth/email/signin:
+    post:
+      operationId: AuthEmailSignin
+      description: |
+        Sign in to an existing account with an email and optional password. The
+        behaviour of this endpoint depends on how the instance is configured. If
+        email+password is the preferred method, a cookie is returned on success
+        but if magic links are preferred, the endpoint will start the code flow.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /v1/auth/email/verify:
+    post:
+      operationId: AuthEmailVerify
+      description: |
+        Verify an email address using a token that was emailed to one of the
+        account's email addresses either set via sign up or added later.
+      tags: [auth]
+      requestBody: { $ref: "#/components/requestBodies/AuthEmailVerify" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
   /v1/auth/oauth/{oauth_provider}/callback:
     post:
       operationId: OAuthProviderCallback
@@ -1381,6 +1427,16 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPair" }
 
+    AuthEmail:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthEmailInitialProps" }
+
+    AuthEmailVerify:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthEmailVerifyProps" }
+
     AuthPasswordCreate:
       content:
         application/json:
@@ -2176,6 +2232,22 @@ components:
           example: "password"
           type: string
 
+    AuthEmailInitialProps:
+      type: object
+      required: [email]
+      properties:
+        email:
+          example: "hello@storyden.org"
+          type: string
+
+    AuthEmailVerifyProps:
+      type: object
+      required: [code]
+      properties:
+        code:
+          example: "728562"
+          type: string
+
     AuthPasswordInitialProps:
       type: object
       required: [password]
@@ -2480,7 +2552,17 @@ components:
         - $ref: "#/components/schemas/AccountCommonProps"
 
     AccountCommonProps:
-      required: [handle, name, bio, links, meta, admin]
+      required:
+        [
+          handle,
+          name,
+          bio,
+          links,
+          meta,
+          verified_status,
+          email_addresses,
+          admin,
+        ]
       properties:
         handle:
           $ref: "#/components/schemas/AccountHandle"
@@ -2494,6 +2576,10 @@ components:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
           $ref: "#/components/schemas/Metadata"
+        verified_status:
+          $ref: "#/components/schemas/AccountVerifiedStatus"
+        email_addresses:
+          $ref: "#/components/schemas/AccountEmailAddressList"
         admin:
           type: boolean
 
@@ -2546,6 +2632,30 @@ components:
           description: The external identifier (third party ID or device ID)
           type: string
         provider: { $ref: "#/components/schemas/AuthProvider" }
+
+    AccountVerifiedStatus:
+      type: string
+      enum: [none, verified_email]
+
+    AccountEmailAddressList:
+      description: |
+        If the instance is configured to not use any email features for auth or
+        transactional/content communications, this will always be empty.
+      type: array
+      items: { $ref: "#/components/schemas/AccountEmailAddress" }
+
+    AccountEmailAddress:
+      type: object
+      required: [email_address, verified, is_auth]
+      properties:
+        email_address:
+          type: string
+        verified:
+          description: Is the email address verified to be owned by the account?
+          type: boolean
+        is_auth:
+          description: Is the email used for authenticating to the platform?
+          type: boolean
 
     #
     # 8888888b.                   .d888 d8b 888
