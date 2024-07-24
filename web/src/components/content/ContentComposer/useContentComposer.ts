@@ -9,9 +9,9 @@ import { ChangeEvent, useEffect } from "react";
 
 import { Asset } from "src/api/openapi/schemas";
 
-import { useImageUpload } from "../useImageUpload";
-
 import { css } from "@/styled-system/css";
+
+import { useImageUpload } from "../useImageUpload";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
 
@@ -42,7 +42,6 @@ export function useContentComposer(props: ContentComposerProps) {
       placeholder: "Write your heart out...",
       includeChildren: true,
       showOnlyCurrent: false,
-      considerAnyAsEmpty: true,
     }),
   ];
 
