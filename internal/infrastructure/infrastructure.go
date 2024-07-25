@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/internal/logger"
 	"github.com/Southclaws/storyden/internal/object"
 	"github.com/Southclaws/storyden/internal/pubsub/queue"
+	"github.com/Southclaws/storyden/internal/saml"
 	"github.com/Southclaws/storyden/internal/sms"
 	"github.com/Southclaws/storyden/internal/weaviate"
 	"github.com/Southclaws/storyden/internal/webauthn"
@@ -28,5 +29,6 @@ func Build() fx.Option {
 		weaviate.Build(),
 		jwt.Build(),
 		queue.Build(),
+		saml.Build(),
 	)
 }

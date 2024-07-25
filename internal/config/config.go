@@ -19,6 +19,12 @@ type Config struct {
 	CookieDomain     string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
 	SessionKey       string `envconfig:"SESSION_KEY"            default:"0000000000000000"`
 	PublicWebAddress string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
+	PublicApiAddress string `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
+
+	SAMLEnabled     bool   `envconfig:"SAML_ENABLED" default:"false"`
+	SAMLCertFile    string `envconfig:"SAML_CERT_FILE"`
+	SAMLKeyFile     string `envconfig:"SAML_KEY_FILE"`
+	SAMLIDPMetaFile string `envconfig:"SAML_IDP_META_FILE"`
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
 	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`

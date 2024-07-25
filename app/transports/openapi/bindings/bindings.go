@@ -31,6 +31,7 @@ package bindings
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -47,6 +48,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/glue"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/saml"
 )
 
 // Bindings is a DI parameter struct that is used to compose together all of the
@@ -66,6 +68,7 @@ type Bindings struct {
 	Admin
 	Authentication
 	WebAuthn
+	SAML
 	PhoneAuth
 	Accounts
 	Profiles
@@ -91,6 +94,7 @@ func bindingsProviders() fx.Option {
 		NewAdmin,
 		NewAuthentication,
 		NewWebAuthn,
+		NewSAML,
 		NewPhoneAuth,
 		NewAccounts,
 		NewProfiles,
@@ -152,7 +156,7 @@ func mount(lc fx.Lifecycle, l *zap.Logger, mux *http.ServeMux, router *echo.Echo
 	})
 }
 
-func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *CookieJar, auth Authentication) error {
+func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *CookieJar, auth Authentication, samlsp *saml.SAML) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
 		return fault.Wrap(err, fmsg.With("failed to get openapi specification"))
@@ -202,6 +206,46 @@ func addMiddleware(cfg config.Config, l *zap.Logger, router *echo.Echo, cj *Cook
 		// Handles validation errors that occur BEFORE the handler is called.
 		ErrorHandler: glue.ValidatorErrorHandler(),
 	}))
+
+	if samlsp != nil {
+		router.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/saml/login":
+					samlsp.Middleware.RequireAccount(h).ServeHTTP(w, r)
+
+				case "/api/saml/acs":
+					samlsp.Middleware.ServeACS(w, r)
+
+				case "/api/saml/metadata":
+					samlsp.Middleware.ServeMetadata(w, r)
+
+				default:
+					h.ServeHTTP(w, r)
+				}
+			})
+		}))
+
+		router.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/saml/login":
+					session, err := samlsp.Middleware.Session.GetSession(r)
+					if err != nil {
+						l.Error("error getting session", zap.Error(err))
+						w.Write([]byte("error getting session"))
+						return
+					}
+
+					// TODO: Use email to perform standard Storyden side auth
+					fmt.Println(session)
+
+				default:
+					h.ServeHTTP(w, r)
+				}
+			})
+		}))
+	}
 
 	return nil
 }

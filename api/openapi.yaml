@@ -39,6 +39,8 @@ tags:
     description: Administration and configuration settings.
   - name: auth
     description: Authentication resources.
+  - name: saml
+    description: SAML authentication endpoints.
   - name: accounts
     description: User accounts.
   - name: profiles
@@ -388,6 +390,71 @@ paths:
         "200":
           description: OK
           headers: { Set-Cookie: { schema: { type: string } } }
+
+  #
+  #                                 888
+  #                                 888
+  #                                 888
+  # .d8888b   8888b.  88888b.d88b.  888
+  # 88K          "88b 888 "888 "88b 888
+  # "Y8888b. .d888888 888  888  888 888
+  #      X88 888  888 888  888  888 888
+  #  88888P' "Y888888 888  888  888 888
+  #
+
+  /saml/login:
+    get:
+      operationId: SAML-Login
+      description: >
+        Initiates a SAML authentication flow and, upon returning with a
+        successful login with token, performs the necessary steps to either 
+        create an account or sign the user in. Upon success, returns a cookie.
+      security: []
+      tags: [saml]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "302":
+          description: Redirect to IDP for authentication.
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /saml/metadata:
+    get:
+      operationId: SAML-Metadata-Read
+      description: >
+        The metadata XML can be downloaded or used for the SAML 2.0 Metadata URL
+        discovery mechanism. This URL is the SAML 2.0 EntityID of the Service
+        Provider implemented by this server.
+      security: []
+      tags: [saml]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200":
+          description: |
+            A valid SAML 2.0 Metadata XML document.
+          content:
+            "application/samlmetadata+xml":
+              schema:
+                type: string
+
+  /saml/acs:
+    post:
+      operationId: SAML-ACS-Get
+      description: |
+        Implements the SAML 2.0 Assertion Consumer Service (ACS) endpoint
+        supporting the POST and Artifact bindings.
+      security: []
+      tags: [saml]
+      parameters:
+        - { $ref: "#/components/parameters/SAMLRelayStateParam" }
+        - { $ref: "#/components/parameters/SAMLArtifactParam" }
+        - { $ref: "#/components/parameters/SAMLResponseParam" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "302":
+          $ref: "#/components/responses/AccessRefreshTokenRedirectResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
   #
   #                                                      888
@@ -1215,6 +1282,36 @@ components:
       schema:
         $ref: "#/components/schemas/AccountHandle"
 
+    SAMLRelayStateParam:
+      name: RelayState
+      in: query
+      schema:
+        type: string
+        description: >
+          Either a URL to take the user to after the ACS has been verified,
+          usually sent by Identity Provider initiated login requests or a UUID
+          of the SAML Relay State stored in the database, used to identify the
+          Service Provider initiated login request.
+
+    SAMLArtifactParam:
+      name: SAMLArt
+      in: query
+      description: >
+        See the SAML 2.0 ACS specification. Cannot be used without a UUID
+        `RelayState` parameter.
+      schema:
+        type: string
+
+    SAMLResponseParam:
+      name: SAMLResponse
+      in: query
+      description: >
+        See the SAML 2.0 ACS specification. Must be present unless `SAMLArt` is
+        specified. If `RelayState` is not a UUID, the SAML Response is unpacked
+        and the identity provider is identified from the response.
+      schema:
+        type: string
+
     ThreadMarkParam:
       description: Thread unique and permanent identifier.
       name: thread_mark
@@ -1540,6 +1637,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Info"
+
+    AccessRefreshTokenRedirectResponse:
+      description: |
+        HTTP See Other redirect response where `Location` is a specially
+        formatted URL that includes an `access_token`, `refresh_token`,
+        `expires_in` as URL query encoded values in the URL fragment. These
+        values are encoded in the fragment as this value is only visible to the
+        browser handling the redirect and is not sent to the server.
+      headers:
+        Location:
+          schema:
+            type: string
+            format: uri
+            example: https://example.com/#access_token=...&refresh_token=...&expires_in=...
 
     AdminSettingsUpdateOK:
       description: OK
