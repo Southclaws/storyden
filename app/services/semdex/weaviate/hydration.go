@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -103,4 +104,8 @@ func (h *withHydration) GetAll(ctx context.Context) (datagraph.NodeReferenceList
 	}
 
 	return results, nil
+}
+
+func (h *withHydration) ScoreRelevance(ctx context.Context, object datagraph.Indexable, idx ...xid.ID) (map[xid.ID]float64, error) {
+	return h.wc.ScoreRelevance(ctx, object, idx...)
 }

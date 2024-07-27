@@ -12,11 +12,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
+type WeaviateAdditional struct {
+	Distance float64 `json:"distance"`
+}
+
 type WeaviateObject struct {
-	DatagraphID   string `json:"datagraph_id"`
-	DatagraphType string `json:"datagraph_type"`
-	Name          string `json:"name"`
-	Content       string `json:"content"`
+	DatagraphID   string             `json:"datagraph_id"`
+	DatagraphType string             `json:"datagraph_type"`
+	Name          string             `json:"name"`
+	Content       string             `json:"content"`
+	Additional    WeaviateAdditional `json:"_additional"`
 }
 
 type WeaviateContent map[string][]WeaviateObject

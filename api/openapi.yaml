@@ -2096,6 +2096,12 @@ components:
         more complex types such as Slate.js editor documents.
       type: string
 
+    RelevanceScore:
+      description: |
+        For recommendations and other uses, only available when a Semdex is
+        configured for content indexing and contextual relativity scoring.
+      type: number
+
     #
     #        d8888      888               d8b
     #       d88888      888               Y8P
@@ -3051,6 +3057,8 @@ components:
           description: The time that the item was added to the collection.
         membership_type:
           $ref: "#/components/schemas/CollectionItemMembershipType"
+        relevance_score:
+          $ref: "#/components/schemas/RelevanceScore"
 
     CollectionItemMembershipType:
       type: string
