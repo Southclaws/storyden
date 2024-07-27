@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface BadgeVariant {
-  variant: "solid" | "subtle" | "outline"
+  /**
+ * @default "subtle"
+ */
+variant: "solid" | "subtle" | "outline"
+/**
+ * @default "md"
+ */
 size: "sm" | "md" | "lg"
 }
 

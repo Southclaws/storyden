@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ToggleGroupVariant {
-  variant: "outline" | "ghost"
+  /**
+ * @default "outline"
+ */
+variant: "outline" | "ghost"
+/**
+ * @default "md"
+ */
 size: "sm" | "md" | "lg"
 }
 

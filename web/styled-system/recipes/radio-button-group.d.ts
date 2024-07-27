@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface RadioButtonGroupVariant {
-  variant: "solid" | "outline"
+  /**
+ * @default "solid"
+ */
+variant: "solid" | "outline"
+/**
+ * @default "md"
+ */
 size: "sm" | "md" | "lg" | "xl"
 }
 

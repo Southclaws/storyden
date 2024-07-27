@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface IconButtonVariant {
-  variant: "solid" | "outline" | "ghost" | "link" | "subtle"
+  /**
+ * @default "solid"
+ */
+variant: "solid" | "outline" | "ghost" | "link" | "subtle"
+/**
+ * @default "md"
+ */
 size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 

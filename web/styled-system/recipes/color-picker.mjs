@@ -46,12 +46,20 @@ const colorPickerSlotNames = [
     "colorPicker__channelSlider"
   ],
   [
+    "channelSliderLabel",
+    "colorPicker__channelSliderLabel"
+  ],
+  [
     "channelSliderTrack",
     "colorPicker__channelSliderTrack"
   ],
   [
     "channelSliderThumb",
     "colorPicker__channelSliderThumb"
+  ],
+  [
+    "channelSliderValueText",
+    "colorPicker__channelSliderValueText"
   ],
   [
     "channelInput",
@@ -138,12 +146,20 @@ const colorPickerSlotNames = [
     "colorPicker__channelSlider"
   ],
   [
+    "channelSliderLabel",
+    "colorPicker__channelSliderLabel"
+  ],
+  [
     "channelSliderTrack",
     "colorPicker__channelSliderTrack"
   ],
   [
     "channelSliderThumb",
     "colorPicker__channelSliderThumb"
+  ],
+  [
+    "channelSliderValueText",
+    "colorPicker__channelSliderValueText"
   ],
   [
     "channelInput",

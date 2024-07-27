@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface TableVariant {
-  variant: "outline" | "plain"
+  /**
+ * @default "plain"
+ */
+variant: "outline" | "plain"
+/**
+ * @default "md"
+ */
 size: "sm" | "md"
 }
 

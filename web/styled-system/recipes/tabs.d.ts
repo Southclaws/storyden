@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface TabsVariant {
-  variant: "enclosed" | "line" | "outline"
+  /**
+ * @default "line"
+ */
+variant: "enclosed" | "line" | "outline"
+/**
+ * @default "md"
+ */
 size: "sm" | "md" | "lg"
 }
 

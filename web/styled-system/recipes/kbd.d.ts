@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface KbdVariant {
-  size: "sm" | "md" | "lg"
+  /**
+ * @default "md"
+ */
+size: "sm" | "md" | "lg"
 }
 
 type KbdVariantMap = {

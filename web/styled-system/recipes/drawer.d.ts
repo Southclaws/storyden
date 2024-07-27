@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface DrawerVariant {
-  variant: "left" | "right"
+  /**
+ * @default "right"
+ */
+variant: "left" | "right"
 }
 
 type DrawerVariantMap = {

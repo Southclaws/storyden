@@ -4826,7 +4826,7 @@ scale?: ConditionalValue<WithEscapeHatch<UtilityValues["scale"] | CssVars>>
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/scrollbar-color
    */
-scrollbarColor?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarColor"]>>
+scrollbarColor?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollbarColor"] | CssVars>>
  /**
    * The **`scrollbar-gutter`** CSS property allows authors to reserve space for the scrollbar, preventing unwanted layout changes as the content grows while also avoiding unnecessary visuals when scrolling isn't needed.
    *
@@ -4840,7 +4840,7 @@ scrollbarColor?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarColor"
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/scrollbar-gutter
    */
-scrollbarGutter?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarGutter"]>>
+scrollbarGutter?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollbarGutter"] | CssVars>>
  /**
    * The **`scrollbar-width`** property allows the author to set the maximum thickness of an element's scrollbars when they are shown.
    *
@@ -4854,7 +4854,7 @@ scrollbarGutter?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarGutte
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/scrollbar-width
    */
-scrollbarWidth?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarWidth"]>>
+scrollbarWidth?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollbarWidth"] | CssVars>>
  /**
    * The **`scroll-behavior`** CSS property sets the behavior for a scrolling box when scrolling is triggered by the navigation or CSSOM scrolling APIs.
    *
@@ -7377,6 +7377,7 @@ scrollPaddingX?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollPaddingIn
  backdropSepia?: ConditionalValue<WithEscapeHatch<string | number>>
  borderSpacingX?: ConditionalValue<WithEscapeHatch<UtilityValues["borderSpacingX"] | CssVars>>
  borderSpacingY?: ConditionalValue<WithEscapeHatch<UtilityValues["borderSpacingY"] | CssVars>>
+ animationState?: ConditionalValue<WithEscapeHatch<string | number>>
  rotateX?: ConditionalValue<WithEscapeHatch<string | number>>
  rotateY?: ConditionalValue<WithEscapeHatch<string | number>>
  rotateZ?: ConditionalValue<WithEscapeHatch<string | number>>

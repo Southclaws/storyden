@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface NumberInputVariant {
-  size: "md" | "lg" | "xl"
+  /**
+ * @default "md"
+ */
+size: "md" | "lg" | "xl"
 }
 
 type NumberInputVariantMap = {
