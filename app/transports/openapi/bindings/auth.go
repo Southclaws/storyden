@@ -13,7 +13,11 @@ import (
 	echomiddleware "github.com/oapi-codegen/echo-middleware"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
@@ -22,20 +26,28 @@ import (
 
 type Authentication struct {
 	p      *password.Provider
+	ep     *email_only.Provider
+	epp    *email_password.Provider
 	sm     *CookieJar
 	ar     account.Repository
+	er     email.EmailRepo
 	am     *authentication.Manager
+	ev     email_verify.Verifier
 	domain string
 }
 
 func NewAuthentication(
 	cfg config.Config,
 	p *password.Provider,
+	ep *email_only.Provider,
+	epp *email_password.Provider,
 	ar account.Repository,
+	er email.EmailRepo,
 	sm *CookieJar,
 	am *authentication.Manager,
+	ev email_verify.Verifier,
 ) Authentication {
-	return Authentication{p, sm, ar, am, cfg.CookieDomain}
+	return Authentication{p, ep, epp, sm, ar, er, am, ev, cfg.CookieDomain}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {

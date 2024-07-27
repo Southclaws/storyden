@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_graph"
+	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -48,6 +49,7 @@ func Build() fx.Option {
 			link.New,
 			link_graph.New,
 			profile_search.New,
+			mailtemplate.New,
 		),
 	)
 }

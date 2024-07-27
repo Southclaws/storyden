@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -357,6 +358,65 @@ func init() {
 	collectionpostDescMembershipType := collectionpostFields[2].Descriptor()
 	// collectionpost.DefaultMembershipType holds the default value on creation for the membership_type field.
 	collectionpost.DefaultMembershipType = collectionpostDescMembershipType.Default.(string)
+	emailMixin := schema.Email{}.Mixin()
+	emailMixinFields0 := emailMixin[0].Fields()
+	_ = emailMixinFields0
+	emailMixinFields1 := emailMixin[1].Fields()
+	_ = emailMixinFields1
+	emailFields := schema.Email{}.Fields()
+	_ = emailFields
+	// emailDescCreatedAt is the schema descriptor for created_at field.
+	emailDescCreatedAt := emailMixinFields1[0].Descriptor()
+	// email.DefaultCreatedAt holds the default value on creation for the created_at field.
+	email.DefaultCreatedAt = emailDescCreatedAt.Default.(func() time.Time)
+	// emailDescEmailAddress is the schema descriptor for email_address field.
+	emailDescEmailAddress := emailFields[2].Descriptor()
+	// email.EmailAddressValidator is a validator for the "email_address" field. It is called by the builders before save.
+	email.EmailAddressValidator = func() func(string) error {
+		validators := emailDescEmailAddress.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+			validators[3].(func(string) error),
+		}
+		return func(email_address string) error {
+			for _, fn := range fns {
+				if err := fn(email_address); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// emailDescVerificationCode is the schema descriptor for verification_code field.
+	emailDescVerificationCode := emailFields[3].Descriptor()
+	// email.VerificationCodeValidator is a validator for the "verification_code" field. It is called by the builders before save.
+	email.VerificationCodeValidator = emailDescVerificationCode.Validators[0].(func(string) error)
+	// emailDescVerified is the schema descriptor for verified field.
+	emailDescVerified := emailFields[4].Descriptor()
+	// email.DefaultVerified holds the default value on creation for the verified field.
+	email.DefaultVerified = emailDescVerified.Default.(bool)
+	// emailDescID is the schema descriptor for id field.
+	emailDescID := emailMixinFields0[0].Descriptor()
+	// email.DefaultID holds the default value on creation for the id field.
+	email.DefaultID = emailDescID.Default.(func() xid.ID)
+	// email.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	email.IDValidator = func() func(string) error {
+		validators := emailDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	linkMixin := schema.Link{}.Mixin()
 	linkMixinFields0 := linkMixin[0].Fields()
 	_ = linkMixinFields0

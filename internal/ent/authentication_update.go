@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -115,6 +116,21 @@ func (au *AuthenticationUpdate) SetAccount(a *Account) *AuthenticationUpdate {
 	return au.SetAccountID(a.ID)
 }
 
+// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
+func (au *AuthenticationUpdate) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdate {
+	au.mutation.AddEmailAddresIDs(ids...)
+	return au
+}
+
+// AddEmailAddress adds the "email_address" edges to the Email entity.
+func (au *AuthenticationUpdate) AddEmailAddress(e ...*Email) *AuthenticationUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEmailAddresIDs(ids...)
+}
+
 // Mutation returns the AuthenticationMutation object of the builder.
 func (au *AuthenticationUpdate) Mutation() *AuthenticationMutation {
 	return au.mutation
@@ -124,6 +140,27 @@ func (au *AuthenticationUpdate) Mutation() *AuthenticationMutation {
 func (au *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
 	au.mutation.ClearAccount()
 	return au
+}
+
+// ClearEmailAddress clears all "email_address" edges to the Email entity.
+func (au *AuthenticationUpdate) ClearEmailAddress() *AuthenticationUpdate {
+	au.mutation.ClearEmailAddress()
+	return au
+}
+
+// RemoveEmailAddresIDs removes the "email_address" edge to Email entities by IDs.
+func (au *AuthenticationUpdate) RemoveEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdate {
+	au.mutation.RemoveEmailAddresIDs(ids...)
+	return au
+}
+
+// RemoveEmailAddress removes "email_address" edges to Email entities.
+func (au *AuthenticationUpdate) RemoveEmailAddress(e ...*Email) *AuthenticationUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEmailAddresIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -239,6 +276,51 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.EmailAddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEmailAddressIDs(); len(nodes) > 0 && !au.mutation.EmailAddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EmailAddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(au.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -346,6 +428,21 @@ func (auo *AuthenticationUpdateOne) SetAccount(a *Account) *AuthenticationUpdate
 	return auo.SetAccountID(a.ID)
 }
 
+// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
+func (auo *AuthenticationUpdateOne) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdateOne {
+	auo.mutation.AddEmailAddresIDs(ids...)
+	return auo
+}
+
+// AddEmailAddress adds the "email_address" edges to the Email entity.
+func (auo *AuthenticationUpdateOne) AddEmailAddress(e ...*Email) *AuthenticationUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEmailAddresIDs(ids...)
+}
+
 // Mutation returns the AuthenticationMutation object of the builder.
 func (auo *AuthenticationUpdateOne) Mutation() *AuthenticationMutation {
 	return auo.mutation
@@ -355,6 +452,27 @@ func (auo *AuthenticationUpdateOne) Mutation() *AuthenticationMutation {
 func (auo *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
 	auo.mutation.ClearAccount()
 	return auo
+}
+
+// ClearEmailAddress clears all "email_address" edges to the Email entity.
+func (auo *AuthenticationUpdateOne) ClearEmailAddress() *AuthenticationUpdateOne {
+	auo.mutation.ClearEmailAddress()
+	return auo
+}
+
+// RemoveEmailAddresIDs removes the "email_address" edge to Email entities by IDs.
+func (auo *AuthenticationUpdateOne) RemoveEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdateOne {
+	auo.mutation.RemoveEmailAddresIDs(ids...)
+	return auo
+}
+
+// RemoveEmailAddress removes "email_address" edges to Email entities.
+func (auo *AuthenticationUpdateOne) RemoveEmailAddress(e ...*Email) *AuthenticationUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEmailAddresIDs(ids...)
 }
 
 // Where appends a list predicates to the AuthenticationUpdate builder.
@@ -493,6 +611,51 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EmailAddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEmailAddressIDs(); len(nodes) > 0 && !auo.mutation.EmailAddressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EmailAddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -19,6 +19,7 @@ type Config struct {
 	CookieDomain     string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
 	SessionKey       string `envconfig:"SESSION_KEY"            default:"0000000000000000"`
 	PublicWebAddress string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
+	EmailProvider    string `envconfig:"EMAIL_PROVIDER"         default:""`
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
 	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`

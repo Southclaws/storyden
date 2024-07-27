@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -54,6 +55,8 @@ type Client struct {
 	CollectionNode *CollectionNodeClient
 	// CollectionPost is the client for interacting with the CollectionPost builders.
 	CollectionPost *CollectionPostClient
+	// Email is the client for interacting with the Email builders.
+	Email *EmailClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Node is the client for interacting with the Node builders.
@@ -88,6 +91,7 @@ func (c *Client) init() {
 	c.Collection = NewCollectionClient(c.config)
 	c.CollectionNode = NewCollectionNodeClient(c.config)
 	c.CollectionPost = NewCollectionPostClient(c.config)
+	c.Email = NewEmailClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
@@ -195,6 +199,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Collection:     NewCollectionClient(cfg),
 		CollectionNode: NewCollectionNodeClient(cfg),
 		CollectionPost: NewCollectionPostClient(cfg),
+		Email:          NewEmailClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -229,6 +234,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Collection:     NewCollectionClient(cfg),
 		CollectionNode: NewCollectionNodeClient(cfg),
 		CollectionPost: NewCollectionPostClient(cfg),
+		Email:          NewEmailClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -267,8 +273,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Link, c.Node, c.Notification, c.Post,
-		c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.Link, c.Node, c.Notification,
+		c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -279,8 +285,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Link, c.Node, c.Notification, c.Post,
-		c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.Link, c.Node, c.Notification,
+		c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -303,6 +309,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.CollectionNode.mutate(ctx, m)
 	case *CollectionPostMutation:
 		return c.CollectionPost.mutate(ctx, m)
+	case *EmailMutation:
+		return c.Email.mutate(ctx, m)
 	case *LinkMutation:
 		return c.Link.mutate(ctx, m)
 	case *NodeMutation:
@@ -430,6 +438,22 @@ func (c *AccountClient) GetX(ctx context.Context, id xid.ID) *Account {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryEmails queries the emails edge of a Account.
+func (c *AccountClient) QueryEmails(a *Account) *EmailQuery {
+	query := (&EmailClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(email.Table, email.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryPosts queries the posts edge of a Account.
@@ -899,6 +923,22 @@ func (c *AuthenticationClient) QueryAccount(a *Authentication) *AccountQuery {
 			sqlgraph.From(authentication.Table, authentication.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, authentication.AccountTable, authentication.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmailAddress queries the email_address edge of a Authentication.
+func (c *AuthenticationClient) QueryEmailAddress(a *Authentication) *EmailQuery {
+	query := (&EmailClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(authentication.Table, authentication.FieldID, id),
+			sqlgraph.To(email.Table, email.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, authentication.EmailAddressTable, authentication.EmailAddressColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1522,6 +1562,171 @@ func (c *CollectionPostClient) mutate(ctx context.Context, m *CollectionPostMuta
 		return (&CollectionPostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown CollectionPost mutation op: %q", m.Op())
+	}
+}
+
+// EmailClient is a client for the Email schema.
+type EmailClient struct {
+	config
+}
+
+// NewEmailClient returns a client for the Email from the given config.
+func NewEmailClient(c config) *EmailClient {
+	return &EmailClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `email.Hooks(f(g(h())))`.
+func (c *EmailClient) Use(hooks ...Hook) {
+	c.hooks.Email = append(c.hooks.Email, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `email.Intercept(f(g(h())))`.
+func (c *EmailClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Email = append(c.inters.Email, interceptors...)
+}
+
+// Create returns a builder for creating a Email entity.
+func (c *EmailClient) Create() *EmailCreate {
+	mutation := newEmailMutation(c.config, OpCreate)
+	return &EmailCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Email entities.
+func (c *EmailClient) CreateBulk(builders ...*EmailCreate) *EmailCreateBulk {
+	return &EmailCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EmailClient) MapCreateBulk(slice any, setFunc func(*EmailCreate, int)) *EmailCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EmailCreateBulk{err: fmt.Errorf("calling to EmailClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EmailCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EmailCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Email.
+func (c *EmailClient) Update() *EmailUpdate {
+	mutation := newEmailMutation(c.config, OpUpdate)
+	return &EmailUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmailClient) UpdateOne(e *Email) *EmailUpdateOne {
+	mutation := newEmailMutation(c.config, OpUpdateOne, withEmail(e))
+	return &EmailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmailClient) UpdateOneID(id xid.ID) *EmailUpdateOne {
+	mutation := newEmailMutation(c.config, OpUpdateOne, withEmailID(id))
+	return &EmailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Email.
+func (c *EmailClient) Delete() *EmailDelete {
+	mutation := newEmailMutation(c.config, OpDelete)
+	return &EmailDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EmailClient) DeleteOne(e *Email) *EmailDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EmailClient) DeleteOneID(id xid.ID) *EmailDeleteOne {
+	builder := c.Delete().Where(email.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmailDeleteOne{builder}
+}
+
+// Query returns a query builder for Email.
+func (c *EmailClient) Query() *EmailQuery {
+	return &EmailQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEmail},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Email entity by its id.
+func (c *EmailClient) Get(ctx context.Context, id xid.ID) (*Email, error) {
+	return c.Query().Where(email.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmailClient) GetX(ctx context.Context, id xid.ID) *Email {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a Email.
+func (c *EmailClient) QueryAccount(e *Email) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(email.Table, email.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, email.AccountTable, email.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthentication queries the authentication edge of a Email.
+func (c *EmailClient) QueryAuthentication(e *Email) *AuthenticationQuery {
+	query := (&AuthenticationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(email.Table, email.FieldID, id),
+			sqlgraph.To(authentication.Table, authentication.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, email.AuthenticationTable, email.AuthenticationColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EmailClient) Hooks() []Hook {
+	return c.hooks.Email
+}
+
+// Interceptors returns the client interceptors.
+func (c *EmailClient) Interceptors() []Interceptor {
+	return c.inters.Email
+}
+
+func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EmailCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EmailUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EmailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EmailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Email mutation op: %q", m.Op())
 	}
 }
 
@@ -3041,12 +3246,12 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 type (
 	hooks struct {
 		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Link, Node, Notification, Post, React, Role, Setting,
+		CollectionPost, Email, Link, Node, Notification, Post, React, Role, Setting,
 		Tag []ent.Hook
 	}
 	inters struct {
 		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Link, Node, Notification, Post, React, Role, Setting,
+		CollectionPost, Email, Link, Node, Notification, Post, React, Role, Setting,
 		Tag []ent.Interceptor
 	}
 )

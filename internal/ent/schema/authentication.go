@@ -46,6 +46,8 @@ func (Authentication) Edges() []ent.Edge {
 			Ref("authentication").
 			Required().
 			Unique(),
+
+		edge.To("email_address", Email.Type),
 	}
 }
 

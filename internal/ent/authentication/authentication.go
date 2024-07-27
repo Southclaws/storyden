@@ -29,6 +29,8 @@ const (
 	FieldMetadata = "metadata"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
+	// EdgeEmailAddress holds the string denoting the email_address edge name in mutations.
+	EdgeEmailAddress = "email_address"
 	// Table holds the table name of the authentication in the database.
 	Table = "authentications"
 	// AccountTable is the table that holds the account relation/edge.
@@ -38,6 +40,13 @@ const (
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
 	AccountColumn = "account_authentication"
+	// EmailAddressTable is the table that holds the email_address relation/edge.
+	EmailAddressTable = "emails"
+	// EmailAddressInverseTable is the table name for the Email entity.
+	// It exists in this package in order to avoid circular dependency with the "email" package.
+	EmailAddressInverseTable = "emails"
+	// EmailAddressColumn is the table column denoting the email_address relation/edge.
+	EmailAddressColumn = "authentication_record_id"
 )
 
 // Columns holds all SQL columns for authentication fields.
@@ -124,10 +133,31 @@ func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAccountStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByEmailAddressCount orders the results by email_address count.
+func ByEmailAddressCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEmailAddressStep(), opts...)
+	}
+}
+
+// ByEmailAddress orders the results by email_address terms.
+func ByEmailAddress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEmailAddressStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAccountStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
+	)
+}
+func newEmailAddressStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EmailAddressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmailAddressTable, EmailAddressColumn),
 	)
 }

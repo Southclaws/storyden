@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
@@ -34,6 +36,8 @@ func Build() fx.Option {
 			// (1)
 			// All auth providers are initialised, those that fail are disabled.
 			password.New,
+			email_password.New,
+			email_only.New,
 			webauthn.New,
 			google.New,
 			github.New,
@@ -49,6 +53,8 @@ func New(
 	l *zap.Logger,
 
 	pw *password.Provider,
+	ep *email_password.Provider,
+	eo *email_only.Provider,
 	wa *webauthn.Provider,
 	gg *google.Provider,
 	gh *github.GitHubProvider,
@@ -60,6 +66,8 @@ func New(
 		// All OAuth2 providers are statically added to this list regardless of
 		// whether they are enabled or not. Disabled providers are filtered out.
 		pw,
+		ep,
+		eo,
 		wa,
 		gg,
 		gh,
@@ -72,7 +80,7 @@ func New(
 		return p.Enabled()
 	})
 
-	l.Debug("initialised oauth providers",
+	l.Debug("initialised auth providers",
 		zap.Strings("all_providers", dt.Map(allProviders, name)),
 		zap.Strings("enabled_providers", dt.Map(enabledProviders, name)),
 	)

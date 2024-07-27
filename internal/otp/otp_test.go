@@ -1,4 +1,4 @@
-package phone
+package otp
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 func Test_generateCode(t *testing.T) {
-	c1, _ := generateCode()
-	c2, _ := generateCode()
+	c1, _ := Generate()
+	c2, _ := Generate()
 	assert.NotEqual(t, c1, c2)
 }

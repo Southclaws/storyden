@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -31,6 +32,7 @@ type AccountQuery struct {
 	order              []account.OrderOption
 	inters             []Interceptor
 	predicates         []predicate.Account
+	withEmails         *EmailQuery
 	withPosts          *PostQuery
 	withReacts         *ReactQuery
 	withRoles          *RoleQuery
@@ -74,6 +76,28 @@ func (aq *AccountQuery) Unique(unique bool) *AccountQuery {
 func (aq *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
 	aq.order = append(aq.order, o...)
 	return aq
+}
+
+// QueryEmails chains the current query on the "emails" edge.
+func (aq *AccountQuery) QueryEmails() *EmailQuery {
+	query := (&EmailClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(email.Table, email.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryPosts chains the current query on the "posts" edge.
@@ -444,6 +468,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		order:              append([]account.OrderOption{}, aq.order...),
 		inters:             append([]Interceptor{}, aq.inters...),
 		predicates:         append([]predicate.Account{}, aq.predicates...),
+		withEmails:         aq.withEmails.Clone(),
 		withPosts:          aq.withPosts.Clone(),
 		withReacts:         aq.withReacts.Clone(),
 		withRoles:          aq.withRoles.Clone(),
@@ -456,6 +481,17 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
+}
+
+// WithEmails tells the query-builder to eager-load the nodes that are connected to
+// the "emails" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
+	query := (&EmailClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEmails = query
+	return aq
 }
 
 // WithPosts tells the query-builder to eager-load the nodes that are connected to
@@ -624,7 +660,8 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [9]bool{
+			aq.withEmails != nil,
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withRoles != nil,
@@ -655,6 +692,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
+	}
+	if query := aq.withEmails; query != nil {
+		if err := aq.loadEmails(ctx, query, nodes,
+			func(n *Account) { n.Edges.Emails = []*Email{} },
+			func(n *Account, e *Email) { n.Edges.Emails = append(n.Edges.Emails, e) }); err != nil {
+			return nil, err
+		}
 	}
 	if query := aq.withPosts; query != nil {
 		if err := aq.loadPosts(ctx, query, nodes,
@@ -715,6 +759,39 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	return nodes, nil
 }
 
+func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes []*Account, init func(*Account), assign func(*Account, *Email)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(email.FieldAccountID)
+	}
+	query.Where(predicate.Email(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.EmailsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Account, init func(*Account), assign func(*Account, *Post)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)

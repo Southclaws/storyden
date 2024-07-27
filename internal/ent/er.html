@@ -68,6 +68,15 @@ erDiagram
         xidDOTID post_id
         string membership_type
     }
+    Email {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        xidDOTID authentication_record_id
+        string email_address
+        string verification_code
+        bool verified
+    }
     Link {
         xidDOTID id
         timeDOTTime created_at
@@ -139,6 +148,7 @@ erDiagram
         timeDOTTime created_at
         string name
     }
+    	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ Authentication : "authentication/account"
@@ -146,6 +156,7 @@ erDiagram
     	Account |o--o{ Collection : "collections/owner"
     	Account |o--o{ Node : "nodes/owner"
     	Account |o--o{ Asset : "assets/owner"
+    	Authentication |o--o{ Email : "email_address/authentication"
     	Category |o--o{ Post : "posts/category"
     	Collection }o--o{ Post : "posts/collections"
     	Collection }o--o{ Node : "nodes/collections"

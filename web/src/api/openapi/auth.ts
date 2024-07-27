@@ -13,6 +13,9 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 import { fetcher } from "../client";
 
 import type {
+  AuthEmailBody,
+  AuthEmailPasswordBody,
+  AuthEmailVerifyBody,
   AuthPasswordBody,
   AuthPasswordCreateBody,
   AuthPasswordUpdateBody,
@@ -303,6 +306,313 @@ export const useAuthPasswordUpdate = <
 
   const swrKey = swrOptions?.swrKey ?? getAuthPasswordUpdateMutationKey();
   const swrFn = getAuthPasswordUpdateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Register a new account with a email and password.
+ */
+export const authEmailPasswordSignup = (
+  authEmailPasswordBody: AuthEmailPasswordBody,
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/email-password/signup`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailPasswordBody,
+  });
+};
+
+export const getAuthEmailPasswordSignupMutationFetcher = () => {
+  return (
+    _: string,
+    { arg }: { arg: AuthEmailPasswordBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authEmailPasswordSignup(arg);
+  };
+};
+export const getAuthEmailPasswordSignupMutationKey = () =>
+  `/v1/auth/email-password/signup` as const;
+
+export type AuthEmailPasswordSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authEmailPasswordSignup>>
+>;
+export type AuthEmailPasswordSignupMutationError =
+  | BadRequestResponse
+  | InternalServerErrorResponse;
+
+export const useAuthEmailPasswordSignup = <
+  TError = BadRequestResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authEmailPasswordSignup>>,
+    TError,
+    string,
+    AuthEmailPasswordBody,
+    Awaited<ReturnType<typeof authEmailPasswordSignup>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthEmailPasswordSignupMutationKey();
+  const swrFn = getAuthEmailPasswordSignupMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Sign in to an existing account with a email and password.
+ */
+export const authEmailPasswordSignin = (
+  authEmailPasswordBody: AuthEmailPasswordBody,
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/email-password/signin`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailPasswordBody,
+  });
+};
+
+export const getAuthEmailPasswordSigninMutationFetcher = () => {
+  return (
+    _: string,
+    { arg }: { arg: AuthEmailPasswordBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authEmailPasswordSignin(arg);
+  };
+};
+export const getAuthEmailPasswordSigninMutationKey = () =>
+  `/v1/auth/email-password/signin` as const;
+
+export type AuthEmailPasswordSigninMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authEmailPasswordSignin>>
+>;
+export type AuthEmailPasswordSigninMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuthEmailPasswordSignin = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authEmailPasswordSignin>>,
+    TError,
+    string,
+    AuthEmailPasswordBody,
+    Awaited<ReturnType<typeof authEmailPasswordSignin>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthEmailPasswordSigninMutationKey();
+  const swrFn = getAuthEmailPasswordSigninMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Register a new account with an email and optional password. The password
+requirement is dependent on how the instance is configured for account
+authentication with email addresses (password vs magic link.)
+
+When the email address has not been registered, this endpoint will send
+a verification email however it will also return a session cookie to
+facilitate pre-verification usage of the platform. If the email address
+already exists, no session cookie will be returned in order to prevent
+arbitrary account control by a malicious actor. In this case, the email
+will be sent again with the same OTP for the case where the user has
+cleared their cookies or switched device but hasn't yet verified due to
+missing the email or a delivery failure. In this sense, the endpoint can
+act as a "resend verification email" operation as well as registration.
+
+In the first case, a 200 response is provided with the session cookie,
+in the second case, a 422 response is provided without a session cookie.
+
+Given that this is an unauthenticated endpoint that triggers an email to
+be sent to any public address, it MUST be heavily rate limited.
+
+ */
+export const authEmailSignup = (authEmailBody: AuthEmailBody) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/email/signup`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailBody,
+  });
+};
+
+export const getAuthEmailSignupMutationFetcher = () => {
+  return (
+    _: string,
+    { arg }: { arg: AuthEmailBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authEmailSignup(arg);
+  };
+};
+export const getAuthEmailSignupMutationKey = () =>
+  `/v1/auth/email/signup` as const;
+
+export type AuthEmailSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authEmailSignup>>
+>;
+export type AuthEmailSignupMutationError =
+  | BadRequestResponse
+  | void
+  | InternalServerErrorResponse;
+
+export const useAuthEmailSignup = <
+  TError = BadRequestResponse | void | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authEmailSignup>>,
+    TError,
+    string,
+    AuthEmailBody,
+    Awaited<ReturnType<typeof authEmailSignup>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthEmailSignupMutationKey();
+  const swrFn = getAuthEmailSignupMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Sign in to an existing account with an email and optional password. The
+behaviour of this endpoint depends on how the instance is configured. If
+email+password is the preferred method, a cookie is returned on success
+but if magic links are preferred, the endpoint will start the code flow.
+
+ */
+export const authEmailSignin = (authEmailBody: AuthEmailBody) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/email/signin`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailBody,
+  });
+};
+
+export const getAuthEmailSigninMutationFetcher = () => {
+  return (
+    _: string,
+    { arg }: { arg: AuthEmailBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authEmailSignin(arg);
+  };
+};
+export const getAuthEmailSigninMutationKey = () =>
+  `/v1/auth/email/signin` as const;
+
+export type AuthEmailSigninMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authEmailSignin>>
+>;
+export type AuthEmailSigninMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuthEmailSignin = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authEmailSignin>>,
+    TError,
+    string,
+    AuthEmailBody,
+    Awaited<ReturnType<typeof authEmailSignin>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthEmailSigninMutationKey();
+  const swrFn = getAuthEmailSigninMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Verify an email address using a token that was emailed to one of the
+account's email addresses either set via sign up or added later.
+
+ */
+export const authEmailVerify = (authEmailVerifyBody: AuthEmailVerifyBody) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/v1/auth/email/verify`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailVerifyBody,
+  });
+};
+
+export const getAuthEmailVerifyMutationFetcher = () => {
+  return (
+    _: string,
+    { arg }: { arg: AuthEmailVerifyBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authEmailVerify(arg);
+  };
+};
+export const getAuthEmailVerifyMutationKey = () =>
+  `/v1/auth/email/verify` as const;
+
+export type AuthEmailVerifyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authEmailVerify>>
+>;
+export type AuthEmailVerifyMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuthEmailVerify = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authEmailVerify>>,
+    TError,
+    string,
+    AuthEmailVerifyBody,
+    Awaited<ReturnType<typeof authEmailVerify>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthEmailVerifyMutationKey();
+  const swrFn = getAuthEmailVerifyMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

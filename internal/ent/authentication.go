@@ -43,9 +43,11 @@ type Authentication struct {
 type AuthenticationEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
+	// EmailAddress holds the value of the email_address edge.
+	EmailAddress []*Email `json:"email_address,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // AccountOrErr returns the Account value or an error if the edge
@@ -57,6 +59,15 @@ func (e AuthenticationEdges) AccountOrErr() (*Account, error) {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "account"}
+}
+
+// EmailAddressOrErr returns the EmailAddress value or an error if the edge
+// was not loaded in eager-loading.
+func (e AuthenticationEdges) EmailAddressOrErr() ([]*Email, error) {
+	if e.loadedTypes[1] {
+		return e.EmailAddress, nil
+	}
+	return nil, &NotLoadedError{edge: "email_address"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -157,6 +168,11 @@ func (a *Authentication) Value(name string) (ent.Value, error) {
 // QueryAccount queries the "account" edge of the Authentication entity.
 func (a *Authentication) QueryAccount() *AccountQuery {
 	return NewAuthenticationClient(a.config).QueryAccount(a)
+}
+
+// QueryEmailAddress queries the "email_address" edge of the Authentication entity.
+func (a *Authentication) QueryEmailAddress() *EmailQuery {
+	return NewAuthenticationClient(a.config).QueryEmailAddress(a)
 }
 
 // Update returns a builder for updating this Authentication.
