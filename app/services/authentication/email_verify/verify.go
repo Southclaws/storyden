@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/internal/mailer"
+	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
 var (

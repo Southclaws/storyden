@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/pubsub/watermill"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/watermill"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

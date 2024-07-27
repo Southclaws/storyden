@@ -9,7 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
-	"github.com/Southclaws/storyden/internal/object"
+	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
 
 type Service interface {

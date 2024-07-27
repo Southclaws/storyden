@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/semdex/result_hydrator"
 	"github.com/Southclaws/storyden/app/services/semdex/simplesearch"
-	weaviate_client "github.com/Southclaws/storyden/internal/weaviate"
+	weaviate_client "github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 )
 
 type weaviateSemdexer struct {

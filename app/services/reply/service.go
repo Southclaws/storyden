@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/hydrator"
-	"github.com/Southclaws/storyden/internal/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {

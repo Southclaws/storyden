@@ -11,7 +11,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/endec"
+	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
 
 type jwtEncrypterDecrypter struct {

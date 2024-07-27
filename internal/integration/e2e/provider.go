@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
 	"github.com/Southclaws/storyden/internal/config"
-	internal_http "github.com/Southclaws/storyden/internal/http"
+	internal_http "github.com/Southclaws/storyden/internal/infrastructure/http"
 )
 
 func newHttpTestServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.ServeMux) *httptest.Server {

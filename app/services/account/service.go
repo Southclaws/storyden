@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
-	"github.com/Southclaws/storyden/internal/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {

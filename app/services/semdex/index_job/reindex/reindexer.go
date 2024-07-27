@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
 	entpost "github.com/Southclaws/storyden/internal/ent/post"
-	"github.com/Southclaws/storyden/internal/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
