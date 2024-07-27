@@ -1,4 +1,4 @@
-package email_only
+package email_verifier
 
 import (
 	"context"

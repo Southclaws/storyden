@@ -281,6 +281,31 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /v1/auth/email-password/signup:
+    post:
+      operationId: AuthEmailPasswordSignup
+      description: Register a new account with a email and password.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /v1/auth/email-password/signin:
+    post:
+      operationId: AuthEmailPasswordSignin
+      description: Sign in to an existing account with a email and password.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
   /v1/auth/email/signup:
     post:
       operationId: AuthEmailSignup
@@ -288,12 +313,30 @@ paths:
         Register a new account with an email and optional password. The password
         requirement is dependent on how the instance is configured for account
         authentication with email addresses (password vs magic link.)
+
+        When the email address has not been registered, this endpoint will send
+        a verification email however it will also return a session cookie to
+        facilitate pre-verification usage of the platform. If the email address
+        already exists, no session cookie will be returned in order to prevent
+        arbitrary account control by a malicious actor. In this case, the email
+        will be sent again with the same OTP for the case where the user has
+        cleared their cookies or switched device but hasn't yet verified due to
+        missing the email or a delivery failure. In this sense, the endpoint can
+        act as a "resend verification email" operation as well as registration.
+
+        In the first case, a 200 response is provided with the session cookie,
+        in the second case, a 422 response is provided without a session cookie.
+
+        Given that this is an unauthenticated endpoint that triggers an email to
+        be sent to any public address, it MUST be heavily rate limited.
       tags: [auth]
       security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "422":
+          description: Verification email sent but no session will be provided.
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
   /v1/auth/email/signin:
@@ -320,6 +363,7 @@ paths:
         Verify an email address using a token that was emailed to one of the
         account's email addresses either set via sign up or added later.
       tags: [auth]
+      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmailVerify" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1427,6 +1471,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPair" }
 
+    AuthEmailPassword:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthEmailPasswordInitialProps" }
+
     AuthEmail:
       content:
         application/json:
@@ -2232,6 +2281,18 @@ components:
           example: "password"
           type: string
 
+    AuthEmailPasswordInitialProps:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          example: "hello@storyden.org"
+          type: string
+        password:
+          type: string
+        handle:
+          $ref: "#/components/schemas/AccountHandle"
+
     AuthEmailInitialProps:
       type: object
       required: [email]
@@ -2239,11 +2300,18 @@ components:
         email:
           example: "hello@storyden.org"
           type: string
+        handle:
+          $ref: "#/components/schemas/AccountHandle"
 
     AuthEmailVerifyProps:
       type: object
       required: [code]
       properties:
+        email:
+          description: |
+            The email address to be verified, only necessary for when submitting
+            a verification without a session cookie present.
+          type: string
         code:
           example: "728562"
           type: string

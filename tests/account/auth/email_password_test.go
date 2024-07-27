@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/tests"
 )
 
-func TestEmailOnlyAuth(t *testing.T) {
+func TestEmailPasswordAuth(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -35,15 +35,22 @@ func TestEmailOnlyAuth(t *testing.T) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
-			t.Run("verify_success", func(t *testing.T) {
+			t.Run("register_success", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
 				address := xid.New().String() + "@storyden.org"
+				handle := xid.New().String()
+				password := "password"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
 				tests.Ok(t, err, signup)
+
+				// Sign in with email
+				signin, err := cl.AuthEmailPasswordSigninWithResponse(root, openapi.AuthEmailPasswordSigninJSONRequestBody{Email: address, Password: password})
+				tests.Ok(t, err, signin)
+				a.NotEmpty(signin.HTTPResponse.Header.Get("Set-Cookie"))
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
 				ctx1 := session.WithAccountID(root, accountID)
@@ -57,6 +64,23 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
 				a.True(unverified.JSON200.EmailAddresses[0].IsAuth)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
+			})
+
+			t.Run("register_verify_success", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				address := xid.New().String() + "@storyden.org"
+				handle := xid.New().String()
+				password := "password"
+
+				// Sign up with email
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
+				tests.Ok(t, err, signup)
+
+				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
+				ctx1 := session.WithAccountID(root, accountID)
+				session := e2e.WithSession(ctx1, cj)
 
 				// Get code from email, verify account
 				r.Len(inbox.GetSent(), 1)

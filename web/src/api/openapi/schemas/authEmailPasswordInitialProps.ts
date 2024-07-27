@@ -7,7 +7,8 @@
  */
 import type { AccountHandle } from "./accountHandle";
 
-export interface AuthEmailInitialProps {
+export interface AuthEmailPasswordInitialProps {
   email: string;
   handle?: AccountHandle;
+  password: string;
 }
