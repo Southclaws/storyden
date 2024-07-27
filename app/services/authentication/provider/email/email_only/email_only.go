@@ -3,7 +3,6 @@ package email_only
 import (
 	"context"
 	"net/mail"
-	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,17 +16,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/services/authentication/email_verifier"
+	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
-var (
-	ErrAccountAlreadyExists = errors.New("account already exists")
-	ErrNotFound             = errors.New("account not found")
-	ErrAuthMethodNotFound   = errors.New("authentication method not found")
-	ErrTokenMismatch        = fault.New("token mismatch", ftag.With(ftag.Unauthenticated))
-)
+var ErrAccountAlreadyExists = errors.New("account already exists")
 
 const (
 	id   = "email_only"
@@ -41,7 +35,7 @@ type Provider struct {
 	er       email.EmailRepo
 
 	// TODO: Replace with an MQ message and sender job.
-	sender email_verifier.VerificationMailSender
+	sender email_verify.Verifier
 }
 
 func New(
@@ -49,7 +43,7 @@ func New(
 	ar account.Repository,
 	register register.Service,
 	er email.EmailRepo,
-	sender email_verifier.VerificationMailSender,
+	sender email_verify.Verifier,
 ) *Provider {
 	return &Provider{auth, ar, register, er, sender}
 }
@@ -59,18 +53,18 @@ func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
 func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.Optional[string]) (*account.Account, error) {
-	code, err := otp.Generate()
+	_, exists, err := b.er.LookupAccount(ctx, email)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	// NOTE: Do we want to duplicate the email here?
-	_, exists, err := b.auth.LookupByIdentifier(ctx, id, email.Address)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
-	}
-
 	if exists {
+		// If they've already registered, resend the code.
+		// TODO: Put this on a queue and ensure there's a sufficient rate limit.
+		err := b.sender.ResendVerification(ctx, email)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
 		return nil, fault.Wrap(ErrAccountAlreadyExists,
 			fctx.With(ctx),
 			ftag.With(ftag.AlreadyExists),
@@ -86,12 +80,7 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
 
-	if err := b.addEmailAuth(ctx, account.ID, email, code); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	err = b.sender.SendVerificationEmail(ctx, email, code)
-	if err != nil {
+	if err := b.addEmailAuth(ctx, account.ID, email); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -104,55 +93,29 @@ func (b *Provider) Link(_ string) (string, error) {
 }
 
 func (b *Provider) Login(ctx context.Context, accountID string, code string) (*account.Account, error) {
-	aid, err := xid.FromString(accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := b.ar.GetByID(ctx, account.AccountID(aid))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	a, exists, err := b.auth.LookupByHandle(ctx, id, acc.Handle)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if !exists {
-		return nil, fault.Wrap(ErrAuthMethodNotFound, fctx.With(ctx))
-	}
-	authRecordEmailAddress, err := mail.ParseAddress(a.Identifier)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := acc.RejectSuspended(); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if strings.TrimSpace(a.Token) != strings.TrimSpace(code) {
-		return nil, fault.Wrap(ErrTokenMismatch, fctx.With(ctx))
-	}
-
-	err = b.er.Verify(ctx, acc.ID, *authRecordEmailAddress)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return acc, nil
+	// NOTE: There's no login method for this, it uses the email.Verify method.
+	return nil, nil
 }
 
-func (b *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID, email mail.Address, token string) error {
-	em, err := b.er.Add(ctx, accountID, email, true)
+func (b *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID, email mail.Address) error {
+	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	identifier := em.Email.Address
+	// Email auth records do not hold tokens or identifiers. There's no password
+	// hash and the verification code is held in the email resource.
+	identifier := xid.New().String()
+	token := xid.New().String()
 
-	_, err = b.auth.Create(ctx, accountID, id, identifier, token, nil)
+	authRecord, err := b.auth.Create(ctx, accountID, id, identifier, token, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
+	}
+
+	err = b.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil

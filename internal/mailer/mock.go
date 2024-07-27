@@ -32,20 +32,12 @@ func (m *Mock) Send(
 	defer m.mu.Unlock()
 
 	fmt.Printf(`Mock email sent to: %s <%s> '%s'
-
-PLAIN TEXT:
-
-%s
-
-HTML:
-
 %s
 `,
 		name,
 		address.String(),
 		subject,
 		plain,
-		html,
 	)
 
 	m.sent = append(m.sent, MockEmail{
@@ -59,9 +51,9 @@ HTML:
 	return nil
 }
 
-func (m *Mock) GetSent() []MockEmail {
+func (m *Mock) GetLast() MockEmail {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	return m.sent
+	return m.sent[len(m.sent)-1]
 }

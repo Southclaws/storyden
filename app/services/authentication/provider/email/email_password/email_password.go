@@ -12,11 +12,12 @@ import (
 	"github.com/alexedwards/argon2id"
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/services/authentication/email_verifier"
+	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -25,7 +26,6 @@ var (
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
 	ErrNoPassword           = errors.New("password not enabled")
-	ErrPasswordAlreadySet   = errors.New("password already enabled")
 	ErrPasswordTooShort     = errors.New("password too short")
 	ErrNotFound             = errors.New("account not found")
 )
@@ -42,7 +42,7 @@ type Provider struct {
 	register register.Service
 
 	// TODO: Replace with an MQ message and sender job.
-	sender email_verifier.VerificationMailSender
+	sender email_verify.Verifier
 }
 
 func New(
@@ -50,7 +50,7 @@ func New(
 	ar account.Repository,
 	er email.EmailRepo,
 	register register.Service,
-	sender email_verifier.VerificationMailSender,
+	sender email_verify.Verifier,
 ) *Provider {
 	return &Provider{auth, ar, er, register, sender}
 }
@@ -60,11 +60,6 @@ func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
 func (b *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string]) (*account.Account, error) {
-	code, err := otp.Generate()
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -95,10 +90,6 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, password st
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = b.sender.SendVerificationEmail(ctx, email, code)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
 	return account, nil
 }
 
@@ -137,7 +128,7 @@ func (b *Provider) Login(ctx context.Context, email string, password string) (*a
 	}
 
 	// Get the auth record for this email address
-	a, exists, err := b.auth.LookupByIdentifier(ctx, id, email)
+	a, exists, err := b.auth.LookupByHandle(ctx, id, acc.Handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -175,19 +166,28 @@ func (b *Provider) Update(ctx context.Context, aid account.AccountID, email mail
 }
 
 func (b *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
+	code, err := otp.Generate()
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	hashed, err := argon2id.CreateHash(password, argon2id.DefaultParams)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	_, err = b.er.Add(ctx, accountID, email, true)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	// Email auth records do not hold identifiers. However the auth record does
+	// use the token field for the password hash.
+	identifier := xid.New().String()
 
-	_, err = b.auth.Create(ctx, accountID, id, email.Address, string(hashed), nil)
+	authRecord, err := b.auth.Create(ctx, accountID, id, identifier, string(hashed), nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
+	}
+
+	err = b.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
