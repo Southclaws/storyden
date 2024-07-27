@@ -20,6 +20,6 @@ func MapEmail(in *ent.Email) *EmailAddress {
 	return &EmailAddress{
 		Email:    *addr,
 		Verified: in.Verified,
-		IsAuth:   in.IsAuth,
+		IsAuth:   in.AuthenticationRecordID != nil,
 	}
 }

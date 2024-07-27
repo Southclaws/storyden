@@ -2305,7 +2305,7 @@ components:
 
     AuthEmailVerifyProps:
       type: object
-      required: [code]
+      required: [email, code]
       properties:
         email:
           description: |

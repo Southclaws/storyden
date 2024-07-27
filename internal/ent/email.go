@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
@@ -21,14 +22,16 @@ type Email struct {
 	ID xid.ID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// AccountID holds the value of the "account_id" field.
+	// If set, this email is associated with an account, otherwise can be used for newsletter subscriptions etc.
 	AccountID *xid.ID `json:"account_id,omitempty"`
+	// If set, this this email is used for authentication
+	AuthenticationRecordID *xid.ID `json:"authentication_record_id,omitempty"`
 	// EmailAddress holds the value of the "email_address" field.
 	EmailAddress string `json:"email_address,omitempty"`
+	// A six digit code that is sent to the email address to verify ownership
+	VerificationCode string `json:"verification_code,omitempty"`
 	// Whether this email has been verified to be owned by the account via a token send+verify process
 	Verified bool `json:"verified,omitempty"`
-	// Whether this email is used for authentication
-	IsAuth bool `json:"is_auth,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmailQuery when eager-loading is set.
 	Edges        EmailEdges `json:"edges"`
@@ -39,9 +42,11 @@ type Email struct {
 type EmailEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
+	// Authentication holds the value of the authentication edge.
+	Authentication *Authentication `json:"authentication,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // AccountOrErr returns the Account value or an error if the edge
@@ -55,16 +60,27 @@ func (e EmailEdges) AccountOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "account"}
 }
 
+// AuthenticationOrErr returns the Authentication value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EmailEdges) AuthenticationOrErr() (*Authentication, error) {
+	if e.Authentication != nil {
+		return e.Authentication, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: authentication.Label}
+	}
+	return nil, &NotLoadedError{edge: "authentication"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Email) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case email.FieldAccountID:
+		case email.FieldAccountID, email.FieldAuthenticationRecordID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case email.FieldVerified, email.FieldIsAuth:
+		case email.FieldVerified:
 			values[i] = new(sql.NullBool)
-		case email.FieldEmailAddress:
+		case email.FieldEmailAddress, email.FieldVerificationCode:
 			values[i] = new(sql.NullString)
 		case email.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -104,23 +120,30 @@ func (e *Email) assignValues(columns []string, values []any) error {
 				e.AccountID = new(xid.ID)
 				*e.AccountID = *value.S.(*xid.ID)
 			}
+		case email.FieldAuthenticationRecordID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field authentication_record_id", values[i])
+			} else if value.Valid {
+				e.AuthenticationRecordID = new(xid.ID)
+				*e.AuthenticationRecordID = *value.S.(*xid.ID)
+			}
 		case email.FieldEmailAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email_address", values[i])
 			} else if value.Valid {
 				e.EmailAddress = value.String
 			}
+		case email.FieldVerificationCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field verification_code", values[i])
+			} else if value.Valid {
+				e.VerificationCode = value.String
+			}
 		case email.FieldVerified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field verified", values[i])
 			} else if value.Valid {
 				e.Verified = value.Bool
-			}
-		case email.FieldIsAuth:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_auth", values[i])
-			} else if value.Valid {
-				e.IsAuth = value.Bool
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -138,6 +161,11 @@ func (e *Email) Value(name string) (ent.Value, error) {
 // QueryAccount queries the "account" edge of the Email entity.
 func (e *Email) QueryAccount() *AccountQuery {
 	return NewEmailClient(e.config).QueryAccount(e)
+}
+
+// QueryAuthentication queries the "authentication" edge of the Email entity.
+func (e *Email) QueryAuthentication() *AuthenticationQuery {
+	return NewEmailClient(e.config).QueryAuthentication(e)
 }
 
 // Update returns a builder for updating this Email.
@@ -171,14 +199,19 @@ func (e *Email) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
+	if v := e.AuthenticationRecordID; v != nil {
+		builder.WriteString("authentication_record_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("email_address=")
 	builder.WriteString(e.EmailAddress)
 	builder.WriteString(", ")
+	builder.WriteString("verification_code=")
+	builder.WriteString(e.VerificationCode)
+	builder.WriteString(", ")
 	builder.WriteString("verified=")
 	builder.WriteString(fmt.Sprintf("%v", e.Verified))
-	builder.WriteString(", ")
-	builder.WriteString("is_auth=")
-	builder.WriteString(fmt.Sprintf("%v", e.IsAuth))
 	builder.WriteByte(')')
 	return builder.String()
 }

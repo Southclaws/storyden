@@ -66,19 +66,24 @@ func AccountID(v xid.ID) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldAccountID, v))
 }
 
+// AuthenticationRecordID applies equality check predicate on the "authentication_record_id" field. It's identical to AuthenticationRecordIDEQ.
+func AuthenticationRecordID(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldAuthenticationRecordID, v))
+}
+
 // EmailAddress applies equality check predicate on the "email_address" field. It's identical to EmailAddressEQ.
 func EmailAddress(v string) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldEmailAddress, v))
 }
 
+// VerificationCode applies equality check predicate on the "verification_code" field. It's identical to VerificationCodeEQ.
+func VerificationCode(v string) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationCode, v))
+}
+
 // Verified applies equality check predicate on the "verified" field. It's identical to VerifiedEQ.
 func Verified(v bool) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldVerified, v))
-}
-
-// IsAuth applies equality check predicate on the "is_auth" field. It's identical to IsAuthEQ.
-func IsAuth(v bool) predicate.Email {
-	return predicate.Email(sql.FieldEQ(FieldIsAuth, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -201,6 +206,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Email {
 	return predicate.Email(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// AuthenticationRecordIDEQ applies the EQ predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDEQ(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDNEQ applies the NEQ predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDNEQ(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldNEQ(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDIn applies the In predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDIn(vs ...xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldIn(FieldAuthenticationRecordID, vs...))
+}
+
+// AuthenticationRecordIDNotIn applies the NotIn predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDNotIn(vs ...xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldNotIn(FieldAuthenticationRecordID, vs...))
+}
+
+// AuthenticationRecordIDGT applies the GT predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDGT(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldGT(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDGTE applies the GTE predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDGTE(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldGTE(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDLT applies the LT predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDLT(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldLT(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDLTE applies the LTE predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDLTE(v xid.ID) predicate.Email {
+	return predicate.Email(sql.FieldLTE(FieldAuthenticationRecordID, v))
+}
+
+// AuthenticationRecordIDContains applies the Contains predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDContains(v xid.ID) predicate.Email {
+	vc := v.String()
+	return predicate.Email(sql.FieldContains(FieldAuthenticationRecordID, vc))
+}
+
+// AuthenticationRecordIDHasPrefix applies the HasPrefix predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDHasPrefix(v xid.ID) predicate.Email {
+	vc := v.String()
+	return predicate.Email(sql.FieldHasPrefix(FieldAuthenticationRecordID, vc))
+}
+
+// AuthenticationRecordIDHasSuffix applies the HasSuffix predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDHasSuffix(v xid.ID) predicate.Email {
+	vc := v.String()
+	return predicate.Email(sql.FieldHasSuffix(FieldAuthenticationRecordID, vc))
+}
+
+// AuthenticationRecordIDIsNil applies the IsNil predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDIsNil() predicate.Email {
+	return predicate.Email(sql.FieldIsNull(FieldAuthenticationRecordID))
+}
+
+// AuthenticationRecordIDNotNil applies the NotNil predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDNotNil() predicate.Email {
+	return predicate.Email(sql.FieldNotNull(FieldAuthenticationRecordID))
+}
+
+// AuthenticationRecordIDEqualFold applies the EqualFold predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDEqualFold(v xid.ID) predicate.Email {
+	vc := v.String()
+	return predicate.Email(sql.FieldEqualFold(FieldAuthenticationRecordID, vc))
+}
+
+// AuthenticationRecordIDContainsFold applies the ContainsFold predicate on the "authentication_record_id" field.
+func AuthenticationRecordIDContainsFold(v xid.ID) predicate.Email {
+	vc := v.String()
+	return predicate.Email(sql.FieldContainsFold(FieldAuthenticationRecordID, vc))
+}
+
 // EmailAddressEQ applies the EQ predicate on the "email_address" field.
 func EmailAddressEQ(v string) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldEmailAddress, v))
@@ -266,6 +351,71 @@ func EmailAddressContainsFold(v string) predicate.Email {
 	return predicate.Email(sql.FieldContainsFold(FieldEmailAddress, v))
 }
 
+// VerificationCodeEQ applies the EQ predicate on the "verification_code" field.
+func VerificationCodeEQ(v string) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationCode, v))
+}
+
+// VerificationCodeNEQ applies the NEQ predicate on the "verification_code" field.
+func VerificationCodeNEQ(v string) predicate.Email {
+	return predicate.Email(sql.FieldNEQ(FieldVerificationCode, v))
+}
+
+// VerificationCodeIn applies the In predicate on the "verification_code" field.
+func VerificationCodeIn(vs ...string) predicate.Email {
+	return predicate.Email(sql.FieldIn(FieldVerificationCode, vs...))
+}
+
+// VerificationCodeNotIn applies the NotIn predicate on the "verification_code" field.
+func VerificationCodeNotIn(vs ...string) predicate.Email {
+	return predicate.Email(sql.FieldNotIn(FieldVerificationCode, vs...))
+}
+
+// VerificationCodeGT applies the GT predicate on the "verification_code" field.
+func VerificationCodeGT(v string) predicate.Email {
+	return predicate.Email(sql.FieldGT(FieldVerificationCode, v))
+}
+
+// VerificationCodeGTE applies the GTE predicate on the "verification_code" field.
+func VerificationCodeGTE(v string) predicate.Email {
+	return predicate.Email(sql.FieldGTE(FieldVerificationCode, v))
+}
+
+// VerificationCodeLT applies the LT predicate on the "verification_code" field.
+func VerificationCodeLT(v string) predicate.Email {
+	return predicate.Email(sql.FieldLT(FieldVerificationCode, v))
+}
+
+// VerificationCodeLTE applies the LTE predicate on the "verification_code" field.
+func VerificationCodeLTE(v string) predicate.Email {
+	return predicate.Email(sql.FieldLTE(FieldVerificationCode, v))
+}
+
+// VerificationCodeContains applies the Contains predicate on the "verification_code" field.
+func VerificationCodeContains(v string) predicate.Email {
+	return predicate.Email(sql.FieldContains(FieldVerificationCode, v))
+}
+
+// VerificationCodeHasPrefix applies the HasPrefix predicate on the "verification_code" field.
+func VerificationCodeHasPrefix(v string) predicate.Email {
+	return predicate.Email(sql.FieldHasPrefix(FieldVerificationCode, v))
+}
+
+// VerificationCodeHasSuffix applies the HasSuffix predicate on the "verification_code" field.
+func VerificationCodeHasSuffix(v string) predicate.Email {
+	return predicate.Email(sql.FieldHasSuffix(FieldVerificationCode, v))
+}
+
+// VerificationCodeEqualFold applies the EqualFold predicate on the "verification_code" field.
+func VerificationCodeEqualFold(v string) predicate.Email {
+	return predicate.Email(sql.FieldEqualFold(FieldVerificationCode, v))
+}
+
+// VerificationCodeContainsFold applies the ContainsFold predicate on the "verification_code" field.
+func VerificationCodeContainsFold(v string) predicate.Email {
+	return predicate.Email(sql.FieldContainsFold(FieldVerificationCode, v))
+}
+
 // VerifiedEQ applies the EQ predicate on the "verified" field.
 func VerifiedEQ(v bool) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldVerified, v))
@@ -274,16 +424,6 @@ func VerifiedEQ(v bool) predicate.Email {
 // VerifiedNEQ applies the NEQ predicate on the "verified" field.
 func VerifiedNEQ(v bool) predicate.Email {
 	return predicate.Email(sql.FieldNEQ(FieldVerified, v))
-}
-
-// IsAuthEQ applies the EQ predicate on the "is_auth" field.
-func IsAuthEQ(v bool) predicate.Email {
-	return predicate.Email(sql.FieldEQ(FieldIsAuth, v))
-}
-
-// IsAuthNEQ applies the NEQ predicate on the "is_auth" field.
-func IsAuthNEQ(v bool) predicate.Email {
-	return predicate.Email(sql.FieldNEQ(FieldIsAuth, v))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.
@@ -301,6 +441,29 @@ func HasAccount() predicate.Email {
 func HasAccountWith(preds ...predicate.Account) predicate.Email {
 	return predicate.Email(func(s *sql.Selector) {
 		step := newAccountStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAuthentication applies the HasEdge predicate on the "authentication" edge.
+func HasAuthentication() predicate.Email {
+	return predicate.Email(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, AuthenticationTable, AuthenticationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAuthenticationWith applies the HasEdge predicate on the "authentication" edge with a given conditions (other predicates).
+func HasAuthenticationWith(preds ...predicate.Authentication) predicate.Email {
+	return predicate.Email(func(s *sql.Selector) {
+		step := newAuthenticationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

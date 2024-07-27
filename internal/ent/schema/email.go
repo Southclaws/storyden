@@ -23,7 +23,14 @@ func (Email) Fields() []ent.Field {
 		field.String("account_id").
 			Optional().
 			Nillable().
-			GoType(xid.ID{}),
+			GoType(xid.ID{}).
+			Comment("If set, this email is associated with an account, otherwise can be used for newsletter subscriptions etc."),
+
+		field.String("authentication_record_id").
+			Optional().
+			Nillable().
+			GoType(xid.ID{}).
+			Comment("If set, this this email is used for authentication"),
 
 		field.String("email_address").
 			NotEmpty().
@@ -35,15 +42,14 @@ func (Email) Fields() []ent.Field {
 			return err
 		}),
 
+		field.String("verification_code").
+			MaxLen(6).
+			Comment("A six digit code that is sent to the email address to verify ownership"),
+
 		field.Bool("verified").
 			Default(false).
 			Annotations(entsql.Default("false")).
 			Comment("Whether this email has been verified to be owned by the account via a token send+verify process"),
-
-		field.Bool("is_auth").
-			Default(false).
-			Annotations(entsql.Default("false")).
-			Comment("Whether this email is used for authentication"),
 	}
 }
 
@@ -52,6 +58,11 @@ func (Email) Edges() []ent.Edge {
 		edge.From("account", Account.Type).
 			Ref("emails").
 			Field("account_id").
+			Unique(),
+
+		edge.From("authentication", Authentication.Type).
+			Ref("email_address").
+			Field("authentication_record_id").
 			Unique(),
 	}
 }

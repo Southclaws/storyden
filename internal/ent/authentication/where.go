@@ -424,6 +424,29 @@ func HasAccountWith(preds ...predicate.Account) predicate.Authentication {
 	})
 }
 
+// HasEmailAddress applies the HasEdge predicate on the "email_address" edge.
+func HasEmailAddress() predicate.Authentication {
+	return predicate.Authentication(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmailAddressTable, EmailAddressColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEmailAddressWith applies the HasEdge predicate on the "email_address" edge with a given conditions (other predicates).
+func HasEmailAddressWith(preds ...predicate.Email) predicate.Authentication {
+	return predicate.Authentication(func(s *sql.Selector) {
+		step := newEmailAddressStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Authentication) predicate.Authentication {
 	return predicate.Authentication(sql.AndPredicates(predicates...))

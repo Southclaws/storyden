@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
@@ -53,9 +54,29 @@ func (ec *EmailCreate) SetNillableAccountID(x *xid.ID) *EmailCreate {
 	return ec
 }
 
+// SetAuthenticationRecordID sets the "authentication_record_id" field.
+func (ec *EmailCreate) SetAuthenticationRecordID(x xid.ID) *EmailCreate {
+	ec.mutation.SetAuthenticationRecordID(x)
+	return ec
+}
+
+// SetNillableAuthenticationRecordID sets the "authentication_record_id" field if the given value is not nil.
+func (ec *EmailCreate) SetNillableAuthenticationRecordID(x *xid.ID) *EmailCreate {
+	if x != nil {
+		ec.SetAuthenticationRecordID(*x)
+	}
+	return ec
+}
+
 // SetEmailAddress sets the "email_address" field.
 func (ec *EmailCreate) SetEmailAddress(s string) *EmailCreate {
 	ec.mutation.SetEmailAddress(s)
+	return ec
+}
+
+// SetVerificationCode sets the "verification_code" field.
+func (ec *EmailCreate) SetVerificationCode(s string) *EmailCreate {
+	ec.mutation.SetVerificationCode(s)
 	return ec
 }
 
@@ -69,20 +90,6 @@ func (ec *EmailCreate) SetVerified(b bool) *EmailCreate {
 func (ec *EmailCreate) SetNillableVerified(b *bool) *EmailCreate {
 	if b != nil {
 		ec.SetVerified(*b)
-	}
-	return ec
-}
-
-// SetIsAuth sets the "is_auth" field.
-func (ec *EmailCreate) SetIsAuth(b bool) *EmailCreate {
-	ec.mutation.SetIsAuth(b)
-	return ec
-}
-
-// SetNillableIsAuth sets the "is_auth" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableIsAuth(b *bool) *EmailCreate {
-	if b != nil {
-		ec.SetIsAuth(*b)
 	}
 	return ec
 }
@@ -104,6 +111,25 @@ func (ec *EmailCreate) SetNillableID(x *xid.ID) *EmailCreate {
 // SetAccount sets the "account" edge to the Account entity.
 func (ec *EmailCreate) SetAccount(a *Account) *EmailCreate {
 	return ec.SetAccountID(a.ID)
+}
+
+// SetAuthenticationID sets the "authentication" edge to the Authentication entity by ID.
+func (ec *EmailCreate) SetAuthenticationID(id xid.ID) *EmailCreate {
+	ec.mutation.SetAuthenticationID(id)
+	return ec
+}
+
+// SetNillableAuthenticationID sets the "authentication" edge to the Authentication entity by ID if the given value is not nil.
+func (ec *EmailCreate) SetNillableAuthenticationID(id *xid.ID) *EmailCreate {
+	if id != nil {
+		ec = ec.SetAuthenticationID(*id)
+	}
+	return ec
+}
+
+// SetAuthentication sets the "authentication" edge to the Authentication entity.
+func (ec *EmailCreate) SetAuthentication(a *Authentication) *EmailCreate {
+	return ec.SetAuthenticationID(a.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
@@ -149,10 +175,6 @@ func (ec *EmailCreate) defaults() {
 		v := email.DefaultVerified
 		ec.mutation.SetVerified(v)
 	}
-	if _, ok := ec.mutation.IsAuth(); !ok {
-		v := email.DefaultIsAuth
-		ec.mutation.SetIsAuth(v)
-	}
 	if _, ok := ec.mutation.ID(); !ok {
 		v := email.DefaultID()
 		ec.mutation.SetID(v)
@@ -172,11 +194,16 @@ func (ec *EmailCreate) check() error {
 			return &ValidationError{Name: "email_address", err: fmt.Errorf(`ent: validator failed for field "Email.email_address": %w`, err)}
 		}
 	}
+	if _, ok := ec.mutation.VerificationCode(); !ok {
+		return &ValidationError{Name: "verification_code", err: errors.New(`ent: missing required field "Email.verification_code"`)}
+	}
+	if v, ok := ec.mutation.VerificationCode(); ok {
+		if err := email.VerificationCodeValidator(v); err != nil {
+			return &ValidationError{Name: "verification_code", err: fmt.Errorf(`ent: validator failed for field "Email.verification_code": %w`, err)}
+		}
+	}
 	if _, ok := ec.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "Email.verified"`)}
-	}
-	if _, ok := ec.mutation.IsAuth(); !ok {
-		return &ValidationError{Name: "is_auth", err: errors.New(`ent: missing required field "Email.is_auth"`)}
 	}
 	if v, ok := ec.mutation.ID(); ok {
 		if err := email.IDValidator(v.String()); err != nil {
@@ -227,13 +254,13 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 		_spec.SetField(email.FieldEmailAddress, field.TypeString, value)
 		_node.EmailAddress = value
 	}
+	if value, ok := ec.mutation.VerificationCode(); ok {
+		_spec.SetField(email.FieldVerificationCode, field.TypeString, value)
+		_node.VerificationCode = value
+	}
 	if value, ok := ec.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
 		_node.Verified = value
-	}
-	if value, ok := ec.mutation.IsAuth(); ok {
-		_spec.SetField(email.FieldIsAuth, field.TypeBool, value)
-		_node.IsAuth = value
 	}
 	if nodes := ec.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -250,6 +277,23 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AccountID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.AuthenticationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   email.AuthenticationTable,
+			Columns: []string{email.AuthenticationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.AuthenticationRecordID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -322,6 +366,36 @@ func (u *EmailUpsert) ClearAccountID() *EmailUpsert {
 	return u
 }
 
+// SetAuthenticationRecordID sets the "authentication_record_id" field.
+func (u *EmailUpsert) SetAuthenticationRecordID(v xid.ID) *EmailUpsert {
+	u.Set(email.FieldAuthenticationRecordID, v)
+	return u
+}
+
+// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
+func (u *EmailUpsert) UpdateAuthenticationRecordID() *EmailUpsert {
+	u.SetExcluded(email.FieldAuthenticationRecordID)
+	return u
+}
+
+// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
+func (u *EmailUpsert) ClearAuthenticationRecordID() *EmailUpsert {
+	u.SetNull(email.FieldAuthenticationRecordID)
+	return u
+}
+
+// SetVerificationCode sets the "verification_code" field.
+func (u *EmailUpsert) SetVerificationCode(v string) *EmailUpsert {
+	u.Set(email.FieldVerificationCode, v)
+	return u
+}
+
+// UpdateVerificationCode sets the "verification_code" field to the value that was provided on create.
+func (u *EmailUpsert) UpdateVerificationCode() *EmailUpsert {
+	u.SetExcluded(email.FieldVerificationCode)
+	return u
+}
+
 // SetVerified sets the "verified" field.
 func (u *EmailUpsert) SetVerified(v bool) *EmailUpsert {
 	u.Set(email.FieldVerified, v)
@@ -331,18 +405,6 @@ func (u *EmailUpsert) SetVerified(v bool) *EmailUpsert {
 // UpdateVerified sets the "verified" field to the value that was provided on create.
 func (u *EmailUpsert) UpdateVerified() *EmailUpsert {
 	u.SetExcluded(email.FieldVerified)
-	return u
-}
-
-// SetIsAuth sets the "is_auth" field.
-func (u *EmailUpsert) SetIsAuth(v bool) *EmailUpsert {
-	u.Set(email.FieldIsAuth, v)
-	return u
-}
-
-// UpdateIsAuth sets the "is_auth" field to the value that was provided on create.
-func (u *EmailUpsert) UpdateIsAuth() *EmailUpsert {
-	u.SetExcluded(email.FieldIsAuth)
 	return u
 }
 
@@ -421,6 +483,41 @@ func (u *EmailUpsertOne) ClearAccountID() *EmailUpsertOne {
 	})
 }
 
+// SetAuthenticationRecordID sets the "authentication_record_id" field.
+func (u *EmailUpsertOne) SetAuthenticationRecordID(v xid.ID) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetAuthenticationRecordID(v)
+	})
+}
+
+// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
+func (u *EmailUpsertOne) UpdateAuthenticationRecordID() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateAuthenticationRecordID()
+	})
+}
+
+// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
+func (u *EmailUpsertOne) ClearAuthenticationRecordID() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.ClearAuthenticationRecordID()
+	})
+}
+
+// SetVerificationCode sets the "verification_code" field.
+func (u *EmailUpsertOne) SetVerificationCode(v string) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationCode(v)
+	})
+}
+
+// UpdateVerificationCode sets the "verification_code" field to the value that was provided on create.
+func (u *EmailUpsertOne) UpdateVerificationCode() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationCode()
+	})
+}
+
 // SetVerified sets the "verified" field.
 func (u *EmailUpsertOne) SetVerified(v bool) *EmailUpsertOne {
 	return u.Update(func(s *EmailUpsert) {
@@ -432,20 +529,6 @@ func (u *EmailUpsertOne) SetVerified(v bool) *EmailUpsertOne {
 func (u *EmailUpsertOne) UpdateVerified() *EmailUpsertOne {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerified()
-	})
-}
-
-// SetIsAuth sets the "is_auth" field.
-func (u *EmailUpsertOne) SetIsAuth(v bool) *EmailUpsertOne {
-	return u.Update(func(s *EmailUpsert) {
-		s.SetIsAuth(v)
-	})
-}
-
-// UpdateIsAuth sets the "is_auth" field to the value that was provided on create.
-func (u *EmailUpsertOne) UpdateIsAuth() *EmailUpsertOne {
-	return u.Update(func(s *EmailUpsert) {
-		s.UpdateIsAuth()
 	})
 }
 
@@ -691,6 +774,41 @@ func (u *EmailUpsertBulk) ClearAccountID() *EmailUpsertBulk {
 	})
 }
 
+// SetAuthenticationRecordID sets the "authentication_record_id" field.
+func (u *EmailUpsertBulk) SetAuthenticationRecordID(v xid.ID) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetAuthenticationRecordID(v)
+	})
+}
+
+// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
+func (u *EmailUpsertBulk) UpdateAuthenticationRecordID() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateAuthenticationRecordID()
+	})
+}
+
+// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
+func (u *EmailUpsertBulk) ClearAuthenticationRecordID() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.ClearAuthenticationRecordID()
+	})
+}
+
+// SetVerificationCode sets the "verification_code" field.
+func (u *EmailUpsertBulk) SetVerificationCode(v string) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationCode(v)
+	})
+}
+
+// UpdateVerificationCode sets the "verification_code" field to the value that was provided on create.
+func (u *EmailUpsertBulk) UpdateVerificationCode() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationCode()
+	})
+}
+
 // SetVerified sets the "verified" field.
 func (u *EmailUpsertBulk) SetVerified(v bool) *EmailUpsertBulk {
 	return u.Update(func(s *EmailUpsert) {
@@ -702,20 +820,6 @@ func (u *EmailUpsertBulk) SetVerified(v bool) *EmailUpsertBulk {
 func (u *EmailUpsertBulk) UpdateVerified() *EmailUpsertBulk {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerified()
-	})
-}
-
-// SetIsAuth sets the "is_auth" field.
-func (u *EmailUpsertBulk) SetIsAuth(v bool) *EmailUpsertBulk {
-	return u.Update(func(s *EmailUpsert) {
-		s.SetIsAuth(v)
-	})
-}
-
-// UpdateIsAuth sets the "is_auth" field to the value that was provided on create.
-func (u *EmailUpsertBulk) UpdateIsAuth() *EmailUpsertBulk {
-	return u.Update(func(s *EmailUpsert) {
-		s.UpdateIsAuth()
 	})
 }
 

@@ -7,8 +7,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email_password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"

@@ -370,7 +370,7 @@ func init() {
 	// email.DefaultCreatedAt holds the default value on creation for the created_at field.
 	email.DefaultCreatedAt = emailDescCreatedAt.Default.(func() time.Time)
 	// emailDescEmailAddress is the schema descriptor for email_address field.
-	emailDescEmailAddress := emailFields[1].Descriptor()
+	emailDescEmailAddress := emailFields[2].Descriptor()
 	// email.EmailAddressValidator is a validator for the "email_address" field. It is called by the builders before save.
 	email.EmailAddressValidator = func() func(string) error {
 		validators := emailDescEmailAddress.Validators
@@ -389,14 +389,14 @@ func init() {
 			return nil
 		}
 	}()
+	// emailDescVerificationCode is the schema descriptor for verification_code field.
+	emailDescVerificationCode := emailFields[3].Descriptor()
+	// email.VerificationCodeValidator is a validator for the "verification_code" field. It is called by the builders before save.
+	email.VerificationCodeValidator = emailDescVerificationCode.Validators[0].(func(string) error)
 	// emailDescVerified is the schema descriptor for verified field.
-	emailDescVerified := emailFields[2].Descriptor()
+	emailDescVerified := emailFields[4].Descriptor()
 	// email.DefaultVerified holds the default value on creation for the verified field.
 	email.DefaultVerified = emailDescVerified.Default.(bool)
-	// emailDescIsAuth is the schema descriptor for is_auth field.
-	emailDescIsAuth := emailFields[3].Descriptor()
-	// email.DefaultIsAuth holds the default value on creation for the is_auth field.
-	email.DefaultIsAuth = emailDescIsAuth.Default.(bool)
 	// emailDescID is the schema descriptor for id field.
 	emailDescID := emailMixinFields0[0].Descriptor()
 	// email.DefaultID holds the default value on creation for the id field.
