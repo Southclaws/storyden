@@ -2,7 +2,6 @@ package weaviate
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -14,6 +13,10 @@ import (
 
 type WeaviateAdditional struct {
 	Distance float64 `json:"distance"`
+	Summary  []struct {
+		Property string `json:"property"`
+		Result   string `json:"result"`
+	} `json:"summary"`
 }
 
 type WeaviateObject struct {
@@ -45,23 +48,17 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.Node
 		WithFusionType(graphql.RelativeScore).
 		WithQuery(q)
 
-	result, err := s.wc.GraphQL().Get().
+	result, err := mergeErrors(s.wc.GraphQL().Get().
 		WithClassName(s.cn.String()).
 		WithFields(fields...).
 		WithHybrid(arg).
 		WithLimit(30).
-		Do(context.Background())
+		Do(context.Background()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	j, err := json.Marshal(result.Data)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	parsed := WeaviateResponse{}
-	err = json.Unmarshal(j, &parsed)
+	parsed, err := mapResponseObjects(result.Data)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

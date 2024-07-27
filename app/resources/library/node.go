@@ -34,15 +34,16 @@ type Node struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Name       string
-	Slug       string
-	Assets     []*asset.Asset
-	Links      datagraph.Links
-	Content    opt.Optional[content.Rich]
-	Owner      profile.Public
-	Parent     opt.Optional[Node]
-	Visibility visibility.Visibility
-	Metadata   map[string]any
+	Name        string
+	Slug        string
+	Assets      []*asset.Asset
+	Links       datagraph.Links
+	Content     opt.Optional[content.Rich]
+	Description opt.Optional[string]
+	Owner       profile.Public
+	Parent      opt.Optional[Node]
+	Visibility  visibility.Visibility
+	Metadata    map[string]any
 
 	Nodes []*Node
 }
@@ -53,6 +54,12 @@ func (c *Node) GetID() xid.ID           { return xid.ID(c.ID) }
 func (c *Node) GetKind() datagraph.Kind { return datagraph.KindNode }
 func (c *Node) GetName() string         { return c.Name }
 func (c *Node) GetSlug() string         { return c.Slug }
-func (c *Node) GetDesc() string         { return c.Content.OrZero().Short() }
-func (c *Node) GetText() string         { return c.Content.OrZero().HTML() }
-func (c *Node) GetProps() any           { return nil }
+func (c *Node) GetDesc() string {
+	cd, ok := c.Content.Get()
+	if ok && cd.Short() != "" {
+		return cd.Short()
+	}
+	return c.Description.OrZero()
+}
+func (c *Node) GetText() string { return c.Content.OrZero().HTML() }
+func (c *Node) GetProps() any   { return nil }

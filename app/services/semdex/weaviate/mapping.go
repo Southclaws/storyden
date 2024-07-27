@@ -22,6 +22,6 @@ func mapToNodeReference(v WeaviateObject) (*datagraph.NodeReference, error) {
 		ID:    id,
 		Kind:  dk,
 		Name:  v.Name,
-		Score: v.Additional.Distance,
+		Score: min(max(1-v.Additional.Distance, 0), 1),
 	}, nil
 }

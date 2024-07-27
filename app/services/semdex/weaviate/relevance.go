@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
+	"github.com/weaviate/weaviate/entities/models"
 )
 
 func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.Indexable, ids ...xid.ID) (map[xid.ID]float64, error) {
@@ -30,23 +31,17 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 		{Name: "_additional", Fields: []graphql.Field{{Name: "distance"}}},
 	}
 
-	r, err := w.wc.GraphQL().Get().
+	r, err := mergeErrors(w.wc.GraphQL().Get().
 		WithNearObject(&near).
 		WithClassName(w.cn.String()).
 		WithFields(fields...).
 		WithWhere(where).
-		Do(ctx)
+		Do(ctx))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	j, err := json.Marshal(r.Data)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	parsed := WeaviateResponse{}
-	err = json.Unmarshal(j, &parsed)
+	parsed, err := mapResponseObjects(r.Data)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -68,4 +63,19 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 	}, map[xid.ID]float64{})
 
 	return out, nil
+}
+
+func mapResponseObjects(raw map[string]models.JSONObject) (*WeaviateResponse, error) {
+	j, err := json.Marshal(raw)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	parsed := WeaviateResponse{}
+	err = json.Unmarshal(j, &parsed)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return &parsed, nil
 }
