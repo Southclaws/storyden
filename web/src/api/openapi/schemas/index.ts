@@ -202,6 +202,7 @@ export * from "./publicProfileListResult";
 export * from "./publicProfileListResultAllOf";
 export * from "./react";
 export * from "./reactList";
+export * from "./relevanceScore";
 export * from "./residentKeyRequirement";
 export * from "./searchQueryParameter";
 export * from "./slug";
