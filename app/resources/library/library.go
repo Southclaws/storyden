@@ -82,6 +82,12 @@ func WithContent(v content.Rich) Option {
 	}
 }
 
+func WithDescription(v string) Option {
+	return func(c *ent.NodeMutation) {
+		c.SetDescription(v)
+	}
+}
+
 func WithParent(v NodeID) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetParentID(xid.ID(v))

@@ -111,8 +111,9 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 
 	opts := []node_traversal.Filter{}
 
-	if v := request.Params.Author; v != nil {
-		opts = append(opts, node_traversal.WithOwner(*v))
+	author := opt.NewPtr(request.Params.Author)
+	if v, ok := author.Get(); ok {
+		opts = append(opts, node_traversal.WithOwner(v))
 	}
 
 	if d, ok := depth.Get(); ok {
@@ -133,14 +134,18 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		if v, ok := visibilities.Get(); ok {
 			opts = append(opts, node_traversal.WithVisibility(v...))
 
-			if lo.Contains(v, visibility.VisibilityDraft) {
-				// If the result is to contain drafts, only show the account's.
-				opts = append(opts, node_traversal.WithOwner(a.Handle))
-			} else if lo.Contains(v, visibility.VisibilityReview) {
-				// If the result is to contain nodes that are in-review, then
-				// we need to check if the requesting account is an admin first.
-				if !a.Admin {
+			authorFilter, filteringByAuthor := author.Get()
+
+			if !filteringByAuthor || authorFilter == a.Handle {
+				if lo.Contains(v, visibility.VisibilityDraft) {
+					// If the result is to contain drafts, only show the account's.
 					opts = append(opts, node_traversal.WithOwner(a.Handle))
+				} else if lo.Contains(v, visibility.VisibilityReview) {
+					// If the result is to contain nodes that are in-review, then
+					// we need to check if the requesting account is an admin first.
+					if !a.Admin {
+						opts = append(opts, node_traversal.WithOwner(a.Handle))
+					}
 				}
 			}
 		}
@@ -298,7 +303,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Content.OrZero().Short(),
+		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
@@ -318,7 +323,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
-		Description: in.Content.OrZero().Short(),
+		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {

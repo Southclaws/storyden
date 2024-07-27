@@ -39,18 +39,15 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Index
 		{Name: "datagraph_type"},
 	}
 
-	recommendations, err := w.wc.GraphQL().Get().
+	recommendations, err := mergeErrors(w.wc.GraphQL().Get().
 		WithClassName(w.cn.String()).
 		WithFields(fields...).
 		WithNearVector(withNearVector).
 		WithAutocut(2).
 		WithLimit(10).
-		Do(ctx)
+		Do(ctx))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if len(recommendations.Errors) > 0 {
-		return nil, fault.Wrap(gqlerror(recommendations.Errors), fctx.With(ctx))
 	}
 
 	j, err := json.Marshal(recommendations.Data)
