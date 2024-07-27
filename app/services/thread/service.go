@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/semdex"
-	"github.com/Southclaws/storyden/internal/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {

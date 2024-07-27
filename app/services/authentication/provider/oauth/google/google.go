@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/endec"
+	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
 
 var (

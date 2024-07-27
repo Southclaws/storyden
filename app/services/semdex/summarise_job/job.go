@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/internal/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func runSummariseConsumer(

@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/object"
+	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
 
 const assetsSubdirectory = "assets"

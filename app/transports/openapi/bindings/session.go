@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/endec/securecookie"
+	"github.com/Southclaws/storyden/internal/infrastructure/endec/securecookie"
 )
 
 const secureCookieName = "storyden-session"

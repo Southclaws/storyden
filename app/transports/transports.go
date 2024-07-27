@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
-	"github.com/Southclaws/storyden/internal/http"
+	"github.com/Southclaws/storyden/internal/infrastructure/http"
 )
 
 func Build() fx.Option {

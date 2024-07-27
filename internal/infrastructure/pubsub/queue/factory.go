@@ -8,10 +8,11 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/storyden/internal/pubsub"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"go.uber.org/zap"
+
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type QueueFactory struct {

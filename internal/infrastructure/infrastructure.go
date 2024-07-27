@@ -4,17 +4,17 @@ package infrastructure
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/internal/db"
-	"github.com/Southclaws/storyden/internal/endec/jwt"
-	"github.com/Southclaws/storyden/internal/endec/securecookie"
-	"github.com/Southclaws/storyden/internal/frontend"
-	"github.com/Southclaws/storyden/internal/logger"
-	"github.com/Southclaws/storyden/internal/mailer"
-	"github.com/Southclaws/storyden/internal/object"
-	"github.com/Southclaws/storyden/internal/pubsub/queue"
-	"github.com/Southclaws/storyden/internal/sms"
-	"github.com/Southclaws/storyden/internal/weaviate"
-	"github.com/Southclaws/storyden/internal/webauthn"
+	"github.com/Southclaws/storyden/internal/infrastructure/db"
+	"github.com/Southclaws/storyden/internal/infrastructure/endec/jwt"
+	"github.com/Southclaws/storyden/internal/infrastructure/endec/securecookie"
+	"github.com/Southclaws/storyden/internal/infrastructure/frontend"
+	"github.com/Southclaws/storyden/internal/infrastructure/logger"
+	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
+	"github.com/Southclaws/storyden/internal/infrastructure/object"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
+	"github.com/Southclaws/storyden/internal/infrastructure/sms"
+	"github.com/Southclaws/storyden/internal/infrastructure/weaviate"
+	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
 )
 
 func Build() fx.Option {
@@ -22,7 +22,7 @@ func Build() fx.Option {
 		logger.Build(),
 		db.Build(),
 		securecookie.Build(),
-		mailer.Build(), 
+		mailer.Build(),
 		sms.Build(),
 		fx.Provide(webauthn.New),
 		object.Build(),
