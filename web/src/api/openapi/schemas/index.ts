@@ -43,6 +43,8 @@ export * from "./assetUploadOKResponse";
 export * from "./attestationConveyancePreference";
 export * from "./authEmailBody";
 export * from "./authEmailInitialProps";
+export * from "./authEmailPasswordBody";
+export * from "./authEmailPasswordInitialProps";
 export * from "./authEmailVerifyBody";
 export * from "./authEmailVerifyProps";
 export * from "./authPair";

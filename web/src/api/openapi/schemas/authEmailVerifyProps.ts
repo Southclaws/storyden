@@ -8,4 +8,8 @@
 
 export interface AuthEmailVerifyProps {
   code: string;
+  /** The email address to be verified, only necessary for when submitting
+a verification without a session cookie present.
+ */
+  email?: string;
 }

@@ -9,13 +9,15 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/pkg/errors"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/services/account/session"
+	"github.com/Southclaws/storyden/app/services/authentication/email_verifier"
 	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -28,49 +30,42 @@ var (
 )
 
 const (
-	id   = "password"
-	name = "Password"
+	id   = "email_only"
+	name = "Email"
 )
 
 type Provider struct {
-	session  session.SessionProvider
 	auth     authentication.Repository
 	ar       account.Repository
 	register register.Service
 	er       email.EmailRepo
 
 	// TODO: Replace with an MQ message and sender job.
-	sender VerificationMailSender
+	sender email_verifier.VerificationMailSender
 }
 
 func New(
-	session session.SessionProvider,
 	auth authentication.Repository,
 	ar account.Repository,
 	register register.Service,
 	er email.EmailRepo,
-	sender VerificationMailSender,
+	sender email_verifier.VerificationMailSender,
 ) *Provider {
-	return &Provider{session, auth, ar, register, er, sender}
+	return &Provider{auth, ar, register, er, sender}
 }
 
 func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
 func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
-func (b *Provider) Register(ctx context.Context, email mail.Address) (*account.Account, error) {
+func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.Optional[string]) (*account.Account, error) {
 	code, err := otp.Generate()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = b.sender.SendVerificationEmail(ctx, email, code)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	// NOTE: Do we want to duplicate the email here?
-	_, exists, err := b.auth.LookupByIdentifier(ctx, id, email.String())
+	_, exists, err := b.auth.LookupByIdentifier(ctx, id, email.Address)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -84,7 +79,7 @@ func (b *Provider) Register(ctx context.Context, email mail.Address) (*account.A
 
 	// For direct email registration, we generate a random handle for the new
 	// account which is a simple placeholder that the owner can overwrite later.
-	identifier := petname.Generate(2, "-")
+	identifier := handle.Or(petname.Generate(2, "-"))
 
 	account, err := b.register.Create(ctx, identifier)
 	if err != nil {
@@ -92,6 +87,11 @@ func (b *Provider) Register(ctx context.Context, email mail.Address) (*account.A
 	}
 
 	if err := b.addEmailAuth(ctx, account.ID, email, code); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = b.sender.SendVerificationEmail(ctx, email, code)
+	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -104,7 +104,12 @@ func (b *Provider) Link(_ string) (string, error) {
 }
 
 func (b *Provider) Login(ctx context.Context, accountID string, code string) (*account.Account, error) {
-	acc, err := b.session.Account(ctx)
+	aid, err := xid.FromString(accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := b.ar.GetByID(ctx, account.AccountID(aid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -116,6 +121,10 @@ func (b *Provider) Login(ctx context.Context, accountID string, code string) (*a
 	if !exists {
 		return nil, fault.Wrap(ErrAuthMethodNotFound, fctx.With(ctx))
 	}
+	authRecordEmailAddress, err := mail.ParseAddress(a.Identifier)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	if err := acc.RejectSuspended(); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -125,7 +134,7 @@ func (b *Provider) Login(ctx context.Context, accountID string, code string) (*a
 		return nil, fault.Wrap(ErrTokenMismatch, fctx.With(ctx))
 	}
 
-	err = b.er.Verify(ctx, acc.ID, a.Identifier)
+	err = b.er.Verify(ctx, acc.ID, *authRecordEmailAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -139,7 +148,7 @@ func (b *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	identifier := em.Email.String()
+	identifier := em.Email.Address
 
 	_, err = b.auth.Create(ctx, accountID, id, identifier, token, nil)
 	if err != nil {
