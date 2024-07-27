@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/internal/endec/securecookie"
 	"github.com/Southclaws/storyden/internal/frontend"
 	"github.com/Southclaws/storyden/internal/logger"
+	"github.com/Southclaws/storyden/internal/mailer"
 	"github.com/Southclaws/storyden/internal/object"
 	"github.com/Southclaws/storyden/internal/pubsub/queue"
 	"github.com/Southclaws/storyden/internal/sms"
@@ -21,6 +22,7 @@ func Build() fx.Option {
 		logger.Build(),
 		db.Build(),
 		securecookie.Build(),
+		mailer.Build(), 
 		sms.Build(),
 		fx.Provide(webauthn.New),
 		object.Build(),

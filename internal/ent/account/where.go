@@ -456,6 +456,29 @@ func MetadataNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldMetadata))
 }
 
+// HasEmails applies the HasEdge predicate on the "emails" edge.
+func HasEmails() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEmailsWith applies the HasEdge predicate on the "emails" edge with a given conditions (other predicates).
+func HasEmailsWith(preds ...predicate.Email) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newEmailsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

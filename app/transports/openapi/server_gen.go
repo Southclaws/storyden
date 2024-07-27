@@ -28,12 +28,18 @@ const (
 	WebauthnScopes = "webauthn.Scopes"
 )
 
+// Defines values for AccountVerifiedStatus.
+const (
+	AccountVerifiedStatusNone          AccountVerifiedStatus = "none"
+	AccountVerifiedStatusVerifiedEmail AccountVerifiedStatus = "verified_email"
+)
+
 // Defines values for AttestationConveyancePreference.
 const (
-	Direct     AttestationConveyancePreference = "direct"
-	Enterprise AttestationConveyancePreference = "enterprise"
-	Indirect   AttestationConveyancePreference = "indirect"
-	None       AttestationConveyancePreference = "none"
+	AttestationConveyancePreferenceDirect     AttestationConveyancePreference = "direct"
+	AttestationConveyancePreferenceEnterprise AttestationConveyancePreference = "enterprise"
+	AttestationConveyancePreferenceIndirect   AttestationConveyancePreference = "indirect"
+	AttestationConveyancePreferenceNone       AttestationConveyancePreference = "none"
 )
 
 // Defines values for AuthenticatorAttachment.
@@ -164,6 +170,10 @@ type Account struct {
 	// DeletedAt The time the resource was soft-deleted.
 	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 
+	// EmailAddresses If the instance is configured to not use any email features for auth or
+	// transactional/content communications, this will always be empty.
+	EmailAddresses AccountEmailAddressList `json:"email_addresses"`
+
 	// Handle The unique @ handle of an account.
 	Handle AccountHandle `json:"handle"`
 
@@ -184,7 +194,8 @@ type Account struct {
 	Name AccountName `json:"name"`
 
 	// UpdatedAt The time the resource was updated.
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt      time.Time             `json:"updatedAt"`
+	VerifiedStatus AccountVerifiedStatus `json:"verified_status"`
 }
 
 // AccountAuthMethod An authentication method is an active instance of an authentication
@@ -224,6 +235,10 @@ type AccountCommonProps struct {
 	// Bio The rich-text bio for an account's public profile.
 	Bio AccountBio `json:"bio"`
 
+	// EmailAddresses If the instance is configured to not use any email features for auth or
+	// transactional/content communications, this will always be empty.
+	EmailAddresses AccountEmailAddressList `json:"email_addresses"`
+
 	// Handle The unique @ handle of an account.
 	Handle AccountHandle `json:"handle"`
 
@@ -235,8 +250,24 @@ type AccountCommonProps struct {
 	Meta Metadata `json:"meta"`
 
 	// Name The account owners display name.
-	Name AccountName `json:"name"`
+	Name           AccountName           `json:"name"`
+	VerifiedStatus AccountVerifiedStatus `json:"verified_status"`
 }
+
+// AccountEmailAddress defines model for AccountEmailAddress.
+type AccountEmailAddress struct {
+	EmailAddress string `json:"email_address"`
+
+	// IsAuth Is the email used for authenticating to the platform?
+	IsAuth bool `json:"is_auth"`
+
+	// Verified Is the email address verified to be owned by the account?
+	Verified bool `json:"verified"`
+}
+
+// AccountEmailAddressList If the instance is configured to not use any email features for auth or
+// transactional/content communications, this will always be empty.
+type AccountEmailAddressList = []AccountEmailAddress
 
 // AccountHandle The unique @ handle of an account.
 type AccountHandle = string
@@ -262,6 +293,9 @@ type AccountMutableProps struct {
 
 // AccountName The account owners display name.
 type AccountName = string
+
+// AccountVerifiedStatus defines model for AccountVerifiedStatus.
+type AccountVerifiedStatus string
 
 // AdminSettingsMutableProps defines model for AdminSettingsMutableProps.
 type AdminSettingsMutableProps struct {
@@ -306,6 +340,32 @@ type AssetSourceURL = string
 
 // AttestationConveyancePreference https://www.w3.org/TR/webauthn-2/#enum-attestation-convey
 type AttestationConveyancePreference string
+
+// AuthEmailInitialProps defines model for AuthEmailInitialProps.
+type AuthEmailInitialProps struct {
+	Email string `json:"email"`
+
+	// Handle The unique @ handle of an account.
+	Handle *AccountHandle `json:"handle,omitempty"`
+}
+
+// AuthEmailPasswordInitialProps defines model for AuthEmailPasswordInitialProps.
+type AuthEmailPasswordInitialProps struct {
+	Email string `json:"email"`
+
+	// Handle The unique @ handle of an account.
+	Handle   *AccountHandle `json:"handle,omitempty"`
+	Password string         `json:"password"`
+}
+
+// AuthEmailVerifyProps defines model for AuthEmailVerifyProps.
+type AuthEmailVerifyProps struct {
+	Code string `json:"code"`
+
+	// Email The email address to be verified, only necessary for when submitting
+	// a verification without a session cookie present.
+	Email string `json:"email"`
+}
 
 // AuthPair defines model for AuthPair.
 type AuthPair struct {
@@ -1799,6 +1859,15 @@ type AccountUpdate = AccountMutableProps
 // AdminSettingsUpdate defines model for AdminSettingsUpdate.
 type AdminSettingsUpdate = AdminSettingsMutableProps
 
+// AuthEmail defines model for AuthEmail.
+type AuthEmail = AuthEmailInitialProps
+
+// AuthEmailPassword defines model for AuthEmailPassword.
+type AuthEmailPassword = AuthEmailPasswordInitialProps
+
+// AuthEmailVerify defines model for AuthEmailVerify.
+type AuthEmailVerify = AuthEmailVerifyProps
+
 // AuthPassword defines model for AuthPassword.
 type AuthPassword = AuthPair
 
@@ -1990,6 +2059,21 @@ type AccountUpdateJSONRequestBody = AccountMutableProps
 // AdminSettingsUpdateJSONRequestBody defines body for AdminSettingsUpdate for application/json ContentType.
 type AdminSettingsUpdateJSONRequestBody = AdminSettingsMutableProps
 
+// AuthEmailPasswordSigninJSONRequestBody defines body for AuthEmailPasswordSignin for application/json ContentType.
+type AuthEmailPasswordSigninJSONRequestBody = AuthEmailPasswordInitialProps
+
+// AuthEmailPasswordSignupJSONRequestBody defines body for AuthEmailPasswordSignup for application/json ContentType.
+type AuthEmailPasswordSignupJSONRequestBody = AuthEmailPasswordInitialProps
+
+// AuthEmailSigninJSONRequestBody defines body for AuthEmailSignin for application/json ContentType.
+type AuthEmailSigninJSONRequestBody = AuthEmailInitialProps
+
+// AuthEmailSignupJSONRequestBody defines body for AuthEmailSignup for application/json ContentType.
+type AuthEmailSignupJSONRequestBody = AuthEmailInitialProps
+
+// AuthEmailVerifyJSONRequestBody defines body for AuthEmailVerify for application/json ContentType.
+type AuthEmailVerifyJSONRequestBody = AuthEmailVerifyProps
+
 // OAuthProviderCallbackJSONRequestBody defines body for OAuthProviderCallback for application/json ContentType.
 type OAuthProviderCallbackJSONRequestBody = OAuthCallback
 
@@ -2174,6 +2258,31 @@ type ClientInterface interface {
 
 	// AuthProviderList request
 	AuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthEmailPasswordSigninWithBody request with any body
+	AuthEmailPasswordSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthEmailPasswordSignin(ctx context.Context, body AuthEmailPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthEmailPasswordSignupWithBody request with any body
+	AuthEmailPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthEmailPasswordSignup(ctx context.Context, body AuthEmailPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthEmailSigninWithBody request with any body
+	AuthEmailSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthEmailSignin(ctx context.Context, body AuthEmailSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthEmailSignupWithBody request with any body
+	AuthEmailSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthEmailSignup(ctx context.Context, body AuthEmailSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AuthEmailVerifyWithBody request with any body
+	AuthEmailVerifyWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AuthEmailVerify(ctx context.Context, body AuthEmailVerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AuthProviderLogout request
 	AuthProviderLogout(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -2557,6 +2666,126 @@ func (c *Client) AssetGet(ctx context.Context, assetFilename AssetPathParam, req
 
 func (c *Client) AuthProviderList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthProviderListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailPasswordSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailPasswordSigninRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailPasswordSignin(ctx context.Context, body AuthEmailPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailPasswordSigninRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailPasswordSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailPasswordSignupRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailPasswordSignup(ctx context.Context, body AuthEmailPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailPasswordSignupRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailSigninWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailSigninRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailSignin(ctx context.Context, body AuthEmailSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailSigninRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailSignupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailSignupRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailSignup(ctx context.Context, body AuthEmailSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailSignupRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailVerifyWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailVerifyRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AuthEmailVerify(ctx context.Context, body AuthEmailVerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAuthEmailVerifyRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3941,6 +4170,206 @@ func NewAuthProviderListRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewAuthEmailPasswordSigninRequest calls the generic AuthEmailPasswordSignin builder with application/json body
+func NewAuthEmailPasswordSigninRequest(server string, body AuthEmailPasswordSigninJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthEmailPasswordSigninRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthEmailPasswordSigninRequestWithBody generates requests for AuthEmailPasswordSignin with any type of body
+func NewAuthEmailPasswordSigninRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/email-password/signin")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthEmailPasswordSignupRequest calls the generic AuthEmailPasswordSignup builder with application/json body
+func NewAuthEmailPasswordSignupRequest(server string, body AuthEmailPasswordSignupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthEmailPasswordSignupRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthEmailPasswordSignupRequestWithBody generates requests for AuthEmailPasswordSignup with any type of body
+func NewAuthEmailPasswordSignupRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/email-password/signup")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthEmailSigninRequest calls the generic AuthEmailSignin builder with application/json body
+func NewAuthEmailSigninRequest(server string, body AuthEmailSigninJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthEmailSigninRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthEmailSigninRequestWithBody generates requests for AuthEmailSignin with any type of body
+func NewAuthEmailSigninRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/email/signin")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthEmailSignupRequest calls the generic AuthEmailSignup builder with application/json body
+func NewAuthEmailSignupRequest(server string, body AuthEmailSignupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthEmailSignupRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthEmailSignupRequestWithBody generates requests for AuthEmailSignup with any type of body
+func NewAuthEmailSignupRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/email/signup")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAuthEmailVerifyRequest calls the generic AuthEmailVerify builder with application/json body
+func NewAuthEmailVerifyRequest(server string, body AuthEmailVerifyJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAuthEmailVerifyRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAuthEmailVerifyRequestWithBody generates requests for AuthEmailVerify with any type of body
+func NewAuthEmailVerifyRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/auth/email/verify")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -6496,6 +6925,31 @@ type ClientWithResponsesInterface interface {
 	// AuthProviderListWithResponse request
 	AuthProviderListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderListResponse, error)
 
+	// AuthEmailPasswordSigninWithBodyWithResponse request with any body
+	AuthEmailPasswordSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSigninResponse, error)
+
+	AuthEmailPasswordSigninWithResponse(ctx context.Context, body AuthEmailPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSigninResponse, error)
+
+	// AuthEmailPasswordSignupWithBodyWithResponse request with any body
+	AuthEmailPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSignupResponse, error)
+
+	AuthEmailPasswordSignupWithResponse(ctx context.Context, body AuthEmailPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSignupResponse, error)
+
+	// AuthEmailSigninWithBodyWithResponse request with any body
+	AuthEmailSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailSigninResponse, error)
+
+	AuthEmailSigninWithResponse(ctx context.Context, body AuthEmailSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailSigninResponse, error)
+
+	// AuthEmailSignupWithBodyWithResponse request with any body
+	AuthEmailSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailSignupResponse, error)
+
+	AuthEmailSignupWithResponse(ctx context.Context, body AuthEmailSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailSignupResponse, error)
+
+	// AuthEmailVerifyWithBodyWithResponse request with any body
+	AuthEmailVerifyWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailVerifyResponse, error)
+
+	AuthEmailVerifyWithResponse(ctx context.Context, body AuthEmailVerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailVerifyResponse, error)
+
 	// AuthProviderLogoutWithResponse request
 	AuthProviderLogoutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderLogoutResponse, error)
 
@@ -6997,6 +7451,121 @@ func (r AuthProviderListResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AuthProviderListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthEmailPasswordSigninResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccessOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthEmailPasswordSigninResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthEmailPasswordSigninResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthEmailPasswordSignupResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccessOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthEmailPasswordSignupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthEmailPasswordSignupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthEmailSigninResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccessOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthEmailSigninResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthEmailSigninResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthEmailSignupResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccessOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthEmailSignupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthEmailSignupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AuthEmailVerifyResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AuthSuccessOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AuthEmailVerifyResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AuthEmailVerifyResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -8394,6 +8963,91 @@ func (c *ClientWithResponses) AuthProviderListWithResponse(ctx context.Context, 
 	return ParseAuthProviderListResponse(rsp)
 }
 
+// AuthEmailPasswordSigninWithBodyWithResponse request with arbitrary body returning *AuthEmailPasswordSigninResponse
+func (c *ClientWithResponses) AuthEmailPasswordSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSigninResponse, error) {
+	rsp, err := c.AuthEmailPasswordSigninWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailPasswordSigninResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthEmailPasswordSigninWithResponse(ctx context.Context, body AuthEmailPasswordSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSigninResponse, error) {
+	rsp, err := c.AuthEmailPasswordSignin(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailPasswordSigninResponse(rsp)
+}
+
+// AuthEmailPasswordSignupWithBodyWithResponse request with arbitrary body returning *AuthEmailPasswordSignupResponse
+func (c *ClientWithResponses) AuthEmailPasswordSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSignupResponse, error) {
+	rsp, err := c.AuthEmailPasswordSignupWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailPasswordSignupResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthEmailPasswordSignupWithResponse(ctx context.Context, body AuthEmailPasswordSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailPasswordSignupResponse, error) {
+	rsp, err := c.AuthEmailPasswordSignup(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailPasswordSignupResponse(rsp)
+}
+
+// AuthEmailSigninWithBodyWithResponse request with arbitrary body returning *AuthEmailSigninResponse
+func (c *ClientWithResponses) AuthEmailSigninWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailSigninResponse, error) {
+	rsp, err := c.AuthEmailSigninWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailSigninResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthEmailSigninWithResponse(ctx context.Context, body AuthEmailSigninJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailSigninResponse, error) {
+	rsp, err := c.AuthEmailSignin(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailSigninResponse(rsp)
+}
+
+// AuthEmailSignupWithBodyWithResponse request with arbitrary body returning *AuthEmailSignupResponse
+func (c *ClientWithResponses) AuthEmailSignupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailSignupResponse, error) {
+	rsp, err := c.AuthEmailSignupWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailSignupResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthEmailSignupWithResponse(ctx context.Context, body AuthEmailSignupJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailSignupResponse, error) {
+	rsp, err := c.AuthEmailSignup(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailSignupResponse(rsp)
+}
+
+// AuthEmailVerifyWithBodyWithResponse request with arbitrary body returning *AuthEmailVerifyResponse
+func (c *ClientWithResponses) AuthEmailVerifyWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AuthEmailVerifyResponse, error) {
+	rsp, err := c.AuthEmailVerifyWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailVerifyResponse(rsp)
+}
+
+func (c *ClientWithResponses) AuthEmailVerifyWithResponse(ctx context.Context, body AuthEmailVerifyJSONRequestBody, reqEditors ...RequestEditorFn) (*AuthEmailVerifyResponse, error) {
+	rsp, err := c.AuthEmailVerify(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAuthEmailVerifyResponse(rsp)
+}
+
 // AuthProviderLogoutWithResponse request returning *AuthProviderLogoutResponse
 func (c *ClientWithResponses) AuthProviderLogoutWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AuthProviderLogoutResponse, error) {
 	rsp, err := c.AuthProviderLogout(ctx, reqEditors...)
@@ -9457,6 +10111,171 @@ func ParseAuthProviderListResponse(rsp *http.Response) (*AuthProviderListRespons
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AuthProviderListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthEmailPasswordSigninResponse parses an HTTP response from a AuthEmailPasswordSigninWithResponse call
+func ParseAuthEmailPasswordSigninResponse(rsp *http.Response) (*AuthEmailPasswordSigninResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthEmailPasswordSigninResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccessOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthEmailPasswordSignupResponse parses an HTTP response from a AuthEmailPasswordSignupWithResponse call
+func ParseAuthEmailPasswordSignupResponse(rsp *http.Response) (*AuthEmailPasswordSignupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthEmailPasswordSignupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccessOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthEmailSigninResponse parses an HTTP response from a AuthEmailSigninWithResponse call
+func ParseAuthEmailSigninResponse(rsp *http.Response) (*AuthEmailSigninResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthEmailSigninResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccessOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthEmailSignupResponse parses an HTTP response from a AuthEmailSignupWithResponse call
+func ParseAuthEmailSignupResponse(rsp *http.Response) (*AuthEmailSignupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthEmailSignupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccessOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAuthEmailVerifyResponse parses an HTTP response from a AuthEmailVerifyWithResponse call
+func ParseAuthEmailVerifyResponse(rsp *http.Response) (*AuthEmailVerifyResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AuthEmailVerifyResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AuthSuccessOK
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11282,6 +12101,21 @@ type ServerInterface interface {
 	// (GET /v1/auth)
 	AuthProviderList(ctx echo.Context) error
 
+	// (POST /v1/auth/email-password/signin)
+	AuthEmailPasswordSignin(ctx echo.Context) error
+
+	// (POST /v1/auth/email-password/signup)
+	AuthEmailPasswordSignup(ctx echo.Context) error
+
+	// (POST /v1/auth/email/signin)
+	AuthEmailSignin(ctx echo.Context) error
+
+	// (POST /v1/auth/email/signup)
+	AuthEmailSignup(ctx echo.Context) error
+
+	// (POST /v1/auth/email/verify)
+	AuthEmailVerify(ctx echo.Context) error
+
 	// (GET /v1/auth/logout)
 	AuthProviderLogout(ctx echo.Context) error
 
@@ -11664,6 +12498,51 @@ func (w *ServerInterfaceWrapper) AuthProviderList(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthProviderList(ctx)
+	return err
+}
+
+// AuthEmailPasswordSignin converts echo context to params.
+func (w *ServerInterfaceWrapper) AuthEmailPasswordSignin(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AuthEmailPasswordSignin(ctx)
+	return err
+}
+
+// AuthEmailPasswordSignup converts echo context to params.
+func (w *ServerInterfaceWrapper) AuthEmailPasswordSignup(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AuthEmailPasswordSignup(ctx)
+	return err
+}
+
+// AuthEmailSignin converts echo context to params.
+func (w *ServerInterfaceWrapper) AuthEmailSignin(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AuthEmailSignin(ctx)
+	return err
+}
+
+// AuthEmailSignup converts echo context to params.
+func (w *ServerInterfaceWrapper) AuthEmailSignup(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AuthEmailSignup(ctx)
+	return err
+}
+
+// AuthEmailVerify converts echo context to params.
+func (w *ServerInterfaceWrapper) AuthEmailVerify(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AuthEmailVerify(ctx)
 	return err
 }
 
@@ -12729,6 +13608,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/assets", wrapper.AssetUpload)
 	router.GET(baseURL+"/v1/assets/:asset_filename", wrapper.AssetGet)
 	router.GET(baseURL+"/v1/auth", wrapper.AuthProviderList)
+	router.POST(baseURL+"/v1/auth/email-password/signin", wrapper.AuthEmailPasswordSignin)
+	router.POST(baseURL+"/v1/auth/email-password/signup", wrapper.AuthEmailPasswordSignup)
+	router.POST(baseURL+"/v1/auth/email/signin", wrapper.AuthEmailSignin)
+	router.POST(baseURL+"/v1/auth/email/signup", wrapper.AuthEmailSignup)
+	router.POST(baseURL+"/v1/auth/email/verify", wrapper.AuthEmailVerify)
 	router.GET(baseURL+"/v1/auth/logout", wrapper.AuthProviderLogout)
 	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
 	router.PATCH(baseURL+"/v1/auth/password", wrapper.AuthPasswordUpdate)
@@ -13457,6 +14341,220 @@ type AuthProviderListdefaultJSONResponse struct {
 }
 
 func (response AuthProviderListdefaultJSONResponse) VisitAuthProviderListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailPasswordSigninRequestObject struct {
+	Body *AuthEmailPasswordSigninJSONRequestBody
+}
+
+type AuthEmailPasswordSigninResponseObject interface {
+	VisitAuthEmailPasswordSigninResponse(w http.ResponseWriter) error
+}
+
+type AuthEmailPasswordSignin200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response AuthEmailPasswordSignin200JSONResponse) VisitAuthEmailPasswordSigninResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailPasswordSignin401Response = UnauthorisedResponse
+
+func (response AuthEmailPasswordSignin401Response) VisitAuthEmailPasswordSigninResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AuthEmailPasswordSignin404Response = NotFoundResponse
+
+func (response AuthEmailPasswordSignin404Response) VisitAuthEmailPasswordSigninResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AuthEmailPasswordSignindefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AuthEmailPasswordSignindefaultJSONResponse) VisitAuthEmailPasswordSigninResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailPasswordSignupRequestObject struct {
+	Body *AuthEmailPasswordSignupJSONRequestBody
+}
+
+type AuthEmailPasswordSignupResponseObject interface {
+	VisitAuthEmailPasswordSignupResponse(w http.ResponseWriter) error
+}
+
+type AuthEmailPasswordSignup200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response AuthEmailPasswordSignup200JSONResponse) VisitAuthEmailPasswordSignupResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailPasswordSignup400Response = BadRequestResponse
+
+func (response AuthEmailPasswordSignup400Response) VisitAuthEmailPasswordSignupResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type AuthEmailPasswordSignupdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AuthEmailPasswordSignupdefaultJSONResponse) VisitAuthEmailPasswordSignupResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailSigninRequestObject struct {
+	Body *AuthEmailSigninJSONRequestBody
+}
+
+type AuthEmailSigninResponseObject interface {
+	VisitAuthEmailSigninResponse(w http.ResponseWriter) error
+}
+
+type AuthEmailSignin200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response AuthEmailSignin200JSONResponse) VisitAuthEmailSigninResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailSignin401Response = UnauthorisedResponse
+
+func (response AuthEmailSignin401Response) VisitAuthEmailSigninResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AuthEmailSignin404Response = NotFoundResponse
+
+func (response AuthEmailSignin404Response) VisitAuthEmailSigninResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AuthEmailSignindefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AuthEmailSignindefaultJSONResponse) VisitAuthEmailSigninResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailSignupRequestObject struct {
+	Body *AuthEmailSignupJSONRequestBody
+}
+
+type AuthEmailSignupResponseObject interface {
+	VisitAuthEmailSignupResponse(w http.ResponseWriter) error
+}
+
+type AuthEmailSignup200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response AuthEmailSignup200JSONResponse) VisitAuthEmailSignupResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailSignup400Response = BadRequestResponse
+
+func (response AuthEmailSignup400Response) VisitAuthEmailSignupResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type AuthEmailSignup422Response struct {
+}
+
+func (response AuthEmailSignup422Response) VisitAuthEmailSignupResponse(w http.ResponseWriter) error {
+	w.WriteHeader(422)
+	return nil
+}
+
+type AuthEmailSignupdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AuthEmailSignupdefaultJSONResponse) VisitAuthEmailSignupResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailVerifyRequestObject struct {
+	Body *AuthEmailVerifyJSONRequestBody
+}
+
+type AuthEmailVerifyResponseObject interface {
+	VisitAuthEmailVerifyResponse(w http.ResponseWriter) error
+}
+
+type AuthEmailVerify200JSONResponse struct{ AuthSuccessOKJSONResponse }
+
+func (response AuthEmailVerify200JSONResponse) VisitAuthEmailVerifyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AuthEmailVerify401Response = UnauthorisedResponse
+
+func (response AuthEmailVerify401Response) VisitAuthEmailVerifyResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AuthEmailVerify404Response = NotFoundResponse
+
+func (response AuthEmailVerify404Response) VisitAuthEmailVerifyResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AuthEmailVerifydefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AuthEmailVerifydefaultJSONResponse) VisitAuthEmailVerifyResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -15750,6 +16848,21 @@ type StrictServerInterface interface {
 	// (GET /v1/auth)
 	AuthProviderList(ctx context.Context, request AuthProviderListRequestObject) (AuthProviderListResponseObject, error)
 
+	// (POST /v1/auth/email-password/signin)
+	AuthEmailPasswordSignin(ctx context.Context, request AuthEmailPasswordSigninRequestObject) (AuthEmailPasswordSigninResponseObject, error)
+
+	// (POST /v1/auth/email-password/signup)
+	AuthEmailPasswordSignup(ctx context.Context, request AuthEmailPasswordSignupRequestObject) (AuthEmailPasswordSignupResponseObject, error)
+
+	// (POST /v1/auth/email/signin)
+	AuthEmailSignin(ctx context.Context, request AuthEmailSigninRequestObject) (AuthEmailSigninResponseObject, error)
+
+	// (POST /v1/auth/email/signup)
+	AuthEmailSignup(ctx context.Context, request AuthEmailSignupRequestObject) (AuthEmailSignupResponseObject, error)
+
+	// (POST /v1/auth/email/verify)
+	AuthEmailVerify(ctx context.Context, request AuthEmailVerifyRequestObject) (AuthEmailVerifyResponseObject, error)
+
 	// (GET /v1/auth/logout)
 	AuthProviderLogout(ctx context.Context, request AuthProviderLogoutRequestObject) (AuthProviderLogoutResponseObject, error)
 
@@ -16251,6 +17364,151 @@ func (sh *strictHandler) AuthProviderList(ctx echo.Context) error {
 		return err
 	} else if validResponse, ok := response.(AuthProviderListResponseObject); ok {
 		return validResponse.VisitAuthProviderListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AuthEmailPasswordSignin operation middleware
+func (sh *strictHandler) AuthEmailPasswordSignin(ctx echo.Context) error {
+	var request AuthEmailPasswordSigninRequestObject
+
+	var body AuthEmailPasswordSigninJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AuthEmailPasswordSignin(ctx.Request().Context(), request.(AuthEmailPasswordSigninRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AuthEmailPasswordSignin")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AuthEmailPasswordSigninResponseObject); ok {
+		return validResponse.VisitAuthEmailPasswordSigninResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AuthEmailPasswordSignup operation middleware
+func (sh *strictHandler) AuthEmailPasswordSignup(ctx echo.Context) error {
+	var request AuthEmailPasswordSignupRequestObject
+
+	var body AuthEmailPasswordSignupJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AuthEmailPasswordSignup(ctx.Request().Context(), request.(AuthEmailPasswordSignupRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AuthEmailPasswordSignup")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AuthEmailPasswordSignupResponseObject); ok {
+		return validResponse.VisitAuthEmailPasswordSignupResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AuthEmailSignin operation middleware
+func (sh *strictHandler) AuthEmailSignin(ctx echo.Context) error {
+	var request AuthEmailSigninRequestObject
+
+	var body AuthEmailSigninJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AuthEmailSignin(ctx.Request().Context(), request.(AuthEmailSigninRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AuthEmailSignin")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AuthEmailSigninResponseObject); ok {
+		return validResponse.VisitAuthEmailSigninResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AuthEmailSignup operation middleware
+func (sh *strictHandler) AuthEmailSignup(ctx echo.Context) error {
+	var request AuthEmailSignupRequestObject
+
+	var body AuthEmailSignupJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AuthEmailSignup(ctx.Request().Context(), request.(AuthEmailSignupRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AuthEmailSignup")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AuthEmailSignupResponseObject); ok {
+		return validResponse.VisitAuthEmailSignupResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AuthEmailVerify operation middleware
+func (sh *strictHandler) AuthEmailVerify(ctx echo.Context) error {
+	var request AuthEmailVerifyRequestObject
+
+	var body AuthEmailVerifyJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AuthEmailVerify(ctx.Request().Context(), request.(AuthEmailVerifyRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AuthEmailVerify")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AuthEmailVerifyResponseObject); ok {
+		return validResponse.VisitAuthEmailVerifyResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -17750,208 +19008,226 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
 
@@ -100,6 +101,21 @@ func (ac *AuthenticationCreate) SetAccountID(id xid.ID) *AuthenticationCreate {
 // SetAccount sets the "account" edge to the Account entity.
 func (ac *AuthenticationCreate) SetAccount(a *Account) *AuthenticationCreate {
 	return ac.SetAccountID(a.ID)
+}
+
+// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
+func (ac *AuthenticationCreate) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationCreate {
+	ac.mutation.AddEmailAddresIDs(ids...)
+	return ac
+}
+
+// AddEmailAddress adds the "email_address" edges to the Email entity.
+func (ac *AuthenticationCreate) AddEmailAddress(e ...*Email) *AuthenticationCreate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEmailAddresIDs(ids...)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -254,6 +270,22 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.account_authentication = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.EmailAddressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   authentication.EmailAddressTable,
+			Columns: []string{authentication.EmailAddressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
