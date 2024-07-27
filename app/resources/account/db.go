@@ -10,7 +10,6 @@ import (
 
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 type database struct {
@@ -31,12 +30,16 @@ func (d *database) Create(ctx context.Context, handle string, opts ...Option) (*
 		v(&withrequired)
 	}
 
-	a, err := d.db.Account.
-		Create().
+	create := d.db.Account.Create()
+
+	if !xid.ID(withrequired.ID).IsNil() {
+		create.SetID(xid.ID(withrequired.ID))
+	}
+
+	a, err := create.
 		SetHandle(withrequired.Handle).
 		SetName(withrequired.Name).
 		SetBio(withrequired.Bio.HTML()).
-		SetNillableID(utils.OptionalID(xid.ID(withrequired.ID))).
 		SetAdmin(withrequired.Admin).
 		Save(ctx)
 	if err != nil {

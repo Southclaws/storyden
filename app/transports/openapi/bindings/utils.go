@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/internal/utils"
 )
 
 func serialiseAccount(acc *account.Account) openapi.Account {
@@ -32,7 +31,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Meta:           acc.Metadata,
 		CreatedAt:      acc.CreatedAt,
 		UpdatedAt:      acc.UpdatedAt,
-		DeletedAt:      utils.OptionalToPointer(acc.DeletedAt),
+		DeletedAt:      acc.DeletedAt.Ptr(),
 		Admin:          acc.Admin,
 		VerifiedStatus: openapi.AccountVerifiedStatus(acc.VerifiedStatus.String()),
 		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddress),
@@ -57,11 +56,13 @@ func serialiseExternalLinks(in []account.ExternalLink) openapi.ProfileExternalLi
 }
 
 func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
+	postCount := len(t.Posts)
+
 	return openapi.ThreadReference{
 		Id:        openapi.Identifier(xid.ID(t.ID).String()),
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
-		DeletedAt: utils.OptionalToPointer(t.DeletedAt),
+		DeletedAt: t.DeletedAt.Ptr(),
 
 		Title:  t.Title,
 		Author: serialiseProfileReference(t.Author),
@@ -71,7 +72,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
-		PostCount:   utils.Ref(len(t.Posts)),
+		PostCount:   &postCount,
 		Reacts:      reacts(t.Reacts),
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetReference),
@@ -112,7 +113,7 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
-		DeletedAt: utils.OptionalToPointer(p.DeletedAt),
+		DeletedAt: p.DeletedAt.Ptr(),
 		RootId:    p.RootPostID.String(),
 		RootSlug:  p.RootThreadMark,
 		Body:      p.Content.HTML(),
