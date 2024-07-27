@@ -92,9 +92,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ark-ui/react@npm:^3.6.1":
-  version: 3.6.1
-  resolution: "@ark-ui/react@npm:3.6.1"
+"@ark-ui/anatomy@npm:^3.4.0":
+  version: 3.5.0
+  resolution: "@ark-ui/anatomy@npm:3.5.0"
   dependencies:
     "@zag-js/accordion": "npm:0.62.1"
     "@zag-js/anatomy": "npm:0.62.1"
@@ -106,16 +106,12 @@ __metadata:
     "@zag-js/color-picker": "npm:0.62.1"
     "@zag-js/color-utils": "npm:0.62.1"
     "@zag-js/combobox": "npm:0.62.1"
-    "@zag-js/core": "npm:0.62.1"
     "@zag-js/date-picker": "npm:0.62.1"
     "@zag-js/date-utils": "npm:0.62.1"
     "@zag-js/dialog": "npm:0.62.1"
-    "@zag-js/dom-query": "npm:0.62.1"
     "@zag-js/editable": "npm:0.62.1"
     "@zag-js/file-upload": "npm:0.62.1"
-    "@zag-js/file-utils": "npm:0.62.1"
     "@zag-js/hover-card": "npm:0.62.1"
-    "@zag-js/i18n-utils": "npm:0.62.1"
     "@zag-js/menu": "npm:0.62.1"
     "@zag-js/number-input": "npm:0.62.1"
     "@zag-js/pagination": "npm:0.62.1"
@@ -126,7 +122,6 @@ __metadata:
     "@zag-js/qr-code": "npm:0.62.1"
     "@zag-js/radio-group": "npm:0.62.1"
     "@zag-js/rating-group": "npm:0.62.1"
-    "@zag-js/react": "npm:0.62.1"
     "@zag-js/select": "npm:0.62.1"
     "@zag-js/signature-pad": "npm:0.62.1"
     "@zag-js/slider": "npm:0.62.1"
@@ -139,11 +134,61 @@ __metadata:
     "@zag-js/toggle-group": "npm:0.62.1"
     "@zag-js/tooltip": "npm:0.62.1"
     "@zag-js/tree-view": "npm:0.62.1"
-    "@zag-js/types": "npm:0.62.1"
+  checksum: 10c0/20e3d5654e1558d408dcc8c7e6fecba41082353bad103557d5d92026d7a174b37fb5921a6f968bf566196a215bf4140952b24d78c92d35dc253ee403ca341824
+  languageName: node
+  linkType: hard
+
+"@ark-ui/react@npm:3.4.0":
+  version: 3.4.0
+  resolution: "@ark-ui/react@npm:3.4.0"
+  dependencies:
+    "@ark-ui/anatomy": "npm:^3.4.0"
+    "@zag-js/accordion": "npm:0.58.2"
+    "@zag-js/avatar": "npm:0.58.2"
+    "@zag-js/carousel": "npm:0.58.2"
+    "@zag-js/checkbox": "npm:0.58.2"
+    "@zag-js/clipboard": "npm:0.58.2"
+    "@zag-js/collapsible": "npm:0.58.2"
+    "@zag-js/color-picker": "npm:0.58.2"
+    "@zag-js/color-utils": "npm:0.58.2"
+    "@zag-js/combobox": "npm:0.58.2"
+    "@zag-js/core": "npm:0.58.2"
+    "@zag-js/date-picker": "npm:0.58.2"
+    "@zag-js/date-utils": "npm:0.58.2"
+    "@zag-js/dialog": "npm:0.58.2"
+    "@zag-js/dom-query": "npm:0.58.2"
+    "@zag-js/editable": "npm:0.58.2"
+    "@zag-js/file-upload": "npm:0.58.2"
+    "@zag-js/file-utils": "npm:0.58.2"
+    "@zag-js/hover-card": "npm:0.58.2"
+    "@zag-js/i18n-utils": "npm:0.58.2"
+    "@zag-js/menu": "npm:0.58.2"
+    "@zag-js/number-input": "npm:0.58.2"
+    "@zag-js/pagination": "npm:0.58.2"
+    "@zag-js/pin-input": "npm:0.58.2"
+    "@zag-js/popover": "npm:0.58.2"
+    "@zag-js/presence": "npm:0.58.2"
+    "@zag-js/progress": "npm:0.58.2"
+    "@zag-js/qr-code": "npm:0.58.2"
+    "@zag-js/radio-group": "npm:0.58.2"
+    "@zag-js/rating-group": "npm:0.58.2"
+    "@zag-js/react": "npm:0.58.2"
+    "@zag-js/select": "npm:0.58.2"
+    "@zag-js/signature-pad": "npm:0.58.2"
+    "@zag-js/slider": "npm:0.58.2"
+    "@zag-js/splitter": "npm:0.58.2"
+    "@zag-js/switch": "npm:0.58.2"
+    "@zag-js/tabs": "npm:0.58.2"
+    "@zag-js/tags-input": "npm:0.58.2"
+    "@zag-js/toast": "npm:0.58.2"
+    "@zag-js/toggle-group": "npm:0.58.2"
+    "@zag-js/tooltip": "npm:0.58.2"
+    "@zag-js/tree-view": "npm:0.58.2"
+    "@zag-js/types": "npm:0.58.2"
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10c0/49e6a7e7b00c6d37a1366b67ce35fbefac5e3cd25f047733c1a4e2d58ef694a781648e1fdf64b84803c45fa289be6906fac0cf45cdf046b7b27136fce4e45e93
+  checksum: 10c0/ee23f89d3c6ced4d1309180a78a73c3fe2ab8f22fbdd18ba6e65e0cf5d417b50a4551ab4eba5ef26dba7ac9d725aeb749539986d1b2b41cf06d6dcf47cabae75
   languageName: node
   linkType: hard
 
@@ -4005,18 +4050,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zag-js/react@npm:0.62.1":
-  version: 0.62.1
-  resolution: "@zag-js/react@npm:0.62.1"
+"@zag-js/react@npm:0.58.2":
+  version: 0.58.2
+  resolution: "@zag-js/react@npm:0.58.2"
   dependencies:
-    "@zag-js/core": "npm:0.62.1"
-    "@zag-js/store": "npm:0.62.1"
-    "@zag-js/types": "npm:0.62.1"
+    "@zag-js/core": "npm:0.58.2"
+    "@zag-js/store": "npm:0.58.2"
+    "@zag-js/types": "npm:0.58.2"
     proxy-compare: "npm:3.0.0"
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10c0/336c65b9a3783556aaff66c2d044f515e4ca0531796dd4ca912d4aa52c3d8784b399fbe72b7b75676542b4f91b14b1470d80db38727fb925f05cc6106f041a8f
+  checksum: 10c0/b71a2dbc746e9b05e4adfc4d3ba281b9754d090e4807b80c2151be59807fa49d8c36515c4b61bd8ea6ac28cae0c2cd7d5d4978ed621243a982066738f56763d9
   languageName: node
   linkType: hard
 
@@ -10641,7 +10686,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "web@workspace:."
   dependencies:
-    "@ark-ui/react": "npm:^3.6.1"
+    "@ark-ui/react": "npm:3.4.0"
     "@dnd-kit/core": "npm:^6.1.0"
     "@dnd-kit/sortable": "npm:^8.0.0"
     "@emoji-mart/data": "npm:^1.2.1"
