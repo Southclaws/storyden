@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface CarouselVariant {
-  size: "sm" | "md"
+  /**
+ * @default "md"
+ */
+size: "sm" | "md"
 }
 
 type CarouselVariantMap = {

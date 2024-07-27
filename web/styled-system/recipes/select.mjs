@@ -49,6 +49,10 @@ const selectSlotNames = [
     "select__itemGroupLabel"
   ],
   [
+    "list",
+    "select__list"
+  ],
+  [
     "content",
     "select__content"
   ],
@@ -103,6 +107,10 @@ const selectSlotNames = [
   [
     "itemGroupLabel",
     "select__itemGroupLabel"
+  ],
+  [
+    "list",
+    "select__list"
   ],
   [
     "content",

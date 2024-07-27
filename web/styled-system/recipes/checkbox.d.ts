@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface CheckboxVariant {
-  size: "sm" | "md" | "lg"
+  /**
+ * @default "md"
+ */
+size: "sm" | "md" | "lg"
 }
 
 type CheckboxVariantMap = {
@@ -16,7 +19,7 @@ export type CheckboxVariantProps = {
 
 export interface CheckboxRecipe {
   __type: CheckboxVariantProps
-  (props?: CheckboxVariantProps): Pretty<Record<"root" | "label" | "control" | "indicator" | "root" | "label" | "control" | "indicator", string>>
+  (props?: CheckboxVariantProps): Pretty<Record<"root" | "label" | "control" | "indicator" | "group" | "root" | "label" | "control" | "indicator" | "group", string>>
   raw: (props?: CheckboxVariantProps) => CheckboxVariantProps
   variantMap: CheckboxVariantMap
   variantKeys: Array<keyof CheckboxVariant>

@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ComboboxVariant {
-  size: "sm" | "md" | "lg"
+  /**
+ * @default "md"
+ */
+size: "sm" | "md" | "lg"
 }
 
 type ComboboxVariantMap = {
@@ -16,7 +19,7 @@ export type ComboboxVariantProps = {
 
 export interface ComboboxRecipe {
   __type: ComboboxVariantProps
-  (props?: ComboboxVariantProps): Pretty<Record<"root" | "label" | "input" | "positioner" | "control" | "trigger" | "content" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "root" | "label" | "input" | "positioner" | "control" | "trigger" | "content" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel", string>>
+  (props?: ComboboxVariantProps): Pretty<Record<"root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger" | "root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger", string>>
   raw: (props?: ComboboxVariantProps) => ComboboxVariantProps
   variantMap: ComboboxVariantMap
   variantKeys: Array<keyof ComboboxVariant>

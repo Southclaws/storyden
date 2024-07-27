@@ -3,7 +3,13 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface SelectVariant {
-  variant: "outline" | "ghost"
+  /**
+ * @default "outline"
+ */
+variant: "outline" | "ghost"
+/**
+ * @default "md"
+ */
 size: "sm" | "md" | "lg"
 }
 
@@ -17,7 +23,7 @@ export type SelectVariantProps = {
 
 export interface SelectRecipe {
   __type: SelectVariantProps
-  (props?: SelectVariantProps): Pretty<Record<"label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "content" | "root" | "control" | "valueText" | "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "content" | "root" | "control" | "valueText", string>>
+  (props?: SelectVariantProps): Pretty<Record<"label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText" | "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText", string>>
   raw: (props?: SelectVariantProps) => SelectVariantProps
   variantMap: SelectVariantMap
   variantKeys: Array<keyof SelectVariant>

@@ -3,7 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface PinInputVariant {
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+  /**
+ * @default "md"
+ */
+size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 }
 
 type PinInputVariantMap = {

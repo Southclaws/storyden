@@ -29,7 +29,7 @@ export function ContentNavigationList() {
           width="full"
           css={{
             touchAction: "none",
-            scrollbarWidth: "none",
+            scrollbarWidth: "0",
             "&::-webkit-scrollbar": {
               display: "none",
             },

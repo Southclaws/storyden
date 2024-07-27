@@ -3,8 +3,17 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface RichCardVariant {
-  mediaDisplay: "with" | "without"
+  /**
+ * @default "with"
+ */
+mediaDisplay: "with" | "without"
+/**
+ * @default "box"
+ */
 shape: "box" | "row"
+/**
+ * @default "default"
+ */
 size: "default" | "small"
 }
 

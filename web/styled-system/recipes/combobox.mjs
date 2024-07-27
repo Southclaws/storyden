@@ -12,44 +12,24 @@ const comboboxSlotNames = [
     "combobox__root"
   ],
   [
-    "label",
-    "combobox__label"
-  ],
-  [
-    "input",
-    "combobox__input"
-  ],
-  [
-    "positioner",
-    "combobox__positioner"
-  ],
-  [
-    "control",
-    "combobox__control"
-  ],
-  [
-    "trigger",
-    "combobox__trigger"
+    "clearTrigger",
+    "combobox__clearTrigger"
   ],
   [
     "content",
     "combobox__content"
   ],
   [
-    "clearTrigger",
-    "combobox__clearTrigger"
+    "control",
+    "combobox__control"
+  ],
+  [
+    "input",
+    "combobox__input"
   ],
   [
     "item",
     "combobox__item"
-  ],
-  [
-    "itemText",
-    "combobox__itemText"
-  ],
-  [
-    "itemIndicator",
-    "combobox__itemIndicator"
   ],
   [
     "itemGroup",
@@ -58,50 +38,54 @@ const comboboxSlotNames = [
   [
     "itemGroupLabel",
     "combobox__itemGroupLabel"
+  ],
+  [
+    "itemIndicator",
+    "combobox__itemIndicator"
+  ],
+  [
+    "itemText",
+    "combobox__itemText"
+  ],
+  [
+    "label",
+    "combobox__label"
+  ],
+  [
+    "list",
+    "combobox__list"
+  ],
+  [
+    "positioner",
+    "combobox__positioner"
+  ],
+  [
+    "trigger",
+    "combobox__trigger"
   ],
   [
     "root",
     "combobox__root"
   ],
   [
-    "label",
-    "combobox__label"
-  ],
-  [
-    "input",
-    "combobox__input"
-  ],
-  [
-    "positioner",
-    "combobox__positioner"
-  ],
-  [
-    "control",
-    "combobox__control"
-  ],
-  [
-    "trigger",
-    "combobox__trigger"
+    "clearTrigger",
+    "combobox__clearTrigger"
   ],
   [
     "content",
     "combobox__content"
   ],
   [
-    "clearTrigger",
-    "combobox__clearTrigger"
+    "control",
+    "combobox__control"
+  ],
+  [
+    "input",
+    "combobox__input"
   ],
   [
     "item",
     "combobox__item"
-  ],
-  [
-    "itemText",
-    "combobox__itemText"
-  ],
-  [
-    "itemIndicator",
-    "combobox__itemIndicator"
   ],
   [
     "itemGroup",
@@ -110,6 +94,30 @@ const comboboxSlotNames = [
   [
     "itemGroupLabel",
     "combobox__itemGroupLabel"
+  ],
+  [
+    "itemIndicator",
+    "combobox__itemIndicator"
+  ],
+  [
+    "itemText",
+    "combobox__itemText"
+  ],
+  [
+    "label",
+    "combobox__label"
+  ],
+  [
+    "list",
+    "combobox__list"
+  ],
+  [
+    "positioner",
+    "combobox__positioner"
+  ],
+  [
+    "trigger",
+    "combobox__trigger"
   ]
 ]
 const comboboxSlotFns = /* @__PURE__ */ comboboxSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, comboboxDefaultVariants, getSlotCompoundVariant(comboboxCompoundVariants, slotName))])
