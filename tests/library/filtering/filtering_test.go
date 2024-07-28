@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -26,13 +26,13 @@ func TestNodesFiltering(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			a := assert.New(t)
 
-			ctx1, acc1 := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctx2, acc2 := e2e.WithAccount(ctx, ar, seed.Account_002_Frigg)
+			ctx1, acc1 := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctx2, acc2 := e2e.WithAccount(ctx, aw, seed.Account_002_Frigg)
 
 			visibility := openapi.Published
 

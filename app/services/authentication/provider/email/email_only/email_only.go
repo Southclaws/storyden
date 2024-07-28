@@ -16,8 +16,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
+
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
@@ -30,8 +31,7 @@ const (
 
 type Provider struct {
 	auth     authentication.Repository
-	ar       account.Repository
-	register register.Service
+	register *register.Registrar
 	er       email.EmailRepo
 
 	// TODO: Replace with an MQ message and sender job.
@@ -40,12 +40,12 @@ type Provider struct {
 
 func New(
 	auth authentication.Repository,
-	ar account.Repository,
-	register register.Service,
+
+	register *register.Registrar,
 	er email.EmailRepo,
 	sender email_verify.Verifier,
 ) *Provider {
-	return &Provider{auth, ar, register, er, sender}
+	return &Provider{auth, register, er, sender}
 }
 
 func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.

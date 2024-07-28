@@ -11,6 +11,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -27,7 +29,7 @@ func TestAccountAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		accountQuery account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -100,7 +102,7 @@ func TestAccountAdmin(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		accountWrite account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -117,7 +119,7 @@ func TestAccountAdmin(t *testing.T) {
 			adminID := account.AccountID(utils.Must(xid.FromString(admin.JSON200.Id)))
 			adminSession := e2e.WithSession(session.WithAccountID(root, adminID), cj)
 
-			ar.Update(root, adminID, account.SetAdmin(true))
+			accountWrite.Update(root, adminID, account_writer.SetAdmin(true))
 
 			victim, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: victimHandle, Token: "password"})
 			r.NoError(err)

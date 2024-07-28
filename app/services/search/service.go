@@ -9,7 +9,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -40,7 +40,7 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
+	accountQuery account_querier.Querier,
 	post_search_repo post_search.Repository,
 ) Service {
 	return &service{

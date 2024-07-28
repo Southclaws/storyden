@@ -12,7 +12,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -44,22 +44,22 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo    account.Repository
-	collection_repo collection.Repository
+	accountQuery account_querier.Querier
+	repo         collection.Repository
 }
 
 func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
-	collection_repo collection.Repository,
+	accountQuery account_querier.Querier,
+	repo collection.Repository,
 ) Service {
 	return &service{
-		l:               l.With(zap.String("service", "collection")),
-		rbac:            rbac,
-		account_repo:    account_repo,
-		collection_repo: collection_repo,
+		l:            l.With(zap.String("service", "collection")),
+		rbac:         rbac,
+		accountQuery: accountQuery,
+		repo:         repo,
 	}
 }
 
@@ -73,7 +73,7 @@ func (s *service) Update(ctx context.Context, cid collection.CollectionID, parti
 	partial.Name.Call(func(v string) { opts = append(opts, collection.WithName(v)) })
 	partial.Description.Call(func(v string) { opts = append(opts, collection.WithDescription(v)) })
 
-	col, err := s.collection_repo.Update(ctx, cid, opts...)
+	col, err := s.repo.Update(ctx, cid, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -86,7 +86,7 @@ func (s *service) Delete(ctx context.Context, cid collection.CollectionID) error
 		return err
 	}
 
-	err := s.collection_repo.Delete(ctx, cid)
+	err := s.repo.Delete(ctx, cid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -100,7 +100,7 @@ func (s *service) PostAdd(ctx context.Context, cid collection.CollectionID, pid 
 		return nil, err
 	}
 
-	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithPost(pid, mt))
+	col, err := s.repo.UpdateItems(ctx, cid, collection.WithPost(pid, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -113,7 +113,7 @@ func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, p
 		return nil, err
 	}
 
-	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithPostRemove(pid))
+	col, err := s.repo.UpdateItems(ctx, cid, collection.WithPostRemove(pid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -127,7 +127,7 @@ func (s *service) NodeAdd(ctx context.Context, cid collection.CollectionID, id l
 		return nil, err
 	}
 
-	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithNode(id, mt))
+	col, err := s.repo.UpdateItems(ctx, cid, collection.WithNode(id, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -140,7 +140,7 @@ func (s *service) NodeRemove(ctx context.Context, cid collection.CollectionID, i
 		return nil, err
 	}
 
-	col, err := s.collection_repo.UpdateItems(ctx, cid, collection.WithNodeRemove(id))
+	col, err := s.repo.UpdateItems(ctx, cid, collection.WithNodeRemove(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -154,12 +154,12 @@ func (s *service) authoriseDirectUpdate(ctx context.Context, cid collection.Coll
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, aid)
+	acc, err := s.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	col, err := s.collection_repo.Get(ctx, cid)
+	col, err := s.repo.Get(ctx, cid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -181,12 +181,12 @@ func (s *service) authoriseSubmission(ctx context.Context, cid collection.Collec
 		return fault.Wrap(err, fctx.With(ctx)), collection.MembershipType{}
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, aid)
+	acc, err := s.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx)), collection.MembershipType{}
 	}
 
-	col, err := s.collection_repo.ProbeItem(ctx, cid, iid)
+	col, err := s.repo.ProbeItem(ctx, cid, iid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx)), collection.MembershipType{}
 	}

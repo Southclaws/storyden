@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -26,13 +26,13 @@ func TestDatagraphHappyPath(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 			a := assert.New(t)
 
-			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+			ctx, acc := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
 			// iurl := "https://picsum.photos/500/500"
 
@@ -101,13 +101,13 @@ func TestDatagraphDeletions(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 			a := assert.New(t)
 
-			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
 			// Create three nodes in a tree
 			// node1

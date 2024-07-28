@@ -26,7 +26,7 @@ func (s *service) Create(ctx context.Context,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
-	acc, err := s.account_repo.GetByID(ctx, authorID)
+	acc, err := s.accountQuery.GetByID(ctx, authorID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}

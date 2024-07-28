@@ -12,8 +12,9 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
+	"github.com/Southclaws/storyden/app/services/account/register"
 )
 
 var (
@@ -31,13 +32,13 @@ const (
 )
 
 type Provider struct {
-	auth     authentication.Repository
-	ar       account.Repository
-	register register.Service
+	auth         authentication.Repository
+	accountQuery account_querier.Querier
+	register     *register.Registrar
 }
 
-func New(auth authentication.Repository, ar account.Repository, register register.Service) *Provider {
-	return &Provider{auth, ar, register}
+func New(auth authentication.Repository, accountQuery account_querier.Querier, register *register.Registrar) *Provider {
+	return &Provider{auth, accountQuery, register}
 }
 
 func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
@@ -52,7 +53,7 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
+	_, exists, err := b.accountQuery.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -89,7 +90,7 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
+	_, exists, err := b.accountQuery.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -140,7 +141,7 @@ func (b *Provider) Create(ctx context.Context, aid account.AccountID, password s
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	acc, err := b.ar.GetByID(ctx, aid)
+	acc, err := b.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -172,7 +173,7 @@ func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpasswor
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	a, err := b.ar.GetByID(ctx, aid)
+	a, err := b.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}

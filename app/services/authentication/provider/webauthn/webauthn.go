@@ -12,8 +12,9 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/transports/openapi/glue"
 )
 
@@ -31,22 +32,22 @@ const (
 
 type Provider struct {
 	auth_repo    authentication.Repository
-	account_repo account.Repository
-	reg          register.Service
+	accountQuery account_querier.Querier
+	reg          *register.Registrar
 
 	wa *webauthn.WebAuthn
 }
 
 func New(
 	auth_repo authentication.Repository,
-	account_repo account.Repository,
-	reg register.Service,
+	accountQuery account_querier.Querier,
+	reg *register.Registrar,
 
 	wa *webauthn.WebAuthn,
 ) (*Provider, error) {
 	return &Provider{
 		auth_repo:    auth_repo,
-		account_repo: account_repo,
+		accountQuery: accountQuery,
 		reg:          reg,
 		wa:           wa,
 	}, nil
@@ -65,7 +66,7 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 }
 
 func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential) (*account.Account, error) {
-	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -107,7 +108,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 }
 
 func (p *Provider) add(ctx context.Context, accountID account.AccountID, credential *webauthn.Credential) (*account.Account, error) {
-	acc, err := p.account_repo.GetByID(ctx, accountID)
+	acc, err := p.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

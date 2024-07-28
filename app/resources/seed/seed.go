@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -51,7 +51,7 @@ func New(
 	database *sql.DB,
 	client *ent.Client,
 	settings settings.Repository,
-	account_repo account.Repository,
+	account_writer account_writer.Writer,
 	auth_repo authentication.Repository,
 	category_repo category.Repository,
 	thread_repo thread.Repository,
@@ -72,7 +72,7 @@ func New(
 
 	utils.Must[any](nil, settings.Init(context.Background()))
 
-	accounts(account_repo, auth_repo)
+	accounts(account_writer, auth_repo)
 	categories(category_repo)
 	threads(thread_repo, post_repo, react_repo, asset_repo)
 

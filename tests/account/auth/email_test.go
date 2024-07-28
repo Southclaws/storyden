@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -29,7 +30,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		accountQuery account_querier.Querier,
 		mail mailer.Sender,
 	) {
 		inbox := mail.(*mailer.Mock)

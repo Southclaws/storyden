@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -34,11 +33,9 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo account.Repository
-	asset_repo   asset.Repository
-	thread_repo  thread.Repository
-
-	os object.Storer
+	assets  asset.Repository
+	threads thread.Repository
+	objects object.Storer
 
 	address string
 }
@@ -47,21 +44,19 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
-	asset_repo asset.Repository,
-	thread_repo thread.Repository,
-
-	os object.Storer,
+	assets asset.Repository,
+	threads thread.Repository,
+	objects object.Storer,
 	cfg config.Config,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "asset")),
-		rbac:         rbac,
-		account_repo: account_repo,
-		asset_repo:   asset_repo,
-		thread_repo:  thread_repo,
-		os:           os,
-		address:      cfg.PublicWebAddress,
+		l:    l.With(zap.String("service", "asset")),
+		rbac: rbac,
+
+		assets:  assets,
+		threads: threads,
+		objects: objects,
+		address: cfg.PublicWebAddress,
 	}
 }
 
@@ -71,14 +66,14 @@ func (s *service) Upload(ctx context.Context, r io.Reader, size int64, name asse
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	a, err := s.asset_repo.Add(ctx, accountID, name, url)
+	a, err := s.assets.Add(ctx, accountID, name, url)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	path := buildPath(a.Name)
 
-	if err := s.os.Write(ctx, path, r, size); err != nil {
+	if err := s.objects.Write(ctx, path, r, size); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -86,7 +81,7 @@ func (s *service) Upload(ctx context.Context, r io.Reader, size int64, name asse
 }
 
 func (s *service) Get(ctx context.Context, id asset.Filename) (*asset.Asset, io.Reader, error) {
-	a, err := s.asset_repo.Get(ctx, id)
+	a, err := s.assets.Get(ctx, id)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -94,7 +89,7 @@ func (s *service) Get(ctx context.Context, id asset.Filename) (*asset.Asset, io.
 	path := buildPath(a.Name)
 	ctx = fctx.WithMeta(ctx, "path", path, "asset_id", id.String())
 
-	r, size, err := s.os.Read(ctx, path)
+	r, size, err := s.objects.Read(ctx, path)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -28,10 +28,10 @@ func TestNodesTreeQuerying(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctx, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
 			visibility := openapi.Published
 

@@ -1,4 +1,4 @@
-package library
+package node_mutate
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -32,7 +33,6 @@ type Manager interface {
 		p Partial,
 	) (*library.Node, error)
 
-	Get(ctx context.Context, slug library.NodeSlug) (*library.Node, error)
 	Update(ctx context.Context, slug library.NodeSlug, p Partial) (*library.Node, error)
 	Delete(ctx context.Context, slug library.NodeSlug, d DeleteOptions) (*library.Node, error)
 }
@@ -65,16 +65,16 @@ func (p Partial) Opts() (opts []library.Option) {
 }
 
 type service struct {
-	ar         account.Repository
-	nr         library.Repository
-	nc         node_children.Repository
-	hydrator   hydrator.Service
-	fs         fetcher.Service
-	indexQueue pubsub.Topic[mq.IndexNode]
+	accountQuery account_querier.Querier
+	nr           library.Repository
+	nc           node_children.Repository
+	hydrator     hydrator.Service
+	fs           fetcher.Service
+	indexQueue   pubsub.Topic[mq.IndexNode]
 }
 
 func New(
-	ar account.Repository,
+	accountQuery account_querier.Querier,
 	nr library.Repository,
 	nc node_children.Repository,
 	hydrator hydrator.Service,
@@ -82,12 +82,12 @@ func New(
 	indexQueue pubsub.Topic[mq.IndexNode],
 ) Manager {
 	return &service{
-		ar:         ar,
-		nr:         nr,
-		nc:         nc,
-		hydrator:   hydrator,
-		fs:         fs,
-		indexQueue: indexQueue,
+		accountQuery: accountQuery,
+		nr:           nr,
+		nc:           nc,
+		hydrator:     hydrator,
+		fs:           fs,
+		indexQueue:   indexQueue,
 	}
 }
 
@@ -98,7 +98,7 @@ func (s *service) Create(ctx context.Context,
 ) (*library.Node, error) {
 	if v, ok := p.Visibility.Get(); ok {
 		if v == visibility.VisibilityPublished {
-			acc, err := s.ar.GetByID(ctx, owner)
+			acc, err := s.accountQuery.GetByID(ctx, owner)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -136,15 +136,6 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return n, nil
-}
-
-func (s *service) Get(ctx context.Context, slug library.NodeSlug) (*library.Node, error) {
-	n, err := s.nr.Get(ctx, slug)
-	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -245,7 +236,7 @@ func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []libr
 
 func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, error) {
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
-		return s.ar.GetByID(ctx, aid)
+		return s.accountQuery.GetByID(ctx, aid)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -15,9 +15,10 @@ import (
 	"google.golang.org/api/option"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
@@ -35,7 +36,7 @@ const (
 
 type Provider struct {
 	auth_repo  authentication.Repository
-	register   register.Service
+	register   *register.Registrar
 	avatar_svc avatar.Service
 
 	ed       endec.EncrypterDecrypter
@@ -47,7 +48,7 @@ type Provider struct {
 func New(
 	cfg config.Config,
 	auth_repo authentication.Repository,
-	register register.Service,
+	register *register.Registrar,
 	avatar_svc avatar.Service,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
@@ -153,7 +154,7 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, provider authenticati
 	}
 
 	acc, err := p.register.Create(ctx, handle,
-		account.WithName(name))
+		account_writer.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}

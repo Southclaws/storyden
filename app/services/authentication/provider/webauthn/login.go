@@ -17,7 +17,7 @@ import (
 )
 
 func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.CredentialAssertion, *webauthn.SessionData, error) {
-	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -73,7 +73,7 @@ func (p *Provider) FinishLogin(ctx context.Context,
 	session webauthn.SessionData,
 	parsedResponse *protocol.ParsedCredentialAssertionData,
 ) (*webauthn.Credential, *account.Account, error) {
-	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}

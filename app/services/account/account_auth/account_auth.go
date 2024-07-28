@@ -1,4 +1,4 @@
-package account
+package account_auth
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/samber/lo"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
@@ -15,17 +15,20 @@ import (
 	authentication_service "github.com/Southclaws/storyden/app/services/authentication"
 )
 
-func (s *service) Get(ctx context.Context, id account.AccountID) (*account.Account, error) {
-	acc, err := s.account_repo.GetByID(ctx, id)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account by ID"))
-	}
+type Manager struct {
+	fx.In
 
-	return acc, nil
+	AuthService *authentication_service.Manager
+	AuthRepo    authentication_repo.Repository
 }
 
-func (s *service) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*AuthMethod, error) {
-	ps := s.auth_svc.Providers()
+type AuthMethod struct {
+	Instance authentication_repo.Authentication
+	Provider authentication_service.Provider
+}
+
+func (m *Manager) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*AuthMethod, error) {
+	ps := m.AuthService.Providers()
 
 	mapping := lo.FromEntries(dt.Map(ps, func(p authentication_service.Provider) lo.Entry[string, authentication_service.Provider] {
 		return lo.Entry[string, authentication_service.Provider]{
@@ -34,7 +37,7 @@ func (s *service) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*
 		}
 	}))
 
-	active, err := s.auth_repo.GetAuthMethods(ctx, id)
+	active, err := m.AuthRepo.GetAuthMethods(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -49,8 +52,8 @@ func (s *service) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*
 	}), nil
 }
 
-func (s *service) DeleteAuthMethod(ctx context.Context, id account.AccountID, aid authentication_repo.ID) error {
-	_, err := s.auth_repo.DeleteByID(ctx, id, aid)
+func (m *Manager) DeleteAuthMethod(ctx context.Context, id account.AccountID, aid authentication_repo.ID) error {
+	_, err := m.AuthRepo.DeleteByID(ctx, id, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

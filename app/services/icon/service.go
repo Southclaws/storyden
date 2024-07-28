@@ -21,7 +21,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -74,7 +74,7 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo account.Repository
+	accountQuery account_querier.Querier
 	am           asset_manager.Service
 	thread_repo  thread.Repository
 
@@ -87,7 +87,7 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
+	accountQuery account_querier.Querier,
 	am asset_manager.Service,
 	thread_repo thread.Repository,
 
@@ -97,7 +97,7 @@ func New(
 	return &service{
 		l:            l.With(zap.String("service", "icon")),
 		rbac:         rbac,
-		account_repo: account_repo,
+		accountQuery: accountQuery,
 		am:           am,
 		thread_repo:  thread_repo,
 		os:           os,
@@ -111,7 +111,7 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, accountID)
+	acc, err := s.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
@@ -25,22 +26,22 @@ func Build() fx.Option {
 type service struct {
 	l *zap.Logger
 
-	account_repo account.Repository
-	avatar_gen   avatar_gen.AvatarGenerator
+	accountQuery account_querier.Querier
+	generator    avatar_gen.AvatarGenerator
 	storage      object.Storer
 }
 
 func New(
 	l *zap.Logger,
 
-	account_repo account.Repository,
-	avatar_gen avatar_gen.AvatarGenerator,
+	accountQuery account_querier.Querier,
+	generator avatar_gen.AvatarGenerator,
 	storage object.Storer,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "avatar")),
-		account_repo: account_repo,
-		avatar_gen:   avatar_gen,
+		accountQuery: accountQuery,
+		generator:    generator,
 		storage:      storage,
 	}
 }

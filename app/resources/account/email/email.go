@@ -81,7 +81,7 @@ func (r *EmailRepo) LookupCode(ctx context.Context, emailAddress mail.Address, c
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.FromModel(result)
+	acc, err := account.MapAccount(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -118,7 +118,7 @@ func (r *EmailRepo) LookupAccount(ctx context.Context, emailAddress mail.Address
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.FromModel(result)
+	acc, err := account.MapAccount(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}

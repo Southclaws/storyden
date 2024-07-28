@@ -20,7 +20,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -31,15 +31,15 @@ const cookieName = "storyden-webauthn-session"
 var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
-	sm     *CookieJar
-	ar     account.Repository
-	wa     *waprovider.Provider
-	domain string
+	sm           *CookieJar
+	accountQuery account_querier.Querier
+	wa           *waprovider.Provider
+	domain       string
 }
 
 func NewWebAuthn(
 	cfg config.Config,
-	ar account.Repository,
+	accountQuery account_querier.Querier,
 	sm *CookieJar,
 	wa *waprovider.Provider,
 	router *echo.Echo,
@@ -65,7 +65,7 @@ func NewWebAuthn(
 		}
 	})
 
-	return WebAuthn{sm, ar, wa, cfg.CookieDomain}
+	return WebAuthn{sm, accountQuery, wa, cfg.CookieDomain}
 }
 
 func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) (openapi.WebAuthnRequestCredentialResponseObject, error) {

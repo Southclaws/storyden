@@ -15,10 +15,11 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
@@ -36,10 +37,10 @@ const (
 )
 
 type Provider struct {
-	auth     authentication.Repository
-	ar       account.Repository
-	er       email.EmailRepo
-	register register.Service
+	auth         authentication.Repository
+	accountQuery account_querier.Querier
+	er           email.EmailRepo
+	register     *register.Registrar
 
 	// TODO: Replace with an MQ message and sender job.
 	sender email_verify.Verifier
@@ -47,12 +48,12 @@ type Provider struct {
 
 func New(
 	auth authentication.Repository,
-	ar account.Repository,
+	accountQuery account_querier.Querier,
 	er email.EmailRepo,
-	register register.Service,
+	register *register.Registrar,
 	sender email_verify.Verifier,
 ) *Provider {
-	return &Provider{auth, ar, er, register, sender}
+	return &Provider{auth, accountQuery, er, register, sender}
 }
 
 func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
@@ -69,7 +70,7 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, password st
 
 	identifier := handle.Or(petname.Generate(2, "-"))
 
-	_, exists, err := b.ar.LookupByHandle(ctx, identifier)
+	_, exists, err := b.accountQuery.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}

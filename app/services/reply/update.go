@@ -22,7 +22,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, aid)
+	acc, err := s.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

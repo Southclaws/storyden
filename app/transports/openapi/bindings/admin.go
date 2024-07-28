@@ -8,9 +8,9 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/app/services/account_suspension"
+	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
@@ -18,13 +18,13 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Admin struct {
-	ar account.Repository
-	as account_suspension.Service
-	sr settings.Repository
+	accountQuery account_querier.Querier
+	as           account_suspension.Service
+	sr           settings.Repository
 }
 
-func NewAdmin(ar account.Repository, as account_suspension.Service, sr settings.Repository) Admin {
-	return Admin{ar, as, sr}
+func NewAdmin(accountQuery account_querier.Querier, as account_suspension.Service, sr settings.Repository) Admin {
+	return Admin{accountQuery, as, sr}
 }
 
 func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSettingsUpdateRequestObject) (openapi.AdminSettingsUpdateResponseObject, error) {
@@ -33,7 +33,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := a.ar.GetByID(ctx, accountID)
+	acc, err := a.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -57,7 +57,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 }
 
 func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.AdminAccountBanCreateRequestObject) (openapi.AdminAccountBanCreateResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -67,7 +67,7 @@ func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.Admin
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := i.ar.GetByID(ctx, accountID)
+	acc, err := i.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -87,7 +87,7 @@ func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.Admin
 }
 
 func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.AdminAccountBanRemoveRequestObject) (openapi.AdminAccountBanRemoveResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -97,7 +97,7 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := i.ar.GetByID(ctx, accountID)
+	acc, err := i.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

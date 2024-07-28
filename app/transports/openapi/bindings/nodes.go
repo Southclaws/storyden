@@ -12,39 +12,43 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	node_svc "github.com/Southclaws/storyden/app/services/node"
-	"github.com/Southclaws/storyden/app/services/node/node_visibility"
-	"github.com/Southclaws/storyden/app/services/nodetree"
+	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_visibility"
+	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 )
 
 type Nodes struct {
-	ar    account.Repository
-	ns    node_svc.Manager
-	nv    *node_visibility.Controller
-	ntree nodetree.Graph
-	ntr   node_traversal.Repository
+	accountQuery account_querier.Querier
+	nodeMutator  node_mutate.Manager
+	nodeRepo     library.Repository
+	nv           *node_visibility.Controller
+	ntree        nodetree.Graph
+	ntr          node_traversal.Repository
 }
 
 func NewNodes(
-	ar account.Repository,
-	cs node_svc.Manager,
+	accountQuery account_querier.Querier,
+	nodeMutator node_mutate.Manager,
+	nodeRepo library.Repository,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
 ) Nodes {
 	return Nodes{
-		ar:    ar,
-		ns:    cs,
-		nv:    nv,
-		ntree: ntree,
-		ntr:   ntr,
+		accountQuery: accountQuery,
+		nodeMutator:  nodeMutator,
+		nodeRepo:     nodeRepo,
+		nv:           nv,
+		ntree:        ntree,
+		ntr:          ntr,
 	}
 }
 
@@ -64,10 +68,10 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.ns.Create(ctx,
+	node, err := c.nodeMutator.Create(ctx,
 		session,
 		request.Body.Name,
-		node_svc.Partial{
+		node_mutate.Partial{
 			Slug:         opt.NewPtr(request.Body.Slug),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
@@ -101,7 +105,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}
 
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
-		return c.ar.GetByID(ctx, aid)
+		return c.accountQuery.GetByID(ctx, aid)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -174,7 +178,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.ns.Get(ctx, library.NodeSlug(request.NodeSlug))
+	node, err := c.nodeRepo.Get(ctx, library.NodeSlug(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -190,7 +194,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         opt.NewPtr(request.Body.Slug),
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
@@ -226,7 +230,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 }
 
 func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteRequestObject) (openapi.NodeDeleteResponseObject, error) {
-	destinationNode, err := c.ns.Delete(ctx, library.NodeSlug(request.NodeSlug), node_svc.DeleteOptions{
+	destinationNode, err := c.nodeMutator.Delete(ctx, library.NodeSlug(request.NodeSlug), node_mutate.DeleteOptions{
 		NewParent: opt.NewPtr((*library.NodeSlug)(request.Params.TargetNode)),
 	})
 	if err != nil {
@@ -245,7 +249,7 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
 		AssetsAdd: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
@@ -260,7 +264,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveAssetRequestObject) (openapi.NodeRemoveAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	node, err := c.ns.Update(ctx, library.NodeSlug(request.NodeSlug), node_svc.Partial{
+	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
 		AssetsRemove: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {

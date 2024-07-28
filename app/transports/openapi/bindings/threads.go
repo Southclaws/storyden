@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	account_resource "github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -25,15 +25,15 @@ import (
 type Threads struct {
 	thread_svc      thread_service.Service
 	thread_mark_svc thread_mark.Service
-	account_repo    account_resource.Repository
+	accountQuery    account_querier.Querier
 }
 
 func NewThreads(
 	thread_svc thread_service.Service,
 	thread_mark_svc thread_mark.Service,
-	account_repo account_resource.Repository,
+	accountQuery account_querier.Querier,
 ) Threads {
-	return Threads{thread_svc, thread_mark_svc, account_repo}
+	return Threads{thread_svc, thread_mark_svc, accountQuery}
 }
 
 func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreateRequestObject) (openapi.ThreadCreateResponseObject, error) {
@@ -144,7 +144,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 
 	query := opt.NewPtr(request.Params.Q)
 
-	author, err := openapi.OptionalID(ctx, i.account_repo, request.Params.Author)
+	author, err := openapi.OptionalID(ctx, i.accountQuery, request.Params.Author)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

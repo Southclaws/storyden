@@ -3,7 +3,6 @@ package resources
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
@@ -31,7 +30,6 @@ func Build() fx.Option {
 		rbac.Build(),
 		fx.Provide(
 			settings.New,
-			account.New,
 			asset.New,
 			authentication.New,
 			category.New,

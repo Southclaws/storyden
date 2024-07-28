@@ -32,7 +32,7 @@ func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*proto
 
 	t := temporary{handle: handle}
 
-	acc, exists, err := p.account_repo.LookupByHandle(ctx, handle)
+	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}

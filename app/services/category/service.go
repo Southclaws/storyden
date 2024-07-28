@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -41,7 +41,7 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo  account.Repository
+	accountQuery  account_querier.Querier
 	category_repo category.Repository
 }
 
@@ -49,13 +49,13 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
+	accountQuery account_querier.Querier,
 	category_repo category.Repository,
 ) Service {
 	return &service{
 		l:             l.With(zap.String("service", "collection")),
 		rbac:          rbac,
-		account_repo:  account_repo,
+		accountQuery:  accountQuery,
 		category_repo: category_repo,
 	}
 }
@@ -126,7 +126,7 @@ func (s *service) authorise(ctx context.Context) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, aid)
+	acc, err := s.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
