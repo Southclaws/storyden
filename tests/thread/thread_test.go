@@ -12,7 +12,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/dt"
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -28,14 +28,14 @@ func TestThreads(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 			a := assert.New(t)
 
-			ctx, acc := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctx2, acc2 := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
+			ctx, acc := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctx2, acc2 := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
 
 			cat1name := "Category " + uuid.NewString()
 

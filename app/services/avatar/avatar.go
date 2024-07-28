@@ -41,7 +41,7 @@ func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Read
 		go func() {
 			defer r.Close()
 
-			i, err := s.avatar_gen.Generate(ctx, accountID.String())
+			i, err := s.generator.Generate(ctx, accountID.String())
 			if err != nil {
 				r.CloseWithError(err)
 				return
@@ -51,8 +51,6 @@ func (s *service) Get(ctx context.Context, accountID account.AccountID) (io.Read
 				r.CloseWithError(err)
 				return
 			}
-
-			return
 		}()
 
 		return r, 0, nil

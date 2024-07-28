@@ -32,7 +32,7 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	acc, err := account.FromModel(accEdge)
+	acc, err := account.MapAccount(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

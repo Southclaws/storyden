@@ -11,23 +11,21 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
-	account_repo "github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
-	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
 type Profiles struct {
-	apiAddress string
-	as         account.Service
-	ar         account_repo.Repository
-	ps         profile_search.Repository
+	apiAddress   string
+	accountQuery account_querier.Querier
+	ps           profile_search.Repository
 }
 
-func NewProfiles(cfg config.Config, as account.Service, ar account_repo.Repository, ps profile_search.Repository) Profiles {
-	return Profiles{cfg.PublicWebAddress, as, ar, ps}
+func NewProfiles(cfg config.Config, accountQuery account_querier.Querier, ps profile_search.Repository) Profiles {
+	return Profiles{cfg.PublicWebAddress, accountQuery, ps}
 }
 
 func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListRequestObject) (openapi.ProfileListResponseObject, error) {
@@ -75,12 +73,12 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 }
 
 func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, p.ar, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := p.as.Get(ctx, id)
+	acc, err := p.accountQuery.GetByID(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

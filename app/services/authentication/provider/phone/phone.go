@@ -11,8 +11,9 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -33,13 +34,13 @@ const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
 	auth     authentication.Repository
-	account  account.Repository
-	register register.Service
+	account  account_querier.Querier
+	register *register.Registrar
 
 	sms sms.Sender
 }
 
-func New(auth authentication.Repository, account account.Repository, register register.Service, sms sms.Sender) *Provider {
+func New(auth authentication.Repository, account account_querier.Querier, register *register.Registrar, sms sms.Sender) *Provider {
 	return &Provider{auth, account, register, sms}
 }
 

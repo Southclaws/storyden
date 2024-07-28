@@ -1,74 +1,19 @@
 package account
 
 import (
+	"net/mail"
 	"net/url"
-	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
-var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
-
-type AccountID xid.ID
-
-func (u AccountID) String() string { return xid.ID(u).String() }
-
-type Account struct {
-	ID             AccountID
-	Handle         string
-	Name           string
-	Bio            content.Rich
-	Admin          bool
-	Auths          []string
-	EmailAddresses []*EmailAddress
-	VerifiedStatus VerifiedStatus
-	ExternalLinks  []ExternalLink
-	Metadata       map[string]any
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt opt.Optional[time.Time]
-}
-
-type ExternalLink struct {
-	Text string
-	URL  url.URL
-}
-
-func (a *Account) IsSuspended() bool {
-	return a.DeletedAt.Ok()
-}
-
-func (a *Account) RejectSuspended() error {
-	if a.IsSuspended() {
-		return fault.Wrap(errSuspended, ftag.With(ftag.PermissionDenied))
-	}
-
-	return nil
-}
-
-// Name is the role/resource name.
-const Name = "Account"
-
-func (a *Account) GetRole() string {
-	if a.Admin {
-		return "everyone"
-	}
-
-	return "owner"
-}
-
-func (*Account) GetResourceName() string { return Name }
-
-func FromModel(a *ent.Account) (*Account, error) {
+func MapAccount(a *ent.Account) (*Account, error) {
 	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
 		return a.Service
 	})
@@ -118,4 +63,16 @@ func MapExternalLink(e schema.ExternalLink) (ExternalLink, error) {
 		Text: e.Text,
 		URL:  *u,
 	}, nil
+}
+
+func MapEmail(in *ent.Email) *EmailAddress {
+	addr, _ := mail.ParseAddress(in.EmailAddress)
+	// NOTE: Ent already validates this
+	// TODO: use mail.Address instead of string in ent schema
+
+	return &EmailAddress{
+		Email:    *addr,
+		Verified: in.Verified,
+		IsAuth:   in.AuthenticationRecordID != nil,
+	}
 }

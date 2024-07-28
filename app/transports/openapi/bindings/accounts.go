@@ -12,7 +12,9 @@ import (
 	"github.com/rs/xid"
 
 	account_repo "github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/services/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/services/account/account_auth"
+	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/avatar"
@@ -20,14 +22,27 @@ import (
 )
 
 type Accounts struct {
-	as account.Service
-	av avatar.Service
-	am *authentication.Manager
-	ar account_repo.Repository
+	avatarService avatar.Service
+	authManager   *authentication.Manager
+	accountQuery  account_querier.Querier
+	accountUpdate account_update.Updater
+	accountAuth   account_auth.Manager
 }
 
-func NewAccounts(as account.Service, av avatar.Service, am *authentication.Manager, ar account_repo.Repository) Accounts {
-	return Accounts{as, av, am, ar}
+func NewAccounts(
+	avatarService avatar.Service,
+	authManager *authentication.Manager,
+	accountQuery account_querier.Querier,
+	accountUpdate account_update.Updater,
+	accountAuth account_auth.Manager,
+) Accounts {
+	return Accounts{
+		avatarService,
+		authManager,
+		accountQuery,
+		accountUpdate,
+		accountAuth,
+	}
 }
 
 func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
@@ -36,7 +51,7 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := i.as.Get(ctx, accountID)
+	acc, err := i.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -57,7 +72,7 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := i.as.Update(ctx, accountID, account.Partial{
+	acc, err := i.accountUpdate.Update(ctx, accountID, account_update.Partial{
 		Handle:    opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
 		Name:      opt.NewPtr(request.Body.Name),
 		Bio:       opt.NewPtr(request.Body.Bio),
@@ -96,12 +111,12 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	authmethods, err := i.as.GetAuthMethods(ctx, accountID)
+	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.am.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -130,17 +145,17 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	err = i.as.DeleteAuthMethod(ctx, accountID, id)
+	err = i.accountAuth.DeleteAuthMethod(ctx, accountID, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	authmethods, err := i.as.GetAuthMethods(ctx, accountID)
+	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.am.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -159,12 +174,12 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 }
 
 func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.AccountGetAvatarRequestObject) (openapi.AccountGetAvatarResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.ar, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, size, err := i.av.Get(ctx, id)
+	r, size, err := i.avatarService.Get(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -183,14 +198,14 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := i.av.Set(ctx, accountID, request.Body, int64(request.Params.ContentLength)); err != nil {
+	if err := i.avatarService.Set(ctx, accountID, request.Body, int64(request.Params.ContentLength)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AccountSetAvatar200Response{}, nil
 }
 
-func serialiseAuthMethod(in *account.AuthMethod) (openapi.AccountAuthMethod, error) {
+func serialiseAuthMethod(in *account_auth.AuthMethod) (openapi.AccountAuthMethod, error) {
 	p, err := serialiseAuthProvider(in.Provider)
 	if err != nil {
 		return openapi.AccountAuthMethod{}, fault.Wrap(err)

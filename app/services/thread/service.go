@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -81,7 +82,7 @@ type service struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	account_repo account.Repository
+	accountQuery account_querier.Querier
 	thread_repo  thread.Repository
 	hydrator     hydrator.Service
 	recommender  semdex.Recommender
@@ -92,7 +93,7 @@ func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
-	account_repo account.Repository,
+	accountQuery account_querier.Querier,
 	thread_repo thread.Repository,
 	hydrator hydrator.Service,
 	recommender semdex.Recommender,
@@ -101,7 +102,7 @@ func New(
 	return &service{
 		l:            l.With(zap.String("service", "thread")),
 		rbac:         rbac,
-		account_repo: account_repo,
+		accountQuery: accountQuery,
 		thread_repo:  thread_repo,
 		hydrator:     hydrator,
 		recommender:  recommender,

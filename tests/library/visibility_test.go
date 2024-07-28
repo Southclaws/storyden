@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -28,14 +28,14 @@ func TestNodesVisibility(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			a := assert.New(t)
 
-			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, accAuthor := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
+			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctxAuthor, accAuthor := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
 			t.Run("public_only", func(t *testing.T) {
 				t.Parallel()

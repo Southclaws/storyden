@@ -29,12 +29,11 @@ var (
 type Verifier struct {
 	fx.In
 
-	AccountRepo account.Repository
-	AuthRepo    authentication.Repository
-	EmailRepo   email.EmailRepo
-	Sender      mailer.Sender
-	Template    *mailtemplate.Builder
-	Settings    settings.Repository
+	AuthRepo  authentication.Repository
+	EmailRepo email.EmailRepo
+	Sender    mailer.Sender
+	Template  *mailtemplate.Builder
+	Settings  settings.Repository
 }
 
 // BeginEmailVerification adds an email record for the specified account, sets

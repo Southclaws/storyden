@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/oapi-codegen/echo-middleware"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
@@ -25,15 +25,15 @@ import (
 )
 
 type Authentication struct {
-	p      *password.Provider
-	ep     *email_only.Provider
-	epp    *email_password.Provider
-	sm     *CookieJar
-	ar     account.Repository
-	er     email.EmailRepo
-	am     *authentication.Manager
-	ev     email_verify.Verifier
-	domain string
+	p            *password.Provider
+	ep           *email_only.Provider
+	epp          *email_password.Provider
+	sm           *CookieJar
+	accountQuery account_querier.Querier
+	er           email.EmailRepo
+	am           *authentication.Manager
+	ev           email_verify.Verifier
+	domain       string
 }
 
 func NewAuthentication(
@@ -41,13 +41,13 @@ func NewAuthentication(
 	p *password.Provider,
 	ep *email_only.Provider,
 	epp *email_password.Provider,
-	ar account.Repository,
+	accountQuery account_querier.Querier,
 	er email.EmailRepo,
 	sm *CookieJar,
 	am *authentication.Manager,
 	ev email_verify.Verifier,
 ) Authentication {
-	return Authentication{p, ep, epp, sm, ar, er, am, ev, cfg.CookieDomain}
+	return Authentication{p, ep, epp, sm, accountQuery, er, am, ev, cfg.CookieDomain}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
@@ -95,7 +95,7 @@ func (i *Authentication) validator(ctx context.Context, ai *openapi3filter.Authe
 
 	// Then look up the account.
 	// TODO: Cache this.
-	a, err := i.ar.GetByID(ctx, aid)
+	a, err := i.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

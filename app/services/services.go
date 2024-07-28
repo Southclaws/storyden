@@ -3,8 +3,8 @@ package services
 import (
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/services/account"
-	"github.com/Southclaws/storyden/app/services/account_suspension"
+	"github.com/Southclaws/storyden/app/services/account/account_suspension"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
@@ -14,10 +14,10 @@ import (
 	"github.com/Southclaws/storyden/app/services/hydrator"
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
+	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_visibility"
+	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/link_getter"
-	node "github.com/Southclaws/storyden/app/services/node"
-	node_visibility "github.com/Southclaws/storyden/app/services/node/node_visibility"
-	nodetree "github.com/Southclaws/storyden/app/services/nodetree"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -32,9 +32,9 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
+		fx.Provide(register.New),
 		icon.Build(),
 		onboarding.Build(),
-		account.Build(),
 		account_suspension.Build(),
 		authentication.Build(),
 		category.Build(),
@@ -53,7 +53,7 @@ func Build() fx.Option {
 		index_job.Build(),
 		summarise_job.Build(),
 		fx.Provide(avatar_gen.New),
-		fx.Provide(node.New, nodetree.New, node_visibility.New),
+		fx.Provide(node_mutate.New, nodetree.New, node_visibility.New),
 		fx.Provide(link_getter.New),
 	)
 }

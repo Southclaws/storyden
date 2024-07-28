@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -17,20 +17,20 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Controller struct {
-	ar account.Repository
-	nr library.Repository
-	nc node_children.Repository
+	accountQuery account_querier.Querier
+	nr           library.Repository
+	nc           node_children.Repository
 }
 
 func New(
-	ar account.Repository,
+	accountQuery account_querier.Querier,
 	nr library.Repository,
 	nc node_children.Repository,
 ) *Controller {
 	return &Controller{
-		ar: ar,
-		nr: nr,
-		nc: nc,
+		accountQuery: accountQuery,
+		nr:           nr,
+		nc:           nc,
 	}
 }
 
@@ -40,7 +40,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug library.NodeSlug
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := m.ar.GetByID(ctx, accountID)
+	acc, err := m.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

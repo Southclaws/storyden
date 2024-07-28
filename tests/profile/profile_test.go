@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -29,7 +30,7 @@ func TestPublicProfiles(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		ar account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -89,7 +90,7 @@ func TestUpdateProfile(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		accountQuery account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			handle1 := "user-" + xid.New().String()
@@ -173,7 +174,7 @@ func TestUpdateProfile(t *testing.T) {
 	}))
 }
 
-func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithResponses, ar account.Repository, handle string) account.Account {
+func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithResponses, ar account_querier.Querier, handle string) account.Account {
 	r := require.New(t)
 
 	hand1 := handle + "-" + xid.New().String()

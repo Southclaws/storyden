@@ -7,6 +7,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 )
 
@@ -44,7 +45,7 @@ var (
 	}
 )
 
-func accounts(r account.Repository, auth authentication.Repository) {
+func accounts(r account_writer.Writer, auth authentication.Repository) {
 	ctx := context.Background()
 
 	for _, v := range Accounts {
@@ -62,12 +63,12 @@ func accounts(r account.Repository, auth authentication.Repository) {
 	fmt.Println("created seed users")
 }
 
-func SeedAccount(ctx context.Context, r account.Repository, auth authentication.Repository, v account.Account) {
+func SeedAccount(ctx context.Context, r account_writer.Writer, auth authentication.Repository, v account.Account) {
 	acc, err := r.Create(ctx, v.Handle,
-		account.WithID(v.ID),
-		account.WithName(v.Name),
-		account.WithBio(v.Bio),
-		account.WithAdmin(v.Admin),
+		account_writer.WithID(v.ID),
+		account_writer.WithName(v.Name),
+		account_writer.WithBio(v.Bio),
+		account_writer.WithAdmin(v.Admin),
 	)
 	if err != nil {
 		panic(err)
@@ -81,11 +82,11 @@ func SeedAccount(ctx context.Context, r account.Repository, auth authentication.
 	}
 }
 
-func SeedAccountUnique(ctx context.Context, r account.Repository, auth authentication.Repository, opts ...account.Option) {
+func SeedAccountUnique(ctx context.Context, r account_writer.Writer, auth authentication.Repository, opts ...account_writer.Option) {
 	id := account.AccountID(xid.New())
 	handle := fmt.Sprintf("acc%s", id.String())
 
-	opts = append(opts, account.WithID(id), account.WithName(handle))
+	opts = append(opts, account_writer.WithID(id), account_writer.WithName(handle))
 
 	acc, err := r.Create(ctx, handle, opts...)
 	if err != nil {

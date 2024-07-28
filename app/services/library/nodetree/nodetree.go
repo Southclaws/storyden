@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -31,12 +31,12 @@ type Graph interface {
 }
 
 type service struct {
-	nr library.Repository
-	ar account.Repository
+	nr           library.Repository
+	accountQuery account_querier.Querier
 }
 
-func New(nr library.Repository, ar account.Repository) Graph {
-	return &service{nr: nr, ar: ar}
+func New(nr library.Repository, accountQuery account_querier.Querier) Graph {
+	return &service{nr: nr, accountQuery: accountQuery}
 }
 
 func (s *service) Move(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error) {
@@ -49,7 +49,7 @@ func (s *service) Move(ctx context.Context, child library.NodeSlug, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.ar.GetByID(ctx, accountID)
+	acc, err := s.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

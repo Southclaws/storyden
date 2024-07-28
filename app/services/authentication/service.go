@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
 )
 
 type Manager struct {
@@ -45,7 +44,7 @@ func Build() fx.Option {
 			phone.New,
 		),
 
-		fx.Provide(New, register.New),
+		fx.Provide(New),
 	)
 }
 

@@ -14,9 +14,10 @@ import (
 	"golang.org/x/oauth2/linkedin"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
-	"github.com/Southclaws/storyden/app/services/authentication/register"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -33,14 +34,14 @@ const (
 
 type LinkedInProvider struct {
 	auth_repo  authentication.Repository
-	register   register.Service
+	register   *register.Registrar
 	avatar_svc avatar.Service
 
 	callback string
 	config   all.Configuration
 }
 
-func New(cfg config.Config, auth_repo authentication.Repository, register register.Service, avatar_svc avatar.Service) (*LinkedInProvider, error) {
+func New(cfg config.Config, auth_repo authentication.Repository, register *register.Registrar, avatar_svc avatar.Service) (*LinkedInProvider, error) {
 	config, err := all.LoadProvider(id)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -185,7 +186,7 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 	}
 
 	acc, err := p.register.Create(ctx, handle,
-		account.WithName(name))
+		account_writer.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}

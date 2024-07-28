@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -20,9 +21,9 @@ import (
 type indexerConsumer struct {
 	l *zap.Logger
 
-	replyRepo   reply.Repository
-	nodeRepo    library.Repository
-	accountRepo account.Repository
+	replyRepo    reply.Repository
+	nodeRepo     library.Repository
+	accountQuery account_querier.Querier
 
 	qnode    pubsub.Topic[mq.IndexNode]
 	qnodesum pubsub.Topic[mq.SummariseNode]
@@ -37,7 +38,7 @@ func newIndexConsumer(
 
 	replyRepo reply.Repository,
 	nodeRepo library.Repository,
-	accountRepo account.Repository,
+	accountQuery account_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qnodesum pubsub.Topic[mq.SummariseNode],
@@ -48,15 +49,15 @@ func newIndexConsumer(
 	retriever semdex.Retriever,
 ) *indexerConsumer {
 	return &indexerConsumer{
-		l:           l,
-		replyRepo:   replyRepo,
-		nodeRepo:    nodeRepo,
-		accountRepo: accountRepo,
-		qnode:       qnode,
-		qnodesum:    qnodesum,
-		qpost:       qpost,
-		indexer:     indexer,
-		retriever:   retriever,
+		l:            l,
+		replyRepo:    replyRepo,
+		nodeRepo:     nodeRepo,
+		accountQuery: accountQuery,
+		qnode:        qnode,
+		qnodesum:     qnodesum,
+		qpost:        qpost,
+		indexer:      indexer,
+		retriever:    retriever,
 	}
 }
 
@@ -89,7 +90,7 @@ func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) erro
 }
 
 func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {
-	p, err := i.accountRepo.GetByID(ctx, id)
+	p, err := i.accountQuery.GetByID(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

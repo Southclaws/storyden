@@ -9,12 +9,13 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 type SessionProvider struct {
 	fx.In
-	Repo account.Repository
+	Repo account_querier.Querier
 }
 
 func (s *SessionProvider) Account(ctx context.Context) (*account.Account, error) {

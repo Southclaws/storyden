@@ -7,19 +7,24 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
 )
 
-func WithAccount(ctx context.Context, ar account.Repository, template account.Account, opts ...account.Option) (context.Context, *account.Account) {
+func WithAccount(ctx context.Context, aw account_writer.Writer, template account.Account, opts ...account_writer.Option) (context.Context, *account.Account) {
 	unique := xid.New()
 	template.ID = account.AccountID(unique)
 	template.Handle = template.Handle + "-" + unique.String()
 
-	opts = append(opts, account.WithID(template.ID), account.WithName(template.Name), account.WithAdmin(template.Admin))
+	opts = append(opts,
+		account_writer.WithID(template.ID),
+		account_writer.WithName(template.Name),
+		account_writer.WithAdmin(template.Admin),
+	)
 
-	acc, err := ar.Create(ctx, template.Handle, opts...)
+	acc, err := aw.Create(ctx, template.Handle, opts...)
 	if err != nil {
 		panic(err)
 	}
@@ -39,3 +44,4 @@ func WithSession(ctx context.Context, cj *bindings.CookieJar) openapi.RequestEdi
 		return nil
 	}
 }
+ 

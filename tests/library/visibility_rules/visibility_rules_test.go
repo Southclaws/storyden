@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
@@ -28,12 +28,12 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
+			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
 			draft := openapi.Draft
 			unlisted := openapi.Unlisted
@@ -97,12 +97,12 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
+			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
 			draft := openapi.Draft
 			unlisted := openapi.Unlisted
@@ -166,12 +166,12 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
+			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
 			draft := openapi.Draft
 			unlisted := openapi.Unlisted
@@ -235,12 +235,12 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *bindings.CookieJar,
-		ar account.Repository,
+		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctxAdmin, _ := e2e.WithAccount(ctx, ar, seed.Account_001_Odin)
-			ctxAuthor, _ := e2e.WithAccount(ctx, ar, seed.Account_003_Baldur)
-			ctxRando, _ := e2e.WithAccount(ctx, ar, seed.Account_004_Loki)
+			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
+			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
 			draft := openapi.Draft
 			unlisted := openapi.Unlisted

@@ -19,7 +19,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.account_repo.GetByID(ctx, aid)
+	acc, err := s.accountQuery.GetByID(ctx, aid)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
