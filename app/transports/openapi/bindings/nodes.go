@@ -249,8 +249,14 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
+	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
-		AssetsAdd: opt.New([]asset.AssetID{id}),
+		AssetsAdd:   opt.New([]asset.AssetID{id}),
+		ContentFill: contentFillCmd,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

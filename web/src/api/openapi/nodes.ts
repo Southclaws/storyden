@@ -14,6 +14,7 @@ import { fetcher } from "../client";
 
 import type {
   InternalServerErrorResponse,
+  NodeAddAssetParams,
   NodeAddChildOKResponse,
   NodeCreateBody,
   NodeCreateOKResponse,
@@ -378,19 +379,25 @@ export const useNodeUpdateVisibility = <
 /**
  * Add an asset to a node.
  */
-export const nodeAddAsset = (nodeSlug: string, assetId: string) => {
+export const nodeAddAsset = (
+  nodeSlug: string,
+  assetId: string,
+  params?: NodeAddAssetParams,
+) => {
   return fetcher<NodeUpdateOKResponse>({
     url: `/v1/nodes/${nodeSlug}/assets/${assetId}`,
     method: "PUT",
+    params,
   });
 };
 
 export const getNodeAddAssetMutationFetcher = (
   nodeSlug: string,
   assetId: string,
+  params?: NodeAddAssetParams,
 ) => {
   return (_: string, __: { arg: Arguments }): Promise<NodeUpdateOKResponse> => {
-    return nodeAddAsset(nodeSlug, assetId);
+    return nodeAddAsset(nodeSlug, assetId, params);
   };
 };
 export const getNodeAddAssetMutationKey = (nodeSlug: string, assetId: string) =>
@@ -412,6 +419,7 @@ export const useNodeAddAsset = <
 >(
   nodeSlug: string,
   assetId: string,
+  params?: NodeAddAssetParams,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof nodeAddAsset>>,
@@ -426,7 +434,7 @@ export const useNodeAddAsset = <
 
   const swrKey =
     swrOptions?.swrKey ?? getNodeAddAssetMutationKey(nodeSlug, assetId);
-  const swrFn = getNodeAddAssetMutationFetcher(nodeSlug, assetId);
+  const swrFn = getNodeAddAssetMutationFetcher(nodeSlug, assetId, params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

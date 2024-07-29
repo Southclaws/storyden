@@ -3,6 +3,7 @@ package node_mutate
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -48,6 +49,7 @@ type Partial struct {
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
 	AssetSources opt.Optional[[]string]
+	ContentFill  opt.Optional[asset.ContentFillCommand]
 }
 
 type DeleteOptions struct {
@@ -65,12 +67,13 @@ func (p Partial) Opts() (opts []library.Option) {
 }
 
 type service struct {
-	accountQuery account_querier.Querier
-	nr           library.Repository
-	nc           node_children.Repository
-	hydrator     hydrator.Service
-	fs           fetcher.Service
-	indexQueue   pubsub.Topic[mq.IndexNode]
+	accountQuery      account_querier.Querier
+	nr                library.Repository
+	nc                node_children.Repository
+	hydrator          hydrator.Service
+	fs                fetcher.Service
+	indexQueue        pubsub.Topic[mq.IndexNode]
+	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset]
 }
 
 func New(
@@ -80,14 +83,16 @@ func New(
 	hydrator hydrator.Service,
 	fs fetcher.Service,
 	indexQueue pubsub.Topic[mq.IndexNode],
+	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
 ) Manager {
 	return &service{
-		accountQuery: accountQuery,
-		nr:           nr,
-		nc:           nc,
-		hydrator:     hydrator,
-		fs:           fs,
-		indexQueue:   indexQueue,
+		accountQuery:      accountQuery,
+		nr:                nr,
+		nc:                nc,
+		hydrator:          hydrator,
+		fs:                fs,
+		indexQueue:        indexQueue,
+		assetAnalyseQueue: assetAnalyseQueue,
 	}
 }
 
@@ -172,6 +177,21 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 			}
 
 			opts = append(opts, library.WithAssets([]asset.AssetID{a.ID}))
+		}
+	}
+
+	assetsAdd, assetsAddSet := p.AssetsAdd.Get()
+	if assetsAddSet && p.ContentFill.Ok() {
+
+		messages := dt.Map(assetsAdd, func(a asset.AssetID) mq.AnalyseAsset {
+			return mq.AnalyseAsset{
+				AssetID:         a,
+				ContentFillRule: p.ContentFill,
+			}
+		})
+
+		if err := s.assetAnalyseQueue.Publish(ctx, messages...); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 	}
 

@@ -16,6 +16,7 @@ import type {
   AssetGetOKResponse,
   AssetUploadBody,
   AssetUploadOKResponse,
+  AssetUploadParams,
   InternalServerErrorResponse,
   NotFoundResponse,
   UnauthorisedResponse,
@@ -24,21 +25,25 @@ import type {
 /**
  * Upload and process a media file.
  */
-export const assetUpload = (assetUploadBody: AssetUploadBody) => {
+export const assetUpload = (
+  assetUploadBody: AssetUploadBody,
+  params?: AssetUploadParams,
+) => {
   return fetcher<AssetUploadOKResponse>({
     url: `/v1/assets`,
     method: "POST",
     headers: { "Content-Type": "application/octet-stream" },
     data: assetUploadBody,
+    params,
   });
 };
 
-export const getAssetUploadMutationFetcher = () => {
+export const getAssetUploadMutationFetcher = (params?: AssetUploadParams) => {
   return (
     _: string,
     { arg }: { arg: AssetUploadBody },
   ): Promise<AssetUploadOKResponse> => {
-    return assetUpload(arg);
+    return assetUpload(arg, params);
   };
 };
 export const getAssetUploadMutationKey = () => `/v1/assets` as const;
@@ -52,19 +57,22 @@ export type AssetUploadMutationError =
 
 export const useAssetUpload = <
   TError = UnauthorisedResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof assetUpload>>,
-    TError,
-    string,
-    AssetUploadBody,
-    Awaited<ReturnType<typeof assetUpload>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: AssetUploadParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof assetUpload>>,
+      TError,
+      string,
+      AssetUploadBody,
+      Awaited<ReturnType<typeof assetUpload>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getAssetUploadMutationKey();
-  const swrFn = getAssetUploadMutationFetcher();
+  const swrFn = getAssetUploadMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
