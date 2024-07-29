@@ -2,6 +2,9 @@ package pubsub
 
 import (
 	"context"
+
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 )
 
 type Message[T any] struct {
@@ -9,6 +12,7 @@ type Message[T any] struct {
 	Payload T
 	Ack     func() bool
 	Nack    func() bool
+	ActorID opt.Optional[xid.ID]
 }
 
 type Topic[T any] interface {

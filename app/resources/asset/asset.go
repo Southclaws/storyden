@@ -21,6 +21,7 @@ type Repository interface {
 	) (*Asset, error)
 
 	Get(ctx context.Context, id Filename) (*Asset, error)
+	GetByID(ctx context.Context, id AssetID) (*Asset, error)
 
 	Remove(ctx context.Context, owner account.AccountID, id Filename) error
 }
