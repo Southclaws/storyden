@@ -19,8 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/services/hydrator"
-	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/link/hydrator"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -69,7 +69,7 @@ type service struct {
 	nr           library.Repository
 	nc           node_children.Repository
 	hydrator     hydrator.Service
-	fs           fetcher.Service
+	fs           *fetcher.Fetcher
 	indexQueue   pubsub.Topic[mq.IndexNode]
 }
 
@@ -78,7 +78,7 @@ func New(
 	nr library.Repository,
 	nc node_children.Repository,
 	hydrator hydrator.Service,
-	fs fetcher.Service,
+	fs *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexNode],
 ) Manager {
 	return &service{
@@ -119,7 +119,7 @@ func (s *service) Create(ctx context.Context,
 
 	if v, ok := p.AssetSources.Get(); ok {
 		for _, source := range v {
-			a, err := s.fs.Copy(ctx, source)
+			a, err := s.fs.CopyAsset(ctx, source)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -164,9 +164,10 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// TODO: Queue this for background processing
 	if v, ok := p.AssetSources.Get(); ok {
 		for _, source := range v {
-			a, err := s.fs.Copy(ctx, source)
+			a, err := s.fs.CopyAsset(ctx, source)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
