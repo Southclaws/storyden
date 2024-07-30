@@ -1,4 +1,4 @@
-package url
+package scrape
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/content"
 )
@@ -23,10 +22,6 @@ type WebContent struct {
 	Text        string
 	Image       string
 	Content     content.Rich
-}
-
-func Build() fx.Option {
-	return fx.Provide(New)
 }
 
 type webScraper struct{}

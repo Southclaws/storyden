@@ -1,6 +1,8 @@
 package mq
 
 import (
+	"net/url"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -20,4 +22,8 @@ type IndexProfile struct {
 
 type SummariseNode struct {
 	ID library.NodeID
+}
+
+type ScrapeLink struct {
+	URL url.URL
 }

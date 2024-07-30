@@ -19,7 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/hydrator"
+	"github.com/Southclaws/storyden/app/services/link/hydrator"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )

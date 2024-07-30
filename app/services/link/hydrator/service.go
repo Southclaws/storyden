@@ -2,10 +2,10 @@ package hydrator
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 type Service interface {
@@ -22,22 +22,18 @@ type Service interface {
 	HydrateNode(ctx context.Context, structured content.Rich, url opt.Optional[string]) []library.Option
 }
 
-func Build() fx.Option {
-	return fx.Provide(New)
-}
-
 type service struct {
 	l  *zap.Logger
 	tr thread.Repository
 	nr library.Repository
-	f  fetcher.Service
+	f  fetcher.Fetcher
 }
 
 func New(
 	l *zap.Logger,
 	tr thread.Repository,
 	nr library.Repository,
-	f fetcher.Service,
+	f fetcher.Fetcher,
 ) Service {
 	return &service{
 		l:  l.With(zap.String("service", "hydrator")),
@@ -74,18 +70,26 @@ func (s *service) HydrateNode(ctx context.Context, structured content.Rich, url 
 	}
 }
 
-// hydrate takes the body and primary URL of a piece of content and fetches all
-// the links and produces a short summary of the post's body text.
-func (s *service) hydrate(ctx context.Context, structured content.Rich, urls opt.Optional[string]) ([]xid.ID, []asset.AssetID) {
+func (s *service) hydrate(ctx context.Context, structured content.Rich, optionalURL opt.Optional[string]) ([]xid.ID, []asset.AssetID) {
+	urls := []string{}
+
+	if u, ok := optionalURL.Get(); ok {
+		urls = append(urls, u)
+	}
+
 	urls = append(urls, structured.Links()...)
 
 	links := []xid.ID{}
 	assets := []asset.AssetID{}
 
 	for _, l := range urls {
-		// TODO: async
+		parsed, err := url.Parse(l)
+		if err != nil {
+			// TODO: Handle this in queue consumer later
+			continue
+		}
 
-		ln, err := s.f.Fetch(ctx, l)
+		ln, err := s.f.Fetch(ctx, *parsed)
 		if err != nil {
 			continue
 		}
