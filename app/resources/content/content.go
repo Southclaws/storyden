@@ -70,6 +70,10 @@ func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
 	textonly := strings.Builder{}
 	links := []string{}
 
+	if htmlTree.DataAtom == atom.Body {
+		bodyTree = htmlTree
+	}
+
 	var walk func(n *html.Node)
 	walk = func(n *html.Node) {
 		if n.Parent != nil {

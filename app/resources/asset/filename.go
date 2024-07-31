@@ -2,6 +2,7 @@ package asset
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -10,6 +11,8 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 )
+
+const AssetsSubdirectory = "assets"
 
 type Filename struct {
 	id    opt.Optional[xid.ID]
@@ -69,4 +72,8 @@ func formatFilename(id xid.ID, name string) string {
 		return id.String()
 	}
 	return fmt.Sprintf("%s-%s", id.String(), name)
+}
+
+func BuildAssetPath(name Filename) string {
+	return path.Join(AssetsSubdirectory, name.String())
 }

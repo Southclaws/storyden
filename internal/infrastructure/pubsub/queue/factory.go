@@ -8,12 +8,18 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
+
+const actorIDMetadataKey = "actor_id"
 
 type QueueFactory struct {
 	log *zap.Logger
@@ -73,11 +79,18 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 					continue
 				}
 
+				actorID, err := getActorID(msg)
+				if err != nil {
+					q.log.Error("failed to get actor ID from message metadata",
+						zap.Error(err))
+				}
+
 				recv <- &pubsub.Message[T]{
 					ID:      msg.UUID,
 					Payload: payload,
 					Ack:     msg.Ack,
 					Nack:    msg.Nack,
+					ActorID: actorID,
 				}
 			}
 		}
@@ -87,13 +100,20 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 }
 
 func (q *watermillQueue[T]) Publish(ctx context.Context, payloads ...T) error {
+	// If the publish was acted by a session account, store in the payload.
+	actorID := session.GetOptAccountID(ctx)
+
 	messages, err := dt.MapErr(payloads, func(p T) (*message.Message, error) {
 		payload, err := json.Marshal(p)
 		if err != nil {
 			return nil, err
 		}
 
-		return message.NewMessage(watermill.NewUUID(), payload), nil
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+
+		msg.Metadata.Set(actorIDMetadataKey, actorID.String())
+
+		return msg, nil
 	})
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -112,4 +132,18 @@ func typename[T any]() string {
 	var zero [0]T
 	to := reflect.TypeOf(zero).Elem()
 	return to.String()
+}
+
+func getActorID(msg *message.Message) (opt.Optional[xid.ID], error) {
+	raw := msg.Metadata.Get(actorIDMetadataKey)
+	if raw == "" {
+		return opt.NewEmpty[xid.ID](), nil
+	}
+
+	actorID, err := xid.FromString(raw)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("malformed actor ID in message metadata"))
+	}
+
+	return opt.New[xid.ID](actorID), nil
 }
