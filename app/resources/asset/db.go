@@ -54,6 +54,20 @@ func (d *database) Get(ctx context.Context, id Filename) (*Asset, error) {
 	return FromModel(asset), nil
 }
 
+func (d *database) GetByID(ctx context.Context, id AssetID) (*Asset, error) {
+	asset, err := d.db.Asset.Query().Where(
+		asset.ID(id),
+	).First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return FromModel(asset), nil
+}
+
 func (d *database) Remove(ctx context.Context, accountID account.AccountID, id Filename) error {
 	q := d.db.Asset.
 		Delete().Where(

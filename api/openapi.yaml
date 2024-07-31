@@ -863,7 +863,11 @@ paths:
       description: Upload and process a media file.
       tags: [assets]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
-      parameters: [$ref: "#/components/parameters/ContentLength"]
+      parameters:
+        - $ref: "#/components/parameters/ContentLength"
+        - $ref: "#/components/parameters/AssetNameQuery"
+        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
+        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -1119,6 +1123,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/AssetIDParam"
+        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
+        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1372,6 +1378,14 @@ components:
       schema:
         type: string
 
+    AssetNameQuery:
+      description: The client-provided file name for the asset.
+      name: filename
+      in: query
+      required: false
+      schema:
+        type: string
+
     CategoryIDParam:
       description: Unique category ID.
       name: category_id
@@ -1401,6 +1415,30 @@ components:
       name: node_slug_child
       in: path
       required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    NodeContentFillRuleQuery:
+      description: |
+        Use the content extracted from the child resource to modify the target
+        resource. This can be used to populate a node from a asset or link. For
+        example, if you wanted to create a node that held the contents of a PDF
+        file, you can upload the file with a target node and a fill rule set.
+      # NOTE: We may use content fill features for other content in future, such
+      # as posts or profiles, so this param does is not prefixed with "node_".
+      name: content_fill_rule
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/ContentFillRule"
+
+    NodeContentFillTargetQuery:
+      description: |
+        When NodeContentFillRuleQuery is used, this option must be set in order
+        to specify which node will receive content extracted from the source.
+      name: node_content_fill_target
+      in: query
+      required: false
       schema:
         $ref: "#/components/schemas/Identifier"
 
@@ -2034,6 +2072,14 @@ components:
     ContentKinds:
       type: array
       items: { $ref: "#/components/schemas/ContentKind" }
+
+    ContentFillRule:
+      type: string
+      enum:
+        - replace
+        # NOTE: Prepend and append are not implemented yet.
+        # - prepend
+        # - append
 
     Visibility:
       type: string

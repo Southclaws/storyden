@@ -15,6 +15,10 @@ import (
 )
 
 func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.Indexable, ids ...xid.ID) (map[xid.ID]float64, error) {
+	if len(ids) == 0 {
+		return map[xid.ID]float64{}, nil
+	}
+
 	sids := dt.Map(ids, func(id xid.ID) string { return id.String() })
 
 	near := graphql.NearObjectArgumentBuilder{}

@@ -1,9 +1,12 @@
 package mq
 
 import (
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/rs/xid"
 )
 
 type IndexNode struct {
@@ -20,4 +23,9 @@ type IndexProfile struct {
 
 type SummariseNode struct {
 	ID library.NodeID
+}
+
+type AnalyseAsset struct {
+	AssetID         xid.ID
+	ContentFillRule opt.Optional[asset.ContentFillCommand]
 }

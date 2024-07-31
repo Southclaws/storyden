@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var ErrNoAccountInContext = errors.New("no account in context")
@@ -36,4 +37,13 @@ func GetOptAccountID(ctx context.Context) opt.Optional[account.AccountID] {
 	}
 
 	return opt.NewEmpty[account.AccountID]()
+}
+
+func GetSessionFromMessage[T any](ctx context.Context, msg *pubsub.Message[T]) context.Context {
+	actorID, ok := msg.ActorID.Get()
+	if !ok {
+		return ctx
+	}
+
+	return WithAccountID(ctx, account.AccountID(actorID))
 }
