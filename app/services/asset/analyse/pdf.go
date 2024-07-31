@@ -28,7 +28,7 @@ func (a *Analyser) analysePDF(ctx context.Context, buf []byte, fillrule opt.Opti
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	rich, err := content.NewRichText(result.Text)
+	rich, err := content.NewRichTextFromHTML(result.HTML)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
