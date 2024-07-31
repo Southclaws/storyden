@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -21,15 +22,17 @@ type Uploader struct {
 	l    *zap.Logger
 	rbac rbac.AccessManager
 
-	assets  asset.Repository
-	objects object.Storer
-	queue   pubsub.Topic[mq.AnalyseAsset]
+	nodewriter library.Repository
+	assets     asset.Repository
+	objects    object.Storer
+	queue      pubsub.Topic[mq.AnalyseAsset]
 }
 
 func New(
 	l *zap.Logger,
 	rbac rbac.AccessManager,
 
+	nodewriter library.Repository,
 	assets asset.Repository,
 	objects object.Storer,
 	queue pubsub.Topic[mq.AnalyseAsset],
@@ -38,9 +41,10 @@ func New(
 		l:    l.With(zap.String("service", "asset")),
 		rbac: rbac,
 
-		assets:  assets,
-		objects: objects,
-		queue:   queue,
+		nodewriter: nodewriter,
+		assets:     assets,
+		objects:    objects,
+		queue:      queue,
 	}
 }
 
@@ -59,7 +63,14 @@ func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name ass
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO Use the content fill rule to also link the asset to the target node.
+	if cfr, ok := opts.ContentFill.Get(); ok {
+		nodeID := library.NodeID(cfr.TargetNodeID)
+
+		_, err := s.nodewriter.Update(ctx, nodeID, library.WithAssets([]asset.AssetID{a.ID}))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
 
 	path := asset.BuildAssetPath(a.Name)
 
