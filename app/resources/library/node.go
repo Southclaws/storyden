@@ -55,11 +55,16 @@ func (c *Node) GetKind() datagraph.Kind { return datagraph.KindNode }
 func (c *Node) GetName() string         { return c.Name }
 func (c *Node) GetSlug() string         { return c.Slug }
 func (c *Node) GetDesc() string {
+	if d, ok := c.Description.Get(); ok && d != "" {
+		return d
+	}
+
 	cd, ok := c.Content.Get()
 	if ok && cd.Short() != "" {
 		return cd.Short()
 	}
-	return c.Description.OrZero()
+
+	return ""
 }
 func (c *Node) GetText() string { return c.Content.OrZero().HTML() }
 func (c *Node) GetProps() any   { return nil }
