@@ -14,6 +14,8 @@ import (
 	"github.com/klippa-app/go-pdfium/webassembly"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 type Extractor struct {
@@ -133,7 +135,19 @@ func (e *Extractor) Extract(ctx context.Context, buf []byte) (*ExtractionResult,
 
 	blocks := []string{}
 
+	root := html.Node{
+		Type:     html.ElementNode,
+		Data:     "body",
+		DataAtom: atom.Body,
+	}
+
 	for p := range pages.PageCount {
+		pageNode := &html.Node{
+			Type:     html.ElementNode,
+			Data:     "p",
+			DataAtom: atom.P,
+		}
+
 		pageText, err := e.instance.GetPageText(&requests.GetPageText{
 			Page: requests.Page{
 				ByIndex: &requests.PageByIndex{
@@ -146,10 +160,28 @@ func (e *Extractor) Extract(ctx context.Context, buf []byte) (*ExtractionResult,
 			return nil, err
 		}
 
+		data := strip(pageText.Text)
+
+		pageNode.AppendChild(&html.Node{
+			Type: html.TextNode,
+			Data: data,
+		})
+
+		root.AppendChild(pageNode)
+
 		blocks = append(blocks, pageText.Text)
 	}
 
 	return &ExtractionResult{
 		Text: strings.Join(blocks, "\n"),
+		HTML: &root,
 	}, nil
+}
+
+func strip(s string) string {
+	trim := strings.TrimSpace(s)
+	newlines := strings.ReplaceAll(trim, "\n", " ")
+	tabs := strings.ReplaceAll(newlines, "\t", " ")
+	doublespace := strings.Join(strings.Fields(tabs), " ")
+	return doublespace
 }
