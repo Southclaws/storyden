@@ -13,6 +13,7 @@ import type { NodeDescription } from "./nodeDescription";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
+import type { RelevanceScore } from "./relevanceScore";
 import type { Slug } from "./slug";
 import type { Visibility } from "./visibility";
 
@@ -28,6 +29,7 @@ export interface NodeCommonProps {
   name: NodeName;
   owner: ProfileReference;
   parent?: Node;
+  relevance_score?: RelevanceScore;
   slug: Slug;
   visibility: Visibility;
 }
