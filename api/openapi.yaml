@@ -3347,6 +3347,7 @@ components:
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
         visibility: { $ref: "#/components/schemas/Visibility" }
+        relevance_score: { $ref: "#/components/schemas/RelevanceScore" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     NodeTree:

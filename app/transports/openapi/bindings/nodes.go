@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/transports/openapi"
@@ -28,7 +29,7 @@ import (
 type Nodes struct {
 	accountQuery account_querier.Querier
 	nodeMutator  node_mutate.Manager
-	nodeRepo     library.Repository
+	nodeReader   *node_read.HydratedQuerier
 	nv           *node_visibility.Controller
 	ntree        nodetree.Graph
 	ntr          node_traversal.Repository
@@ -37,7 +38,7 @@ type Nodes struct {
 func NewNodes(
 	accountQuery account_querier.Querier,
 	nodeMutator node_mutate.Manager,
-	nodeRepo library.Repository,
+	nodeReader *node_read.HydratedQuerier,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
@@ -45,7 +46,7 @@ func NewNodes(
 	return Nodes{
 		accountQuery: accountQuery,
 		nodeMutator:  nodeMutator,
-		nodeRepo:     nodeRepo,
+		nodeReader:   nodeReader,
 		nv:           nv,
 		ntree:        ntree,
 		ntr:          ntr,
@@ -178,7 +179,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.nodeRepo.Get(ctx, library.NodeSlug(request.NodeSlug))
+	node, err := c.nodeReader.GetBySlug(ctx, library.NodeSlug(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -325,6 +326,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 }
 
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
+	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
 	return openapi.NodeWithChildren{
 		Id:          in.ID.String(),
 		CreatedAt:   in.CreatedAt,
@@ -339,9 +341,10 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Visibility: serialiseVisibility(in.Visibility),
-		Meta:       in.Metadata,
-		Children:   dt.Map(in.Nodes, serialiseNodeWithItems),
+		Visibility:     serialiseVisibility(in.Visibility),
+		RelevanceScore: rs.Ptr(),
+		Meta:           in.Metadata,
+		Children:       dt.Map(in.Nodes, serialiseNodeWithItems),
 	}
 }
 

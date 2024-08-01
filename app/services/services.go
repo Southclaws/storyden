@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/link_getter"
@@ -55,7 +56,7 @@ func Build() fx.Option {
 		index_job.Build(),
 		summarise_job.Build(),
 		fx.Provide(avatar_gen.New),
-		fx.Provide(node_mutate.New, nodetree.New, node_visibility.New),
+		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
 		fx.Provide(link_getter.New),
 	)
 }

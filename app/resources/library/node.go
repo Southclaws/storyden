@@ -34,16 +34,17 @@ type Node struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Name        string
-	Slug        string
-	Assets      []*asset.Asset
-	Links       datagraph.Links
-	Content     opt.Optional[content.Rich]
-	Description opt.Optional[string]
-	Owner       profile.Public
-	Parent      opt.Optional[Node]
-	Visibility  visibility.Visibility
-	Metadata    map[string]any
+	Name           string
+	Slug           string
+	Assets         []*asset.Asset
+	Links          datagraph.Links
+	Content        opt.Optional[content.Rich]
+	Description    opt.Optional[string]
+	Owner          profile.Public
+	Parent         opt.Optional[Node]
+	Visibility     visibility.Visibility
+	RelevanceScore opt.Optional[float64]
+	Metadata       map[string]any
 
 	Nodes []*Node
 }
