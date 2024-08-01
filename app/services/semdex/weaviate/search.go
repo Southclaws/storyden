@@ -17,6 +17,10 @@ type WeaviateAdditional struct {
 		Property string `json:"property"`
 		Result   string `json:"result"`
 	} `json:"summary"`
+	Generate struct {
+		SingleResult string `json:"singleResult"`
+		Error        string `json:"error"`
+	} `json:"generate"`
 }
 
 type WeaviateObject struct {

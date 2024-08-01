@@ -17,12 +17,39 @@ func (s *weaviateSemdexer) Summarise(ctx context.Context, object datagraph.Index
 		{Name: "datagraph_type"},
 		{Name: "name"},
 		{Name: "content"},
-		{Name: "_additional", Fields: []graphql.Field{
-			{Name: "summary(properties: [\"content\"])", Fields: []graphql.Field{
-				{Name: "property"},
-				{Name: "result"},
-			}},
-		}},
+	}
+
+	// Switch summariser strategy based on the Weaviate class.
+	// Local inference uses sum-transformers, remote inference uses openai.
+	// TODO: Express this switcher in a better way at the top-level config.
+	if s.cn.String() == "ContentText2vecTransformers" {
+		fields = append(fields, graphql.Field{
+			Name: "_additional",
+			Fields: []graphql.Field{
+				{Name: "summary(properties: [\"content\"])", Fields: []graphql.Field{
+					{Name: "property"},
+					{Name: "result"},
+				}},
+			},
+		})
+	} else if s.cn.String() == "ContentOpenAI" {
+		fields = append(fields, graphql.Field{
+			Name: "_additional",
+			Fields: []graphql.Field{
+				{Name: `generate(singleResult: {
+					prompt: """
+						Describe the following as a short summary: {content}
+					"""
+				})`, Fields: []graphql.Field{
+					{Name: "singleResult"},
+					{Name: "error"},
+				}},
+			},
+		})
+	} else {
+		// No summariser available
+		// TODO: return an error maybe?
+		return "", nil
 	}
 
 	where := filters.Where().
@@ -50,11 +77,21 @@ func (s *weaviateSemdexer) Summarise(ctx context.Context, object datagraph.Index
 		return "", fault.Newf("expected exactly one result, got %d", len(classData))
 	}
 
-	if classData[0].Additional.Summary == nil || len(classData[0].Additional.Summary) != 1 {
-		return "", fault.New("summary not found in response")
+	if s.cn.String() == "ContentText2vecTransformers" {
+		if classData[0].Additional.Summary == nil || len(classData[0].Additional.Summary) != 1 {
+			return "", fault.New("summary not found in response")
+		}
+
+		return classData[0].Additional.Summary[0].Result, nil
+
+	} else if s.cn.String() == "ContentOpenAI" {
+		if classData[0].Additional.Generate.Error != "" {
+			return "", fault.New(classData[0].Additional.Generate.Error)
+		}
+
+		return classData[0].Additional.Generate.SingleResult, nil
 	}
 
-	summary := classData[0].Additional.Summary[0].Result
-
-	return summary, nil
+	// TODO: handle this edge case
+	return "", nil
 }

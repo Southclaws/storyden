@@ -62,15 +62,25 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 		"text2vec-transformers": {
 			Class:      "ContentText2vecTransformers",
 			Vectorizer: "text2vec-transformers",
-			ModuleConfig: map[string]interface{}{
-				"text2vec-transformers": map[string]interface{}{},
+			ModuleConfig: map[string]any{
+				"text2vec-transformers": map[string]any{},
 			},
 		},
 		"text2vec-openai": {
 			Class:      "ContentOpenAI",
 			Vectorizer: "text2vec-openai",
-			ModuleConfig: map[string]interface{}{
-				"text2vec-transformers": map[string]interface{}{},
+			Properties: []*models.Property{
+				{
+					Name:     "content",
+					DataType: []string{"text"},
+				},
+			},
+			ModuleConfig: map[string]any{
+				"text2vec-openai": map[string]any{
+					"model":      "text-embedding-3-large",
+					"dimensions": "3072",
+					"type":       "text",
+				},
 			},
 		},
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
@@ -50,13 +51,13 @@ type ThreadWithRecommendations struct {
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) GetID() xid.ID           { return xid.ID(t.ID) }
-func (t *Thread) GetKind() datagraph.Kind { return datagraph.KindPost }
-func (t *Thread) GetName() string         { return t.Title }
-func (t *Thread) GetSlug() string         { return t.Slug }
-func (t *Thread) GetDesc() string         { return t.Short }
-func (t *Thread) GetText() string         { return t.Posts[0].Content.HTML() }
-func (t *Thread) GetProps() any           { return t.Meta }
+func (t *Thread) GetID() xid.ID            { return xid.ID(t.ID) }
+func (t *Thread) GetKind() datagraph.Kind  { return datagraph.KindPost }
+func (t *Thread) GetName() string          { return t.Title }
+func (t *Thread) GetSlug() string          { return t.Slug }
+func (t *Thread) GetDesc() string          { return t.Short }
+func (t *Thread) GetContent() content.Rich { return t.Posts[0].Content }
+func (t *Thread) GetProps() any            { return t.Meta }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()
