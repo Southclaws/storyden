@@ -67,5 +67,5 @@ func (c *Node) GetDesc() string {
 
 	return ""
 }
-func (c *Node) GetText() string { return c.Content.OrZero().HTML() }
-func (c *Node) GetProps() any   { return nil }
+func (c *Node) GetContent() content.Rich { return c.Content.OrZero() }
+func (c *Node) GetProps() any            { return nil }

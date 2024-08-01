@@ -4,6 +4,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/content"
 )
 
 type Indexable interface {
@@ -12,7 +13,7 @@ type Indexable interface {
 	GetName() string
 	GetSlug() string
 	GetDesc() string
-	GetText() string
+	GetContent() content.Rich
 	GetProps() any
 }
 

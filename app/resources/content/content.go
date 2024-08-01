@@ -45,6 +45,10 @@ func (r Rich) HTML() string {
 	return w.String()
 }
 
+func (r Rich) HTMLTree() *html.Node {
+	return r.html
+}
+
 func (r Rich) Short() string {
 	return r.short
 }

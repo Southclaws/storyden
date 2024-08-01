@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/google/uuid"
+	"github.com/k3a/html2text"
 	"github.com/rs/xid"
 	weaviate_errors "github.com/weaviate/weaviate-go-client/v4/weaviate/fault"
 
@@ -14,8 +15,10 @@ import (
 )
 
 func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable) error {
-	content := object.GetText()
+	rich := object.GetContent()
 	sid := object.GetID()
+
+	content := html2text.HTML2Text(rich.HTML())
 
 	wid := GetWeaviateID(object.GetID())
 
