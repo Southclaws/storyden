@@ -57,7 +57,7 @@ func (m *SendGrid) Send(
 	plain string,
 ) error {
 	from := mail.NewEmail(m.fromName, m.fromAddress)
-	to := mail.NewEmail(name, address.String())
+	to := mail.NewEmail(name, address.Address)
 	message := mail.NewSingleEmail(from, subject, to, plain, html)
 
 	m.l.Info("sending live email",
