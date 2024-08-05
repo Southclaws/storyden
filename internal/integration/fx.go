@@ -24,7 +24,7 @@ import (
 // have finished. Usage is a simple call and defer:
 //
 //	func TestMyThing(t *testing.T) {
-//	    defer bdd.Test(t, nil, fx.Invoke(func(test dependencies...) {
+//	    defer integration.Test(t, nil, fx.Invoke(func(test dependencies...) {
 //	        r := require.New(t)
 //	        a := assert.New(t)
 //
