@@ -14,8 +14,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/internal/utils"
@@ -29,7 +29,7 @@ func TestPublicProfiles(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		ar account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -89,7 +89,7 @@ func TestUpdateProfile(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		accountQuery account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {

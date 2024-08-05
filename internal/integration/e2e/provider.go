@@ -10,10 +10,11 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
-	internal_http "github.com/Southclaws/storyden/internal/infrastructure/http"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
 func newHttpTestServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.ServeMux) *httptest.Server {
@@ -43,6 +44,6 @@ func newClient(ts *httptest.Server) (*openapi.ClientWithResponses, error) {
 func Setup() fx.Option {
 	return fx.Options(
 		bindings.Build(),
-		fx.Provide(internal_http.NewRouter, newHttpTestServer, newClient),
+		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient, cookie.New),
 	)
 }

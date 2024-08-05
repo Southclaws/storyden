@@ -13,8 +13,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/internal/script"
@@ -44,11 +44,11 @@ const PostsQuery = `
 
 func main() {
 	script.Run(
-		fx.Provide(bindings.NewCookieJar),
+		fx.Provide(cookie.New),
 		fx.Invoke(func(
 			ctx context.Context,
 			ec *ent.Client,
-			cj *bindings.CookieJar,
+			cj *cookie.Jar,
 		) (*struct{}, error) {
 			if len(os.Args) < 2 {
 				return nil, fault.New("no database specified")

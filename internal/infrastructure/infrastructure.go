@@ -31,6 +31,6 @@ func Build() fx.Option {
 		weaviate.Build(),
 		jwt.Build(),
 		queue.Build(),
-		fx.Provide(pdf.New), 
+		fx.Provide(pdf.New),
 	)
 }

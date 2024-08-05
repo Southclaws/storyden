@@ -9,8 +9,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 func WithAccount(ctx context.Context, aw account_writer.Writer, template account.Account, opts ...account_writer.Option) (context.Context, *account.Account) {
@@ -33,7 +33,7 @@ func WithAccount(ctx context.Context, aw account_writer.Writer, template account
 	return ctx, acc
 }
 
-func WithSession(ctx context.Context, cj *bindings.CookieJar) openapi.RequestEditorFn {
+func WithSession(ctx context.Context, cj *cookie.Jar) openapi.RequestEditorFn {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		panic(err)
@@ -44,4 +44,3 @@ func WithSession(ctx context.Context, cj *bindings.CookieJar) openapi.RequestEdi
 		return nil
 	}
 }
- 
