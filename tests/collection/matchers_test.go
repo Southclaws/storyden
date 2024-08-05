@@ -3,9 +3,11 @@ package collection_test
 import (
 	"testing"
 
-	"github.com/Southclaws/storyden/app/transports/openapi"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
+
 func matchThreadToItem(t *testing.T, thread *openapi.Thread, item openapi.CollectionItem) {
 	t.Helper()
 	a := assert.New(t)

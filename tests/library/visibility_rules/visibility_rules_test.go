@@ -13,8 +13,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/openapi"
-	"github.com/Southclaws/storyden/app/transports/openapi/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -27,7 +27,7 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -96,7 +96,7 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -165,7 +165,7 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -234,7 +234,7 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *bindings.CookieJar,
+		cj *cookie.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
