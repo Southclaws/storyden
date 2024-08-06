@@ -3504,6 +3504,7 @@ components:
           type: string
         description:
           type: string
+        meta: { $ref: "#/components/schemas/Metadata" }
 
     DatagraphNodeKind:
       type: string

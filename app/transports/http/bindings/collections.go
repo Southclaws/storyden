@@ -185,6 +185,7 @@ func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.Co
 
 func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionItem {
 	score := opt.PtrMap(in.RelevanceScore, func(s float64) float32 { return float32(s) })
+	meta := in.Item.GetProps()
 
 	return openapi.CollectionItem{
 		Id:             in.Item.GetID().String(),
@@ -196,5 +197,6 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 		Slug:           in.Item.GetSlug(),
 		Description:    opt.New(in.Item.GetDesc()).Ptr(),
 		RelevanceScore: score,
+		Meta:           (*openapi.Metadata)(&meta),
 	}
 }
