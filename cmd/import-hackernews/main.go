@@ -13,7 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -22,11 +22,11 @@ import (
 
 func main() {
 	script.Run(
-		fx.Provide(cookie.New),
+		fx.Provide(session1.New),
 		fx.Invoke(func(
 			ctx context.Context,
 			ec *ent.Client,
-			cj *cookie.Jar,
+			cj *session1.Jar,
 		) (*struct{}, error) {
 			if len(os.Args) < 2 {
 				return nil, fault.New("no input file specified")

@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -29,7 +29,7 @@ func TestCollectionItems(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *cookie.Jar,
+		cj *session1.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {

@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -20,7 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -29,7 +28,7 @@ type Authentication struct {
 	p            *password.Provider
 	ep           *email_only.Provider
 	epp          *email_password.Provider
-	cj           *cookie.Jar
+	cj           *session1.Jar
 	accountQuery account_querier.Querier
 	er           email.EmailRepo
 	am           *authentication.Manager
@@ -44,7 +43,7 @@ func NewAuthentication(
 	epp *email_password.Provider,
 	accountQuery account_querier.Querier,
 	er email.EmailRepo,
-	sm *cookie.Jar,
+	sm *session1.Jar,
 	am *authentication.Manager,
 	ev email_verify.Verifier,
 ) Authentication {
@@ -67,15 +66,7 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi.AuthProviderLogoutRequestObject) (openapi.AuthProviderLogoutResponseObject, error) {
 	return openapi.AuthProviderLogout200Response{
 		Headers: openapi.AuthProviderLogout200ResponseHeaders{
-			SetCookie: (&http.Cookie{
-				Name:     a.cj.GetCookieName(),
-				Value:    "",
-				SameSite: http.SameSiteDefaultMode,
-				Path:     "/",
-				Domain:   a.domain,
-				Secure:   true,
-				HttpOnly: true,
-			}).String(),
+			SetCookie: a.cj.Destroy().String(),
 		},
 	}, nil
 }

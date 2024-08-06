@@ -12,7 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -25,7 +25,7 @@ func TestDatagraphHappyPath(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *cookie.Jar,
+		cj *session.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -100,7 +100,7 @@ func TestDatagraphDeletions(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *cookie.Jar,
+		cj *session.Jar,
 		aw account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {

@@ -14,11 +14,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestAccountAuth(t *testing.T) {
@@ -28,7 +29,7 @@ func TestAccountAuth(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *cookie.Jar,
+		cj *session1.Jar,
 		accountQuery account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -90,6 +91,10 @@ func TestAccountAuth(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(signin2)
 			r.Equal(http.StatusOK, signin2.StatusCode())
+
+			signout, err := cl.AuthProviderLogoutWithResponse(root, e2e.WithSession(ctx1, cj))
+			tests.Ok(t, err, signout)
+			a.Contains(signout.HTTPResponse.Header.Get("Set-Cookie"), "storyden-session=;")
 		}))
 	}))
 }
@@ -101,7 +106,7 @@ func TestAccountAdmin(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *cookie.Jar,
+		cj *session1.Jar,
 		accountWrite account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
