@@ -14,7 +14,7 @@ type Indexable interface {
 	GetSlug() string
 	GetDesc() string
 	GetContent() content.Rich
-	GetProps() any
+	GetProps() map[string]any
 }
 
 // NodeReference is a general structure that refers to a datagraph node of Kind.

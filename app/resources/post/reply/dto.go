@@ -58,7 +58,7 @@ func (r *Reply) GetSlug() string {
 }
 func (r *Reply) GetContent() content.Rich { return r.Content }
 func (r *Reply) GetDesc() string          { return r.Content.Short() }
-func (r *Reply) GetProps() any            { return r.Meta }
+func (r *Reply) GetProps() map[string]any { return r.Meta }
 
 func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Content.Short())

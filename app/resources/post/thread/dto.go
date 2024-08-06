@@ -57,7 +57,7 @@ func (t *Thread) GetName() string          { return t.Title }
 func (t *Thread) GetSlug() string          { return t.Slug }
 func (t *Thread) GetDesc() string          { return t.Short }
 func (t *Thread) GetContent() content.Rich { return t.Posts[0].Content }
-func (t *Thread) GetProps() any            { return t.Meta }
+func (t *Thread) GetProps() map[string]any { return t.Meta }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()

@@ -34,7 +34,7 @@ func (p *Public) GetName() string          { return p.Name }
 func (p *Public) GetSlug() string          { return p.Handle }
 func (p *Public) GetDesc() string          { return p.Bio.Short() }
 func (p *Public) GetContent() content.Rich { return p.Bio }
-func (p *Public) GetProps() any            { return nil }
+func (p *Public) GetProps() map[string]any { return p.Metadata }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
 	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {

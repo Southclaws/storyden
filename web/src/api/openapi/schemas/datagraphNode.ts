@@ -7,11 +7,13 @@
  */
 import type { DatagraphNodeKind } from "./datagraphNodeKind";
 import type { Identifier } from "./identifier";
+import type { Metadata } from "./metadata";
 
 export interface DatagraphNode {
   description?: string;
   id: Identifier;
   kind: DatagraphNodeKind;
+  meta?: Metadata;
   name: string;
   slug: string;
 }
