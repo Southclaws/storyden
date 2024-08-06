@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
-	"github.com/Southclaws/storyden/internal/infrastructure/httpserver/middleware/useragent"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
 )
 
 var (
