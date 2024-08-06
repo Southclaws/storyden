@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )

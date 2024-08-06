@@ -10,8 +10,9 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	http_transport "github.com/Southclaws/storyden/app/transports/http"
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
-	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
@@ -43,7 +44,19 @@ func newClient(ts *httptest.Server) (*openapi.ClientWithResponses, error) {
 
 func Setup() fx.Option {
 	return fx.Options(
+		// In the normal app, we call http.Build() which constructs a production
+		// HTTP server with the http.ServeMux router as the handler. In tests we
+		// don't want this, instead we want the httptest.Server instead. So this
+		// setup looks very similar to http.Build() but instead of calling the
+		// httpserver.Build() provider, we provide the http.ServeMux and then we
+		// mount it onto the httptest.Server instead of http.Server.
+		//
+		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient),
+
+		fx.Provide(cookie.New),
+
 		bindings.Build(),
-		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient, cookie.New),
+
+		fx.Invoke(http_transport.MountOpenAPI),
 	)
 }

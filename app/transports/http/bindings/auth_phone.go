@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
-	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 

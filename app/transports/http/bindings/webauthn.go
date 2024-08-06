@@ -22,7 +22,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
-	"github.com/Southclaws/storyden/app/transports/http/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
