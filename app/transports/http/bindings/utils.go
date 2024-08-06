@@ -21,12 +21,12 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
-func serialiseAccount(acc *account.Account) openapi.Account {
-	return openapi.Account{
-		Id:             openapi.Identifier(acc.ID.String()),
-		Handle:         acc.Handle,
-		Name:           acc.Name,
-		Bio:            acc.Bio.HTML(),
+func serialiseAccount(acc *account.Account) *openapi.Account {
+	return &openapi.Account{
+		ID:             openapi.Identifier(acc.ID.String()),
+		Handle:         openapi.AccountHandle(acc.Handle),
+		Name:           openapi.AccountName(acc.Name),
+		Bio:            openapi.AccountBio(acc.Bio.HTML()),
 		Links:          serialiseExternalLinks(acc.ExternalLinks),
 		Meta:           acc.Metadata,
 		CreatedAt:      acc.CreatedAt,

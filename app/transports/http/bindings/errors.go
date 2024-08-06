@@ -1,4 +1,4 @@
-package openapi
+package bindings
 
 import (
 	"context"
@@ -7,52 +7,60 @@ import (
 	"net/http"
 	"syscall"
 
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
-
-	"github.com/Southclaws/storyden/internal/ent"
 )
 
-// HTTPErrorHandler provides an error handler function for use with the Echo
-// router. The purpose of this implementation is to map application level errors
-// to HTTP status codes. This is achieved (currently) with the use of a library
-// called "ftag" which enables the decoration of error chains with a basic kind
-// of category which helps organise the kind of errors that occur within an app.
-func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
-	return func(err error, c echo.Context) {
-		errmsg := err.Error()
-		errtag, status := categorise(err)
-		errctx := fctx.Unwrap(err)
-		message := fmsg.GetIssue(err)
-		chain := fault.Flatten(err)
+type ErrorHandler struct {
+	fx.In
+}
 
-		if status == http.StatusInternalServerError {
-			l.Error(errmsg,
-				zap.String("package", "http"),
-				zap.String("message", message),
-				zap.String("path", c.Path()),
-				zap.String("tag", string(errtag)),
-				zap.Any("metadata", errctx),
-				zap.Any("trace", chain),
-			)
-		}
+func (e *ErrorHandler) NewError(ctx context.Context, err error) *openapi.InternalServerErrorStatusCode {
+	errmsg := err.Error()
+	errtag, status := categorise(err)
+	errctx := fctx.Unwrap(err)
+	message := fmsg.GetIssue(err)
+	chain := fault.Flatten(err)
 
-		meta := lo.MapValues(errctx, func(v, k string) any { return v })
-		errormessage := opt.NewIf(message, func(s string) bool { return s != "" }).Ptr()
-		errormetadata := opt.NewIf(meta, func(m map[string]any) bool { return len(m) > 0 }).Ptr()
+	if status == http.StatusInternalServerError {
+		l.Error(errmsg,
+			zap.String("package", "http"),
+			zap.String("message", message),
+			zap.String("path", c.Path()),
+			zap.String("tag", string(errtag)),
+			zap.Any("metadata", errctx),
+			zap.Any("trace", chain),
+		)
+	}
 
-		//nolint:errcheck
-		c.JSON(status, APIError{
+	meta := lo.MapValues(errctx, func(v, k string) any { return v })
+	errormessage := opt.NewIf(message, func(s string) bool { return s != "" }).Ptr()
+	errormetadata := opt.NewIf(meta, func(m map[string]any) bool { return len(m) > 0 }).Ptr()
+
+	//nolint:errcheck
+	c.JSON(status, APIError{
+		Error:    errmsg,
+		Message:  errormessage,
+		Metadata: errormetadata,
+	})
+
+	return &openapi.InternalServerErrorStatusCode{
+		StatusCode: 500,
+		Response: openapi.APIError{
 			Error:    errmsg,
-			Message:  errormessage,
-			Metadata: errormetadata,
-		})
+			Message:  openapi.NewOptString(errormessage),
+			Metadata: openapi.NewOptAPIErrorMetadata(errormetadata),
+		},
 	}
 }
 

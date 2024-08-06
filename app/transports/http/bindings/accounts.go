@@ -45,7 +45,7 @@ func NewAccounts(
 	}
 }
 
-func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
+func (i *Accounts) AccountGet(ctx context.Context) (openapi.AccountGetRes, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -56,37 +56,33 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountGet200JSONResponse{
-		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse(serialiseAccount(acc)),
-	}, nil
+	return serialiseAccount(acc), nil
 }
 
-func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpdateRequestObject) (openapi.AccountUpdateResponseObject, error) {
+func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountMutableProps) (openapi.AccountUpdateRes, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	links, err := opt.MapErr(opt.NewPtr(request.Body.Links), deserialiseExternalLinkList)
+	links, err := opt.MapErr(opt.NewPtr(request.Links), deserialiseExternalLinkList)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	acc, err := i.accountUpdate.Update(ctx, accountID, account_update.Partial{
-		Handle:    opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
-		Name:      opt.NewPtr(request.Body.Name),
-		Bio:       opt.NewPtr(request.Body.Bio),
+		Handle:    opt.NewSafe(request.Handle.Get()),
+		Name:      opt.NewSafe(request.GetName()),
+		Bio:       opt.NewSafe(request.GetBio()),
 		Links:     links,
-		Meta:      opt.NewPtr((*map[string]any)(request.Body.Meta)),
-		Interests: opt.NewPtrMap(request.Body.Interests, tagsIDs),
+		Meta:      opt.NewSafe(request.GetMeta()),
+		Interests: opt.NewPtrMap(request.Interests, tagsIDs),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return openapi.AccountUpdate200JSONResponse{
-		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
-	}, nil
+	return serialiseAccount(acc), nil
 }
 
 func deserialiseExternalLinkList(i openapi.ProfileExternalLinkList) ([]account.ExternalLink, error) {
@@ -94,7 +90,7 @@ func deserialiseExternalLinkList(i openapi.ProfileExternalLinkList) ([]account.E
 }
 
 func deserialiseExternalLink(l openapi.ProfileExternalLink) (account.ExternalLink, error) {
-	u, err := url.Parse(string(l.Url))
+	u, err := url.Parse(string(l.URL))
 	if err != nil {
 		return account.ExternalLink{}, err
 	}

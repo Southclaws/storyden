@@ -30,14 +30,8 @@
 package bindings
 
 import (
-	"strings"
+	"net/http"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fmsg"
-	"github.com/getkin/kin-openapi/openapi3filter"
-	"github.com/labstack/echo/v4"
-	oapi_middleware "github.com/oapi-codegen/echo-middleware"
-	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -125,60 +119,24 @@ func bindingsProviders() fx.Option {
 // (such as `/v1/accounts`) will map to a file, struct and constructor here
 // (such as `accounts.go`, `Accounts` and `NewAccounts`) and everything is glued
 // together in this file.
-func bindings(s Bindings) openapi.StrictServerInterface {
+func bindings(s Bindings) openapi.Handler {
 	return &s
 }
 
 // mounts the OpenAPI routes and middleware onto the /api path. Everything that
 // is outside of the `/api` path is considered separate from the OpenAPI spec.
-func mount(
+func newOgenServer(
 	l *zap.Logger,
-	router *echo.Echo,
+	mux *http.ServeMux,
 	auth Authentication,
-	si openapi.StrictServerInterface,
-) error {
-	spec, err := openapi.GetSwagger()
+	si openapi.Handler,
+) (http.Handler, error) {
+	server, err := openapi.NewServer(si, nil)
 	if err != nil {
-		return fault.Wrap(err, fmsg.With("failed to get openapi specification"))
+		return nil, err
 	}
 
-	// Skips validation for any paths not prefixed with "/api".
-	skipper := func(c echo.Context) bool {
-		return !strings.HasPrefix(c.Path(), apiPathPrefix)
-	}
-
-	requestValidatorMiddleware := oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{
-		Skipper: skipper,
-		Options: openapi3filter.Options{
-			IncludeResponseStatus: true,
-			AuthenticationFunc:    auth.validator,
-		},
-		SilenceServersWarning: true,
-		// Handles validation errors that occur BEFORE the handler is called.
-		ErrorHandler: openapi.ValidatorErrorHandler(),
-	})
-
-	openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), apiPathPrefix)
-
-	router.Use(
-		requestValidatorMiddleware,
-		openapi.ParameterContext,
-	)
-
-	l.Debug("mounted OpenAPI to service bindings",
-		zap.Strings("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
-			return r.Path
-		})),
-	)
-
-	return nil
-}
-
-func newRouter(l *zap.Logger) *echo.Echo {
-	router := echo.New()
-	router.HTTPErrorHandler = openapi.HTTPErrorHandler(l)
-
-	return router
+	return server, nil
 }
 
 func Build() fx.Option {
@@ -188,11 +146,8 @@ func Build() fx.Option {
 		// single struct.
 		fx.Provide(bindings),
 
-		// Provide the Echo router.
-		fx.Provide(newRouter),
-
 		// Mount the bound OpenAPI routes onto the router.
-		fx.Invoke(mount),
+		fx.Provide(newOgenServer),
 
 		// Provide all service layer bindings to the DI system.
 		bindingsProviders(),

@@ -3,7 +3,6 @@ package http
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -23,7 +22,7 @@ func MountOpenAPI(
 	cfg config.Config,
 	logger *zap.Logger,
 	mux *http.ServeMux,
-	router *echo.Echo,
+	router http.Handler,
 
 	// Middleware providers
 	cj *session.Jar,
