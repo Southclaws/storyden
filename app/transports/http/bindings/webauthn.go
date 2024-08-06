@@ -22,7 +22,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -32,7 +32,7 @@ const cookieName = "storyden-webauthn-session"
 var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
-	cj           *cookie.Jar
+	cj           *session.Jar
 	accountQuery account_querier.Querier
 	wa           *waprovider.Provider
 	domain       string
@@ -41,7 +41,7 @@ type WebAuthn struct {
 func NewWebAuthn(
 	cfg config.Config,
 	accountQuery account_querier.Querier,
-	cj *cookie.Jar,
+	cj *session.Jar,
 	wa *waprovider.Provider,
 	router *echo.Echo,
 ) WebAuthn {

@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/cookie"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
@@ -21,7 +21,7 @@ func Build() fx.Option {
 		httpserver.Build(),
 
 		// Provide the cookie session manager.
-		fx.Provide(cookie.New),
+		fx.Provide(session.New),
 
 		// Binds all the generated spec code for services to the *http.ServeMux.
 		bindings.Build(),

@@ -1,4 +1,7 @@
-package cookie
+// Package session provides session handling primitives and middleware for the
+// API. Sessions work by encrypting an account's ID inside a cookie value. This
+// is read via a middleware and dropped into the request context for later use.
+package session
 
 import (
 	"context"
@@ -14,7 +17,15 @@ import (
 )
 
 // TODO: Allow changing this via config.
-const secureCookieName = "storyden-session"
+const (
+	secureCookieName = "storyden-session"
+	sameSiteMode     = http.SameSiteDefaultMode
+	cookieLifespan   = time.Hour * 24 * 90
+)
+
+func expiryFunc() time.Time {
+	return time.Now().Add(cookieLifespan)
+}
 
 type Jar struct {
 	ss               *securecookie.Session
@@ -30,18 +41,29 @@ func New(cfg config.Config, ss *securecookie.Session) *Jar {
 	}
 }
 
-// Create an encrypted cookie from an account ID.
-func (j *Jar) Create(accountID string) *http.Cookie {
+func (j *Jar) createWithValue(value string, expire time.Time) *http.Cookie {
 	return &http.Cookie{
 		Name:     secureCookieName,
-		Value:    j.ss.Encrypt(accountID),
-		SameSite: http.SameSiteDefaultMode,
-		Expires:  time.Now().Add(time.Hour * 24 * 90),
+		Value:    value,
+		SameSite: sameSiteMode,
+		Expires:  expire,
 		Path:     "/",
 		Domain:   j.domain,
-		Secure:   true,
+
+		// Always secure, localhost is automatically excluded by browsers.
+		Secure: true,
+
+		// JS never needs to access these cookies.
 		HttpOnly: true,
 	}
+}
+
+func (j *Jar) Create(accountID string) *http.Cookie {
+	return j.createWithValue(j.ss.Encrypt(accountID), expiryFunc())
+}
+
+func (j *Jar) Destroy() *http.Cookie {
+	return j.createWithValue("", time.Now())
 }
 
 // WithSession checks the request for a session and drops it into a context.
