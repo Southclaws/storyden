@@ -75,16 +75,17 @@ func (r *reindexer) reindexAll(ctx context.Context) error {
 	}
 
 	posts := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindPost })
+	nodes := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindNode })
+	profiles := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindProfile })
+
 	if err := r.reindexPosts(ctx, posts); err != nil {
 		return err
 	}
 
-	nodes := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindNode })
 	if err := r.reindexNodes(ctx, nodes); err != nil {
 		return err
 	}
 
-	profiles := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindProfile })
 	if err := r.reindexProfiles(ctx, profiles); err != nil {
 		return err
 	}

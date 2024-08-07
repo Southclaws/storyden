@@ -13,6 +13,13 @@ import (
 func (o *weaviateSemdexer) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {
 	objects, err := o.wc.Data().
 		ObjectsGetter().
+		//
+		// NOTE: Currently this effectively limits indexing to 10k datagraph
+		// nodes. Including posts, nodes, profiles, etc. This needs to be fixed
+		// to use paging so that all items are returned. But tbh, long term it's
+		// probably best to re-think how re-indexing works for large instances.
+		//
+		WithLimit(10000).
 		WithClassName(o.cn.String()).
 		Do(ctx)
 	if err != nil {
