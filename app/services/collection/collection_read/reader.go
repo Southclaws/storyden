@@ -86,7 +86,7 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 
 		scores, err := r.Semdex.ScoreRelevance(ctx, pro, ids...)
 		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+			r.Logger.Warn("failed to score relevance", zap.Error(err))
 		}
 
 		col.Items = dt.Map(col.Items, func(i *collection.CollectionItem) *collection.CollectionItem {
