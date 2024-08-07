@@ -3,6 +3,7 @@ package weaviate
 import (
 	"context"
 	"net/url"
+	"reflect"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
@@ -149,20 +150,31 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 			// will be EXPENSIVE! So, until we settle on the properties, beware.
 			//
 
-			err := client.Schema().
-				ClassDeleter().
+			current, err := client.Schema().
+				ClassGetter().
 				WithClassName(class.Class).
 				Do(ctx)
 			if err != nil {
-				return fault.Wrap(err)
+				return err
 			}
 
-			err = client.Schema().
-				ClassCreator().
-				WithClass(&class).
-				Do(ctx)
-			if err != nil {
-				return fault.Wrap(err)
+			same := compareClassConfig(cfg.ClassName, *current, class)
+			if !same {
+				err = client.Schema().
+					ClassDeleter().
+					WithClassName(class.Class).
+					Do(ctx)
+				if err != nil {
+					return fault.Wrap(err)
+				}
+
+				err = client.Schema().
+					ClassCreator().
+					WithClass(&class).
+					Do(ctx)
+				if err != nil {
+					return fault.Wrap(err)
+				}
 			}
 		}
 
@@ -170,4 +182,47 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 	}))
 
 	return client, WeaviateClassName(class.Class), nil
+}
+
+func compareClassConfig(cn string, a, b models.Class) bool {
+	if a.Class != b.Class {
+		return false
+	}
+
+	if a.Vectorizer != b.Vectorizer {
+		return false
+	}
+
+	if len(a.Properties) != len(b.Properties) {
+		return false
+	}
+
+	for i := range a.Properties {
+		if !comparePropertyConfig(cn, a.Properties[i], b.Properties[i]) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func comparePropertyConfig(cn string, a, b *models.Property) bool {
+	if a.Name != b.Name {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.DataType, b.DataType) {
+		return false
+	}
+
+	if a.ModuleConfig != nil && b.ModuleConfig != nil {
+		mca := a.ModuleConfig.(map[string]any)[cn].(map[string]any)
+		mcb := b.ModuleConfig.(map[string]any)[cn].(map[string]any)
+
+		if mca["skip"] != mcb["skip"] {
+			return false
+		}
+	}
+
+	return true
 }
