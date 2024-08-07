@@ -45,7 +45,6 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable
 		"name":           object.GetName(),
 		"description":    object.GetDesc(),
 		"content":        content[:min(1000, len(content))],
-		"props":          object.GetProps(),
 	}
 
 	if !nonExistent {

@@ -71,6 +71,32 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 			Vectorizer: "text2vec-openai",
 			Properties: []*models.Property{
 				{
+					Name:     "datagraph_id",
+					DataType: []string{"text"},
+					ModuleConfig: map[string]any{
+						"text2vec-openai": map[string]any{
+							"skip": false,
+						},
+					},
+				},
+				{
+					Name:     "datagraph_type",
+					DataType: []string{"text"},
+					ModuleConfig: map[string]any{
+						"text2vec-openai": map[string]any{
+							"skip": false,
+						},
+					},
+				},
+				{
+					Name:     "name",
+					DataType: []string{"text"},
+				},
+				{
+					Name:     "description",
+					DataType: []string{"text"},
+				},
+				{
 					Name:     "content",
 					DataType: []string{"text"},
 				},
@@ -105,6 +131,33 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 
 		if !r {
 			err := client.Schema().
+				ClassCreator().
+				WithClass(&class).
+				Do(ctx)
+			if err != nil {
+				return fault.Wrap(err)
+			}
+		} else {
+			//
+			// MASSIVE HACK WARNING
+			//
+			// Weaviate does not support updating class properties but currently
+			// it's still experimental, so the class structure MAY change in the
+			// future so what happens here is the class is deleted which deletes
+			// ALL vectorised content. Once this happens after a successful boot
+			// the reindex job will re-index all content. On large instances, it
+			// will be EXPENSIVE! So, until we settle on the properties, beware.
+			//
+
+			err := client.Schema().
+				ClassDeleter().
+				WithClassName(class.Class).
+				Do(ctx)
+			if err != nil {
+				return fault.Wrap(err)
+			}
+
+			err = client.Schema().
 				ClassCreator().
 				WithClass(&class).
 				Do(ctx)
