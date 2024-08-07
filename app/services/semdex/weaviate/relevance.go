@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
@@ -42,6 +43,10 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 		WithWhere(where).
 		Do(ctx))
 	if err != nil {
+		// janky error handling because weaviate client doesn't use sentinals
+		if err.Error() == "vector not found" {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

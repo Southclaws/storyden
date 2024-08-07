@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -15,17 +16,20 @@ import (
 )
 
 type HydratedQuerier struct {
+	logger     *zap.Logger
 	session    session.SessionProvider
 	nodereader library.Repository
 	scorer     semdex.RelevanceScorer
 }
 
 func New(
+	logger *zap.Logger,
 	session session.SessionProvider,
 	nodereader library.Repository,
 	scorer semdex.RelevanceScorer,
 ) *HydratedQuerier {
 	return &HydratedQuerier{
+		logger:     logger,
 		session:    session,
 		nodereader: nodereader,
 		scorer:     scorer,
@@ -46,15 +50,13 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, slug library.NodeSlug) 
 
 		scores, err := q.scorer.ScoreRelevance(ctx, pro, nid)
 		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+			q.logger.Warn("failed to score relevance", zap.Error(err))
 		}
 
 		score, ok := scores[nid]
-		if !ok {
-			return n, nil
+		if ok {
+			n.RelevanceScore = opt.New(score)
 		}
-
-		n.RelevanceScore = opt.New(score)
 
 		// TODO: Hydrate recommendations
 	}
