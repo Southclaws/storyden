@@ -7,8 +7,8 @@
  */
 import type { CollectionItemMetadata } from "./collectionItemMetadata";
 import type { CommonProperties } from "./commonProperties";
-import type { DatagraphNode } from "./datagraphNode";
+import type { DatagraphItem } from "./datagraphItem";
 
 export type CollectionItem = CommonProperties &
-  DatagraphNode &
+  DatagraphItem &
   CollectionItemMetadata;

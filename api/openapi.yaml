@@ -3266,7 +3266,7 @@ components:
     CollectionItem:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/DatagraphNode"
+        - $ref: "#/components/schemas/DatagraphItem"
         - $ref: "#/components/schemas/CollectionItemMetadata"
 
     CollectionItemMetadata:
@@ -3486,35 +3486,35 @@ components:
         - type: object
           required: [items]
           properties:
-            items: { $ref: "#/components/schemas/DatagraphNodeList" }
+            items: { $ref: "#/components/schemas/DatagraphItemList" }
 
-    DatagraphNodeList:
+    DatagraphItemList:
       type: array
-      items: { $ref: "#/components/schemas/DatagraphNode" }
+      items: { $ref: "#/components/schemas/DatagraphItem" }
 
-    DatagraphNode:
+    DatagraphItem:
       type: object
       required: [kind, id, name, slug, assets]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphNodeKind" }
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
         id: { $ref: "#/components/schemas/Identifier" }
-        assets: { $ref: "#/components/schemas/AssetList" }
         name:
           type: string
         slug:
           type: string
         description:
           type: string
+        assets: { $ref: "#/components/schemas/AssetList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
-    DatagraphNodeKind:
+    DatagraphItemKind:
       type: string
       enum: [post, node, profile]
 
     DatagraphRecommendations:
       required: [recomentations]
       properties:
-        recomentations: { $ref: "#/components/schemas/DatagraphNodeList" }
+        recomentations: { $ref: "#/components/schemas/DatagraphItemList" }
 
   securitySchemes:
     browser:

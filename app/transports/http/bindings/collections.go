@@ -192,7 +192,7 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 		AddedAt:        in.Added,
 		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
 		Owner:          serialiseProfileReference(in.Author), // Invalid, wrong owner
-		Kind:           openapi.DatagraphNodeKind(in.Item.GetKind().String()),
+		Kind:           serialiseDatagraphKind(in.Item.GetKind()),
 		Name:           in.Item.GetName(),
 		Slug:           in.Item.GetSlug(),
 		Description:    opt.New(in.Item.GetDesc()).Ptr(),

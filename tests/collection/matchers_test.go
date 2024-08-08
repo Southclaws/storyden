@@ -12,7 +12,7 @@ func matchThreadToItem(t *testing.T, thread *openapi.Thread, item openapi.Collec
 	t.Helper()
 	a := assert.New(t)
 
-	a.Equal(openapi.DatagraphNodeKindPost, item.Kind)
+	a.Equal(openapi.DatagraphItemKindPost, item.Kind)
 	a.Equal(thread.Id, item.Id)
 	// a.Equal(thread.CreatedAt, item.CreatedAt) // TODO
 	a.Equal(thread.Title, item.Name)
@@ -25,7 +25,7 @@ func matchNodeToItem(t *testing.T, node *openapi.Node, item openapi.CollectionIt
 	t.Helper()
 	a := assert.New(t)
 
-	a.Equal(openapi.DatagraphNodeKindNode, item.Kind)
+	a.Equal(openapi.DatagraphItemKindNode, item.Kind)
 	a.Equal(node.Id, item.Id)
 	// a.Equal(node.CreatedAt, item.CreatedAt) // TODO
 	a.Equal(node.Name, item.Name)

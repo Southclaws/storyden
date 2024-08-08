@@ -34,7 +34,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	items := dt.Map(r, serialiseDatagraphNodeReference)
+	items := dt.Map(r, serialiseDatagraphItem)
 
 	return openapi.DatagraphSearch200JSONResponse{
 		DatagraphSearchOKJSONResponse: openapi.DatagraphSearchOKJSONResponse{
@@ -44,9 +44,9 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 	}, nil
 }
 
-func serialiseDatagraphNodeReference(v datagraph.Item) openapi.DatagraphNode {
+func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
 	desc := v.GetDesc()
-	return openapi.DatagraphNode{
+	return openapi.DatagraphItem{
 		Kind:        serialiseDatagraphKind(v.GetKind()),
 		Id:          v.GetID().String(),
 		Name:        v.GetName(),
@@ -55,14 +55,14 @@ func serialiseDatagraphNodeReference(v datagraph.Item) openapi.DatagraphNode {
 	}
 }
 
-func serialiseDatagraphKind(in datagraph.Kind) openapi.DatagraphNodeKind {
+func serialiseDatagraphKind(in datagraph.Kind) openapi.DatagraphItemKind {
 	switch in {
 	case datagraph.KindPost:
-		return openapi.DatagraphNodeKindPost
+		return openapi.DatagraphItemKindPost
 	case datagraph.KindNode:
-		return openapi.DatagraphNodeKindNode
+		return openapi.DatagraphItemKindNode
 	case datagraph.KindProfile:
-		return openapi.DatagraphNodeKindProfile
+		return openapi.DatagraphItemKindProfile
 	default:
 		panic(fault.Newf("unknown kind '%s'", in))
 	}
