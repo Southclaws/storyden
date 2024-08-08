@@ -41,23 +41,19 @@ type Thread struct {
 	Assets      []*asset.Asset
 	Collections []*collection.Collection
 	Links       datagraph.Links
-	Related     []*datagraph.NodeReference
-}
-
-type ThreadWithRecommendations struct {
-	Thread
-	Related []*datagraph.Indexable
+	Related     datagraph.ItemList
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) GetID() xid.ID            { return xid.ID(t.ID) }
-func (t *Thread) GetKind() datagraph.Kind  { return datagraph.KindPost }
-func (t *Thread) GetName() string          { return t.Title }
-func (t *Thread) GetSlug() string          { return t.Slug }
-func (t *Thread) GetDesc() string          { return t.Short }
-func (t *Thread) GetContent() content.Rich { return t.Posts[0].Content }
-func (t *Thread) GetProps() map[string]any { return t.Meta }
+func (t *Thread) GetID() xid.ID             { return xid.ID(t.ID) }
+func (t *Thread) GetKind() datagraph.Kind   { return datagraph.KindPost }
+func (t *Thread) GetName() string           { return t.Title }
+func (t *Thread) GetSlug() string           { return t.Slug }
+func (t *Thread) GetDesc() string           { return t.Short }
+func (t *Thread) GetContent() content.Rich  { return t.Posts[0].Content }
+func (t *Thread) GetProps() map[string]any  { return t.Meta }
+func (t *Thread) GetAssets() []*asset.Asset { return t.Assets }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()

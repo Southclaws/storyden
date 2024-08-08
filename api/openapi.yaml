@@ -3494,10 +3494,11 @@ components:
 
     DatagraphNode:
       type: object
-      required: [kind, id, name, slug]
+      required: [kind, id, name, slug, assets]
       properties:
         kind: { $ref: "#/components/schemas/DatagraphNodeKind" }
         id: { $ref: "#/components/schemas/Identifier" }
+        assets: { $ref: "#/components/schemas/AssetList" }
         name:
           type: string
         slug:

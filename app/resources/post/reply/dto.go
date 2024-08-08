@@ -56,9 +56,10 @@ func (r *Reply) GetSlug() string {
 	}
 	return r.RootThreadMark
 }
-func (r *Reply) GetContent() content.Rich { return r.Content }
-func (r *Reply) GetDesc() string          { return r.Content.Short() }
-func (r *Reply) GetProps() map[string]any { return r.Meta }
+func (r *Reply) GetContent() content.Rich  { return r.Content }
+func (r *Reply) GetDesc() string           { return r.Content.Short() }
+func (r *Reply) GetProps() map[string]any  { return r.Meta }
+func (r *Reply) GetAssets() []*asset.Asset { return r.Assets }
 
 func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Content.Short())
