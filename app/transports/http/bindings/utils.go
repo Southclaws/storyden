@@ -104,7 +104,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Assets:         dt.Map(t.Assets, serialiseAssetReference),
 		Collections:    dt.Map(t.Collections, serialiseCollection),
 		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
-		Recomentations: dt.Map(t.Related, serialiseDatagraphNodeReference),
+		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 	}
 }
 

@@ -6,15 +6,15 @@
  * OpenAPI spec version: 1
  */
 import type { AssetList } from "./assetList";
-import type { DatagraphNodeKind } from "./datagraphNodeKind";
+import type { DatagraphItemKind } from "./datagraphItemKind";
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 
-export interface DatagraphNode {
+export interface DatagraphItem {
   assets: AssetList;
   description?: string;
   id: Identifier;
-  kind: DatagraphNodeKind;
+  kind: DatagraphItemKind;
   meta?: Metadata;
   name: string;
   slug: string;
