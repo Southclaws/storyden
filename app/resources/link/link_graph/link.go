@@ -27,7 +27,7 @@ type WithRefs struct {
 	Threads     []*thread.Thread
 	Replies     []*reply.Reply
 	Nodes       []*library.Node
-	Related     datagraph.NodeReferenceList
+	Related     datagraph.ItemList
 }
 
 func (l *WithRefs) AssetIDs() []asset.AssetID {

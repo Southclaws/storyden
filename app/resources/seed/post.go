@@ -26,13 +26,10 @@ import (
 
 var (
 	Post_01_Welcome = thread.Thread{
-		ID:       post.ID(id("00000000000000000010")),
-		Title:    "Welcome to Storyden!",
-		Author:   profile.Public{ID: Account_001_Odin.ID},
-		Category: Category_01_General,
-		Posts: []*reply.Reply{
-			{
-				Content: utils.Must(content.NewRichText(`Storyden is a platform for building communities.
+		Post: post.Post{
+			ID:     post.ID(id("00000000000000000010")),
+			Author: profile.Public{ID: Account_001_Odin.ID},
+			Content: utils.Must(content.NewRichText(`Storyden is a platform for building communities.
 
 But not just another chat app or another forum site. Storyden is a modern take on oldschool bulletin board forums you may remember from the earlier days of the internet.
 
@@ -64,208 +61,247 @@ The code aims to be simple and accessible for either experienced software engine
 
 Storyden is still in development so please give the repository a watch if you're interested!
 `)),
+		},
+		Title:    "Welcome to Storyden!",
+		Category: Category_01_General,
+		Replies: []*reply.Reply{
+			{
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000001010")),
+					Author:  profile.Public{ID: Account_004_Loki.ID},
+					Content: utils.Must(content.NewRichText("first 😁")),
+				},
+				RootPostID: post.ID(id("00000000000000000010")),
 			},
 			{
-				ID:         post.ID(id("00000000000000001010")),
-				Content:    utils.Must(content.NewRichText("first 😁")),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000002010")),
+					Author:  profile.Public{ID: Account_002_Frigg.ID},
+					Content: utils.Must(content.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000002010")),
-				Content:    utils.Must(content.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000003010")),
+					Author:  profile.Public{ID: Account_001_Odin.ID},
+					Content: utils.Must(content.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000003010")),
-				Content:    utils.Must(content.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000004010")),
+					Author:  profile.Public{ID: Account_008_Heimdallr.ID},
+					Content: utils.Must(content.NewRichText("What about images and stuff?")),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_001_Odin.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000004010")),
-				Content:    utils.Must(content.NewRichText("What about images and stuff?")),
+				Post: post.Post{
+					ID:     post.ID(id("00000000000000005010")),
+					Author: profile.Public{ID: Account_004_Loki.ID},
+					Content: utils.Must(content.NewRichText(`oh you can do that like this:
+					
+					![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
+					`)),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_008_Heimdallr.ID},
 			},
 			{
-				ID: post.ID(id("00000000000000005010")),
-				Content: utils.Must(content.NewRichText(`oh you can do that like this:
-
-![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
-`)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000006010")),
+					Author:  profile.Public{ID: Account_005_Þórr.ID},
+					Content: utils.Must(content.NewRichText(`how did you do that??`)),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000006010")),
-				Content:    utils.Must(content.NewRichText(`how did you do that??`)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000007010")),
+					Author:  profile.Public{ID: Account_004_Loki.ID},
+					Content: utils.Must(content.NewRichText(`haha secret 😉`)),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_005_Þórr.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000007010")),
-				Content:    utils.Must(content.NewRichText(`haha secret 😉`)),
+				Post: post.Post{
+					ID:     post.ID(id("00000000000000008010")),
+					Author: profile.Public{ID: Account_002_Frigg.ID},
+					Content: utils.Must(content.NewRichText(`It was mentioned above, use markdown:
+					
+					https://daringfireball.net/markdown
+					`)),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 			{
-				ID: post.ID(id("00000000000000008010")),
-				Content: utils.Must(content.NewRichText(`It was mentioned above, use markdown:
-
-https://daringfireball.net/markdown
-`)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000009010")),
+					Author:  profile.Public{ID: Account_008_Heimdallr.ID},
+					Content: utils.Must(content.NewRichText("Thanks guys!")),
+				},
 				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_002_Frigg.ID},
-			},
-			{
-				ID:         post.ID(id("00000000000000009010")),
-				Content:    utils.Must(content.NewRichText("Thanks guys!")),
-				RootPostID: post.ID(id("00000000000000000010")),
-				Author:     profile.Public{ID: Account_008_Heimdallr.ID},
 			},
 		},
 	}
 	Post_02_HowToContribute = thread.Thread{
-		ID:       post.ID(id("00000000000000000020")),
+		Post: post.Post{
+			ID:     post.ID(id("00000000000000000020")),
+			Author: profile.Public{ID: Account_001_Odin.ID},
+			Content: utils.Must(content.NewRichText(`This post contains a list of resources for those of you who wish to contribute to Storyden.
+	
+	What does contribution mean? Anything, large or small! Even if you spot a typo in the home page or in this demo data you can report it or even take a swing at fixing it!
+	
+	If you're new to open source, don't be shy and ask for guidance on how to solve a problem you or someone else has found.
+	
+	The main place for reporting issues or making feature requests is here:
+	
+	https://github.com/Southclaws/storyden/issues
+	
+	You can also scout out what's in-progress and offer feedback or support here:
+	
+	https://github.com/Southclaws/storyden/pulls
+	
+	And there's also a great community that's friends with Storyden called Makeroom, they run a Discord server where you can ask questions and get support for anything related to building digital products:
+	
+	https://makeroom.club
+	
+	If I've missed anything, post in this thread and I'll add it here 😃
+	`)),
+		},
 		Title:    "How to contribute",
-		Author:   profile.Public{ID: Account_001_Odin.ID},
 		Category: Category_01_General,
-		Posts: []*reply.Reply{
+		Replies: []*reply.Reply{
 			{
-				Content: utils.Must(content.NewRichText(`This post contains a list of resources for those of you who wish to contribute to Storyden.
-
-What does contribution mean? Anything, large or small! Even if you spot a typo in the home page or in this demo data you can report it or even take a swing at fixing it!
-
-If you're new to open source, don't be shy and ask for guidance on how to solve a problem you or someone else has found.
-
-The main place for reporting issues or making feature requests is here:
-
-https://github.com/Southclaws/storyden/issues
-
-You can also scout out what's in-progress and offer feedback or support here:
-
-https://github.com/Southclaws/storyden/pulls
-
-And there's also a great community that's friends with Storyden called Makeroom, they run a Discord server where you can ask questions and get support for anything related to building digital products:
-
-https://makeroom.club
-
-If I've missed anything, post in this thread and I'll add it here 😃
-`)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000001020")),
+					Content: utils.Must(content.NewRichText("Is there a wiki?")),
+					Author:  profile.Public{ID: Account_006_Freyja.ID},
+				},
+				RootPostID: post.ID(id("00000000000000000020")),
 			},
 			{
-				ID:         post.ID(id("00000000000000001020")),
-				Content:    utils.Must(content.NewRichText("Is there a wiki?")),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000002020")),
+					Content: utils.Must(content.NewRichText("Not yet but they're working on it!")),
+					Author:  profile.Public{ID: Account_002_Frigg.ID},
+				},
 				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     profile.Public{ID: Account_006_Freyja.ID},
-			},
-			{
-				ID:         post.ID(id("00000000000000002020")),
-				Content:    utils.Must(content.NewRichText("Not yet but they're working on it!")),
-				RootPostID: post.ID(id("00000000000000000020")),
-				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 		},
 	}
 
 	Post_03_LoremIpsum = thread.Thread{
-		ID:       post.ID(id("00000000000000000030")),
+		Post: post.Post{
+			ID:     post.ID(id("00000000000000000030")),
+			Author: profile.Public{ID: Account_005_Þórr.ID},
+			Content: utils.Must(content.NewRichText(`In this thread:
+	
+	Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
+		},
 		Title:    "The lorem ipsum thread",
-		Author:   profile.Public{ID: Account_005_Þórr.ID},
 		Category: Category_01_General,
-		Posts: []*reply.Reply{
+		Replies: []*reply.Reply{
 			{
-				Content: utils.Must(content.NewRichText(`In this thread:
-
-Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000001030")),
+					Content: utils.Must(content.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
+					Author:  profile.Public{ID: Account_006_Freyja.ID},
+				},
+				RootPostID: post.ID(id("00000000000000000030")),
 			},
 			{
-				ID:         post.ID(id("00000000000000001030")),
-				Content:    utils.Must(content.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000002030")),
+					Content: utils.Must(content.NewRichText(markdownTest03)),
+					Author:  profile.Public{ID: Account_002_Frigg.ID},
+				},
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     profile.Public{ID: Account_006_Freyja.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000002030")),
-				Content:    utils.Must(content.NewRichText(markdownTest03)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000003030")),
+					Content: utils.Must(content.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
+					Author:  profile.Public{ID: Account_007_Freyr.ID},
+				},
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     profile.Public{ID: Account_002_Frigg.ID},
 			},
 			{
-				ID:         post.ID(id("00000000000000003030")),
-				Content:    utils.Must(content.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
+				Post: post.Post{
+					ID:      post.ID(id("00000000000000004030")),
+					Content: utils.Must(content.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
+					Author:  profile.Public{ID: Account_004_Loki.ID},
+				},
 				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     profile.Public{ID: Account_007_Freyr.ID},
-			},
-			{
-				ID:         post.ID(id("00000000000000004030")),
-				Content:    utils.Must(content.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
-				RootPostID: post.ID(id("00000000000000000030")),
-				Author:     profile.Public{ID: Account_004_Loki.ID},
 			},
 		},
 	}
 
 	Post_04_Photos = thread.Thread{
-		ID:       post.ID(id("00000000000000000040")),
-		Title:    "Trip to Iceland",
-		Author:   profile.Public{ID: Account_005_Þórr.ID},
-		Category: Category_02_Photos,
-		Assets: []*asset.Asset{
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
-				Size: 2537802, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
-				Size: 1433625, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
-				Size: 1828065, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
-				Size: 1769497, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
-				Size: 1930321, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
-				Size: 1724055, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
-				Size: 2552083, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
-			},
-			{
-				ID:   utils.Must(xid.FromString("00000000000000000040")),
-				Name: asset.NewFilename("00000000000000000040-asset-01"),
-				URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
-				Size: 3155277, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
+		Post: post.Post{
+			ID:      post.ID(id("00000000000000000040")),
+			Author:  profile.Public{ID: Account_005_Þórr.ID},
+			Content: utils.Must(content.NewRichText("some pics from my trip!")),
+			Assets: []*asset.Asset{
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
+					Size: 2537802, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
+					Size: 1433625, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
+					Size: 1828065, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
+					Size: 1769497, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
+					Size: 1930321, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
+					Size: 1724055, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
+					Size: 2552083, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
+				},
+				{
+					ID:   utils.Must(xid.FromString("00000000000000000040")),
+					Name: asset.NewFilename("00000000000000000040-asset-01"),
+					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
+					Size: 3155277, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
+				},
 			},
 		},
-		Posts: []*reply.Reply{
+		Title:    "Trip to Iceland",
+		Category: Category_02_Photos,
+
+		Replies: []*reply.Reply{
 			{
-				Content: utils.Must(content.NewRichText("")),
+				Post: post.Post{
+					Content: utils.Must(content.NewRichText("")),
+				},
 			},
 		},
 	}
@@ -282,8 +318,6 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 	ctx := context.Background()
 
 	for _, t := range Threads {
-		first := t.Posts[0]
-
 		assetIDs := []asset.AssetID{}
 		for i, a := range t.Assets {
 			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
@@ -302,7 +336,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			t.Category.ID,
 			t.Tags,
 			thread.WithID(t.ID),
-			thread.WithContent(first.Content),
+			thread.WithContent(t.Content),
 			thread.WithVisibility(visibility.VisibilityPublished),
 			thread.WithAssets(assetIDs),
 		)
@@ -313,7 +347,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 			panic(err)
 		}
 
-		for _, p := range t.Posts[1:] {
+		for _, p := range t.Replies {
 			p, err = pr.Create(ctx,
 				p.Author.ID,
 				th.ID,

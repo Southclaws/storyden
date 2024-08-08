@@ -40,7 +40,7 @@ type CollectionItem struct {
 	Added          time.Time
 	MembershipType MembershipType
 	Author         profile.Public
-	Item           datagraph.Indexable
+	Item           datagraph.Item
 	RelevanceScore opt.Optional[float64]
 }
 

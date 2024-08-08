@@ -8,10 +8,10 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
 	entpost "github.com/Southclaws/storyden/internal/ent/post"
@@ -74,9 +74,9 @@ func (r *reindexer) reindexAll(ctx context.Context) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	posts := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindPost })
-	nodes := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindNode })
-	profiles := dt.Filter(indexed, func(i *datagraph.NodeReference) bool { return i.Kind == datagraph.KindProfile })
+	posts := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindPost })
+	nodes := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindNode })
+	profiles := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindProfile })
 
 	if err := r.reindexPosts(ctx, posts); err != nil {
 		return err
@@ -93,13 +93,13 @@ func (r *reindexer) reindexAll(ctx context.Context) error {
 	return nil
 }
 
-func (r *reindexer) reindexNodes(ctx context.Context, indexed []*datagraph.NodeReference) error {
+func (r *reindexer) reindexNodes(ctx context.Context, indexed []*datagraph.Ref) error {
 	nodes, err := r.ec.Node.Query().Select(entpost.FieldID).All(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	indexedIDs := dt.Map(indexed, func(i *datagraph.NodeReference) xid.ID { return i.ID })
+	indexedIDs := dt.Map(indexed, func(i *datagraph.Ref) xid.ID { return i.ID })
 	postIDs := dt.Map(nodes, func(p *ent.Node) xid.ID { return p.ID })
 
 	intersection := lo.Without(postIDs, indexedIDs...)
@@ -121,13 +121,13 @@ func (r *reindexer) reindexNodes(ctx context.Context, indexed []*datagraph.NodeR
 	return nil
 }
 
-func (r *reindexer) reindexPosts(ctx context.Context, indexed []*datagraph.NodeReference) error {
+func (r *reindexer) reindexPosts(ctx context.Context, indexed []*datagraph.Ref) error {
 	posts, err := r.ec.Post.Query().Select(entpost.FieldID).All(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	indexedIDs := dt.Map(indexed, func(i *datagraph.NodeReference) xid.ID { return i.ID })
+	indexedIDs := dt.Map(indexed, func(i *datagraph.Ref) xid.ID { return i.ID })
 	postIDs := dt.Map(posts, func(p *ent.Post) xid.ID { return p.ID })
 
 	intersection := lo.Without(postIDs, indexedIDs...)
@@ -149,13 +149,13 @@ func (r *reindexer) reindexPosts(ctx context.Context, indexed []*datagraph.NodeR
 	return nil
 }
 
-func (r *reindexer) reindexProfiles(ctx context.Context, indexed []*datagraph.NodeReference) error {
+func (r *reindexer) reindexProfiles(ctx context.Context, indexed []*datagraph.Ref) error {
 	profiles, err := r.ec.Account.Query().Select(entaccount.FieldID).All(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	indexedIDs := dt.Map(indexed, func(i *datagraph.NodeReference) xid.ID { return i.ID })
+	indexedIDs := dt.Map(indexed, func(i *datagraph.Ref) xid.ID { return i.ID })
 	accountIDs := dt.Map(profiles, func(p *ent.Account) xid.ID { return p.ID })
 
 	intersection := lo.Without(accountIDs, indexedIDs...)

@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Indexable) error {
+func (s *weaviateRefIndex) Index(ctx context.Context, object datagraph.Item) error {
 	rich := object.GetContent()
 	sid := object.GetID()
 

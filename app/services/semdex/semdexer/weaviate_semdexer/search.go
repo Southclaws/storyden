@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -38,7 +38,7 @@ type WeaviateResponse struct {
 	Explore WeaviateContent
 }
 
-func (s *weaviateSemdexer) Search(ctx context.Context, q string) (datagraph.NodeReferenceList, error) {
+func (s *weaviateRefIndex) Search(ctx context.Context, q string) (datagraph.RefList, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},

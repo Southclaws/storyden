@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"github.com/weaviate/weaviate/entities/models"
 )
 
-func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.Indexable, ids ...xid.ID) (map[xid.ID]float64, error) {
+func (w *weaviateRefIndex) ScoreRelevance(ctx context.Context, object datagraph.Item, ids ...xid.ID) (map[xid.ID]float64, error) {
 	if len(ids) == 0 {
 		return map[xid.ID]float64{}, nil
 	}
@@ -66,8 +66,8 @@ func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	out := dt.Reduce(results, func(acc map[xid.ID]float64, ref *datagraph.NodeReference) map[xid.ID]float64 {
-		acc[ref.ID] = ref.Score
+	out := dt.Reduce(results, func(acc map[xid.ID]float64, ref *datagraph.Ref) map[xid.ID]float64 {
+		acc[ref.ID] = ref.Relevance
 		return acc
 	}, map[xid.ID]float64{})
 

@@ -1,14 +1,9 @@
 package thread
 
 import (
-	"time"
-
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
@@ -16,48 +11,33 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type Thread struct {
-	ID        post.ID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt opt.Optional[time.Time]
+	post.Post
 
-	Title       string
-	Slug        string
-	Short       string
-	Pinned      bool
-	Author      profile.Public
-	Tags        []string
+	Title  string
+	Slug   string
+	Short  string
+	Pinned bool
+
+	Replies     []*reply.Reply
 	Category    category.Category
 	Visibility  visibility.Visibility
-	Posts       []*reply.Reply
-	Reacts      []*react.React
-	Meta        map[string]any
-	Assets      []*asset.Asset
+	Tags        []string
 	Collections []*collection.Collection
-	Links       datagraph.Links
-	Related     []*datagraph.NodeReference
-}
-
-type ThreadWithRecommendations struct {
-	Thread
-	Related []*datagraph.Indexable
+	Related     datagraph.ItemList
 }
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) GetID() xid.ID            { return xid.ID(t.ID) }
-func (t *Thread) GetKind() datagraph.Kind  { return datagraph.KindPost }
-func (t *Thread) GetName() string          { return t.Title }
-func (t *Thread) GetSlug() string          { return t.Slug }
-func (t *Thread) GetDesc() string          { return t.Short }
-func (t *Thread) GetContent() content.Rich { return t.Posts[0].Content }
-func (t *Thread) GetProps() map[string]any { return t.Meta }
+func (t *Thread) GetName() string { return t.Title }
+func (t *Thread) GetSlug() string { return t.Slug }
+func (t *Thread) GetDesc() string { return t.Short }
 
 func FromModel(m *ent.Post) (*Thread, error) {
 	categoryEdge, err := m.Edges.CategoryOrErr()
@@ -118,24 +98,30 @@ func FromModel(m *ent.Post) (*Thread, error) {
 	}
 
 	return &Thread{
-		ID:        post.ID(m.ID),
-		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
-		DeletedAt: opt.NewPtr(m.DeletedAt),
+		Post: post.Post{
+			ID: post.ID(m.ID),
 
-		Title:       m.Title,
-		Slug:        m.Slug,
-		Short:       m.Short,
-		Pinned:      m.Pinned,
-		Author:      *pro,
-		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
+			Content: first.Post.Content,
+			Author:  *pro,
+			Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
+			Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
+			Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
+			Meta:    m.Metadata,
+
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: opt.NewPtr(m.DeletedAt),
+		},
+
+		Title:  m.Title,
+		Slug:   m.Slug,
+		Short:  m.Short,
+		Pinned: m.Pinned,
+
+		Replies:     posts,
 		Category:    *category,
 		Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
-		Posts:       posts,
-		Reacts:      dt.Map(m.Edges.Reacts, react.FromModel),
-		Meta:        m.Metadata,
-		Assets:      dt.Map(m.Edges.Assets, asset.FromModel),
+		Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
 		Collections: collections.OrZero(),
-		Links:       dt.Map(m.Edges.Links, datagraph.LinkFromModel),
 	}, nil
 }

@@ -25,8 +25,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/semdex/index_job"
+	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/summarise_job"
-	"github.com/Southclaws/storyden/app/services/semdex/weaviate"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/services/url"
@@ -52,7 +52,7 @@ func Build() fx.Option {
 		url.Build(),
 		hydrator.Build(),
 		fetcher.Build(),
-		weaviate.Build(),
+		semdexer.Build(),
 		index_job.Build(),
 		summarise_job.Build(),
 		fx.Provide(avatar_gen.New),

@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/weaviate/weaviate/entities/models"
 )
 
-func (o *weaviateSemdexer) GetAll(ctx context.Context) (datagraph.NodeReferenceList, error) {
+func (o *weaviateRefIndex) GetAll(ctx context.Context) (datagraph.RefList, error) {
 	objects, err := o.wc.Data().
 		ObjectsGetter().
 		//
@@ -27,7 +27,7 @@ func (o *weaviateSemdexer) GetAll(ctx context.Context) (datagraph.NodeReferenceL
 	}
 
 	invalid := []*models.Object{}
-	refs := []*datagraph.NodeReference{}
+	refs := []*datagraph.Ref{}
 
 	for _, m := range objects {
 		o, err := mapWeaviateObject(m)
@@ -45,10 +45,10 @@ func (o *weaviateSemdexer) GetAll(ctx context.Context) (datagraph.NodeReferenceL
 		}
 	}
 
-	return datagraph.NodeReferenceList(refs), nil
+	return datagraph.RefList(refs), nil
 }
 
-func mapWeaviateObject(o *models.Object) (*datagraph.NodeReference, error) {
+func mapWeaviateObject(o *models.Object) (*datagraph.Ref, error) {
 	wo, err := unmarshalWeaviateObject(o.Properties)
 	if err != nil {
 		return nil, err

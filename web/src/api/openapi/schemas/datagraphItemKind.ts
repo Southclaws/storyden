@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1
  */
 
-export type DatagraphNodeKind =
-  (typeof DatagraphNodeKind)[keyof typeof DatagraphNodeKind];
+export type DatagraphItemKind =
+  (typeof DatagraphItemKind)[keyof typeof DatagraphItemKind];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const DatagraphNodeKind = {
+export const DatagraphItemKind = {
   post: "post",
   node: "node",
   profile: "profile",

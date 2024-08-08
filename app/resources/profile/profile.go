@@ -8,6 +8,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -28,13 +29,14 @@ type Public struct {
 	Metadata      map[string]any
 }
 
-func (p *Public) GetID() xid.ID            { return xid.ID(p.ID) }
-func (p *Public) GetKind() datagraph.Kind  { return datagraph.KindProfile }
-func (p *Public) GetName() string          { return p.Name }
-func (p *Public) GetSlug() string          { return p.Handle }
-func (p *Public) GetDesc() string          { return p.Bio.Short() }
-func (p *Public) GetContent() content.Rich { return p.Bio }
-func (p *Public) GetProps() map[string]any { return p.Metadata }
+func (p *Public) GetID() xid.ID             { return xid.ID(p.ID) }
+func (p *Public) GetKind() datagraph.Kind   { return datagraph.KindProfile }
+func (p *Public) GetName() string           { return p.Name }
+func (p *Public) GetSlug() string           { return p.Handle }
+func (p *Public) GetDesc() string           { return p.Bio.Short() }
+func (p *Public) GetContent() content.Rich  { return p.Bio }
+func (p *Public) GetProps() map[string]any  { return p.Metadata }
+func (p *Public) GetAssets() []*asset.Asset { return []*asset.Asset{} }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
 	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {

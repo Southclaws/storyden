@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -26,9 +26,9 @@ func NewParallelSearcher(ec *ent.Client) *ParallelSearcher {
 	}
 }
 
-func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.NodeReferenceList, error) {
+func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
 	mx := sync.Mutex{}
-	results := []*datagraph.NodeReference{}
+	results := datagraph.ItemList{}
 
 	eg, ctx := errgroup.WithContext(ctx)
 
@@ -37,7 +37,7 @@ func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.
 		eg.Go(func() error {
 			r, err := v.Search(ctx, query)
 			if err != nil {
-				return err // nolint:wrapcheck
+				return err
 			}
 
 			mx.Lock()
@@ -53,13 +53,4 @@ func (s *ParallelSearcher) Search(ctx context.Context, query string) (datagraph.
 	}
 
 	return results, nil
-}
-
-func indexableToResult[T datagraph.Indexable](v T) *datagraph.NodeReference {
-	return &datagraph.NodeReference{
-		ID:   v.GetID(),
-		Kind: v.GetKind(),
-		Name: v.GetName(),
-		Slug: v.GetSlug(),
-	}
 }

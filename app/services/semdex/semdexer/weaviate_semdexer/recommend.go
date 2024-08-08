@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Indexable) (datagraph.NodeReferenceList, error) {
+func (w *weaviateRefIndex) Recommend(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
 	wid := GetWeaviateID(object.GetID())
 
 	result, err := w.wc.Data().ObjectsGetter().

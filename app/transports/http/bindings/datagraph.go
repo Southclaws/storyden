@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -34,7 +34,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	items := dt.Map(r, serialiseDatagraphNodeReference)
+	items := dt.Map(r, serialiseDatagraphItem)
 
 	return openapi.DatagraphSearch200JSONResponse{
 		DatagraphSearchOKJSONResponse: openapi.DatagraphSearchOKJSONResponse{
@@ -44,12 +44,26 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 	}, nil
 }
 
-func serialiseDatagraphNodeReference(v *datagraph.NodeReference) openapi.DatagraphNode {
-	return openapi.DatagraphNode{
-		Kind:        openapi.DatagraphNodeKind(v.Kind.String()),
-		Id:          v.ID.String(),
-		Name:        v.Name,
-		Slug:        v.Slug,
-		Description: &v.Description,
+func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
+	desc := v.GetDesc()
+	return openapi.DatagraphItem{
+		Kind:        serialiseDatagraphKind(v.GetKind()),
+		Id:          v.GetID().String(),
+		Name:        v.GetName(),
+		Slug:        v.GetSlug(),
+		Description: &desc,
+	}
+}
+
+func serialiseDatagraphKind(in datagraph.Kind) openapi.DatagraphItemKind {
+	switch in {
+	case datagraph.KindPost:
+		return openapi.DatagraphItemKindPost
+	case datagraph.KindNode:
+		return openapi.DatagraphItemKindNode
+	case datagraph.KindProfile:
+		return openapi.DatagraphItemKindProfile
+	default:
+		panic(fault.Newf("unknown kind '%s'", in))
 	}
 }
