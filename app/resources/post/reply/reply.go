@@ -2,7 +2,6 @@ package reply
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -19,29 +18,16 @@ import (
 )
 
 type Reply struct {
-	ID post.ID
+	post.Post
 
-	Content         content.Rich
-	Author          profile.Public
 	RootPostID      post.ID
 	RootThreadMark  string
 	RootThreadTitle string
 	ReplyTo         opt.Optional[post.ID]
-	Reacts          []*react.React
-	Meta            map[string]any
-	Assets          []*asset.Asset
-	Links           []*datagraph.Link
-	URL             opt.Optional[string]
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt opt.Optional[time.Time]
 }
 
 func (*Reply) GetResourceName() string { return "post" }
 
-func (r *Reply) GetID() xid.ID           { return xid.ID(r.ID) }
-func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindPost }
 func (r *Reply) GetName() string {
 	if xid.ID(r.RootPostID).IsZero() {
 		return r.RootThreadTitle
@@ -56,10 +42,7 @@ func (r *Reply) GetSlug() string {
 	}
 	return r.RootThreadMark
 }
-func (r *Reply) GetContent() content.Rich  { return r.Content }
-func (r *Reply) GetDesc() string           { return r.Content.Short() }
-func (r *Reply) GetProps() map[string]any  { return r.Meta }
-func (r *Reply) GetAssets() []*asset.Asset { return r.Assets }
+func (r *Reply) GetDesc() string { return r.Content.Short() }
 
 func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Content.Short())
@@ -105,22 +88,24 @@ func FromModel(m *ent.Post) (*Reply, error) {
 	}
 
 	return &Reply{
-		ID: post.ID(m.ID),
+		Post: post.Post{
+			ID: post.ID(m.ID),
 
-		Content: content,
-		Author:  *pro,
+			Content: content,
+			Author:  *pro,
+			Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
+			Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
+			Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
+			Meta:    m.Metadata,
+
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: opt.NewPtr(m.DeletedAt),
+		},
 		ReplyTo: replyTo,
-		Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
-		Meta:    m.Metadata,
-		Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
-		Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
 
 		RootPostID:      rootPostID,
 		RootThreadMark:  rootThreadMark,
 		RootThreadTitle: rootThreadTitle,
-
-		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
-		DeletedAt: opt.NewPtr(m.DeletedAt),
 	}, nil
 }
