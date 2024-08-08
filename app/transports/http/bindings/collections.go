@@ -191,12 +191,13 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 		Id:             in.Item.GetID().String(),
 		AddedAt:        in.Added,
 		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
-		Owner:          serialiseProfileReference(in.Author),
+		Owner:          serialiseProfileReference(in.Author), // Invalid, wrong owner
 		Kind:           openapi.DatagraphNodeKind(in.Item.GetKind().String()),
 		Name:           in.Item.GetName(),
 		Slug:           in.Item.GetSlug(),
 		Description:    opt.New(in.Item.GetDesc()).Ptr(),
 		RelevanceScore: score,
 		Meta:           (*openapi.Metadata)(&meta),
+		Assets:         dt.Map(in.Item.GetAssets(), serialiseAssetReference),
 	}
 }
