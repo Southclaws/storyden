@@ -6,11 +6,11 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
-	post_model "github.com/Southclaws/storyden/internal/ent/post"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
 type database struct {
@@ -21,9 +21,9 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Reply, error) {
+func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post, error) {
 	if len(filters) == 0 {
-		return []*reply.Reply{}, nil
+		return []*post.Post{}, nil
 	}
 
 	q := d.db.Post.
@@ -32,40 +32,54 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*reply.Repl
 		WithReacts().
 		WithTags().
 		WithRoot().
-		Order(ent.Asc(post_model.FieldCreatedAt))
+		Order(ent.Asc(ent_post.FieldCreatedAt))
 
 	for _, fn := range filters {
 		fn(q)
 	}
 
-	posts, err := q.All(ctx)
+	result, err := q.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	transform := func(v *ent.Post) (*reply.Reply, error) {
-		// hydrate the thread-specific info here. post.FromModel cannot do this
-		// as this info is only available in the context of a thread of posts.
-		dto, err := reply.FromModel(v)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		if v.First {
-			dto.RootThreadMark = v.Slug
-			dto.RootPostID = post.ID(v.ID)
-		} else {
-			dto.RootThreadMark = v.Edges.Root.Slug
-			dto.RootPostID = post.ID(v.Edges.Root.ID)
-		}
-
-		return dto, nil
-	}
-
-	replies, err := dt.MapErr(posts, transform)
+	posts, err := dt.MapErr(result, post.Map)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return replies, nil
+	return posts, nil
+}
+
+func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, error) {
+	if len(ids) == 0 {
+		return []*post.Post{}, nil
+	}
+
+	rawids := dt.Map(ids, func(in post.ID) xid.ID {
+		return xid.ID(in)
+	})
+
+	q := d.db.Post.
+		Query().
+		Where(
+			ent_post.IDIn(rawids...),
+		).
+		WithAuthor().
+		WithReacts().
+		WithTags().
+		WithRoot().
+		Order(ent.Asc(ent_post.FieldCreatedAt))
+
+	result, err := q.All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	posts, err := dt.MapErr(result, post.Map)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return posts, nil
 }

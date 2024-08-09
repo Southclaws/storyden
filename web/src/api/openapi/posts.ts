@@ -15,8 +15,6 @@ import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
   NotFoundResponse,
-  PostCreateBody,
-  PostCreateOKResponse,
   PostReactAddBody,
   PostReactAddOKResponse,
   PostSearchOKResponse,
@@ -26,69 +24,6 @@ import type {
   UnauthorisedResponse,
 } from "./schemas";
 
-/**
- * Create a new post within a thread.
- */
-export const postCreate = (
-  threadMark: string,
-  postCreateBody: PostCreateBody,
-) => {
-  return fetcher<PostCreateOKResponse>({
-    url: `/v1/threads/${threadMark}/posts`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: postCreateBody,
-  });
-};
-
-export const getPostCreateMutationFetcher = (threadMark: string) => {
-  return (
-    _: string,
-    { arg }: { arg: PostCreateBody },
-  ): Promise<PostCreateOKResponse> => {
-    return postCreate(threadMark, arg);
-  };
-};
-export const getPostCreateMutationKey = (threadMark: string) =>
-  `/v1/threads/${threadMark}/posts` as const;
-
-export type PostCreateMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postCreate>>
->;
-export type PostCreateMutationError =
-  | UnauthorisedResponse
-  | NotFoundResponse
-  | InternalServerErrorResponse;
-
-export const usePostCreate = <
-  TError =
-    | UnauthorisedResponse
-    | NotFoundResponse
-    | InternalServerErrorResponse,
->(
-  threadMark: string,
-  options?: {
-    swr?: SWRMutationConfiguration<
-      Awaited<ReturnType<typeof postCreate>>,
-      TError,
-      string,
-      PostCreateBody,
-      Awaited<ReturnType<typeof postCreate>>
-    > & { swrKey?: string };
-  },
-) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const swrKey = swrOptions?.swrKey ?? getPostCreateMutationKey(threadMark);
-  const swrFn = getPostCreateMutationFetcher(threadMark);
-
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
 /**
  * Publish changes to a single post.
  */

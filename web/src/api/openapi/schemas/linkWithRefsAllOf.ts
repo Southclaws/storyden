@@ -7,12 +7,10 @@
  */
 import type { CollectionList } from "./collectionList";
 import type { NodeList } from "./nodeList";
-import type { PostList } from "./postList";
-import type { ThreadList } from "./threadList";
+import type { PostReferenceList } from "./postReferenceList";
 
 export type LinkWithRefsAllOf = {
   collections: CollectionList;
   nodes: NodeList;
-  posts: PostList;
-  threads: ThreadList;
+  posts: PostReferenceList;
 };

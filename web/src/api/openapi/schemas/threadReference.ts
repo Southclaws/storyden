@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { CommonProperties } from "./commonProperties";
+import type { PostReference } from "./postReference";
 import type { ThreadReferenceAllOf } from "./threadReferenceAllOf";
 
 /**
@@ -14,4 +15,6 @@ does not include the posts within the thread. Useful for rendering large
 lists of threads or other situations when you don't need the full data.
 
  */
-export type ThreadReference = CommonProperties & ThreadReferenceAllOf;
+export type ThreadReference = CommonProperties &
+  PostReference &
+  ThreadReferenceAllOf;

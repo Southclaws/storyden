@@ -7,12 +7,12 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -122,7 +122,7 @@ func MapCollectionPost(n *ent.CollectionPost) (*CollectionItem, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := reply.FromModel(p)
+	item, err := post.Map(p)
 	if err != nil {
 		return nil, err
 	}
