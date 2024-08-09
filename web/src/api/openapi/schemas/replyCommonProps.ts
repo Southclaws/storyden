@@ -6,13 +6,10 @@
  * OpenAPI spec version: 1
  */
 import type { Identifier } from "./identifier";
-import type { Metadata } from "./metadata";
-import type { PostContent } from "./postContent";
-import type { Url } from "./url";
+import type { ThreadMark } from "./threadMark";
 
-export interface PostInitialProps {
-  body: PostContent;
-  meta?: Metadata;
+export interface ReplyCommonProps {
   reply_to?: Identifier;
-  url?: Url;
+  root_id: Identifier;
+  root_slug: ThreadMark;
 }

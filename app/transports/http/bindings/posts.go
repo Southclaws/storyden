@@ -10,9 +10,6 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/post_search"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -37,42 +34,6 @@ func NewPosts(
 	}
 }
 
-func (p *Posts) PostCreate(ctx context.Context, request openapi.PostCreateRequestObject) (openapi.PostCreateResponseObject, error) {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	postID, err := p.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	richContent, err := content.NewRichText(request.Body.Body)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
-	partial := reply_service.Partial{
-		Content: opt.New(richContent),
-		ReplyTo: opt.Map(opt.NewPtr(request.Body.ReplyTo), deserialisePostID),
-		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
-	}
-
-	post, err := p.reply_svc.Create(ctx,
-		accountID,
-		postID,
-		partial,
-	)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return openapi.PostCreate200JSONResponse{
-		PostCreateOKJSONResponse: openapi.PostCreateOKJSONResponse(serialisePost(post)),
-	}, nil
-}
-
 func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateRequestObject) (openapi.PostUpdateResponseObject, error) {
 	postID, err := p.thread_mark_svc.Lookup(ctx, string(request.PostId))
 	if err != nil {
@@ -95,7 +56,7 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 	}
 
 	return openapi.PostUpdate200JSONResponse{
-		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(serialisePost(post)),
+		PostUpdateOKJSONResponse: openapi.PostUpdateOKJSONResponse(serialisePost(&post.Post)),
 	}, nil
 }
 
@@ -138,25 +99,4 @@ func (p *Posts) PostSearch(ctx context.Context, request openapi.PostSearchReques
 			Results: results,
 		},
 	}, nil
-}
-
-func deserialisePostID(s string) post.ID {
-	return post.ID(openapi.ParseID(s))
-}
-
-func deserialiseContentKinds(in openapi.ContentKinds) ([]post_search.Kind, error) {
-	out, err := dt.MapErr(in, deserialiseContentKind)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-	return out, nil
-}
-
-func deserialiseContentKind(in openapi.ContentKind) (post_search.Kind, error) {
-	out, err := post_search.NewKind(string(in))
-	if err != nil {
-		return post_search.Kind{}, fault.Wrap(err)
-	}
-
-	return out, nil
 }

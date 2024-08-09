@@ -49,6 +49,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 			pq.WithAuthor()
 			pq.WithCategory()
 			pq.WithTags()
+			pq.WithRoot()
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
 			nq.WithOwner()

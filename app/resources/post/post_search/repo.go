@@ -5,10 +5,10 @@ import (
 
 	"github.com/Southclaws/dt"
 
-	post_resource "github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/post"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 )
 
@@ -24,20 +24,21 @@ const (
 type Filter func(*ent.PostQuery)
 
 type Repository interface {
-	Search(ctx context.Context, opts ...Filter) ([]*post_resource.Reply, error)
+	Search(ctx context.Context, opts ...Filter) ([]*post.Post, error)
+	GetMany(ctx context.Context, id ...post.ID) ([]*post.Post, error)
 }
 
 func WithKinds(ks ...Kind) Filter {
 	return func(pq *ent.PostQuery) {
 		pq.Where(
-			post.Or(
+			ent_post.Or(
 				dt.Map(ks, func(k Kind) predicate.Post {
 					switch k {
 					case KindThread:
-						return post.First(true)
+						return ent_post.First(true)
 
 					case KindPost:
-						return post.First(false)
+						return ent_post.First(false)
 
 					default:
 						return nil
@@ -50,23 +51,23 @@ func WithKinds(ks ...Kind) Filter {
 
 func WithTitleContains(q string) Filter {
 	return func(pq *ent.PostQuery) {
-		pq.Where(post.And(
-			post.First(true),
-			post.TitleContainsFold(q),
+		pq.Where(ent_post.And(
+			ent_post.First(true),
+			ent_post.TitleContainsFold(q),
 		))
 	}
 }
 
 func WithBodyContains(q string) Filter {
 	return func(pq *ent.PostQuery) {
-		pq.Where(post.BodyContains(q))
+		pq.Where(ent_post.BodyContains(q))
 	}
 }
 
 func WithAuthorHandle(handle string) Filter {
 	return func(pq *ent.PostQuery) {
 		pq.Where(
-			post.HasAuthorWith(
+			ent_post.HasAuthorWith(
 				account.Handle(handle),
 			),
 		)

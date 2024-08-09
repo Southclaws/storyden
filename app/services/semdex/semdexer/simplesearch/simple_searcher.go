@@ -10,18 +10,22 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
-	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/app/resources/library/node_search"
+	"github.com/Southclaws/storyden/app/resources/post/post_search"
 )
 
 type ParallelSearcher struct {
 	searchers []semdex.Searcher
 }
 
-func NewParallelSearcher(ec *ent.Client) *ParallelSearcher {
+func NewParallelSearcher(
+	post_searcher post_search.Repository,
+	node_searcher node_search.Search,
+) *ParallelSearcher {
 	return &ParallelSearcher{
 		searchers: []semdex.Searcher{
-			&postSearcher{ec},
-			&nodeSearcher{ec},
+			&postSearcher{post_searcher},
+			&nodeSearcher{node_searcher},
 		},
 	}
 }

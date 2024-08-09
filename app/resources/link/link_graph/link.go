@@ -11,8 +11,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -24,8 +22,7 @@ type WithRefs struct {
 	Title       opt.Optional[string]
 	Description opt.Optional[string]
 	Assets      []*asset.Asset
-	Threads     []*thread.Thread
-	Replies     []*reply.Reply
+	Posts       []*post.Post
 	Nodes       []*library.Node
 	Related     datagraph.ItemList
 }
@@ -51,27 +48,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 
 	// Mapping
 
-	threads, err := dt.MapErr(dt.Filter(postEdge, func(p *ent.Post) bool { return p.First }), thread.FromModel)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	replies, err := dt.MapErr(dt.Filter(postEdge, func(p *ent.Post) bool { return !p.First }), func(p *ent.Post) (*reply.Reply, error) {
-		root, err := p.Edges.RootOrErr()
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		rep, err := reply.FromModel(p)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		rep.RootThreadMark = root.Slug
-		rep.RootPostID = post.ID(root.ID)
-
-		return rep, nil
-	})
+	posts, err := dt.MapErr(postEdge, post.Map)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -89,8 +66,7 @@ func Map(in *ent.Link) (*WithRefs, error) {
 		Title:       opt.New(in.Title),
 		Description: opt.New(in.Description),
 		Assets:      dt.Map(in.Edges.Assets, asset.FromModel),
-		Threads:     threads,
-		Replies:     replies,
+		Posts:       posts,
 		Nodes:       nodes,
 	}, nil
 }

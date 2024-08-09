@@ -7,9 +7,8 @@
  */
 
 /**
- * Reactions are currently just simple strings but they may improve later.
-
+ * Reactions are currently just simple emoji characters.
  */
-export interface PostReactProps {
+export interface ReactInitialProps {
   emoji?: string;
 }

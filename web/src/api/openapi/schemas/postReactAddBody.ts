@@ -5,9 +5,9 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostReactProps } from "./postReactProps";
+import type { ReactInitialProps } from "./reactInitialProps";
 
 /**
  * Add a reaction to a post.
  */
-export type PostReactAddBody = PostReactProps;
+export type PostReactAddBody = ReactInitialProps;
