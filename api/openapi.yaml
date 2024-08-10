@@ -1845,7 +1845,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ReplyProps"
+            $ref: "#/components/schemas/Reply"
 
     PostUpdateOK:
       description: Post updated successfully.
@@ -3154,7 +3154,7 @@ components:
     #                    888           "Y88P"
     #
 
-    ReplyProps:
+    Reply:
       type: object
       description: |
         A new post within a thread of posts. A post may reply to another post in
@@ -3163,13 +3163,13 @@ components:
       allOf:
         - { $ref: "#/components/schemas/CommonProperties" }
         - { $ref: "#/components/schemas/PostProps" }
-        - { $ref: "#/components/schemas/ReplyCommonProps" }
+        - { $ref: "#/components/schemas/ReplyProps" }
 
     ReplyList:
       type: array
-      items: { $ref: "#/components/schemas/ReplyProps" }
+      items: { $ref: "#/components/schemas/Reply" }
 
-    ReplyCommonProps:
+    ReplyProps:
       type: object
       required: [root_id, root_slug, body, author, reacts, assets, links]
       properties:

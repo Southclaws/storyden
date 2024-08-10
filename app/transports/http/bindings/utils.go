@@ -110,8 +110,8 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 	}
 }
 
-func serialiseReply(p *reply.Reply) openapi.ReplyProps {
-	return openapi.ReplyProps{
+func serialiseReply(p *reply.Reply) openapi.Reply {
+	return openapi.Reply{
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
