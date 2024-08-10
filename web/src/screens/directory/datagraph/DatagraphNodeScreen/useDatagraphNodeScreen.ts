@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi/nodes";
-import { Asset, Visibility } from "src/api/openapi/schemas";
+import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi-client/nodes";
+import { Asset, Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import {
   DatagraphNode,

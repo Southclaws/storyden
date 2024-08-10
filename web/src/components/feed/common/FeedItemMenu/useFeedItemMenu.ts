@@ -2,7 +2,7 @@
 
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 
-import { PostReference } from "src/api/openapi/schemas";
+import { PostReference } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
 import { isShareEnabled } from "src/utils/client";

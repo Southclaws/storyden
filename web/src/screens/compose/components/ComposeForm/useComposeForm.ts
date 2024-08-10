@@ -3,13 +3,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useCategoryList } from "src/api/openapi/categories";
-import {
-  Thread,
-  ThreadInitialProps,
-  Visibility,
-} from "src/api/openapi/schemas";
-import { threadCreate, threadUpdate } from "src/api/openapi/threads";
+import { useCategoryList } from "src/api/openapi-client/categories";
+import { threadCreate, threadUpdate } from "src/api/openapi-client/threads";
+import { Thread, ThreadInitialProps, Visibility } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 
 export type Props = { editing?: string; initialDraft?: Thread };

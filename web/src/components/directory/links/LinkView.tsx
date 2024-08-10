@@ -1,6 +1,6 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
-import { LinkWithRefs } from "src/api/openapi/schemas";
+import { LinkWithRefs } from "src/api/openapi-schema";
 import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 
 import { LinkButton } from "@/components/ui/link-button";

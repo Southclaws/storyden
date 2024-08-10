@@ -1,4 +1,4 @@
-import { Asset, Link } from "src/api/openapi/schemas";
+import { Asset, Link } from "src/api/openapi-schema";
 
 import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
 

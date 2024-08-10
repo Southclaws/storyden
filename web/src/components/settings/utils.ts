@@ -5,7 +5,7 @@ import {
   AccountAuthMethodList,
   AuthProvider,
   AuthProviderList,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 
 const groupProviders = keyBy<AuthProvider>("provider");
 

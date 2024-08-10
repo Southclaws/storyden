@@ -3,7 +3,7 @@ import {
   PostProps,
   PostReference,
   ThreadReference,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";

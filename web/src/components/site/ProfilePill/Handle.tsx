@@ -1,6 +1,6 @@
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
-import { ProfileReference } from "src/api/openapi/schemas";
+import { ProfileReference } from "src/api/openapi-schema";
 
 import { styled } from "@/styled-system/jsx";
 

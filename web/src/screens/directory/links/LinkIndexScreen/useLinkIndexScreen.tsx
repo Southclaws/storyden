@@ -1,5 +1,5 @@
-import { useLinkList } from "src/api/openapi/links";
-import { LinkListResult } from "src/api/openapi/schemas";
+import { useLinkList } from "src/api/openapi-client/links";
+import { LinkListResult } from "src/api/openapi-schema";
 
 export type Props = {
   query?: string;

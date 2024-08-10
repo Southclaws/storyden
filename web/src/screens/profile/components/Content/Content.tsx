@@ -1,4 +1,4 @@
-import { PublicProfile } from "src/api/openapi/schemas";
+import { PublicProfile } from "src/api/openapi-schema";
 import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
 

@@ -7,7 +7,7 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect } from "react";
 
-import { Asset } from "src/api/openapi/schemas";
+import { Asset } from "src/api/openapi-schema";
 
 import { css } from "@/styled-system/css";
 

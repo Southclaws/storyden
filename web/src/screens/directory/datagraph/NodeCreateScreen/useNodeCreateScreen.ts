@@ -1,12 +1,12 @@
 import { last } from "lodash";
 import { useRouter } from "next/navigation";
 
-import { nodeCreate } from "src/api/openapi/nodes";
+import { nodeCreate } from "src/api/openapi-client/nodes";
 import {
   Account,
   NodeInitialProps,
   NodeWithChildren,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 
 import { joinDirectoryPath } from "../directory-path";
 import { useDirectoryPath } from "../useDirectoryPath";

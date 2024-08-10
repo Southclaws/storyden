@@ -5,13 +5,12 @@ import {
   collectionAddPost,
   collectionRemovePost,
   useCollectionList,
-} from "src/api/openapi/collections";
+} from "src/api/openapi-client/collections";
 import {
   Collection,
   CollectionList,
   PostReference,
-  ThreadReference,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useDisclosure } from "src/utils/useDisclosure";
 

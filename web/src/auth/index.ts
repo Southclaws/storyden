@@ -1,6 +1,5 @@
-import { useAccountGet } from "src/api/openapi/accounts";
-
-import { Account } from "@/api/openapi/schemas";
+import { useAccountGet } from "@/api/openapi-client/accounts";
+import { Account } from "@/api/openapi-schema";
 
 export function useSession(initial?: Account) {
   const { data } = useAccountGet({

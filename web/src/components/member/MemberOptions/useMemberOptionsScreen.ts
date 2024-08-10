@@ -1,4 +1,4 @@
-import { PublicProfile } from "src/api/openapi/schemas";
+import { PublicProfile } from "src/api/openapi-schema";
 
 export type Props = PublicProfile & {
   onChange?: () => void;

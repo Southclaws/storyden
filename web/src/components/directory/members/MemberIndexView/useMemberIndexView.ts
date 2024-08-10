@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
 import { z } from "zod";
 
-import { PublicProfileListResult } from "src/api/openapi/schemas";
+import { PublicProfileListResult } from "src/api/openapi-schema";
 
 export type Props = {
   profiles: PublicProfileListResult;

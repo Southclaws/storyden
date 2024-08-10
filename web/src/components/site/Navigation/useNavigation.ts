@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetInfo } from "src/api/openapi/misc";
+import { useGetInfo } from "src/api/openapi-client/misc";
 import { useSession } from "src/auth";
 
 // NOTE: Everything that involves data fetching here has a suitable fallback.

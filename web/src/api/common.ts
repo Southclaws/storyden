@@ -1,5 +1,7 @@
 import { filter, flow, reduce, toPairs } from "lodash/fp";
 
+import { API_ADDRESS } from "@/config";
+
 export type Options = {
   url: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -9,6 +11,56 @@ export type Options = {
   responseType?: string;
   cookie?: string;
 };
+
+export class RequestError extends Error {
+  public status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export function buildRequest({
+  url,
+  method = "GET",
+  headers,
+  params,
+  data,
+}: Options): Request {
+  const address = `${API_ADDRESS}/api${url}${cleanQuery(params)}`;
+  const _method = method.toUpperCase();
+
+  return new Request(address, {
+    method: _method,
+    mode: "cors",
+    credentials: "include",
+    headers,
+    body: buildPayload(data),
+  });
+}
+
+export async function buildResult<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const data = await response.json().catch(() => undefined);
+    const fallback = `${response.status} ${response.statusText}`;
+
+    throw new RequestError(data?.message ?? fallback, response.status);
+  }
+
+  // NOTE: The API code generator returns empty responses where there is no
+  // response type specified with a content type so this is the easy way to
+  // escape that code path and exit easily.
+  if (response.headers.get("content-length") === "0") {
+    return undefined as T;
+  }
+
+  if (response.headers.get("content-type")?.includes("json")) {
+    return response.json();
+  }
+
+  return response.blob() as T;
+}
 
 export const buildPayload = (data: unknown) => {
   if (!data) {

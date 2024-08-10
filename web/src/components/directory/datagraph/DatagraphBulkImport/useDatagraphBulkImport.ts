@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { linkCreate } from "src/api/openapi/links";
-import { Link } from "src/api/openapi/schemas";
+import { linkCreate } from "src/api/openapi-client/links";
+import { Link } from "src/api/openapi-schema";
 import { DatagraphNodeWithRelations } from "src/components/directory/datagraph/DatagraphNode";
 import { useDirectoryPath } from "src/screens/directory/datagraph/useDirectoryPath";
 import { deriveError } from "src/utils/error";

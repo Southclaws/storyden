@@ -1,4 +1,4 @@
-import { Link as LinkSchema, ThreadReference } from "src/api/openapi/schemas";
+import { Link as LinkSchema, ThreadReference } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
 import { Heading } from "@/components/ui/heading";

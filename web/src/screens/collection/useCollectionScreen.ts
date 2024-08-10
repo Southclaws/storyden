@@ -1,4 +1,4 @@
-import { useCollectionGet } from "src/api/openapi/collections";
+import { useCollectionGet } from "src/api/openapi-client/collections";
 
 export type Props = {
   handle: string;

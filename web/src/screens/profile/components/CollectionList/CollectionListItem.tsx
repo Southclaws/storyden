@@ -1,4 +1,4 @@
-import { Collection } from "src/api/openapi/schemas";
+import { Collection } from "src/api/openapi-schema";
 
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";

@@ -1,4 +1,4 @@
-import { ThreadReference } from "src/api/openapi/schemas";
+import { ThreadReference } from "src/api/openapi-schema";
 import { EmptyState } from "src/components/feed/EmptyState";
 
 import { styled } from "@/styled-system/jsx";

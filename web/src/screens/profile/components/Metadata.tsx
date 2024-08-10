@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 
-import { PublicProfile } from "src/api/openapi/schemas";
+import { PublicProfile } from "src/api/openapi-schema";
 import { Timestamp } from "src/components/site/Timestamp";
 
 import { styled } from "@/styled-system/jsx";

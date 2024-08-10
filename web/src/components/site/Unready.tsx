@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from "react";
 
-import { APIError } from "src/api/openapi/schemas";
+import { APIError } from "src/api/openapi-schema";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Flex } from "@/styled-system/jsx";
