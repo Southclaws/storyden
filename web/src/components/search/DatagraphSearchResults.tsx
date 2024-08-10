@@ -1,4 +1,4 @@
-import { DatagraphNode, DatagraphSearchResult } from "src/api/openapi/schemas";
+import { DatagraphItem, DatagraphSearchResult } from "src/api/openapi/schemas";
 import { EmptyState } from "src/components/feed/EmptyState";
 
 import { Heading } from "@/components/ui/heading";
@@ -24,7 +24,7 @@ export function DatagraphSearchResults({ result }: Props) {
   );
 }
 
-export function DatagraphResultItem(props: DatagraphNode) {
+export function DatagraphResultItem(props: DatagraphItem) {
   const permalink = buildPermalink(props);
 
   return (
@@ -48,7 +48,7 @@ export function DatagraphResultItem(props: DatagraphNode) {
   );
 }
 
-function buildPermalink(d: DatagraphNode): string {
+function buildPermalink(d: DatagraphItem): string {
   switch (d.kind) {
     case "post":
       return `/t/${d.slug}`;

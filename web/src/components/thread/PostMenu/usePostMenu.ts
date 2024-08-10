@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
 import { postDelete } from "src/api/openapi/posts";
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { isShareEnabled } from "src/utils/client";
@@ -13,14 +13,14 @@ import { isShareEnabled } from "src/utils/client";
 import { useThreadScreenContext } from "../context/context";
 import { getPermalinkForPost } from "../utils";
 
-export function usePostMenu(props: PostProps) {
+export function usePostMenu(props: Post) {
   const router = useRouter();
 
   const account = useSession();
   const { thread, setEditingPostID } = useThreadScreenContext();
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const permalink = getPermalinkForPost(props.root_slug, props.id);
+  const permalink = getPermalinkForPost(props.slug, props.id);
 
   const shareEnabled = isShareEnabled();
   const editEnabled = account?.id === props.author.id;

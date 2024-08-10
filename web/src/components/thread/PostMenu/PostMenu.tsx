@@ -5,7 +5,7 @@ import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns/format";
 
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 import { MoreAction } from "src/components/site/Action/More";
 
 import * as Menu from "@/components/ui/menu";
@@ -13,7 +13,7 @@ import { HStack, styled } from "@/styled-system/jsx";
 
 import { usePostMenu } from "./usePostMenu";
 
-export function PostMenu(props: PostProps) {
+export function PostMenu(props: Post) {
   const {
     onCopyLink,
     shareEnabled,

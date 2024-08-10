@@ -24,6 +24,6 @@ export async function generateMetadata({ params }: Props) {
 
   return {
     title: `${data.title} | ${info.title}`,
-    description: data.short,
+    description: data.description,
   };
 }
