@@ -6,7 +6,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 
-import { ThreadListParams } from "src/api/openapi/schemas";
+import { ThreadListParams } from "src/api/openapi-schema";
 
 import { FilterParamsSchema } from "./filterParams";
 

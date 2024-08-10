@@ -1,22 +1,42 @@
 import { defineConfig } from "orval";
 
-export default defineConfig({
-  storyden: {
-    input: {
-      target: "../api/openapi.yaml",
+const input = {
+  target: "../api/openapi.yaml",
+  validation: true,
+};
 
-      validation: false,
-    },
+const common = {
+  mode: "tags" as const,
+  clean: true,
+  prettier: true,
+};
+
+export default defineConfig({
+  client: {
+    input,
     output: {
-      target: "./src/api/openapi",
-      mode: "tags",
+      ...common,
+      target: "src/api/openapi-client",
       client: "swr",
-      clean: true,
-      prettier: true,
-      schemas: "src/api/openapi/schemas",
+      schemas: "src/api/openapi-schema",
       override: {
         mutator: {
           path: "./src/api/client.ts",
+          name: "fetcher",
+        },
+      },
+    },
+  },
+  server: {
+    input,
+    output: {
+      ...common,
+      target: "src/api/openapi-server",
+      schemas: "src/api/openapi-schema",
+      client: "fetch",
+      override: {
+        mutator: {
+          path: "./src/api/server.ts",
           name: "fetcher",
         },
       },

@@ -1,8 +1,8 @@
 import {
   useAccountAuthProviderList,
   useAccountGet,
-} from "src/api/openapi/accounts";
-import { AccountAuthMethod } from "src/api/openapi/schemas";
+} from "src/api/openapi-client/accounts";
+import { AccountAuthMethod } from "src/api/openapi-schema";
 import { passkeyRegister } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 

@@ -1,11 +1,12 @@
-import { GetInfoOKResponse } from "@/api/openapi/schemas/getInfoOKResponse";
-import { server } from "@/api/server";
+import { Info } from "@/api/openapi-schema";
+import { getInfo as getInfoAPI } from "@/api/openapi-server/misc";
 
 import { FALLBACK_COLOUR } from "./colour";
 
-export async function getInfo(): Promise<GetInfoOKResponse> {
+export async function getInfo(): Promise<Info> {
   try {
-    return await server<GetInfoOKResponse>({ url: "/v1/info" });
+    const { data } = await getInfoAPI();
+    return data;
   } catch (e) {
     console.error(e);
     return {

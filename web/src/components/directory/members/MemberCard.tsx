@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 
-import { PublicProfile } from "src/api/openapi/schemas";
+import { PublicProfile } from "src/api/openapi-schema";
 import { MemberOptionsTrigger } from "src/components/member/MemberOptions/MemberOptionsTrigger";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 

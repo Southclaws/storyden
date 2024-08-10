@@ -2,9 +2,9 @@
 
 import { FormEvent, useState } from "react";
 
-import { replyCreate } from "src/api/openapi/replies";
-import { Thread } from "src/api/openapi/schemas";
-import { useThreadGet } from "src/api/openapi/threads";
+import { replyCreate } from "src/api/openapi-client/replies";
+import { useThreadGet } from "src/api/openapi-client/threads";
+import { Thread } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 
 export function useReplyBox(thread: Thread) {

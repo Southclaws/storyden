@@ -1,6 +1,6 @@
-import { postUpdate } from "src/api/openapi/posts";
-import { Post } from "src/api/openapi/schemas";
-import { threadUpdate, useThreadGet } from "src/api/openapi/threads";
+import { postUpdate } from "src/api/openapi-client/posts";
+import { threadUpdate, useThreadGet } from "src/api/openapi-client/threads";
+import { Post } from "src/api/openapi-schema";
 
 import { useThreadScreenContext } from "../context/context";
 

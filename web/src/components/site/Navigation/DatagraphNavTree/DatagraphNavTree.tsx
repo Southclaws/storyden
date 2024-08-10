@@ -2,8 +2,8 @@
 
 import { reduce } from "lodash/fp";
 
-import { useNodeList } from "@/api/openapi/nodes";
-import { NodeWithChildren } from "@/api/openapi/schemas";
+import { useNodeList } from "@/api/openapi-client/nodes";
+import { NodeWithChildren } from "@/api/openapi-schema";
 import { Child, TreeView, TreeViewData } from "@/components/ui/tree-view";
 
 const recursivelyMapChildren = reduce<NodeWithChildren, Child[]>(

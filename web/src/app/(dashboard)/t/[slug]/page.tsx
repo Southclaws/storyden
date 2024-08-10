@@ -1,7 +1,7 @@
-import { ThreadGetResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { ThreadScreen } from "src/screens/thread/ThreadScreen";
 import { getInfo } from "src/utils/info";
+
+import { threadGet } from "@/api/openapi-server/threads";
 
 export type Props = {
   params: {
@@ -15,12 +15,7 @@ export default function Page(props: Props) {
 
 export async function generateMetadata({ params }: Props) {
   const info = await getInfo();
-  const data = await server<ThreadGetResponse>({
-    url: `/v1/threads/${params.slug}`,
-    params: {
-      slug: [params.slug],
-    },
-  });
+  const { data } = await threadGet(params.slug);
 
   return {
     title: `${data.title} | ${info.title}`,

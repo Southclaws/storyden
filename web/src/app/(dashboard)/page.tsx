@@ -1,10 +1,8 @@
-import {
-  NodeListOKResponse,
-  ThreadListOKResponse,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { Unready } from "src/components/site/Unready";
 import { FeedScreenClient } from "src/screens/feed/FeedScreenClient";
+
+import { nodeList } from "@/api/openapi-server/nodes";
+import { threadList } from "@/api/openapi-server/threads";
 
 export default async function Page() {
   try {
@@ -13,16 +11,13 @@ export default async function Page() {
     // objects of all kinds based on a set of heuristics such as what's hot,
     // what's relevant to the account (if any) and what's been featured.
 
-    const [threads, nodes] = await Promise.all([
-      server<ThreadListOKResponse>({ url: "/v1/threads" }),
-      server<NodeListOKResponse>({ url: "/v1/nodes" }),
-    ]);
+    const [threads, nodes] = await Promise.all([threadList(), nodeList()]);
 
     return (
       <FeedScreenClient
         initialData={{
-          threads,
-          nodes,
+          threads: threads.data,
+          nodes: nodes.data,
         }}
       />
     );

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Thread } from "src/api/openapi/schemas";
+import { Thread } from "src/api/openapi-schema";
 
 import { ThreadScreenContextShape } from "./context";
 

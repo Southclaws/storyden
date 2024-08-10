@@ -1,4 +1,4 @@
-import { ProfileReference } from "src/api/openapi/schemas";
+import { ProfileReference } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { Anchor } from "src/components/site/Anchor";
 import { Avatar } from "src/components/site/Avatar/Avatar";

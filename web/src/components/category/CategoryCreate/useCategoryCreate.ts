@@ -3,8 +3,11 @@ import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
 
-import { categoryCreate, getCategoryListKey } from "src/api/openapi/categories";
-import { APIError } from "src/api/openapi/schemas";
+import {
+  categoryCreate,
+  getCategoryListKey,
+} from "src/api/openapi-client/categories";
+import { APIError } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 

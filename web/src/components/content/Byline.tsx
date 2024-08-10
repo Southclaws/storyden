@@ -1,4 +1,4 @@
-import { ProfileReference } from "src/api/openapi/schemas";
+import { ProfileReference } from "src/api/openapi-schema";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Timestamp } from "src/components/site/Timestamp";
 

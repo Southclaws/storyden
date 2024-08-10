@@ -1,6 +1,6 @@
 import { readableColor, tint } from "polished";
 
-import { CategoryReference } from "src/api/openapi/schemas";
+import { CategoryReference } from "src/api/openapi-schema";
 
 import { styled } from "@/styled-system/jsx";
 

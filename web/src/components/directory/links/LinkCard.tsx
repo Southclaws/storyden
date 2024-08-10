@@ -1,4 +1,4 @@
-import { Link as LinkSchema } from "src/api/openapi/schemas";
+import { Link as LinkSchema } from "src/api/openapi-schema";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Card } from "@/components/ui/rich-card";

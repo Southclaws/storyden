@@ -1,7 +1,7 @@
 import { SWRResponse } from "swr";
 
-import { useAccountAuthProviderList } from "src/api/openapi/accounts";
-import { APIError, AccountAuthMethods } from "src/api/openapi/schemas";
+import { useAccountAuthProviderList } from "src/api/openapi-client/accounts";
+import { APIError, AccountAuthMethods } from "src/api/openapi-schema";
 import {
   groupAuthMethods,
   groupAuthProviders,

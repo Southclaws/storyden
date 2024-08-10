@@ -1,9 +1,9 @@
 import {
   adminAccountBanCreate,
   adminAccountBanRemove,
-} from "src/api/openapi/accounts";
-import { useProfileGet } from "src/api/openapi/profiles";
-import { PublicProfile } from "src/api/openapi/schemas";
+} from "src/api/openapi-client/accounts";
+import { useProfileGet } from "src/api/openapi-client/profiles";
+import { PublicProfile } from "src/api/openapi-schema";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
 export type Props = PublicProfile & {

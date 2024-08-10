@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
 import { z } from "zod";
 
-import { ThreadListResult } from "src/api/openapi/schemas";
+import { ThreadListResult } from "src/api/openapi-schema";
 
 export type Props = {
   threads: ThreadListResult;

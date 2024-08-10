@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountGet } from "src/api/openapi/accounts";
-import { authPasswordSignin } from "src/api/openapi/auth";
-import { APIError } from "src/api/openapi/schemas";
+import { useAccountGet } from "src/api/openapi-client/accounts";
+import { authPasswordSignin } from "src/api/openapi-client/auth";
+import { APIError } from "src/api/openapi-schema";
 import { passkeyLogin } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 

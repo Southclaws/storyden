@@ -1,9 +1,9 @@
 import { useClickAway } from "@uidotdev/usehooks";
 import { mutate } from "swr";
 
-import { postReactAdd } from "src/api/openapi/posts";
-import { Post } from "src/api/openapi/schemas";
-import { getThreadGetKey } from "src/api/openapi/threads";
+import { postReactAdd } from "src/api/openapi-client/posts";
+import { getThreadGetKey } from "src/api/openapi-client/threads";
+import { Post } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useDisclosure } from "src/utils/useDisclosure";
 

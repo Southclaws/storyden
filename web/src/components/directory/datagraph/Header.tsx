@@ -1,4 +1,4 @@
-import { Node } from "src/api/openapi/schemas";
+import { Node } from "src/api/openapi-schema";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
 import { Heading } from "@/components/ui/heading";

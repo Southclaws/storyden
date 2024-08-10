@@ -1,7 +1,12 @@
 import { filter } from "lodash/fp";
 import { useSWRConfig } from "swr";
 
-import { useNodeList } from "src/api/openapi/nodes";
+import { useNodeList } from "src/api/openapi-client/nodes";
+import {
+  getThreadListKey,
+  threadDelete,
+  useThreadList,
+} from "src/api/openapi-client/threads";
 import {
   NodeList,
   NodeListParams,
@@ -11,12 +16,7 @@ import {
   ThreadListResult,
   ThreadMark,
   ThreadReference,
-} from "src/api/openapi/schemas";
-import {
-  getThreadListKey,
-  threadDelete,
-  useThreadList,
-} from "src/api/openapi/threads";
+} from "src/api/openapi-schema";
 
 export type MixedContent = {
   threads: ThreadListResult;
