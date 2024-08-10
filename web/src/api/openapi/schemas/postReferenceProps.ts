@@ -6,15 +6,23 @@
  * OpenAPI spec version: 1
  */
 import type { AssetList } from "./assetList";
+import type { CollectionList } from "./collectionList";
 import type { LinkList } from "./linkList";
 import type { Metadata } from "./metadata";
+import type { PostDescription } from "./postDescription";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
+import type { ThreadMark } from "./threadMark";
+import type { ThreadTitle } from "./threadTitle";
 
 export interface PostReferenceProps {
   assets: AssetList;
   author: ProfileReference;
+  collections: CollectionList;
+  description?: PostDescription;
   links: LinkList;
   meta?: Metadata;
   reacts: ReactList;
+  slug: ThreadMark;
+  title: ThreadTitle;
 }

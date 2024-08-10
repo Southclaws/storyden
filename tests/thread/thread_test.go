@@ -68,7 +68,7 @@ func TestThreads(t *testing.T) {
 			a.Equal("Thread testing", thread1create.JSON200.Title)
 			a.Contains(thread1create.JSON200.Slug, "thread-testing")
 			a.Equal("<body><p>this is a thread</p></body>", thread1create.JSON200.Replies[0].Body)
-			a.Equal("this is a thread", *thread1create.JSON200.Short)
+			a.Equal("this is a thread", *thread1create.JSON200.Description)
 			a.Equal(false, thread1create.JSON200.Pinned)
 			a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)
 			a.Len(thread1create.JSON200.Replies, 1)
