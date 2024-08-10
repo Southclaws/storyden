@@ -7,6 +7,7 @@
  */
 import type { CommonProperties } from "./commonProperties";
 import type { PostProps } from "./postProps";
+import type { PostReferenceProps } from "./postReferenceProps";
 
 /**
  * A post represents a temporal piece of content, it can be a thread, or a
@@ -15,4 +16,4 @@ Post is used in generic use-cases where it may not matter whether you
 want a thread or a reply, such as search results or recommendations.
 
  */
-export type Post = CommonProperties & PostProps;
+export type Post = CommonProperties & PostReferenceProps & PostProps;

@@ -6,8 +6,9 @@
  * OpenAPI spec version: 1
  */
 import type { CommonProperties } from "./commonProperties";
-import type { PostReference } from "./postReference";
-import type { ThreadReferenceAllOf } from "./threadReferenceAllOf";
+import type { PostProps } from "./postProps";
+import type { PostReferenceProps } from "./postReferenceProps";
+import type { ThreadReferenceProps } from "./threadReferenceProps";
 
 /**
  * A thread reference includes most of the information about a thread but
@@ -16,5 +17,6 @@ lists of threads or other situations when you don't need the full data.
 
  */
 export type ThreadReference = CommonProperties &
-  PostReference &
-  ThreadReferenceAllOf;
+  PostReferenceProps &
+  PostProps &
+  ThreadReferenceProps;

@@ -7,6 +7,7 @@
  */
 import type { CommonProperties } from "./commonProperties";
 import type { PostProps } from "./postProps";
+import type { PostReferenceProps } from "./postReferenceProps";
 import type { ReplyProps } from "./replyProps";
 
 /**
@@ -15,4 +16,7 @@ the thread by specifying the `reply_to` property. The identifier in the
 `reply_to` value must be post within the same thread.
 
  */
-export type Reply = CommonProperties & PostProps & ReplyProps;
+export type Reply = CommonProperties &
+  PostReferenceProps &
+  PostProps &
+  ReplyProps;

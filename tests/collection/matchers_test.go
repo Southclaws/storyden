@@ -17,7 +17,7 @@ func matchThreadToItem(t *testing.T, thread *openapi.Thread, item openapi.Collec
 	// a.Equal(thread.CreatedAt, item.CreatedAt) // TODO
 	a.Equal(thread.Title, item.Name)
 	a.Contains(thread.Slug, item.Slug)
-	a.Equal(thread.Short, item.Description)
+	a.Equal(thread.Description, item.Description)
 	a.Equal(thread.Author, item.Owner)
 }
 

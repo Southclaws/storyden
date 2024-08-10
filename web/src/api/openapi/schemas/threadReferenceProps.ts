@@ -6,24 +6,15 @@
  * OpenAPI spec version: 1
  */
 import type { CategoryReference } from "./categoryReference";
-import type { CollectionList } from "./collectionList";
 import type { Link } from "./link";
-import type { ThreadMark } from "./threadMark";
 
-export type ThreadReferenceAllOf = {
+export interface ThreadReferenceProps {
   category: CategoryReference;
-  collections: CollectionList;
   link?: Link;
   /** Whether the thread is pinned in this category. */
   pinned: boolean;
   /** The number of posts under this thread. */
   readonly post_count: number;
-  /** A short version of the thread's body text for use in previews.
-   */
-  readonly short: string;
-  slug: ThreadMark;
   /** A list of tags associated with the thread. */
   tags: string[];
-  /** The title of the thread. */
-  title: string;
-};
+}
