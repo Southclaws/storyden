@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/account/session"
@@ -57,8 +57,8 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 			vis = n.Visibility
 			ownerID = n.Owner.ID
 
-		case *reply.Reply:
-			// TODO: Add visibility to reply structure
+		case *post.Post:
+			// TODO: Add visibility to post structure
 			// vis = n.Visibility
 			vis = visibility.VisibilityPublished
 			ownerID = n.Author.ID

@@ -45,9 +45,11 @@ tags:
     description: Public profiles.
   - name: categories
     description: Thread categories.
+  - name: posts
+    description: Any operations for any kind of Post resource.
   - name: threads
     description: Forum threads.
-  - name: posts
+  - name: replies
     description: Posts within a specific thread.
   - name: assets
     description: File uploads and downloads.
@@ -756,31 +758,45 @@ paths:
         "200": { description: OK }
 
   #
-  #                             888
-  #                             888
-  #                             888
-  #  88888b.   .d88b.  .d8888b  888888 .d8888b
-  #  888 "88b d88""88b 88K      888    88K
-  #  888  888 888  888 "Y8888b. 888    "Y8888b.
-  #  888 d88P Y88..88P      X88 Y88b.       X88
-  #  88888P"   "Y88P"   88888P'  "Y888  88888P'
-  #  888
-  #  888
-  #  888
+  #                          888 d8b
+  #                          888 Y8P
+  #                          888
+  # 888d888 .d88b.  88888b.  888 888  .d88b.  .d8888b
+  # 888P"  d8P  Y8b 888 "88b 888 888 d8P  Y8b 88K
+  # 888    88888888 888  888 888 888 88888888 "Y8888b.
+  # 888    Y8b.     888 d88P 888 888 Y8b.          X88
+  # 888     "Y8888  88888P"  888 888  "Y8888   88888P'
+  #                 888
+  #                 888
+  #                 888
   #
 
-  /v1/threads/{thread_mark}/posts:
+  /v1/threads/{thread_mark}/replies:
     post:
-      operationId: PostCreate
+      operationId: ReplyCreate
       description: Create a new post within a thread.
-      tags: [posts]
+      tags: [replies]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/PostCreate" }
+      requestBody: { $ref: "#/components/requestBodies/ReplyCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostCreateOK" }
+        "200": { $ref: "#/components/responses/ReplyCreateOK" }
+
+  #
+  #                            888
+  #                            888
+  #                            888
+  # 88888b.   .d88b.  .d8888b  888888 .d8888b
+  # 888 "88b d88""88b 88K      888    88K
+  # 888  888 888  888 "Y8888b. 888    "Y8888b.
+  # 888 d88P Y88..88P      X88 Y88b.       X88
+  # 88888P"   "Y88P"   88888P'  "Y888  88888P'
+  # 888
+  # 888
+  # 888
+  #
 
   /v1/posts/{post_id}:
     patch:
@@ -1596,11 +1612,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/ThreadMutableProps" }
 
-    PostCreate:
-      description: Create a post within a thread.
+    ReplyCreate:
+      description: Create a reply, which is a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostInitialProps" }
+          schema: { $ref: "#/components/schemas/ReplyInitialProps" }
 
     PostUpdate:
       description: Create a post within a thread.
@@ -1612,7 +1628,7 @@ components:
       description: Add a reaction to a post.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostReactProps" }
+          schema: { $ref: "#/components/schemas/ReactInitialProps" }
 
     AssetUpload:
       description: Upload a file.
@@ -1824,19 +1840,19 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
 
-    PostCreateOK:
-      description: Thread post created successfully.
+    ReplyCreateOK:
+      description: Thread reply created successfully.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PostProps"
+            $ref: "#/components/schemas/Reply"
 
     PostUpdateOK:
-      description: Thread post updated successfully.
+      description: Post updated successfully.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PostProps"
+            $ref: "#/components/schemas/Post"
 
     PostSearchOK:
       description: Thread post updated successfully.
@@ -2941,6 +2957,86 @@ components:
       items: { $ref: "#/components/schemas/Identifier" }
 
     #
+    # 8888888b.                   888
+    # 888   Y88b                  888
+    # 888    888                  888
+    # 888   d88P .d88b.  .d8888b  888888
+    # 8888888P" d88""88b 88K      888
+    # 888       888  888 "Y8888b. 888
+    # 888       Y88..88P      X88 Y88b.
+    # 888        "Y88P"   88888P'  "Y888
+    #
+
+    Post:
+      type: object
+      description: |
+        A post represents a temporal piece of content, it can be a thread, or a
+        reply to a thread or something else such as a blog, announcement, etc.
+        Post is used in generic use-cases where it may not matter whether you
+        want a thread or a reply, such as search results or recommendations.
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/PostReferenceProps" }
+        - { $ref: "#/components/schemas/PostProps" }
+
+    PostReference:
+      description: |
+        A minimal object used to refer to a post without providing a lot of
+        unnecessary data such as the full content or child items.
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/PostReferenceProps" }
+
+    PostProps:
+      description: |
+        The general properties required for any post-like resource. Is composed
+        with Threads or Replies to provide the basic common properties.
+      type: object
+      required: [title, slug, body, author, reacts, assets, links]
+      properties:
+        body: { $ref: "#/components/schemas/PostContent" }
+
+    PostReferenceProps:
+      required: [title, slug, author, assets, links, reacts, collections]
+      properties:
+        title: { $ref: "#/components/schemas/ThreadTitle" }
+        description: { $ref: "#/components/schemas/PostDescription" }
+        slug: { $ref: "#/components/schemas/ThreadMark" }
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        assets: { $ref: "#/components/schemas/AssetList" }
+        links: { $ref: "#/components/schemas/LinkList" }
+        reacts: { $ref: "#/components/schemas/ReactList" }
+        collections: { $ref: "#/components/schemas/CollectionList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    PostReferenceList:
+      type: array
+      items: { $ref: "#/components/schemas/PostReference" }
+
+    PostMutableProps:
+      type: object
+      properties:
+        body: { $ref: "#/components/schemas/PostContent" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+        url: { $ref: "#/components/schemas/URL" }
+
+    PostSearchResults:
+      type: object
+      required: [count, results]
+      properties:
+        count:
+          type: number
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    PostDescription:
+      type: string
+      description: A short version of the post's body text for use in previews.
+
+    #
     # 88888888888 888                                    888
     #     888     888                                    888
     #     888     888                                    888
@@ -2950,6 +3046,15 @@ components:
     #     888     888  888 888    Y8b.     888  888 Y88b 888
     #     888     888  888 888     "Y8888  "Y888888  "Y88888
     #
+
+    Thread:
+      allOf:
+        - $ref: "#/components/schemas/ThreadReference"
+        - $ref: "#/components/schemas/DatagraphRecommendations"
+        - type: object
+          required: [replies]
+          properties:
+            replies: { $ref: "#/components/schemas/ReplyList" }
 
     ThreadInitialProps:
       type: object
@@ -2985,50 +3090,33 @@ components:
         lists of threads or other situations when you don't need the full data.
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - type: object
-          required:
-            - title
-            - slug
-            - short
-            - pinned
-            - author
-            - tags
-            - post_count
-            - category
-            - reacts
-            - assets
-            - collections
-          properties:
-            title:
-              type: string
-              example: Hello world!
-              description: The title of the thread.
-            slug: { $ref: "#/components/schemas/ThreadMark" }
-            short:
-              type: string
-              readOnly: true
-              description: |
-                A short version of the thread's body text for use in previews.
-            pinned:
-              type: boolean
-              description: Whether the thread is pinned in this category.
-            author: { $ref: "#/components/schemas/ProfileReference" }
-            tags:
-              type: array
-              items:
-                type: string
-              description: A list of tags associated with the thread.
-            post_count:
-              type: integer
-              readOnly: true
-              description: The number of posts under this thread.
-            category: { $ref: "#/components/schemas/CategoryReference" }
-            reacts:
-              $ref: "#/components/schemas/ReactList"
-            meta: { $ref: "#/components/schemas/Metadata" }
-            assets: { $ref: "#/components/schemas/AssetList" }
-            collections: { $ref: "#/components/schemas/CollectionList" }
-            link: { $ref: "#/components/schemas/Link" }
+        - $ref: "#/components/schemas/PostReferenceProps"
+        - $ref: "#/components/schemas/PostProps"
+        - $ref: "#/components/schemas/ThreadReferenceProps"
+
+    ThreadReferenceProps:
+      type: object
+      required:
+        - pinned
+        - tags
+        - post_count
+        - category
+        - collections
+      properties:
+        pinned:
+          type: boolean
+          description: Whether the thread is pinned in this category.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags associated with the thread.
+        post_count:
+          type: integer
+          readOnly: true
+          description: The number of posts under this thread.
+        category: { $ref: "#/components/schemas/CategoryReference" }
+        link: { $ref: "#/components/schemas/Link" }
 
     ThreadList:
       type: array
@@ -3043,60 +3131,45 @@ components:
           properties:
             threads: { $ref: "#/components/schemas/ThreadList" }
 
-    Thread:
-      allOf:
-        - $ref: "#/components/schemas/ThreadReference"
-        - $ref: "#/components/schemas/DatagraphRecommendations"
-        - type: object
-          required: [posts]
-          properties:
-            posts: { $ref: "#/components/schemas/PostList" }
-
     #
     # 8888888b.                   888
     # 888   Y88b                  888
     # 888    888                  888
-    # 888   d88P .d88b.  .d8888b  888888
-    # 8888888P" d88""88b 88K      888
-    # 888       888  888 "Y8888b. 888
-    # 888       Y88..88P      X88 Y88b.
-    # 888        "Y88P"   88888P'  "Y888
+    # 888   d88P .d88b.  88888b.  888 888  888
+    # 8888888P" d8P  Y8b 888 "88b 888 888  888
+    # 888 T88b  88888888 888  888 888 888  888
+    # 888  T88b Y8b.     888 d88P 888 Y88b 888
+    # 888   T88b "Y8888  88888P"  888  "Y88888
+    #                    888               888
+    #                    888          Y8b d88P
+    #                    888           "Y88P"
     #
 
-    PostProps:
+    Reply:
       type: object
       description: |
         A new post within a thread of posts. A post may reply to another post in
         the thread by specifying the `reply_to` property. The identifier in the
         `reply_to` value must be post within the same thread.
       allOf:
-        - { $ref: "#/components/schemas/PostMetadata" }
-        - { $ref: "#/components/schemas/PostCommonProps" }
-
-    PostList:
-      type: array
-      items: { $ref: "#/components/schemas/PostProps" }
-
-    PostMetadata:
-      type: object
-      allOf:
         - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/PostReferenceProps" }
+        - { $ref: "#/components/schemas/PostProps" }
+        - { $ref: "#/components/schemas/ReplyProps" }
 
-    PostCommonProps:
+    ReplyList:
+      type: array
+      items: { $ref: "#/components/schemas/Reply" }
+
+    ReplyProps:
       type: object
       required: [root_id, root_slug, body, author, reacts, assets, links]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
-        body: { $ref: "#/components/schemas/PostContent" }
-        author: { $ref: "#/components/schemas/ProfileReference" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        reacts: { $ref: "#/components/schemas/ReactList" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
-        assets: { $ref: "#/components/schemas/AssetList" }
-        links: { $ref: "#/components/schemas/LinkList" }
 
-    PostInitialProps:
+    ReplyInitialProps:
       type: object
       required: [body]
       properties:
@@ -3105,17 +3178,16 @@ components:
         reply_to: { $ref: "#/components/schemas/Identifier" }
         url: { $ref: "#/components/schemas/URL" }
 
-    PostMutableProps:
-      type: object
-      properties:
-        body: { $ref: "#/components/schemas/PostContent" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        url: { $ref: "#/components/schemas/URL" }
-
-    ReactList:
-      description: A list of reactions this post has had from people.
-      type: array
-      items: { $ref: "#/components/schemas/React" }
+    #
+    # 8888888b.                            888
+    # 888   Y88b                           888
+    # 888    888                           888
+    # 888   d88P .d88b.   8888b.   .d8888b 888888
+    # 8888888P" d8P  Y8b     "88b d88P"    888
+    # 888 T88b  88888888 .d888888 888      888
+    # 888  T88b Y8b.     888  888 Y88b.    Y88b.
+    # 888   T88b "Y8888  "Y888888  "Y8888P  "Y888
+    #
 
     React:
       type: object
@@ -3124,24 +3196,17 @@ components:
         emoji:
           type: string
 
-    PostReactProps:
-      description: |
-        Reactions are currently just simple strings but they may improve later.
+    ReactInitialProps:
+      description: Reactions are currently just simple emoji characters.
       type: object
       properties:
         emoji:
           type: string
 
-    PostSearchResults:
-      type: object
-      required: [count, results]
-      properties:
-        count:
-          type: number
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/PostProps"
+    ReactList:
+      description: A list of reactions this post has had from people.
+      type: array
+      items: { $ref: "#/components/schemas/React" }
 
     #
     # 888b     d888               888 d8b
@@ -3440,8 +3505,7 @@ components:
         - $ref: "#/components/schemas/DatagraphRecommendations"
         - required: [threads, posts, nodes, collections]
           properties:
-            threads: { $ref: "#/components/schemas/ThreadList" }
-            posts: { $ref: "#/components/schemas/PostList" }
+            posts: { $ref: "#/components/schemas/PostReferenceList" }
             nodes: { $ref: "#/components/schemas/NodeList" }
             collections: { $ref: "#/components/schemas/CollectionList" }
 

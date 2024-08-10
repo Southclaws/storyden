@@ -33,7 +33,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     defaultValues: initialDraft
       ? {
           title: initialDraft.title,
-          body: initialDraft.posts[0]?.body,
+          body: initialDraft.body,
           tags: initialDraft.tags,
           url: initialDraft.link?.url,
         }

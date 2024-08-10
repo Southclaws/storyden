@@ -77,7 +77,7 @@ export default async function Image({ params: { slug } }: Props) {
               fontWeight: 300,
             }}
           >
-            {thread.short}
+            {thread.description}
           </div>
         </div>
       </div>

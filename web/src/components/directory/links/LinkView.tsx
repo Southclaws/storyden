@@ -64,9 +64,6 @@ export function LinkView({ link }: Props) {
         {images?.map((v) => <>{v}</>)}
       </Flex>
 
-      <styled.h2 fontSize="heading.variable.3">Shared in</styled.h2>
-      <PostRefList items={link.threads} emptyText="not shared anywhere" />
-
       <styled.h2 fontSize="heading.variable.3">Mentioned in replies</styled.h2>
       <PostRefList items={link.posts} emptyText="not mentioned in any posts" />
     </Flex>

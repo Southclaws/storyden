@@ -5,6 +5,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -64,11 +66,11 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		UpdatedAt: t.UpdatedAt,
 		DeletedAt: t.DeletedAt.Ptr(),
 
-		Title:  t.Title,
-		Author: serialiseProfileReference(t.Author),
-		Slug:   t.Slug,
-		Short:  &t.Short,
-		Meta:   (*openapi.Metadata)(&t.Meta),
+		Title:       t.Title,
+		Author:      serialiseProfileReference(t.Author),
+		Slug:        t.Slug,
+		Description: &t.Short,
+		Meta:        (*openapi.Metadata)(&t.Meta),
 
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
@@ -95,10 +97,10 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
 		Reacts:         dt.Map(t.Reacts, serialiseReact),
-		Short:          &t.Short,
+		Description:    &t.Short,
 		Slug:           t.Slug,
 		Tags:           t.Tags,
-		Posts:          dt.Map(t.Replies, serialisePost),
+		Replies:        dt.Map(t.Replies, serialiseReply),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
 		Assets:         dt.Map(t.Assets, serialiseAssetReference),
@@ -108,8 +110,8 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 	}
 }
 
-func serialisePost(p *reply.Reply) openapi.PostProps {
-	return openapi.PostProps{
+func serialiseReply(p *reply.Reply) openapi.Reply {
+	return openapi.Reply{
 		Id:        openapi.Identifier(xid.ID(p.ID).String()),
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
@@ -123,6 +125,56 @@ func serialisePost(p *reply.Reply) openapi.PostProps {
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
 		Links:     dt.Map(p.Links, serialiseLink),
 	}
+}
+
+func serialisePost(p *post.Post) openapi.Post {
+	return openapi.Post{
+		Id:        openapi.Identifier(xid.ID(p.ID).String()),
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+		DeletedAt: p.DeletedAt.Ptr(),
+		Body:      p.Content.HTML(),
+		Author:    serialiseProfileReference(p.Author),
+		Reacts:    dt.Map(p.Reacts, serialiseReact),
+		Meta:      (*openapi.Metadata)(&p.Meta),
+		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Links:     dt.Map(p.Links, serialiseLink),
+	}
+}
+
+func serialisePostRef(p *post.Post) openapi.PostReference {
+	return openapi.PostReference{
+		Id:        openapi.Identifier(xid.ID(p.ID).String()),
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+		DeletedAt: p.DeletedAt.Ptr(),
+		Author:    serialiseProfileReference(p.Author),
+		Reacts:    dt.Map(p.Reacts, serialiseReact),
+		Meta:      (*openapi.Metadata)(&p.Meta),
+		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Links:     dt.Map(p.Links, serialiseLink),
+	}
+}
+
+func deserialisePostID(s string) post.ID {
+	return post.ID(openapi.ParseID(s))
+}
+
+func deserialiseContentKinds(in openapi.ContentKinds) ([]post_search.Kind, error) {
+	out, err := dt.MapErr(in, deserialiseContentKind)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+	return out, nil
+}
+
+func deserialiseContentKind(in openapi.ContentKind) (post_search.Kind, error) {
+	out, err := post_search.NewKind(string(in))
+	if err != nil {
+		return post_search.Kind{}, fault.Wrap(err)
+	}
+
+	return out, nil
 }
 
 func serialiseProfileReference(a profile.Public) openapi.ProfileReference {

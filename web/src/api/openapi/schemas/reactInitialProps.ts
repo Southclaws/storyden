@@ -5,8 +5,10 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { ReplyList } from "./replyList";
 
-export type ThreadAllOf = {
-  replies: ReplyList;
-};
+/**
+ * Reactions are currently just simple emoji characters.
+ */
+export interface ReactInitialProps {
+  emoji?: string;
+}

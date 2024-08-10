@@ -2,12 +2,12 @@ import { useClickAway } from "@uidotdev/usehooks";
 import { mutate } from "swr";
 
 import { postReactAdd } from "src/api/openapi/posts";
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 import { getThreadGetKey } from "src/api/openapi/threads";
 import { useSession } from "src/auth";
 import { useDisclosure } from "src/utils/useDisclosure";
 
-export type Props = PostProps & {
+export type Props = Post & {
   slug?: string;
 };
 

@@ -6,22 +6,23 @@
  * OpenAPI spec version: 1
  */
 import type { AssetList } from "./assetList";
-import type { Identifier } from "./identifier";
+import type { CollectionList } from "./collectionList";
 import type { LinkList } from "./linkList";
 import type { Metadata } from "./metadata";
-import type { PostContent } from "./postContent";
+import type { PostDescription } from "./postDescription";
 import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
 import type { ThreadMark } from "./threadMark";
+import type { ThreadTitle } from "./threadTitle";
 
-export interface PostCommonProps {
+export interface PostReferenceProps {
   assets: AssetList;
   author: ProfileReference;
-  body: PostContent;
+  collections: CollectionList;
+  description?: PostDescription;
   links: LinkList;
   meta?: Metadata;
   reacts: ReactList;
-  reply_to?: Identifier;
-  root_id: Identifier;
-  root_slug: ThreadMark;
+  slug: ThreadMark;
+  title: ThreadTitle;
 }

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 
 import { Divider, styled } from "@/styled-system/jsx";
 
@@ -8,7 +8,7 @@ import { PostView } from "./PostView/PostView";
 
 type Props = {
   slug?: string;
-  posts: PostProps[];
+  posts: Post[];
 };
 
 export function PostListView(props: Props) {
@@ -25,7 +25,7 @@ export function PostListView(props: Props) {
         <Fragment key={p.id}>
           <Divider />
           <styled.li key={p.id} listStyleType="none" m="0">
-            <PostView slug={props.slug} {...p} />
+            <PostView {...p} />
           </styled.li>
         </Fragment>
       ))}

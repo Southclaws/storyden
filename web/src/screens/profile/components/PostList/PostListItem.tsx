@@ -1,11 +1,11 @@
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 import { Byline } from "src/components/content/Byline";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { PostMenu } from "src/components/thread/PostMenu/PostMenu";
 
 import { Flex } from "@/styled-system/jsx";
 
-export function PostListItem(props: PostProps) {
+export function PostListItem(props: Post) {
   return (
     <Flex id={props.id} flexDir="column" gap="2">
       <ContentComposer disabled initialValue={props.body} />

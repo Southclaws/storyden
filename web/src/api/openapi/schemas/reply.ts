@@ -8,15 +8,15 @@
 import type { CommonProperties } from "./commonProperties";
 import type { PostProps } from "./postProps";
 import type { PostReferenceProps } from "./postReferenceProps";
-import type { ThreadReferenceProps } from "./threadReferenceProps";
+import type { ReplyProps } from "./replyProps";
 
 /**
- * A thread reference includes most of the information about a thread but
-does not include the posts within the thread. Useful for rendering large
-lists of threads or other situations when you don't need the full data.
+ * A new post within a thread of posts. A post may reply to another post in
+the thread by specifying the `reply_to` property. The identifier in the
+`reply_to` value must be post within the same thread.
 
  */
-export type ThreadReference = CommonProperties &
+export type Reply = CommonProperties &
   PostReferenceProps &
   PostProps &
-  ThreadReferenceProps;
+  ReplyProps;
