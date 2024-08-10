@@ -216,7 +216,7 @@ export * from "./react";
 export * from "./reactInitialProps";
 export * from "./reactList";
 export * from "./relevanceScore";
-export * from "./replyCommonProps";
+export * from "./reply";
 export * from "./replyCreateBody";
 export * from "./replyCreateOKResponse";
 export * from "./replyInitialProps";

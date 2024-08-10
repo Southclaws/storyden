@@ -101,7 +101,7 @@ func TestThreads(t *testing.T) {
 			r.Equal(http.StatusOK, thread1get.StatusCode())
 
 			a.Len(thread1get.JSON200.Replies, 2)
-			replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.ReplyProps) string { return p.Id })
+			replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.Reply) string { return p.Id })
 			a.Contains(replyids, reply1create.JSON200.Id)
 		}))
 	}))
