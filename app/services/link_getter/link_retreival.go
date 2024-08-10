@@ -8,8 +8,8 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/link/link_graph"
-	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))

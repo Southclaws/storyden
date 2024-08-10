@@ -56,7 +56,7 @@ func serialiseExternalLinks(in []account.ExternalLink) openapi.ProfileExternalLi
 }
 
 func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
-	postCount := len(t.Posts)
+	postCount := len(t.Replies)
 
 	return openapi.ThreadReference{
 		Id:        openapi.Identifier(xid.ID(t.ID).String()),
@@ -98,13 +98,13 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Short:          &t.Short,
 		Slug:           t.Slug,
 		Tags:           t.Tags,
-		Posts:          dt.Map(t.Posts, serialisePost),
+		Posts:          dt.Map(t.Replies, serialisePost),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
 		Assets:         dt.Map(t.Assets, serialiseAssetReference),
 		Collections:    dt.Map(t.Collections, serialiseCollection),
 		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
-		Recomentations: dt.Map(t.Related, serialiseDatagraphNodeReference),
+		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 	}
 }
 

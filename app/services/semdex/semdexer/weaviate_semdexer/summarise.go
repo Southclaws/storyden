@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 )
 
-func (s *weaviateSemdexer) Summarise(ctx context.Context, object datagraph.Indexable) (string, error) {
+func (s *weaviateRefIndex) Summarise(ctx context.Context, object datagraph.Item) (string, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
