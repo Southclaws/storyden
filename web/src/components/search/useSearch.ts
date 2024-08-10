@@ -1,8 +1,8 @@
-import { useDatagraphSearch } from "src/api/openapi/datagraph";
+import { useDatagraphSearch } from "src/api/openapi-client/datagraph";
 import {
   DatagraphSearchParams,
   DatagraphSearchResult,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 
 export function useSearch(
   params?: DatagraphSearchParams,

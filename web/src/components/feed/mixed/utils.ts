@@ -1,7 +1,7 @@
 import { zip } from "lodash";
 import { chunk } from "lodash/fp";
 
-import { NodeList, ThreadList } from "src/api/openapi/schemas";
+import { NodeList, ThreadList } from "src/api/openapi-schema";
 
 import { MixedContent, MixedContentLists } from "../useFeed";
 

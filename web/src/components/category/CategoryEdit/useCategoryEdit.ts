@@ -2,9 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { categoryUpdate, useCategoryList } from "src/api/openapi/categories";
-import { useGetInfo } from "src/api/openapi/misc";
-import { APIError, Category } from "src/api/openapi/schemas";
+import {
+  categoryUpdate,
+  useCategoryList,
+} from "src/api/openapi-client/categories";
+import { useGetInfo } from "src/api/openapi-client/misc";
+import { APIError, Category } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 

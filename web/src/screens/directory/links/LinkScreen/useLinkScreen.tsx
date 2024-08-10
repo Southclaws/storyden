@@ -1,5 +1,5 @@
-import { useLinkGet } from "src/api/openapi/links";
-import { LinkWithRefs } from "src/api/openapi/schemas";
+import { useLinkGet } from "src/api/openapi-client/links";
+import { LinkWithRefs } from "src/api/openapi-schema";
 
 export type Props = {
   slug: string;

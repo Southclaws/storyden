@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { oAuthProviderCallback } from "src/api/openapi/auth";
+import { oAuthProviderCallback } from "src/api/openapi-client/auth";
 import { Unready } from "src/components/site/Unready";
 
 import { LinkButton } from "@/components/ui/link-button";

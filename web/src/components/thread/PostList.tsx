@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { Post } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi-schema";
 
 import { Divider, styled } from "@/styled-system/jsx";
 

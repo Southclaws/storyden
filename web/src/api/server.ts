@@ -1,51 +1,36 @@
-import { API_ADDRESS } from "src/config";
+import { cookies } from "next/headers";
 
-import { Options, buildPayload, cleanQuery, shouldLog } from "./common";
+import { buildRequest, buildResult } from "./common";
 
-export const server = async <T>({
-  url,
-  params,
-  method = "GET",
-  data,
-  cookie,
-}: Options): Promise<T> => {
-  const address = `${API_ADDRESS}/api${url}${cleanQuery(params)}`;
-  const _method = method.toUpperCase();
+// Server side variant of fetcher that includes SSR cookies.
 
-  const response = await fetch(address, {
-    method: _method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(cookie ? { Cookie: cookie } : {}),
-    },
-    body: buildPayload(data),
-  });
-
-  if (!response.ok) {
-    const data = await response
-      .json()
-      .catch(() => ({ error: "Failed to parse API response" }));
-
-    if (shouldLog(response.status)) {
-      console.warn({
-        ...data,
-        status: response.status,
-        statusText: response.statusText,
-      });
-    }
-
-    throw new Error(
-      data.message ??
-        `An unexpected error occurred: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  // NOTE: The API code generator returns empty responses where there is no
-  // response type specified with a content type so this is the easy way to
-  // escape that code path and exit easily.
-  if (response.headers.get("content-length") === "0") {
-    return undefined as T;
-  }
-
-  return response.json();
+type Options = RequestInit & {
+  method: string;
 };
+
+// Orval fetch generated code is a bit different to SWR fetcher for some reason.
+type Result<T> = {
+  data: T;
+  status: number;
+};
+
+export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
+  const req = buildRequest({ url, method: opts.method as any });
+
+  req.headers.set("Cookie", getCookieHeader());
+
+  const response = await fetch(req);
+  const result = await buildResult<T>(response);
+
+  // Orval generated types are incorrect here. For some reason it generates a
+  // struct with a `data` field, but the actual result type is just the data.
+  // However the generated caller passes T as Promise<T> so we need to cast it.
+  return { data: result, status: response.status } as T;
+};
+
+function getCookieHeader(): string {
+  return cookies()
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+}

@@ -1,4 +1,4 @@
-import { Post } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi-schema";
 import { Byline } from "src/components/content/Byline";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 import { PostMenu } from "src/components/thread/PostMenu/PostMenu";

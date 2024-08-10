@@ -1,4 +1,4 @@
-import { Thread } from "src/api/openapi/schemas";
+import { Thread } from "src/api/openapi-schema";
 
 import { VStack } from "@/styled-system/jsx";
 

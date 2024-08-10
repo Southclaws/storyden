@@ -1,5 +1,5 @@
-import { useProfileList } from "src/api/openapi/profiles";
-import { PublicProfileListResult } from "src/api/openapi/schemas";
+import { useProfileList } from "src/api/openapi-client/profiles";
+import { PublicProfileListResult } from "src/api/openapi-schema";
 
 export type Props = {
   query?: string;

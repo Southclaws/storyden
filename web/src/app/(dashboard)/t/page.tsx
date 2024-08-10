@@ -1,11 +1,8 @@
 import { z } from "zod";
 
-import {
-  ThreadListOKResponse,
-  ThreadListParams,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { ThreadIndexScreen } from "src/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
+
+import { threadList } from "@/api/openapi-server/threads";
 
 type Props = {
   searchParams: Query;
@@ -22,17 +19,14 @@ const QuerySchema = z.object({
 type Query = z.infer<typeof QuerySchema>;
 
 export default async function Page({ searchParams }: Props) {
-  const response = await server<ThreadListOKResponse>({
-    url: "/v1/threads",
-    params: {
-      ...(searchParams.q ? { q: searchParams.q } : {}),
-      ...(searchParams.page ? { page: searchParams.page?.toString() } : {}),
-    } satisfies ThreadListParams,
+  const { data } = await threadList({
+    ...(searchParams.q ? { q: searchParams.q } : {}),
+    ...(searchParams.page ? { page: searchParams.page?.toString() } : {}),
   });
 
   return (
     <ThreadIndexScreen
-      threads={response}
+      threads={data}
       page={searchParams.page}
       query={searchParams.q}
     />

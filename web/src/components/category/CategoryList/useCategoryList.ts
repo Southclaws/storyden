@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 import {
   categoryUpdateOrder,
   useCategoryList as useGetCategoryList,
-} from "src/api/openapi/categories";
-import { Category } from "src/api/openapi/schemas";
+} from "src/api/openapi-client/categories";
+import { Category } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 export function useCategoryList() {

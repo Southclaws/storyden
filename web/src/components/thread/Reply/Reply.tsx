@@ -1,6 +1,6 @@
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 
-import { Thread } from "src/api/openapi/schemas";
+import { Thread } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
 import { HStack } from "@/styled-system/jsx";

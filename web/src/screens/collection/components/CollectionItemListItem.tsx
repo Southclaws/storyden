@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CollectionItem } from "src/api/openapi/schemas";
+import { CollectionItem } from "src/api/openapi-schema";
 import { Byline } from "src/components/content/Byline";
 
 import { Heading } from "@/components/ui/heading";

@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from "react";
 
-import { OnboardingStatus } from "src/api/openapi/schemas";
+import { OnboardingStatus } from "src/api/openapi-schema";
 import { CheckCircle } from "src/components/graphics/CheckCircle";
 
 import { Button } from "@/components/ui/button";

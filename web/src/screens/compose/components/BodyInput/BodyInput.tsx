@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { Controller } from "react-hook-form";
 
-import { Asset } from "src/api/openapi/schemas";
+import { Asset } from "src/api/openapi-schema";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
 import { FormControl } from "@/components/ui/form/FormControl";

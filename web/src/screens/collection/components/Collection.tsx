@@ -1,4 +1,4 @@
-import { CollectionWithItems } from "src/api/openapi/schemas";
+import { CollectionWithItems } from "src/api/openapi-schema";
 import { Timestamp } from "src/components/site/Timestamp";
 
 import { Heading } from "@/components/ui/heading";

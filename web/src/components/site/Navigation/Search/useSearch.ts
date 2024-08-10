@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useGetInfo } from "src/api/openapi/misc";
+import { useGetInfo } from "src/api/openapi-client/misc";
 
 export const FormSchema = z.object({
   q: z.string().min(1, { message: "Please enter a search term" }),

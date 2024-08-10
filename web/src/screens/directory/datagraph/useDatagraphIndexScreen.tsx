@@ -1,9 +1,6 @@
-import { useLinkList } from "src/api/openapi/links";
-import { useNodeList } from "src/api/openapi/nodes";
-import {
-  LinkListOKResponse,
-  NodeListOKResponse,
-} from "src/api/openapi/schemas";
+import { useLinkList } from "src/api/openapi-client/links";
+import { useNodeList } from "src/api/openapi-client/nodes";
+import { LinkListOKResponse, NodeListOKResponse } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 export type Props = {

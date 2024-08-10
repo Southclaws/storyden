@@ -1,4 +1,4 @@
-import { useGetInfo } from "src/api/openapi/misc";
+import { useGetInfo } from "src/api/openapi-client/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 import { Unready } from "src/components/site/Unready";
 

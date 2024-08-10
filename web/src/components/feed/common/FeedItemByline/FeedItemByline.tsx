@@ -1,11 +1,11 @@
-import { ThreadReference } from "src/api/openapi/schemas";
+import { ThreadReference } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 
-import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
-
 import { Flex, HStack } from "@/styled-system/jsx";
+
+import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
 
 type Props = {
   thread: ThreadReference;

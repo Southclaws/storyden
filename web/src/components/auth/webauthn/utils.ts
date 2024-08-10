@@ -9,7 +9,12 @@ import {
   webAuthnMakeAssertion,
   webAuthnMakeCredential,
   webAuthnRequestCredential,
-} from "src/api/openapi/auth";
+} from "src/api/openapi-client/auth";
+
+import {
+  WebAuthnMakeAssertionBody,
+  WebAuthnMakeCredentialBody,
+} from "@/api/openapi-schema";
 
 export async function passkeyLogin(handle: string) {
   const { publicKey } = await webAuthnGetAssertion(handle);
@@ -20,7 +25,7 @@ export async function passkeyLogin(handle: string) {
   // 2. https://github.com/go-webauthn/webauthn/issues/93
   credential.response.userHandle = undefined;
 
-  await webAuthnMakeAssertion(credential);
+  await webAuthnMakeAssertion(credential as WebAuthnMakeAssertionBody);
 }
 
 export async function passkeyRegister(handle: string) {
@@ -30,5 +35,5 @@ export async function passkeyRegister(handle: string) {
     ...publicKey,
   });
 
-  await webAuthnMakeCredential(credential);
+  await webAuthnMakeCredential(credential as WebAuthnMakeCredentialBody);
 }

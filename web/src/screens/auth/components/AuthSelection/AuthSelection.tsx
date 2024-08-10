@@ -1,4 +1,4 @@
-import { AuthProvider } from "src/api/openapi/schemas";
+import { AuthProvider } from "src/api/openapi-schema";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { styled } from "@/styled-system/jsx";

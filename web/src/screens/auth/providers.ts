@@ -1,11 +1,9 @@
 import "server-only";
 
-import {
-  AuthProvider,
-  AuthProviderListOKResponse,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { AuthProvider } from "src/api/openapi-schema";
 import { groupAuthProviders } from "src/components/settings/utils";
+
+import { authProviderList } from "@/api/openapi-server/auth";
 
 interface Providers {
   password: boolean;
@@ -21,9 +19,7 @@ interface Providers {
  * @returns Available auth providers with password/phone separated.
  */
 export async function getProviders(): Promise<Providers> {
-  const { providers } = await server<AuthProviderListOKResponse>({
-    url: "/v1/auth",
-  });
+  const { data } = await authProviderList();
 
-  return groupAuthProviders(providers);
+  return groupAuthProviders(data.providers);
 }

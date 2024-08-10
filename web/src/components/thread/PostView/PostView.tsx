@@ -1,4 +1,4 @@
-import { Post } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi-schema";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
 import { Button } from "@/components/ui/button";

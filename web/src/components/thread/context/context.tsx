@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 
-import { Identifier, Thread } from "src/api/openapi/schemas";
+import { Identifier, Thread } from "src/api/openapi-schema";
 
 export type ThreadScreenContextShape = {
   thread: Thread | undefined;

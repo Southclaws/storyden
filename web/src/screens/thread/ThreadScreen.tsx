@@ -1,5 +1,4 @@
-import { ThreadGetResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { threadGet } from "@/api/openapi-server/threads";
 
 import { Client } from "./Client";
 
@@ -8,12 +7,7 @@ type Props = {
 };
 
 export async function ThreadScreen(props: Props) {
-  const data = await server<ThreadGetResponse>({
-    url: `/v1/threads/${props.slug}`,
-    params: {
-      slug: [props.slug],
-    },
-  });
+  const { data } = await threadGet(props.slug);
 
   return <Client slug={props.slug} thread={data} />;
 }

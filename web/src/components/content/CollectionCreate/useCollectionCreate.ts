@@ -6,8 +6,8 @@ import { z } from "zod";
 import {
   collectionCreate,
   getCollectionListKey,
-} from "src/api/openapi/collections";
-import { APIError } from "src/api/openapi/schemas";
+} from "src/api/openapi-client/collections";
+import { APIError } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 

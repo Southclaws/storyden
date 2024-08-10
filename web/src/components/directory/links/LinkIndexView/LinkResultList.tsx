@@ -1,4 +1,4 @@
-import { LinkListResult } from "src/api/openapi/schemas";
+import { LinkListResult } from "src/api/openapi-schema";
 import { Empty } from "src/components/site/Empty";
 
 import { LinkCardRows } from "../LinkCardList";

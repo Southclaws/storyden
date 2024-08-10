@@ -1,4 +1,4 @@
-import { Category } from "src/api/openapi/schemas";
+import { Category } from "src/api/openapi-schema";
 import { EditAction } from "src/components/site/Action/Edit";
 import { useDisclosure } from "src/utils/useDisclosure";
 

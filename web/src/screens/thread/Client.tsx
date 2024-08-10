@@ -1,7 +1,7 @@
 "use client";
 
-import { Thread } from "src/api/openapi/schemas";
-import { useThreadGet } from "src/api/openapi/threads";
+import { useThreadGet } from "src/api/openapi-client/threads";
+import { Thread } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 import { ThreadView } from "src/components/thread/ThreadView/ThreadView";
 

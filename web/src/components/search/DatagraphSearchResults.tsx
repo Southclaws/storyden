@@ -1,4 +1,4 @@
-import { DatagraphItem, DatagraphSearchResult } from "src/api/openapi/schemas";
+import { DatagraphItem, DatagraphSearchResult } from "src/api/openapi-schema";
 import { EmptyState } from "src/components/feed/EmptyState";
 
 import { Heading } from "@/components/ui/heading";

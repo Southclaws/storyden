@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
 
-import { adminSettingsUpdate } from "src/api/openapi/admin";
-import { getGetInfoKey, iconUpload } from "src/api/openapi/misc";
-import { Info } from "src/api/openapi/schemas";
+import { adminSettingsUpdate } from "src/api/openapi-client/admin";
+import { getGetInfoKey, iconUpload } from "src/api/openapi-client/misc";
+import { Info } from "src/api/openapi-schema";
 import { getColourVariants } from "src/utils/colour";
 
 export type Props = Info;

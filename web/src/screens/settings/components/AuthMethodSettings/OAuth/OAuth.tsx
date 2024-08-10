@@ -1,4 +1,4 @@
-import { AccountAuthMethod, AuthProvider } from "src/api/openapi/schemas";
+import { AccountAuthMethod, AuthProvider } from "src/api/openapi-schema";
 
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
