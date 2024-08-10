@@ -67,11 +67,11 @@ func TestThreads(t *testing.T) {
 			a.Equal(acc.ID.String(), thread1create.JSON200.Author.Id)
 			a.Equal("Thread testing", thread1create.JSON200.Title)
 			a.Contains(thread1create.JSON200.Slug, "thread-testing")
-			a.Equal("<body><p>this is a thread</p></body>", thread1create.JSON200.Posts[0].Body)
-			a.Equal("this is a thread", *thread1create.JSON200.Short)
+			a.Equal("<body><p>this is a thread</p></body>", thread1create.JSON200.Replies[0].Body)
+			a.Equal("this is a thread", *thread1create.JSON200.Description)
 			a.Equal(false, thread1create.JSON200.Pinned)
 			a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)
-			a.Len(thread1create.JSON200.Posts, 1)
+			a.Len(thread1create.JSON200.Replies, 1)
 			a.Len(thread1create.JSON200.Reacts, 0)
 
 			// Get list of all threads
@@ -86,7 +86,7 @@ func TestThreads(t *testing.T) {
 
 			// Reply to the thread
 
-			reply1create, err := cl.PostCreateWithResponse(ctx, thread1create.JSON200.Slug, openapi.PostInitialProps{
+			reply1create, err := cl.ReplyCreateWithResponse(ctx, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
 				Body: "this is a reply",
 			}, e2e.WithSession(ctx2, cj))
 			r.NoError(err)
@@ -100,8 +100,8 @@ func TestThreads(t *testing.T) {
 			r.NotNil(thread1get)
 			r.Equal(http.StatusOK, thread1get.StatusCode())
 
-			a.Len(thread1get.JSON200.Posts, 2)
-			replyids := dt.Map(thread1get.JSON200.Posts, func(p openapi.PostProps) string { return p.Id })
+			a.Len(thread1get.JSON200.Replies, 2)
+			replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.Reply) string { return p.Id })
 			a.Contains(replyids, reply1create.JSON200.Id)
 		}))
 	}))

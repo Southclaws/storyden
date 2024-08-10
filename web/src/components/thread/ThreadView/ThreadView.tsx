@@ -1,12 +1,12 @@
 import { Thread } from "src/api/openapi/schemas";
 
+import { VStack } from "@/styled-system/jsx";
+
 import { PostListView } from "../PostList";
 import { Reply } from "../Reply/Reply";
 import { Title } from "../Title/Title";
 import { ThreadScreenContext } from "../context/context";
 import { useThreadScreenState } from "../context/state";
-
-import { VStack } from "@/styled-system/jsx";
 
 export function ThreadView(props: Thread) {
   const state = useThreadScreenState(props);
@@ -16,7 +16,7 @@ export function ThreadView(props: Thread) {
       <VStack alignItems="start" gap="2" width="full">
         <Title {...props} />
 
-        <PostListView {...props} />
+        <PostListView posts={props.replies} />
 
         <Reply {...props} />
       </VStack>

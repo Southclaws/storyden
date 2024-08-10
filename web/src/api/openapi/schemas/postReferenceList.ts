@@ -5,11 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { PostReference } from "./postReference";
 
-/**
- * Reactions are currently just simple strings but they may improve later.
-
- */
-export interface PostReactProps {
-  emoji?: string;
-}
+export type PostReferenceList = PostReference[];

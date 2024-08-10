@@ -69,8 +69,9 @@ type Bindings struct {
 	Accounts
 	Profiles
 	Categories
-	Threads
 	Posts
+	Threads
+	Replies
 	Reacts
 	Assets
 	Collections
@@ -94,8 +95,9 @@ func bindingsProviders() fx.Option {
 		NewAccounts,
 		NewProfiles,
 		NewCategories,
-		NewThreads,
 		NewPosts,
+		NewThreads,
+		NewReplies,
 		NewReacts,
 		NewAssets,
 		NewCollections,

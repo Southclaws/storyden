@@ -3,10 +3,10 @@ import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 
-import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
-
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
+
+import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
 type Props = {
   thread: ThreadReference;
@@ -22,7 +22,7 @@ export function TextPost({ thread, onDelete }: Props) {
       shape="row"
       id={thread.id}
       title={thread.title}
-      text={thread.short}
+      text={thread.description}
       url={permalink}
       image={thread.assets[0]?.url}
       controls={

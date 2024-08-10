@@ -5,13 +5,13 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { PostCommonProps } from "./postCommonProps";
-import type { PostMetadata } from "./postMetadata";
+import type { PostContent } from "./postContent";
 
 /**
- * A new post within a thread of posts. A post may reply to another post in
-the thread by specifying the `reply_to` property. The identifier in the
-`reply_to` value must be post within the same thread.
+ * The general properties required for any post-like resource. Is composed
+with Threads or Replies to provide the basic common properties.
 
  */
-export type PostProps = PostMetadata & PostCommonProps;
+export interface PostProps {
+  body: PostContent;
+}

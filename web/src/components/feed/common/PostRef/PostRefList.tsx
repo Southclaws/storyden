@@ -1,15 +1,13 @@
-import { PostProps, ThreadReference } from "src/api/openapi/schemas";
-
-import { Empty } from "../../../site/Empty";
+import { PostReference } from "src/api/openapi/schemas";
 
 import { styled } from "@/styled-system/jsx";
 
+import { Empty } from "../../../site/Empty";
+
 import { PostRef } from "./PostRef";
 
-type Either = PostProps | ThreadReference;
-
 type Props = {
-  items: Either[];
+  items: PostReference[];
   emptyText?: string;
 };
 
@@ -20,17 +18,9 @@ export function PostRefList({ items, emptyText }: Props) {
 
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="4">
-      {items.map((t) =>
-        isThread(t) ? (
-          <PostRef key={t.id} kind="thread" item={t as ThreadReference} />
-        ) : (
-          <PostRef key={t.id} kind="post" item={t as PostProps} />
-        ),
-      )}
+      {items.map((t) => (
+        <PostRef key={t.id} item={t} />
+      ))}
     </styled.ol>
   );
-}
-
-function isThread(e: Either) {
-  return "title" in (e as ThreadReference);
 }

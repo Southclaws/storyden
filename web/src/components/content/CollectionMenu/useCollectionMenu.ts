@@ -9,6 +9,7 @@ import {
 import {
   Collection,
   CollectionList,
+  PostReference,
   ThreadReference,
 } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
@@ -17,7 +18,7 @@ import { useDisclosure } from "src/utils/useDisclosure";
 import { useFeedMutation } from "@/components/feed/useFeed";
 
 export type Props = {
-  thread: ThreadReference;
+  thread: PostReference;
 };
 
 export type CollectionWithHasPost = Collection & {

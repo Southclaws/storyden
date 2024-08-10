@@ -2,13 +2,13 @@
 
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 
-import { ThreadReference } from "src/api/openapi/schemas";
+import { PostReference } from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { WEB_ADDRESS } from "src/config";
 import { isShareEnabled } from "src/utils/client";
 
 export type Props = {
-  thread: ThreadReference;
+  thread: PostReference;
   onDelete?: () => void;
 };
 
@@ -26,7 +26,7 @@ export function useFeedItemMenu(props: Props) {
     await navigator.share({
       title: `A post by ${props.thread.author.name}`,
       url: `#${props.thread.id}`,
-      text: props.thread.short,
+      text: props.thread.description,
     });
   }
 
