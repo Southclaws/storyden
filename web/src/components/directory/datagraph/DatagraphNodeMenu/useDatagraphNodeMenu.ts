@@ -1,4 +1,4 @@
-import { Visibility } from "src/api/openapi/schemas";
+import { Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useDeleteAction } from "src/components/site/Action/Delete";
 

@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountAuthProviderList } from "src/api/openapi/accounts";
-import { authPasswordCreate } from "src/api/openapi/auth";
-import { APIError } from "src/api/openapi/schemas";
+import { useAccountAuthProviderList } from "src/api/openapi-client/accounts";
+import { authPasswordCreate } from "src/api/openapi-client/auth";
+import { APIError } from "src/api/openapi-schema";
 import { PasswordSchema } from "src/screens/auth/schemas";
 import { deriveError } from "src/utils/error";
 

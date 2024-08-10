@@ -1,15 +1,15 @@
-import { Node } from "src/api/openapi/schemas";
+import { Node } from "src/api/openapi-schema";
 import { Timestamp } from "src/components/site/Timestamp";
 import {
   DirectoryPath,
   joinDirectoryPath,
 } from "src/screens/directory/datagraph/directory-path";
 
-import { DirectoryBadge } from "../DirectoryBadge";
-
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
+
+import { DirectoryBadge } from "../DirectoryBadge";
 
 export type NodeCardContext = "directory" | "generic";
 

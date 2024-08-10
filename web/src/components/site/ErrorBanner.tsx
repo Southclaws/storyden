@@ -1,6 +1,6 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
-import { APIError } from "src/api/openapi/schemas";
+import { APIError } from "src/api/openapi-schema";
 
 import { Flex, styled } from "@/styled-system/jsx";
 

@@ -1,7 +1,7 @@
 import { last } from "lodash";
 
-import { nodeCreate, useNodeGet } from "src/api/openapi/nodes";
-import { Link, NodeWithChildren } from "src/api/openapi/schemas";
+import { nodeCreate, useNodeGet } from "src/api/openapi-client/nodes";
+import { Link, NodeWithChildren } from "src/api/openapi-schema";
 import { DatagraphNodeWithRelations } from "src/components/directory/datagraph/DatagraphNode";
 
 import { useDirectoryPath } from "../useDirectoryPath";

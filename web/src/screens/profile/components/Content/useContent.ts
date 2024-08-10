@@ -1,6 +1,6 @@
-import { useCollectionList } from "src/api/openapi/collections";
-import { usePostSearch } from "src/api/openapi/posts";
-import { PublicProfile } from "src/api/openapi/schemas";
+import { useCollectionList } from "src/api/openapi-client/collections";
+import { usePostSearch } from "src/api/openapi-client/posts";
+import { PublicProfile } from "src/api/openapi-schema";
 import { useFeed } from "src/components/feed/useFeed";
 
 export function useContent(props: PublicProfile) {

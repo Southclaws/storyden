@@ -1,6 +1,6 @@
 "use client";
 
-import { DatagraphSearchResult } from "src/api/openapi/schemas";
+import { DatagraphSearchResult } from "src/api/openapi-schema";
 import { DatagraphSearchResults } from "src/components/search/DatagraphSearchResults";
 import { useSearch } from "src/components/search/useSearch";
 import { Unready } from "src/components/site/Unready";

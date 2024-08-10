@@ -5,7 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import { map } from "lodash/fp";
 
-import { Category } from "src/api/openapi/schemas";
+import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 
 import { styled } from "@/styled-system/jsx";

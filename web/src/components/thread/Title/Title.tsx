@@ -1,4 +1,4 @@
-import { Thread } from "src/api/openapi/schemas";
+import { Thread } from "src/api/openapi-schema";
 
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";

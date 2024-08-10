@@ -5,7 +5,7 @@ import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns/format";
 
-import { Post } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi-schema";
 import { MoreAction } from "src/components/site/Action/More";
 
 import * as Menu from "@/components/ui/menu";

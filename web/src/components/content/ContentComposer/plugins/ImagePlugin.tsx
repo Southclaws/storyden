@@ -8,7 +8,7 @@ import {
 } from "@tiptap/react";
 import { Plugin } from "prosemirror-state";
 
-import { Asset } from "src/api/openapi/schemas";
+import { Asset } from "src/api/openapi-schema";
 
 import { css } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";

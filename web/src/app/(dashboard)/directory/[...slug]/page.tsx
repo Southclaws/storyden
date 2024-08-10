@@ -1,7 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 
-import { NodeGetOKResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { getServerSession } from "src/auth/server-session";
 import { getTargetSlug } from "src/components/directory/datagraph/utils";
 import { NodeCreateManyScreen } from "src/screens/directory/datagraph/NodeCreateManyScreen/NodeCreateManyScreen";
@@ -13,6 +11,8 @@ import {
   Query,
   QuerySchema,
 } from "src/screens/directory/datagraph/directory-path";
+
+import { nodeGet } from "@/api/openapi-server/nodes";
 
 type Props = {
   params: Params;
@@ -35,16 +35,14 @@ export default async function Page(props: Props) {
       return <NodeCreateScreen session={session} />;
     }
 
-    const node = await server<NodeGetOKResponse>({
-      url: `/v1/nodes/${targetSlug}`,
-    });
+    const { data } = await nodeGet(targetSlug);
 
     if (bulk) {
       return <NodeCreateManyScreen />;
     }
 
-    if (node) {
-      return <NodeViewerScreen slug={targetSlug} node={node} />;
+    if (data) {
+      return <NodeViewerScreen slug={targetSlug} node={data} />;
     }
   }
 

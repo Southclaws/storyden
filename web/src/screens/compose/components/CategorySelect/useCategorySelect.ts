@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { useCategoryList } from "src/api/openapi/categories";
+import { useCategoryList } from "src/api/openapi-client/categories";
 
 import { FormShape } from "../ComposeForm/useComposeForm";
 

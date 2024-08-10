@@ -5,7 +5,7 @@ import {
   AccountAuthMethodList,
   AuthProvider,
   AuthProviderList,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 
 const groupProviders = keyBy<AuthProvider>("provider");
 
@@ -13,11 +13,13 @@ export function groupAuthProviders(providers: AuthProviderList) {
   // pull out password and phone, if present, the rest are OAuth2 providers.
   const { password, phone, webauthn, ...rest } = groupProviders(providers);
 
+  const oauth = values(rest).filter((v) => v.link);
+
   return {
     password: Boolean(password),
     phone: Boolean(phone),
     webauthn: Boolean(webauthn),
-    providers: values(rest),
+    providers: oauth,
   };
 }
 

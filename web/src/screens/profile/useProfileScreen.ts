@@ -1,5 +1,5 @@
-import { useProfileGet } from "src/api/openapi/profiles";
-import { APIError, PublicProfile } from "src/api/openapi/schemas";
+import { useProfileGet } from "src/api/openapi-client/profiles";
+import { APIError, PublicProfile } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { ProfileContextShape } from "./context";

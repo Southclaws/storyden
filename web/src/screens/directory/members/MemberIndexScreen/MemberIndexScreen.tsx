@@ -1,20 +1,13 @@
-import {
-  ProfileListOKResponse,
-  ProfileListParams,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { profileList } from "@/api/openapi-server/profiles";
 
 import { Client } from "./Client";
 import { Props } from "./useMemberIndexScreen";
 
 export async function MemberIndexScreen(props: Omit<Props, "profiles">) {
-  const response = await server<ProfileListOKResponse>({
-    url: "/v1/profiles",
-    params: {
-      q: props.query,
-      page: props.page,
-    } as ProfileListParams,
+  const { data } = await profileList({
+    q: props.query,
+    page: props.page?.toString(),
   });
 
-  return <Client {...props} profiles={response} />;
+  return <Client {...props} profiles={data} />;
 }

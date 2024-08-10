@@ -1,4 +1,4 @@
-import { PublicProfileList } from "src/api/openapi/schemas";
+import { PublicProfileList } from "src/api/openapi-schema";
 import { Empty } from "src/components/site/Empty";
 
 import { styled } from "@/styled-system/jsx";

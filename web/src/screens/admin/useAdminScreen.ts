@@ -1,4 +1,4 @@
-import { useAccountGet } from "src/api/openapi/accounts";
+import { useAccountGet } from "src/api/openapi-client/accounts";
 
 export function useAdminScreen() {
   const { data, error } = useAccountGet();

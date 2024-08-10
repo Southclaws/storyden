@@ -1,6 +1,6 @@
 "use client";
 
-import { OnboardingStatus } from "src/api/openapi/schemas";
+import { OnboardingStatus } from "src/api/openapi-schema";
 import { CategoryCreateModal } from "src/components/category/CategoryCreate/CategoryCreateModal";
 
 import { Button } from "@/components/ui/button";

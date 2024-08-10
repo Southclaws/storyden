@@ -1,4 +1,4 @@
-import { PublicProfile } from "src/api/openapi/schemas";
+import { PublicProfile } from "src/api/openapi-schema";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 
 import { Heading } from "@/components/ui/heading";

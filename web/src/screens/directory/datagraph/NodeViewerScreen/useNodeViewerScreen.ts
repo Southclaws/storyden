@@ -5,13 +5,13 @@ import {
   nodeUpdate,
   nodeUpdateVisibility,
   useNodeGet,
-} from "src/api/openapi/nodes";
+} from "src/api/openapi-client/nodes";
 import {
   Node,
   NodeInitialProps,
   NodeWithChildren,
   Visibility,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 
 import { replaceDirectoryPath } from "../directory-path";
 import { useDirectoryPath } from "../useDirectoryPath";

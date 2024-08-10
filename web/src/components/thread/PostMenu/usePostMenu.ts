@@ -4,9 +4,9 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 
-import { postDelete } from "src/api/openapi/posts";
-import { Post } from "src/api/openapi/schemas";
-import { getThreadGetKey, threadDelete } from "src/api/openapi/threads";
+import { postDelete } from "src/api/openapi-client/posts";
+import { getThreadGetKey, threadDelete } from "src/api/openapi-client/threads";
+import { Post } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { isShareEnabled } from "src/utils/client";
 

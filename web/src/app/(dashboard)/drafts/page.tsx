@@ -1,23 +1,17 @@
-import {
-  NodeListOKResponse,
-  ThreadListOKResponse,
-  Visibility,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { Visibility } from "src/api/openapi-schema";
 import { DraftListScreen } from "src/screens/drafts/DraftListScreen";
+
+import { nodeList } from "@/api/openapi-server/nodes";
+import { threadList } from "@/api/openapi-server/threads";
 
 export default async function Page() {
   const [threads, nodes] = await Promise.all([
-    server<ThreadListOKResponse>({
-      url: "/v1/threads",
-      params: { visibility: [Visibility.draft] },
+    threadList({
+      /* TODO: Visibility param */
     }),
 
-    server<NodeListOKResponse>({
-      url: "/v1/nodes",
-      params: { visibility: [Visibility.draft] },
-    }),
+    nodeList({ visibility: [Visibility.draft] }),
   ]);
 
-  return <DraftListScreen threads={threads} nodes={nodes} />;
+  return <DraftListScreen threads={threads.data} nodes={nodes.data} />;
 }

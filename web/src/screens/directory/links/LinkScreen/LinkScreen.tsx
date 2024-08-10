@@ -1,13 +1,10 @@
-import { LinkGetOKResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
+import { linkGet } from "@/api/openapi-server/links";
 
 import { Client } from "./Client";
 import { Props } from "./useLinkScreen";
 
 export async function LinkScreen(props: Omit<Props, "link">) {
-  const response = await server<LinkGetOKResponse>({
-    url: `/v1/links/${props.slug}`,
-  });
+  const { data } = await linkGet(props.slug);
 
-  return <Client {...props} link={response} />;
+  return <Client {...props} link={data} />;
 }

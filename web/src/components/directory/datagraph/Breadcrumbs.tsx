@@ -2,7 +2,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { last } from "lodash";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
-import { Visibility } from "src/api/openapi/schemas";
+import { Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import {
   DirectoryPath,

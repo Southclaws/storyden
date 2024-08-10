@@ -1,9 +1,9 @@
-import { useNodeList } from "src/api/openapi/nodes";
+import { useNodeList } from "src/api/openapi-client/nodes";
 import {
   NodeListOKResponse,
   ThreadListOKResponse,
   Visibility,
-} from "src/api/openapi/schemas";
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 export type Props = {

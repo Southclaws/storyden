@@ -1,8 +1,8 @@
 import {
   accountAuthMethodDelete,
   useAccountAuthProviderList,
-} from "src/api/openapi/accounts";
-import { APIError } from "src/api/openapi/schemas";
+} from "src/api/openapi-client/accounts";
+import { APIError } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 

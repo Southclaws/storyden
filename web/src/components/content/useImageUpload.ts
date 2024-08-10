@@ -1,4 +1,4 @@
-import { assetUpload } from "src/api/openapi/assets";
+import { assetUpload } from "src/api/openapi-client/assets";
 
 export function useImageUpload() {
   async function upload(f: File) {

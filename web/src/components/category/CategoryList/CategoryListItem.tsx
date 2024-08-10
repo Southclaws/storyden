@@ -2,14 +2,14 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { usePathname } from "next/navigation";
 
-import { Category } from "src/api/openapi/schemas";
+import { Category } from "src/api/openapi-schema";
 import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
 import { Anchor } from "src/components/site/Anchor";
 
-import { CategoryEdit } from "../CategoryEdit/CategoryEdit";
-
 import { css } from "@/styled-system/css";
 import { Box, HStack, styled } from "@/styled-system/jsx";
+
+import { CategoryEdit } from "../CategoryEdit/CategoryEdit";
 
 export function CategoryListItem(props: Category & { isAdmin: boolean }) {
   const {

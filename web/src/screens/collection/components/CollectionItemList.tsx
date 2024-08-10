@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import { CollectionItem as CollectionItemSchema } from "src/api/openapi/schemas";
+import { CollectionItem as CollectionItemSchema } from "src/api/openapi-schema";
 
 import { Divider, styled } from "@/styled-system/jsx";
 

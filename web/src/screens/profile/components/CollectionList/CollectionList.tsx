@@ -1,11 +1,11 @@
 import { Fragment } from "react";
 
-import { Collection } from "src/api/openapi/schemas";
+import { Collection } from "src/api/openapi-schema";
 import { CollectionCreateTrigger } from "src/components/content/CollectionCreate/CollectionCreateTrigger";
 
-import { useProfileContext } from "../../context";
-
 import { Divider, VStack, styled } from "@/styled-system/jsx";
+
+import { useProfileContext } from "../../context";
 
 import { CollectionListItem } from "./CollectionListItem";
 

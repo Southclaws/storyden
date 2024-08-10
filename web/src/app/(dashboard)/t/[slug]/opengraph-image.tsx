@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
 
-import { ThreadGetResponse } from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { getInfo } from "src/utils/info";
+
+import { threadGet } from "@/api/openapi-server/threads";
 
 import { Props } from "./page";
 
@@ -14,13 +14,11 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image({ params: { slug } }: Props) {
-  const thread = await server<ThreadGetResponse>({
-    url: `/v1/threads/${slug}`,
-  });
+  const { data } = await threadGet(slug);
 
   const { accent_colour } = await getInfo();
 
-  const image = thread.assets[0];
+  const image = data.assets[0];
 
   return new ImageResponse(
     (
@@ -68,7 +66,7 @@ export default async function Image({ params: { slug } }: Props) {
               fontWeight: 600,
             }}
           >
-            {thread.title}
+            {data.title}
           </div>
 
           <div
@@ -77,7 +75,7 @@ export default async function Image({ params: { slug } }: Props) {
               fontWeight: 300,
             }}
           >
-            {thread.description}
+            {data.description}
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import {
 import { SettingsAction } from "src/components/site/Navigation/Anchors/Settings";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
-import { Account } from "@/api/openapi/schemas";
+import { Account } from "@/api/openapi-schema";
 import { HStack } from "@/styled-system/jsx";
 
 import { ComposeAction } from "../Anchors/Compose";

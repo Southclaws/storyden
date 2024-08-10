@@ -1,7 +1,7 @@
 import { map } from "lodash/fp";
 import { Controller } from "react-hook-form";
 
-import { Category } from "src/api/openapi/schemas";
+import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 
 import { FormControl } from "@/components/ui/form/FormControl";

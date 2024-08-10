@@ -1,11 +1,7 @@
-import {
-  LinkListOKResponse,
-  NodeListOKResponse,
-  ThreadListOKResponse,
-} from "src/api/openapi/schemas";
-import { server } from "src/api/server";
 import { Unready } from "src/components/site/Unready";
 import { FeedScreenClient } from "src/screens/feed/FeedScreenClient";
+
+import { threadList } from "@/api/openapi-server/threads";
 
 type Props = {
   params: {
@@ -20,11 +16,8 @@ export default async function Page(props: Props) {
     // objects of all kinds based on a set of heuristics such as what's hot,
     // what's relevant to the account (if any) and what's been featured.
 
-    const threads = await server<ThreadListOKResponse>({
-      url: "/v1/threads",
-      params: {
-        category: props.params.category,
-      },
+    const { data } = await threadList({
+      categories: [props.params.category],
     });
 
     return (
@@ -34,9 +27,7 @@ export default async function Page(props: Props) {
             categories: [props.params.category],
           },
         }}
-        initialData={{
-          threads,
-        }}
+        initialData={{ threads: data }}
       />
     );
   } catch (error) {

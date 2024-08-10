@@ -1,4 +1,4 @@
-import { OnboardingStatus } from "src/api/openapi/schemas";
+import { OnboardingStatus } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useDisclosure } from "src/utils/useDisclosure";
 
