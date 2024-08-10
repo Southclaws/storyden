@@ -67,5 +67,6 @@ func (c *Node) GetDesc() string {
 
 	return ""
 }
-func (c *Node) GetContent() content.Rich { return c.Content.OrZero() }
-func (c *Node) GetProps() map[string]any { return c.Metadata }
+func (c *Node) GetContent() content.Rich  { return c.Content.OrZero() }
+func (c *Node) GetProps() map[string]any  { return c.Metadata }
+func (c *Node) GetAssets() []*asset.Asset { return c.Assets }

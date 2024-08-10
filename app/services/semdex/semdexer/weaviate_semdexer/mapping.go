@@ -1,4 +1,4 @@
-package weaviate
+package weaviate_semdexer
 
 import (
 	"github.com/Southclaws/fault"
@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func mapToNodeReference(v WeaviateObject) (*datagraph.NodeReference, error) {
+func mapToNodeReference(v WeaviateObject) (*datagraph.Ref, error) {
 	id, err := xid.FromString(v.DatagraphID)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -18,10 +18,9 @@ func mapToNodeReference(v WeaviateObject) (*datagraph.NodeReference, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	return &datagraph.NodeReference{
-		ID:    id,
-		Kind:  dk,
-		Name:  v.Name,
-		Score: min(max(1-v.Additional.Distance, 0), 1),
+	return &datagraph.Ref{
+		ID:        id,
+		Kind:      dk,
+		Relevance: min(max(1-v.Additional.Distance, 0), 1),
 	}, nil
 }

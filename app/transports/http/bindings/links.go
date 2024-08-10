@@ -110,6 +110,6 @@ func serialiseLinkWithRefs(in *link_graph.WithRefs) openapi.LinkWithRefs {
 		Threads:        dt.Map(in.Threads, serialiseThreadReference),
 		Posts:          dt.Map(in.Replies, serialisePost),
 		Nodes:          dt.Map(in.Nodes, serialiseNode),
-		Recomentations: dt.Map(in.Related, serialiseDatagraphNodeReference),
+		Recomentations: dt.Map(in.Related, serialiseDatagraphItem),
 	}
 }
