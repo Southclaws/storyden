@@ -1,57 +1,36 @@
-import { PostProps, ThreadReference } from "src/api/openapi/schemas";
+import {
+  Post,
+  PostProps,
+  PostReference,
+  ThreadReference,
+} from "src/api/openapi/schemas";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
 
-import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
-
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 
-type Props =
-  | {
-      kind: "thread";
-      item: ThreadReference;
-    }
-  | {
-      kind: "post";
-      item: PostProps;
-    };
+import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
 
-export function PostRef({ kind, item }: Props) {
+type Props = {
+  item: PostReference;
+};
+
+export function PostRef({ item }: Props) {
   const session = useSession();
 
-  const data =
-    kind === "thread"
-      ? {
-          id: item.id,
-          title: item.title,
-          permalink: `/t/${item.slug}`,
-          short: item.short,
-          author: item.author,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        }
-      : {
-          id: item.id,
-          title: item.root_slug, // TODO: Include parent thread title on API
-          permalink: `/t/${item.root_slug}#${item.id}`,
-          short: item.body,
-          author: item.author,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        };
+  const permalink = `/t/${item.slug}#${item.id}`;
 
   return (
     <Card
-      id={data.id}
-      title={data.title}
-      text={data.short}
-      url={data.permalink}
+      id={item.id}
+      title={item.title}
+      text={item.description}
+      url={permalink}
       shape="row"
       controls={
-        session &&
-        kind === "thread" && (
+        session && (
           <HStack>
             <CollectionMenu thread={item} />
             <FeedItemMenu thread={item} />
@@ -60,10 +39,10 @@ export function PostRef({ kind, item }: Props) {
       }
     >
       <Byline
-        href={data.permalink}
-        author={data.author}
-        time={new Date(data.createdAt)}
-        updated={new Date(data.updatedAt)}
+        href={permalink}
+        author={item.author}
+        time={new Date(item.createdAt)}
+        updated={new Date(item.updatedAt)}
       />
     </Card>
   );

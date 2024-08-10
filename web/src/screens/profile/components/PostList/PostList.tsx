@@ -1,11 +1,11 @@
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 
 import { styled } from "@/styled-system/jsx";
 
 import { PostListItem } from "./PostListItem";
 
 type Props = {
-  posts: PostProps[];
+  posts: Post[];
 };
 
 export function PostList(props: Props) {

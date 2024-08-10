@@ -25,7 +25,7 @@ export function useThreadScreenState(
       setEditingTitle(props?.title);
     }
 
-    const target = props?.posts.find((p) => p.id === id);
+    const target = props?.replies.find((p) => p.id === id);
     if (target) {
       setEditingContent(target.body);
     }

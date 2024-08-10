@@ -1,15 +1,15 @@
-import { PostProps } from "src/api/openapi/schemas";
+import { Post } from "src/api/openapi/schemas";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
-
-import { Byline } from "../../content/Byline";
-import { PostMenu } from "../PostMenu/PostMenu";
 
 import { Button } from "@/components/ui/button";
 import { Flex, HStack } from "@/styled-system/jsx";
 
+import { Byline } from "../../content/Byline";
+import { PostMenu } from "../PostMenu/PostMenu";
+
 import { usePostView } from "./usePostView";
 
-type Props = PostProps & {
+type Props = Post & {
   slug?: string;
 };
 

@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 
-import { postCreate } from "src/api/openapi/posts";
+import { replyCreate } from "src/api/openapi/replies";
 import { Thread } from "src/api/openapi/schemas";
 import { useThreadGet } from "src/api/openapi/threads";
 import { handleError } from "src/components/site/ErrorBanner";
@@ -19,7 +19,7 @@ export function useReplyBox(thread: Thread) {
 
   async function doReply() {
     setLoading(true);
-    await postCreate(thread.id, { body: value })
+    await replyCreate(thread.id, { body: value })
       .catch(handleError)
       .then(async () => {
         await mutate();
