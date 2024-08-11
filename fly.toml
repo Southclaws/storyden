@@ -9,8 +9,7 @@ processes    = []
   dockerfile = "docker/api/Dockerfile"
 
 [env]
-  COOKIE_DOMAIN      = "makeroom.club"
-  PUBLIC_API_ADDRESS = "https://storyden.fly.dev"
+  PUBLIC_API_ADDRESS = "https://api.makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
   # S3 credentials are specified via Fly secrets.
