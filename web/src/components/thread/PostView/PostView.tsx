@@ -2,7 +2,7 @@ import { Post } from "src/api/openapi-schema";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
 import { Button } from "@/components/ui/button";
-import { Flex, HStack } from "@/styled-system/jsx";
+import { CardBox, HStack } from "@/styled-system/jsx";
 
 import { Byline } from "../../content/Byline";
 import { PostMenu } from "../PostMenu/PostMenu";
@@ -23,7 +23,7 @@ export function PostView(props: Props) {
   } = usePostView(props);
 
   return (
-    <Flex id={props.id} flexDir="column" gap="2">
+    <CardBox id={props.id} flexDir="column" gap="2">
       <Byline
         href={`#${props.id}`}
         author={props.author}
@@ -49,6 +49,6 @@ export function PostView(props: Props) {
           <ContentComposer initialValue={props.body} disabled />
         </>
       )}
-    </Flex>
+    </CardBox>
   );
 }
