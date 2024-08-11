@@ -22,8 +22,8 @@ export function Title(props: Thread) {
           </Heading>
         )}
       </div>
-      {props.link && <LinkView link={props.link} asset={props.assets?.[0]} />}
-      <CategoryPill category={props.category} />
+      {/* TODO: Revisit link aggregator product feature */}
+      {/* {props.link && <LinkView link={props.link} asset={props.assets?.[0]} />} */}
     </>
   );
 }
