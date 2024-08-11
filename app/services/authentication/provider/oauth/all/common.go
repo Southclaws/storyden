@@ -37,5 +37,5 @@ func LoadProvider(name string) (Configuration, error) {
 }
 
 func Redirect(cfg config.Config, name string) string {
-	return fmt.Sprintf("%s/auth/%s/callback", cfg.PublicWebAddress, name)
+	return fmt.Sprintf("%s/auth/%s/callback", cfg.PublicWebAddress.String(), name)
 }
