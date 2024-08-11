@@ -30,8 +30,8 @@ func MountOpenAPI(
 ) {
 	lc.Append(fx.StartHook(func() {
 		applied := httpserver.Apply(router,
-			reqlog.WithLogger(logger),
 			origin.WithCORS(cfg),
+			reqlog.WithLogger(logger),
 			useragent.UserAgentContext,
 			cj.WithAuth,
 		)
