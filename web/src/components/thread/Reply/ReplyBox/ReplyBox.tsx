@@ -1,36 +1,48 @@
 import { Thread } from "src/api/openapi-schema";
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
+import { ProfilePill } from "@/components/site/ProfilePill/ProfilePill";
 import { Button } from "@/components/ui/button";
-import { HStack, styled } from "@/styled-system/jsx";
+import { CardBox, HStack, styled } from "@/styled-system/jsx";
 
 import { useReplyBox } from "./useReplyBox";
 
 export function ReplyBox(props: Thread) {
-  const { onChange, onReply, onKeyDown, isLoading, resetKey } =
+  const { onChange, onReply, onKeyDown, isLoading, isEmpty, resetKey } =
     useReplyBox(props);
 
   return (
-    <styled.form
-      display="flex"
-      flexDirection="column"
-      width="full"
-      borderRadius="2xl"
-      p="2"
-      alignItems="end"
-      onKeyDown={onKeyDown}
-    >
-      <ContentComposer
-        onChange={onChange}
-        disabled={isLoading}
-        resetKey={resetKey}
-      />
+    <CardBox>
+      <styled.form
+        display="flex"
+        flexDirection="column"
+        gap="1"
+        width="full"
+        borderRadius="2xl"
+        onKeyDown={onKeyDown}
+      >
+        <HStack justifyContent="space-between">
+          <HStack gap="1">
+            Reply to{" "}
+            <ProfilePill profileReference={props.author} showAvatar={false} />
+          </HStack>
 
-      <HStack mt="4" justifyContent="end">
-        <Button type="submit" onClick={onReply} disabled={isLoading}>
-          Post
-        </Button>
-      </HStack>
-    </styled.form>
+          <Button
+            type="submit"
+            size="xs"
+            onClick={onReply}
+            disabled={isLoading || isEmpty}
+          >
+            Post
+          </Button>
+        </HStack>
+
+        <ContentComposer
+          onChange={onChange}
+          disabled={isLoading}
+          resetKey={resetKey}
+        />
+      </styled.form>
+    </CardBox>
   );
 }
