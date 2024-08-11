@@ -13,10 +13,15 @@
 */
 
 .navgrid {
-  --grid-padding-outer: var(--spacing-5);
-  --grid-padding-inner: var(--spacing-3);
-  --grid-padding-inner-right: 0px;
+  --grid-row-padding-outer: var(--spacing-5);
+  --grid-row-padding-inner: var(--spacing-3);
+
+  --grid-col-padding-outer: var(--spacing-5);
+  --grid-col-padding-inner: var(--spacing-3);
+  --grid-col-padding-inner-right: 0px;
+
   --navgrid-right-bar-display: none;
+
   min-height: 100dvh;
 }
 
@@ -28,20 +33,20 @@
   height: 100%;
 
   grid-template-rows:
-    var(--grid-padding-outer)
+    var(--grid-row-padding-outer)
     1fr
-    var(--grid-padding-inner)
+    var(--grid-row-padding-inner)
     auto
-    var(--grid-padding-outer);
+    var(--grid-row-padding-outer);
 
   grid-template-columns:
-    minmax(var(--grid-padding-outer), 1fr)
+    minmax(var(--grid-col-padding-outer), 1fr)
     1fr
-    var(--grid-padding-inner)
+    var(--grid-col-padding-inner)
     minmax(0, var(--sizes-breakpoint-lg))
-    var(--grid-padding-inner-right)
+    var(--grid-col-padding-inner-right)
     1fr
-    minmax(var(--grid-padding-outer), 1fr);
+    minmax(var(--grid-col-padding-outer), 1fr);
 
   grid-template-areas:
     " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
@@ -71,7 +76,7 @@
 
 @media screen and (min-width: 1280px) {
   .navgrid {
-    --grid-padding-inner-right: var(--spacing-3);
+    --grid-col-padding-inner-right: var(--spacing-3);
     --navgrid-right-bar-display: block;
   }
 }
@@ -81,20 +86,20 @@
     display: grid;
 
     grid-template-rows:
-      var(--grid-padding-outer)
+      var(--grid-row-padding-outer)
       4rem
-      var(--grid-padding-inner)
+      var(--grid-row-padding-inner)
       1fr
-      var(--grid-padding-outer);
+      var(--grid-row-padding-outer);
 
     grid-template-columns:
-      minmax(var(--grid-padding-outer), 1fr)
+      var(--grid-col-padding-outer)
       18rem
-      var(--grid-padding-inner)
+      minmax(var(--grid-col-padding-inner), 1fr)
       minmax(0, var(--sizes-breakpoint-lg))
-      var(--grid-padding-inner-right)
+      minmax(var(--grid-col-padding-inner-right), 1fr)
       18rem
-      minmax(var(--grid-padding-outer), 1fr);
+      var(--grid-col-padding-outer);
 
     grid-template-areas:
       " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
