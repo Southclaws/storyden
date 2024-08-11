@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/kelseyhightower/envconfig"
@@ -14,12 +16,13 @@ type Config struct {
 	LogLevel    zapcore.Level `envconfig:"LOG_LEVEL"    default:"info"`
 	RunFrontend string        `envconfig:"RUN_FRONTEND" default:""`
 
-	DatabaseURL      string `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
-	ListenAddr       string `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
-	CookieDomain     string `envconfig:"COOKIE_DOMAIN"          default:"localhost"`
-	SessionKey       string `envconfig:"SESSION_KEY"            default:"0000000000000000"`
-	PublicWebAddress string `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
-	EmailProvider    string `envconfig:"EMAIL_PROVIDER"         default:""`
+	DatabaseURL      string  `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
+	ListenAddr       string  `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
+	SessionKey       string  `envconfig:"SESSION_KEY"            default:"0000000000000000"`
+	PublicWebAddress url.URL `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
+	PublicAPIAddress url.URL `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
+
+	EmailProvider string `envconfig:"EMAIL_PROVIDER"         default:""`
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
 	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`

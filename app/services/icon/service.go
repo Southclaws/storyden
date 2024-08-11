@@ -10,6 +10,7 @@ import (
 	"image/png"
 	_ "image/png"
 	"io"
+	"net/url"
 	"path"
 	"strings"
 
@@ -80,7 +81,7 @@ type service struct {
 
 	os object.Storer
 
-	address string
+	address url.URL
 }
 
 func New(
@@ -171,7 +172,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 		}
 
 		apiPath := path.Join(iconRoute)
-		url := fmt.Sprintf("%s/%s", s.address, apiPath)
+		url := fmt.Sprintf("%s/%s", s.address.String(), apiPath)
 
 		_, err = s.am.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, url)
 		if err != nil {

@@ -2,6 +2,7 @@ package mailtemplate
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,7 +18,7 @@ type Rendered struct {
 }
 
 type Builder struct {
-	instanceURL string
+	instanceURL url.URL
 	settings    settings.Repository
 }
 
@@ -44,7 +45,7 @@ func (b *Builder) Build(ctx context.Context, name string, intros []string, actio
 	h := hermes.Hermes{
 		Product: hermes.Product{
 			Name:      instanceTitle,
-			Link:      instanceURL,
+			Link:      instanceURL.String(),
 			Copyright: "-",
 		},
 	}

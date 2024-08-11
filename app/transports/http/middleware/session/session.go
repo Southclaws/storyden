@@ -35,7 +35,7 @@ type Jar struct {
 
 func New(cfg config.Config, ss *securecookie.Session) *Jar {
 	return &Jar{
-		domain:           cfg.CookieDomain,
+		domain:           cfg.PublicAPIAddress.Hostname(),
 		ss:               ss,
 		secureCookieName: secureCookieName,
 	}
