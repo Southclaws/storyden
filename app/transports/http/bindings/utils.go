@@ -88,25 +88,29 @@ func serialiseContentHTML(c content.Rich) string {
 }
 
 func serialiseThread(t *thread.Thread) openapi.Thread {
+	posts := len(t.Replies)
 	return openapi.Thread{
-		Author:    serialiseProfileReference(t.Author),
-		Category:  serialiseCategoryReference(&t.Category),
-		CreatedAt: t.CreatedAt,
-		// DeletedAt: t.DeletedAt,
+		Assets:         dt.Map(t.Assets, serialiseAssetReference),
+		Author:         serialiseProfileReference(t.Author),
+		Body:           serialiseContentHTML(t.Content),
+		Category:       serialiseCategoryReference(&t.Category),
+		Collections:    dt.Map(t.Collections, serialiseCollection),
+		CreatedAt:      t.CreatedAt,
+		DeletedAt:      t.DeletedAt.Ptr(),
+		Description:    &t.Short,
 		Id:             openapi.Identifier(t.ID.String()),
+		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
+		Links:          dt.Map(t.Links, serialiseLink),
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
+		PostCount:      &posts,
 		Reacts:         dt.Map(t.Reacts, serialiseReact),
-		Description:    &t.Short,
+		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
+		Replies:        dt.Map(t.Replies, serialiseReply),
 		Slug:           t.Slug,
 		Tags:           t.Tags,
-		Replies:        dt.Map(t.Replies, serialiseReply),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
-		Assets:         dt.Map(t.Assets, serialiseAssetReference),
-		Collections:    dt.Map(t.Collections, serialiseCollection),
-		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
-		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 	}
 }
 

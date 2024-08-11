@@ -69,12 +69,11 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		return dto, nil
 	}
 
-	// Thread data structure will always contain one post: itself in post form.
 	first, err := transform(m)
 	if err != nil {
 		return nil, err
 	}
-	posts := []*reply.Reply{first}
+	posts := []*reply.Reply{}
 
 	if p, err := m.Edges.PostsOrErr(); err == nil && len(p) > 0 {
 		transformed, err := dt.MapErr(p, transform)
