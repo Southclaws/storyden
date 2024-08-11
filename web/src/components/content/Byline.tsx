@@ -14,7 +14,7 @@ type Props = {
 
 export function Byline(props: Props) {
   return (
-    <Flex alignItems="end" justify="space-between" minWidth="0">
+    <Flex alignItems="start" justify="space-between" minWidth="0">
       <Flex
         alignItems="center"
         gap="0"
