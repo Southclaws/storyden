@@ -21,7 +21,7 @@ export type ContentComposerProps = {
   disabled?: boolean;
   resetKey?: string;
   initialValue?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: string, isEmpty: boolean) => void;
   onAssetUpload?: (asset: Asset) => void;
 };
 
@@ -65,7 +65,7 @@ export function useContentComposer(props: ContentComposerProps) {
     content: props.initialValue ?? "<p></p>",
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      props.onChange?.(html);
+      props.onChange?.(html, editor.isEmpty);
     },
   });
 

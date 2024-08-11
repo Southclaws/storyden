@@ -11,12 +11,14 @@ import { Handle } from "./Handle";
 type Props = {
   profileReference: ProfileReference;
   showHandle?: boolean;
+  showAvatar?: boolean;
   size?: "sm" | "lg";
 };
 
 export function ProfilePill({
   profileReference,
   showHandle = true,
+  showAvatar = true,
   size = "sm",
 }: Props) {
   const account = useSession();
@@ -38,11 +40,13 @@ export function ProfilePill({
         gap: "1",
       })}
     >
-      <Avatar
-        flexShrink={0}
-        handle={profileReference.handle}
-        width={large ? "8" : "6"}
-      />
+      {showAvatar && (
+        <Avatar
+          flexShrink={0}
+          handle={profileReference.handle}
+          width={large ? "8" : "6"}
+        />
+      )}
       {showHandle && (
         <Box minW="0" flexShrink={1}>
           <Handle profileReference={profileReference} size={size} />

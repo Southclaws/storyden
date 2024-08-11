@@ -3,19 +3,25 @@ import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { Thread } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
-import { HStack } from "@/styled-system/jsx";
+import { Box, HStack } from "@/styled-system/jsx";
 
 import { ReplyBox } from "./ReplyBox/ReplyBox";
 import { useReply } from "./useReply";
 
 export function Reply(props: Thread) {
   const { loggedIn } = useReply();
-  // NOTE: isLoading is a hack to easily reset the ReplyBox + provide feedback.
 
-  if (loggedIn) {
-    return <ReplyBox {...props} />;
-  }
+  return (
+    <Box
+      w="full"
+      pb="12" // Provide spacing at the bottom for the editor's menu + navbar.
+    >
+      {loggedIn ? <ReplyBox {...props} /> : <LoginToReply />}
+    </Box>
+  );
+}
 
+function LoginToReply() {
   return (
     <HStack
       w="full"

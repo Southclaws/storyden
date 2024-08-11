@@ -7,23 +7,41 @@ import { useThreadGet } from "src/api/openapi-client/threads";
 import { Thread } from "src/api/openapi-schema";
 import { handleError } from "src/components/site/ErrorBanner";
 
+type Value = {
+  body: string;
+  isEmpty: boolean;
+};
+
 export function useReplyBox(thread: Thread) {
   const { mutate } = useThreadGet(thread.slug);
   const [isLoading, setLoading] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState<Value>({
+    body: "",
+    isEmpty: true,
+  });
   const [resetKey, setResetKey] = useState("");
 
-  function onChange(v: string) {
-    setValue(v);
+  function onChange(v: string, isEmpty: boolean) {
+    setValue({
+      body: v,
+      isEmpty,
+    });
   }
 
   async function doReply() {
+    if (value.isEmpty) {
+      return;
+    }
+
     setLoading(true);
-    await replyCreate(thread.id, { body: value })
+    await replyCreate(thread.id, { body: value.body })
       .catch(handleError)
       .then(async () => {
         await mutate();
-        setValue("");
+        setValue({
+          body: "",
+          isEmpty: true,
+        });
 
         // This is a little hack tbh, essentially if this prop for the
         // ContentComposer component changes, its value is reset. Could have
@@ -59,5 +77,6 @@ export function useReplyBox(thread: Thread) {
     onKeyDown,
     isLoading,
     resetKey,
+    isEmpty: value.isEmpty,
   };
 }
