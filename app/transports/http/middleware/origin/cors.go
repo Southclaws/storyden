@@ -10,48 +10,63 @@ import (
 )
 
 func WithCORS(cfg config.Config) func(next http.Handler) http.Handler {
-	allowedOrigins := []string{
-		"http://localhost:3000", // Local development
-		"http://localhost:8001", // Swagger UI
-		cfg.PublicWebAddress,    // Live public website
+	allowedMethods := []string{
+		"GET",
+		"POST",
+		"PUT",
+		"PATCH",
+		"DELETE",
+		"OPTIONS",
 	}
 
-	table := lo.SliceToMap(allowedOrigins, func(s string) (string, struct{}) { return s, struct{}{} })
-
-	allowOriginFunc := func(origin string) bool {
-		_, present := table[origin]
-		return present
+	allowedHeaders := []string{
+		"Accept",
+		"Authorization",
+		"Content-Type",
+		"Content-Length",
+		"X-CSRF-Token",
+		"X-Correlation-ID",
+		"X-Forwarded-Host",
 	}
 
-	cors := cors.New(cors.Options{
-		AllowOriginFunc: allowOriginFunc,
-		AllowedMethods: []string{
-			"GET",
-			"POST",
-			"PUT",
-			"PATCH",
-			"DELETE",
-			"OPTIONS",
-		},
-		AllowedHeaders: []string{
-			"Accept",
-			"Authorization",
-			"Content-Type",
-			"Content-Length",
-			"X-CSRF-Token",
-			"X-Correlation-ID",
-			"X-Forwarded-Host",
-		},
-		ExposedHeaders: []string{
-			"Link",
-			"Content-Type",
-			"Content-Length",
-			"X-Ratelimit-Limit",
-			"X-Ratelimit-Reset",
-		},
-		AllowCredentials: true,
-		MaxAge:           300,
-	})
+	exposedHeaders := []string{
+		"Link",
+		"Content-Type",
+		"Content-Length",
+		"X-Ratelimit-Limit",
+		"X-Ratelimit-Reset",
+	}
 
-	return cors.Handler
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
+
+			// TODO: Provide a way to set multiple allowed origins via config.
+			// NOTE: Currently, we allow all origins but not via "*".
+			allowedOrigins := []string{
+				"http://localhost:3000",
+				origin,
+			}
+
+			table := lo.SliceToMap(allowedOrigins, func(s string) (string, struct{}) { return s, struct{}{} })
+
+			allowOriginFunc := func(origin string) bool {
+				_, present := table[origin]
+				return present
+			}
+
+			corsConfig := cors.New(cors.Options{
+				AllowOriginFunc:  allowOriginFunc,
+				AllowedMethods:   allowedMethods,
+				AllowedHeaders:   allowedHeaders,
+				ExposedHeaders:   exposedHeaders,
+				AllowCredentials: true,
+				MaxAge:           300,
+			})
+
+			ctx := setOriginContext(r.Context(), origin)
+
+			corsConfig.Handler(next).ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
