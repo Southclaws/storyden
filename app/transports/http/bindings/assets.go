@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -20,7 +21,7 @@ import (
 type Assets struct {
 	a        asset_manager.Service
 	uploader *asset_upload.Uploader
-	address  string
+	address  url.URL
 }
 
 func NewAssets(cfg config.Config, a asset_manager.Service, uploader *asset_upload.Uploader) Assets {
@@ -52,7 +53,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	// TODO: This must be specified on the READ path not the write path.
 	// It's not the responsibility of the write-path transport layer to figure
 	// out the public URL of the asset. This may change if a direct CDN is used.
-	url := fmt.Sprintf("%s/api/v1/assets/%s", i.address, filename.String())
+	url := fmt.Sprintf("%s/api/v1/assets/%s", i.address.String(), filename.String())
 
 	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
 	if err != nil {

@@ -29,9 +29,9 @@ func NewServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.S
 
 				l.Info("storyden http server starting",
 					zap.String("address", cfg.ListenAddr),
-					zap.String("cookie_domain", cfg.CookieDomain),
-					zap.String("frontend_address", cfg.PublicWebAddress),
-					zap.Bool("frontend_address", cfg.Production),
+					zap.String("api_address", cfg.PublicAPIAddress.String()),
+					zap.String("web_address", cfg.PublicWebAddress.String()),
+					zap.Bool("production", cfg.Production),
 					zap.String("log_level", cfg.LogLevel.String()),
 				)
 

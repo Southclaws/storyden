@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -35,7 +36,7 @@ type WebAuthn struct {
 	cj           *session.Jar
 	accountQuery account_querier.Querier
 	wa           *waprovider.Provider
-	domain       string
+	address      url.URL
 }
 
 func NewWebAuthn(
@@ -66,7 +67,7 @@ func NewWebAuthn(
 		}
 	})
 
-	return WebAuthn{cj, accountQuery, wa, cfg.CookieDomain}
+	return WebAuthn{cj, accountQuery, wa, cfg.PublicAPIAddress}
 }
 
 func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) (openapi.WebAuthnRequestCredentialResponseObject, error) {
@@ -93,7 +94,7 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 		Expires:  time.Now().Add(time.Minute * 10),
 		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
-		Domain:   a.domain,
+		Domain:   a.address.Hostname(),
 		Secure:   true,
 		HttpOnly: true,
 	}
@@ -177,7 +178,7 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 		Expires:  time.Now().Add(time.Minute * 10),
 		SameSite: http.SameSiteDefaultMode,
 		Path:     "/",
-		Domain:   a.domain,
+		Domain:   a.address.Hostname(),
 		Secure:   true,
 		HttpOnly: true,
 	}

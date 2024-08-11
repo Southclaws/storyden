@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -17,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure"
+	"github.com/Southclaws/storyden/internal/utils"
 )
 
 // Test provides a full app setup for testing service behaviour. It returns a
@@ -34,8 +36,8 @@ import (
 //	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	defaultConfig := config.Config{
-		CookieDomain:     "localhost",
-		PublicWebAddress: "http://localhost",
+		PublicAPIAddress: *utils.Must(url.Parse("http://localhost")),
+		PublicWebAddress: *utils.Must(url.Parse("http://localhost")),
 	}
 
 	if url := os.Getenv("DATABASE_URL"); url != "" {

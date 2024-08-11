@@ -33,7 +33,6 @@ type Authentication struct {
 	er           email.EmailRepo
 	am           *authentication.Manager
 	ev           email_verify.Verifier
-	domain       string
 }
 
 func NewAuthentication(
@@ -47,7 +46,7 @@ func NewAuthentication(
 	am *authentication.Manager,
 	ev email_verify.Verifier,
 ) Authentication {
-	return Authentication{p, ep, epp, sm, accountQuery, er, am, ev, cfg.CookieDomain}
+	return Authentication{p, ep, epp, sm, accountQuery, er, am, ev}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {

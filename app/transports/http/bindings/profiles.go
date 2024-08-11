@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -19,7 +20,7 @@ import (
 )
 
 type Profiles struct {
-	apiAddress   string
+	apiAddress   url.URL
 	accountQuery account_querier.Querier
 	ps           profile_search.Repository
 }
@@ -84,7 +85,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	}
 
 	// TODO: Make this a bit more well designed and less coupled to the hostname
-	avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", p.apiAddress, acc.Handle)
+	avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", p.apiAddress.String(), acc.Handle)
 
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{

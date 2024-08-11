@@ -3,6 +3,7 @@ package asset_manager
 import (
 	"context"
 	"io"
+	"net/url"
 	"path"
 
 	"github.com/Southclaws/fault"
@@ -37,7 +38,7 @@ type service struct {
 	threads thread.Repository
 	objects object.Storer
 
-	address string
+	address url.URL
 }
 
 func New(
