@@ -25,7 +25,7 @@ type Assets struct {
 }
 
 func NewAssets(cfg config.Config, a asset_manager.Service, uploader *asset_upload.Uploader) Assets {
-	return Assets{a, uploader, cfg.PublicWebAddress}
+	return Assets{a, uploader, cfg.PublicAPIAddress}
 }
 
 func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestObject) (openapi.AssetGetResponseObject, error) {
