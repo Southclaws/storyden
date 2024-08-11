@@ -8,6 +8,7 @@ import styles from "./navigation.module.css";
 
 import { Left } from "./Left/Left";
 import { Navpill } from "./Navpill/Navpill";
+import { Right } from "./Right/Right";
 import { getServerSidebarState } from "./Sidebar/server";
 import { Top } from "./Top/Top";
 
@@ -47,8 +48,7 @@ export async function Navigation({ children }: PropsWithChildren) {
         </Box>
 
         <Box className={styles["rightbar"]}>
-          {/* RIGHT BAR NOT DONE YET */}
-          {/* <Right /> */}
+          <Right />
         </Box>
 
         <Box className={styles["navpill"]}>
