@@ -39,13 +39,21 @@ This specifies the primary database Storyden will persist all its main data in. 
 
 The interface bind address. Usually you won't ever need to change this.
 
-### `COOKIE_DOMAIN`
+### `PUBLIC_API_ADDRESS`
 
-> default: `localhost`
+> default: `http://localhost:8000`
 
 This is important as it affects the ability for users to authenticate. It's used for both cookies and WebAuthn.
 
+The hostname part of this URL is used to set the `Domain` attribute on cookies. This is important for security and privacy reasons. If you're running Storyden on a subdomain, you should set this to the full domain including the subdomain.
+
 Warning: Changing this will break WebAuthn/Passkey sessions. There's a planned workaround coming but currently it's not recommended you switch domains if you allow users to authenticate with WebAuthn/Passkey.
+
+### `PUBLIC_WEB_ADDRESS`
+
+> default: `http://localhost:3000`
+
+The public address for the frontend application. Change this to your production frontend URL with which you access the web application from via a browser. In production it should not have a port number and should use https.
 
 ### `SESSION_KEY`
 
@@ -58,12 +66,6 @@ An encryption key for secure cookies. Do not leave this as the default value for
   users to log in again. It's best to set this once and only change it if you
   believe the key has been compromised.
 </Callout>
-
-### `PUBLIC_WEB_ADDRESS`
-
-> default: `http://localhost:3000`
-
-The public address for the frontend application. Change this to your production frontend URL with which you access the web application from via a browser. In production it should not have a port number and should use https.
 
 ## Optional
 

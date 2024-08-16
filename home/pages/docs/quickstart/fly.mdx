@@ -38,7 +38,7 @@ You can visit the URL that Fly.io gives you and you'll see your Storyden instanc
 That's only half the story though. You have an instance but
 
 1. it's entirely **ephemeral**! This means that if the instance is restarted, it will lose all its data.
-2. it has no idea what its domain name is! This means session cookies won't work.
+2. it has no idea what its public address is! This means session cookies won't work.
 
 ### Persistent storage
 
@@ -121,14 +121,14 @@ Here's an example of the environment variables section in the `fly.toml` file:
 
 ```toml
 [env]
-  COOKIE_DOMAIN      = "storyden-unique-name-1234.fly.dev"
+  PUBLIC_API_ADDRESS = "https://storyden-unique-name-1234.fly.dev"
   PUBLIC_WEB_ADDRESS = "https://storyden-unique-name-1234.fly.dev"
   SESSION_KEY        = "<your key>"
 ```
 
-#### `COOKIE_DOMAIN` and `PUBLIC_WEB_ADDRESS`
+#### `PUBLIC_API_ADDRESS` and `PUBLIC_WEB_ADDRESS`
 
-The [cookie domain](/docs/operating/configuration#cookie_domain) and [public web address](/docs/operating/configuration#public_web_address) variables are necessary for Storyden to manage sessions using cookies and a few other things such as knowing where links should point to.
+The [public API address](/docs/operating/configuration#public_api_address) and [public web address](/docs/operating/configuration#public_web_address) variables are necessary for Storyden to manage sessions using cookies and a few other things such as knowing where links should point to.
 
 In the above section, when you ran `fly launch`, it gives you the URL of your app. This URL will look something like:
 
@@ -137,6 +137,18 @@ https://storyden-unique-name-1234.fly.dev
 ```
 
 It's a subdomain of `fly.dev` and is uniquely generated based on your app name. You can refer to the Fly.io domains documentation for information on setting up a custom domain.
+
+<Callout type="info" emoji="ℹ️">
+  For this quick start guide, your instance is all hosted on a single domain,
+  that means the API and the frontend both run on
+  `https://storyden-unique-name-1234.fly.dev`. But if you're using separate
+  backend and frontend deployments (hosting the frontend on Vercel for example)
+  it's necessary that both share the same root domain. So you'd put the API on
+  something like `api.mycommunity.com` and the frontend on `mycommunity.com`.
+  Cookies will be issued to the root domain, `mycommunity.com` in this example
+  and will be included in requests to both the API and the frontend's SSR
+  rendering backend if you're using a framework such as Next.js.
+</Callout>
 
 #### `SESSION_KEY`
 
