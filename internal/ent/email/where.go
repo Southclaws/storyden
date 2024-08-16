@@ -86,6 +86,11 @@ func Verified(v bool) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldVerified, v))
 }
 
+// Public applies equality check predicate on the "public" field. It's identical to PublicEQ.
+func Public(v bool) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldPublic, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldCreatedAt, v))
@@ -424,6 +429,16 @@ func VerifiedEQ(v bool) predicate.Email {
 // VerifiedNEQ applies the NEQ predicate on the "verified" field.
 func VerifiedNEQ(v bool) predicate.Email {
 	return predicate.Email(sql.FieldNEQ(FieldVerified, v))
+}
+
+// PublicEQ applies the EQ predicate on the "public" field.
+func PublicEQ(v bool) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldPublic, v))
+}
+
+// PublicNEQ applies the NEQ predicate on the "public" field.
+func PublicNEQ(v bool) predicate.Email {
+	return predicate.Email(sql.FieldNEQ(FieldPublic, v))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.

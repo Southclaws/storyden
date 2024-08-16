@@ -6019,6 +6019,7 @@ type EmailMutation struct {
 	email_address         *string
 	verification_code     *string
 	verified              *bool
+	public                *bool
 	clearedFields         map[string]struct{}
 	account               *xid.ID
 	clearedaccount        bool
@@ -6375,6 +6376,42 @@ func (m *EmailMutation) ResetVerified() {
 	m.verified = nil
 }
 
+// SetPublic sets the "public" field.
+func (m *EmailMutation) SetPublic(b bool) {
+	m.public = &b
+}
+
+// Public returns the value of the "public" field in the mutation.
+func (m *EmailMutation) Public() (r bool, exists bool) {
+	v := m.public
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPublic returns the old "public" field's value of the Email entity.
+// If the Email object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailMutation) OldPublic(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPublic is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPublic requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublic: %w", err)
+	}
+	return oldValue.Public, nil
+}
+
+// ResetPublic resets all changes to the "public" field.
+func (m *EmailMutation) ResetPublic() {
+	m.public = nil
+}
+
 // ClearAccount clears the "account" edge to the Account entity.
 func (m *EmailMutation) ClearAccount() {
 	m.clearedaccount = true
@@ -6476,7 +6513,7 @@ func (m *EmailMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EmailMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, email.FieldCreatedAt)
 	}
@@ -6494,6 +6531,9 @@ func (m *EmailMutation) Fields() []string {
 	}
 	if m.verified != nil {
 		fields = append(fields, email.FieldVerified)
+	}
+	if m.public != nil {
+		fields = append(fields, email.FieldPublic)
 	}
 	return fields
 }
@@ -6515,6 +6555,8 @@ func (m *EmailMutation) Field(name string) (ent.Value, bool) {
 		return m.VerificationCode()
 	case email.FieldVerified:
 		return m.Verified()
+	case email.FieldPublic:
+		return m.Public()
 	}
 	return nil, false
 }
@@ -6536,6 +6578,8 @@ func (m *EmailMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldVerificationCode(ctx)
 	case email.FieldVerified:
 		return m.OldVerified(ctx)
+	case email.FieldPublic:
+		return m.OldPublic(ctx)
 	}
 	return nil, fmt.Errorf("unknown Email field %s", name)
 }
@@ -6586,6 +6630,13 @@ func (m *EmailMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetVerified(v)
+		return nil
+	case email.FieldPublic:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublic(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Email field %s", name)
@@ -6668,6 +6719,9 @@ func (m *EmailMutation) ResetField(name string) error {
 		return nil
 	case email.FieldVerified:
 		m.ResetVerified()
+		return nil
+	case email.FieldPublic:
+		m.ResetPublic()
 		return nil
 	}
 	return fmt.Errorf("unknown Email field %s", name)

@@ -5,9 +5,8 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { EmailAddress } from "./emailAddress";
 
-export interface AuthEmailVerifyProps {
-  code: string;
-  email: EmailAddress;
-}
+/**
+ * A valid email address.
+ */
+export type EmailAddress = string;

@@ -5,9 +5,10 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { EmailAddress } from "./emailAddress";
 
 export interface AccountEmailAddress {
-  email_address: string;
+  email_address: EmailAddress;
   /** Is the email used for authenticating to the platform? */
   is_auth: boolean;
   /** Is the email address verified to be owned by the account? */

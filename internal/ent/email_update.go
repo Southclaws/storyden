@@ -99,6 +99,20 @@ func (eu *EmailUpdate) SetNillableVerified(b *bool) *EmailUpdate {
 	return eu
 }
 
+// SetPublic sets the "public" field.
+func (eu *EmailUpdate) SetPublic(b bool) *EmailUpdate {
+	eu.mutation.SetPublic(b)
+	return eu
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (eu *EmailUpdate) SetNillablePublic(b *bool) *EmailUpdate {
+	if b != nil {
+		eu.SetPublic(*b)
+	}
+	return eu
+}
+
 // SetAccount sets the "account" edge to the Account entity.
 func (eu *EmailUpdate) SetAccount(a *Account) *EmailUpdate {
 	return eu.SetAccountID(a.ID)
@@ -200,6 +214,9 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
+	}
+	if value, ok := eu.mutation.Public(); ok {
+		_spec.SetField(email.FieldPublic, field.TypeBool, value)
 	}
 	if eu.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -349,6 +366,20 @@ func (euo *EmailUpdateOne) SetNillableVerified(b *bool) *EmailUpdateOne {
 	return euo
 }
 
+// SetPublic sets the "public" field.
+func (euo *EmailUpdateOne) SetPublic(b bool) *EmailUpdateOne {
+	euo.mutation.SetPublic(b)
+	return euo
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (euo *EmailUpdateOne) SetNillablePublic(b *bool) *EmailUpdateOne {
+	if b != nil {
+		euo.SetPublic(*b)
+	}
+	return euo
+}
+
 // SetAccount sets the "account" edge to the Account entity.
 func (euo *EmailUpdateOne) SetAccount(a *Account) *EmailUpdateOne {
 	return euo.SetAccountID(a.ID)
@@ -480,6 +511,9 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 	}
 	if value, ok := euo.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
+	}
+	if value, ok := euo.mutation.Public(); ok {
+		_spec.SetField(email.FieldPublic, field.TypeBool, value)
 	}
 	if euo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{

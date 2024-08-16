@@ -8,6 +8,7 @@
 import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { EmailAddressList } from "./emailAddressList";
 import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { TagList } from "./tagList";
@@ -15,6 +16,7 @@ import type { TagList } from "./tagList";
 export type PublicProfileAllOf = {
   bio: AccountBio;
   createdAt: string;
+  emails: EmailAddressList;
   handle: AccountHandle;
   image?: string;
   interests: TagList;

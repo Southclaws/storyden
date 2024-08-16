@@ -32,6 +32,8 @@ type Email struct {
 	VerificationCode string `json:"verification_code,omitempty"`
 	// Whether this email has been verified to be owned by the account via a token send+verify process
 	Verified bool `json:"verified,omitempty"`
+	// Whether this email is publicly available via the public profile schema.
+	Public bool `json:"public,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmailQuery when eager-loading is set.
 	Edges        EmailEdges `json:"edges"`
@@ -78,7 +80,7 @@ func (*Email) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case email.FieldAccountID, email.FieldAuthenticationRecordID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case email.FieldVerified:
+		case email.FieldVerified, email.FieldPublic:
 			values[i] = new(sql.NullBool)
 		case email.FieldEmailAddress, email.FieldVerificationCode:
 			values[i] = new(sql.NullString)
@@ -144,6 +146,12 @@ func (e *Email) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field verified", values[i])
 			} else if value.Valid {
 				e.Verified = value.Bool
+			}
+		case email.FieldPublic:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field public", values[i])
+			} else if value.Valid {
+				e.Public = value.Bool
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -212,6 +220,9 @@ func (e *Email) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("verified=")
 	builder.WriteString(fmt.Sprintf("%v", e.Verified))
+	builder.WriteString(", ")
+	builder.WriteString("public=")
+	builder.WriteString(fmt.Sprintf("%v", e.Public))
 	builder.WriteByte(')')
 	return builder.String()
 }

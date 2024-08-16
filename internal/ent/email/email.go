@@ -27,6 +27,8 @@ const (
 	FieldVerificationCode = "verification_code"
 	// FieldVerified holds the string denoting the verified field in the database.
 	FieldVerified = "verified"
+	// FieldPublic holds the string denoting the public field in the database.
+	FieldPublic = "public"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldEmailAddress,
 	FieldVerificationCode,
 	FieldVerified,
+	FieldPublic,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -79,6 +82,8 @@ var (
 	VerificationCodeValidator func(string) error
 	// DefaultVerified holds the default value on creation for the "verified" field.
 	DefaultVerified bool
+	// DefaultPublic holds the default value on creation for the "public" field.
+	DefaultPublic bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -121,6 +126,11 @@ func ByVerificationCode(opts ...sql.OrderTermOption) OrderOption {
 // ByVerified orders the results by the verified field.
 func ByVerified(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVerified, opts...).ToFunc()
+}
+
+// ByPublic orders the results by the public field.
+func ByPublic(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPublic, opts...).ToFunc()
 }
 
 // ByAccountField orders the results by account field.

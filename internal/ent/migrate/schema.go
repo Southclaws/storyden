@@ -209,6 +209,7 @@ var (
 		{Name: "email_address", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "verification_code", Type: field.TypeString, Size: 6},
 		{Name: "verified", Type: field.TypeBool, Default: "false"},
+		{Name: "public", Type: field.TypeBool, Default: "false"},
 		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "authentication_record_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
@@ -220,13 +221,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "emails_accounts_emails",
-				Columns:    []*schema.Column{EmailsColumns[5]},
+				Columns:    []*schema.Column{EmailsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "emails_authentications_email_address",
-				Columns:    []*schema.Column{EmailsColumns[6]},
+				Columns:    []*schema.Column{EmailsColumns[7]},
 				RefColumns: []*schema.Column{AuthenticationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

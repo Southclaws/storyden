@@ -6,8 +6,9 @@
  * OpenAPI spec version: 1
  */
 import type { AccountHandle } from "./accountHandle";
+import type { EmailAddress } from "./emailAddress";
 
 export interface AuthEmailInitialProps {
-  email: string;
+  email: EmailAddress;
   handle?: AccountHandle;
 }

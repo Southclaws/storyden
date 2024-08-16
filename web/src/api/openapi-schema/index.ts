@@ -118,6 +118,8 @@ export * from "./datagraphSearchOKResponse";
 export * from "./datagraphSearchParams";
 export * from "./datagraphSearchResult";
 export * from "./datagraphSearchResultAllOf";
+export * from "./emailAddress";
+export * from "./emailAddressList";
 export * from "./getInfoOKResponse";
 export * from "./identifier";
 export * from "./info";

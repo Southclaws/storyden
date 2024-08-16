@@ -94,6 +94,20 @@ func (ec *EmailCreate) SetNillableVerified(b *bool) *EmailCreate {
 	return ec
 }
 
+// SetPublic sets the "public" field.
+func (ec *EmailCreate) SetPublic(b bool) *EmailCreate {
+	ec.mutation.SetPublic(b)
+	return ec
+}
+
+// SetNillablePublic sets the "public" field if the given value is not nil.
+func (ec *EmailCreate) SetNillablePublic(b *bool) *EmailCreate {
+	if b != nil {
+		ec.SetPublic(*b)
+	}
+	return ec
+}
+
 // SetID sets the "id" field.
 func (ec *EmailCreate) SetID(x xid.ID) *EmailCreate {
 	ec.mutation.SetID(x)
@@ -175,6 +189,10 @@ func (ec *EmailCreate) defaults() {
 		v := email.DefaultVerified
 		ec.mutation.SetVerified(v)
 	}
+	if _, ok := ec.mutation.Public(); !ok {
+		v := email.DefaultPublic
+		ec.mutation.SetPublic(v)
+	}
 	if _, ok := ec.mutation.ID(); !ok {
 		v := email.DefaultID()
 		ec.mutation.SetID(v)
@@ -204,6 +222,9 @@ func (ec *EmailCreate) check() error {
 	}
 	if _, ok := ec.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "Email.verified"`)}
+	}
+	if _, ok := ec.mutation.Public(); !ok {
+		return &ValidationError{Name: "public", err: errors.New(`ent: missing required field "Email.public"`)}
 	}
 	if v, ok := ec.mutation.ID(); ok {
 		if err := email.IDValidator(v.String()); err != nil {
@@ -261,6 +282,10 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
 		_node.Verified = value
+	}
+	if value, ok := ec.mutation.Public(); ok {
+		_spec.SetField(email.FieldPublic, field.TypeBool, value)
+		_node.Public = value
 	}
 	if nodes := ec.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -408,6 +433,18 @@ func (u *EmailUpsert) UpdateVerified() *EmailUpsert {
 	return u
 }
 
+// SetPublic sets the "public" field.
+func (u *EmailUpsert) SetPublic(v bool) *EmailUpsert {
+	u.Set(email.FieldPublic, v)
+	return u
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *EmailUpsert) UpdatePublic() *EmailUpsert {
+	u.SetExcluded(email.FieldPublic)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -529,6 +566,20 @@ func (u *EmailUpsertOne) SetVerified(v bool) *EmailUpsertOne {
 func (u *EmailUpsertOne) UpdateVerified() *EmailUpsertOne {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerified()
+	})
+}
+
+// SetPublic sets the "public" field.
+func (u *EmailUpsertOne) SetPublic(v bool) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetPublic(v)
+	})
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *EmailUpsertOne) UpdatePublic() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdatePublic()
 	})
 }
 
@@ -820,6 +871,20 @@ func (u *EmailUpsertBulk) SetVerified(v bool) *EmailUpsertBulk {
 func (u *EmailUpsertBulk) UpdateVerified() *EmailUpsertBulk {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerified()
+	})
+}
+
+// SetPublic sets the "public" field.
+func (u *EmailUpsertBulk) SetPublic(v bool) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetPublic(v)
+	})
+}
+
+// UpdatePublic sets the "public" field to the value that was provided on create.
+func (u *EmailUpsertBulk) UpdatePublic() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdatePublic()
 	})
 }
 

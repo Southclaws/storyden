@@ -5,11 +5,6 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AccountHandle } from "./accountHandle";
 import type { EmailAddress } from "./emailAddress";
 
-export interface AuthEmailPasswordInitialProps {
-  email: EmailAddress;
-  handle?: AccountHandle;
-  password: string;
-}
+export type EmailAddressList = EmailAddress[];

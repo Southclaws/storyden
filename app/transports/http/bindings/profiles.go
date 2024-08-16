@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
@@ -68,7 +69,7 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 			TotalPages:  result.TotalPages,
 			CurrentPage: page,
 			NextPage:    result.NextPage.Ptr(),
-			Profiles:    dt.Map(result.Profiles, serialiseProfile),
+			Profiles:    dt.Map(result.Profiles, serialiseProfile(p.apiAddress.String())),
 		},
 	}, nil
 }
@@ -84,34 +85,32 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Make this a bit more well designed and less coupled to the hostname
-	avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", p.apiAddress.String(), acc.Handle)
+	pro := profile.ProfileFromAccount(acc)
 
 	return openapi.ProfileGet200JSONResponse{
-		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
-			Id:        openapi.Identifier(acc.ID.String()),
-			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
-			DeletedAt: acc.DeletedAt.Ptr(),
-			Bio:       acc.Bio.HTML(),
-			Handle:    acc.Handle,
-			Image:     &avatarURL,
-			Name:      acc.Name,
-			Links:     serialiseExternalLinks(acc.ExternalLinks),
-			Meta:      acc.Metadata,
-		},
+		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse(serialiseProfile(p.apiAddress.String())(pro)),
 	}, nil
 }
 
-func serialiseProfile(in *profile.Public) openapi.PublicProfile {
-	return openapi.PublicProfile{
-		Id:        openapi.Identifier(in.ID.String()),
-		CreatedAt: in.Created.Format(time.RFC3339),
-		DeletedAt: in.Deleted.Ptr(),
-		Bio:       in.Bio.HTML(),
-		Handle:    in.Handle,
-		Links:     serialiseExternalLinks(in.ExternalLinks),
-		Meta:      in.Metadata,
-		// Image:     &avatarURL,
-		Name: in.Name,
+func serialiseProfile(api string) func(in *profile.Public) openapi.PublicProfile {
+	return func(in *profile.Public) openapi.PublicProfile {
+		avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", api, in.Handle)
+		return openapi.PublicProfile{
+			Bio:       in.Bio.HTML(),
+			CreatedAt: in.Created.Format(time.RFC3339),
+			DeletedAt: in.Deleted.Ptr(),
+			Emails:    dt.Map(in.PublicEmails, serialisePublicEmailAddress),
+			Handle:    in.Handle,
+			Id:        openapi.Identifier(in.ID.String()),
+			Image:     &avatarURL,
+			Links:     serialiseExternalLinks(in.ExternalLinks),
+			Meta:      in.Metadata,
+			Name:      in.Name,
+			UpdatedAt: time.Time{},
+		}
 	}
+}
+
+func serialisePublicEmailAddress(in *account.EmailAddress) openapi.EmailAddress {
+	return in.Email.Address
 }

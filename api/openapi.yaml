@@ -187,7 +187,7 @@ paths:
         account owner to log in and use the platform. It keeps the account on
         record for linkage to content so UI doesn't break. It does not change
         anything else about the account such as the avatar, name, etc.
-      tags: [accounts]
+      tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -197,7 +197,7 @@ paths:
     delete:
       operationId: AdminAccountBanRemove
       description: Given the account is suspended, remove the suspended state.
-      tags: [accounts]
+      tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -513,6 +513,22 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
+
+  /v1/accounts/{account_handle}/emails:
+    patch:
+      operationId: AccountEmailUpdate
+      description: |
+        Update the properties for an email address specified in the query param.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/AccountHandleParam"
+        - $ref: "#/components/parameters/EmailAddressParam"
+      requestBody: { $ref: "#/components/requestBodies/AccountEmailUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
 
   /v1/accounts/self/auth-methods:
     get:
@@ -1327,6 +1343,15 @@ components:
       schema:
         $ref: "#/components/schemas/AccountHandle"
 
+    EmailAddressParam:
+      description: An email address resource.
+      example: southclaws@storyden.org
+      name: email_address
+      in: query
+      required: true
+      schema:
+        $ref: "#/components/schemas/EmailAddress"
+
     ThreadMarkParam:
       description: Thread unique and permanent identifier.
       name: thread_mark
@@ -1580,6 +1605,12 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AccountMutableProps" }
 
+    AccountEmailUpdate:
+      content:
+        application/json:
+          schema:
+            { $ref: "#/components/schemas/AccountEmailAddressMutableProps" }
+
     AccountSetAvatar:
       content:
         application/octet-stream:
@@ -1763,6 +1794,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
+
+    AccountEmailUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountEmailAddress"
 
     AccountAuthProviderListOK:
       description: OK
@@ -2216,6 +2254,15 @@ components:
       description: The rich-text bio for an account's public profile.
       example: <body><p>hi, my name is</p><p>southclaws</p></body>
 
+    EmailAddress:
+      description: A valid email address.
+      type: string
+      example: "hello@storyden.org"
+
+    EmailAddressList:
+      type: array
+      items: { $ref: "#/components/schemas/EmailAddress" }
+
     ProfileReference:
       type: object
       description: A minimal reference to an account.
@@ -2347,9 +2394,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         password:
           type: string
         handle:
@@ -2359,9 +2404,7 @@ components:
       type: object
       required: [email]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
@@ -2369,11 +2412,7 @@ components:
       type: object
       required: [email, code]
       properties:
-        email:
-          description: |
-            The email address to be verified, only necessary for when submitting
-            a verification without a session cookie present.
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         code:
           example: "728562"
           type: string
@@ -2778,14 +2817,20 @@ components:
       type: object
       required: [email_address, verified, is_auth]
       properties:
-        email_address:
-          type: string
+        email_address: { $ref: "#/components/schemas/EmailAddress" }
         verified:
           description: Is the email address verified to be owned by the account?
           type: boolean
         is_auth:
           description: Is the email used for authenticating to the platform?
           type: boolean
+
+    AccountEmailAddressMutableProps:
+      type: object
+      properties:
+        public:
+          type: bool
+          description: When true, the email address will be publicly available.
 
     #
     # 8888888b.                   .d888 d8b 888
@@ -2802,7 +2847,8 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [createdAt, handle, name, bio, interests, links, meta]
+        - required:
+            [createdAt, handle, name, bio, interests, links, emails, meta]
           properties:
             createdAt:
               type: string
@@ -2818,6 +2864,8 @@ components:
               $ref: "#/components/schemas/TagList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
+            emails:
+              $ref: "#/components/schemas/EmailAddressList"
             meta:
               $ref: "#/components/schemas/Metadata"
 

@@ -26,6 +26,7 @@ type Public struct {
 	Admin         bool
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
+	PublicEmails  []*account.EmailAddress
 	Metadata      map[string]any
 }
 
@@ -51,16 +52,21 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		return nil, err
 	}
 
+	emails := dt.Map(dt.Filter(a.Edges.Emails, func(e *ent.Email) bool {
+		return e.Public
+	}), account.MapEmail)
+
 	return &Public{
-		ID:        account.AccountID(a.ID),
-		Created:   a.CreatedAt,
-		Deleted:   opt.NewPtr(a.DeletedAt),
-		Handle:    a.Handle,
-		Name:      a.Name,
-		Bio:       bio,
-		Admin:     a.Admin,
-		Interests: interests,
-		Metadata:  a.Metadata,
+		ID:           account.AccountID(a.ID),
+		Created:      a.CreatedAt,
+		Deleted:      opt.NewPtr(a.DeletedAt),
+		Handle:       a.Handle,
+		Name:         a.Name,
+		Bio:          bio,
+		Admin:        a.Admin,
+		Interests:    interests,
+		Metadata:     a.Metadata,
+		PublicEmails: emails,
 	}, nil
 }
 

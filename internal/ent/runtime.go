@@ -397,6 +397,10 @@ func init() {
 	emailDescVerified := emailFields[4].Descriptor()
 	// email.DefaultVerified holds the default value on creation for the verified field.
 	email.DefaultVerified = emailDescVerified.Default.(bool)
+	// emailDescPublic is the schema descriptor for public field.
+	emailDescPublic := emailFields[5].Descriptor()
+	// email.DefaultPublic holds the default value on creation for the public field.
+	email.DefaultPublic = emailDescPublic.Default.(bool)
 	// emailDescID is the schema descriptor for id field.
 	emailDescID := emailMixinFields0[0].Descriptor()
 	// email.DefaultID holds the default value on creation for the id field.

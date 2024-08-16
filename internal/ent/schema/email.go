@@ -50,6 +50,11 @@ func (Email) Fields() []ent.Field {
 			Default(false).
 			Annotations(entsql.Default("false")).
 			Comment("Whether this email has been verified to be owned by the account via a token send+verify process"),
+
+		field.Bool("public").
+			Default(false).
+			Annotations(entsql.Default("false")).
+			Comment("Whether this email is publicly available via the public profile schema."),
 	}
 }
 
