@@ -6,10 +6,14 @@ package session
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/rs/xid"
+	"golang.org/x/net/publicsuffix"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
@@ -33,12 +37,42 @@ type Jar struct {
 	secureCookieName string
 }
 
-func New(cfg config.Config, ss *securecookie.Session) *Jar {
+func New(cfg config.Config, ss *securecookie.Session) (*Jar, error) {
+	domain, err := getDomain(cfg.PublicAPIAddress)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to parse domain from public API address"))
+	}
+
 	return &Jar{
-		domain:           cfg.PublicAPIAddress.Hostname(),
+		domain:           domain,
 		ss:               ss,
 		secureCookieName: secureCookieName,
+	}, nil
+}
+
+func getDomain(address url.URL) (string, error) {
+	// We want to use the site's domain, not the API's subdomain to ensure that
+	// cookies can be used in both the frontend and for the API. This assumption
+	// is based on the idea that Storyden must be hosted on a single domain with
+	// the API and frontend on different subdomains. For example, if your site
+	// was "www.cats.com" and the API was "api.cats.com", then the domain config
+	// would be set up with `www.cats.com` as the `PUBLIC_WEB_ADDRESS` and then
+	// `api.cats.com` as the `PUBLIC_API_ADDRESS` and then this code would use
+	// the API address hostname to parse `cats.com` as the actual cookie domain.
+	// The reason for this is that it makes SSR frontends trivial to implement.
+
+	hostname := address.Hostname()
+
+	if hostname == "localhost" {
+		return hostname, nil
 	}
+
+	domain, err := publicsuffix.EffectiveTLDPlusOne(hostname)
+	if err != nil {
+		return "", fault.Wrap(err, fmsg.With("failed to parse domain from public API address"))
+	}
+
+	return domain, nil
 }
 
 func (j *Jar) createWithValue(value string, expire time.Time) *http.Cookie {
