@@ -101,6 +101,11 @@ func AccountID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldAccountID, v))
 }
 
+// LinkID applies equality check predicate on the "link_id" field. It's identical to LinkIDEQ.
+func LinkID(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldLinkID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldCreatedAt, v))
@@ -661,6 +666,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// LinkIDEQ applies the EQ predicate on the "link_id" field.
+func LinkIDEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldLinkID, v))
+}
+
+// LinkIDNEQ applies the NEQ predicate on the "link_id" field.
+func LinkIDNEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldLinkID, v))
+}
+
+// LinkIDIn applies the In predicate on the "link_id" field.
+func LinkIDIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldLinkID, vs...))
+}
+
+// LinkIDNotIn applies the NotIn predicate on the "link_id" field.
+func LinkIDNotIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldLinkID, vs...))
+}
+
+// LinkIDGT applies the GT predicate on the "link_id" field.
+func LinkIDGT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldLinkID, v))
+}
+
+// LinkIDGTE applies the GTE predicate on the "link_id" field.
+func LinkIDGTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldLinkID, v))
+}
+
+// LinkIDLT applies the LT predicate on the "link_id" field.
+func LinkIDLT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldLinkID, v))
+}
+
+// LinkIDLTE applies the LTE predicate on the "link_id" field.
+func LinkIDLTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldLinkID, v))
+}
+
+// LinkIDContains applies the Contains predicate on the "link_id" field.
+func LinkIDContains(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContains(FieldLinkID, vc))
+}
+
+// LinkIDHasPrefix applies the HasPrefix predicate on the "link_id" field.
+func LinkIDHasPrefix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasPrefix(FieldLinkID, vc))
+}
+
+// LinkIDHasSuffix applies the HasSuffix predicate on the "link_id" field.
+func LinkIDHasSuffix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasSuffix(FieldLinkID, vc))
+}
+
+// LinkIDIsNil applies the IsNil predicate on the "link_id" field.
+func LinkIDIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldLinkID))
+}
+
+// LinkIDNotNil applies the NotNil predicate on the "link_id" field.
+func LinkIDNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldLinkID))
+}
+
+// LinkIDEqualFold applies the EqualFold predicate on the "link_id" field.
+func LinkIDEqualFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldEqualFold(FieldLinkID, vc))
+}
+
+// LinkIDContainsFold applies the ContainsFold predicate on the "link_id" field.
+func LinkIDContainsFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContainsFold(FieldLinkID, vc))
+}
+
 // VisibilityEQ applies the EQ predicate on the "visibility" field.
 func VisibilityEQ(v Visibility) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldVisibility, v))
@@ -806,21 +891,44 @@ func HasTagsWith(preds ...predicate.Tag) predicate.Node {
 	})
 }
 
-// HasLinks applies the HasEdge predicate on the "links" edge.
-func HasLinks() predicate.Node {
+// HasLink applies the HasEdge predicate on the "link" edge.
+func HasLink() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, LinkTable, LinkColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasLinksWith applies the HasEdge predicate on the "links" edge with a given conditions (other predicates).
-func HasLinksWith(preds ...predicate.Link) predicate.Node {
+// HasLinkWith applies the HasEdge predicate on the "link" edge with a given conditions (other predicates).
+func HasLinkWith(preds ...predicate.Link) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
-		step := newLinksStep()
+		step := newLinkStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasContentLinks applies the HasEdge predicate on the "content_links" edge.
+func HasContentLinks() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ContentLinksTable, ContentLinksPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasContentLinksWith applies the HasEdge predicate on the "content_links" edge with a given conditions (other predicates).
+func HasContentLinksWith(preds ...predicate.Link) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newContentLinksStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

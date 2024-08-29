@@ -31,6 +31,7 @@ func TestNodesHappyPath(t *testing.T) {
 	) {
 		lc.Append(fx.StartHook(func() {
 			a := assert.New(t)
+			r := require.New(t)
 
 			ctx, acc := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
@@ -53,6 +54,7 @@ func TestNodesHappyPath(t *testing.T) {
 			a.Equal(slug1, node1.JSON200.Slug)
 			a.Equal("Rich text content.", node1.JSON200.Description)
 			a.Equal("<body><h1>Nodes</h1><p>Rich text content.</p></body>", *node1.JSON200.Content)
+			r.NotNil(node1.JSON200.Link)
 			a.Equal(url1, node1.JSON200.Link.Url)
 			a.Equal(acc.ID.String(), string(node1.JSON200.Owner.Id))
 
@@ -89,6 +91,7 @@ func TestNodesHappyPath(t *testing.T) {
 			a.Equal(slug1, node1update.JSON200.Slug)
 			a.Equal("Newly changed content.", node1update.JSON200.Description)
 			a.Equal("<body><h1>Nodes</h1><p>Newly changed content.</p></body>", *node1update.JSON200.Content)
+			r.NotNil(node1update.JSON200.Link)
 			a.Equal(url1, node1update.JSON200.Link.Url)
 			a.Equal(prop1, node1update.JSON200.Meta)
 		}))

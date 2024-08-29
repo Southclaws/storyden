@@ -198,6 +198,6 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 		Description:    opt.New(in.Item.GetDesc()).Ptr(),
 		RelevanceScore: score,
 		Meta:           (*openapi.Metadata)(&meta),
-		Assets:         dt.Map(in.Item.GetAssets(), serialiseAssetReference),
+		Assets:         dt.Map(in.Item.GetAssets(), serialiseAssetPtr),
 	}
 }

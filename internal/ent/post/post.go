@@ -44,6 +44,8 @@ const (
 	FieldVisibility = "visibility"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
+	// FieldLinkID holds the string denoting the link_id field in the database.
+	FieldLinkID = "link_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
@@ -64,8 +66,10 @@ const (
 	EdgeAssets = "assets"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
-	// EdgeLinks holds the string denoting the links edge name in mutations.
-	EdgeLinks = "links"
+	// EdgeLink holds the string denoting the link edge name in mutations.
+	EdgeLink = "link"
+	// EdgeContentLinks holds the string denoting the content_links edge name in mutations.
+	EdgeContentLinks = "content_links"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -120,11 +124,18 @@ const (
 	// CollectionsInverseTable is the table name for the Collection entity.
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
-	// LinksTable is the table that holds the links relation/edge. The primary key declared below.
-	LinksTable = "link_posts"
-	// LinksInverseTable is the table name for the Link entity.
+	// LinkTable is the table that holds the link relation/edge.
+	LinkTable = "posts"
+	// LinkInverseTable is the table name for the Link entity.
 	// It exists in this package in order to avoid circular dependency with the "link" package.
-	LinksInverseTable = "links"
+	LinkInverseTable = "links"
+	// LinkColumn is the table column denoting the link relation/edge.
+	LinkColumn = "link_id"
+	// ContentLinksTable is the table that holds the content_links relation/edge. The primary key declared below.
+	ContentLinksTable = "link_post_content_references"
+	// ContentLinksInverseTable is the table name for the Link entity.
+	// It exists in this package in order to avoid circular dependency with the "link" package.
+	ContentLinksInverseTable = "links"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -144,6 +155,7 @@ var Columns = []string{
 	FieldMetadata,
 	FieldVisibility,
 	FieldCategoryID,
+	FieldLinkID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
@@ -162,9 +174,9 @@ var (
 	// CollectionsPrimaryKey and CollectionsColumn2 are the table columns denoting the
 	// primary key for the collections relation (M2M).
 	CollectionsPrimaryKey = []string{"collection_id", "post_id"}
-	// LinksPrimaryKey and LinksColumn2 are the table columns denoting the
-	// primary key for the links relation (M2M).
-	LinksPrimaryKey = []string{"link_id", "post_id"}
+	// ContentLinksPrimaryKey and ContentLinksColumn2 are the table columns denoting the
+	// primary key for the content_links relation (M2M).
+	ContentLinksPrimaryKey = []string{"link_id", "post_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -298,6 +310,11 @@ func ByCategoryID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategoryID, opts...).ToFunc()
 }
 
+// ByLinkID orders the results by the link_id field.
+func ByLinkID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLinkID, opts...).ToFunc()
+}
+
 // ByAuthorField orders the results by author field.
 func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -410,17 +427,24 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByLinksCount orders the results by links count.
-func ByLinksCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLinkField orders the results by link field.
+func ByLinkField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLinksStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newLinkStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByLinks orders the results by links terms.
-func ByLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByContentLinksCount orders the results by content_links count.
+func ByContentLinksCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborsCount(s, newContentLinksStep(), opts...)
+	}
+}
+
+// ByContentLinks orders the results by content_links terms.
+func ByContentLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newContentLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newAuthorStep() *sqlgraph.Step {
@@ -493,10 +517,17 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
 	)
 }
-func newLinksStep() *sqlgraph.Step {
+func newLinkStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(LinksInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, LinksTable, LinksPrimaryKey...),
+		sqlgraph.To(LinkInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, LinkTable, LinkColumn),
+	)
+}
+func newContentLinksStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ContentLinksInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ContentLinksTable, ContentLinksPrimaryKey...),
 	)
 }

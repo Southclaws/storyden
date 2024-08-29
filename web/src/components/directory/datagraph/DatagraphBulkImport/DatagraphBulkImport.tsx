@@ -1,10 +1,10 @@
-import { NodeCard } from "../NodeCard";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardRows } from "@/components/ui/rich-card";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
+
+import { NodeCard } from "../NodeCard";
 
 import { Props, State, useDatagraphBulkImport } from "./useDatagraphBulkImport";
 
@@ -89,7 +89,7 @@ export function DatagraphBulkImport(props: Props) {
                   title={link.title || link.url}
                   text={link.description || "(no description found)"}
                   url={link.url}
-                  image={link.assets[0]?.url}
+                  image={link.primary_image?.url}
                   controls={<StateBadge state={task.state} />}
                 >
                   <HStack>

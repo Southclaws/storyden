@@ -1,10 +1,11 @@
-package url
+package scrape
 
 import (
 	"bytes"
 	"context"
 	"embed"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -34,7 +35,9 @@ func Test_webScraper_postprocess(t *testing.T) {
 		b, err := os.ReadFile(filename)
 		r.NoError(err)
 
-		wc, err := w.postprocess(ctx, "https://storyden.org", bytes.NewReader(b))
+		u, _ := url.Parse("https://storyden.org")
+
+		wc, err := w.postprocess(ctx, *u, bytes.NewReader(b))
 		r.NoError(err)
 		r.NotNil(wc)
 

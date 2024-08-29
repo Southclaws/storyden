@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { linkCreate } from "src/api/openapi-client/links";
-import { Link } from "src/api/openapi-schema";
+import { LinkReference } from "src/api/openapi-schema";
 import { DatagraphNodeWithRelations } from "src/components/directory/datagraph/DatagraphNode";
 import { useDirectoryPath } from "src/screens/directory/datagraph/useDirectoryPath";
 import { deriveError } from "src/utils/error";
@@ -17,7 +17,9 @@ const multipleURLs =
 
 export type Props = {
   node?: DatagraphNodeWithRelations;
-  onCreateNodeFromLink: (link: Link) => Promise<DatagraphNodeWithRelations>;
+  onCreateNodeFromLink: (
+    link: LinkReference,
+  ) => Promise<DatagraphNodeWithRelations>;
 };
 
 const ManyLinkSchema = z
@@ -39,8 +41,8 @@ type Form = z.infer<typeof FormSchema>;
 type TaskState =
   | { state: "idle" }
   | { state: "loading" }
-  | { state: "success"; link: Link }
-  | { state: "created"; link: Link; node: DatagraphNodeWithRelations }
+  | { state: "success"; link: LinkReference }
+  | { state: "created"; link: LinkReference; node: DatagraphNodeWithRelations }
   | { state: "error"; error: string };
 
 type TaskStateWithUrl = TaskState & { url: string };
@@ -78,7 +80,7 @@ export function useDatagraphBulkImport(props: Props) {
     props.node?.children.map((node) => [node.link?.url, node]),
   );
 
-  async function handleCreateNodeFromLink(link: Link) {
+  async function handleCreateNodeFromLink(link: LinkReference) {
     const node = await props.onCreateNodeFromLink(link);
 
     setTasks((current) => ({

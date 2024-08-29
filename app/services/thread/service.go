@@ -4,6 +4,7 @@ package thread
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -20,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/hydrator"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -60,7 +61,7 @@ type Partial struct {
 	Tags       opt.Optional[[]xid.ID]
 	Category   opt.Optional[xid.ID]
 	Visibility opt.Optional[visibility.Visibility]
-	URL        opt.Optional[string]
+	URL        opt.Optional[url.URL]
 	Meta       opt.Optional[map[string]any]
 }
 
@@ -84,7 +85,7 @@ type service struct {
 
 	accountQuery account_querier.Querier
 	thread_repo  thread.Repository
-	hydrator     hydrator.Service
+	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
 	indexQueue   pubsub.Topic[mq.IndexPost]
 }
@@ -95,7 +96,7 @@ func New(
 
 	accountQuery account_querier.Querier,
 	thread_repo thread.Repository,
-	hydrator hydrator.Service,
+	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
 	indexQueue pubsub.Topic[mq.IndexPost],
 ) Service {
@@ -104,7 +105,7 @@ func New(
 		rbac:         rbac,
 		accountQuery: accountQuery,
 		thread_repo:  thread_repo,
-		hydrator:     hydrator,
+		fetcher:      fetcher,
 		recommender:  recommender,
 		indexQueue:   indexQueue,
 	}

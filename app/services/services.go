@@ -12,14 +12,12 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
-	"github.com/Southclaws/storyden/app/services/hydrator"
-	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
-	"github.com/Southclaws/storyden/app/services/link_getter"
+	"github.com/Southclaws/storyden/app/services/link"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -29,7 +27,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/summarise_job"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
-	"github.com/Southclaws/storyden/app/services/url"
 )
 
 func Build() fx.Option {
@@ -49,14 +46,11 @@ func Build() fx.Option {
 		asset_manager.Build(),
 		thread_mark.Build(),
 		collection.Build(),
-		url.Build(),
-		hydrator.Build(),
-		fetcher.Build(),
+		link.Build(),
 		semdexer.Build(),
 		index_job.Build(),
 		summarise_job.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
-		fx.Provide(link_getter.New),
 	)
 }

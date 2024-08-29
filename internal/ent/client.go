@@ -1846,7 +1846,23 @@ func (c *LinkClient) QueryPosts(l *Link) *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.PostsTable, link.PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, link.PostsTable, link.PostsColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPostContentReferences queries the post_content_references edge of a Link.
+func (c *LinkClient) QueryPostContentReferences(l *Link) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.PostContentReferencesTable, link.PostContentReferencesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -1862,7 +1878,55 @@ func (c *LinkClient) QueryNodes(l *Link) *NodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.NodesTable, link.NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, link.NodesTable, link.NodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNodeContentReferences queries the node_content_references edge of a Link.
+func (c *LinkClient) QueryNodeContentReferences(l *Link) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.NodeContentReferencesTable, link.NodeContentReferencesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrimaryImage queries the primary_image edge of a Link.
+func (c *LinkClient) QueryPrimaryImage(l *Link) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.PrimaryImageTable, link.PrimaryImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFaviconImage queries the favicon_image edge of a Link.
+func (c *LinkClient) QueryFaviconImage(l *Link) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.FaviconImageTable, link.FaviconImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -2099,15 +2163,31 @@ func (c *NodeClient) QueryTags(n *Node) *TagQuery {
 	return query
 }
 
-// QueryLinks queries the links edge of a Node.
-func (c *NodeClient) QueryLinks(n *Node) *LinkQuery {
+// QueryLink queries the link edge of a Node.
+func (c *NodeClient) QueryLink(n *Node) *LinkQuery {
 	query := (&LinkClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(link.Table, link.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, node.LinksTable, node.LinksPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.LinkTable, node.LinkColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryContentLinks queries the content_links edge of a Node.
+func (c *NodeClient) QueryContentLinks(n *Node) *LinkQuery {
+	query := (&LinkClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, node.ContentLinksTable, node.ContentLinksPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil
@@ -2573,15 +2653,31 @@ func (c *PostClient) QueryCollections(po *Post) *CollectionQuery {
 	return query
 }
 
-// QueryLinks queries the links edge of a Post.
-func (c *PostClient) QueryLinks(po *Post) *LinkQuery {
+// QueryLink queries the link edge of a Post.
+func (c *PostClient) QueryLink(po *Post) *LinkQuery {
 	query := (&LinkClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := po.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(link.Table, link.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.LinksTable, post.LinksPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.LinkTable, post.LinkColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryContentLinks queries the content_links edge of a Post.
+func (c *PostClient) QueryContentLinks(po *Post) *LinkQuery {
+	query := (&LinkClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, post.ContentLinksTable, post.ContentLinksPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil

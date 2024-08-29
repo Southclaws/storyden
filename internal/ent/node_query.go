@@ -34,7 +34,8 @@ type NodeQuery struct {
 	withNodes           *NodeQuery
 	withAssets          *AssetQuery
 	withTags            *TagQuery
-	withLinks           *LinkQuery
+	withLink            *LinkQuery
+	withContentLinks    *LinkQuery
 	withCollections     *CollectionQuery
 	withCollectionNodes *CollectionNodeQuery
 	modifiers           []func(*sql.Selector)
@@ -184,8 +185,8 @@ func (nq *NodeQuery) QueryTags() *TagQuery {
 	return query
 }
 
-// QueryLinks chains the current query on the "links" edge.
-func (nq *NodeQuery) QueryLinks() *LinkQuery {
+// QueryLink chains the current query on the "link" edge.
+func (nq *NodeQuery) QueryLink() *LinkQuery {
 	query := (&LinkClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -198,7 +199,29 @@ func (nq *NodeQuery) QueryLinks() *LinkQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(link.Table, link.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, node.LinksTable, node.LinksPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.LinkTable, node.LinkColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryContentLinks chains the current query on the "content_links" edge.
+func (nq *NodeQuery) QueryContentLinks() *LinkQuery {
+	query := (&LinkClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, node.ContentLinksTable, node.ContentLinksPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -447,7 +470,8 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		withNodes:           nq.withNodes.Clone(),
 		withAssets:          nq.withAssets.Clone(),
 		withTags:            nq.withTags.Clone(),
-		withLinks:           nq.withLinks.Clone(),
+		withLink:            nq.withLink.Clone(),
+		withContentLinks:    nq.withContentLinks.Clone(),
 		withCollections:     nq.withCollections.Clone(),
 		withCollectionNodes: nq.withCollectionNodes.Clone(),
 		// clone intermediate query.
@@ -511,14 +535,25 @@ func (nq *NodeQuery) WithTags(opts ...func(*TagQuery)) *NodeQuery {
 	return nq
 }
 
-// WithLinks tells the query-builder to eager-load the nodes that are connected to
-// the "links" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithLinks(opts ...func(*LinkQuery)) *NodeQuery {
+// WithLink tells the query-builder to eager-load the nodes that are connected to
+// the "link" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithLink(opts ...func(*LinkQuery)) *NodeQuery {
 	query := (&LinkClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withLinks = query
+	nq.withLink = query
+	return nq
+}
+
+// WithContentLinks tells the query-builder to eager-load the nodes that are connected to
+// the "content_links" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithContentLinks(opts ...func(*LinkQuery)) *NodeQuery {
+	query := (&LinkClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withContentLinks = query
 	return nq
 }
 
@@ -622,13 +657,14 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	var (
 		nodes       = []*Node{}
 		_spec       = nq.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [9]bool{
 			nq.withOwner != nil,
 			nq.withParent != nil,
 			nq.withNodes != nil,
 			nq.withAssets != nil,
 			nq.withTags != nil,
-			nq.withLinks != nil,
+			nq.withLink != nil,
+			nq.withContentLinks != nil,
 			nq.withCollections != nil,
 			nq.withCollectionNodes != nil,
 		}
@@ -687,10 +723,16 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			return nil, err
 		}
 	}
-	if query := nq.withLinks; query != nil {
-		if err := nq.loadLinks(ctx, query, nodes,
-			func(n *Node) { n.Edges.Links = []*Link{} },
-			func(n *Node, e *Link) { n.Edges.Links = append(n.Edges.Links, e) }); err != nil {
+	if query := nq.withLink; query != nil {
+		if err := nq.loadLink(ctx, query, nodes, nil,
+			func(n *Node, e *Link) { n.Edges.Link = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := nq.withContentLinks; query != nil {
+		if err := nq.loadContentLinks(ctx, query, nodes,
+			func(n *Node) { n.Edges.ContentLinks = []*Link{} },
+			func(n *Node, e *Link) { n.Edges.ContentLinks = append(n.Edges.ContentLinks, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -921,7 +963,36 @@ func (nq *NodeQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Nod
 	}
 	return nil
 }
-func (nq *NodeQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*Node, init func(*Node), assign func(*Node, *Link)) error {
+func (nq *NodeQuery) loadLink(ctx context.Context, query *LinkQuery, nodes []*Node, init func(*Node), assign func(*Node, *Link)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Node)
+	for i := range nodes {
+		fk := nodes[i].LinkID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(link.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "link_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (nq *NodeQuery) loadContentLinks(ctx context.Context, query *LinkQuery, nodes []*Node, init func(*Node), assign func(*Node, *Link)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Node)
 	nids := make(map[xid.ID]map[*Node]struct{})
@@ -933,11 +1004,11 @@ func (nq *NodeQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*N
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(node.LinksTable)
-		s.Join(joinT).On(s.C(link.FieldID), joinT.C(node.LinksPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(node.LinksPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(node.ContentLinksTable)
+		s.Join(joinT).On(s.C(link.FieldID), joinT.C(node.ContentLinksPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(node.ContentLinksPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(node.LinksPrimaryKey[1]))
+		s.Select(joinT.C(node.ContentLinksPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -974,7 +1045,7 @@ func (nq *NodeQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*N
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "links" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "content_links" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -1107,6 +1178,9 @@ func (nq *NodeQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if nq.withParent != nil {
 			_spec.Node.AddColumnOnce(node.FieldParentNodeID)
+		}
+		if nq.withLink != nil {
+			_spec.Node.AddColumnOnce(node.FieldLinkID)
 		}
 	}
 	if ps := nq.predicates; len(ps) > 0 {

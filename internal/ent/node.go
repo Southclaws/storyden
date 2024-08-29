@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/rs/xid"
 )
@@ -38,6 +39,8 @@ type Node struct {
 	ParentNodeID xid.ID `json:"parent_node_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// LinkID holds the value of the "link_id" field.
+	LinkID xid.ID `json:"link_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility node.Visibility `json:"visibility,omitempty"`
 	// Metadata holds the value of the "metadata" field.
@@ -60,15 +63,17 @@ type NodeEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
-	// Links holds the value of the links edge.
-	Links []*Link `json:"links,omitempty"`
+	// Link holds the value of the link edge.
+	Link *Link `json:"link,omitempty"`
+	// ContentLinks holds the value of the content_links edge.
+	ContentLinks []*Link `json:"content_links,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
 	// CollectionNodes holds the value of the collection_nodes edge.
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [9]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -120,19 +125,30 @@ func (e NodeEdges) TagsOrErr() ([]*Tag, error) {
 	return nil, &NotLoadedError{edge: "tags"}
 }
 
-// LinksOrErr returns the Links value or an error if the edge
-// was not loaded in eager-loading.
-func (e NodeEdges) LinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[5] {
-		return e.Links, nil
+// LinkOrErr returns the Link value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NodeEdges) LinkOrErr() (*Link, error) {
+	if e.Link != nil {
+		return e.Link, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: link.Label}
 	}
-	return nil, &NotLoadedError{edge: "links"}
+	return nil, &NotLoadedError{edge: "link"}
+}
+
+// ContentLinksOrErr returns the ContentLinks value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) ContentLinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[6] {
+		return e.ContentLinks, nil
+	}
+	return nil, &NotLoadedError{edge: "content_links"}
 }
 
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -141,7 +157,7 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[8] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
@@ -158,7 +174,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID:
+		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID, node.FieldLinkID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -238,6 +254,12 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				n.AccountID = *value
 			}
+		case node.FieldLinkID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field link_id", values[i])
+			} else if value != nil {
+				n.LinkID = *value
+			}
 		case node.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
@@ -290,9 +312,14 @@ func (n *Node) QueryTags() *TagQuery {
 	return NewNodeClient(n.config).QueryTags(n)
 }
 
-// QueryLinks queries the "links" edge of the Node entity.
-func (n *Node) QueryLinks() *LinkQuery {
-	return NewNodeClient(n.config).QueryLinks(n)
+// QueryLink queries the "link" edge of the Node entity.
+func (n *Node) QueryLink() *LinkQuery {
+	return NewNodeClient(n.config).QueryLink(n)
+}
+
+// QueryContentLinks queries the "content_links" edge of the Node entity.
+func (n *Node) QueryContentLinks() *LinkQuery {
+	return NewNodeClient(n.config).QueryContentLinks(n)
 }
 
 // QueryCollections queries the "collections" edge of the Node entity.
@@ -360,6 +387,9 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
+	builder.WriteString(", ")
+	builder.WriteString("link_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.LinkID))
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
 	builder.WriteString(fmt.Sprintf("%v", n.Visibility))

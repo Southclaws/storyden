@@ -1,4 +1,4 @@
-import { Link as LinkSchema } from "src/api/openapi-schema";
+import { LinkReference } from "src/api/openapi-schema";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Card } from "@/components/ui/rich-card";
@@ -6,11 +6,11 @@ import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
 
 export type Props = {
-  link: LinkSchema;
+  link: LinkReference;
 } & RichCardVariantProps;
 
 export function LinkCard({ link, ...rest }: Props) {
-  const asset = link.assets?.[0] ?? undefined;
+  const asset = link.primary_image;
   const domainSearch = `/l?q=${link.domain}`;
 
   return (

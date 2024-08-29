@@ -1,13 +1,13 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
-import { LinkWithRefs } from "src/api/openapi-schema";
+import { Link } from "src/api/openapi-schema";
 import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
 
 type Props = {
-  link: LinkWithRefs;
+  link: Link;
 };
 
 export function LinkView({ link }: Props) {
