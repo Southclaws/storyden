@@ -12,26 +12,29 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/link"
-	"github.com/Southclaws/storyden/app/resources/link/link_graph"
+	"github.com/Southclaws/storyden/app/resources/link/link_querier"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/link/link_writer"
+
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Links struct {
-	fr *fetcher.Fetcher
-	lr link.Repository
-	lg link_graph.Repository
+	fetcher     *fetcher.Fetcher
+	linkWriter  *link_writer.LinkWriter
+	linkQuerier *link_querier.LinkQuerier
 }
 
 func NewLinks(
-	fr *fetcher.Fetcher,
-	lr link.Repository,
-	lg link_graph.Repository,
+	fetcher *fetcher.Fetcher,
+	linkWriter *link_writer.LinkWriter,
+	linkQuerier *link_querier.LinkQuerier,
 ) Links {
 	return Links{
-		fr: fr,
-		lr: lr,
-		lg: lg,
+		fetcher:     fetcher,
+		linkWriter:  linkWriter,
+		linkQuerier: linkQuerier,
 	}
 }
 
@@ -41,13 +44,13 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	link, err := i.fr.Fetch(ctx, *u)
+	link, err := i.fetcher.Fetch(ctx, *u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.LinkCreate200JSONResponse{
-		LinkCreateOKJSONResponse: openapi.LinkCreateOKJSONResponse(serialiseLink(*link)),
+		LinkCreateOKJSONResponse: openapi.LinkCreateOKJSONResponse(serialiseLinkRef(*link)),
 	}, nil
 }
 
@@ -63,16 +66,16 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 		return max(1, int(v))
 	}).Or(1)
 
-	opts := []link.Filter{}
+	opts := []link_querier.Filter{}
 
 	if v := request.Params.Q; v != nil {
-		opts = append(opts, link.WithKeyword(*v))
+		opts = append(opts, link_querier.WithKeyword(*v))
 	}
 
 	// API is 1-indexed, internally it's 0-indexed.
 	page = max(0, page-1)
 
-	result, err := i.lr.Search(ctx, page, pageSize, opts...)
+	result, err := i.linkQuerier.Search(ctx, page, pageSize, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -87,32 +90,60 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 			TotalPages:  result.TotalPages,
 			CurrentPage: page,
 			NextPage:    result.NextPage.Ptr(),
-			Links:       serialiseLinks(result.Links),
+			Links:       serialiseLinkRefs(result.Links),
 		},
 	}, nil
 }
 
 func (i *Links) LinkGet(ctx context.Context, request openapi.LinkGetRequestObject) (openapi.LinkGetResponseObject, error) {
-	l, err := i.lg.Get(ctx, request.LinkSlug)
+	l, err := i.linkQuerier.Get(ctx, request.LinkSlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.LinkGet200JSONResponse{
-		LinkGetOKJSONResponse: openapi.LinkGetOKJSONResponse(serialiseLinkWithRefs(l)),
+		LinkGetOKJSONResponse: openapi.LinkGetOKJSONResponse(serialiseLink(l)),
 	}, nil
 }
 
-func serialiseLinkWithRefs(in *link_graph.WithRefs) openapi.LinkWithRefs {
-	return openapi.LinkWithRefs{
+func serialiseLink(in *link.Link) openapi.Link {
+	return openapi.Link{
+		Id:             in.ID.String(),
+		CreatedAt:      in.CreatedAt,
+		UpdatedAt:      in.UpdatedAt,
 		Url:            in.URL,
-		Title:          in.Title.Ptr(),
-		Description:    in.Description.Ptr(),
 		Slug:           in.Slug,
 		Domain:         in.Domain,
-		Assets:         dt.Map(in.Assets, serialiseAssetReference),
-		Posts:          dt.Map(in.Posts, serialisePostRef),
+		Title:          in.Title.Ptr(),
+		Description:    in.Description.Ptr(),
+		FaviconImage:   opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
+		PrimaryImage:   &openapi.Asset{},
+		Assets:         dt.Map(in.Assets, serialiseAssetPtr),
 		Nodes:          dt.Map(in.Nodes, serialiseNode),
+		Posts:          dt.Map(in.Posts, serialisePostRef),
 		Recomentations: dt.Map(in.Related, serialiseDatagraphItem),
 	}
+}
+
+func serialiseLinkRef(in link_ref.LinkRef) openapi.LinkReference {
+	return openapi.LinkReference{
+		Id:           in.ID.String(),
+		CreatedAt:    in.CreatedAt,
+		UpdatedAt:    in.UpdatedAt,
+		Slug:         in.Slug,
+		Url:          in.URL,
+		Domain:       in.Domain,
+		Title:        in.Title.Ptr(),
+		Description:  in.Description.Ptr(),
+		FaviconImage: opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
+		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+	}
+}
+
+func serialiseLinkRefPtr(in *link_ref.LinkRef) openapi.LinkReference {
+	return serialiseLinkRef(*in)
+}
+
+func serialiseLinkRefs(in link_ref.LinkRefs) []openapi.LinkReference {
+	return dt.Map(in, serialiseLinkRefPtr)
 }

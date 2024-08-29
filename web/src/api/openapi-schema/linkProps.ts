@@ -5,12 +5,18 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
+import type { AssetList } from "./assetList";
 import type { CollectionList } from "./collectionList";
 import type { NodeList } from "./nodeList";
 import type { PostReferenceList } from "./postReferenceList";
 
-export type LinkWithRefsAllOf = {
+/**
+ * All the resources that a link has been referenced in. May be large.
+
+ */
+export interface LinkProps {
+  assets: AssetList;
   collections: CollectionList;
   nodes: NodeList;
   posts: PostReferenceList;
-};
+}

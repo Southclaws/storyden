@@ -10,8 +10,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
-	"github.com/Southclaws/storyden/app/resources/link"
-	"github.com/Southclaws/storyden/app/resources/link/link_graph"
+	"github.com/Southclaws/storyden/app/resources/link/link_querier"
+	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post/category"
@@ -44,8 +44,8 @@ func Build() fx.Option {
 			node_traversal.New,
 			node_children.New,
 			node_search.New,
-			link.New,
-			link_graph.New,
+			link_querier.New,
+			link_writer.New,
 			profile_search.New,
 			mailtemplate.New,
 		),

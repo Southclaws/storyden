@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1
  */
 import type { CategoryReference } from "./categoryReference";
-import type { Link } from "./link";
+import type { LinkReference } from "./linkReference";
 
 export interface ThreadReferenceProps {
   category: CategoryReference;
-  link?: Link;
+  link?: LinkReference;
   /** Whether the thread is pinned in this category. */
   pinned: boolean;
   /** The number of posts under this thread. */

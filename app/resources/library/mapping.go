@@ -7,7 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -53,8 +53,8 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	}
 
 	// This edge is optional anyway, so if not loaded, nothing bad happens.
-	link := opt.Map(opt.NewPtr(c.Edges.Link), func(in ent.Link) datagraph.Link {
-		return *datagraph.LinkFromModel(&in)
+	link := opt.Map(opt.NewPtr(c.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+		return *link_ref.Map(&in)
 	})
 
 	return &Node{

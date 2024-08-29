@@ -16,7 +16,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/link"
+	"github.com/Southclaws/storyden/app/resources/link/link_querier"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
@@ -28,7 +30,8 @@ var errEmptyLink = fault.New("empty link")
 type Fetcher struct {
 	l     *zap.Logger
 	as    asset_manager.Service
-	lr    link.Repository
+	lq    *link_querier.LinkQuerier
+	lr    *link_writer.LinkWriter
 	sc    scrape.Scraper
 	queue pubsub.Topic[mq.ScrapeLink]
 }
@@ -37,25 +40,27 @@ func New(
 	l *zap.Logger,
 	as asset_manager.Service,
 	nr library.Repository,
-	lr link.Repository,
+	lq *link_querier.LinkQuerier,
+	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
 	queue pubsub.Topic[mq.ScrapeLink],
 ) *Fetcher {
 	return &Fetcher{
 		l:     l.With(zap.String("service", "hydrator")),
 		as:    as,
+		lq:    lq,
 		lr:    lr,
 		sc:    sc,
 		queue: queue,
 	}
 }
 
-func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*datagraph.Link, error) {
+func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
 	if u.String() == "" {
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	r, err := s.lr.Search(ctx, 0, 1, link.WithURL(u.String()))
+	r, err := s.lq.Search(ctx, 0, 1, link_querier.WithURL(u.String()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -106,31 +111,35 @@ func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.It
 	return nil
 }
 
-func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*datagraph.Link, error) {
-	wc, err := s.sc.Scrape(ctx, u.String())
+func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
+	wc, err := s.sc.Scrape(ctx, u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	opts := []link.Option{}
+	opts := []link_writer.Option{}
 
-	var a *asset.Asset
-	if wc.Image != "" {
-		a, err = s.CopyAsset(ctx, wc.Image)
+	if wc.Favicon != "" {
+		a, err := s.CopyAsset(ctx, wc.Favicon)
 		if err != nil {
-			s.l.Warn("failed to scrape web content image", zap.Error(err), zap.String("url", u.String()))
+			s.l.Warn("failed to scrape web content favicon image", zap.Error(err), zap.String("url", u.String()))
 		} else {
-			opts = append(opts, link.WithAssets(a.ID))
+			opts = append(opts, link_writer.WithFaviconImage(a.ID))
+		}
+	}
+
+	if wc.Image != "" {
+		a, err := s.CopyAsset(ctx, wc.Image)
+		if err != nil {
+			s.l.Warn("failed to scrape web content primary image", zap.Error(err), zap.String("url", u.String()))
+		} else {
+			opts = append(opts, link_writer.WithPrimaryImage(a.ID))
 		}
 	}
 
 	ln, err := s.lr.Store(ctx, u.String(), wc.Title, wc.Description, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if a != nil {
-		ln.Assets = append(ln.Assets, a)
 	}
 
 	return ln, nil

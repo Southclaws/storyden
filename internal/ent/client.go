@@ -1902,6 +1902,38 @@ func (c *LinkClient) QueryNodeContentReferences(l *Link) *NodeQuery {
 	return query
 }
 
+// QueryPrimaryImage queries the primary_image edge of a Link.
+func (c *LinkClient) QueryPrimaryImage(l *Link) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.PrimaryImageTable, link.PrimaryImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFaviconImage queries the favicon_image edge of a Link.
+func (c *LinkClient) QueryFaviconImage(l *Link) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.FaviconImageTable, link.FaviconImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryAssets queries the assets edge of a Link.
 func (c *LinkClient) QueryAssets(l *Link) *AssetQuery {
 	query := (&AssetClient{config: c.config}).Query()

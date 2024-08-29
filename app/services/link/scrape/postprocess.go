@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/Southclaws/dt"
@@ -15,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/content"
 )
 
-func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) (*WebContent, error) {
+func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader) (*WebContent, error) {
 	buf, err := io.ReadAll(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -32,10 +33,28 @@ func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	withBaseURL := func(urlOrPath string) string {
+		if urlOrPath == "" {
+			return ""
+		}
+
+		u, err := url.Parse(urlOrPath)
+		if err != nil {
+			return ""
+		}
+
+		if u.IsAbs() {
+			return u.String()
+		}
+
+		return addr.ResolveReference(u).String()
+	}
+
 	wc := &WebContent{
 		Title:       title(t),
 		Description: description(t),
 		Text:        text,
+		Favicon:     withBaseURL(favicon(doc)),
 		Image:       t["og:image"],
 		Content:     rc,
 	}
@@ -43,8 +62,8 @@ func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) 
 	return wc, nil
 }
 
-func getArticleContent(r io.Reader, pageURL string) (content.Rich, string, error) {
-	result, err := readability.New().Parse(r, pageURL)
+func getArticleContent(r io.Reader, pageURL url.URL) (content.Rich, string, error) {
+	result, err := readability.New().Parse(r, pageURL.String())
 	if err != nil {
 		return content.Rich{}, "", fault.Wrap(err)
 	}
@@ -112,4 +131,24 @@ func description(t map[string]string) string {
 	}
 
 	return ""
+}
+
+func favicon(doc *goquery.Document) string {
+	if href, ok := doc.Find("link[rel='icon']").Attr("href"); ok {
+		return href
+	}
+
+	if href, ok := doc.Find("link[rel='shortcut icon']").Attr("href"); ok {
+		return href
+	}
+
+	if href, ok := doc.Find("link[rel='apple-touch-icon']").Attr("href"); ok {
+		return href
+	}
+
+	if href, ok := doc.Find("link[rel='apple-touch-icon-precomposed']").Attr("href"); ok {
+		return href
+	}
+
+	return "/favicon.ico"
 }

@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1
  */
 import type { AssetList } from "./assetList";
-import type { Link } from "./link";
+import type { LinkReference } from "./linkReference";
 import type { Metadata } from "./metadata";
 import type { Node } from "./node";
 import type { NodeDescription } from "./nodeDescription";
@@ -24,7 +24,7 @@ export interface NodeCommonProps {
   assets: AssetList;
   content?: PostContent;
   description: NodeDescription;
-  link?: Link;
+  link?: LinkReference;
   meta: Metadata;
   name: NodeName;
   owner: ProfileReference;

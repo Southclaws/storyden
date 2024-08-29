@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { LinkList } from "./linkList";
+import type { LinkReferenceList } from "./linkReferenceList";
 import type { PostContent } from "./postContent";
 
 /**
@@ -15,5 +15,5 @@ with Threads or Replies to provide the basic common properties.
  */
 export interface PostProps {
   body: PostContent;
-  body_links: LinkList;
+  body_links: LinkReferenceList;
 }

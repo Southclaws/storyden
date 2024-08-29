@@ -3,6 +3,7 @@ package scrape
 import (
 	"context"
 	"net/http"
+	"net/url"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -13,13 +14,14 @@ import (
 var errFailedToScrape = fault.New("failed to scrape")
 
 type Scraper interface {
-	Scrape(ctx context.Context, url string) (*WebContent, error)
+	Scrape(ctx context.Context, url url.URL) (*WebContent, error)
 }
 
 type WebContent struct {
 	Title       string
 	Description string
 	Text        string
+	Favicon     string
 	Image       string
 	Content     content.Rich
 }
@@ -30,8 +32,8 @@ func New() Scraper {
 	return &webScraper{}
 }
 
-func (s *webScraper) Scrape(ctx context.Context, addr string) (*WebContent, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr, nil)
+func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr.String(), nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
