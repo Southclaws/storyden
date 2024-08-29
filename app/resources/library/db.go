@@ -63,7 +63,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error)
 		Query().
 		WithOwner().
 		WithAssets().
-		WithLinks(func(lq *ent.LinkQuery) {
+		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
@@ -91,7 +91,7 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 		Where(node.Slug(string(slug))).
 		WithOwner().
 		WithAssets().
-		WithLinks(func(lq *ent.LinkQuery) {
+		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithNodes(func(cq *ent.NodeQuery) {
@@ -124,7 +124,7 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 		Where(node.ID(xid.ID(id))).
 		WithOwner().
 		WithAssets().
-		WithLinks(func(lq *ent.LinkQuery) {
+		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithNodes(func(cq *ent.NodeQuery) {

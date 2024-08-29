@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestThreads(t *testing.T) {
@@ -103,6 +104,51 @@ func TestThreads(t *testing.T) {
 			a.Len(thread1get.JSON200.Replies, 1)
 			replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.Reply) string { return p.Id })
 			a.Contains(replyids, reply1create.JSON200.Id)
+		}))
+	}))
+}
+
+func TestThreadLinkAggregation(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *session.Jar,
+		aw account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_002_Frigg)
+
+			catname := "Category " + uuid.NewString()
+			cat, err := cl.CategoryCreateWithResponse(ctx, openapi.CategoryInitialProps{
+				Admin:       false,
+				Colour:      "#fe4efd",
+				Description: "category testing",
+				Name:        catname,
+			}, e2e.WithSession(ctx, cj))
+			tests.Ok(t, err, cat)
+
+			url := "https://ogp.me"
+			thread1create, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
+				Body:       "<p>this is a thread</p>",
+				Category:   cat.JSON200.Id,
+				Visibility: openapi.Published,
+				Title:      "Thread URL link aggregation",
+				Url:        &url,
+			}, e2e.WithSession(ctx, cj))
+			tests.Ok(t, err, thread1create)
+
+			r.NotNil(thread1create.JSON200.Link)
+			a.Equal(url, thread1create.JSON200.Link.Url)
+			a.Equal("Open Graph protocol", *thread1create.JSON200.Link.Title)
+			a.Equal("The Open Graph protocol enables any web page to become a rich object in a social graph.", *thread1create.JSON200.Link.Description)
+			a.Equal("ogp.me", thread1create.JSON200.Link.Domain)
+			a.Equal("ogp-me", thread1create.JSON200.Link.Slug)
 		}))
 	}))
 }

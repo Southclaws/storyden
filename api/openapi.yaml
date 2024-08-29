@@ -2993,19 +2993,19 @@ components:
         The general properties required for any post-like resource. Is composed
         with Threads or Replies to provide the basic common properties.
       type: object
-      required: [title, slug, body, author, reacts, assets, links]
+      required: [body, body_links]
       properties:
         body: { $ref: "#/components/schemas/PostContent" }
+        body_links: { $ref: "#/components/schemas/LinkList" }
 
     PostReferenceProps:
-      required: [title, slug, author, assets, links, reacts, collections]
+      required: [title, slug, author, assets, reacts, collections]
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         description: { $ref: "#/components/schemas/PostDescription" }
         slug: { $ref: "#/components/schemas/ThreadMark" }
         author: { $ref: "#/components/schemas/ProfileReference" }
         assets: { $ref: "#/components/schemas/AssetList" }
-        links: { $ref: "#/components/schemas/LinkList" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         collections: { $ref: "#/components/schemas/CollectionList" }
         meta: { $ref: "#/components/schemas/Metadata" }

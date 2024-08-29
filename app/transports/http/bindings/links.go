@@ -2,30 +2,31 @@ package bindings
 
 import (
 	"context"
+	"net/url"
 	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_graph"
-	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
-	"github.com/Southclaws/storyden/app/services/link_getter"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Links struct {
-	fr fetcher.Service
+	fr *fetcher.Fetcher
 	lr link.Repository
-	lg *link_getter.Getter
+	lg link_graph.Repository
 }
 
 func NewLinks(
-	fr fetcher.Service,
+	fr *fetcher.Fetcher,
 	lr link.Repository,
-	lg *link_getter.Getter,
+	lg link_graph.Repository,
 ) Links {
 	return Links{
 		fr: fr,
@@ -35,15 +36,18 @@ func NewLinks(
 }
 
 func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateRequestObject) (openapi.LinkCreateResponseObject, error) {
-	link, err := i.fr.Fetch(ctx,
-		request.Body.Url,
-	)
+	u, err := url.Parse(request.Body.Url)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	link, err := i.fr.Fetch(ctx, *u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.LinkCreate200JSONResponse{
-		LinkCreateOKJSONResponse: openapi.LinkCreateOKJSONResponse(serialiseLink(link)),
+		LinkCreateOKJSONResponse: openapi.LinkCreateOKJSONResponse(serialiseLink(*link)),
 	}, nil
 }
 
@@ -83,7 +87,7 @@ func (i *Links) LinkList(ctx context.Context, request openapi.LinkListRequestObj
 			TotalPages:  result.TotalPages,
 			CurrentPage: page,
 			NextPage:    result.NextPage.Ptr(),
-			Links:       dt.Map(result.Links, serialiseLink),
+			Links:       serialiseLinks(result.Links),
 		},
 	}, nil
 }

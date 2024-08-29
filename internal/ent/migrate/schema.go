@@ -261,6 +261,7 @@ var (
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "link_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "parent_node_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NodesTable holds the schema information for the "nodes" table.
@@ -276,8 +277,14 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "nodes_nodes_nodes",
+				Symbol:     "nodes_links_nodes",
 				Columns:    []*schema.Column{NodesColumns[11]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "nodes_nodes_nodes",
+				Columns:    []*schema.Column{NodesColumns[12]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -321,6 +328,7 @@ var (
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "account_posts", Type: field.TypeString, Size: 20},
 		{Name: "category_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "link_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "root_post_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "reply_to_post_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
@@ -343,14 +351,20 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "posts_posts_posts",
+				Symbol:     "posts_links_posts",
 				Columns:    []*schema.Column{PostsColumns[14]},
+				RefColumns: []*schema.Column{LinksColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "posts_posts_posts",
+				Columns:    []*schema.Column{PostsColumns[15]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_replies",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[16]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -446,51 +460,51 @@ var (
 			},
 		},
 	}
-	// LinkPostsColumns holds the columns for the "link_posts" table.
-	LinkPostsColumns = []*schema.Column{
+	// LinkPostContentReferencesColumns holds the columns for the "link_post_content_references" table.
+	LinkPostContentReferencesColumns = []*schema.Column{
 		{Name: "link_id", Type: field.TypeString, Size: 20},
 		{Name: "post_id", Type: field.TypeString, Size: 20},
 	}
-	// LinkPostsTable holds the schema information for the "link_posts" table.
-	LinkPostsTable = &schema.Table{
-		Name:       "link_posts",
-		Columns:    LinkPostsColumns,
-		PrimaryKey: []*schema.Column{LinkPostsColumns[0], LinkPostsColumns[1]},
+	// LinkPostContentReferencesTable holds the schema information for the "link_post_content_references" table.
+	LinkPostContentReferencesTable = &schema.Table{
+		Name:       "link_post_content_references",
+		Columns:    LinkPostContentReferencesColumns,
+		PrimaryKey: []*schema.Column{LinkPostContentReferencesColumns[0], LinkPostContentReferencesColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "link_posts_link_id",
-				Columns:    []*schema.Column{LinkPostsColumns[0]},
+				Symbol:     "link_post_content_references_link_id",
+				Columns:    []*schema.Column{LinkPostContentReferencesColumns[0]},
 				RefColumns: []*schema.Column{LinksColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "link_posts_post_id",
-				Columns:    []*schema.Column{LinkPostsColumns[1]},
+				Symbol:     "link_post_content_references_post_id",
+				Columns:    []*schema.Column{LinkPostContentReferencesColumns[1]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
 	}
-	// LinkNodesColumns holds the columns for the "link_nodes" table.
-	LinkNodesColumns = []*schema.Column{
+	// LinkNodeContentReferencesColumns holds the columns for the "link_node_content_references" table.
+	LinkNodeContentReferencesColumns = []*schema.Column{
 		{Name: "link_id", Type: field.TypeString, Size: 20},
 		{Name: "node_id", Type: field.TypeString, Size: 20},
 	}
-	// LinkNodesTable holds the schema information for the "link_nodes" table.
-	LinkNodesTable = &schema.Table{
-		Name:       "link_nodes",
-		Columns:    LinkNodesColumns,
-		PrimaryKey: []*schema.Column{LinkNodesColumns[0], LinkNodesColumns[1]},
+	// LinkNodeContentReferencesTable holds the schema information for the "link_node_content_references" table.
+	LinkNodeContentReferencesTable = &schema.Table{
+		Name:       "link_node_content_references",
+		Columns:    LinkNodeContentReferencesColumns,
+		PrimaryKey: []*schema.Column{LinkNodeContentReferencesColumns[0], LinkNodeContentReferencesColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "link_nodes_link_id",
-				Columns:    []*schema.Column{LinkNodesColumns[0]},
+				Symbol:     "link_node_content_references_link_id",
+				Columns:    []*schema.Column{LinkNodeContentReferencesColumns[0]},
 				RefColumns: []*schema.Column{LinksColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "link_nodes_node_id",
-				Columns:    []*schema.Column{LinkNodesColumns[1]},
+				Symbol:     "link_node_content_references_node_id",
+				Columns:    []*schema.Column{LinkNodeContentReferencesColumns[1]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -665,8 +679,8 @@ var (
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
-		LinkPostsTable,
-		LinkNodesTable,
+		LinkPostContentReferencesTable,
+		LinkNodeContentReferencesTable,
 		LinkAssetsTable,
 		NodeAssetsTable,
 		PostAssetsTable,
@@ -687,20 +701,22 @@ func init() {
 	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
 	EmailsTable.ForeignKeys[1].RefTable = AuthenticationsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
-	NodesTable.ForeignKeys[1].RefTable = NodesTable
+	NodesTable.ForeignKeys[1].RefTable = LinksTable
+	NodesTable.ForeignKeys[2].RefTable = NodesTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
-	PostsTable.ForeignKeys[2].RefTable = PostsTable
+	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
+	PostsTable.ForeignKeys[4].RefTable = PostsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	AccountTagsTable.Annotation = &entsql.Annotation{}
-	LinkPostsTable.ForeignKeys[0].RefTable = LinksTable
-	LinkPostsTable.ForeignKeys[1].RefTable = PostsTable
-	LinkNodesTable.ForeignKeys[0].RefTable = LinksTable
-	LinkNodesTable.ForeignKeys[1].RefTable = NodesTable
+	LinkPostContentReferencesTable.ForeignKeys[0].RefTable = LinksTable
+	LinkPostContentReferencesTable.ForeignKeys[1].RefTable = PostsTable
+	LinkNodeContentReferencesTable.ForeignKeys[0].RefTable = LinksTable
+	LinkNodeContentReferencesTable.ForeignKeys[1].RefTable = NodesTable
 	LinkAssetsTable.ForeignKeys[0].RefTable = LinksTable
 	LinkAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	NodeAssetsTable.ForeignKeys[0].RefTable = NodesTable

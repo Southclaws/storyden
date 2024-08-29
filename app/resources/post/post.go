@@ -31,7 +31,7 @@ type Post struct {
 	Author  profile.Public
 	Reacts  []*react.React
 	Assets  []*asset.Asset
-	Links   datagraph.Links
+	WebLink opt.Optional[datagraph.Link]
 	Meta    map[string]any
 
 	CreatedAt time.Time
@@ -72,10 +72,14 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	// This edge is optional anyway, so if not loaded, nothing bad happens.
+	link := opt.Map(opt.NewPtr(in.Edges.Link), func(in ent.Link) datagraph.Link {
+		return *datagraph.LinkFromModel(&in)
+	})
+
 	// These edges are arrays so if not loaded, nothing bad happens.
 	reacts := dt.Map(in.Edges.Reacts, react.FromModel)
 	assets := dt.Map(in.Edges.Assets, asset.FromModel)
-	links := dt.Map(in.Edges.Links, datagraph.LinkFromModel)
 
 	return &Post{
 		ID:   ID(in.ID),
@@ -87,7 +91,7 @@ func Map(in *ent.Post) (*Post, error) {
 		Author:  *pro,
 		Reacts:  reacts,
 		Assets:  assets,
-		Links:   links,
+		WebLink: link,
 		Meta:    in.Metadata,
 
 		CreatedAt: in.CreatedAt,

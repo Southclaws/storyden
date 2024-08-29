@@ -195,6 +195,20 @@ func (pc *PostCreate) SetNillableCategoryID(x *xid.ID) *PostCreate {
 	return pc
 }
 
+// SetLinkID sets the "link_id" field.
+func (pc *PostCreate) SetLinkID(x xid.ID) *PostCreate {
+	pc.mutation.SetLinkID(x)
+	return pc
+}
+
+// SetNillableLinkID sets the "link_id" field if the given value is not nil.
+func (pc *PostCreate) SetNillableLinkID(x *xid.ID) *PostCreate {
+	if x != nil {
+		pc.SetLinkID(*x)
+	}
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PostCreate) SetID(x xid.ID) *PostCreate {
 	pc.mutation.SetID(x)
@@ -353,19 +367,24 @@ func (pc *PostCreate) AddCollections(c ...*Collection) *PostCreate {
 	return pc.AddCollectionIDs(ids...)
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (pc *PostCreate) AddLinkIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddLinkIDs(ids...)
+// SetLink sets the "link" edge to the Link entity.
+func (pc *PostCreate) SetLink(l *Link) *PostCreate {
+	return pc.SetLinkID(l.ID)
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
+func (pc *PostCreate) AddContentLinkIDs(ids ...xid.ID) *PostCreate {
+	pc.mutation.AddContentLinkIDs(ids...)
 	return pc
 }
 
-// AddLinks adds the "links" edges to the Link entity.
-func (pc *PostCreate) AddLinks(l ...*Link) *PostCreate {
+// AddContentLinks adds the "content_links" edges to the Link entity.
+func (pc *PostCreate) AddContentLinks(l ...*Link) *PostCreate {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return pc.AddLinkIDs(ids...)
+	return pc.AddContentLinkIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
@@ -705,12 +724,29 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.LinkIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.LinkTable,
+			Columns: []string{post.LinkColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.LinkID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -968,6 +1004,24 @@ func (u *PostUpsert) UpdateCategoryID() *PostUpsert {
 // ClearCategoryID clears the value of the "category_id" field.
 func (u *PostUpsert) ClearCategoryID() *PostUpsert {
 	u.SetNull(post.FieldCategoryID)
+	return u
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *PostUpsert) SetLinkID(v xid.ID) *PostUpsert {
+	u.Set(post.FieldLinkID, v)
+	return u
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *PostUpsert) UpdateLinkID() *PostUpsert {
+	u.SetExcluded(post.FieldLinkID)
+	return u
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *PostUpsert) ClearLinkID() *PostUpsert {
+	u.SetNull(post.FieldLinkID)
 	return u
 }
 
@@ -1250,6 +1304,27 @@ func (u *PostUpsertOne) UpdateCategoryID() *PostUpsertOne {
 func (u *PostUpsertOne) ClearCategoryID() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearCategoryID()
+	})
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *PostUpsertOne) SetLinkID(v xid.ID) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLinkID(v)
+	})
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateLinkID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLinkID()
+	})
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *PostUpsertOne) ClearLinkID() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLinkID()
 	})
 }
 
@@ -1699,6 +1774,27 @@ func (u *PostUpsertBulk) UpdateCategoryID() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearCategoryID() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearCategoryID()
+	})
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *PostUpsertBulk) SetLinkID(v xid.ID) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLinkID(v)
+	})
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateLinkID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLinkID()
+	})
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *PostUpsertBulk) ClearLinkID() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLinkID()
 	})
 }
 

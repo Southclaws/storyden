@@ -37,7 +37,7 @@ type Node struct {
 	Name           string
 	Slug           string
 	Assets         []*asset.Asset
-	Links          datagraph.Links
+	WebLink        opt.Optional[datagraph.Link]
 	Content        opt.Optional[content.Rich]
 	Description    opt.Optional[string]
 	Owner          profile.Public

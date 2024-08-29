@@ -22,14 +22,16 @@ import (
 // LinkQuery is the builder for querying Link entities.
 type LinkQuery struct {
 	config
-	ctx        *QueryContext
-	order      []link.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Link
-	withPosts  *PostQuery
-	withNodes  *NodeQuery
-	withAssets *AssetQuery
-	modifiers  []func(*sql.Selector)
+	ctx                       *QueryContext
+	order                     []link.OrderOption
+	inters                    []Interceptor
+	predicates                []predicate.Link
+	withPosts                 *PostQuery
+	withPostContentReferences *PostQuery
+	withNodes                 *NodeQuery
+	withNodeContentReferences *NodeQuery
+	withAssets                *AssetQuery
+	modifiers                 []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -80,7 +82,29 @@ func (lq *LinkQuery) QueryPosts() *PostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.PostsTable, link.PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, link.PostsTable, link.PostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPostContentReferences chains the current query on the "post_content_references" edge.
+func (lq *LinkQuery) QueryPostContentReferences() *PostQuery {
+	query := (&PostClient{config: lq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := lq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := lq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, selector),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.PostContentReferencesTable, link.PostContentReferencesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -102,7 +126,29 @@ func (lq *LinkQuery) QueryNodes() *NodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(link.Table, link.FieldID, selector),
 			sqlgraph.To(node.Table, node.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, link.NodesTable, link.NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, link.NodesTable, link.NodesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodeContentReferences chains the current query on the "node_content_references" edge.
+func (lq *LinkQuery) QueryNodeContentReferences() *NodeQuery {
+	query := (&NodeClient{config: lq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := lq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := lq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, link.NodeContentReferencesTable, link.NodeContentReferencesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -319,14 +365,16 @@ func (lq *LinkQuery) Clone() *LinkQuery {
 		return nil
 	}
 	return &LinkQuery{
-		config:     lq.config,
-		ctx:        lq.ctx.Clone(),
-		order:      append([]link.OrderOption{}, lq.order...),
-		inters:     append([]Interceptor{}, lq.inters...),
-		predicates: append([]predicate.Link{}, lq.predicates...),
-		withPosts:  lq.withPosts.Clone(),
-		withNodes:  lq.withNodes.Clone(),
-		withAssets: lq.withAssets.Clone(),
+		config:                    lq.config,
+		ctx:                       lq.ctx.Clone(),
+		order:                     append([]link.OrderOption{}, lq.order...),
+		inters:                    append([]Interceptor{}, lq.inters...),
+		predicates:                append([]predicate.Link{}, lq.predicates...),
+		withPosts:                 lq.withPosts.Clone(),
+		withPostContentReferences: lq.withPostContentReferences.Clone(),
+		withNodes:                 lq.withNodes.Clone(),
+		withNodeContentReferences: lq.withNodeContentReferences.Clone(),
+		withAssets:                lq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
@@ -344,6 +392,17 @@ func (lq *LinkQuery) WithPosts(opts ...func(*PostQuery)) *LinkQuery {
 	return lq
 }
 
+// WithPostContentReferences tells the query-builder to eager-load the nodes that are connected to
+// the "post_content_references" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LinkQuery) WithPostContentReferences(opts ...func(*PostQuery)) *LinkQuery {
+	query := (&PostClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	lq.withPostContentReferences = query
+	return lq
+}
+
 // WithNodes tells the query-builder to eager-load the nodes that are connected to
 // the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
 func (lq *LinkQuery) WithNodes(opts ...func(*NodeQuery)) *LinkQuery {
@@ -352,6 +411,17 @@ func (lq *LinkQuery) WithNodes(opts ...func(*NodeQuery)) *LinkQuery {
 		opt(query)
 	}
 	lq.withNodes = query
+	return lq
+}
+
+// WithNodeContentReferences tells the query-builder to eager-load the nodes that are connected to
+// the "node_content_references" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LinkQuery) WithNodeContentReferences(opts ...func(*NodeQuery)) *LinkQuery {
+	query := (&NodeClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	lq.withNodeContentReferences = query
 	return lq
 }
 
@@ -444,9 +514,11 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 	var (
 		nodes       = []*Link{}
 		_spec       = lq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
 			lq.withPosts != nil,
+			lq.withPostContentReferences != nil,
 			lq.withNodes != nil,
+			lq.withNodeContentReferences != nil,
 			lq.withAssets != nil,
 		}
 	)
@@ -478,10 +550,24 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 			return nil, err
 		}
 	}
+	if query := lq.withPostContentReferences; query != nil {
+		if err := lq.loadPostContentReferences(ctx, query, nodes,
+			func(n *Link) { n.Edges.PostContentReferences = []*Post{} },
+			func(n *Link, e *Post) { n.Edges.PostContentReferences = append(n.Edges.PostContentReferences, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := lq.withNodes; query != nil {
 		if err := lq.loadNodes(ctx, query, nodes,
 			func(n *Link) { n.Edges.Nodes = []*Node{} },
 			func(n *Link, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := lq.withNodeContentReferences; query != nil {
+		if err := lq.loadNodeContentReferences(ctx, query, nodes,
+			func(n *Link) { n.Edges.NodeContentReferences = []*Node{} },
+			func(n *Link, e *Node) { n.Edges.NodeContentReferences = append(n.Edges.NodeContentReferences, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -496,6 +582,37 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 }
 
 func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Link, init func(*Link), assign func(*Link, *Post)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Link)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(post.FieldLinkID)
+	}
+	query.Where(predicate.Post(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(link.PostsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.LinkID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "link_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (lq *LinkQuery) loadPostContentReferences(ctx context.Context, query *PostQuery, nodes []*Link, init func(*Link), assign func(*Link, *Post)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Link)
 	nids := make(map[xid.ID]map[*Link]struct{})
@@ -507,11 +624,11 @@ func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*L
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(link.PostsTable)
-		s.Join(joinT).On(s.C(post.FieldID), joinT.C(link.PostsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(link.PostsPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(link.PostContentReferencesTable)
+		s.Join(joinT).On(s.C(post.FieldID), joinT.C(link.PostContentReferencesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(link.PostContentReferencesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(link.PostsPrimaryKey[0]))
+		s.Select(joinT.C(link.PostContentReferencesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -548,7 +665,7 @@ func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*L
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "posts" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "post_content_references" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -557,6 +674,36 @@ func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*L
 	return nil
 }
 func (lq *LinkQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Link, init func(*Link), assign func(*Link, *Node)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Link)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(node.FieldLinkID)
+	}
+	query.Where(predicate.Node(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(link.NodesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.LinkID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "link_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (lq *LinkQuery) loadNodeContentReferences(ctx context.Context, query *NodeQuery, nodes []*Link, init func(*Link), assign func(*Link, *Node)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Link)
 	nids := make(map[xid.ID]map[*Link]struct{})
@@ -568,11 +715,11 @@ func (lq *LinkQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*L
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(link.NodesTable)
-		s.Join(joinT).On(s.C(node.FieldID), joinT.C(link.NodesPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(link.NodesPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(link.NodeContentReferencesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(link.NodeContentReferencesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(link.NodeContentReferencesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(link.NodesPrimaryKey[0]))
+		s.Select(joinT.C(link.NodeContentReferencesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -609,7 +756,7 @@ func (lq *LinkQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*L
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "nodes" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "node_content_references" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

@@ -7,7 +7,6 @@
  */
 import type { AssetList } from "./assetList";
 import type { CollectionList } from "./collectionList";
-import type { LinkList } from "./linkList";
 import type { Metadata } from "./metadata";
 import type { PostDescription } from "./postDescription";
 import type { ProfileReference } from "./profileReference";
@@ -20,7 +19,6 @@ export interface PostReferenceProps {
   author: ProfileReference;
   collections: CollectionList;
   description?: PostDescription;
-  links: LinkList;
   meta?: Metadata;
   reacts: ReactList;
   slug: ThreadMark;

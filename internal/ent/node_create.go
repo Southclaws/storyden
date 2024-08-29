@@ -131,6 +131,20 @@ func (nc *NodeCreate) SetAccountID(x xid.ID) *NodeCreate {
 	return nc
 }
 
+// SetLinkID sets the "link_id" field.
+func (nc *NodeCreate) SetLinkID(x xid.ID) *NodeCreate {
+	nc.mutation.SetLinkID(x)
+	return nc
+}
+
+// SetNillableLinkID sets the "link_id" field if the given value is not nil.
+func (nc *NodeCreate) SetNillableLinkID(x *xid.ID) *NodeCreate {
+	if x != nil {
+		nc.SetLinkID(*x)
+	}
+	return nc
+}
+
 // SetVisibility sets the "visibility" field.
 func (nc *NodeCreate) SetVisibility(n node.Visibility) *NodeCreate {
 	nc.mutation.SetVisibility(n)
@@ -240,19 +254,24 @@ func (nc *NodeCreate) AddTags(t ...*Tag) *NodeCreate {
 	return nc.AddTagIDs(ids...)
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (nc *NodeCreate) AddLinkIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddLinkIDs(ids...)
+// SetLink sets the "link" edge to the Link entity.
+func (nc *NodeCreate) SetLink(l *Link) *NodeCreate {
+	return nc.SetLinkID(l.ID)
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
+func (nc *NodeCreate) AddContentLinkIDs(ids ...xid.ID) *NodeCreate {
+	nc.mutation.AddContentLinkIDs(ids...)
 	return nc
 }
 
-// AddLinks adds the "links" edges to the Link entity.
-func (nc *NodeCreate) AddLinks(l ...*Link) *NodeCreate {
+// AddContentLinks adds the "content_links" edges to the Link entity.
+func (nc *NodeCreate) AddContentLinks(l ...*Link) *NodeCreate {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return nc.AddLinkIDs(ids...)
+	return nc.AddContentLinkIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
@@ -510,12 +529,29 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.LinkIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.LinkTable,
+			Columns: []string{node.LinkColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.LinkID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   node.LinksTable,
-			Columns: node.LinksPrimaryKey,
+			Table:   node.ContentLinksTable,
+			Columns: node.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -715,6 +751,24 @@ func (u *NodeUpsert) SetAccountID(v xid.ID) *NodeUpsert {
 // UpdateAccountID sets the "account_id" field to the value that was provided on create.
 func (u *NodeUpsert) UpdateAccountID() *NodeUpsert {
 	u.SetExcluded(node.FieldAccountID)
+	return u
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *NodeUpsert) SetLinkID(v xid.ID) *NodeUpsert {
+	u.Set(node.FieldLinkID, v)
+	return u
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateLinkID() *NodeUpsert {
+	u.SetExcluded(node.FieldLinkID)
+	return u
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *NodeUpsert) ClearLinkID() *NodeUpsert {
+	u.SetNull(node.FieldLinkID)
 	return u
 }
 
@@ -936,6 +990,27 @@ func (u *NodeUpsertOne) SetAccountID(v xid.ID) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateAccountID() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *NodeUpsertOne) SetLinkID(v xid.ID) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetLinkID(v)
+	})
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateLinkID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateLinkID()
+	})
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *NodeUpsertOne) ClearLinkID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearLinkID()
 	})
 }
 
@@ -1329,6 +1404,27 @@ func (u *NodeUpsertBulk) SetAccountID(v xid.ID) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateAccountID() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetLinkID sets the "link_id" field.
+func (u *NodeUpsertBulk) SetLinkID(v xid.ID) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetLinkID(v)
+	})
+}
+
+// UpdateLinkID sets the "link_id" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateLinkID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateLinkID()
+	})
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (u *NodeUpsertBulk) ClearLinkID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearLinkID()
 	})
 }
 

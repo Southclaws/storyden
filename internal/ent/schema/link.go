@@ -30,8 +30,16 @@ func (Link) Fields() []ent.Field {
 
 func (Link) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("posts", Post.Type),
+		edge.To("posts", Post.Type).
+			Comment("Link aggregation posts that have shared this link."),
+
+		edge.To("post_content_references", Post.Type).
+			Comment("Posts that reference this link in their content."),
+
 		edge.To("nodes", Node.Type),
+
+		edge.To("node_content_references", Node.Type),
+
 		edge.To("assets", Asset.Type),
 	}
 }

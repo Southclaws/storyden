@@ -39,6 +39,7 @@ func (Post) Fields() []ent.Field {
 
 		// Edges
 		field.String("category_id").GoType(xid.ID{}).Optional(),
+		field.String("link_id").GoType(xid.ID{}).Optional(),
 	}
 }
 
@@ -82,7 +83,12 @@ func (Post) Edges() []ent.Edge {
 		edge.From("collections", Collection.Type).
 			Ref("posts"),
 
-		edge.From("links", Link.Type).
-			Ref("posts"),
+		edge.From("link", Link.Type).
+			Field("link_id").
+			Ref("posts").
+			Unique(),
+
+		edge.From("content_links", Link.Type).
+			Ref("post_content_references"),
 	}
 }

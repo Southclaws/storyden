@@ -2,6 +2,7 @@ package node_mutate
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -10,6 +11,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -20,8 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/services/hydrator"
-	"github.com/Southclaws/storyden/app/services/hydrator/fetcher"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -41,7 +42,7 @@ type Manager interface {
 type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[string]
-	URL          opt.Optional[string]
+	URL          opt.Optional[url.URL]
 	Content      opt.Optional[content.Rich]
 	Parent       opt.Optional[library.NodeSlug]
 	Visibility   opt.Optional[visibility.Visibility]
@@ -70,8 +71,8 @@ type service struct {
 	accountQuery      account_querier.Querier
 	nr                library.Repository
 	nc                node_children.Repository
-	hydrator          hydrator.Service
-	fs                fetcher.Service
+	fetcher           *fetcher.Fetcher
+	fs                *fetcher.Fetcher
 	indexQueue        pubsub.Topic[mq.IndexNode]
 	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset]
 }
@@ -80,8 +81,8 @@ func New(
 	accountQuery account_querier.Querier,
 	nr library.Repository,
 	nc node_children.Repository,
-	hydrator hydrator.Service,
-	fs fetcher.Service,
+	fetcher *fetcher.Fetcher,
+	fs *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
 ) Manager {
@@ -89,7 +90,7 @@ func New(
 		accountQuery:      accountQuery,
 		nr:                nr,
 		nc:                nc,
-		hydrator:          hydrator,
+		fetcher:           fetcher,
 		fs:                fs,
 		indexQueue:        indexQueue,
 		assetAnalyseQueue: assetAnalyseQueue,
@@ -124,7 +125,7 @@ func (s *service) Create(ctx context.Context,
 
 	if v, ok := p.AssetSources.Get(); ok {
 		for _, source := range v {
-			a, err := s.fs.Copy(ctx, source)
+			a, err := s.fs.CopyAsset(ctx, source)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -135,6 +136,13 @@ func (s *service) Create(ctx context.Context,
 
 	nodeSlug := p.Slug.Or(slug.Make(name))
 
+	if u, ok := p.URL.Get(); ok {
+		ln, err := s.fetcher.Fetch(ctx, u)
+		if err == nil {
+			opts = append(opts, library.WithLink(xid.ID(ln.ID)))
+		}
+	}
+
 	n, err := s.nr.Create(ctx, owner, name, nodeSlug, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -143,6 +151,8 @@ func (s *service) Create(ctx context.Context,
 	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	s.fetcher.HydrateContentURLs(ctx, n)
 
 	return n, nil
 }
@@ -169,9 +179,10 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// TODO: Queue this for background processing
 	if v, ok := p.AssetSources.Get(); ok {
 		for _, source := range v {
-			a, err := s.fs.Copy(ctx, source)
+			a, err := s.fs.CopyAsset(ctx, source)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -195,6 +206,13 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		}
 	}
 
+	if u, ok := p.URL.Get(); ok {
+		ln, err := s.fetcher.Fetch(ctx, u)
+		if err == nil {
+			opts = append(opts, library.WithLink(xid.ID(ln.ID)))
+		}
+	}
+
 	n, err = s.nr.Update(ctx, n.ID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -203,6 +221,8 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	s.fetcher.HydrateContentURLs(ctx, n)
 
 	return n, nil
 }
@@ -244,16 +264,6 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 	return destination.Ptr(), nil
 }
 
-func (s *service) hydrateLink(ctx context.Context, partial Partial) (opts []library.Option) {
-	text, textOK := partial.Content.Get()
-
-	if !textOK && !partial.URL.Ok() {
-		return
-	}
-
-	return s.hydrator.HydrateNode(ctx, text, partial.URL)
-}
-
 func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, error) {
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
 		return s.accountQuery.GetByID(ctx, aid)
@@ -283,8 +293,6 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, e
 			opts = append(opts, library.WithVisibility(value))
 		})
 	}
-
-	opts = append(opts, s.hydrateLink(ctx, p)...)
 
 	return opts, nil
 }

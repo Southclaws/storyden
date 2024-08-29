@@ -96,6 +96,10 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) datagraph.Link {
+		return *datagraph.LinkFromModel(&in)
+	})
+
 	return &Thread{
 		Post: post.Post{
 			ID: post.ID(m.ID),
@@ -104,7 +108,7 @@ func FromModel(m *ent.Post) (*Thread, error) {
 			Author:  *pro,
 			Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 			Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
-			Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
+			WebLink: link,
 			Meta:    m.Metadata,
 
 			CreatedAt: m.CreatedAt,

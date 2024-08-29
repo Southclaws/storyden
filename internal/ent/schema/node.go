@@ -24,6 +24,7 @@ func (Node) Fields() []ent.Field {
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 		field.JSON("metadata", map[string]any{}).Optional(),
 	}
@@ -54,8 +55,13 @@ func (Node) Edges() []ent.Edge {
 		edge.From("tags", Tag.Type).
 			Ref("nodes"),
 
-		edge.From("links", Link.Type).
-			Ref("nodes"),
+		edge.From("link", Link.Type).
+			Field("link_id").
+			Ref("nodes").
+			Unique(),
+
+		edge.From("content_links", Link.Type).
+			Ref("node_content_references"),
 
 		edge.From("collections", Collection.Type).
 			Ref("nodes").

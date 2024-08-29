@@ -42,8 +42,6 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	opts := partial.Opts()
 
-	opts = append(opts, s.hydrate(ctx, partial)...)
-
 	p, err = s.post_repo.Update(ctx, threadID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -54,6 +52,8 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}); err != nil {
 		s.l.Error("failed to publish index post message", zap.Error(err))
 	}
+
+	s.fetcher.HydrateContentURLs(ctx, p)
 
 	return p, nil
 }
