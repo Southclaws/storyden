@@ -103,7 +103,9 @@ func (d *database) Create(
 		WithCategory().
 		WithTags().
 		WithAssets().
-		WithLink().
+		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithFaviconImage().WithPrimaryImage()
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -151,7 +153,9 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		WithCategory().
 		WithTags().
 		WithAssets().
-		WithLink().
+		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithFaviconImage().WithPrimaryImage()
+		}).
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -190,6 +194,7 @@ func (d *database) List(
 			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
 		}).
 		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Order(ent_post.ByUpdatedAt(sql.OrderDesc()), ent_post.ByCreatedAt(sql.OrderDesc()))
@@ -250,6 +255,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 				WithAuthor().
 				WithAssets().
 				WithLink(func(lq *ent.LinkQuery) {
+					lq.WithFaviconImage().WithPrimaryImage()
 					lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 				}).
 				Order(ent.Asc(ent_post.FieldCreatedAt))
@@ -264,6 +270,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)

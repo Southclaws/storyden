@@ -241,12 +241,28 @@ var (
 		{Name: "domain", Type: field.TypeString},
 		{Name: "title", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "primary_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "favicon_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// LinksTable holds the schema information for the "links" table.
 	LinksTable = &schema.Table{
 		Name:       "links",
 		Columns:    LinksColumns,
 		PrimaryKey: []*schema.Column{LinksColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "links_assets_primary_image",
+				Columns:    []*schema.Column{LinksColumns[7]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "links_assets_favicon_image",
+				Columns:    []*schema.Column{LinksColumns[8]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// NodesColumns holds the columns for the "nodes" table.
 	NodesColumns = []*schema.Column{
@@ -700,6 +716,8 @@ func init() {
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
 	EmailsTable.ForeignKeys[1].RefTable = AuthenticationsTable
+	LinksTable.ForeignKeys[0].RefTable = AssetsTable
+	LinksTable.ForeignKeys[1].RefTable = AssetsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable

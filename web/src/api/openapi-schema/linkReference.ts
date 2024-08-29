@@ -6,15 +6,10 @@
  * OpenAPI spec version: 1
  */
 import type { CommonProperties } from "./commonProperties";
-import type { DatagraphRecommendations } from "./datagraphRecommendations";
-import type { LinkProps } from "./linkProps";
 import type { LinkReferenceProps } from "./linkReferenceProps";
 
 /**
- * A web address with content information such as title, description, etc.
+ * A minimal object used to refer to a link without sending too much data.
 
  */
-export type Link = CommonProperties &
-  LinkReferenceProps &
-  LinkProps &
-  DatagraphRecommendations;
+export type LinkReference = CommonProperties & LinkReferenceProps;

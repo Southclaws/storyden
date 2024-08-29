@@ -74,6 +74,46 @@ func (lu *LinkUpdate) SetNillableDescription(s *string) *LinkUpdate {
 	return lu
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (lu *LinkUpdate) SetPrimaryAssetID(x xid.ID) *LinkUpdate {
+	lu.mutation.SetPrimaryAssetID(x)
+	return lu
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (lu *LinkUpdate) SetNillablePrimaryAssetID(x *xid.ID) *LinkUpdate {
+	if x != nil {
+		lu.SetPrimaryAssetID(*x)
+	}
+	return lu
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (lu *LinkUpdate) ClearPrimaryAssetID() *LinkUpdate {
+	lu.mutation.ClearPrimaryAssetID()
+	return lu
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (lu *LinkUpdate) SetFaviconAssetID(x xid.ID) *LinkUpdate {
+	lu.mutation.SetFaviconAssetID(x)
+	return lu
+}
+
+// SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
+func (lu *LinkUpdate) SetNillableFaviconAssetID(x *xid.ID) *LinkUpdate {
+	if x != nil {
+		lu.SetFaviconAssetID(*x)
+	}
+	return lu
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (lu *LinkUpdate) ClearFaviconAssetID() *LinkUpdate {
+	lu.mutation.ClearFaviconAssetID()
+	return lu
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (lu *LinkUpdate) AddPostIDs(ids ...xid.ID) *LinkUpdate {
 	lu.mutation.AddPostIDs(ids...)
@@ -132,6 +172,44 @@ func (lu *LinkUpdate) AddNodeContentReferences(n ...*Node) *LinkUpdate {
 		ids[i] = n[i].ID
 	}
 	return lu.AddNodeContentReferenceIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (lu *LinkUpdate) SetPrimaryImageID(id xid.ID) *LinkUpdate {
+	lu.mutation.SetPrimaryImageID(id)
+	return lu
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (lu *LinkUpdate) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdate {
+	if id != nil {
+		lu = lu.SetPrimaryImageID(*id)
+	}
+	return lu
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (lu *LinkUpdate) SetPrimaryImage(a *Asset) *LinkUpdate {
+	return lu.SetPrimaryImageID(a.ID)
+}
+
+// SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
+func (lu *LinkUpdate) SetFaviconImageID(id xid.ID) *LinkUpdate {
+	lu.mutation.SetFaviconImageID(id)
+	return lu
+}
+
+// SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
+func (lu *LinkUpdate) SetNillableFaviconImageID(id *xid.ID) *LinkUpdate {
+	if id != nil {
+		lu = lu.SetFaviconImageID(*id)
+	}
+	return lu
+}
+
+// SetFaviconImage sets the "favicon_image" edge to the Asset entity.
+func (lu *LinkUpdate) SetFaviconImage(a *Asset) *LinkUpdate {
+	return lu.SetFaviconImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -236,6 +314,18 @@ func (lu *LinkUpdate) RemoveNodeContentReferences(n ...*Node) *LinkUpdate {
 		ids[i] = n[i].ID
 	}
 	return lu.RemoveNodeContentReferenceIDs(ids...)
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (lu *LinkUpdate) ClearPrimaryImage() *LinkUpdate {
+	lu.mutation.ClearPrimaryImage()
+	return lu
+}
+
+// ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
+func (lu *LinkUpdate) ClearFaviconImage() *LinkUpdate {
+	lu.mutation.ClearFaviconImage()
+	return lu
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -490,6 +580,64 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if lu.mutation.PrimaryImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.PrimaryImageTable,
+			Columns: []string{link.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.PrimaryImageTable,
+			Columns: []string{link.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if lu.mutation.FaviconImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.FaviconImageTable,
+			Columns: []string{link.FaviconImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.FaviconImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.FaviconImageTable,
+			Columns: []string{link.FaviconImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if lu.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -599,6 +747,46 @@ func (luo *LinkUpdateOne) SetNillableDescription(s *string) *LinkUpdateOne {
 	return luo
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (luo *LinkUpdateOne) SetPrimaryAssetID(x xid.ID) *LinkUpdateOne {
+	luo.mutation.SetPrimaryAssetID(x)
+	return luo
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillablePrimaryAssetID(x *xid.ID) *LinkUpdateOne {
+	if x != nil {
+		luo.SetPrimaryAssetID(*x)
+	}
+	return luo
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (luo *LinkUpdateOne) ClearPrimaryAssetID() *LinkUpdateOne {
+	luo.mutation.ClearPrimaryAssetID()
+	return luo
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (luo *LinkUpdateOne) SetFaviconAssetID(x xid.ID) *LinkUpdateOne {
+	luo.mutation.SetFaviconAssetID(x)
+	return luo
+}
+
+// SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillableFaviconAssetID(x *xid.ID) *LinkUpdateOne {
+	if x != nil {
+		luo.SetFaviconAssetID(*x)
+	}
+	return luo
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (luo *LinkUpdateOne) ClearFaviconAssetID() *LinkUpdateOne {
+	luo.mutation.ClearFaviconAssetID()
+	return luo
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (luo *LinkUpdateOne) AddPostIDs(ids ...xid.ID) *LinkUpdateOne {
 	luo.mutation.AddPostIDs(ids...)
@@ -657,6 +845,44 @@ func (luo *LinkUpdateOne) AddNodeContentReferences(n ...*Node) *LinkUpdateOne {
 		ids[i] = n[i].ID
 	}
 	return luo.AddNodeContentReferenceIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (luo *LinkUpdateOne) SetPrimaryImageID(id xid.ID) *LinkUpdateOne {
+	luo.mutation.SetPrimaryImageID(id)
+	return luo
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdateOne {
+	if id != nil {
+		luo = luo.SetPrimaryImageID(*id)
+	}
+	return luo
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (luo *LinkUpdateOne) SetPrimaryImage(a *Asset) *LinkUpdateOne {
+	return luo.SetPrimaryImageID(a.ID)
+}
+
+// SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
+func (luo *LinkUpdateOne) SetFaviconImageID(id xid.ID) *LinkUpdateOne {
+	luo.mutation.SetFaviconImageID(id)
+	return luo
+}
+
+// SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
+func (luo *LinkUpdateOne) SetNillableFaviconImageID(id *xid.ID) *LinkUpdateOne {
+	if id != nil {
+		luo = luo.SetFaviconImageID(*id)
+	}
+	return luo
+}
+
+// SetFaviconImage sets the "favicon_image" edge to the Asset entity.
+func (luo *LinkUpdateOne) SetFaviconImage(a *Asset) *LinkUpdateOne {
+	return luo.SetFaviconImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -761,6 +987,18 @@ func (luo *LinkUpdateOne) RemoveNodeContentReferences(n ...*Node) *LinkUpdateOne
 		ids[i] = n[i].ID
 	}
 	return luo.RemoveNodeContentReferenceIDs(ids...)
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (luo *LinkUpdateOne) ClearPrimaryImage() *LinkUpdateOne {
+	luo.mutation.ClearPrimaryImage()
+	return luo
+}
+
+// ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
+func (luo *LinkUpdateOne) ClearFaviconImage() *LinkUpdateOne {
+	luo.mutation.ClearFaviconImage()
+	return luo
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1038,6 +1276,64 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.PrimaryImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.PrimaryImageTable,
+			Columns: []string{link.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.PrimaryImageTable,
+			Columns: []string{link.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.FaviconImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.FaviconImageTable,
+			Columns: []string{link.FaviconImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.FaviconImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.FaviconImageTable,
+			Columns: []string{link.FaviconImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

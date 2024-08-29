@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gosimple/slug"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -113,7 +114,7 @@ func TestThreadLinkAggregation(t *testing.T) {
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
-		ctx context.Context,
+		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
 		aw account_writer.Writer,
@@ -122,33 +123,75 @@ func TestThreadLinkAggregation(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_002_Frigg)
+			sessionCtx, _ := e2e.WithAccount(root, aw, seed.Account_002_Frigg)
+			session := e2e.WithSession(sessionCtx, cj)
 
 			catname := "Category " + uuid.NewString()
-			cat, err := cl.CategoryCreateWithResponse(ctx, openapi.CategoryInitialProps{
+			cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,
 				Colour:      "#fe4efd",
 				Description: "category testing",
 				Name:        catname,
-			}, e2e.WithSession(ctx, cj))
+			}, session)
 			tests.Ok(t, err, cat)
 
 			url := "https://ogp.me"
-			thread1create, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
+			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       "<p>this is a thread</p>",
 				Category:   cat.JSON200.Id,
 				Visibility: openapi.Published,
 				Title:      "Thread URL link aggregation",
 				Url:        &url,
-			}, e2e.WithSession(ctx, cj))
+			}, session)
 			tests.Ok(t, err, thread1create)
 
 			r.NotNil(thread1create.JSON200.Link)
 			a.Equal(url, thread1create.JSON200.Link.Url)
+			a.Equal("ogp-me", thread1create.JSON200.Link.Slug)
+			a.Equal("ogp.me", thread1create.JSON200.Link.Domain)
 			a.Equal("Open Graph protocol", *thread1create.JSON200.Link.Title)
 			a.Equal("The Open Graph protocol enables any web page to become a rich object in a social graph.", *thread1create.JSON200.Link.Description)
-			a.Equal("ogp.me", thread1create.JSON200.Link.Domain)
-			a.Equal("ogp-me", thread1create.JSON200.Link.Slug)
+			r.NotNil(thread1create.JSON200.Link.FaviconImage)
+			a.NotEmpty(thread1create.JSON200.Link.FaviconImage.Id)
+			r.NotNil(thread1create.JSON200.Link.PrimaryImage)
+			a.NotEmpty(thread1create.JSON200.Link.PrimaryImage.Id)
+
+			// Get the thread just created, ensure link is present.
+
+			thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, session)
+			tests.Ok(t, err, thread1get)
+
+			r.NotNil(thread1get.JSON200.Link)
+			a.Equal(url, thread1get.JSON200.Link.Url)
+			a.Equal("ogp-me", thread1get.JSON200.Link.Slug)
+			a.Equal("ogp.me", thread1get.JSON200.Link.Domain)
+			a.Equal("Open Graph protocol", *thread1get.JSON200.Link.Title)
+			a.Equal("The Open Graph protocol enables any web page to become a rich object in a social graph.", *thread1get.JSON200.Link.Description)
+			r.NotNil(thread1get.JSON200.Link.FaviconImage)
+			a.NotEmpty(thread1get.JSON200.Link.FaviconImage.Id)
+			r.NotNil(thread1get.JSON200.Link.PrimaryImage)
+			a.NotEmpty(thread1get.JSON200.Link.PrimaryImage.Id)
+
+			// List threads, ensure link is present.
+
+			threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+			tests.Ok(t, err, threadlist)
+
+			listThread, found := lo.Find(threadlist.JSON200.Threads, func(th openapi.ThreadReference) bool {
+				return th.Id == thread1create.JSON200.Id
+			})
+			r.True(found)
+
+			r.NotNil(listThread.Link)
+			a.Equal(url, listThread.Link.Url)
+			a.Equal("ogp-me", listThread.Link.Slug)
+			a.Equal("ogp.me", listThread.Link.Domain)
+			a.Equal("Open Graph protocol", *listThread.Link.Title)
+			a.Equal("The Open Graph protocol enables any web page to become a rich object in a social graph.", *listThread.Link.Description)
+			r.NotNil(listThread.Link.FaviconImage)
+			a.NotEmpty(listThread.Link.FaviconImage.Id)
+			r.NotNil(listThread.Link.PrimaryImage)
+			a.NotEmpty(listThread.Link.PrimaryImage.Id)
 		}))
 	}))
 }

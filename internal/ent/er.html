@@ -85,6 +85,8 @@ erDiagram
         string domain
         string title
         string description
+        xidDOTID primary_asset_id
+        xidDOTID favicon_asset_id
     }
     Node {
         xidDOTID id
@@ -170,6 +172,8 @@ erDiagram
     	Link }o--o{ Post : "post_content_references/content_links"
     	Link |o--o{ Node : "nodes/link"
     	Link }o--o{ Node : "node_content_references/content_links"
+    	Link }o--o| Asset : "primary_image"
+    	Link }o--o| Asset : "favicon_image"
     	Link }o--o{ Asset : "assets/links"
     	Node |o--o{ Node : "nodes/parent"
     	Node }o--o{ Asset : "assets/nodes"

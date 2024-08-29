@@ -6790,6 +6790,10 @@ type LinkMutation struct {
 	node_content_references        map[xid.ID]struct{}
 	removednode_content_references map[xid.ID]struct{}
 	clearednode_content_references bool
+	primary_image                  *xid.ID
+	clearedprimary_image           bool
+	favicon_image                  *xid.ID
+	clearedfavicon_image           bool
 	assets                         map[xid.ID]struct{}
 	removedassets                  map[xid.ID]struct{}
 	clearedassets                  bool
@@ -7118,6 +7122,104 @@ func (m *LinkMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (m *LinkMutation) SetPrimaryAssetID(x xid.ID) {
+	m.primary_image = &x
+}
+
+// PrimaryAssetID returns the value of the "primary_asset_id" field in the mutation.
+func (m *LinkMutation) PrimaryAssetID() (r xid.ID, exists bool) {
+	v := m.primary_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryAssetID returns the old "primary_asset_id" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldPrimaryAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryAssetID: %w", err)
+	}
+	return oldValue.PrimaryAssetID, nil
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (m *LinkMutation) ClearPrimaryAssetID() {
+	m.primary_image = nil
+	m.clearedFields[link.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryAssetIDCleared returns if the "primary_asset_id" field was cleared in this mutation.
+func (m *LinkMutation) PrimaryAssetIDCleared() bool {
+	_, ok := m.clearedFields[link.FieldPrimaryAssetID]
+	return ok
+}
+
+// ResetPrimaryAssetID resets all changes to the "primary_asset_id" field.
+func (m *LinkMutation) ResetPrimaryAssetID() {
+	m.primary_image = nil
+	delete(m.clearedFields, link.FieldPrimaryAssetID)
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (m *LinkMutation) SetFaviconAssetID(x xid.ID) {
+	m.favicon_image = &x
+}
+
+// FaviconAssetID returns the value of the "favicon_asset_id" field in the mutation.
+func (m *LinkMutation) FaviconAssetID() (r xid.ID, exists bool) {
+	v := m.favicon_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFaviconAssetID returns the old "favicon_asset_id" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldFaviconAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFaviconAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFaviconAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFaviconAssetID: %w", err)
+	}
+	return oldValue.FaviconAssetID, nil
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (m *LinkMutation) ClearFaviconAssetID() {
+	m.favicon_image = nil
+	m.clearedFields[link.FieldFaviconAssetID] = struct{}{}
+}
+
+// FaviconAssetIDCleared returns if the "favicon_asset_id" field was cleared in this mutation.
+func (m *LinkMutation) FaviconAssetIDCleared() bool {
+	_, ok := m.clearedFields[link.FieldFaviconAssetID]
+	return ok
+}
+
+// ResetFaviconAssetID resets all changes to the "favicon_asset_id" field.
+func (m *LinkMutation) ResetFaviconAssetID() {
+	m.favicon_image = nil
+	delete(m.clearedFields, link.FieldFaviconAssetID)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
 func (m *LinkMutation) AddPostIDs(ids ...xid.ID) {
 	if m.posts == nil {
@@ -7334,6 +7436,86 @@ func (m *LinkMutation) ResetNodeContentReferences() {
 	m.removednode_content_references = nil
 }
 
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by id.
+func (m *LinkMutation) SetPrimaryImageID(id xid.ID) {
+	m.primary_image = &id
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (m *LinkMutation) ClearPrimaryImage() {
+	m.clearedprimary_image = true
+	m.clearedFields[link.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryImageCleared reports if the "primary_image" edge to the Asset entity was cleared.
+func (m *LinkMutation) PrimaryImageCleared() bool {
+	return m.PrimaryAssetIDCleared() || m.clearedprimary_image
+}
+
+// PrimaryImageID returns the "primary_image" edge ID in the mutation.
+func (m *LinkMutation) PrimaryImageID() (id xid.ID, exists bool) {
+	if m.primary_image != nil {
+		return *m.primary_image, true
+	}
+	return
+}
+
+// PrimaryImageIDs returns the "primary_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PrimaryImageID instead. It exists only for internal usage by the builders.
+func (m *LinkMutation) PrimaryImageIDs() (ids []xid.ID) {
+	if id := m.primary_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPrimaryImage resets all changes to the "primary_image" edge.
+func (m *LinkMutation) ResetPrimaryImage() {
+	m.primary_image = nil
+	m.clearedprimary_image = false
+}
+
+// SetFaviconImageID sets the "favicon_image" edge to the Asset entity by id.
+func (m *LinkMutation) SetFaviconImageID(id xid.ID) {
+	m.favicon_image = &id
+}
+
+// ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
+func (m *LinkMutation) ClearFaviconImage() {
+	m.clearedfavicon_image = true
+	m.clearedFields[link.FieldFaviconAssetID] = struct{}{}
+}
+
+// FaviconImageCleared reports if the "favicon_image" edge to the Asset entity was cleared.
+func (m *LinkMutation) FaviconImageCleared() bool {
+	return m.FaviconAssetIDCleared() || m.clearedfavicon_image
+}
+
+// FaviconImageID returns the "favicon_image" edge ID in the mutation.
+func (m *LinkMutation) FaviconImageID() (id xid.ID, exists bool) {
+	if m.favicon_image != nil {
+		return *m.favicon_image, true
+	}
+	return
+}
+
+// FaviconImageIDs returns the "favicon_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FaviconImageID instead. It exists only for internal usage by the builders.
+func (m *LinkMutation) FaviconImageIDs() (ids []xid.ID) {
+	if id := m.favicon_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFaviconImage resets all changes to the "favicon_image" edge.
+func (m *LinkMutation) ResetFaviconImage() {
+	m.favicon_image = nil
+	m.clearedfavicon_image = false
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *LinkMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -7422,7 +7604,7 @@ func (m *LinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LinkMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, link.FieldCreatedAt)
 	}
@@ -7440,6 +7622,12 @@ func (m *LinkMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, link.FieldDescription)
+	}
+	if m.primary_image != nil {
+		fields = append(fields, link.FieldPrimaryAssetID)
+	}
+	if m.favicon_image != nil {
+		fields = append(fields, link.FieldFaviconAssetID)
 	}
 	return fields
 }
@@ -7461,6 +7649,10 @@ func (m *LinkMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case link.FieldDescription:
 		return m.Description()
+	case link.FieldPrimaryAssetID:
+		return m.PrimaryAssetID()
+	case link.FieldFaviconAssetID:
+		return m.FaviconAssetID()
 	}
 	return nil, false
 }
@@ -7482,6 +7674,10 @@ func (m *LinkMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTitle(ctx)
 	case link.FieldDescription:
 		return m.OldDescription(ctx)
+	case link.FieldPrimaryAssetID:
+		return m.OldPrimaryAssetID(ctx)
+	case link.FieldFaviconAssetID:
+		return m.OldFaviconAssetID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Link field %s", name)
 }
@@ -7533,6 +7729,20 @@ func (m *LinkMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case link.FieldPrimaryAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryAssetID(v)
+		return nil
+	case link.FieldFaviconAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFaviconAssetID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Link field %s", name)
 }
@@ -7562,7 +7772,14 @@ func (m *LinkMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *LinkMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(link.FieldPrimaryAssetID) {
+		fields = append(fields, link.FieldPrimaryAssetID)
+	}
+	if m.FieldCleared(link.FieldFaviconAssetID) {
+		fields = append(fields, link.FieldFaviconAssetID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -7575,6 +7792,14 @@ func (m *LinkMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *LinkMutation) ClearField(name string) error {
+	switch name {
+	case link.FieldPrimaryAssetID:
+		m.ClearPrimaryAssetID()
+		return nil
+	case link.FieldFaviconAssetID:
+		m.ClearFaviconAssetID()
+		return nil
+	}
 	return fmt.Errorf("unknown Link nullable field %s", name)
 }
 
@@ -7600,13 +7825,19 @@ func (m *LinkMutation) ResetField(name string) error {
 	case link.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case link.FieldPrimaryAssetID:
+		m.ResetPrimaryAssetID()
+		return nil
+	case link.FieldFaviconAssetID:
+		m.ResetFaviconAssetID()
+		return nil
 	}
 	return fmt.Errorf("unknown Link field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LinkMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.posts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
@@ -7618,6 +7849,12 @@ func (m *LinkMutation) AddedEdges() []string {
 	}
 	if m.node_content_references != nil {
 		edges = append(edges, link.EdgeNodeContentReferences)
+	}
+	if m.primary_image != nil {
+		edges = append(edges, link.EdgePrimaryImage)
+	}
+	if m.favicon_image != nil {
+		edges = append(edges, link.EdgeFaviconImage)
 	}
 	if m.assets != nil {
 		edges = append(edges, link.EdgeAssets)
@@ -7653,6 +7890,14 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case link.EdgePrimaryImage:
+		if id := m.primary_image; id != nil {
+			return []ent.Value{*id}
+		}
+	case link.EdgeFaviconImage:
+		if id := m.favicon_image; id != nil {
+			return []ent.Value{*id}
+		}
 	case link.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -7665,7 +7910,7 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LinkMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.removedposts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
@@ -7724,7 +7969,7 @@ func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LinkMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.clearedposts {
 		edges = append(edges, link.EdgePosts)
 	}
@@ -7736,6 +7981,12 @@ func (m *LinkMutation) ClearedEdges() []string {
 	}
 	if m.clearednode_content_references {
 		edges = append(edges, link.EdgeNodeContentReferences)
+	}
+	if m.clearedprimary_image {
+		edges = append(edges, link.EdgePrimaryImage)
+	}
+	if m.clearedfavicon_image {
+		edges = append(edges, link.EdgeFaviconImage)
 	}
 	if m.clearedassets {
 		edges = append(edges, link.EdgeAssets)
@@ -7755,6 +8006,10 @@ func (m *LinkMutation) EdgeCleared(name string) bool {
 		return m.clearednodes
 	case link.EdgeNodeContentReferences:
 		return m.clearednode_content_references
+	case link.EdgePrimaryImage:
+		return m.clearedprimary_image
+	case link.EdgeFaviconImage:
+		return m.clearedfavicon_image
 	case link.EdgeAssets:
 		return m.clearedassets
 	}
@@ -7765,6 +8020,12 @@ func (m *LinkMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *LinkMutation) ClearEdge(name string) error {
 	switch name {
+	case link.EdgePrimaryImage:
+		m.ClearPrimaryImage()
+		return nil
+	case link.EdgeFaviconImage:
+		m.ClearFaviconImage()
+		return nil
 	}
 	return fmt.Errorf("unknown Link unique edge %s", name)
 }
@@ -7784,6 +8045,12 @@ func (m *LinkMutation) ResetEdge(name string) error {
 		return nil
 	case link.EdgeNodeContentReferences:
 		m.ResetNodeContentReferences()
+		return nil
+	case link.EdgePrimaryImage:
+		m.ResetPrimaryImage()
+		return nil
+	case link.EdgeFaviconImage:
+		m.ResetFaviconImage()
 		return nil
 	case link.EdgeAssets:
 		m.ResetAssets()

@@ -1998,7 +1998,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Link"
+            $ref: "#/components/schemas/LinkReference"
 
     LinkListOK:
       description: Link list.
@@ -2011,7 +2011,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/LinkWithRefs"
+            $ref: "#/components/schemas/Link"
 
     DatagraphSearchOK:
       description: Search results.
@@ -2996,7 +2996,7 @@ components:
       required: [body, body_links]
       properties:
         body: { $ref: "#/components/schemas/PostContent" }
-        body_links: { $ref: "#/components/schemas/LinkList" }
+        body_links: { $ref: "#/components/schemas/LinkReferenceList" }
 
     PostReferenceProps:
       required: [title, slug, author, assets, reacts, collections]
@@ -3116,7 +3116,7 @@ components:
           readOnly: true
           description: The number of posts under this thread.
         category: { $ref: "#/components/schemas/CategoryReference" }
-        link: { $ref: "#/components/schemas/Link" }
+        link: { $ref: "#/components/schemas/LinkReference" }
 
     ThreadList:
       type: array
@@ -3406,7 +3406,7 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         assets: { $ref: "#/components/schemas/AssetList" }
-        link: { $ref: "#/components/schemas/Link" }
+        link: { $ref: "#/components/schemas/LinkReference" }
         description: { $ref: "#/components/schemas/NodeDescription" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
@@ -3470,6 +3470,47 @@ components:
     # 88888888 888 888  888 888  888
     #
 
+    Link:
+      description: |
+        A web address with content information such as title, description, etc.
+      type: object
+      required: [url, assets, slug, domain]
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/LinkReferenceProps" }
+        - { $ref: "#/components/schemas/LinkProps" }
+        - { $ref: "#/components/schemas/DatagraphRecommendations" }
+
+    LinkReference:
+      description: |
+        A minimal object used to refer to a link without sending too much data.
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/LinkReferenceProps" }
+
+    LinkProps:
+      description: |
+        All the resources that a link has been referenced in. May be large.
+      required: [assets, posts, nodes, collections]
+      properties:
+        assets: { $ref: "#/components/schemas/AssetList" }
+        posts: { $ref: "#/components/schemas/PostReferenceList" }
+        nodes: { $ref: "#/components/schemas/NodeList" }
+        collections: { $ref: "#/components/schemas/CollectionList" }
+
+    LinkReferenceProps:
+      type: object
+      required: [url, slug, domain]
+      properties:
+        url: { $ref: "#/components/schemas/URL" }
+        slug: { $ref: "#/components/schemas/LinkSlug" }
+        domain: { $ref: "#/components/schemas/LinkDomain" }
+        title: { $ref: "#/components/schemas/LinkTitle" }
+        description: { $ref: "#/components/schemas/LinkDescription" }
+        favicon_image: { $ref: "#/components/schemas/Asset" }
+        primary_image: { $ref: "#/components/schemas/Asset" }
+
     LinkTitle:
       type: string
       example: "The Open Graph Protocol"
@@ -3486,32 +3527,9 @@ components:
       type: string
       example: github.com
 
-    Link:
-      description: |
-        A web address with content information such as title, description, etc.
-      type: object
-      required: [url, assets, slug, domain]
-      properties:
-        url: { $ref: "#/components/schemas/URL" }
-        title: { $ref: "#/components/schemas/LinkTitle" }
-        description: { $ref: "#/components/schemas/LinkDescription" }
-        slug: { $ref: "#/components/schemas/LinkSlug" }
-        domain: { $ref: "#/components/schemas/LinkDomain" }
-        assets: { $ref: "#/components/schemas/AssetList" }
-
-    LinkWithRefs:
-      allOf:
-        - $ref: "#/components/schemas/Link"
-        - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [threads, posts, nodes, collections]
-          properties:
-            posts: { $ref: "#/components/schemas/PostReferenceList" }
-            nodes: { $ref: "#/components/schemas/NodeList" }
-            collections: { $ref: "#/components/schemas/CollectionList" }
-
-    LinkList:
+    LinkReferenceList:
       type: array
-      items: { $ref: "#/components/schemas/Link" }
+      items: { $ref: "#/components/schemas/LinkReference" }
 
     LinkListResult:
       allOf:
@@ -3519,7 +3537,7 @@ components:
         - type: object
           required: [links]
           properties:
-            links: { $ref: "#/components/schemas/LinkList" }
+            links: { $ref: "#/components/schemas/LinkReferenceList" }
 
     LinkInitialProps:
       type: object

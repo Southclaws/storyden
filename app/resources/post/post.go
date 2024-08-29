@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -31,7 +32,7 @@ type Post struct {
 	Author  profile.Public
 	Reacts  []*react.React
 	Assets  []*asset.Asset
-	WebLink opt.Optional[datagraph.Link]
+	WebLink opt.Optional[link_ref.LinkRef]
 	Meta    map[string]any
 
 	CreatedAt time.Time
@@ -73,8 +74,8 @@ func Map(in *ent.Post) (*Post, error) {
 	}
 
 	// This edge is optional anyway, so if not loaded, nothing bad happens.
-	link := opt.Map(opt.NewPtr(in.Edges.Link), func(in ent.Link) datagraph.Link {
-		return *datagraph.LinkFromModel(&in)
+	link := opt.Map(opt.NewPtr(in.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+		return *link_ref.Map(&in)
 	})
 
 	// These edges are arrays so if not loaded, nothing bad happens.

@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -96,8 +97,8 @@ func FromModel(m *ent.Post) (*Thread, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) datagraph.Link {
-		return *datagraph.LinkFromModel(&in)
+	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+		return *link_ref.Map(&in)
 	})
 
 	return &Thread{

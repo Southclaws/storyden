@@ -30,6 +30,8 @@ type LinkQuery struct {
 	withPostContentReferences *PostQuery
 	withNodes                 *NodeQuery
 	withNodeContentReferences *NodeQuery
+	withPrimaryImage          *AssetQuery
+	withFaviconImage          *AssetQuery
 	withAssets                *AssetQuery
 	modifiers                 []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -149,6 +151,50 @@ func (lq *LinkQuery) QueryNodeContentReferences() *NodeQuery {
 			sqlgraph.From(link.Table, link.FieldID, selector),
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, link.NodeContentReferencesTable, link.NodeContentReferencesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPrimaryImage chains the current query on the "primary_image" edge.
+func (lq *LinkQuery) QueryPrimaryImage() *AssetQuery {
+	query := (&AssetClient{config: lq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := lq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := lq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.PrimaryImageTable, link.PrimaryImageColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFaviconImage chains the current query on the "favicon_image" edge.
+func (lq *LinkQuery) QueryFaviconImage() *AssetQuery {
+	query := (&AssetClient{config: lq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := lq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := lq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(link.Table, link.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, link.FaviconImageTable, link.FaviconImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -374,6 +420,8 @@ func (lq *LinkQuery) Clone() *LinkQuery {
 		withPostContentReferences: lq.withPostContentReferences.Clone(),
 		withNodes:                 lq.withNodes.Clone(),
 		withNodeContentReferences: lq.withNodeContentReferences.Clone(),
+		withPrimaryImage:          lq.withPrimaryImage.Clone(),
+		withFaviconImage:          lq.withFaviconImage.Clone(),
 		withAssets:                lq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
@@ -422,6 +470,28 @@ func (lq *LinkQuery) WithNodeContentReferences(opts ...func(*NodeQuery)) *LinkQu
 		opt(query)
 	}
 	lq.withNodeContentReferences = query
+	return lq
+}
+
+// WithPrimaryImage tells the query-builder to eager-load the nodes that are connected to
+// the "primary_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LinkQuery) WithPrimaryImage(opts ...func(*AssetQuery)) *LinkQuery {
+	query := (&AssetClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	lq.withPrimaryImage = query
+	return lq
+}
+
+// WithFaviconImage tells the query-builder to eager-load the nodes that are connected to
+// the "favicon_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LinkQuery) WithFaviconImage(opts ...func(*AssetQuery)) *LinkQuery {
+	query := (&AssetClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	lq.withFaviconImage = query
 	return lq
 }
 
@@ -514,11 +584,13 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 	var (
 		nodes       = []*Link{}
 		_spec       = lq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [7]bool{
 			lq.withPosts != nil,
 			lq.withPostContentReferences != nil,
 			lq.withNodes != nil,
 			lq.withNodeContentReferences != nil,
+			lq.withPrimaryImage != nil,
+			lq.withFaviconImage != nil,
 			lq.withAssets != nil,
 		}
 	)
@@ -568,6 +640,18 @@ func (lq *LinkQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Link, e
 		if err := lq.loadNodeContentReferences(ctx, query, nodes,
 			func(n *Link) { n.Edges.NodeContentReferences = []*Node{} },
 			func(n *Link, e *Node) { n.Edges.NodeContentReferences = append(n.Edges.NodeContentReferences, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := lq.withPrimaryImage; query != nil {
+		if err := lq.loadPrimaryImage(ctx, query, nodes, nil,
+			func(n *Link, e *Asset) { n.Edges.PrimaryImage = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := lq.withFaviconImage; query != nil {
+		if err := lq.loadFaviconImage(ctx, query, nodes, nil,
+			func(n *Link, e *Asset) { n.Edges.FaviconImage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -764,6 +848,70 @@ func (lq *LinkQuery) loadNodeContentReferences(ctx context.Context, query *NodeQ
 	}
 	return nil
 }
+func (lq *LinkQuery) loadPrimaryImage(ctx context.Context, query *AssetQuery, nodes []*Link, init func(*Link), assign func(*Link, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Link)
+	for i := range nodes {
+		if nodes[i].PrimaryAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].PrimaryAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "primary_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (lq *LinkQuery) loadFaviconImage(ctx context.Context, query *AssetQuery, nodes []*Link, init func(*Link), assign func(*Link, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Link)
+	for i := range nodes {
+		if nodes[i].FaviconAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].FaviconAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "favicon_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (lq *LinkQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Link, init func(*Link), assign func(*Link, *Asset)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Link)
@@ -853,6 +1001,12 @@ func (lq *LinkQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != link.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if lq.withPrimaryImage != nil {
+			_spec.Node.AddColumnOnce(link.FieldPrimaryAssetID)
+		}
+		if lq.withFaviconImage != nil {
+			_spec.Node.AddColumnOnce(link.FieldFaviconAssetID)
 		}
 	}
 	if ps := lq.predicates; len(ps) > 0 {

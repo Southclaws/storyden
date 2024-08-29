@@ -71,6 +71,34 @@ func (lc *LinkCreate) SetDescription(s string) *LinkCreate {
 	return lc
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (lc *LinkCreate) SetPrimaryAssetID(x xid.ID) *LinkCreate {
+	lc.mutation.SetPrimaryAssetID(x)
+	return lc
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (lc *LinkCreate) SetNillablePrimaryAssetID(x *xid.ID) *LinkCreate {
+	if x != nil {
+		lc.SetPrimaryAssetID(*x)
+	}
+	return lc
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (lc *LinkCreate) SetFaviconAssetID(x xid.ID) *LinkCreate {
+	lc.mutation.SetFaviconAssetID(x)
+	return lc
+}
+
+// SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
+func (lc *LinkCreate) SetNillableFaviconAssetID(x *xid.ID) *LinkCreate {
+	if x != nil {
+		lc.SetFaviconAssetID(*x)
+	}
+	return lc
+}
+
 // SetID sets the "id" field.
 func (lc *LinkCreate) SetID(x xid.ID) *LinkCreate {
 	lc.mutation.SetID(x)
@@ -143,6 +171,44 @@ func (lc *LinkCreate) AddNodeContentReferences(n ...*Node) *LinkCreate {
 		ids[i] = n[i].ID
 	}
 	return lc.AddNodeContentReferenceIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (lc *LinkCreate) SetPrimaryImageID(id xid.ID) *LinkCreate {
+	lc.mutation.SetPrimaryImageID(id)
+	return lc
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (lc *LinkCreate) SetNillablePrimaryImageID(id *xid.ID) *LinkCreate {
+	if id != nil {
+		lc = lc.SetPrimaryImageID(*id)
+	}
+	return lc
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (lc *LinkCreate) SetPrimaryImage(a *Asset) *LinkCreate {
+	return lc.SetPrimaryImageID(a.ID)
+}
+
+// SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
+func (lc *LinkCreate) SetFaviconImageID(id xid.ID) *LinkCreate {
+	lc.mutation.SetFaviconImageID(id)
+	return lc
+}
+
+// SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
+func (lc *LinkCreate) SetNillableFaviconImageID(id *xid.ID) *LinkCreate {
+	if id != nil {
+		lc = lc.SetFaviconImageID(*id)
+	}
+	return lc
+}
+
+// SetFaviconImage sets the "favicon_image" edge to the Asset entity.
+func (lc *LinkCreate) SetFaviconImage(a *Asset) *LinkCreate {
+	return lc.SetFaviconImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -354,6 +420,40 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := lc.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.PrimaryImageTable,
+			Columns: []string{link.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.PrimaryAssetID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := lc.mutation.FaviconImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   link.FaviconImageTable,
+			Columns: []string{link.FaviconImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.FaviconAssetID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := lc.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -458,6 +558,42 @@ func (u *LinkUpsert) UpdateDescription() *LinkUpsert {
 	return u
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *LinkUpsert) SetPrimaryAssetID(v xid.ID) *LinkUpsert {
+	u.Set(link.FieldPrimaryAssetID, v)
+	return u
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *LinkUpsert) UpdatePrimaryAssetID() *LinkUpsert {
+	u.SetExcluded(link.FieldPrimaryAssetID)
+	return u
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *LinkUpsert) ClearPrimaryAssetID() *LinkUpsert {
+	u.SetNull(link.FieldPrimaryAssetID)
+	return u
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (u *LinkUpsert) SetFaviconAssetID(v xid.ID) *LinkUpsert {
+	u.Set(link.FieldFaviconAssetID, v)
+	return u
+}
+
+// UpdateFaviconAssetID sets the "favicon_asset_id" field to the value that was provided on create.
+func (u *LinkUpsert) UpdateFaviconAssetID() *LinkUpsert {
+	u.SetExcluded(link.FieldFaviconAssetID)
+	return u
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (u *LinkUpsert) ClearFaviconAssetID() *LinkUpsert {
+	u.SetNull(link.FieldFaviconAssetID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -554,6 +690,48 @@ func (u *LinkUpsertOne) SetDescription(v string) *LinkUpsertOne {
 func (u *LinkUpsertOne) UpdateDescription() *LinkUpsertOne {
 	return u.Update(func(s *LinkUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *LinkUpsertOne) SetPrimaryAssetID(v xid.ID) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetPrimaryAssetID(v)
+	})
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdatePrimaryAssetID() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdatePrimaryAssetID()
+	})
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *LinkUpsertOne) ClearPrimaryAssetID() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearPrimaryAssetID()
+	})
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (u *LinkUpsertOne) SetFaviconAssetID(v xid.ID) *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetFaviconAssetID(v)
+	})
+}
+
+// UpdateFaviconAssetID sets the "favicon_asset_id" field to the value that was provided on create.
+func (u *LinkUpsertOne) UpdateFaviconAssetID() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateFaviconAssetID()
+	})
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (u *LinkUpsertOne) ClearFaviconAssetID() *LinkUpsertOne {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearFaviconAssetID()
 	})
 }
 
@@ -820,6 +998,48 @@ func (u *LinkUpsertBulk) SetDescription(v string) *LinkUpsertBulk {
 func (u *LinkUpsertBulk) UpdateDescription() *LinkUpsertBulk {
 	return u.Update(func(s *LinkUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *LinkUpsertBulk) SetPrimaryAssetID(v xid.ID) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetPrimaryAssetID(v)
+	})
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdatePrimaryAssetID() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdatePrimaryAssetID()
+	})
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *LinkUpsertBulk) ClearPrimaryAssetID() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearPrimaryAssetID()
+	})
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (u *LinkUpsertBulk) SetFaviconAssetID(v xid.ID) *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.SetFaviconAssetID(v)
+	})
+}
+
+// UpdateFaviconAssetID sets the "favicon_asset_id" field to the value that was provided on create.
+func (u *LinkUpsertBulk) UpdateFaviconAssetID() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.UpdateFaviconAssetID()
+	})
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (u *LinkUpsertBulk) ClearFaviconAssetID() *LinkUpsertBulk {
+	return u.Update(func(s *LinkUpsert) {
+		s.ClearFaviconAssetID()
 	})
 }
 

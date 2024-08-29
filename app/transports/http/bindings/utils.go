@@ -10,15 +10,12 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/react"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -77,9 +74,9 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		PostCount:   &postCount,
 		Reacts:      reacts(t.Reacts),
 		Tags:        t.Tags,
-		Assets:      dt.Map(t.Assets, serialiseAssetReference),
+		Assets:      dt.Map(t.Assets, serialiseAssetPtr),
 		Collections: dt.Map(t.Collections, serialiseCollection),
-		Link:        opt.Map(t.WebLink, serialiseLink).Ptr(),
+		Link:        opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 	}
 }
 
@@ -90,7 +87,7 @@ func serialiseContentHTML(c content.Rich) string {
 func serialiseThread(t *thread.Thread) openapi.Thread {
 	posts := len(t.Replies)
 	return openapi.Thread{
-		Assets:         dt.Map(t.Assets, serialiseAssetReference),
+		Assets:         dt.Map(t.Assets, serialiseAssetPtr),
 		Author:         serialiseProfileReference(t.Author),
 		Body:           serialiseContentHTML(t.Content),
 		Category:       serialiseCategoryReference(&t.Category),
@@ -99,7 +96,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		DeletedAt:      t.DeletedAt.Ptr(),
 		Description:    &t.Short,
 		Id:             openapi.Identifier(t.ID.String()),
-		Link:           opt.Map(t.WebLink, serialiseLink).Ptr(),
+		Link:           opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
 		PostCount:      &posts,
@@ -125,7 +122,7 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
-		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
 	}
 }
 
@@ -139,7 +136,7 @@ func serialisePost(p *post.Post) openapi.Post {
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
-		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
 	}
 }
 
@@ -152,7 +149,7 @@ func serialisePostRef(p *post.Post) openapi.PostReference {
 		Author:    serialiseProfileReference(p.Author),
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
-		Assets:    dt.Map(p.Assets, serialiseAssetReference),
+		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
 	}
 }
 
@@ -220,59 +217,12 @@ func serialiseReact(r *react.React) openapi.React {
 	}
 }
 
-func serialiseAssetReference(a *asset.Asset) openapi.Asset {
-	return openapi.Asset{
-		Id:       a.ID.String(),
-		Filename: a.Name.String(),
-		Url:      a.URL,
-		MimeType: a.Metadata.GetMIMEType(),
-		Width:    float32(a.Metadata.GetWidth()),
-		Height:   float32(a.Metadata.GetHeight()),
-	}
-}
-
-func deserialiseAssetID(in string) asset.AssetID {
-	return asset.AssetID(openapi.ParseID(in))
-}
-
-func deserialiseAssetIDs(ids []string) []asset.AssetID {
-	return dt.Map(ids, deserialiseAssetID)
-}
-
-func serialiseTag(t tag.Tag) openapi.Tag {
-	return openapi.Tag{
-		Id:   openapi.Identifier(t.ID),
-		Name: t.Name,
-	}
-}
-
 func deserialiseID(t openapi.Identifier) xid.ID {
 	return openapi.ParseID(t)
 }
 
 func tagsIDs(i openapi.TagListIDs) []xid.ID {
 	return dt.Map(i, deserialiseID)
-}
-
-func serialiseLinks(in datagraph.Links) []openapi.Link {
-	return dt.Map(in, func(i *datagraph.Link) openapi.Link {
-		return serialiseLink(*i)
-	})
-}
-
-func serialiseLink(in datagraph.Link) openapi.Link {
-	return openapi.Link{
-		Url:         in.URL,
-		Title:       in.Title.Ptr(),
-		Description: in.Description.Ptr(),
-		Slug:        in.Slug,
-		Domain:      in.Domain,
-		Assets:      dt.Map(in.Assets, serialiseAssetReference),
-	}
-}
-
-func serialiseLinkPtr(in *datagraph.Link) openapi.Link {
-	return serialiseLink(*in)
 }
 
 func deserialiseVisibility(in openapi.Visibility) (visibility.Visibility, error) {
@@ -295,8 +245,4 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility
 	}
 
 	return v, nil
-}
-
-func serialiseVisibilityList(in []visibility.Visibility) []openapi.Visibility {
-	return dt.Map(in, serialiseVisibility)
 }

@@ -27,6 +27,10 @@ const (
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldPrimaryAssetID holds the string denoting the primary_asset_id field in the database.
+	FieldPrimaryAssetID = "primary_asset_id"
+	// FieldFaviconAssetID holds the string denoting the favicon_asset_id field in the database.
+	FieldFaviconAssetID = "favicon_asset_id"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgePostContentReferences holds the string denoting the post_content_references edge name in mutations.
@@ -35,6 +39,10 @@ const (
 	EdgeNodes = "nodes"
 	// EdgeNodeContentReferences holds the string denoting the node_content_references edge name in mutations.
 	EdgeNodeContentReferences = "node_content_references"
+	// EdgePrimaryImage holds the string denoting the primary_image edge name in mutations.
+	EdgePrimaryImage = "primary_image"
+	// EdgeFaviconImage holds the string denoting the favicon_image edge name in mutations.
+	EdgeFaviconImage = "favicon_image"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// Table holds the table name of the link in the database.
@@ -63,6 +71,20 @@ const (
 	// NodeContentReferencesInverseTable is the table name for the Node entity.
 	// It exists in this package in order to avoid circular dependency with the "node" package.
 	NodeContentReferencesInverseTable = "nodes"
+	// PrimaryImageTable is the table that holds the primary_image relation/edge.
+	PrimaryImageTable = "links"
+	// PrimaryImageInverseTable is the table name for the Asset entity.
+	// It exists in this package in order to avoid circular dependency with the "asset" package.
+	PrimaryImageInverseTable = "assets"
+	// PrimaryImageColumn is the table column denoting the primary_image relation/edge.
+	PrimaryImageColumn = "primary_asset_id"
+	// FaviconImageTable is the table that holds the favicon_image relation/edge.
+	FaviconImageTable = "links"
+	// FaviconImageInverseTable is the table name for the Asset entity.
+	// It exists in this package in order to avoid circular dependency with the "asset" package.
+	FaviconImageInverseTable = "assets"
+	// FaviconImageColumn is the table column denoting the favicon_image relation/edge.
+	FaviconImageColumn = "favicon_asset_id"
 	// AssetsTable is the table that holds the assets relation/edge. The primary key declared below.
 	AssetsTable = "link_assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -79,6 +101,8 @@ var Columns = []string{
 	FieldDomain,
 	FieldTitle,
 	FieldDescription,
+	FieldPrimaryAssetID,
+	FieldFaviconAssetID,
 }
 
 var (
@@ -150,6 +174,16 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByPrimaryAssetID orders the results by the primary_asset_id field.
+func ByPrimaryAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPrimaryAssetID, opts...).ToFunc()
+}
+
+// ByFaviconAssetID orders the results by the favicon_asset_id field.
+func ByFaviconAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFaviconAssetID, opts...).ToFunc()
+}
+
 // ByPostsCount orders the results by posts count.
 func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -206,6 +240,20 @@ func ByNodeContentReferences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 	}
 }
 
+// ByPrimaryImageField orders the results by primary_image field.
+func ByPrimaryImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPrimaryImageStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByFaviconImageField orders the results by favicon_image field.
+func ByFaviconImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFaviconImageStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByAssetsCount orders the results by assets count.
 func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -245,6 +293,20 @@ func newNodeContentReferencesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodeContentReferencesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, NodeContentReferencesTable, NodeContentReferencesPrimaryKey...),
+	)
+}
+func newPrimaryImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PrimaryImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, PrimaryImageTable, PrimaryImageColumn),
+	)
+}
+func newFaviconImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FaviconImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, FaviconImageTable, FaviconImageColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {
