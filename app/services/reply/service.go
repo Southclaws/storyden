@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/services/hydrator"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -56,7 +56,7 @@ type service struct {
 
 	accountQuery account_querier.Querier
 	post_repo    reply.Repository
-	hydrator     hydrator.Service
+	fetcher      *fetcher.Fetcher
 	indexQueue   pubsub.Topic[mq.IndexPost]
 }
 
@@ -66,7 +66,7 @@ func New(
 
 	accountQuery account_querier.Querier,
 	post_repo reply.Repository,
-	hydrator hydrator.Service,
+	fetcher *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexPost],
 ) Service {
 	return &service{
@@ -74,16 +74,7 @@ func New(
 		rbac:         rbac,
 		accountQuery: accountQuery,
 		post_repo:    post_repo,
-		hydrator:     hydrator,
+		fetcher:      fetcher,
 		indexQueue:   indexQueue,
 	}
-}
-
-func (s *service) hydrate(ctx context.Context, partial Partial) (opts []reply.Option) {
-	body, bodyOK := partial.Content.Get()
-	if !bodyOK {
-		return
-	}
-
-	return s.hydrator.HydrateReply(ctx, body, opt.NewEmpty[string]())
 }

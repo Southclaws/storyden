@@ -60,8 +60,14 @@ func WithAssets(ids ...asset.AssetID) Option {
 	}
 }
 
-func WithLinks(ids ...xid.ID) Option {
+func WithLink(id xid.ID) Option {
 	return func(pm *ent.PostMutation) {
-		pm.AddLinkIDs(ids...)
+		pm.SetLinkID(id)
+	}
+}
+
+func WithContentLinks(ids ...xid.ID) Option {
+	return func(pm *ent.PostMutation) {
+		pm.AddContentLinkIDs(ids...)
 	}
 }

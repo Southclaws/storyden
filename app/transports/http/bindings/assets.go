@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -70,7 +71,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	}
 
 	return openapi.AssetUpload200JSONResponse{
-		AssetUploadOKJSONResponse: openapi.AssetUploadOKJSONResponse(serialiseAssetReference(a)),
+		AssetUploadOKJSONResponse: openapi.AssetUploadOKJSONResponse(serialiseAssetPtr(a)),
 	}, nil
 }
 
@@ -97,4 +98,27 @@ func getContentFillRuleCommand(contentFillRuleParam *openapi.ContentFillRule, co
 	}
 
 	return opt.NewEmpty[asset.ContentFillCommand](), nil
+}
+
+func serialiseAsset(a asset.Asset) openapi.Asset {
+	return openapi.Asset{
+		Id:       a.ID.String(),
+		Filename: a.Name.String(),
+		Url:      a.URL,
+		MimeType: a.Metadata.GetMIMEType(),
+		Width:    float32(a.Metadata.GetWidth()),
+		Height:   float32(a.Metadata.GetHeight()),
+	}
+}
+
+func serialiseAssetPtr(a *asset.Asset) openapi.Asset {
+	return serialiseAsset(*a)
+}
+
+func deserialiseAssetID(in string) asset.AssetID {
+	return asset.AssetID(openapi.ParseID(in))
+}
+
+func deserialiseAssetIDs(ids []string) []asset.AssetID {
+	return dt.Map(ids, deserialiseAssetID)
 }

@@ -6,7 +6,7 @@ import { KeyedMutator } from "swr";
 import { z } from "zod";
 
 import { linkCreate } from "src/api/openapi-client/links";
-import { Link, LinkListResult } from "src/api/openapi-schema";
+import { LinkListResult, LinkReference } from "src/api/openapi-schema";
 
 export type Props = {
   links: LinkListResult;
@@ -32,7 +32,7 @@ export type IndexingState =
     }
   | {
       state: "indexed";
-      link: Link;
+      link: LinkReference;
     }
   | {
       state: "error";

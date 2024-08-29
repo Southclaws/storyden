@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"net/url"
 	"strconv"
 
 	"github.com/Southclaws/dt"
@@ -59,6 +60,17 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
+		u, err := url.Parse(s)
+		if err != nil {
+			return url.URL{}, err
+		}
+		return *u, nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		accountID,
@@ -68,7 +80,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta,
 		thread_service.Partial{
 			Content: opt.New(richContent),
-			URL:     opt.NewPtr(request.Body.Url),
+			URL:     url,
 		},
 	)
 	if err != nil {

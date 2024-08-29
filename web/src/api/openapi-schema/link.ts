@@ -5,22 +5,16 @@
  * Storyden social API for building community driven platforms.
  * OpenAPI spec version: 1
  */
-import type { AssetList } from "./assetList";
-import type { LinkDescription } from "./linkDescription";
-import type { LinkDomain } from "./linkDomain";
-import type { LinkSlug } from "./linkSlug";
-import type { LinkTitle } from "./linkTitle";
-import type { Url } from "./url";
+import type { CommonProperties } from "./commonProperties";
+import type { DatagraphRecommendations } from "./datagraphRecommendations";
+import type { LinkProps } from "./linkProps";
+import type { LinkReferenceProps } from "./linkReferenceProps";
 
 /**
  * A web address with content information such as title, description, etc.
 
  */
-export interface Link {
-  assets: AssetList;
-  description?: LinkDescription;
-  domain: LinkDomain;
-  slug: LinkSlug;
-  title?: LinkTitle;
-  url: Url;
-}
+export type Link = CommonProperties &
+  LinkReferenceProps &
+  LinkProps &
+  DatagraphRecommendations;

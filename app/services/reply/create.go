@@ -22,8 +22,6 @@ func (s *service) Create(
 ) (*reply.Reply, error) {
 	opts := partial.Opts()
 
-	opts = append(opts, s.hydrate(ctx, partial)...)
-
 	p, err := s.post_repo.Create(ctx, authorID, parentID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
@@ -34,6 +32,8 @@ func (s *service) Create(
 	}); err != nil {
 		s.l.Error("failed to publish index post message", zap.Error(err))
 	}
+
+	s.fetcher.HydrateContentURLs(ctx, p)
 
 	return p, nil
 }

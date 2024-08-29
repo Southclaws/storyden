@@ -6,12 +6,12 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -87,6 +87,10 @@ func FromModel(m *ent.Post) (*Reply, error) {
 		rootThreadTitle = opt.NewPtr(m.Edges.Root).OrZero().Title
 	}
 
+	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+		return *link_ref.Map(&in)
+	})
+
 	return &Reply{
 		Post: post.Post{
 			ID: post.ID(m.ID),
@@ -95,7 +99,7 @@ func FromModel(m *ent.Post) (*Reply, error) {
 			Author:  *pro,
 			Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
 			Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
-			Links:   dt.Map(m.Edges.Links, datagraph.LinkFromModel),
+			WebLink: link,
 			Meta:    m.Metadata,
 
 			CreatedAt: m.CreatedAt,

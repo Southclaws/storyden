@@ -245,6 +245,26 @@ func (pu *PostUpdate) ClearCategoryID() *PostUpdate {
 	return pu
 }
 
+// SetLinkID sets the "link_id" field.
+func (pu *PostUpdate) SetLinkID(x xid.ID) *PostUpdate {
+	pu.mutation.SetLinkID(x)
+	return pu
+}
+
+// SetNillableLinkID sets the "link_id" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableLinkID(x *xid.ID) *PostUpdate {
+	if x != nil {
+		pu.SetLinkID(*x)
+	}
+	return pu
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (pu *PostUpdate) ClearLinkID() *PostUpdate {
+	pu.mutation.ClearLinkID()
+	return pu
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (pu *PostUpdate) SetAuthorID(id xid.ID) *PostUpdate {
 	pu.mutation.SetAuthorID(id)
@@ -389,19 +409,24 @@ func (pu *PostUpdate) AddCollections(c ...*Collection) *PostUpdate {
 	return pu.AddCollectionIDs(ids...)
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (pu *PostUpdate) AddLinkIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddLinkIDs(ids...)
+// SetLink sets the "link" edge to the Link entity.
+func (pu *PostUpdate) SetLink(l *Link) *PostUpdate {
+	return pu.SetLinkID(l.ID)
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
+func (pu *PostUpdate) AddContentLinkIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddContentLinkIDs(ids...)
 	return pu
 }
 
-// AddLinks adds the "links" edges to the Link entity.
-func (pu *PostUpdate) AddLinks(l ...*Link) *PostUpdate {
+// AddContentLinks adds the "content_links" edges to the Link entity.
+func (pu *PostUpdate) AddContentLinks(l ...*Link) *PostUpdate {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return pu.AddLinkIDs(ids...)
+	return pu.AddContentLinkIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
@@ -559,25 +584,31 @@ func (pu *PostUpdate) RemoveCollections(c ...*Collection) *PostUpdate {
 	return pu.RemoveCollectionIDs(ids...)
 }
 
-// ClearLinks clears all "links" edges to the Link entity.
-func (pu *PostUpdate) ClearLinks() *PostUpdate {
-	pu.mutation.ClearLinks()
+// ClearLink clears the "link" edge to the Link entity.
+func (pu *PostUpdate) ClearLink() *PostUpdate {
+	pu.mutation.ClearLink()
 	return pu
 }
 
-// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
-func (pu *PostUpdate) RemoveLinkIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveLinkIDs(ids...)
+// ClearContentLinks clears all "content_links" edges to the Link entity.
+func (pu *PostUpdate) ClearContentLinks() *PostUpdate {
+	pu.mutation.ClearContentLinks()
 	return pu
 }
 
-// RemoveLinks removes "links" edges to Link entities.
-func (pu *PostUpdate) RemoveLinks(l ...*Link) *PostUpdate {
+// RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
+func (pu *PostUpdate) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveContentLinkIDs(ids...)
+	return pu
+}
+
+// RemoveContentLinks removes "content_links" edges to Link entities.
+func (pu *PostUpdate) RemoveContentLinks(l ...*Link) *PostUpdate {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return pu.RemoveLinkIDs(ids...)
+	return pu.RemoveContentLinkIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1075,12 +1106,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.LinksCleared() {
+	if pu.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.LinkTable,
+			Columns: []string{post.LinkColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -1088,12 +1119,41 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedLinksIDs(); len(nodes) > 0 && !pu.mutation.LinksCleared() {
+	if nodes := pu.mutation.LinkIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.LinkTable,
+			Columns: []string{post.LinkColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !pu.mutation.ContentLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -1104,12 +1164,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -1350,6 +1410,26 @@ func (puo *PostUpdateOne) ClearCategoryID() *PostUpdateOne {
 	return puo
 }
 
+// SetLinkID sets the "link_id" field.
+func (puo *PostUpdateOne) SetLinkID(x xid.ID) *PostUpdateOne {
+	puo.mutation.SetLinkID(x)
+	return puo
+}
+
+// SetNillableLinkID sets the "link_id" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableLinkID(x *xid.ID) *PostUpdateOne {
+	if x != nil {
+		puo.SetLinkID(*x)
+	}
+	return puo
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (puo *PostUpdateOne) ClearLinkID() *PostUpdateOne {
+	puo.mutation.ClearLinkID()
+	return puo
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (puo *PostUpdateOne) SetAuthorID(id xid.ID) *PostUpdateOne {
 	puo.mutation.SetAuthorID(id)
@@ -1494,19 +1574,24 @@ func (puo *PostUpdateOne) AddCollections(c ...*Collection) *PostUpdateOne {
 	return puo.AddCollectionIDs(ids...)
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (puo *PostUpdateOne) AddLinkIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddLinkIDs(ids...)
+// SetLink sets the "link" edge to the Link entity.
+func (puo *PostUpdateOne) SetLink(l *Link) *PostUpdateOne {
+	return puo.SetLinkID(l.ID)
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
+func (puo *PostUpdateOne) AddContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddContentLinkIDs(ids...)
 	return puo
 }
 
-// AddLinks adds the "links" edges to the Link entity.
-func (puo *PostUpdateOne) AddLinks(l ...*Link) *PostUpdateOne {
+// AddContentLinks adds the "content_links" edges to the Link entity.
+func (puo *PostUpdateOne) AddContentLinks(l ...*Link) *PostUpdateOne {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return puo.AddLinkIDs(ids...)
+	return puo.AddContentLinkIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
@@ -1664,25 +1749,31 @@ func (puo *PostUpdateOne) RemoveCollections(c ...*Collection) *PostUpdateOne {
 	return puo.RemoveCollectionIDs(ids...)
 }
 
-// ClearLinks clears all "links" edges to the Link entity.
-func (puo *PostUpdateOne) ClearLinks() *PostUpdateOne {
-	puo.mutation.ClearLinks()
+// ClearLink clears the "link" edge to the Link entity.
+func (puo *PostUpdateOne) ClearLink() *PostUpdateOne {
+	puo.mutation.ClearLink()
 	return puo
 }
 
-// RemoveLinkIDs removes the "links" edge to Link entities by IDs.
-func (puo *PostUpdateOne) RemoveLinkIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveLinkIDs(ids...)
+// ClearContentLinks clears all "content_links" edges to the Link entity.
+func (puo *PostUpdateOne) ClearContentLinks() *PostUpdateOne {
+	puo.mutation.ClearContentLinks()
 	return puo
 }
 
-// RemoveLinks removes "links" edges to Link entities.
-func (puo *PostUpdateOne) RemoveLinks(l ...*Link) *PostUpdateOne {
+// RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
+func (puo *PostUpdateOne) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveContentLinkIDs(ids...)
+	return puo
+}
+
+// RemoveContentLinks removes "content_links" edges to Link entities.
+func (puo *PostUpdateOne) RemoveContentLinks(l ...*Link) *PostUpdateOne {
 	ids := make([]xid.ID, len(l))
 	for i := range l {
 		ids[i] = l[i].ID
 	}
-	return puo.RemoveLinkIDs(ids...)
+	return puo.RemoveContentLinkIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -2210,12 +2301,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.LinksCleared() {
+	if puo.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.LinkTable,
+			Columns: []string{post.LinkColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -2223,12 +2314,41 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !puo.mutation.LinksCleared() {
+	if nodes := puo.mutation.LinkIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.LinkTable,
+			Columns: []string{post.LinkColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !puo.mutation.ContentLinksCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
@@ -2239,12 +2359,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   post.LinksTable,
-			Columns: post.LinksPrimaryKey,
+			Table:   post.ContentLinksTable,
+			Columns: post.ContentLinksPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),

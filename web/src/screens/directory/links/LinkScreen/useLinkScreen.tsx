@@ -1,9 +1,9 @@
 import { useLinkGet } from "src/api/openapi-client/links";
-import { LinkWithRefs } from "src/api/openapi-schema";
+import { Link } from "src/api/openapi-schema";
 
 export type Props = {
   slug: string;
-  link: LinkWithRefs;
+  link: Link;
 };
 
 export function useLinkScreen(props: Props) {

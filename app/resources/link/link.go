@@ -1,180 +1,81 @@
 package link
 
 import (
-	"context"
-	"fmt"
-	"math"
-	"net/url"
-	"strings"
-
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/link"
 )
 
-type Result struct {
-	PageSize    int
-	Results     int
-	TotalPages  int
-	CurrentPage int
-	NextPage    opt.Optional[int]
-	Links       []*datagraph.Link
+type LinkID xid.ID
+
+type Link struct {
+	link_ref.LinkRef
+
+	Assets  []*asset.Asset
+	Posts   []*post.Post
+	Nodes   []*library.Node
+	Related datagraph.ItemList
 }
 
-type Repository interface {
-	Store(ctx context.Context, url, title, description string, opts ...Option) (*datagraph.Link, error)
-	Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error)
-	GetByID(ctx context.Context, id datagraph.LinkID) (*datagraph.Link, error)
+func (l *Link) AssetIDs() []asset.AssetID {
+	return dt.Map(l.Assets, func(a *asset.Asset) asset.AssetID { return a.ID })
 }
 
-type (
-	Option func(*ent.LinkMutation)
-	Filter func(*ent.LinkQuery)
-)
-
-func WithPosts(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddPostIDs(ids...)
+func NewLink(url, title, description string) link_ref.LinkRef {
+	return link_ref.LinkRef{
+		URL:         url,
+		Title:       opt.New(title),
+		Description: opt.New(description),
 	}
 }
 
-func WithNodes(ids ...xid.ID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddNodeIDs(ids...)
+func NewLinkOpt(purl, ptitle, pdescription *string) opt.Optional[link_ref.LinkRef] {
+	if purl == nil {
+		return opt.NewEmpty[link_ref.LinkRef]()
 	}
+
+	return opt.New(link_ref.LinkRef{
+		URL:         opt.NewPtr(purl).String(),
+		Title:       opt.NewPtr(ptitle),
+		Description: opt.NewPtr(pdescription),
+	})
 }
 
-func WithAssets(ids ...asset.AssetID) Option {
-	return func(lm *ent.LinkMutation) {
-		lm.AddAssetIDs(ids...)
-	}
-}
-
-func WithURL(s string) Filter {
-	return func(lq *ent.LinkQuery) {
-		lq.Where(link.URLContainsFold(s))
-	}
-}
-
-func WithKeyword(s string) Filter {
-	return func(lq *ent.LinkQuery) {
-		lq.Where(link.Or(
-			link.TitleContainsFold(s),
-			link.DescriptionContainsFold(s),
-			link.URLContainsFold(s),
-		))
-	}
-}
-
-type database struct {
-	db *ent.Client
-}
-
-func New(db *ent.Client) Repository {
-	return &database{db}
-}
-
-func (d *database) Store(ctx context.Context, address, title, description string, opts ...Option) (*datagraph.Link, error) {
-	u, err := url.Parse(address)
+func Map(in *ent.Link) (*Link, error) {
+	postEdge, err := in.Edges.PostsOrErr()
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err)
 	}
 
-	slug, domain := getLinkAttrs(*u)
-
-	create := d.db.Link.Create()
-	mutate := create.Mutation()
-
-	mutate.SetURL(address)
-	mutate.SetSlug(slug)
-	mutate.SetDomain(domain)
-	mutate.SetTitle(title)
-	mutate.SetDescription(description)
-
-	for _, fn := range opts {
-		fn(mutate)
-	}
-
-	create.OnConflictColumns("url").UpdateNewValues()
-	create.OnConflictColumns("slug").UpdateNewValues()
-
-	r, err := create.Save(ctx)
+	nodeEdge, err := in.Edges.NodesOrErr()
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err)
 	}
 
-	return d.GetByID(ctx, datagraph.LinkID(r.ID))
-}
+	// Mapping
 
-func (d *database) Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error) {
-	total, err := d.db.Link.Query().Count(ctx)
+	posts, err := dt.MapErr(postEdge, post.Map)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err)
 	}
 
-	query := d.db.Link.Query().
-		Limit(size + 1).
-		Offset(page * size).
-		Order(ent.Desc(link.FieldCreatedAt))
-
-	for _, fn := range filters {
-		fn(query)
-	}
-
-	query.WithAssets()
-
-	r, err := query.All(ctx)
+	nodes, err := dt.MapErr(nodeEdge, library.NodeFromModel)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err)
 	}
 
-	isNextPage := len(r) >= size
-	nextPage := opt.NewSafe(page+1, isNextPage)
-
-	if isNextPage {
-		r = r[:len(r)-1]
-	}
-
-	links := datagraph.LinksFromModel(r)
-
-	return &Result{
-		PageSize:    size,
-		Results:     len(links),
-		TotalPages:  int(math.Ceil(float64(total) / float64(size))),
-		CurrentPage: page,
-		NextPage:    nextPage,
-		Links:       links,
+	return &Link{
+		LinkRef: *link_ref.Map(in),
+		Assets:  dt.Map(in.Edges.Assets, asset.FromModel),
+		Posts:   posts,
+		Nodes:   nodes,
 	}, nil
-}
-
-func (d *database) GetByID(ctx context.Context, id datagraph.LinkID) (*datagraph.Link, error) {
-	r, err := d.db.Link.Query().
-		WithAssets().
-		Where(link.ID(xid.ID(id))).
-		First(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	link := datagraph.LinkFromModel(r)
-
-	return link, nil
-}
-
-func getLinkAttrs(u url.URL) (string, string) {
-	host := strings.TrimPrefix(u.Hostname(), "www.")
-
-	full := fmt.Sprintf("%s-%s", host, u.Path)
-
-	slugified := slug.Make(full)
-	domain := u.Hostname()
-
-	return slugified, domain
 }

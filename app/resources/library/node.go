@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
@@ -37,7 +38,7 @@ type Node struct {
 	Name           string
 	Slug           string
 	Assets         []*asset.Asset
-	Links          datagraph.Links
+	WebLink        opt.Optional[link_ref.LinkRef]
 	Content        opt.Optional[content.Rich]
 	Description    opt.Optional[string]
 	Owner          profile.Public

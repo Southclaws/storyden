@@ -6768,28 +6768,38 @@ func (m *EmailMutation) ResetEdge(name string) error {
 // LinkMutation represents an operation that mutates the Link nodes in the graph.
 type LinkMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	url           *string
-	slug          *string
-	domain        *string
-	title         *string
-	description   *string
-	clearedFields map[string]struct{}
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	nodes         map[xid.ID]struct{}
-	removednodes  map[xid.ID]struct{}
-	clearednodes  bool
-	assets        map[xid.ID]struct{}
-	removedassets map[xid.ID]struct{}
-	clearedassets bool
-	done          bool
-	oldValue      func(context.Context) (*Link, error)
-	predicates    []predicate.Link
+	op                             Op
+	typ                            string
+	id                             *xid.ID
+	created_at                     *time.Time
+	url                            *string
+	slug                           *string
+	domain                         *string
+	title                          *string
+	description                    *string
+	clearedFields                  map[string]struct{}
+	posts                          map[xid.ID]struct{}
+	removedposts                   map[xid.ID]struct{}
+	clearedposts                   bool
+	post_content_references        map[xid.ID]struct{}
+	removedpost_content_references map[xid.ID]struct{}
+	clearedpost_content_references bool
+	nodes                          map[xid.ID]struct{}
+	removednodes                   map[xid.ID]struct{}
+	clearednodes                   bool
+	node_content_references        map[xid.ID]struct{}
+	removednode_content_references map[xid.ID]struct{}
+	clearednode_content_references bool
+	primary_image                  *xid.ID
+	clearedprimary_image           bool
+	favicon_image                  *xid.ID
+	clearedfavicon_image           bool
+	assets                         map[xid.ID]struct{}
+	removedassets                  map[xid.ID]struct{}
+	clearedassets                  bool
+	done                           bool
+	oldValue                       func(context.Context) (*Link, error)
+	predicates                     []predicate.Link
 }
 
 var _ ent.Mutation = (*LinkMutation)(nil)
@@ -7112,6 +7122,104 @@ func (m *LinkMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (m *LinkMutation) SetPrimaryAssetID(x xid.ID) {
+	m.primary_image = &x
+}
+
+// PrimaryAssetID returns the value of the "primary_asset_id" field in the mutation.
+func (m *LinkMutation) PrimaryAssetID() (r xid.ID, exists bool) {
+	v := m.primary_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryAssetID returns the old "primary_asset_id" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldPrimaryAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryAssetID: %w", err)
+	}
+	return oldValue.PrimaryAssetID, nil
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (m *LinkMutation) ClearPrimaryAssetID() {
+	m.primary_image = nil
+	m.clearedFields[link.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryAssetIDCleared returns if the "primary_asset_id" field was cleared in this mutation.
+func (m *LinkMutation) PrimaryAssetIDCleared() bool {
+	_, ok := m.clearedFields[link.FieldPrimaryAssetID]
+	return ok
+}
+
+// ResetPrimaryAssetID resets all changes to the "primary_asset_id" field.
+func (m *LinkMutation) ResetPrimaryAssetID() {
+	m.primary_image = nil
+	delete(m.clearedFields, link.FieldPrimaryAssetID)
+}
+
+// SetFaviconAssetID sets the "favicon_asset_id" field.
+func (m *LinkMutation) SetFaviconAssetID(x xid.ID) {
+	m.favicon_image = &x
+}
+
+// FaviconAssetID returns the value of the "favicon_asset_id" field in the mutation.
+func (m *LinkMutation) FaviconAssetID() (r xid.ID, exists bool) {
+	v := m.favicon_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFaviconAssetID returns the old "favicon_asset_id" field's value of the Link entity.
+// If the Link object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LinkMutation) OldFaviconAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFaviconAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFaviconAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFaviconAssetID: %w", err)
+	}
+	return oldValue.FaviconAssetID, nil
+}
+
+// ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
+func (m *LinkMutation) ClearFaviconAssetID() {
+	m.favicon_image = nil
+	m.clearedFields[link.FieldFaviconAssetID] = struct{}{}
+}
+
+// FaviconAssetIDCleared returns if the "favicon_asset_id" field was cleared in this mutation.
+func (m *LinkMutation) FaviconAssetIDCleared() bool {
+	_, ok := m.clearedFields[link.FieldFaviconAssetID]
+	return ok
+}
+
+// ResetFaviconAssetID resets all changes to the "favicon_asset_id" field.
+func (m *LinkMutation) ResetFaviconAssetID() {
+	m.favicon_image = nil
+	delete(m.clearedFields, link.FieldFaviconAssetID)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
 func (m *LinkMutation) AddPostIDs(ids ...xid.ID) {
 	if m.posts == nil {
@@ -7166,6 +7274,60 @@ func (m *LinkMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by ids.
+func (m *LinkMutation) AddPostContentReferenceIDs(ids ...xid.ID) {
+	if m.post_content_references == nil {
+		m.post_content_references = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.post_content_references[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPostContentReferences clears the "post_content_references" edge to the Post entity.
+func (m *LinkMutation) ClearPostContentReferences() {
+	m.clearedpost_content_references = true
+}
+
+// PostContentReferencesCleared reports if the "post_content_references" edge to the Post entity was cleared.
+func (m *LinkMutation) PostContentReferencesCleared() bool {
+	return m.clearedpost_content_references
+}
+
+// RemovePostContentReferenceIDs removes the "post_content_references" edge to the Post entity by IDs.
+func (m *LinkMutation) RemovePostContentReferenceIDs(ids ...xid.ID) {
+	if m.removedpost_content_references == nil {
+		m.removedpost_content_references = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.post_content_references, ids[i])
+		m.removedpost_content_references[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPostContentReferences returns the removed IDs of the "post_content_references" edge to the Post entity.
+func (m *LinkMutation) RemovedPostContentReferencesIDs() (ids []xid.ID) {
+	for id := range m.removedpost_content_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostContentReferencesIDs returns the "post_content_references" edge IDs in the mutation.
+func (m *LinkMutation) PostContentReferencesIDs() (ids []xid.ID) {
+	for id := range m.post_content_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPostContentReferences resets all changes to the "post_content_references" edge.
+func (m *LinkMutation) ResetPostContentReferences() {
+	m.post_content_references = nil
+	m.clearedpost_content_references = false
+	m.removedpost_content_references = nil
+}
+
 // AddNodeIDs adds the "nodes" edge to the Node entity by ids.
 func (m *LinkMutation) AddNodeIDs(ids ...xid.ID) {
 	if m.nodes == nil {
@@ -7218,6 +7380,140 @@ func (m *LinkMutation) ResetNodes() {
 	m.nodes = nil
 	m.clearednodes = false
 	m.removednodes = nil
+}
+
+// AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by ids.
+func (m *LinkMutation) AddNodeContentReferenceIDs(ids ...xid.ID) {
+	if m.node_content_references == nil {
+		m.node_content_references = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.node_content_references[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeContentReferences clears the "node_content_references" edge to the Node entity.
+func (m *LinkMutation) ClearNodeContentReferences() {
+	m.clearednode_content_references = true
+}
+
+// NodeContentReferencesCleared reports if the "node_content_references" edge to the Node entity was cleared.
+func (m *LinkMutation) NodeContentReferencesCleared() bool {
+	return m.clearednode_content_references
+}
+
+// RemoveNodeContentReferenceIDs removes the "node_content_references" edge to the Node entity by IDs.
+func (m *LinkMutation) RemoveNodeContentReferenceIDs(ids ...xid.ID) {
+	if m.removednode_content_references == nil {
+		m.removednode_content_references = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.node_content_references, ids[i])
+		m.removednode_content_references[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeContentReferences returns the removed IDs of the "node_content_references" edge to the Node entity.
+func (m *LinkMutation) RemovedNodeContentReferencesIDs() (ids []xid.ID) {
+	for id := range m.removednode_content_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeContentReferencesIDs returns the "node_content_references" edge IDs in the mutation.
+func (m *LinkMutation) NodeContentReferencesIDs() (ids []xid.ID) {
+	for id := range m.node_content_references {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeContentReferences resets all changes to the "node_content_references" edge.
+func (m *LinkMutation) ResetNodeContentReferences() {
+	m.node_content_references = nil
+	m.clearednode_content_references = false
+	m.removednode_content_references = nil
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by id.
+func (m *LinkMutation) SetPrimaryImageID(id xid.ID) {
+	m.primary_image = &id
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (m *LinkMutation) ClearPrimaryImage() {
+	m.clearedprimary_image = true
+	m.clearedFields[link.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryImageCleared reports if the "primary_image" edge to the Asset entity was cleared.
+func (m *LinkMutation) PrimaryImageCleared() bool {
+	return m.PrimaryAssetIDCleared() || m.clearedprimary_image
+}
+
+// PrimaryImageID returns the "primary_image" edge ID in the mutation.
+func (m *LinkMutation) PrimaryImageID() (id xid.ID, exists bool) {
+	if m.primary_image != nil {
+		return *m.primary_image, true
+	}
+	return
+}
+
+// PrimaryImageIDs returns the "primary_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PrimaryImageID instead. It exists only for internal usage by the builders.
+func (m *LinkMutation) PrimaryImageIDs() (ids []xid.ID) {
+	if id := m.primary_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPrimaryImage resets all changes to the "primary_image" edge.
+func (m *LinkMutation) ResetPrimaryImage() {
+	m.primary_image = nil
+	m.clearedprimary_image = false
+}
+
+// SetFaviconImageID sets the "favicon_image" edge to the Asset entity by id.
+func (m *LinkMutation) SetFaviconImageID(id xid.ID) {
+	m.favicon_image = &id
+}
+
+// ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
+func (m *LinkMutation) ClearFaviconImage() {
+	m.clearedfavicon_image = true
+	m.clearedFields[link.FieldFaviconAssetID] = struct{}{}
+}
+
+// FaviconImageCleared reports if the "favicon_image" edge to the Asset entity was cleared.
+func (m *LinkMutation) FaviconImageCleared() bool {
+	return m.FaviconAssetIDCleared() || m.clearedfavicon_image
+}
+
+// FaviconImageID returns the "favicon_image" edge ID in the mutation.
+func (m *LinkMutation) FaviconImageID() (id xid.ID, exists bool) {
+	if m.favicon_image != nil {
+		return *m.favicon_image, true
+	}
+	return
+}
+
+// FaviconImageIDs returns the "favicon_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FaviconImageID instead. It exists only for internal usage by the builders.
+func (m *LinkMutation) FaviconImageIDs() (ids []xid.ID) {
+	if id := m.favicon_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFaviconImage resets all changes to the "favicon_image" edge.
+func (m *LinkMutation) ResetFaviconImage() {
+	m.favicon_image = nil
+	m.clearedfavicon_image = false
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
@@ -7308,7 +7604,7 @@ func (m *LinkMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *LinkMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, link.FieldCreatedAt)
 	}
@@ -7326,6 +7622,12 @@ func (m *LinkMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, link.FieldDescription)
+	}
+	if m.primary_image != nil {
+		fields = append(fields, link.FieldPrimaryAssetID)
+	}
+	if m.favicon_image != nil {
+		fields = append(fields, link.FieldFaviconAssetID)
 	}
 	return fields
 }
@@ -7347,6 +7649,10 @@ func (m *LinkMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case link.FieldDescription:
 		return m.Description()
+	case link.FieldPrimaryAssetID:
+		return m.PrimaryAssetID()
+	case link.FieldFaviconAssetID:
+		return m.FaviconAssetID()
 	}
 	return nil, false
 }
@@ -7368,6 +7674,10 @@ func (m *LinkMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTitle(ctx)
 	case link.FieldDescription:
 		return m.OldDescription(ctx)
+	case link.FieldPrimaryAssetID:
+		return m.OldPrimaryAssetID(ctx)
+	case link.FieldFaviconAssetID:
+		return m.OldFaviconAssetID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Link field %s", name)
 }
@@ -7419,6 +7729,20 @@ func (m *LinkMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case link.FieldPrimaryAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryAssetID(v)
+		return nil
+	case link.FieldFaviconAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFaviconAssetID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Link field %s", name)
 }
@@ -7448,7 +7772,14 @@ func (m *LinkMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *LinkMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(link.FieldPrimaryAssetID) {
+		fields = append(fields, link.FieldPrimaryAssetID)
+	}
+	if m.FieldCleared(link.FieldFaviconAssetID) {
+		fields = append(fields, link.FieldFaviconAssetID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -7461,6 +7792,14 @@ func (m *LinkMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *LinkMutation) ClearField(name string) error {
+	switch name {
+	case link.FieldPrimaryAssetID:
+		m.ClearPrimaryAssetID()
+		return nil
+	case link.FieldFaviconAssetID:
+		m.ClearFaviconAssetID()
+		return nil
+	}
 	return fmt.Errorf("unknown Link nullable field %s", name)
 }
 
@@ -7486,18 +7825,36 @@ func (m *LinkMutation) ResetField(name string) error {
 	case link.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case link.FieldPrimaryAssetID:
+		m.ResetPrimaryAssetID()
+		return nil
+	case link.FieldFaviconAssetID:
+		m.ResetFaviconAssetID()
+		return nil
 	}
 	return fmt.Errorf("unknown Link field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LinkMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 7)
 	if m.posts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
+	if m.post_content_references != nil {
+		edges = append(edges, link.EdgePostContentReferences)
+	}
 	if m.nodes != nil {
 		edges = append(edges, link.EdgeNodes)
+	}
+	if m.node_content_references != nil {
+		edges = append(edges, link.EdgeNodeContentReferences)
+	}
+	if m.primary_image != nil {
+		edges = append(edges, link.EdgePrimaryImage)
+	}
+	if m.favicon_image != nil {
+		edges = append(edges, link.EdgeFaviconImage)
 	}
 	if m.assets != nil {
 		edges = append(edges, link.EdgeAssets)
@@ -7515,12 +7872,32 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case link.EdgePostContentReferences:
+		ids := make([]ent.Value, 0, len(m.post_content_references))
+		for id := range m.post_content_references {
+			ids = append(ids, id)
+		}
+		return ids
 	case link.EdgeNodes:
 		ids := make([]ent.Value, 0, len(m.nodes))
 		for id := range m.nodes {
 			ids = append(ids, id)
 		}
 		return ids
+	case link.EdgeNodeContentReferences:
+		ids := make([]ent.Value, 0, len(m.node_content_references))
+		for id := range m.node_content_references {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgePrimaryImage:
+		if id := m.primary_image; id != nil {
+			return []ent.Value{*id}
+		}
+	case link.EdgeFaviconImage:
+		if id := m.favicon_image; id != nil {
+			return []ent.Value{*id}
+		}
 	case link.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -7533,12 +7910,18 @@ func (m *LinkMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LinkMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 7)
 	if m.removedposts != nil {
 		edges = append(edges, link.EdgePosts)
 	}
+	if m.removedpost_content_references != nil {
+		edges = append(edges, link.EdgePostContentReferences)
+	}
 	if m.removednodes != nil {
 		edges = append(edges, link.EdgeNodes)
+	}
+	if m.removednode_content_references != nil {
+		edges = append(edges, link.EdgeNodeContentReferences)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, link.EdgeAssets)
@@ -7556,9 +7939,21 @@ func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case link.EdgePostContentReferences:
+		ids := make([]ent.Value, 0, len(m.removedpost_content_references))
+		for id := range m.removedpost_content_references {
+			ids = append(ids, id)
+		}
+		return ids
 	case link.EdgeNodes:
 		ids := make([]ent.Value, 0, len(m.removednodes))
 		for id := range m.removednodes {
+			ids = append(ids, id)
+		}
+		return ids
+	case link.EdgeNodeContentReferences:
+		ids := make([]ent.Value, 0, len(m.removednode_content_references))
+		for id := range m.removednode_content_references {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7574,12 +7969,24 @@ func (m *LinkMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LinkMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 7)
 	if m.clearedposts {
 		edges = append(edges, link.EdgePosts)
 	}
+	if m.clearedpost_content_references {
+		edges = append(edges, link.EdgePostContentReferences)
+	}
 	if m.clearednodes {
 		edges = append(edges, link.EdgeNodes)
+	}
+	if m.clearednode_content_references {
+		edges = append(edges, link.EdgeNodeContentReferences)
+	}
+	if m.clearedprimary_image {
+		edges = append(edges, link.EdgePrimaryImage)
+	}
+	if m.clearedfavicon_image {
+		edges = append(edges, link.EdgeFaviconImage)
 	}
 	if m.clearedassets {
 		edges = append(edges, link.EdgeAssets)
@@ -7593,8 +8000,16 @@ func (m *LinkMutation) EdgeCleared(name string) bool {
 	switch name {
 	case link.EdgePosts:
 		return m.clearedposts
+	case link.EdgePostContentReferences:
+		return m.clearedpost_content_references
 	case link.EdgeNodes:
 		return m.clearednodes
+	case link.EdgeNodeContentReferences:
+		return m.clearednode_content_references
+	case link.EdgePrimaryImage:
+		return m.clearedprimary_image
+	case link.EdgeFaviconImage:
+		return m.clearedfavicon_image
 	case link.EdgeAssets:
 		return m.clearedassets
 	}
@@ -7605,6 +8020,12 @@ func (m *LinkMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *LinkMutation) ClearEdge(name string) error {
 	switch name {
+	case link.EdgePrimaryImage:
+		m.ClearPrimaryImage()
+		return nil
+	case link.EdgeFaviconImage:
+		m.ClearFaviconImage()
+		return nil
 	}
 	return fmt.Errorf("unknown Link unique edge %s", name)
 }
@@ -7616,8 +8037,20 @@ func (m *LinkMutation) ResetEdge(name string) error {
 	case link.EdgePosts:
 		m.ResetPosts()
 		return nil
+	case link.EdgePostContentReferences:
+		m.ResetPostContentReferences()
+		return nil
 	case link.EdgeNodes:
 		m.ResetNodes()
+		return nil
+	case link.EdgeNodeContentReferences:
+		m.ResetNodeContentReferences()
+		return nil
+	case link.EdgePrimaryImage:
+		m.ResetPrimaryImage()
+		return nil
+	case link.EdgeFaviconImage:
+		m.ResetFaviconImage()
 		return nil
 	case link.EdgeAssets:
 		m.ResetAssets()
@@ -7629,41 +8062,43 @@ func (m *LinkMutation) ResetEdge(name string) error {
 // NodeMutation represents an operation that mutates the Node nodes in the graph.
 type NodeMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *xid.ID
-	created_at         *time.Time
-	updated_at         *time.Time
-	deleted_at         *time.Time
-	name               *string
-	slug               *string
-	description        *string
-	content            *string
-	visibility         *node.Visibility
-	metadata           *map[string]interface{}
-	clearedFields      map[string]struct{}
-	owner              *xid.ID
-	clearedowner       bool
-	parent             *xid.ID
-	clearedparent      bool
-	nodes              map[xid.ID]struct{}
-	removednodes       map[xid.ID]struct{}
-	clearednodes       bool
-	assets             map[xid.ID]struct{}
-	removedassets      map[xid.ID]struct{}
-	clearedassets      bool
-	tags               map[xid.ID]struct{}
-	removedtags        map[xid.ID]struct{}
-	clearedtags        bool
-	links              map[xid.ID]struct{}
-	removedlinks       map[xid.ID]struct{}
-	clearedlinks       bool
-	collections        map[xid.ID]struct{}
-	removedcollections map[xid.ID]struct{}
-	clearedcollections bool
-	done               bool
-	oldValue           func(context.Context) (*Node, error)
-	predicates         []predicate.Node
+	op                   Op
+	typ                  string
+	id                   *xid.ID
+	created_at           *time.Time
+	updated_at           *time.Time
+	deleted_at           *time.Time
+	name                 *string
+	slug                 *string
+	description          *string
+	content              *string
+	visibility           *node.Visibility
+	metadata             *map[string]interface{}
+	clearedFields        map[string]struct{}
+	owner                *xid.ID
+	clearedowner         bool
+	parent               *xid.ID
+	clearedparent        bool
+	nodes                map[xid.ID]struct{}
+	removednodes         map[xid.ID]struct{}
+	clearednodes         bool
+	assets               map[xid.ID]struct{}
+	removedassets        map[xid.ID]struct{}
+	clearedassets        bool
+	tags                 map[xid.ID]struct{}
+	removedtags          map[xid.ID]struct{}
+	clearedtags          bool
+	link                 *xid.ID
+	clearedlink          bool
+	content_links        map[xid.ID]struct{}
+	removedcontent_links map[xid.ID]struct{}
+	clearedcontent_links bool
+	collections          map[xid.ID]struct{}
+	removedcollections   map[xid.ID]struct{}
+	clearedcollections   bool
+	done                 bool
+	oldValue             func(context.Context) (*Node, error)
+	predicates           []predicate.Node
 }
 
 var _ ent.Mutation = (*NodeMutation)(nil)
@@ -8146,6 +8581,55 @@ func (m *NodeMutation) ResetAccountID() {
 	m.owner = nil
 }
 
+// SetLinkID sets the "link_id" field.
+func (m *NodeMutation) SetLinkID(x xid.ID) {
+	m.link = &x
+}
+
+// LinkID returns the value of the "link_id" field in the mutation.
+func (m *NodeMutation) LinkID() (r xid.ID, exists bool) {
+	v := m.link
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLinkID returns the old "link_id" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldLinkID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLinkID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLinkID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLinkID: %w", err)
+	}
+	return oldValue.LinkID, nil
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (m *NodeMutation) ClearLinkID() {
+	m.link = nil
+	m.clearedFields[node.FieldLinkID] = struct{}{}
+}
+
+// LinkIDCleared returns if the "link_id" field was cleared in this mutation.
+func (m *NodeMutation) LinkIDCleared() bool {
+	_, ok := m.clearedFields[node.FieldLinkID]
+	return ok
+}
+
+// ResetLinkID resets all changes to the "link_id" field.
+func (m *NodeMutation) ResetLinkID() {
+	m.link = nil
+	delete(m.clearedFields, node.FieldLinkID)
+}
+
 // SetVisibility sets the "visibility" field.
 func (m *NodeMutation) SetVisibility(n node.Visibility) {
 	m.visibility = &n
@@ -8473,58 +8957,85 @@ func (m *NodeMutation) ResetTags() {
 	m.removedtags = nil
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by ids.
-func (m *NodeMutation) AddLinkIDs(ids ...xid.ID) {
-	if m.links == nil {
-		m.links = make(map[xid.ID]struct{})
+// ClearLink clears the "link" edge to the Link entity.
+func (m *NodeMutation) ClearLink() {
+	m.clearedlink = true
+	m.clearedFields[node.FieldLinkID] = struct{}{}
+}
+
+// LinkCleared reports if the "link" edge to the Link entity was cleared.
+func (m *NodeMutation) LinkCleared() bool {
+	return m.LinkIDCleared() || m.clearedlink
+}
+
+// LinkIDs returns the "link" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// LinkID instead. It exists only for internal usage by the builders.
+func (m *NodeMutation) LinkIDs() (ids []xid.ID) {
+	if id := m.link; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetLink resets all changes to the "link" edge.
+func (m *NodeMutation) ResetLink() {
+	m.link = nil
+	m.clearedlink = false
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by ids.
+func (m *NodeMutation) AddContentLinkIDs(ids ...xid.ID) {
+	if m.content_links == nil {
+		m.content_links = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
-		m.links[ids[i]] = struct{}{}
+		m.content_links[ids[i]] = struct{}{}
 	}
 }
 
-// ClearLinks clears the "links" edge to the Link entity.
-func (m *NodeMutation) ClearLinks() {
-	m.clearedlinks = true
+// ClearContentLinks clears the "content_links" edge to the Link entity.
+func (m *NodeMutation) ClearContentLinks() {
+	m.clearedcontent_links = true
 }
 
-// LinksCleared reports if the "links" edge to the Link entity was cleared.
-func (m *NodeMutation) LinksCleared() bool {
-	return m.clearedlinks
+// ContentLinksCleared reports if the "content_links" edge to the Link entity was cleared.
+func (m *NodeMutation) ContentLinksCleared() bool {
+	return m.clearedcontent_links
 }
 
-// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
-func (m *NodeMutation) RemoveLinkIDs(ids ...xid.ID) {
-	if m.removedlinks == nil {
-		m.removedlinks = make(map[xid.ID]struct{})
+// RemoveContentLinkIDs removes the "content_links" edge to the Link entity by IDs.
+func (m *NodeMutation) RemoveContentLinkIDs(ids ...xid.ID) {
+	if m.removedcontent_links == nil {
+		m.removedcontent_links = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
-		delete(m.links, ids[i])
-		m.removedlinks[ids[i]] = struct{}{}
+		delete(m.content_links, ids[i])
+		m.removedcontent_links[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
-func (m *NodeMutation) RemovedLinksIDs() (ids []xid.ID) {
-	for id := range m.removedlinks {
+// RemovedContentLinks returns the removed IDs of the "content_links" edge to the Link entity.
+func (m *NodeMutation) RemovedContentLinksIDs() (ids []xid.ID) {
+	for id := range m.removedcontent_links {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// LinksIDs returns the "links" edge IDs in the mutation.
-func (m *NodeMutation) LinksIDs() (ids []xid.ID) {
-	for id := range m.links {
+// ContentLinksIDs returns the "content_links" edge IDs in the mutation.
+func (m *NodeMutation) ContentLinksIDs() (ids []xid.ID) {
+	for id := range m.content_links {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetLinks resets all changes to the "links" edge.
-func (m *NodeMutation) ResetLinks() {
-	m.links = nil
-	m.clearedlinks = false
-	m.removedlinks = nil
+// ResetContentLinks resets all changes to the "content_links" edge.
+func (m *NodeMutation) ResetContentLinks() {
+	m.content_links = nil
+	m.clearedcontent_links = false
+	m.removedcontent_links = nil
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by ids.
@@ -8615,7 +9126,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -8642,6 +9153,9 @@ func (m *NodeMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, node.FieldAccountID)
+	}
+	if m.link != nil {
+		fields = append(fields, node.FieldLinkID)
 	}
 	if m.visibility != nil {
 		fields = append(fields, node.FieldVisibility)
@@ -8675,6 +9189,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.ParentNodeID()
 	case node.FieldAccountID:
 		return m.AccountID()
+	case node.FieldLinkID:
+		return m.LinkID()
 	case node.FieldVisibility:
 		return m.Visibility()
 	case node.FieldMetadata:
@@ -8706,6 +9222,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldParentNodeID(ctx)
 	case node.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case node.FieldLinkID:
+		return m.OldLinkID(ctx)
 	case node.FieldVisibility:
 		return m.OldVisibility(ctx)
 	case node.FieldMetadata:
@@ -8782,6 +9300,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAccountID(v)
 		return nil
+	case node.FieldLinkID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLinkID(v)
+		return nil
 	case node.FieldVisibility:
 		v, ok := value.(node.Visibility)
 		if !ok {
@@ -8838,6 +9363,9 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldParentNodeID) {
 		fields = append(fields, node.FieldParentNodeID)
 	}
+	if m.FieldCleared(node.FieldLinkID) {
+		fields = append(fields, node.FieldLinkID)
+	}
 	if m.FieldCleared(node.FieldMetadata) {
 		fields = append(fields, node.FieldMetadata)
 	}
@@ -8866,6 +9394,9 @@ func (m *NodeMutation) ClearField(name string) error {
 		return nil
 	case node.FieldParentNodeID:
 		m.ClearParentNodeID()
+		return nil
+	case node.FieldLinkID:
+		m.ClearLinkID()
 		return nil
 	case node.FieldMetadata:
 		m.ClearMetadata()
@@ -8905,6 +9436,9 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldAccountID:
 		m.ResetAccountID()
 		return nil
+	case node.FieldLinkID:
+		m.ResetLinkID()
+		return nil
 	case node.FieldVisibility:
 		m.ResetVisibility()
 		return nil
@@ -8917,7 +9451,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -8933,8 +9467,11 @@ func (m *NodeMutation) AddedEdges() []string {
 	if m.tags != nil {
 		edges = append(edges, node.EdgeTags)
 	}
-	if m.links != nil {
-		edges = append(edges, node.EdgeLinks)
+	if m.link != nil {
+		edges = append(edges, node.EdgeLink)
+	}
+	if m.content_links != nil {
+		edges = append(edges, node.EdgeContentLinks)
 	}
 	if m.collections != nil {
 		edges = append(edges, node.EdgeCollections)
@@ -8972,9 +9509,13 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.links))
-		for id := range m.links {
+	case node.EdgeLink:
+		if id := m.link; id != nil {
+			return []ent.Value{*id}
+		}
+	case node.EdgeContentLinks:
+		ids := make([]ent.Value, 0, len(m.content_links))
+		for id := range m.content_links {
 			ids = append(ids, id)
 		}
 		return ids
@@ -8990,7 +9531,7 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -9000,8 +9541,8 @@ func (m *NodeMutation) RemovedEdges() []string {
 	if m.removedtags != nil {
 		edges = append(edges, node.EdgeTags)
 	}
-	if m.removedlinks != nil {
-		edges = append(edges, node.EdgeLinks)
+	if m.removedcontent_links != nil {
+		edges = append(edges, node.EdgeContentLinks)
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, node.EdgeCollections)
@@ -9031,9 +9572,9 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.removedlinks))
-		for id := range m.removedlinks {
+	case node.EdgeContentLinks:
+		ids := make([]ent.Value, 0, len(m.removedcontent_links))
+		for id := range m.removedcontent_links {
 			ids = append(ids, id)
 		}
 		return ids
@@ -9049,7 +9590,7 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -9065,8 +9606,11 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedtags {
 		edges = append(edges, node.EdgeTags)
 	}
-	if m.clearedlinks {
-		edges = append(edges, node.EdgeLinks)
+	if m.clearedlink {
+		edges = append(edges, node.EdgeLink)
+	}
+	if m.clearedcontent_links {
+		edges = append(edges, node.EdgeContentLinks)
 	}
 	if m.clearedcollections {
 		edges = append(edges, node.EdgeCollections)
@@ -9088,8 +9632,10 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case node.EdgeTags:
 		return m.clearedtags
-	case node.EdgeLinks:
-		return m.clearedlinks
+	case node.EdgeLink:
+		return m.clearedlink
+	case node.EdgeContentLinks:
+		return m.clearedcontent_links
 	case node.EdgeCollections:
 		return m.clearedcollections
 	}
@@ -9105,6 +9651,9 @@ func (m *NodeMutation) ClearEdge(name string) error {
 		return nil
 	case node.EdgeParent:
 		m.ClearParent()
+		return nil
+	case node.EdgeLink:
+		m.ClearLink()
 		return nil
 	}
 	return fmt.Errorf("unknown Node unique edge %s", name)
@@ -9129,8 +9678,11 @@ func (m *NodeMutation) ResetEdge(name string) error {
 	case node.EdgeTags:
 		m.ResetTags()
 		return nil
-	case node.EdgeLinks:
-		m.ResetLinks()
+	case node.EdgeLink:
+		m.ResetLink()
+		return nil
+	case node.EdgeContentLinks:
+		m.ResetContentLinks()
 		return nil
 	case node.EdgeCollections:
 		m.ResetCollections()
@@ -9690,53 +10242,55 @@ func (m *NotificationMutation) ResetEdge(name string) error {
 // PostMutation represents an operation that mutates the Post nodes in the graph.
 type PostMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *xid.ID
-	created_at         *time.Time
-	updated_at         *time.Time
-	deleted_at         *time.Time
-	first              *bool
-	title              *string
-	slug               *string
-	pinned             *bool
-	body               *string
-	short              *string
-	metadata           *map[string]interface{}
-	visibility         *post.Visibility
-	clearedFields      map[string]struct{}
-	author             *xid.ID
-	clearedauthor      bool
-	category           *xid.ID
-	clearedcategory    bool
-	tags               map[xid.ID]struct{}
-	removedtags        map[xid.ID]struct{}
-	clearedtags        bool
-	root               *xid.ID
-	clearedroot        bool
-	posts              map[xid.ID]struct{}
-	removedposts       map[xid.ID]struct{}
-	clearedposts       bool
-	replyTo            *xid.ID
-	clearedreplyTo     bool
-	replies            map[xid.ID]struct{}
-	removedreplies     map[xid.ID]struct{}
-	clearedreplies     bool
-	reacts             map[xid.ID]struct{}
-	removedreacts      map[xid.ID]struct{}
-	clearedreacts      bool
-	assets             map[xid.ID]struct{}
-	removedassets      map[xid.ID]struct{}
-	clearedassets      bool
-	collections        map[xid.ID]struct{}
-	removedcollections map[xid.ID]struct{}
-	clearedcollections bool
-	links              map[xid.ID]struct{}
-	removedlinks       map[xid.ID]struct{}
-	clearedlinks       bool
-	done               bool
-	oldValue           func(context.Context) (*Post, error)
-	predicates         []predicate.Post
+	op                   Op
+	typ                  string
+	id                   *xid.ID
+	created_at           *time.Time
+	updated_at           *time.Time
+	deleted_at           *time.Time
+	first                *bool
+	title                *string
+	slug                 *string
+	pinned               *bool
+	body                 *string
+	short                *string
+	metadata             *map[string]interface{}
+	visibility           *post.Visibility
+	clearedFields        map[string]struct{}
+	author               *xid.ID
+	clearedauthor        bool
+	category             *xid.ID
+	clearedcategory      bool
+	tags                 map[xid.ID]struct{}
+	removedtags          map[xid.ID]struct{}
+	clearedtags          bool
+	root                 *xid.ID
+	clearedroot          bool
+	posts                map[xid.ID]struct{}
+	removedposts         map[xid.ID]struct{}
+	clearedposts         bool
+	replyTo              *xid.ID
+	clearedreplyTo       bool
+	replies              map[xid.ID]struct{}
+	removedreplies       map[xid.ID]struct{}
+	clearedreplies       bool
+	reacts               map[xid.ID]struct{}
+	removedreacts        map[xid.ID]struct{}
+	clearedreacts        bool
+	assets               map[xid.ID]struct{}
+	removedassets        map[xid.ID]struct{}
+	clearedassets        bool
+	collections          map[xid.ID]struct{}
+	removedcollections   map[xid.ID]struct{}
+	clearedcollections   bool
+	link                 *xid.ID
+	clearedlink          bool
+	content_links        map[xid.ID]struct{}
+	removedcontent_links map[xid.ID]struct{}
+	clearedcontent_links bool
+	done                 bool
+	oldValue             func(context.Context) (*Post, error)
+	predicates           []predicate.Post
 }
 
 var _ ent.Mutation = (*PostMutation)(nil)
@@ -10438,6 +10992,55 @@ func (m *PostMutation) ResetCategoryID() {
 	delete(m.clearedFields, post.FieldCategoryID)
 }
 
+// SetLinkID sets the "link_id" field.
+func (m *PostMutation) SetLinkID(x xid.ID) {
+	m.link = &x
+}
+
+// LinkID returns the value of the "link_id" field in the mutation.
+func (m *PostMutation) LinkID() (r xid.ID, exists bool) {
+	v := m.link
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLinkID returns the old "link_id" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldLinkID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLinkID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLinkID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLinkID: %w", err)
+	}
+	return oldValue.LinkID, nil
+}
+
+// ClearLinkID clears the value of the "link_id" field.
+func (m *PostMutation) ClearLinkID() {
+	m.link = nil
+	m.clearedFields[post.FieldLinkID] = struct{}{}
+}
+
+// LinkIDCleared returns if the "link_id" field was cleared in this mutation.
+func (m *PostMutation) LinkIDCleared() bool {
+	_, ok := m.clearedFields[post.FieldLinkID]
+	return ok
+}
+
+// ResetLinkID resets all changes to the "link_id" field.
+func (m *PostMutation) ResetLinkID() {
+	m.link = nil
+	delete(m.clearedFields, post.FieldLinkID)
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by id.
 func (m *PostMutation) SetAuthorID(id xid.ID) {
 	m.author = &id
@@ -10908,58 +11511,85 @@ func (m *PostMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
-// AddLinkIDs adds the "links" edge to the Link entity by ids.
-func (m *PostMutation) AddLinkIDs(ids ...xid.ID) {
-	if m.links == nil {
-		m.links = make(map[xid.ID]struct{})
+// ClearLink clears the "link" edge to the Link entity.
+func (m *PostMutation) ClearLink() {
+	m.clearedlink = true
+	m.clearedFields[post.FieldLinkID] = struct{}{}
+}
+
+// LinkCleared reports if the "link" edge to the Link entity was cleared.
+func (m *PostMutation) LinkCleared() bool {
+	return m.LinkIDCleared() || m.clearedlink
+}
+
+// LinkIDs returns the "link" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// LinkID instead. It exists only for internal usage by the builders.
+func (m *PostMutation) LinkIDs() (ids []xid.ID) {
+	if id := m.link; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetLink resets all changes to the "link" edge.
+func (m *PostMutation) ResetLink() {
+	m.link = nil
+	m.clearedlink = false
+}
+
+// AddContentLinkIDs adds the "content_links" edge to the Link entity by ids.
+func (m *PostMutation) AddContentLinkIDs(ids ...xid.ID) {
+	if m.content_links == nil {
+		m.content_links = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
-		m.links[ids[i]] = struct{}{}
+		m.content_links[ids[i]] = struct{}{}
 	}
 }
 
-// ClearLinks clears the "links" edge to the Link entity.
-func (m *PostMutation) ClearLinks() {
-	m.clearedlinks = true
+// ClearContentLinks clears the "content_links" edge to the Link entity.
+func (m *PostMutation) ClearContentLinks() {
+	m.clearedcontent_links = true
 }
 
-// LinksCleared reports if the "links" edge to the Link entity was cleared.
-func (m *PostMutation) LinksCleared() bool {
-	return m.clearedlinks
+// ContentLinksCleared reports if the "content_links" edge to the Link entity was cleared.
+func (m *PostMutation) ContentLinksCleared() bool {
+	return m.clearedcontent_links
 }
 
-// RemoveLinkIDs removes the "links" edge to the Link entity by IDs.
-func (m *PostMutation) RemoveLinkIDs(ids ...xid.ID) {
-	if m.removedlinks == nil {
-		m.removedlinks = make(map[xid.ID]struct{})
+// RemoveContentLinkIDs removes the "content_links" edge to the Link entity by IDs.
+func (m *PostMutation) RemoveContentLinkIDs(ids ...xid.ID) {
+	if m.removedcontent_links == nil {
+		m.removedcontent_links = make(map[xid.ID]struct{})
 	}
 	for i := range ids {
-		delete(m.links, ids[i])
-		m.removedlinks[ids[i]] = struct{}{}
+		delete(m.content_links, ids[i])
+		m.removedcontent_links[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedLinks returns the removed IDs of the "links" edge to the Link entity.
-func (m *PostMutation) RemovedLinksIDs() (ids []xid.ID) {
-	for id := range m.removedlinks {
+// RemovedContentLinks returns the removed IDs of the "content_links" edge to the Link entity.
+func (m *PostMutation) RemovedContentLinksIDs() (ids []xid.ID) {
+	for id := range m.removedcontent_links {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// LinksIDs returns the "links" edge IDs in the mutation.
-func (m *PostMutation) LinksIDs() (ids []xid.ID) {
-	for id := range m.links {
+// ContentLinksIDs returns the "content_links" edge IDs in the mutation.
+func (m *PostMutation) ContentLinksIDs() (ids []xid.ID) {
+	for id := range m.content_links {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetLinks resets all changes to the "links" edge.
-func (m *PostMutation) ResetLinks() {
-	m.links = nil
-	m.clearedlinks = false
-	m.removedlinks = nil
+// ResetContentLinks resets all changes to the "content_links" edge.
+func (m *PostMutation) ResetContentLinks() {
+	m.content_links = nil
+	m.clearedcontent_links = false
+	m.removedcontent_links = nil
 }
 
 // Where appends a list predicates to the PostMutation builder.
@@ -10996,7 +11626,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -11039,6 +11669,9 @@ func (m *PostMutation) Fields() []string {
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
 	}
+	if m.link != nil {
+		fields = append(fields, post.FieldLinkID)
+	}
 	return fields
 }
 
@@ -11075,6 +11708,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Visibility()
 	case post.FieldCategoryID:
 		return m.CategoryID()
+	case post.FieldLinkID:
+		return m.LinkID()
 	}
 	return nil, false
 }
@@ -11112,6 +11747,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldVisibility(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
+	case post.FieldLinkID:
+		return m.OldLinkID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Post field %s", name)
 }
@@ -11219,6 +11856,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCategoryID(v)
 		return nil
+	case post.FieldLinkID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLinkID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
 }
@@ -11270,6 +11914,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldCategoryID) {
 		fields = append(fields, post.FieldCategoryID)
 	}
+	if m.FieldCleared(post.FieldLinkID) {
+		fields = append(fields, post.FieldLinkID)
+	}
 	return fields
 }
 
@@ -11304,6 +11951,9 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldCategoryID:
 		m.ClearCategoryID()
+		return nil
+	case post.FieldLinkID:
+		m.ClearLinkID()
 		return nil
 	}
 	return fmt.Errorf("unknown Post nullable field %s", name)
@@ -11355,13 +12005,16 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldCategoryID:
 		m.ResetCategoryID()
 		return nil
+	case post.FieldLinkID:
+		m.ResetLinkID()
+		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -11392,8 +12045,11 @@ func (m *PostMutation) AddedEdges() []string {
 	if m.collections != nil {
 		edges = append(edges, post.EdgeCollections)
 	}
-	if m.links != nil {
-		edges = append(edges, post.EdgeLinks)
+	if m.link != nil {
+		edges = append(edges, post.EdgeLink)
+	}
+	if m.content_links != nil {
+		edges = append(edges, post.EdgeContentLinks)
 	}
 	return edges
 }
@@ -11454,9 +12110,13 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.links))
-		for id := range m.links {
+	case post.EdgeLink:
+		if id := m.link; id != nil {
+			return []ent.Value{*id}
+		}
+	case post.EdgeContentLinks:
+		ids := make([]ent.Value, 0, len(m.content_links))
+		for id := range m.content_links {
 			ids = append(ids, id)
 		}
 		return ids
@@ -11466,7 +12126,7 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -11485,8 +12145,8 @@ func (m *PostMutation) RemovedEdges() []string {
 	if m.removedcollections != nil {
 		edges = append(edges, post.EdgeCollections)
 	}
-	if m.removedlinks != nil {
-		edges = append(edges, post.EdgeLinks)
+	if m.removedcontent_links != nil {
+		edges = append(edges, post.EdgeContentLinks)
 	}
 	return edges
 }
@@ -11531,9 +12191,9 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case post.EdgeLinks:
-		ids := make([]ent.Value, 0, len(m.removedlinks))
-		for id := range m.removedlinks {
+	case post.EdgeContentLinks:
+		ids := make([]ent.Value, 0, len(m.removedcontent_links))
+		for id := range m.removedcontent_links {
 			ids = append(ids, id)
 		}
 		return ids
@@ -11543,7 +12203,7 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -11574,8 +12234,11 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedcollections {
 		edges = append(edges, post.EdgeCollections)
 	}
-	if m.clearedlinks {
-		edges = append(edges, post.EdgeLinks)
+	if m.clearedlink {
+		edges = append(edges, post.EdgeLink)
+	}
+	if m.clearedcontent_links {
+		edges = append(edges, post.EdgeContentLinks)
 	}
 	return edges
 }
@@ -11604,8 +12267,10 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case post.EdgeCollections:
 		return m.clearedcollections
-	case post.EdgeLinks:
-		return m.clearedlinks
+	case post.EdgeLink:
+		return m.clearedlink
+	case post.EdgeContentLinks:
+		return m.clearedcontent_links
 	}
 	return false
 }
@@ -11625,6 +12290,9 @@ func (m *PostMutation) ClearEdge(name string) error {
 		return nil
 	case post.EdgeReplyTo:
 		m.ClearReplyTo()
+		return nil
+	case post.EdgeLink:
+		m.ClearLink()
 		return nil
 	}
 	return fmt.Errorf("unknown Post unique edge %s", name)
@@ -11664,8 +12332,11 @@ func (m *PostMutation) ResetEdge(name string) error {
 	case post.EdgeCollections:
 		m.ResetCollections()
 		return nil
-	case post.EdgeLinks:
-		m.ResetLinks()
+	case post.EdgeLink:
+		m.ResetLink()
+		return nil
+	case post.EdgeContentLinks:
+		m.ResetContentLinks()
 		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)

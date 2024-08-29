@@ -86,6 +86,16 @@ func Description(v string) predicate.Link {
 	return predicate.Link(sql.FieldEQ(FieldDescription, v))
 }
 
+// PrimaryAssetID applies equality check predicate on the "primary_asset_id" field. It's identical to PrimaryAssetIDEQ.
+func PrimaryAssetID(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldPrimaryAssetID, v))
+}
+
+// FaviconAssetID applies equality check predicate on the "favicon_asset_id" field. It's identical to FaviconAssetIDEQ.
+func FaviconAssetID(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldFaviconAssetID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Link {
 	return predicate.Link(sql.FieldEQ(FieldCreatedAt, v))
@@ -451,12 +461,172 @@ func DescriptionContainsFold(v string) predicate.Link {
 	return predicate.Link(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// PrimaryAssetIDEQ applies the EQ predicate on the "primary_asset_id" field.
+func PrimaryAssetIDEQ(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDNEQ applies the NEQ predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNEQ(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDIn applies the In predicate on the "primary_asset_id" field.
+func PrimaryAssetIDIn(vs ...xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldPrimaryAssetID, vs...))
+}
+
+// PrimaryAssetIDNotIn applies the NotIn predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNotIn(vs ...xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldPrimaryAssetID, vs...))
+}
+
+// PrimaryAssetIDGT applies the GT predicate on the "primary_asset_id" field.
+func PrimaryAssetIDGT(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDGTE applies the GTE predicate on the "primary_asset_id" field.
+func PrimaryAssetIDGTE(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDLT applies the LT predicate on the "primary_asset_id" field.
+func PrimaryAssetIDLT(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDLTE applies the LTE predicate on the "primary_asset_id" field.
+func PrimaryAssetIDLTE(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDContains applies the Contains predicate on the "primary_asset_id" field.
+func PrimaryAssetIDContains(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldContains(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDHasPrefix applies the HasPrefix predicate on the "primary_asset_id" field.
+func PrimaryAssetIDHasPrefix(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldHasPrefix(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDHasSuffix applies the HasSuffix predicate on the "primary_asset_id" field.
+func PrimaryAssetIDHasSuffix(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldHasSuffix(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDIsNil applies the IsNil predicate on the "primary_asset_id" field.
+func PrimaryAssetIDIsNil() predicate.Link {
+	return predicate.Link(sql.FieldIsNull(FieldPrimaryAssetID))
+}
+
+// PrimaryAssetIDNotNil applies the NotNil predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNotNil() predicate.Link {
+	return predicate.Link(sql.FieldNotNull(FieldPrimaryAssetID))
+}
+
+// PrimaryAssetIDEqualFold applies the EqualFold predicate on the "primary_asset_id" field.
+func PrimaryAssetIDEqualFold(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldEqualFold(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDContainsFold applies the ContainsFold predicate on the "primary_asset_id" field.
+func PrimaryAssetIDContainsFold(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldContainsFold(FieldPrimaryAssetID, vc))
+}
+
+// FaviconAssetIDEQ applies the EQ predicate on the "favicon_asset_id" field.
+func FaviconAssetIDEQ(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldEQ(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDNEQ applies the NEQ predicate on the "favicon_asset_id" field.
+func FaviconAssetIDNEQ(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldNEQ(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDIn applies the In predicate on the "favicon_asset_id" field.
+func FaviconAssetIDIn(vs ...xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldIn(FieldFaviconAssetID, vs...))
+}
+
+// FaviconAssetIDNotIn applies the NotIn predicate on the "favicon_asset_id" field.
+func FaviconAssetIDNotIn(vs ...xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldNotIn(FieldFaviconAssetID, vs...))
+}
+
+// FaviconAssetIDGT applies the GT predicate on the "favicon_asset_id" field.
+func FaviconAssetIDGT(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldGT(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDGTE applies the GTE predicate on the "favicon_asset_id" field.
+func FaviconAssetIDGTE(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldGTE(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDLT applies the LT predicate on the "favicon_asset_id" field.
+func FaviconAssetIDLT(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldLT(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDLTE applies the LTE predicate on the "favicon_asset_id" field.
+func FaviconAssetIDLTE(v xid.ID) predicate.Link {
+	return predicate.Link(sql.FieldLTE(FieldFaviconAssetID, v))
+}
+
+// FaviconAssetIDContains applies the Contains predicate on the "favicon_asset_id" field.
+func FaviconAssetIDContains(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldContains(FieldFaviconAssetID, vc))
+}
+
+// FaviconAssetIDHasPrefix applies the HasPrefix predicate on the "favicon_asset_id" field.
+func FaviconAssetIDHasPrefix(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldHasPrefix(FieldFaviconAssetID, vc))
+}
+
+// FaviconAssetIDHasSuffix applies the HasSuffix predicate on the "favicon_asset_id" field.
+func FaviconAssetIDHasSuffix(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldHasSuffix(FieldFaviconAssetID, vc))
+}
+
+// FaviconAssetIDIsNil applies the IsNil predicate on the "favicon_asset_id" field.
+func FaviconAssetIDIsNil() predicate.Link {
+	return predicate.Link(sql.FieldIsNull(FieldFaviconAssetID))
+}
+
+// FaviconAssetIDNotNil applies the NotNil predicate on the "favicon_asset_id" field.
+func FaviconAssetIDNotNil() predicate.Link {
+	return predicate.Link(sql.FieldNotNull(FieldFaviconAssetID))
+}
+
+// FaviconAssetIDEqualFold applies the EqualFold predicate on the "favicon_asset_id" field.
+func FaviconAssetIDEqualFold(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldEqualFold(FieldFaviconAssetID, vc))
+}
+
+// FaviconAssetIDContainsFold applies the ContainsFold predicate on the "favicon_asset_id" field.
+func FaviconAssetIDContainsFold(v xid.ID) predicate.Link {
+	vc := v.String()
+	return predicate.Link(sql.FieldContainsFold(FieldFaviconAssetID, vc))
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -474,12 +644,35 @@ func HasPostsWith(preds ...predicate.Post) predicate.Link {
 	})
 }
 
+// HasPostContentReferences applies the HasEdge predicate on the "post_content_references" edge.
+func HasPostContentReferences() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, PostContentReferencesTable, PostContentReferencesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPostContentReferencesWith applies the HasEdge predicate on the "post_content_references" edge with a given conditions (other predicates).
+func HasPostContentReferencesWith(preds ...predicate.Post) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newPostContentReferencesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasNodes applies the HasEdge predicate on the "nodes" edge.
 func HasNodes() predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -489,6 +682,75 @@ func HasNodes() predicate.Link {
 func HasNodesWith(preds ...predicate.Node) predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := newNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNodeContentReferences applies the HasEdge predicate on the "node_content_references" edge.
+func HasNodeContentReferences() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, NodeContentReferencesTable, NodeContentReferencesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeContentReferencesWith applies the HasEdge predicate on the "node_content_references" edge with a given conditions (other predicates).
+func HasNodeContentReferencesWith(preds ...predicate.Node) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newNodeContentReferencesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPrimaryImage applies the HasEdge predicate on the "primary_image" edge.
+func HasPrimaryImage() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, PrimaryImageTable, PrimaryImageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPrimaryImageWith applies the HasEdge predicate on the "primary_image" edge with a given conditions (other predicates).
+func HasPrimaryImageWith(preds ...predicate.Asset) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newPrimaryImageStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFaviconImage applies the HasEdge predicate on the "favicon_image" edge.
+func HasFaviconImage() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, FaviconImageTable, FaviconImageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFaviconImageWith applies the HasEdge predicate on the "favicon_image" edge with a given conditions (other predicates).
+func HasFaviconImageWith(preds ...predicate.Asset) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newFaviconImageStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

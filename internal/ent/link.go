@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/rs/xid"
 )
@@ -30,6 +31,10 @@ type Link struct {
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// PrimaryAssetID holds the value of the "primary_asset_id" field.
+	PrimaryAssetID *xid.ID `json:"primary_asset_id,omitempty"`
+	// FaviconAssetID holds the value of the "favicon_asset_id" field.
+	FaviconAssetID *xid.ID `json:"favicon_asset_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LinkQuery when eager-loading is set.
 	Edges        LinkEdges `json:"edges"`
@@ -38,15 +43,23 @@ type Link struct {
 
 // LinkEdges holds the relations/edges for other nodes in the graph.
 type LinkEdges struct {
-	// Posts holds the value of the posts edge.
+	// Link aggregation posts that have shared this link.
 	Posts []*Post `json:"posts,omitempty"`
+	// Posts that reference this link in their content.
+	PostContentReferences []*Post `json:"post_content_references,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// NodeContentReferences holds the value of the node_content_references edge.
+	NodeContentReferences []*Node `json:"node_content_references,omitempty"`
+	// PrimaryImage holds the value of the primary_image edge.
+	PrimaryImage *Asset `json:"primary_image,omitempty"`
+	// FaviconImage holds the value of the favicon_image edge.
+	FaviconImage *Asset `json:"favicon_image,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [7]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -58,19 +71,59 @@ func (e LinkEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
+// PostContentReferencesOrErr returns the PostContentReferences value or an error if the edge
+// was not loaded in eager-loading.
+func (e LinkEdges) PostContentReferencesOrErr() ([]*Post, error) {
+	if e.loadedTypes[1] {
+		return e.PostContentReferences, nil
+	}
+	return nil, &NotLoadedError{edge: "post_content_references"}
+}
+
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e LinkEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
 }
 
+// NodeContentReferencesOrErr returns the NodeContentReferences value or an error if the edge
+// was not loaded in eager-loading.
+func (e LinkEdges) NodeContentReferencesOrErr() ([]*Node, error) {
+	if e.loadedTypes[3] {
+		return e.NodeContentReferences, nil
+	}
+	return nil, &NotLoadedError{edge: "node_content_references"}
+}
+
+// PrimaryImageOrErr returns the PrimaryImage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e LinkEdges) PrimaryImageOrErr() (*Asset, error) {
+	if e.PrimaryImage != nil {
+		return e.PrimaryImage, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: asset.Label}
+	}
+	return nil, &NotLoadedError{edge: "primary_image"}
+}
+
+// FaviconImageOrErr returns the FaviconImage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e LinkEdges) FaviconImageOrErr() (*Asset, error) {
+	if e.FaviconImage != nil {
+		return e.FaviconImage, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: asset.Label}
+	}
+	return nil, &NotLoadedError{edge: "favicon_image"}
+}
+
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e LinkEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[6] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -81,6 +134,8 @@ func (*Link) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case link.FieldPrimaryAssetID, link.FieldFaviconAssetID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case link.FieldURL, link.FieldSlug, link.FieldDomain, link.FieldTitle, link.FieldDescription:
 			values[i] = new(sql.NullString)
 		case link.FieldCreatedAt:
@@ -144,6 +199,20 @@ func (l *Link) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				l.Description = value.String
 			}
+		case link.FieldPrimaryAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field primary_asset_id", values[i])
+			} else if value.Valid {
+				l.PrimaryAssetID = new(xid.ID)
+				*l.PrimaryAssetID = *value.S.(*xid.ID)
+			}
+		case link.FieldFaviconAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field favicon_asset_id", values[i])
+			} else if value.Valid {
+				l.FaviconAssetID = new(xid.ID)
+				*l.FaviconAssetID = *value.S.(*xid.ID)
+			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
 		}
@@ -162,9 +231,29 @@ func (l *Link) QueryPosts() *PostQuery {
 	return NewLinkClient(l.config).QueryPosts(l)
 }
 
+// QueryPostContentReferences queries the "post_content_references" edge of the Link entity.
+func (l *Link) QueryPostContentReferences() *PostQuery {
+	return NewLinkClient(l.config).QueryPostContentReferences(l)
+}
+
 // QueryNodes queries the "nodes" edge of the Link entity.
 func (l *Link) QueryNodes() *NodeQuery {
 	return NewLinkClient(l.config).QueryNodes(l)
+}
+
+// QueryNodeContentReferences queries the "node_content_references" edge of the Link entity.
+func (l *Link) QueryNodeContentReferences() *NodeQuery {
+	return NewLinkClient(l.config).QueryNodeContentReferences(l)
+}
+
+// QueryPrimaryImage queries the "primary_image" edge of the Link entity.
+func (l *Link) QueryPrimaryImage() *AssetQuery {
+	return NewLinkClient(l.config).QueryPrimaryImage(l)
+}
+
+// QueryFaviconImage queries the "favicon_image" edge of the Link entity.
+func (l *Link) QueryFaviconImage() *AssetQuery {
+	return NewLinkClient(l.config).QueryFaviconImage(l)
 }
 
 // QueryAssets queries the "assets" edge of the Link entity.
@@ -212,6 +301,16 @@ func (l *Link) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(l.Description)
+	builder.WriteString(", ")
+	if v := l.PrimaryAssetID; v != nil {
+		builder.WriteString("primary_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := l.FaviconAssetID; v != nil {
+		builder.WriteString("favicon_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }
