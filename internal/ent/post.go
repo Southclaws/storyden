@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/category"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
 )
@@ -49,6 +50,8 @@ type Post struct {
 	Visibility post.Visibility `json:"visibility,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID xid.ID `json:"category_id,omitempty"`
+	// LinkID holds the value of the "link_id" field.
+	LinkID xid.ID `json:"link_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges         PostEdges `json:"edges"`
@@ -78,11 +81,13 @@ type PostEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
-	// Links holds the value of the links edge.
-	Links []*Link `json:"links,omitempty"`
+	// Link holds the value of the link edge.
+	Link *Link `json:"link,omitempty"`
+	// ContentLinks holds the value of the content_links edge.
+	ContentLinks []*Link `json:"content_links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [11]bool
+	loadedTypes [12]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -183,13 +188,24 @@ func (e PostEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
-// LinksOrErr returns the Links value or an error if the edge
-// was not loaded in eager-loading.
-func (e PostEdges) LinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[10] {
-		return e.Links, nil
+// LinkOrErr returns the Link value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) LinkOrErr() (*Link, error) {
+	if e.Link != nil {
+		return e.Link, nil
+	} else if e.loadedTypes[10] {
+		return nil, &NotFoundError{label: link.Label}
 	}
-	return nil, &NotLoadedError{edge: "links"}
+	return nil, &NotLoadedError{edge: "link"}
+}
+
+// ContentLinksOrErr returns the ContentLinks value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) ContentLinksOrErr() ([]*Link, error) {
+	if e.loadedTypes[11] {
+		return e.ContentLinks, nil
+	}
+	return nil, &NotLoadedError{edge: "content_links"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -205,7 +221,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID:
+		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID, post.FieldLinkID:
 			values[i] = new(xid.ID)
 		case post.ForeignKeys[0]: // account_posts
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
@@ -317,6 +333,12 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				po.CategoryID = *value
 			}
+		case post.FieldLinkID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field link_id", values[i])
+			} else if value != nil {
+				po.LinkID = *value
+			}
 		case post.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
@@ -387,9 +409,14 @@ func (po *Post) QueryCollections() *CollectionQuery {
 	return NewPostClient(po.config).QueryCollections(po)
 }
 
-// QueryLinks queries the "links" edge of the Post entity.
-func (po *Post) QueryLinks() *LinkQuery {
-	return NewPostClient(po.config).QueryLinks(po)
+// QueryLink queries the "link" edge of the Post entity.
+func (po *Post) QueryLink() *LinkQuery {
+	return NewPostClient(po.config).QueryLink(po)
+}
+
+// QueryContentLinks queries the "content_links" edge of the Post entity.
+func (po *Post) QueryContentLinks() *LinkQuery {
+	return NewPostClient(po.config).QueryContentLinks(po)
 }
 
 // Update returns a builder for updating this Post.
@@ -458,6 +485,9 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
+	builder.WriteString(", ")
+	builder.WriteString("link_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.LinkID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -456,7 +456,7 @@ func HasPosts() predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PostsTable, PostsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -474,12 +474,35 @@ func HasPostsWith(preds ...predicate.Post) predicate.Link {
 	})
 }
 
+// HasPostContentReferences applies the HasEdge predicate on the "post_content_references" edge.
+func HasPostContentReferences() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, PostContentReferencesTable, PostContentReferencesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPostContentReferencesWith applies the HasEdge predicate on the "post_content_references" edge with a given conditions (other predicates).
+func HasPostContentReferencesWith(preds ...predicate.Post) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newPostContentReferencesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasNodes applies the HasEdge predicate on the "nodes" edge.
 func HasNodes() predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, NodesTable, NodesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -489,6 +512,29 @@ func HasNodes() predicate.Link {
 func HasNodesWith(preds ...predicate.Node) predicate.Link {
 	return predicate.Link(func(s *sql.Selector) {
 		step := newNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNodeContentReferences applies the HasEdge predicate on the "node_content_references" edge.
+func HasNodeContentReferences() predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, NodeContentReferencesTable, NodeContentReferencesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeContentReferencesWith applies the HasEdge predicate on the "node_content_references" edge with a given conditions (other predicates).
+func HasNodeContentReferencesWith(preds ...predicate.Node) predicate.Link {
+	return predicate.Link(func(s *sql.Selector) {
+		step := newNodeContentReferencesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/el-mike/restrict"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -45,7 +46,12 @@ func (s *service) Create(ctx context.Context,
 		thread.WithMeta(meta),
 	)
 
-	opts = append(opts, s.hydrate(ctx, partial)...)
+	if u, ok := partial.URL.Get(); ok {
+		ln, err := s.fetcher.Fetch(ctx, u)
+		if err == nil {
+			opts = append(opts, thread.WithLink(xid.ID(ln.ID)))
+		}
+	}
 
 	thr, err := s.thread_repo.Create(ctx,
 		title,
@@ -64,14 +70,7 @@ func (s *service) Create(ctx context.Context,
 		s.l.Error("failed to publish index post message", zap.Error(err))
 	}
 
+	s.fetcher.HydrateContentURLs(ctx, thr)
+
 	return thr, nil
-}
-
-func (s *service) hydrate(ctx context.Context, partial Partial) (opts []thread.Option) {
-	body, bodyOK := partial.Content.Get()
-	if !bodyOK && !partial.URL.Ok() {
-		return
-	}
-
-	return s.hydrator.HydrateThread(ctx, body, partial.URL)
 }

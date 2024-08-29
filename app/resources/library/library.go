@@ -69,9 +69,15 @@ func WithAssetsRemoved(a []asset.AssetID) Option {
 	}
 }
 
-func WithLinks(ids ...xid.ID) Option {
+func WithLink(id xid.ID) Option {
 	return func(pm *ent.NodeMutation) {
-		pm.AddLinkIDs(ids...)
+		pm.SetLinkID(id)
+	}
+}
+
+func WithContentLinks(ids ...xid.ID) Option {
+	return func(pm *ent.NodeMutation) {
+		pm.AddContentLinkIDs(ids...)
 	}
 }
 

@@ -38,15 +38,19 @@ type Link struct {
 
 // LinkEdges holds the relations/edges for other nodes in the graph.
 type LinkEdges struct {
-	// Posts holds the value of the posts edge.
+	// Link aggregation posts that have shared this link.
 	Posts []*Post `json:"posts,omitempty"`
+	// Posts that reference this link in their content.
+	PostContentReferences []*Post `json:"post_content_references,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// NodeContentReferences holds the value of the node_content_references edge.
+	NodeContentReferences []*Node `json:"node_content_references,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -58,19 +62,37 @@ func (e LinkEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
+// PostContentReferencesOrErr returns the PostContentReferences value or an error if the edge
+// was not loaded in eager-loading.
+func (e LinkEdges) PostContentReferencesOrErr() ([]*Post, error) {
+	if e.loadedTypes[1] {
+		return e.PostContentReferences, nil
+	}
+	return nil, &NotLoadedError{edge: "post_content_references"}
+}
+
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e LinkEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
 }
 
+// NodeContentReferencesOrErr returns the NodeContentReferences value or an error if the edge
+// was not loaded in eager-loading.
+func (e LinkEdges) NodeContentReferencesOrErr() ([]*Node, error) {
+	if e.loadedTypes[3] {
+		return e.NodeContentReferences, nil
+	}
+	return nil, &NotLoadedError{edge: "node_content_references"}
+}
+
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e LinkEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[4] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -162,9 +184,19 @@ func (l *Link) QueryPosts() *PostQuery {
 	return NewLinkClient(l.config).QueryPosts(l)
 }
 
+// QueryPostContentReferences queries the "post_content_references" edge of the Link entity.
+func (l *Link) QueryPostContentReferences() *PostQuery {
+	return NewLinkClient(l.config).QueryPostContentReferences(l)
+}
+
 // QueryNodes queries the "nodes" edge of the Link entity.
 func (l *Link) QueryNodes() *NodeQuery {
 	return NewLinkClient(l.config).QueryNodes(l)
+}
+
+// QueryNodeContentReferences queries the "node_content_references" edge of the Link entity.
+func (l *Link) QueryNodeContentReferences() *NodeQuery {
+	return NewLinkClient(l.config).QueryNodeContentReferences(l)
 }
 
 // QueryAssets queries the "assets" edge of the Link entity.

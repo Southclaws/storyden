@@ -100,6 +100,21 @@ func (lc *LinkCreate) AddPosts(p ...*Post) *LinkCreate {
 	return lc.AddPostIDs(ids...)
 }
 
+// AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
+func (lc *LinkCreate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkCreate {
+	lc.mutation.AddPostContentReferenceIDs(ids...)
+	return lc
+}
+
+// AddPostContentReferences adds the "post_content_references" edges to the Post entity.
+func (lc *LinkCreate) AddPostContentReferences(p ...*Post) *LinkCreate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return lc.AddPostContentReferenceIDs(ids...)
+}
+
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
 func (lc *LinkCreate) AddNodeIDs(ids ...xid.ID) *LinkCreate {
 	lc.mutation.AddNodeIDs(ids...)
@@ -113,6 +128,21 @@ func (lc *LinkCreate) AddNodes(n ...*Node) *LinkCreate {
 		ids[i] = n[i].ID
 	}
 	return lc.AddNodeIDs(ids...)
+}
+
+// AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
+func (lc *LinkCreate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkCreate {
+	lc.mutation.AddNodeContentReferenceIDs(ids...)
+	return lc
+}
+
+// AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
+func (lc *LinkCreate) AddNodeContentReferences(n ...*Node) *LinkCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return lc.AddNodeContentReferenceIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -262,10 +292,26 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 	}
 	if nodes := lc.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := lc.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -278,10 +324,26 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 	}
 	if nodes := lc.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := lc.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),

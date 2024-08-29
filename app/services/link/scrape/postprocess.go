@@ -1,4 +1,4 @@
-package url
+package scrape
 
 import (
 	"bytes"
@@ -9,9 +9,10 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/cixtor/readability"
 	"golang.org/x/net/html"
+
+	"github.com/Southclaws/storyden/app/resources/content"
 )
 
 func (s *webScraper) postprocess(ctx context.Context, addr string, r io.Reader) (*WebContent, error) {

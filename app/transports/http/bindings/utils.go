@@ -79,7 +79,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetReference),
 		Collections: dt.Map(t.Collections, serialiseCollection),
-		Link:        opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
+		Link:        opt.Map(t.WebLink, serialiseLink).Ptr(),
 	}
 }
 
@@ -99,8 +99,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		DeletedAt:      t.DeletedAt.Ptr(),
 		Description:    &t.Short,
 		Id:             openapi.Identifier(t.ID.String()),
-		Link:           opt.Map(t.Links.Latest(), serialiseLink).Ptr(),
-		Links:          dt.Map(t.Links, serialiseLink),
+		Link:           opt.Map(t.WebLink, serialiseLink).Ptr(),
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
 		PostCount:      &posts,
@@ -127,7 +126,6 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
-		Links:     dt.Map(p.Links, serialiseLink),
 	}
 }
 
@@ -142,7 +140,6 @@ func serialisePost(p *post.Post) openapi.Post {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
-		Links:     dt.Map(p.Links, serialiseLink),
 	}
 }
 
@@ -156,7 +153,6 @@ func serialisePostRef(p *post.Post) openapi.PostReference {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetReference),
-		Links:     dt.Map(p.Links, serialiseLink),
 	}
 }
 
@@ -258,7 +254,13 @@ func tagsIDs(i openapi.TagListIDs) []xid.ID {
 	return dt.Map(i, deserialiseID)
 }
 
-func serialiseLink(in *datagraph.Link) openapi.Link {
+func serialiseLinks(in datagraph.Links) []openapi.Link {
+	return dt.Map(in, func(i *datagraph.Link) openapi.Link {
+		return serialiseLink(*i)
+	})
+}
+
+func serialiseLink(in datagraph.Link) openapi.Link {
 	return openapi.Link{
 		Url:         in.URL,
 		Title:       in.Title.Ptr(),
@@ -267,6 +269,10 @@ func serialiseLink(in *datagraph.Link) openapi.Link {
 		Domain:      in.Domain,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
 	}
+}
+
+func serialiseLinkPtr(in *datagraph.Link) openapi.Link {
+	return serialiseLink(*in)
 }
 
 func deserialiseVisibility(in openapi.Visibility) (visibility.Visibility, error) {

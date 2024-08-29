@@ -52,6 +52,11 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, err
 	}
 
+	// This edge is optional anyway, so if not loaded, nothing bad happens.
+	link := opt.Map(opt.NewPtr(c.Edges.Link), func(in ent.Link) datagraph.Link {
+		return *datagraph.LinkFromModel(&in)
+	})
+
 	return &Node{
 		ID:          NodeID(c.ID),
 		CreatedAt:   c.CreatedAt,
@@ -59,7 +64,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Name:        c.Name,
 		Slug:        c.Slug,
 		Assets:      assets,
-		Links:       dt.Map(c.Edges.Links, datagraph.LinkFromModel),
+		WebLink:     link,
 		Content:     richContent,
 		Description: opt.NewPtr(c.Description),
 		Owner:       *pro,

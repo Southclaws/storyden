@@ -26,23 +26,24 @@ import (
 // PostQuery is the builder for querying Post entities.
 type PostQuery struct {
 	config
-	ctx             *QueryContext
-	order           []post.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Post
-	withAuthor      *AccountQuery
-	withCategory    *CategoryQuery
-	withTags        *TagQuery
-	withRoot        *PostQuery
-	withPosts       *PostQuery
-	withReplyTo     *PostQuery
-	withReplies     *PostQuery
-	withReacts      *ReactQuery
-	withAssets      *AssetQuery
-	withCollections *CollectionQuery
-	withLinks       *LinkQuery
-	withFKs         bool
-	modifiers       []func(*sql.Selector)
+	ctx              *QueryContext
+	order            []post.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.Post
+	withAuthor       *AccountQuery
+	withCategory     *CategoryQuery
+	withTags         *TagQuery
+	withRoot         *PostQuery
+	withPosts        *PostQuery
+	withReplyTo      *PostQuery
+	withReplies      *PostQuery
+	withReacts       *ReactQuery
+	withAssets       *AssetQuery
+	withCollections  *CollectionQuery
+	withLink         *LinkQuery
+	withContentLinks *LinkQuery
+	withFKs          bool
+	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -299,8 +300,8 @@ func (pq *PostQuery) QueryCollections() *CollectionQuery {
 	return query
 }
 
-// QueryLinks chains the current query on the "links" edge.
-func (pq *PostQuery) QueryLinks() *LinkQuery {
+// QueryLink chains the current query on the "link" edge.
+func (pq *PostQuery) QueryLink() *LinkQuery {
 	query := (&LinkClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
@@ -313,7 +314,29 @@ func (pq *PostQuery) QueryLinks() *LinkQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(link.Table, link.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, post.LinksTable, post.LinksPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, post.LinkTable, post.LinkColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryContentLinks chains the current query on the "content_links" edge.
+func (pq *PostQuery) QueryContentLinks() *LinkQuery {
+	query := (&LinkClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(link.Table, link.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, post.ContentLinksTable, post.ContentLinksPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -508,22 +531,23 @@ func (pq *PostQuery) Clone() *PostQuery {
 		return nil
 	}
 	return &PostQuery{
-		config:          pq.config,
-		ctx:             pq.ctx.Clone(),
-		order:           append([]post.OrderOption{}, pq.order...),
-		inters:          append([]Interceptor{}, pq.inters...),
-		predicates:      append([]predicate.Post{}, pq.predicates...),
-		withAuthor:      pq.withAuthor.Clone(),
-		withCategory:    pq.withCategory.Clone(),
-		withTags:        pq.withTags.Clone(),
-		withRoot:        pq.withRoot.Clone(),
-		withPosts:       pq.withPosts.Clone(),
-		withReplyTo:     pq.withReplyTo.Clone(),
-		withReplies:     pq.withReplies.Clone(),
-		withReacts:      pq.withReacts.Clone(),
-		withAssets:      pq.withAssets.Clone(),
-		withCollections: pq.withCollections.Clone(),
-		withLinks:       pq.withLinks.Clone(),
+		config:           pq.config,
+		ctx:              pq.ctx.Clone(),
+		order:            append([]post.OrderOption{}, pq.order...),
+		inters:           append([]Interceptor{}, pq.inters...),
+		predicates:       append([]predicate.Post{}, pq.predicates...),
+		withAuthor:       pq.withAuthor.Clone(),
+		withCategory:     pq.withCategory.Clone(),
+		withTags:         pq.withTags.Clone(),
+		withRoot:         pq.withRoot.Clone(),
+		withPosts:        pq.withPosts.Clone(),
+		withReplyTo:      pq.withReplyTo.Clone(),
+		withReplies:      pq.withReplies.Clone(),
+		withReacts:       pq.withReacts.Clone(),
+		withAssets:       pq.withAssets.Clone(),
+		withCollections:  pq.withCollections.Clone(),
+		withLink:         pq.withLink.Clone(),
+		withContentLinks: pq.withContentLinks.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -640,14 +664,25 @@ func (pq *PostQuery) WithCollections(opts ...func(*CollectionQuery)) *PostQuery 
 	return pq
 }
 
-// WithLinks tells the query-builder to eager-load the nodes that are connected to
-// the "links" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *PostQuery) WithLinks(opts ...func(*LinkQuery)) *PostQuery {
+// WithLink tells the query-builder to eager-load the nodes that are connected to
+// the "link" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithLink(opts ...func(*LinkQuery)) *PostQuery {
 	query := (&LinkClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	pq.withLinks = query
+	pq.withLink = query
+	return pq
+}
+
+// WithContentLinks tells the query-builder to eager-load the nodes that are connected to
+// the "content_links" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithContentLinks(opts ...func(*LinkQuery)) *PostQuery {
+	query := (&LinkClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withContentLinks = query
 	return pq
 }
 
@@ -730,7 +765,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		nodes       = []*Post{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [11]bool{
+		loadedTypes = [12]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -741,7 +776,8 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withReacts != nil,
 			pq.withAssets != nil,
 			pq.withCollections != nil,
-			pq.withLinks != nil,
+			pq.withLink != nil,
+			pq.withContentLinks != nil,
 		}
 	)
 	if pq.withAuthor != nil {
@@ -837,10 +873,16 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			return nil, err
 		}
 	}
-	if query := pq.withLinks; query != nil {
-		if err := pq.loadLinks(ctx, query, nodes,
-			func(n *Post) { n.Edges.Links = []*Link{} },
-			func(n *Post, e *Link) { n.Edges.Links = append(n.Edges.Links, e) }); err != nil {
+	if query := pq.withLink; query != nil {
+		if err := pq.loadLink(ctx, query, nodes, nil,
+			func(n *Post, e *Link) { n.Edges.Link = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withContentLinks; query != nil {
+		if err := pq.loadContentLinks(ctx, query, nodes,
+			func(n *Post) { n.Edges.ContentLinks = []*Link{} },
+			func(n *Post, e *Link) { n.Edges.ContentLinks = append(n.Edges.ContentLinks, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1241,7 +1283,36 @@ func (pq *PostQuery) loadCollections(ctx context.Context, query *CollectionQuery
 	}
 	return nil
 }
-func (pq *PostQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*Post, init func(*Post), assign func(*Post, *Link)) error {
+func (pq *PostQuery) loadLink(ctx context.Context, query *LinkQuery, nodes []*Post, init func(*Post), assign func(*Post, *Link)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Post)
+	for i := range nodes {
+		fk := nodes[i].LinkID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(link.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "link_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (pq *PostQuery) loadContentLinks(ctx context.Context, query *LinkQuery, nodes []*Post, init func(*Post), assign func(*Post, *Link)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Post)
 	nids := make(map[xid.ID]map[*Post]struct{})
@@ -1253,11 +1324,11 @@ func (pq *PostQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*P
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(post.LinksTable)
-		s.Join(joinT).On(s.C(link.FieldID), joinT.C(post.LinksPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(post.LinksPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(post.ContentLinksTable)
+		s.Join(joinT).On(s.C(link.FieldID), joinT.C(post.ContentLinksPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(post.ContentLinksPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(post.LinksPrimaryKey[1]))
+		s.Select(joinT.C(post.ContentLinksPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -1294,7 +1365,7 @@ func (pq *PostQuery) loadLinks(ctx context.Context, query *LinkQuery, nodes []*P
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "links" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "content_links" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -1339,6 +1410,9 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if pq.withReplyTo != nil {
 			_spec.Node.AddColumnOnce(post.FieldReplyToPostID)
+		}
+		if pq.withLink != nil {
+			_spec.Node.AddColumnOnce(post.FieldLinkID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

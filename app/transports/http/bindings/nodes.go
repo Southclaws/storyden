@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"net/url"
 	"strconv"
 
 	"github.com/Southclaws/dt"
@@ -69,6 +70,17 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
+		u, err := url.Parse(s)
+		if err != nil {
+			return url.URL{}, err
+		}
+		return *u, nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	node, err := c.nodeMutator.Create(ctx,
 		session,
 		request.Body.Name,
@@ -76,7 +88,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			Slug:         opt.NewPtr(request.Body.Slug),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-			URL:          opt.NewPtr(request.Body.Url),
+			URL:          url,
 			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
@@ -195,12 +207,23 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
+		u, err := url.Parse(s)
+		if err != nil {
+			return url.URL{}, err
+		}
+		return *u, nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         opt.NewPtr(request.Body.Slug),
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
-		URL:          opt.NewPtr(request.Body.Url),
+		URL:          url,
 		Content:      richContent,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
@@ -313,7 +336,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
-		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
+		Link:        opt.Map(in.WebLink, serialiseLink).Ptr(),
 		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),
@@ -334,7 +357,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Name:        in.Name,
 		Slug:        in.Slug,
 		Assets:      dt.Map(in.Assets, serialiseAssetReference),
-		Link:        opt.Map(in.Links.Latest(), serialiseLink).Ptr(),
+		Link:        opt.Map(in.WebLink, serialiseLink).Ptr(),
 		Description: in.GetDesc(),
 		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
 		Owner:       serialiseProfileReference(in.Owner),

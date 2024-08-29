@@ -89,6 +89,21 @@ func (lu *LinkUpdate) AddPosts(p ...*Post) *LinkUpdate {
 	return lu.AddPostIDs(ids...)
 }
 
+// AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
+func (lu *LinkUpdate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	lu.mutation.AddPostContentReferenceIDs(ids...)
+	return lu
+}
+
+// AddPostContentReferences adds the "post_content_references" edges to the Post entity.
+func (lu *LinkUpdate) AddPostContentReferences(p ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return lu.AddPostContentReferenceIDs(ids...)
+}
+
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
 func (lu *LinkUpdate) AddNodeIDs(ids ...xid.ID) *LinkUpdate {
 	lu.mutation.AddNodeIDs(ids...)
@@ -102,6 +117,21 @@ func (lu *LinkUpdate) AddNodes(n ...*Node) *LinkUpdate {
 		ids[i] = n[i].ID
 	}
 	return lu.AddNodeIDs(ids...)
+}
+
+// AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
+func (lu *LinkUpdate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	lu.mutation.AddNodeContentReferenceIDs(ids...)
+	return lu
+}
+
+// AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
+func (lu *LinkUpdate) AddNodeContentReferences(n ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return lu.AddNodeContentReferenceIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -145,6 +175,27 @@ func (lu *LinkUpdate) RemovePosts(p ...*Post) *LinkUpdate {
 	return lu.RemovePostIDs(ids...)
 }
 
+// ClearPostContentReferences clears all "post_content_references" edges to the Post entity.
+func (lu *LinkUpdate) ClearPostContentReferences() *LinkUpdate {
+	lu.mutation.ClearPostContentReferences()
+	return lu
+}
+
+// RemovePostContentReferenceIDs removes the "post_content_references" edge to Post entities by IDs.
+func (lu *LinkUpdate) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	lu.mutation.RemovePostContentReferenceIDs(ids...)
+	return lu
+}
+
+// RemovePostContentReferences removes "post_content_references" edges to Post entities.
+func (lu *LinkUpdate) RemovePostContentReferences(p ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return lu.RemovePostContentReferenceIDs(ids...)
+}
+
 // ClearNodes clears all "nodes" edges to the Node entity.
 func (lu *LinkUpdate) ClearNodes() *LinkUpdate {
 	lu.mutation.ClearNodes()
@@ -164,6 +215,27 @@ func (lu *LinkUpdate) RemoveNodes(n ...*Node) *LinkUpdate {
 		ids[i] = n[i].ID
 	}
 	return lu.RemoveNodeIDs(ids...)
+}
+
+// ClearNodeContentReferences clears all "node_content_references" edges to the Node entity.
+func (lu *LinkUpdate) ClearNodeContentReferences() *LinkUpdate {
+	lu.mutation.ClearNodeContentReferences()
+	return lu
+}
+
+// RemoveNodeContentReferenceIDs removes the "node_content_references" edge to Node entities by IDs.
+func (lu *LinkUpdate) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	lu.mutation.RemoveNodeContentReferenceIDs(ids...)
+	return lu
+}
+
+// RemoveNodeContentReferences removes "node_content_references" edges to Node entities.
+func (lu *LinkUpdate) RemoveNodeContentReferences(n ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return lu.RemoveNodeContentReferenceIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -240,10 +312,10 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if lu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -253,10 +325,10 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !lu.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -269,10 +341,55 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if lu.mutation.PostContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !lu.mutation.PostContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -285,10 +402,10 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if lu.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -298,10 +415,10 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !lu.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -314,10 +431,55 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if lu.mutation.NodeContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !lu.mutation.NodeContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -452,6 +614,21 @@ func (luo *LinkUpdateOne) AddPosts(p ...*Post) *LinkUpdateOne {
 	return luo.AddPostIDs(ids...)
 }
 
+// AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
+func (luo *LinkUpdateOne) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	luo.mutation.AddPostContentReferenceIDs(ids...)
+	return luo
+}
+
+// AddPostContentReferences adds the "post_content_references" edges to the Post entity.
+func (luo *LinkUpdateOne) AddPostContentReferences(p ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return luo.AddPostContentReferenceIDs(ids...)
+}
+
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
 func (luo *LinkUpdateOne) AddNodeIDs(ids ...xid.ID) *LinkUpdateOne {
 	luo.mutation.AddNodeIDs(ids...)
@@ -465,6 +642,21 @@ func (luo *LinkUpdateOne) AddNodes(n ...*Node) *LinkUpdateOne {
 		ids[i] = n[i].ID
 	}
 	return luo.AddNodeIDs(ids...)
+}
+
+// AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
+func (luo *LinkUpdateOne) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	luo.mutation.AddNodeContentReferenceIDs(ids...)
+	return luo
+}
+
+// AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
+func (luo *LinkUpdateOne) AddNodeContentReferences(n ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return luo.AddNodeContentReferenceIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -508,6 +700,27 @@ func (luo *LinkUpdateOne) RemovePosts(p ...*Post) *LinkUpdateOne {
 	return luo.RemovePostIDs(ids...)
 }
 
+// ClearPostContentReferences clears all "post_content_references" edges to the Post entity.
+func (luo *LinkUpdateOne) ClearPostContentReferences() *LinkUpdateOne {
+	luo.mutation.ClearPostContentReferences()
+	return luo
+}
+
+// RemovePostContentReferenceIDs removes the "post_content_references" edge to Post entities by IDs.
+func (luo *LinkUpdateOne) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	luo.mutation.RemovePostContentReferenceIDs(ids...)
+	return luo
+}
+
+// RemovePostContentReferences removes "post_content_references" edges to Post entities.
+func (luo *LinkUpdateOne) RemovePostContentReferences(p ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return luo.RemovePostContentReferenceIDs(ids...)
+}
+
 // ClearNodes clears all "nodes" edges to the Node entity.
 func (luo *LinkUpdateOne) ClearNodes() *LinkUpdateOne {
 	luo.mutation.ClearNodes()
@@ -527,6 +740,27 @@ func (luo *LinkUpdateOne) RemoveNodes(n ...*Node) *LinkUpdateOne {
 		ids[i] = n[i].ID
 	}
 	return luo.RemoveNodeIDs(ids...)
+}
+
+// ClearNodeContentReferences clears all "node_content_references" edges to the Node entity.
+func (luo *LinkUpdateOne) ClearNodeContentReferences() *LinkUpdateOne {
+	luo.mutation.ClearNodeContentReferences()
+	return luo
+}
+
+// RemoveNodeContentReferenceIDs removes the "node_content_references" edge to Node entities by IDs.
+func (luo *LinkUpdateOne) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	luo.mutation.RemoveNodeContentReferenceIDs(ids...)
+	return luo
+}
+
+// RemoveNodeContentReferences removes "node_content_references" edges to Node entities.
+func (luo *LinkUpdateOne) RemoveNodeContentReferences(n ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return luo.RemoveNodeContentReferenceIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -633,10 +867,10 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if luo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -646,10 +880,10 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if nodes := luo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !luo.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -662,10 +896,55 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if nodes := luo.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.PostsTable,
-			Columns: link.PostsPrimaryKey,
+			Columns: []string{link.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.PostContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !luo.mutation.PostContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.PostContentReferencesTable,
+			Columns: link.PostContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
@@ -678,10 +957,10 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if luo.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -691,10 +970,10 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if nodes := luo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !luo.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
@@ -707,10 +986,55 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 	}
 	if nodes := luo.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   link.NodesTable,
-			Columns: link.NodesPrimaryKey,
+			Columns: []string{link.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.NodeContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !luo.mutation.NodeContentReferencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   link.NodeContentReferencesTable,
+			Columns: link.NodeContentReferencesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
