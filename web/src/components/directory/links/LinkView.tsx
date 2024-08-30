@@ -5,14 +5,17 @@ import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 type Props = {
   link: Link;
 };
 
 export function LinkView({ link }: Props) {
-  const mainImage = link.assets?.[0]?.url;
-  const images = mainImage ? link.assets.slice(1).map((v) => v.url) : undefined;
+  const mainImage = getAssetURL(link.assets?.[0]?.filename);
+  const images = mainImage
+    ? link.assets.slice(1).map((v) => getAssetURL(v.filename))
+    : undefined;
 
   const domainSearch = `/l?q=${link.domain}`;
 

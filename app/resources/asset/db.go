@@ -24,13 +24,13 @@ func New(db *ent.Client) Repository {
 func (d *database) Add(ctx context.Context,
 	accountID account.AccountID,
 	filename Filename,
-	url string,
+	size int,
 ) (*Asset, error) {
 	asset, err := d.db.Asset.
 		Create().
 		SetID(filename.GetID()).
 		SetFilename(filename.name).
-		SetURL(url).
+		SetSize(size).
 		SetAccountID(xid.ID(accountID)).
 		Save(ctx)
 	if err != nil {

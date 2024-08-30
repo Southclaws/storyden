@@ -21,8 +21,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldFilename holds the string denoting the filename field in the database.
 	FieldFilename = "filename"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldAccountID holds the string denoting the account_id field in the database.
@@ -67,7 +67,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldFilename,
-	FieldURL,
+	FieldSize,
 	FieldMetadata,
 	FieldAccountID,
 }
@@ -130,9 +130,9 @@ func ByFilename(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFilename, opts...).ToFunc()
 }
 
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
 
 // ByAccountID orders the results by the account_id field.

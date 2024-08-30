@@ -34,7 +34,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "filename", Type: field.TypeString},
-		{Name: "url", Type: field.TypeString},
+		{Name: "size", Type: field.TypeInt, Default: "0"},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 	}

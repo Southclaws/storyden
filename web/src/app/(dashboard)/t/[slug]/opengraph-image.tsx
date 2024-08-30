@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 import { getInfo } from "src/utils/info";
 
 import { threadGet } from "@/api/openapi-server/threads";
+import { getAssetURL } from "@/utils/asset";
 
 import { Props } from "./page";
 
@@ -37,7 +38,7 @@ export default async function Image({ params: { slug } }: Props) {
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
           <img
-            src={image.url}
+            src={getAssetURL(image.path)}
             width="100%"
             height="100%"
             style={{

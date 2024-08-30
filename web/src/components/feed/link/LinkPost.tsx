@@ -4,6 +4,7 @@ import { Anchor } from "src/components/site/Anchor";
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
+import { getAssetURL } from "@/utils/asset";
 
 import { Empty } from "../../site/Empty";
 import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
@@ -24,7 +25,7 @@ export function LinkPost(props: Props) {
         <Box flexGrow="1" flexShrink="0" width="32">
           {asset ? (
             <styled.img
-              src={asset.url}
+              src={getAssetURL(asset.path)}
               height="full"
               width="full"
               objectPosition="center"

@@ -3,7 +3,6 @@ package bindings
 import (
 	"context"
 	"fmt"
-	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -13,24 +12,22 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/internal/config"
 )
 
 type Assets struct {
-	a        asset_manager.Service
-	uploader *asset_upload.Uploader
-	address  url.URL
+	uploader   *asset_upload.Uploader
+	downloader *asset_download.Downloader
 }
 
-func NewAssets(cfg config.Config, a asset_manager.Service, uploader *asset_upload.Uploader) Assets {
-	return Assets{a, uploader, cfg.PublicAPIAddress}
+func NewAssets(uploader *asset_upload.Uploader, downloader *asset_download.Downloader) Assets {
+	return Assets{uploader, downloader}
 }
 
 func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestObject) (openapi.AssetGetResponseObject, error) {
-	a, r, err := i.a.Get(ctx, asset.NewFilepathFilename(request.AssetFilename))
+	a, r, err := i.downloader.Get(ctx, asset.NewFilepathFilename(request.AssetFilename))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -51,11 +48,6 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	// client can decide on a suitable placeholder or generate a nonsense slug.
 	filename := asset.NewFilename(name.Or("untitled"))
 
-	// TODO: This must be specified on the READ path not the write path.
-	// It's not the responsibility of the write-path transport layer to figure
-	// out the public URL of the asset. This may change if a direct CDN is used.
-	url := fmt.Sprintf("%s/api/assets/%s", i.address.String(), filename.String())
-
 	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
@@ -65,7 +57,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 		ContentFill: contentFillCmd,
 	}
 
-	a, err := i.uploader.Upload(ctx, request.Body, int64(request.Params.ContentLength), filename, url, opts)
+	a, err := i.uploader.Upload(ctx, request.Body, int64(request.Params.ContentLength), filename, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -101,10 +93,12 @@ func getContentFillRuleCommand(contentFillRuleParam *openapi.ContentFillRule, co
 }
 
 func serialiseAsset(a asset.Asset) openapi.Asset {
+	path := fmt.Sprintf(`/api/assets/%s`, a.Name.String())
+
 	return openapi.Asset{
 		Id:       a.ID.String(),
 		Filename: a.Name.String(),
-		Url:      a.URL,
+		Path:     path,
 		MimeType: a.Metadata.GetMIMEType(),
 		Width:    float32(a.Metadata.GetWidth()),
 		Height:   float32(a.Metadata.GetHeight()),

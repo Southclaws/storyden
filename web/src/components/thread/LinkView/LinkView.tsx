@@ -1,6 +1,7 @@
 import { Asset, Link } from "src/api/openapi-schema";
 
 import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 type Props = {
   link: Link;
@@ -22,7 +23,7 @@ export function LinkView({ link, asset }: Props) {
       {asset && (
         <Box flexGrow="1" flexShrink="0" width="32">
           <styled.img
-            src={asset.url}
+            src={getAssetURL(asset.filename)}
             height="full"
             objectPosition="left"
             objectFit="cover"

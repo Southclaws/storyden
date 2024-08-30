@@ -17,7 +17,7 @@ type Repository interface {
 	Add(ctx context.Context,
 		owner account.AccountID,
 		filename Filename,
-		url string,
+		size int,
 	) (*Asset, error)
 
 	Get(ctx context.Context, id Filename) (*Asset, error)
@@ -35,7 +35,6 @@ func NewID() AssetID {
 type Asset struct {
 	ID       AssetID
 	Name     Filename
-	URL      string
 	Size     int
 	Metadata Metadata
 }
@@ -48,7 +47,7 @@ func FromModel(a *ent.Asset) *Asset {
 			name:  a.Filename,
 			hasID: true,
 		},
-		URL:      a.URL,
+		Size:     a.Size,
 		Metadata: a.Metadata,
 	}
 }
@@ -70,7 +69,7 @@ func (m Metadata) GetMIMEType() string {
 }
 
 func (m Metadata) GetWidth() float64 {
-	v, ok := m["mime_type"]
+	v, ok := m["width"]
 	if !ok {
 		return 0.0
 	}

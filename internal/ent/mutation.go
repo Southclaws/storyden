@@ -1685,7 +1685,8 @@ type AssetMutation struct {
 	created_at    *time.Time
 	updated_at    *time.Time
 	filename      *string
-	url           *string
+	size          *int
+	addsize       *int
 	metadata      *map[string]interface{}
 	clearedFields map[string]struct{}
 	posts         map[xid.ID]struct{}
@@ -1916,40 +1917,60 @@ func (m *AssetMutation) ResetFilename() {
 	m.filename = nil
 }
 
-// SetURL sets the "url" field.
-func (m *AssetMutation) SetURL(s string) {
-	m.url = &s
+// SetSize sets the "size" field.
+func (m *AssetMutation) SetSize(i int) {
+	m.size = &i
+	m.addsize = nil
 }
 
-// URL returns the value of the "url" field in the mutation.
-func (m *AssetMutation) URL() (r string, exists bool) {
-	v := m.url
+// Size returns the value of the "size" field in the mutation.
+func (m *AssetMutation) Size() (r int, exists bool) {
+	v := m.size
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldURL returns the old "url" field's value of the Asset entity.
+// OldSize returns the old "size" field's value of the Asset entity.
 // If the Asset object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AssetMutation) OldURL(ctx context.Context) (v string, err error) {
+func (m *AssetMutation) OldSize(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldURL requires an ID field in the mutation")
+		return v, errors.New("OldSize requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
 	}
-	return oldValue.URL, nil
+	return oldValue.Size, nil
 }
 
-// ResetURL resets all changes to the "url" field.
-func (m *AssetMutation) ResetURL() {
-	m.url = nil
+// AddSize adds i to the "size" field.
+func (m *AssetMutation) AddSize(i int) {
+	if m.addsize != nil {
+		*m.addsize += i
+	} else {
+		m.addsize = &i
+	}
+}
+
+// AddedSize returns the value that was added to the "size" field in this mutation.
+func (m *AssetMutation) AddedSize() (r int, exists bool) {
+	v := m.addsize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSize resets all changes to the "size" field.
+func (m *AssetMutation) ResetSize() {
+	m.size = nil
+	m.addsize = nil
 }
 
 // SetMetadata sets the "metadata" field.
@@ -2283,8 +2304,8 @@ func (m *AssetMutation) Fields() []string {
 	if m.filename != nil {
 		fields = append(fields, asset.FieldFilename)
 	}
-	if m.url != nil {
-		fields = append(fields, asset.FieldURL)
+	if m.size != nil {
+		fields = append(fields, asset.FieldSize)
 	}
 	if m.metadata != nil {
 		fields = append(fields, asset.FieldMetadata)
@@ -2306,8 +2327,8 @@ func (m *AssetMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case asset.FieldFilename:
 		return m.Filename()
-	case asset.FieldURL:
-		return m.URL()
+	case asset.FieldSize:
+		return m.Size()
 	case asset.FieldMetadata:
 		return m.Metadata()
 	case asset.FieldAccountID:
@@ -2327,8 +2348,8 @@ func (m *AssetMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUpdatedAt(ctx)
 	case asset.FieldFilename:
 		return m.OldFilename(ctx)
-	case asset.FieldURL:
-		return m.OldURL(ctx)
+	case asset.FieldSize:
+		return m.OldSize(ctx)
 	case asset.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case asset.FieldAccountID:
@@ -2363,12 +2384,12 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFilename(v)
 		return nil
-	case asset.FieldURL:
-		v, ok := value.(string)
+	case asset.FieldSize:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetURL(v)
+		m.SetSize(v)
 		return nil
 	case asset.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -2391,13 +2412,21 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *AssetMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addsize != nil {
+		fields = append(fields, asset.FieldSize)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *AssetMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case asset.FieldSize:
+		return m.AddedSize()
+	}
 	return nil, false
 }
 
@@ -2406,6 +2435,13 @@ func (m *AssetMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AssetMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case asset.FieldSize:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSize(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Asset numeric field %s", name)
 }
@@ -2451,8 +2487,8 @@ func (m *AssetMutation) ResetField(name string) error {
 	case asset.FieldFilename:
 		m.ResetFilename()
 		return nil
-	case asset.FieldURL:
-		m.ResetURL()
+	case asset.FieldSize:
+		m.ResetSize()
 		return nil
 	case asset.FieldMetadata:
 		m.ResetMetadata()

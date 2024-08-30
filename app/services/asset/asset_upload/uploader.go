@@ -52,13 +52,13 @@ type Options struct {
 	ContentFill opt.Optional[asset.ContentFillCommand]
 }
 
-func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name asset.Filename, url string, opts Options) (*asset.Asset, error) {
+func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name asset.Filename, opts Options) (*asset.Asset, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	a, err := s.assets.Add(ctx, accountID, name, url)
+	a, err := s.assets.Add(ctx, accountID, name, int(size))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

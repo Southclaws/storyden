@@ -5,6 +5,7 @@ import { CollectionMenu } from "src/components/content/CollectionMenu/Collection
 
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 import { FeedItemMenu } from "../common/FeedItemMenu/FeedItemMenu";
 
@@ -24,7 +25,7 @@ export function TextPost({ thread, onDelete }: Props) {
       title={thread.title}
       text={thread.description}
       url={permalink}
-      image={thread.assets[0]?.url}
+      image={getAssetURL(thread.assets[0]?.path)}
       controls={
         session && (
           <HStack>
